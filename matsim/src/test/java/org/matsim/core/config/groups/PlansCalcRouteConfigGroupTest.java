@@ -23,7 +23,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +38,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams
 import org.matsim.testcases.MatsimTestUtils;
 
 public class PlansCalcRouteConfigGroupTest {
-	private final static Logger log = Logger.getLogger(PlansCalcRouteConfigGroupTest.class);
+	private final static Logger log = LogManager.getLogger(PlansCalcRouteConfigGroupTest.class);
 	private final static int N_MODE_ROUTING_PARAMS_DEFAULT = 5 ;
 
 	@Rule

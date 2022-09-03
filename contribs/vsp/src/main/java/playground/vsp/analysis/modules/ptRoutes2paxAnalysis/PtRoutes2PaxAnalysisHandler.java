@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -52,8 +53,7 @@ public class PtRoutes2PaxAnalysisHandler implements
 											TransitDriverStartsEventHandler{
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(PtRoutes2PaxAnalysisHandler.class);
+	private static final Logger log = LogManager.getLogger(PtRoutes2PaxAnalysisHandler.class);
 	private HashMap<Id, TransitLineContainer> linesContainer;
 	private Map<Id, AnalysisVehicle> transitVehicles;
 	private List<Id> drivers;

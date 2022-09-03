@@ -31,7 +31,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.IOUtils;
@@ -53,7 +54,7 @@ import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
  * @see <a href="http://wiki.openstreetmap.org/wiki/Key:landuse">OpenStreetMap: Land Use</a>
  */
 public class CombinedOsmReader {
-	private final static Logger log = Logger.getLogger(CombinedOsmReader.class);
+	private final static Logger log = LogManager.getLogger(CombinedOsmReader.class);
 	private QuadTree<Id<ActivityFacility>> linkQT;
 	private ActivityFacilities facilities;
 	private ObjectAttributes facilityAttributes;

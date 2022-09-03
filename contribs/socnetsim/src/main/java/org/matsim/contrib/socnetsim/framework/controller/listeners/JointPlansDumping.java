@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.controller.listeners;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -37,7 +38,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class JointPlansDumping implements BeforeMobsimListener {
 	private static final Logger log =
-		Logger.getLogger(JointPlansDumping.class);
+		LogManager.getLogger(JointPlansDumping.class);
 
 	private final Scenario sc;
 	private final JointPlans jointPlans;

@@ -28,7 +28,8 @@ import java.util.List;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,7 +51,7 @@ import com.jogamp.common.nio.Buffers;
  */
 public class QueryLinkById extends AbstractQuery implements OTFQuery {
 
-	private static final Logger log = Logger.getLogger(QueryLinkById.class);
+	private static final Logger log = LogManager.getLogger(QueryLinkById.class);
 	
 	private List<Id<Link>> linkIds;
 

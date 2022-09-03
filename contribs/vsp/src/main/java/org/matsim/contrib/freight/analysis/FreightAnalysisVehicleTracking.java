@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -40,7 +41,7 @@ import java.util.LinkedHashMap;
 
 class FreightAnalysisVehicleTracking {
 
-	private static final  Logger log = Logger.getLogger(FreightAnalysisVehicleTracking.class);
+	private static final  Logger log = LogManager.getLogger(FreightAnalysisVehicleTracking.class);
 
 	private final LinkedHashMap<Id<Vehicle>, VehicleTracker> trackers = new LinkedHashMap<>();
 	private final LinkedHashMap<Id<Person>, Id<Vehicle>> driver2VehicleId = new LinkedHashMap<>();

@@ -33,7 +33,8 @@ import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -80,7 +81,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesUtils;
  * @author nagel, ikaddoura
  */
 public final class PopulationUtils {
-	private static final Logger log = Logger.getLogger( PopulationUtils.class );
+	private static final Logger log = LogManager.getLogger( PopulationUtils.class );
 //	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
 	private static final PopulationFactory populationFactory = createPopulation( new PlansConfigGroup(), null  ).getFactory() ;
 	// try to avoid misleading comment about config context.  kai, dec'18

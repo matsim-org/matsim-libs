@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats.operatorLogger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.contrib.minibus.hook.PPlan;
@@ -34,7 +35,7 @@ import java.util.*;
  */
 public class PlanElementLinkParent {
 	
-	private static final Logger log = Logger.getLogger(PlanElementLinkParent.class);
+	private static final Logger log = LogManager.getLogger(PlanElementLinkParent.class);
 	
 	/**
 	 * Add a pointer from each child to its parent.

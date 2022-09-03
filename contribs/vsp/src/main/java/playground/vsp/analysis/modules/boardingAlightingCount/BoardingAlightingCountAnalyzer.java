@@ -28,7 +28,8 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,8 +51,7 @@ import playground.vsp.analysis.utils.heatMap.HeatMap;
 public class BoardingAlightingCountAnalyzer extends AbstractAnalysisModule{
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(BoardingAlightingCountAnalyzer.class);
+	private static final Logger log = LogManager.getLogger(BoardingAlightingCountAnalyzer.class);
 	private BoardAlightEventHandler handler;
 //	private Map<Id, Double> boardUnclassifiedTotal;
 //	private Map<Id, Double> alightUnclassifiedTotal;

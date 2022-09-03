@@ -26,7 +26,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -35,7 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class JobScriptWriter {
 
-    private static final Logger LOGGER = Logger.getLogger(JobScriptWriter.class);
+    private static final Logger LOGGER = LogManager.getLogger(JobScriptWriter.class);
     private static final String newLine = System.getProperty("line.separator");
 
     private final StringBuilder buffer = new StringBuilder();

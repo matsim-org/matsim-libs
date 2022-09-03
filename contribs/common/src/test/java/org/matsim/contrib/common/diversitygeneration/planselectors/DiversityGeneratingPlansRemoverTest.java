@@ -2,7 +2,8 @@ package org.matsim.contrib.common.diversitygeneration.planselectors;
 
 import com.google.common.primitives.Doubles;
 import gnu.trove.map.TMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class DiversityGeneratingPlansRemoverTest {
-	private static final Logger log = Logger.getLogger( DiversityGeneratingPlansRemoverTest.class ) ;
+	private static final Logger log = LogManager.getLogger( DiversityGeneratingPlansRemoverTest.class ) ;
 	
 	private final Id<Node> node0 = Id.createNodeId( "node0" ) ;
 	private final Id<Node> node1 = Id.createNodeId( "node1" ) ;

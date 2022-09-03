@@ -26,7 +26,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -83,7 +84,7 @@ import org.matsim.pt.router.TransitTravelDisutility;
  */
 public class MultiDestinationDijkstra {
 
-	private final static Logger log = Logger.getLogger(MultiDestinationDijkstra.class);
+	private final static Logger log = LogManager.getLogger(MultiDestinationDijkstra.class);
 
 	/**
 	 * The network on which we find routes.

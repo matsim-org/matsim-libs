@@ -20,7 +20,8 @@
 package org.matsim.contrib.socnetsim.framework.replanning.removers;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -54,7 +55,7 @@ import java.util.Set;
  * @author thibautd
  */
 public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRemover {
-	private static final Logger log = Logger.getLogger( LexicographicForCompositionExtraPlanRemover.class );
+	private static final Logger log = LogManager.getLogger( LexicographicForCompositionExtraPlanRemover.class );
 	private final Random random;
 	private final int maxPlansPerComposition;
 	private final int maxPlansPerAgent;

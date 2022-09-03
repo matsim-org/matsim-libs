@@ -22,7 +22,8 @@ package org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -91,7 +92,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	protected Id<Vehicle> currentlyAssignedVehicleId = null;
 	protected String stageInteractionType = null;
 	private ParkingSearchConfigGroup configGroup;
-	private static final Logger log = Logger.getLogger(ParkingAgentLogic.class);
+	private static final Logger log = LogManager.getLogger(ParkingAgentLogic.class);
 
 	/**
 	 * @param plan

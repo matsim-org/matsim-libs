@@ -21,7 +21,8 @@ package playground.vsp.analysis.modules.ptTripAnalysis;
 
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -35,7 +36,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  */
 public class PtTripAnalysisReader implements TabularFileHandler {
 	
-	private static final Logger log = Logger.getLogger(PtTripAnalysisReader.class);
+	private static final Logger log = LogManager.getLogger(PtTripAnalysisReader.class);
 	
 	private TabularFileParserConfig tabFileParserConfig;
 	private PtTripAnalysisContainer ptTripAnalysisContainer = new PtTripAnalysisContainer();

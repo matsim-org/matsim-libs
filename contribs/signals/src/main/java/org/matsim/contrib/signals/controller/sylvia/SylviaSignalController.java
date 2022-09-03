@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controller.AbstractSignalController;
@@ -53,7 +54,7 @@ import com.google.inject.Inject;
  */
 public final class SylviaSignalController extends AbstractSignalController implements SignalController {
 
-	private static final Logger log = Logger.getLogger(SylviaSignalController.class);
+	private static final Logger log = LogManager.getLogger(SylviaSignalController.class);
 	
 	public final static String IDENTIFIER = "SylviaSignalControl";
 

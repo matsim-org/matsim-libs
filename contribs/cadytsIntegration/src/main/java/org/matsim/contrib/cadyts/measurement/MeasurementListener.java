@@ -26,7 +26,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -47,7 +48,7 @@ public class MeasurementListener implements PlansTranslator<Measurement>,
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = Logger.getLogger(MeasurementListener.class);
+	private static final Logger log = LogManager.getLogger(MeasurementListener.class);
 
 	private final Scenario scenario;
 

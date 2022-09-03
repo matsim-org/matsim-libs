@@ -24,7 +24,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +43,7 @@ import org.matsim.core.utils.io.IOUtils;
 */
 
 public class RunAccidents {
-	private static final Logger log = Logger.getLogger(RunAccidents.class);
+	private static final Logger log = LogManager.getLogger(RunAccidents.class);
 		
 	public static void main(String[] args) throws IOException {		
 		RunAccidents main = new RunAccidents();

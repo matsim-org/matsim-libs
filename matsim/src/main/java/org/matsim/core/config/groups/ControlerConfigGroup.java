@@ -20,7 +20,8 @@
 
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -31,7 +32,7 @@ import java.util.*;
 
 
 public final class ControlerConfigGroup extends ReflectiveConfigGroup {
-	private static final Logger log = Logger.getLogger( ControlerConfigGroup.class );
+	private static final Logger log = LogManager.getLogger( ControlerConfigGroup.class );
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks, SpeedyALT}
 	

@@ -33,7 +33,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Geometry;
@@ -57,7 +58,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 	private final DrtZonalSystem zones;
 	private static final String zoneIdForOutsideOfZonalSystem = "outsideOfDrtZonalSystem";
 	private static final String notAvailableString = "NaN";
-	private static final Logger log = Logger.getLogger(DrtZonalWaitTimesAnalyzer.class);
+	private static final Logger log = LogManager.getLogger(DrtZonalWaitTimesAnalyzer.class);
 
 	public DrtZonalWaitTimesAnalyzer(DrtConfigGroup configGroup, DrtEventSequenceCollector requestAnalyzer,
 			DrtZonalSystem zones) {

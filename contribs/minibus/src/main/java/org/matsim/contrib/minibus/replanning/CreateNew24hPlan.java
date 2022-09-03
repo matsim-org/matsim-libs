@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.replanning;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.contrib.minibus.hook.PPlan;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
  */
 public final class CreateNew24hPlan extends AbstractPStrategyModule {
 	
-	private final static Logger log = Logger.getLogger(CreateNew24hPlan.class);
+	private final static Logger log = LogManager.getLogger(CreateNew24hPlan.class);
 	private static final String STRATEGY_NAME = "CreateNew24hPlan";
 
 	public CreateNew24hPlan(ArrayList<String> parameter) {

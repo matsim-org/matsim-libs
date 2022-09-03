@@ -22,7 +22,8 @@ package org.matsim.pt.transitSchedule;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -34,7 +35,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class TransitLineTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(TransitLineTest.class);
+	private static final Logger log = LogManager.getLogger(TransitLineTest.class);
 
 	/**
 	 * In case we once should have more than one implementation of

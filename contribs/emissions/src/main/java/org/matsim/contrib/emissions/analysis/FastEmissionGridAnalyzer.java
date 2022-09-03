@@ -24,7 +24,8 @@ package org.matsim.contrib.emissions.analysis;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math3.util.CombinatoricsUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
  */
 public abstract class FastEmissionGridAnalyzer {
 
-    private static final Logger logger = Logger.getLogger(FastEmissionGridAnalyzer.class);
+    private static final Logger logger = LogManager.getLogger(FastEmissionGridAnalyzer.class);
 
     /**
      * Processes an events file with emissions and renders emissions in three steps:

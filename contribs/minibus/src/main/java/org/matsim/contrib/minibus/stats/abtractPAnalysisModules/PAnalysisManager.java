@@ -28,7 +28,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
@@ -50,7 +51,7 @@ import org.matsim.vehicles.Vehicles;
  *
  */
 public final class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
-	private final static Logger log = Logger.getLogger(PAnalysisManager.class);
+	private final static Logger log = LogManager.getLogger(PAnalysisManager.class);
 	
 	private final String pIdentifier;
 	private final List<PAnalysisModule> pAnalyzesList = new LinkedList<>();

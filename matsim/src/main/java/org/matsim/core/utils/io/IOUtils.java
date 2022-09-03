@@ -26,7 +26,8 @@ import net.jpountz.lz4.LZ4FrameInputStream;
 import net.jpountz.lz4.LZ4FrameOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -177,7 +178,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	public static final String NATIVE_NEWLINE = "\n";
 
 	// Logger
-	private final static Logger logger = Logger.getLogger(IOUtils.class);
+	private final static Logger logger = LogManager.getLogger(IOUtils.class);
 
 	/**
 	 * This function takes a path and tries to find the file in the file system or

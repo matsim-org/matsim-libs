@@ -20,7 +20,8 @@
 
 package org.matsim.withinday.controller;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
@@ -59,7 +60,7 @@ public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPl
 	// I renamed this from ExperiencedPlansWriter into ExecutedPlansWriter since we also have an ExperiencedPlansService that
 	// reconstructs experienced plans from events. kai, jun'16
 	
-	private static final Logger log = Logger.getLogger( ExecutedPlansServiceImpl.class );
+	private static final Logger log = LogManager.getLogger( ExecutedPlansServiceImpl.class );
 
 	public static final String EXECUTEDPLANSFILE = "executedPlans.xml.gz";
 

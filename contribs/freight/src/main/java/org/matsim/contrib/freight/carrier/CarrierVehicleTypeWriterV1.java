@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.EngineInformation;
@@ -33,7 +34,7 @@ import java.io.IOException;
 @Deprecated // only there if someone insists on writing V1
 public final class CarrierVehicleTypeWriterV1 extends MatsimXmlWriter {
 
-	private static final  Logger logger = Logger.getLogger(CarrierVehicleTypeWriter.class );
+	private static final  Logger logger = LogManager.getLogger(CarrierVehicleTypeWriter.class );
 
 	private CarrierVehicleTypes vehicleTypes;
 

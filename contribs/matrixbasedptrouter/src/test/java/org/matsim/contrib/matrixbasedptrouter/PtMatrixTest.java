@@ -27,7 +27,8 @@ import java.util.List;
 
 import org.junit.Assert;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,7 +70,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class PtMatrixTest {
 	
-	private static final Logger log = Logger.getLogger(PtMatrixTest.class);
+	private static final Logger log = LogManager.getLogger(PtMatrixTest.class);
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();

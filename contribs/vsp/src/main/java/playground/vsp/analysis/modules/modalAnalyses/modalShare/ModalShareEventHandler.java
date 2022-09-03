@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -107,7 +108,7 @@ public class ModalShareEventHandler implements PersonDepartureEventHandler, Tran
 	}
 
 	private void handleRemainingTransitUsers(){
-		Logger.getLogger(ModalShareEventHandler.class).warn("A few transit users are not handle due to stuckAndAbort. Handling them now.");
+		LogManager.getLogger(ModalShareEventHandler.class).warn("A few transit users are not handle due to stuckAndAbort. Handling them now.");
 		for(Id<Person> pId : person2Modes.keySet()){
 			String legMode = getMainMode(person2Modes.get(pId));
 			storeMode(legMode);

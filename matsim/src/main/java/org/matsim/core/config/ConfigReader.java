@@ -24,7 +24,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -39,7 +40,7 @@ import org.xml.sax.InputSource;
  */
 public final class ConfigReader extends MatsimXmlParser {
 
-	private final static Logger log = Logger.getLogger(ConfigReader.class);
+	private final static Logger log = LogManager.getLogger(ConfigReader.class);
 
 	private final static String CONFIG_V1 = "config_v1.dtd";
 	private final static String CONFIG_V2 = "config_v2.dtd";

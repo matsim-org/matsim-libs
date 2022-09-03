@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +45,7 @@ public class VehicleChoiceAgentImpl implements VehicleChoiceAgent {
 	@Inject
 	@Named("carnetwork")
 	private Network network;
-	public static final Logger log = Logger.getLogger(VehicleChoiceAgentImpl.class);
+	public static final Logger log = LogManager.getLogger(VehicleChoiceAgentImpl.class);
 
 	@Override
 	public CSVehicle chooseVehicle(List<CSVehicle> vehicleOptions, Link startLink, Leg leg, double currentTime,

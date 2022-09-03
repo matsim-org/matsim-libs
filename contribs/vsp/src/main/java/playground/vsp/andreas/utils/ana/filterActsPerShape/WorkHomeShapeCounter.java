@@ -25,8 +25,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.locationtech.jts.geom.Geometry;
@@ -44,9 +45,8 @@ import org.opengis.feature.simple.SimpleFeature;
 
 public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 	
-	private static final Logger log = Logger.getLogger(WorkHomeShapeCounter.class);
-	private static final Level logLevel = Level.INFO;
-	
+	private static final Logger log = LogManager.getLogger(WorkHomeShapeCounter.class);
+
 	private final Coord minXY;
 	private final Coord maxXY;
 	private String actTypeOne;
@@ -117,7 +117,6 @@ public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 		this.actTypeOne = actTypeOne;
 		this.actTypeTwo = actTypeTwo;
 		this.shapeFile = shapeFile;
-		log.setLevel(logLevel);
 		log.info("Added...");
 	}
 

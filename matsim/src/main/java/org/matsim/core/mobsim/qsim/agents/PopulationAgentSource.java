@@ -19,7 +19,8 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
@@ -43,7 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class PopulationAgentSource implements AgentSource {
-	private static final Logger log = Logger.getLogger( PopulationAgentSource.class );
+	private static final Logger log = LogManager.getLogger( PopulationAgentSource.class );
 
 	private final Population population;
 	private final AgentFactory agentFactory;

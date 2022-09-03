@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.gui;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactory;
@@ -47,7 +48,7 @@ public final class OTFVisFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = Logger.getLogger(OTFVisFrame.class);
+	private static final Logger log = LogManager.getLogger(OTFVisFrame.class);
 	private final Component canvas;
 
 	private final OTFOGLDrawer mainDrawer;

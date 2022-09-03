@@ -22,14 +22,15 @@ package org.matsim.contrib.cadyts.utils;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import cadyts.utilities.io.tabularFileParser.TabularFileHandler;
 
 /**Reader for the calibration-stat files produced after calibration.**/
 public class CalibrationStatReader implements TabularFileHandler {
 
-	private static final Logger log = Logger.getLogger(CalibrationStatReader.class);
+	private static final Logger log = LogManager.getLogger(CalibrationStatReader.class);
 
 	private static final String[] HEADER = {"count-ll", "count-ll-pred-err", "p2p-ll", "total-ll", "link-lambda-avg", "link-lambda-stddev", "link-lambda-min", "link-lambda-max", "plan-lambda-avg", "plan-lambda-stddev", "plan-lambda-min", "plan-lambda-max", "replan-count"};
 	private int rowNum =0;

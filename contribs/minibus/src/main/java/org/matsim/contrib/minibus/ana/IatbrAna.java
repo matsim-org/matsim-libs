@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.ana;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -56,7 +57,7 @@ import java.util.TreeSet;
 final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(IatbrAna.class);
+	private static final Logger log = LogManager.getLogger(IatbrAna.class);
 	
 	private final String pIdentifier;
 	private final String trainIdentifier;

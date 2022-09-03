@@ -32,7 +32,7 @@ import org.matsim.core.scoring.functions.ScoringParameters;
  *
  */
 public class MarginalSumScoringFunction {
-//	private final static Logger log = Logger.getLogger(MarginalSumScoringFunction.class);
+//	private final static Logger log = LogManager.getLogger(MarginalSumScoringFunction.class);
 	
 	CharyparNagelActivityScoring activityScoringA;
 	CharyparNagelActivityScoring activityScoringB;

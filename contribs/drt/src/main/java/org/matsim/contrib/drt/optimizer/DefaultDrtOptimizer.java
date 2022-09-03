@@ -22,7 +22,8 @@ package org.matsim.contrib.drt.optimizer;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.Depots;
@@ -47,7 +48,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
  * @author michalm
  */
 public class DefaultDrtOptimizer implements DrtOptimizer {
-	private static final Logger log = Logger.getLogger(DefaultDrtOptimizer.class);
+	private static final Logger log = LogManager.getLogger(DefaultDrtOptimizer.class);
 
 	private final DrtConfigGroup drtCfg;
 	private final Integer rebalancingInterval;

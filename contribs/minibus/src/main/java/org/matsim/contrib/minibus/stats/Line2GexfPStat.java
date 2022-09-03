@@ -26,7 +26,8 @@ import java.util.TreeSet;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
 import org.matsim.core.config.Config;
@@ -46,7 +47,7 @@ import org.matsim.core.controler.listener.StartupListener;
  */
 final class Line2GexfPStat implements StartupListener, IterationEndsListener, ShutdownListener{
 	
-	private static final Logger log = Logger.getLogger(Line2GexfPStat.class);
+	private static final Logger log = LogManager.getLogger(Line2GexfPStat.class);
 
     private CountPPaxHandler globalPaxHandler;
 	private CountPVehHandler vehHandler;

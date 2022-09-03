@@ -18,7 +18,8 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -48,7 +49,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener, StartupListener, IterationStartsListener {
-    public static final Logger masterLogger = Logger.getLogger(MasterControler.class);
+    public static final Logger masterLogger = LogManager.getLogger(MasterControler.class);
     private static StringBuilder masterInitialLogString = new StringBuilder();
     private static String appendString;
     private  final int masterPortNumber;
@@ -728,7 +729,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
 
     private class SlaveHandler implements Runnable {
-        final Logger slaveLogger = Logger.getLogger(this.getClass());
+        final Logger slaveLogger = LogManager.getLogger(this.getClass());
         final Map<String, Plan> plans = new HashMap<>();
         ObjectInputStream reader;
         ObjectOutputStream writer;

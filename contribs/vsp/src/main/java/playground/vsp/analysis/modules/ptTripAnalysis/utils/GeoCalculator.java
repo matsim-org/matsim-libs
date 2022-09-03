@@ -28,7 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
  *
  */
 public class GeoCalculator {
-//	private static final Logger log = Logger.getLogger(GeoCalculator.class);
+//	private static final Logger log = LogManager.getLogger(GeoCalculator.class);
 	
 	public static double distanceBetween2Points(Coord one, Coord two){
 		double a = one.getX() - two.getX();

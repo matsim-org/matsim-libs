@@ -26,7 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -68,7 +69,7 @@ import javax.annotation.Nullable;
  */
 public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
 
-	private static final Logger log = Logger.getLogger(NetworkRoutingInclAccessEgressModule.class);
+	private static final Logger log = LogManager.getLogger(NetworkRoutingInclAccessEgressModule.class);
 
 	private final String mode;
 	private final PopulationFactory populationFactory;

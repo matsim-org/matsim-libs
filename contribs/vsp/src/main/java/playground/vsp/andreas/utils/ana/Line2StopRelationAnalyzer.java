@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -25,7 +26,7 @@ import org.matsim.core.events.EventsUtils;
 public class Line2StopRelationAnalyzer implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	
-	private final static Logger log = Logger.getLogger(Line2StopRelationAnalyzer.class);
+	private final static Logger log = LogManager.getLogger(Line2StopRelationAnalyzer.class);
 	
 	private HashMap<Id, HashMap<Id, HashMap<Id, HashMap<String, Integer>>>> line2StartStop2EndStop2TripsMap = new HashMap<Id, HashMap<Id,HashMap<Id,HashMap<String,Integer>>>>();
 	

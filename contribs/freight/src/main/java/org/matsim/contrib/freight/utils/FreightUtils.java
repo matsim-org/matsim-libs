@@ -25,7 +25,8 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -64,7 +65,7 @@ public class FreightUtils {
 	 */
 	private static final String CARRIERS = "carriers";
 	private static final String CARRIER_VEHICLE_TYPES = "carrierVehicleTypes";
-	private static final Logger log = Logger.getLogger(FreightUtils.class);
+	private static final Logger log = LogManager.getLogger(FreightUtils.class);
 
 	private static final String ATTR_SKILLS = "skills";
 

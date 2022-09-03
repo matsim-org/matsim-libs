@@ -36,7 +36,8 @@ import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -68,7 +69,7 @@ import java.util.List;
  */
 public final class MatsimJspritFactory {
 
-	private static final  Logger log = Logger.getLogger(MatsimJspritFactory.class);
+	private static final  Logger log = LogManager.getLogger(MatsimJspritFactory.class);
 
 	// How to deal with a multi-depot VRP? Which depotLink should be used? kmt
 	// jul/18

@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -67,7 +68,7 @@ import playground.vsp.andreas.utils.pt.TransitScheduleCleaner;
  */
 public class PTCountsNetworkSimplifier {
 
-	private static final Logger log = Logger.getLogger(PTCountsNetworkSimplifier.class);
+	private static final Logger log = LogManager.getLogger(PTCountsNetworkSimplifier.class);
 	private boolean mergeLinkStats = false;
 	private TransitSchedule transitSchedule;
 	private Network network;

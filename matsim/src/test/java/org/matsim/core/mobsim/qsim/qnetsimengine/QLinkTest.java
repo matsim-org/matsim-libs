@@ -24,7 +24,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -83,7 +84,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 @RunWith(Parameterized.class)
 public final class QLinkTest extends MatsimTestCase {
-	private static final Logger logger = Logger.getLogger( QLinkTest.class );
+	private static final Logger logger = LogManager.getLogger( QLinkTest.class );
 
 	private final boolean isUsingFastCapacityUpdate;
 	

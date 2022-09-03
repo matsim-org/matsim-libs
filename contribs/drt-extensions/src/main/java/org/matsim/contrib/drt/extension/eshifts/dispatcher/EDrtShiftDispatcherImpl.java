@@ -2,7 +2,8 @@ package org.matsim.contrib.drt.extension.eshifts.dispatcher;
 
 import com.google.common.base.Verify;
 import org.apache.commons.collections4.iterators.IteratorChain;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -58,7 +59,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseT
  */
 public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
-    private final static Logger logger = Logger.getLogger(EDrtShiftDispatcherImpl.class);
+    private final static Logger logger = LogManager.getLogger(EDrtShiftDispatcherImpl.class);
 
     private Queue<DrtShift> unscheduledShifts;
     private Queue<ShiftEntry> assignedShifts;

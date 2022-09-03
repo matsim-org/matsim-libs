@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,7 +41,7 @@ import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
  */
 public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier {
 	private static final Logger log =
-		Logger.getLogger(JoinableActivitiesPlanLinkIdentifier.class);
+		LogManager.getLogger(JoinableActivitiesPlanLinkIdentifier.class);
 
 	private final String type;
 

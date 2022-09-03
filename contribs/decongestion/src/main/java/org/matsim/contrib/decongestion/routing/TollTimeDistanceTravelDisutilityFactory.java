@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.decongestion.routing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -35,7 +36,7 @@ import org.matsim.contrib.decongestion.data.DecongestionInfo;
  *
  */
 public final class TollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
-	private static final Logger log = Logger.getLogger(TollTimeDistanceTravelDisutilityFactory.class);
+	private static final Logger log = LogManager.getLogger(TollTimeDistanceTravelDisutilityFactory.class);
 
 	@Inject
 	private Scenario scenario;

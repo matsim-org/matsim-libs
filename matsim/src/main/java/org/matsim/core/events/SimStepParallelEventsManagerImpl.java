@@ -32,7 +32,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
@@ -49,7 +50,7 @@ import org.matsim.core.gbl.Gbl;
  */
 class SimStepParallelEventsManagerImpl implements EventsManager {
 
-	private final static Logger log = Logger.getLogger(SimStepParallelEventsManagerImpl.class);
+	private final static Logger log = LogManager.getLogger(SimStepParallelEventsManagerImpl.class);
 
 	private final int numOfThreads;
 	private CyclicBarrier simStepEndBarrier;

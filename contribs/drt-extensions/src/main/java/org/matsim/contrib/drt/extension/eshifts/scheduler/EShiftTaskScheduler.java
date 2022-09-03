@@ -11,7 +11,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -58,7 +59,7 @@ import org.matsim.facilities.Facility;
  */
 public class EShiftTaskScheduler {
 
-    private final static Logger logger = Logger.getLogger(EShiftTaskScheduler.class);
+    private final static Logger logger = LogManager.getLogger(EShiftTaskScheduler.class);
 
     private final TravelTime travelTime;
     private final MobsimTimer timer;

@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder;
@@ -47,7 +48,7 @@ import org.xml.sax.Attributes;
 
 class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
-	public static final  Logger logger = Logger.getLogger(CarrierPlanXmlParserV2.class);
+	public static final  Logger logger = LogManager.getLogger(CarrierPlanXmlParserV2.class);
 
 	public static final String CARRIERS = "carriers";
 	public static final String CARRIER = "carrier";

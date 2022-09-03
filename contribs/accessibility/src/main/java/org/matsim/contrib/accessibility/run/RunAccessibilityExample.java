@@ -20,7 +20,8 @@ package org.matsim.contrib.accessibility.run;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityModule;
@@ -38,7 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 final public class RunAccessibilityExample {
 	// do not change name of class; matsim book refers to it.  kai, dec'14
 
-	private static final Logger LOG = Logger.getLogger(RunAccessibilityExample.class);
+	private static final Logger LOG = LogManager.getLogger(RunAccessibilityExample.class);
 
 	public static void main(String[] args) {
 		if (args.length==0 || args.length>1) {

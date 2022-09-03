@@ -21,7 +21,8 @@ package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import javax.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
@@ -43,7 +44,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentif
 
 public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelectionStrategy {
 	private static final Logger log =
-		Logger.getLogger(GroupTimeAllocationMutatorFactory.class);
+		LogManager.getLogger(GroupTimeAllocationMutatorFactory.class);
 
 	private final Scenario sc;
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;

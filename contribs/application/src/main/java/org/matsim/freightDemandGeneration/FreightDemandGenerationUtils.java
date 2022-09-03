@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.freightDemandGeneration;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
@@ -51,7 +52,7 @@ import java.util.List;
  *
  */
 public class FreightDemandGenerationUtils {
-	private static final Logger log = Logger.getLogger(FreightDemandGenerationUtils.class);
+	private static final Logger log = LogManager.getLogger(FreightDemandGenerationUtils.class);
 
 	/**
 	 * Adds the home coordinates to attributes and removes plans

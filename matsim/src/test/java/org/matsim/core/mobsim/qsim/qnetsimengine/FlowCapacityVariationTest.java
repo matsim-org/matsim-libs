@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -210,7 +211,7 @@ public class FlowCapacityVariationTest {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Logger.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
+			LogManager.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
 			Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
 			if (times == null) {
 				times = new HashMap<>();
@@ -229,7 +230,7 @@ public class FlowCapacityVariationTest {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Logger.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
+			LogManager.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
 			Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
 			if (times != null) {
 				double linkEnterTime = times.get(event.getLinkId())[0];

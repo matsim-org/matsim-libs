@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -100,7 +101,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		try {
 			testForLocked() ;
 		} catch ( Exception ee ) {
-			Logger.getLogger(getClass()).warn("cannot change oerson id while in population.  remove the person, change Id, re-add.");
+			LogManager.getLogger(getClass()).warn("cannot change oerson id while in population.  remove the person, change Id, re-add.");
 			throw ee ;
 		}
 		this.id = newId;

@@ -1,6 +1,7 @@
 package org.matsim.contrib.accessibility;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,7 +32,7 @@ import java.util.Set;
  * @author thibautd, dziemke
  */
 final class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger LOG = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
+	private static final Logger LOG = LogManager.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	private final String mode;
 	private final TravelDisutilityFactory travelDisutilityFactory;

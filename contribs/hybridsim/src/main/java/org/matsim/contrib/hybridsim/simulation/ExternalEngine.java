@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 //import de.dlr.sumo.hybridsim.HybridSimProto;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -50,7 +51,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 
 public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceGrpc.MATSimInterfaceService {
 
-	private static final Logger log = Logger.getLogger(ExternalEngine.class);
+	private static final Logger log = LogManager.getLogger(ExternalEngine.class);
 
 	//	private final CyclicBarrier simStepBarrier = new CyclicBarrier(2);
 	private final Map<String, QVehicle> vehicles = new HashMap<>();

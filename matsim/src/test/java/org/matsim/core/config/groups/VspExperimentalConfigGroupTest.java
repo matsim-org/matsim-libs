@@ -20,12 +20,13 @@
 
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
 
 public class VspExperimentalConfigGroupTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(VspExperimentalConfigGroupTest.class);
+	private static final Logger log = LogManager.getLogger(VspExperimentalConfigGroupTest.class);
 
 	public void testVspConfigGroup() {
 		
