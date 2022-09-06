@@ -20,7 +20,8 @@
 
 package org.matsim.core.config;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -36,7 +37,7 @@ import java.util.Stack;
  */
  class ConfigReaderMatsimV1 extends MatsimXmlParser {
 
-	private final static Logger log = Logger.getLogger(ConfigReaderMatsimV1.class);
+	private final static Logger log = LogManager.getLogger(ConfigReaderMatsimV1.class);
 //	private final static String CONFIG = "config";
 	private final static String MODULE = "module";
 	private final static String INCLUDE = "include";

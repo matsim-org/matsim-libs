@@ -20,7 +20,8 @@
 
 package org.matsim.facilities;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -59,7 +60,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
     private final static String FACILITIES_V1 = "facilities_v1.dtd";
     private final static String FACILITIES_V2 = "facilities_v2.dtd";
 
-    private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
+    private final static Logger log = LogManager.getLogger(MatsimFacilitiesReader.class);
 
     private final String externalInputCRS;
     private final String targetCRS;

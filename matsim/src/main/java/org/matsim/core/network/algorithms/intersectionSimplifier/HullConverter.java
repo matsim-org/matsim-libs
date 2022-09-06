@@ -22,7 +22,8 @@ package org.matsim.core.network.algorithms.intersectionSimplifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -41,7 +42,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author jwjoubert
  */
 public class HullConverter implements AttributeConverter<Geometry> {
-	private final Logger log = Logger.getLogger(HullConverter.class);
+	private final Logger log = LogManager.getLogger(HullConverter.class);
 
 	@Override
 	public Geometry convert(String value) {

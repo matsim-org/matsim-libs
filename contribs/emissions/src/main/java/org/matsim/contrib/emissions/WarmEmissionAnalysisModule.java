@@ -21,7 +21,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +47,7 @@ import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsC
 public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator{
 	// cannot make non-public: used at least twice outside package.  kai, jan'19
 
-	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
+	private static final Logger logger = LogManager.getLogger(WarmEmissionAnalysisModule.class);
 
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>  avgHbefaWarmTable;
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;

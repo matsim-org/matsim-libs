@@ -19,7 +19,8 @@
 package org.matsim.contrib.accessibility;
 
 import ch.sbb.matsim.routing.pt.raptor.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -40,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author dziemke
  */
 class SwissRailRaptorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger LOG = Logger.getLogger( SwissRailRaptorAccessibilityContributionCalculator.class );
+	private static final Logger LOG = LogManager.getLogger( SwissRailRaptorAccessibilityContributionCalculator.class );
 	private SwissRailRaptor raptor;
 	private String mode;
 	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;

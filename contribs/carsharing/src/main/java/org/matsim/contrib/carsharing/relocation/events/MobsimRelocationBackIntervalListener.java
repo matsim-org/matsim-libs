@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.FreeFloatingVehiclesContainer;
@@ -21,7 +22,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import com.google.inject.Inject;
 
 public class MobsimRelocationBackIntervalListener implements MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
-	public static final Logger log = Logger.getLogger("dummy");
+	public static final Logger log = LogManager.getLogger("dummy");
 
 	@Inject private CarsharingSupplyInterface carsharingSupply;
 

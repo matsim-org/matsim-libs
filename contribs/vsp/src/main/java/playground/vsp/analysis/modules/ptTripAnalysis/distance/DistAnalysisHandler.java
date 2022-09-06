@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -65,8 +66,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 												PersonArrivalEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler, 
 												VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler{
 	
-	private static final Logger log = Logger
-			.getLogger(DistAnalysisHandler.class);
+	private static final Logger log = LogManager.getLogger(DistAnalysisHandler.class);
 	
 	private Map<Id<Person>, DistAnalysisAgent> persons;
 	private Map<Id<Person>, DistAnalysisPtDriver> drivers;

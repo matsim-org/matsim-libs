@@ -25,7 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -42,7 +43,7 @@ public class TreesBuilder {
 	// this functionality would better be directly provided by the facilities container (similar to how network does it)
 
 	private Network network = null;
-	private static final Logger log = Logger.getLogger(TreesBuilder.class);
+	private static final Logger log = LogManager.getLogger(TreesBuilder.class);
 	private Set<String> flexibleTypes = new HashSet<String>();
 	private final DestinationChoiceConfigGroupI config;
 	

@@ -1,6 +1,8 @@
 // This software is released into the Public Domain.  See copying.txt for details.
 package playground.vsp.andreas.mzilske.osm;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openstreetmap.osmosis.core.OsmosisRuntimeException;
 import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
@@ -13,8 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class JOSMTolerantFastXMLReader implements RunnableSource {
 		
-		private static final Logger log = Logger.getLogger(JOSMTolerantFastXMLReader.class.getName());
+		private static final Logger log = LogManager.getLogger(JOSMTolerantFastXMLReader.class.getName());
 		
 		private Sink sink;
 		private final File file;
@@ -102,7 +102,7 @@ public class JOSMTolerantFastXMLReader implements RunnableSource {
 					try {
 						inputStream.close();
 					} catch (IOException e) {
-						log.log(Level.SEVERE, "Unable to close input stream.", e);
+						log.error("Unable to close input stream.", e);
 					}
 					inputStream = null;
 				}

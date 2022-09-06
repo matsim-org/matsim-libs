@@ -29,7 +29,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -80,7 +81,7 @@ import com.github.luben.zstd.ZstdInputStream;
  */
 public final class EventsReaderJson {
 
-	private final static Logger LOG = Logger.getLogger(EventsReaderJson.class);
+	private final static Logger LOG = LogManager.getLogger(EventsReaderJson.class);
 	private final static ObjectMapper MAPPER = new ObjectMapper();
 
 	private final EventsManager events;

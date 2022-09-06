@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -60,7 +61,7 @@ import com.google.inject.Inject;
  */
 public class SimpleResponsiveSignal extends AbstractSignalController implements AfterMobsimListener {
 
-	private static final Logger LOG = Logger.getLogger(SimpleResponsiveSignal.class);
+	private static final Logger LOG = LogManager.getLogger(SimpleResponsiveSignal.class);
 	public static final String IDENTIFIER = "SimpleResponsiveSignalControl";
 	
 	// increase this if agents should have "time" (iterations) to react to the changed signal control

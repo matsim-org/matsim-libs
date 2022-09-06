@@ -29,7 +29,8 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -49,7 +50,7 @@ import org.xml.sax.SAXException;
  */
 public final class LanesReader implements MatsimReader {
 	
-	private static final Logger log = Logger.getLogger(LanesReader.class);
+	private static final Logger log = LogManager.getLogger(LanesReader.class);
 	
 	@Deprecated
 	public static final String SCHEMALOCATIONV11 = "http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd";

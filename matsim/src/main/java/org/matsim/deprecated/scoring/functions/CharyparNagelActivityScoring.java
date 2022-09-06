@@ -20,7 +20,8 @@
 
 package org.matsim.deprecated.scoring.functions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
@@ -52,7 +53,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 
 	private Activity firstActivity;
 
-	private static final Logger log = Logger.getLogger(CharyparNagelActivityScoring.class);
+	private static final Logger log = LogManager.getLogger(CharyparNagelActivityScoring.class);
 	
 	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 	public CharyparNagelActivityScoring(final ScoringParameters params) {

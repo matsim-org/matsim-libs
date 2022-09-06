@@ -22,7 +22,8 @@ package org.matsim.contrib.signals.data.conflicts.io;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -33,7 +34,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  */
 public final class ConflictingDirectionsWriter extends MatsimXmlWriter implements MatsimWriter {
 
-	private static final Logger LOG = Logger.getLogger(ConflictingDirectionsWriter.class);
+	private static final Logger LOG = LogManager.getLogger(ConflictingDirectionsWriter.class);
 	
 	private ConflictData conflictData;
 	private ConflictingDirectionsWriterHandlerImpl handler;

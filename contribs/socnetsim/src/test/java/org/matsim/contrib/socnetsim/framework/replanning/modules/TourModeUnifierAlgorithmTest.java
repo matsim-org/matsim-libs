@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -41,7 +42,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
  * @author thibautd
  */
 public class TourModeUnifierAlgorithmTest {
-	private static final Logger log = Logger.getLogger( TourModeUnifierAlgorithmTest.class );
+	private static final Logger log = LogManager.getLogger( TourModeUnifierAlgorithmTest.class );
 
 	@Test
 	public void testPlanWithOneSingleTour() throws Exception {

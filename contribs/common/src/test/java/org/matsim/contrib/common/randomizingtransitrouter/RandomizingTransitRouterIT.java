@@ -22,7 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,7 +53,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public class RandomizingTransitRouterIT {
-	private static final Logger log = Logger.getLogger( RandomizingTransitRouterIT.class ) ;
+	private static final Logger log = LogManager.getLogger( RandomizingTransitRouterIT.class ) ;
 	
 	private static final class MyObserver implements PersonEntersVehicleEventHandler {
 //		private enum ObservedVehicle{ pt_1009_1 /*direct, fast, with wait*/, pt_2009_1 /*direct, slow*/, pt_3009_1 /*with interchange*/} ;

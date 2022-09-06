@@ -5,7 +5,7 @@ import org.matsim.core.gbl.Gbl;
 /**
  * @author nkuehnel, fzwick / MOIA
  */
-public class DefautShiftBreakImpl implements DrtShiftBreak {
+public class DefaultShiftBreakImpl implements DrtShiftBreak {
 
     private final static double UNSCHEDULED_ARRIVAL_TIME = Double.NaN;
 
@@ -15,7 +15,7 @@ public class DefautShiftBreakImpl implements DrtShiftBreak {
 
     private double latestArrivalTime = UNSCHEDULED_ARRIVAL_TIME;
 
-    public DefautShiftBreakImpl(double earliestBreakStartTime, double latestBreakEndTime, double duration) {
+    public DefaultShiftBreakImpl(double earliestBreakStartTime, double latestBreakEndTime, double duration) {
         Gbl.assertIf(latestBreakEndTime - earliestBreakStartTime >= duration);
         if ((earliestBreakStartTime % 1) != 0 || (latestBreakEndTime % 1) != 0 || (duration % 1) != 0) {
             throw new RuntimeException("Cannot use fractions of seconds!");

@@ -1,6 +1,7 @@
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.algorithm.RobustLineIntersector;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  */
 final class ShieldingContext {
 
-    private final static Logger logger = Logger.getLogger(ShieldingContext.class);
+    private final static Logger logger = LogManager.getLogger(ShieldingContext.class);
 
     //STRtree increases performance by ~40% by reducing the amount of potential
     //obstruction candidates. nkuehnel, mar '20

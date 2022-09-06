@@ -30,7 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -44,7 +45,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  *
  */
 public class VehId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalysisModule{
-	private final static Logger log = Logger.getLogger(VehId2PersonEnterLeaveVehicleAnalyzer.class);
+	private final static Logger log = LogManager.getLogger(VehId2PersonEnterLeaveVehicleAnalyzer.class);
 	private MutableScenario scenario;
 	
 	private VehId2PersonEnterLeaveVehicleHandler handler;

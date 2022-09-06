@@ -22,7 +22,8 @@ package org.matsim.contrib.signals.sensor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -58,7 +59,7 @@ import com.google.inject.Singleton;
 public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 	VehicleLeavesTrafficEventHandler, PersonEntersVehicleEventHandler, PersonDepartureEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
 
-	private static final Logger log = Logger.getLogger(LinkSensorManager.class);
+	private static final Logger log = LogManager.getLogger(LinkSensorManager.class);
 	
 //	private Set<Id> monitoredLinkIds = new HashSet<Id>();
 //	private Map<Id, Double> linkIdNumberOfCarsInDistanceMap = new HashMap<Id, Double>();

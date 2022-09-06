@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +49,7 @@ import java.util.Map;
  */
 public class FlowCapacityTest {
 
-	private final static Logger log = Logger.getLogger(FlowCapacityTest.class);
+	private final static Logger log = LogManager.getLogger(FlowCapacityTest.class);
 
 	@Before
 	public void setup() {

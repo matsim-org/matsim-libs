@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.replanning;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
@@ -40,7 +41,7 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 	private final List<T> plans = new ArrayList<>();
 	private long counter = 0;
 	private ReplanningContext replanningContext;
-	private final static Logger log = Logger.getLogger(GenericPlanStrategyImpl.class);
+	private final static Logger log = LogManager.getLogger(GenericPlanStrategyImpl.class);
 
 	/**
 	 * Creates a new strategy using the specified planSelector.

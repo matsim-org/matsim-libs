@@ -26,7 +26,8 @@ package playground.vsp.analysis.modules.ptDriverPrefix;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -38,7 +39,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
  *
  */
 public class PtDriverIdHandler implements TransitDriverStartsEventHandler {
-	private final static Logger log = Logger.getLogger(PtDriverIdHandler.class);
+	private final static Logger log = LogManager.getLogger(PtDriverIdHandler.class);
 	private final static List<Id> ptDriverIDs = new ArrayList<Id>(); //was neither final not static
 
 	@Override

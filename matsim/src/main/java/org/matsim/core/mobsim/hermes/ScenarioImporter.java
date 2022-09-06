@@ -19,7 +19,8 @@
 
 package org.matsim.core.mobsim.hermes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
@@ -80,7 +81,7 @@ import java.util.Map;
 
 class ScenarioImporter {
 
-	final private static Logger log = Logger.getLogger(Hermes.class);
+	final private static Logger log = LogManager.getLogger(Hermes.class);
 
 	private static ScenarioImporter instance;
 
@@ -334,7 +335,7 @@ class ScenarioImporter {
 					realm.delayedAgents().get(Math.min(sleep, scenario.getConfig().hermes().getEndTime() + 1)).add(agent);
 					break;
 				default:
-					Logger.getLogger(getClass()).error(String.format("ERROR -> unknown plan element type %d", type));
+					LogManager.getLogger(getClass()).error(String.format("ERROR -> unknown plan element type %d", type));
 			}
 		}
 

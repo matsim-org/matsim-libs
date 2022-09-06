@@ -20,7 +20,8 @@
 
 package org.matsim.withinday.controller;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -70,7 +71,7 @@ import java.util.*;
  */
 public class ExperiencedPlansWriterTest {
 
-private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.class);
+private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTest.class);
 	
 	@Rule 
 	public MatsimTestUtils utils = new MatsimTestUtils();

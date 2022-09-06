@@ -22,7 +22,8 @@ package playground.vsp.analysis.modules.ptTripAnalysis.traveltime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -37,7 +38,7 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public abstract class SomePtTime {
 
-	private static final Logger LOG = Logger.getLogger(SomePtTime.class);
+	private static final Logger LOG = LogManager.getLogger(SomePtTime.class);
 
 	private boolean finished = false;
 

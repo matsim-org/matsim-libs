@@ -1,29 +1,18 @@
 package org.matsim.contrib.drt.extension.eshifts.scheduler;
 
-import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE;
-import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.extension.eshifts.schedule.EDrtShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
-import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
-import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
-import org.matsim.contrib.drt.extension.shifts.schedule.WaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.shifts.schedule.*;
+import org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -51,14 +40,19 @@ import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.facilities.Facility;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 
 /**
  * @author nkuehnel / MOIA
  */
-public class EShiftTaskScheduler {
+public class EShiftTaskScheduler implements ShiftTaskScheduler {
 
-    private final static Logger logger = Logger.getLogger(EShiftTaskScheduler.class);
+    private final static Logger logger = LogManager.getLogger(EShiftTaskScheduler.class);
 
     private final TravelTime travelTime;
     private final MobsimTimer timer;
@@ -69,8 +63,6 @@ public class EShiftTaskScheduler {
 
     private final Network network;
     private final ChargingInfrastructure chargingInfrastructure;
-	private final OperationFacilities operationFacilities;
-	private final Fleet fleet;
 
 	public EShiftTaskScheduler(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 							   MobsimTimer timer, ShiftDrtTaskFactory taskFactory, DrtShiftParams shiftConfig,
@@ -80,29 +72,10 @@ public class EShiftTaskScheduler {
 		this.taskFactory = taskFactory;
 		this.network = network;
 		this.shiftConfig = shiftConfig;
-		this.operationFacilities = operationFacilities;
-		this.fleet = fleet;
 		this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 		this.chargingInfrastructure = chargingInfrastructure;
-	}
+		ShiftSchedules.initSchedules(operationFacilities, fleet, taskFactory);
 
-	public void initSchedules() {
-		final Map<Id<Link>, List<OperationFacility>> facilitiesByLink = operationFacilities.getDrtOperationFacilities().values().stream().collect(Collectors.groupingBy(Facility::getLinkId));
-		for (DvrpVehicle veh : fleet.getVehicles().values()) {
-			try {
-				final OperationFacility operationFacility = facilitiesByLink.get(veh.getStartLink().getId()).stream().findFirst().orElseThrow((Supplier<Throwable>) () -> new RuntimeException("Vehicles must start at an operation facility!"));
-				veh.getSchedule()
-						.addTask(taskFactory.createWaitForShiftStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
-								veh.getStartLink(), operationFacility));
-				boolean success = operationFacility.register(veh.getId());
-				if(!success) {
-					throw new RuntimeException(String.format("Cannot register vehicle %s at facility %s at start-up. Please check" +
-							"facility capacity and initial fleet distribution.", veh.getId().toString(), operationFacility.getId().toString()));
-				}
-			} catch (Throwable throwable) {
-				throwable.printStackTrace();
-			}
-		}
 	}
 
     public void relocateForBreak(ShiftDvrpVehicle vehicle, OperationFacility breakFacility, DrtShift shift) {
@@ -408,7 +381,15 @@ public class EShiftTaskScheduler {
                                        DrtShift shift, OperationFacility facility, Task lastTask) {
         Schedule schedule = vehicle.getSchedule();
 
-        List<Task> copy = new ArrayList<>(schedule.getTasks().subList(lastTask.getTaskIdx() + 1, schedule.getTasks().size()));
+		Optional<ShiftChangeOverTask> oldChangeOver = ShiftSchedules.getNextShiftChangeover(schedule);
+		if(oldChangeOver.isPresent() && oldChangeOver.get() instanceof EDrtShiftChangeoverTaskImpl) {
+			if(((EDrtShiftChangeoverTaskImpl) oldChangeOver.get()).getChargingTask() != null) {
+				ElectricVehicle ev = ((EvDvrpVehicle) vehicle).getElectricVehicle();
+				((EDrtShiftChangeoverTaskImpl) oldChangeOver.get()).getChargingTask().getChargingLogic().unassignVehicle(ev);
+			}
+		}
+
+		List<Task> copy = new ArrayList<>(schedule.getTasks().subList(lastTask.getTaskIdx() + 1, schedule.getTasks().size()));
         for (Task task : copy) {
             schedule.removeTask(task);
         }

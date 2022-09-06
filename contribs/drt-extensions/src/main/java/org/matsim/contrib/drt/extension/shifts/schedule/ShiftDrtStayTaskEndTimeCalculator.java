@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.schedule;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class ShiftDrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayTaskEndTimeCalculator {
 
-    public final static Logger logger = Logger.getLogger(ShiftDrtStayTaskEndTimeCalculator.class);
+    public final static Logger logger = LogManager.getLogger(ShiftDrtStayTaskEndTimeCalculator.class);
 
     private final DrtShiftParams drtShiftParams;
     private final DrtStayTaskEndTimeCalculator delegate;

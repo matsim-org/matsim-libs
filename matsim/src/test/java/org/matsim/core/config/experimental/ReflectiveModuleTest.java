@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.config.experimental;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,7 +36,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ReflectiveModuleTest {
 	private static final Logger log =
-		Logger.getLogger(ReflectiveModuleTest.class);
+		LogManager.getLogger(ReflectiveModuleTest.class);
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();

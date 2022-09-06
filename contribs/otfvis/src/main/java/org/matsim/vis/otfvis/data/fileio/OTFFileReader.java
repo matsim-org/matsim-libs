@@ -30,7 +30,8 @@ import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
@@ -50,7 +51,7 @@ import org.matsim.vis.otfvis.interfaces.OTFServer;
  */
 public final class OTFFileReader implements OTFServer {
 
-	private static final Logger log = Logger.getLogger(OTFFileReader.class);
+	private static final Logger log = LogManager.getLogger(OTFFileReader.class);
 
 	private final String fileName;
 

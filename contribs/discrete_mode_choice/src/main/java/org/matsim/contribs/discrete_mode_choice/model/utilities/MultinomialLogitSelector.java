@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The MultinomialLogitSelector collects a set of candidates with given
@@ -23,7 +24,7 @@ import org.apache.log4j.Logger;
  * @author sebhoerl
  */
 public class MultinomialLogitSelector implements UtilitySelector {
-	private final static Logger logger = Logger.getLogger(MultinomialLogitSelector.class);
+	private final static Logger logger = LogManager.getLogger(MultinomialLogitSelector.class);
 
 	final private List<UtilityCandidate> candidates = new LinkedList<>();
 

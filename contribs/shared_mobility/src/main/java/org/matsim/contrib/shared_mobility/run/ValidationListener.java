@@ -1,6 +1,7 @@
 package org.matsim.contrib.shared_mobility.run;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.shared_mobility.io.SharingServiceSpecification;
 import org.matsim.contrib.shared_mobility.io.validation.SharingServiceValidator;
@@ -9,7 +10,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
 class ValidationListener implements StartupListener {
-	private final Logger logger = Logger.getLogger(ValidationListener.class);
+	private final Logger logger = LogManager.getLogger(ValidationListener.class);
 
 	private final Id<SharingService> serviceId;
 	private final SharingServiceValidator validator;

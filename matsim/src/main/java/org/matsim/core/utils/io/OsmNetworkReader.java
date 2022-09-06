@@ -36,7 +36,8 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -83,7 +84,7 @@ import org.xml.sax.Attributes;
 @Deprecated
 public class OsmNetworkReader implements MatsimSomeReader {
 
-	private final static Logger log = Logger.getLogger(OsmNetworkReader.class);
+	private final static Logger log = LogManager.getLogger(OsmNetworkReader.class);
 
 	private final static String TAG_LANES = "lanes";
 	private final static String TAG_LANES_FORWARD = "lanes:forward";

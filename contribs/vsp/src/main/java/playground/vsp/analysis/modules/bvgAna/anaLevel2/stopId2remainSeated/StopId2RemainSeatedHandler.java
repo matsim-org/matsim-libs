@@ -24,8 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -42,7 +43,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
  */
 public class StopId2RemainSeatedHandler implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 
-	private final Logger log = Logger.getLogger(StopId2RemainSeatedHandler.class);
+	private final Logger log = LogManager.getLogger(StopId2RemainSeatedHandler.class);
 //	private final Level logLevel = Level.DEBUG;
 
 	private TransitLoadByTimeHandler vehId2OccupancyHandler;

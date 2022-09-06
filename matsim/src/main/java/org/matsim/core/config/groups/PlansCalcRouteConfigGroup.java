@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -61,7 +62,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String BIKE_SPEED = "bikeSpeed";
 	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
 	
-	private static final Logger log = Logger.getLogger(PlansCalcRouteConfigGroup.class) ;
+	private static final Logger log = LogManager.getLogger(PlansCalcRouteConfigGroup.class) ;
 	
 	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
 

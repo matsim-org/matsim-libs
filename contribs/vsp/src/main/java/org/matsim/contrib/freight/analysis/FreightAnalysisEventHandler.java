@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
@@ -58,7 +59,8 @@ import java.util.LinkedHashSet;
  * */
 
 class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, FreightShipmentPickupEventHandler, FreightShipmentDeliveryEventHandler, FreightServiceStartEventHandler, FreightServiceEndEventHandler {
-	private final static Logger log = Logger.getLogger(FreightAnalysisEventHandler.class);
+
+	private final static Logger log = LogManager.getLogger(FreightAnalysisEventHandler.class);
 	private final Vehicles vehicles;
 	private final Network network;
 	private final Carriers carriers;

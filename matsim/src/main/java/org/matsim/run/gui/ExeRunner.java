@@ -28,7 +28,8 @@ import java.util.Arrays;
 
 import javax.swing.JTextArea;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -39,7 +40,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 /*package*/ class ExeRunner {
 
-	/*package*/ final static Logger log = Logger.getLogger(ExeRunner.class);
+	/*package*/ final static Logger log = LogManager.getLogger(ExeRunner.class);
 	
 	private final ExternalExecutor executor;
 

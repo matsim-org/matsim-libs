@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -59,7 +60,7 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
  *
  */
 public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , CongestionEventHandler {
-	private final static Logger log = Logger.getLogger(CongestionAnalysisEventHandler.class);
+	private final static Logger log = LogManager.getLogger(CongestionAnalysisEventHandler.class);
 	private final double vtts_car;
 	
 	// This analysis uses either money events or congestion events.

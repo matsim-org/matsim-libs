@@ -26,7 +26,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +53,7 @@ import org.matsim.core.utils.misc.Counter;
  */
 final class Grid {
 	
-	private static final Logger log = Logger.getLogger(Grid.class);
+	private static final Logger log = LogManager.getLogger(Grid.class);
 
 	private final Scenario scenario;
 	private final NoiseConfigGroup noiseParams;

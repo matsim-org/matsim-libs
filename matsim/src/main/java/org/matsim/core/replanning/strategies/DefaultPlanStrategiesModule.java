@@ -27,7 +27,8 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -43,7 +44,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 public class DefaultPlanStrategiesModule extends AbstractModule {
-    private static final Logger log = Logger.getLogger( DefaultPlanStrategiesModule.class );
+    private static final Logger log = LogManager.getLogger( DefaultPlanStrategiesModule.class );
 
     public enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval,
 		PathSizeLogitSelectorForRemoval }

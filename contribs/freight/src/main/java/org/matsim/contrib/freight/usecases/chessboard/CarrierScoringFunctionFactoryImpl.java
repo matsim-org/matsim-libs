@@ -25,7 +25,8 @@ import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -68,7 +69,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
      */
     static class DriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
-        private static final  Logger log = Logger.getLogger(DriversActivityScoring.class);
+        private static final  Logger log = LogManager.getLogger(DriversActivityScoring.class);
 
         private double score;
         private double timeParameter = 0.008;
@@ -159,7 +160,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
      */
     static class DriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
-        private static final  Logger log = Logger.getLogger(DriversLegScoring.class);
+        private static final  Logger log = LogManager.getLogger(DriversLegScoring.class);
 
         private double score = 0.0;
         private final Network network;
@@ -242,7 +243,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
     static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
-        private static final  Logger log = Logger.getLogger(TollScoring.class);
+        private static final  Logger log = LogManager.getLogger(TollScoring.class);
 
         private double score = 0.;
         private Carrier carrier;

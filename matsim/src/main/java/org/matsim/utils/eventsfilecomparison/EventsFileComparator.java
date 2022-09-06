@@ -23,7 +23,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CyclicBarrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 
 /**
@@ -34,7 +35,7 @@ import org.matsim.api.core.v01.events.Event;
  * @author laemmel
  */
 public final class EventsFileComparator {
-	private static final Logger log = Logger.getLogger(EventsFileComparator.class);
+	private static final Logger log = LogManager.getLogger(EventsFileComparator.class);
 
 	@Deprecated // use Result enum
 	public static final int CODE_FILES_ARE_EQUAL = 0;

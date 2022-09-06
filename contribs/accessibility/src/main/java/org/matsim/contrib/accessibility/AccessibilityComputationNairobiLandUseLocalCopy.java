@@ -21,7 +21,8 @@ package org.matsim.contrib.accessibility;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
@@ -37,7 +38,7 @@ import org.matsim.facilities.ActivityFacilities;
  * @author dziemke
  */
 class AccessibilityComputationNairobiLandUseLocalCopy {
-	public static final Logger LOG = Logger.getLogger(AccessibilityComputationNairobiLandUseLocalCopy.class);
+	public static final Logger LOG = LogManager.getLogger(AccessibilityComputationNairobiLandUseLocalCopy.class);
 	
 	public static void main(String[] args) {
 		int tileSize_m = 500;

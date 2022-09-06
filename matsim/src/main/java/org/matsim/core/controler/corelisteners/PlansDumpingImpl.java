@@ -20,7 +20,8 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -49,7 +50,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 @Singleton
 final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 
-	static final private Logger log = Logger.getLogger(PlansDumpingImpl.class);
+	static final private Logger log = LogManager.getLogger(PlansDumpingImpl.class);
 
 	@Inject private Config config;
 	@Inject private Network network;

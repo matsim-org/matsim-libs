@@ -24,7 +24,8 @@ import java.io.FileReader;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -37,7 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * */
 final class CountsReaderPt {
 
-	private final static Logger log = Logger.getLogger(CountsReaderPt.class);
+	private final static Logger log = LogManager.getLogger(CountsReaderPt.class);
 
 	final String STOP_ID_STRING_0 = "StopId :";
 	final String HEAD_STRING_0 = "hour";

@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.drt.run;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
@@ -28,7 +29,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
  * @author Michal Maciejewski (michalm)
  */
 public class DrtConfigs {
-	private static final Logger LOGGER = Logger.getLogger(DrtControlerCreator.class);
+	private static final Logger LOGGER = LogManager.getLogger(DrtControlerCreator.class);
 
 	public static void adjustMultiModeDrtConfig(MultiModeDrtConfigGroup multiModeDrtCfg,
 			PlanCalcScoreConfigGroup planCalcScoreCfg, PlansCalcRouteConfigGroup plansCalcRouteCfg) {

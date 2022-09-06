@@ -29,7 +29,8 @@ import java.util.List;
 
 import com.google.inject.BindingAnnotation;
 import com.google.inject.ProvisionException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -53,7 +54,7 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public class QSimComponentsTest {
-	private static final Logger log = Logger.getLogger( QSimComponentsTest.class ) ;
+	private static final Logger log = LogManager.getLogger( QSimComponentsTest.class ) ;
 
 	@Test
 	public void testAddComponentViaString() {

@@ -23,7 +23,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 
 import playground.vsp.analysis.modules.ptTripAnalysis.distance.DistAnalysisTripI;
@@ -36,8 +37,7 @@ import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTAnalysisTripS
  *
  */
 public class AnalysisTripSetStorage {
-	private static final Logger log = Logger
-			.getLogger(AnalysisTripSetStorage.class);
+	private static final Logger log = LogManager.getLogger(AnalysisTripSetStorage.class);
 	
 	private Map<String, AbstractAnalysisTripSet> mode2TripSet = new HashMap<String, AbstractAnalysisTripSet>();
 	private boolean storeTrips;

@@ -22,7 +22,8 @@ package playground.vsp.airPollution.exposure;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Cell {
 
@@ -50,7 +51,7 @@ public class Cell {
 	
 	public List<Cell> getNearbyCells(int noOfXCells, int noOfYCells, int distance){
 		if(distance<0){
-			Logger.getLogger(Cell.class).warn("Negative distance - will not return any nearby neighbors.");
+			LogManager.getLogger(Cell.class).warn("Negative distance - will not return any nearby neighbors.");
 			return null;
 		}
 		List<Cell> nearbyCells = new ArrayList<Cell>();
@@ -71,7 +72,7 @@ public class Cell {
 
 	public List<Cell> getCellsWithExactDistance(int noOfXCells, int noOfYCells, int distance) {
 		if(distance<0){
-			Logger.getLogger(Cell.class).warn("Negative distance - will not return any nearby neighbors.");
+			LogManager.getLogger(Cell.class).warn("Negative distance - will not return any nearby neighbors.");
 			return null;
 		}
 		List<Cell> cells = new ArrayList<Cell>();

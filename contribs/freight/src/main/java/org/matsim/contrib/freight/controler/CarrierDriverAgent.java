@@ -1,6 +1,7 @@
 package org.matsim.contrib.freight.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
@@ -28,7 +29,7 @@ import java.util.List;
  * @author mzilske, sschroeder
  */
 final class CarrierDriverAgent{
-	private static final Logger log = Logger.getLogger( CarrierDriverAgent.class );
+	private static final Logger log = LogManager.getLogger( CarrierDriverAgent.class );
 
 	private Leg currentLeg;
 

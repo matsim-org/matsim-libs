@@ -23,7 +23,8 @@ import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgre
 import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,7 +53,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class RunCarsharingIT {
 
-	private final static Logger log = Logger.getLogger(RunCarsharingIT.class);
+	private final static Logger log = LogManager.getLogger(RunCarsharingIT.class);
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 

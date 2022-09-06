@@ -22,7 +22,8 @@
 package org.matsim.contrib.freight.controler;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Person;
@@ -52,7 +53,7 @@ public final class CarrierAgentTracker implements BasicEventHandler
 	// tracker was destroyed and recreated in every iteration, to something that is persistent.  Indeed, original matsim design always was like
 	// that (so that observers could collect information over multiple iterations without additional programming).  kai, jul'22
 
-	private static final Logger log = Logger.getLogger( CarrierAgentTracker.class ) ;
+	private static final Logger log = LogManager.getLogger( CarrierAgentTracker.class ) ;
 
 	private final Carriers carriers;
 	private final CarrierScoringFunctionFactory carrierScoringFunctionFactory;
