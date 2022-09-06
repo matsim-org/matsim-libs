@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package playground.vsp.scoring;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
@@ -54,7 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * the #PlanCalcScoreConfigGroup
  */
 public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements ScoringParametersForPerson {
-    Logger log = Logger.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
+    Logger log = LogManager.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
 
     public static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
 

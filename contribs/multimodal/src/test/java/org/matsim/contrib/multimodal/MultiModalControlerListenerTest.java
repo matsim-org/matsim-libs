@@ -23,7 +23,8 @@ package org.matsim.contrib.multimodal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -66,7 +67,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class MultiModalControlerListenerTest {
 
-	private static final Logger log = Logger.getLogger(MultiModalControlerListenerTest.class);
+	private static final Logger log = LogManager.getLogger(MultiModalControlerListenerTest.class);
 
 	@Rule 
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -306,9 +307,9 @@ public class MultiModalControlerListenerTest {
 		double carTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.car);
 		double bikeTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.bike);
 		double walkTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.walk);
-		Logger.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
-		Logger.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
-		Logger.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
+		LogManager.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
+		LogManager.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
+		LogManager.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
 		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			Assert.assertEquals(
 					"unexpected total travel time for car mode with number of threads "+numberOfThreads,
@@ -434,8 +435,8 @@ public class MultiModalControlerListenerTest {
 			}
 			Double modeTravelTime = this.travelTimesPerMode.get(mode);
 			if ( modeTravelTime==null ) {
-				Logger.getLogger(this.getClass()).warn( "mode:" + mode );
-				Logger.getLogger(this.getClass()).warn( "travelTimesPerMode:" + this.travelTimesPerMode );
+				LogManager.getLogger(this.getClass()).warn( "mode:" + mode );
+				LogManager.getLogger(this.getClass()).warn( "travelTimesPerMode:" + this.travelTimesPerMode );
 			}
 			this.travelTimesPerMode.put(mode, modeTravelTime + tripTravelTime);
 		}

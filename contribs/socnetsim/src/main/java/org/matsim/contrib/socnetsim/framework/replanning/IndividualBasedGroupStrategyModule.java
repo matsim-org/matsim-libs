@@ -21,7 +21,8 @@ package org.matsim.contrib.socnetsim.framework.replanning;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
@@ -36,7 +37,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
  */
 public class IndividualBasedGroupStrategyModule implements GenericStrategyModule<GroupPlans> {
 	private static final Logger log =
-		Logger.getLogger(IndividualBasedGroupStrategyModule.class);
+		LogManager.getLogger(IndividualBasedGroupStrategyModule.class);
 
 	private final boolean actOnPlansInJointPlans;
 	private final PlanStrategyModule delegate;

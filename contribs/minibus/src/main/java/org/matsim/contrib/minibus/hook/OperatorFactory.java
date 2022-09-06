@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 
@@ -30,7 +31,7 @@ import org.matsim.contrib.minibus.PConfigGroup;
  */
 final class OperatorFactory {
 	
-	private final static Logger log = Logger.getLogger(OperatorFactory.class);
+	private final static Logger log = LogManager.getLogger(OperatorFactory.class);
 	
 	private final PConfigGroup pConfig;
 	private final PFranchise franchise;

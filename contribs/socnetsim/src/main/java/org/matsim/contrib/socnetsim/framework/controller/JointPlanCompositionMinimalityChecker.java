@@ -23,7 +23,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -41,7 +42,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentif
 import com.google.inject.Inject;
 
 public final class JointPlanCompositionMinimalityChecker implements IterationEndsListener, IterationStartsListener {
-	private static final Logger log = Logger.getLogger( JointPlanCompositionMinimalityChecker.class );
+	private static final Logger log = LogManager.getLogger( JointPlanCompositionMinimalityChecker.class );
 
 	// Fail only on start of next iteration, to let all consistency checkers print their error, if any.
 	private boolean gotError = false;

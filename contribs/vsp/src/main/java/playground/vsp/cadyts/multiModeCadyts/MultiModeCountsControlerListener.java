@@ -29,7 +29,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -78,7 +79,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 		Set<String> mainModes = new HashSet<>(qsimConfigGroup.getMainModes());
 
 		if( ! this.analyzedModes.equals( mainModes ) ) {
-			Logger.getLogger(MultiModeCountsControlerListener.class).
+			LogManager.getLogger(MultiModeCountsControlerListener.class).
 			warn("Analyzed modes in counts config group and main modes in qsim are not same. Using a common set istead.");
 			this.analyzedModes.addAll(mainModes);
 		}

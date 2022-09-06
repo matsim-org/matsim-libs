@@ -21,7 +21,8 @@ package org.matsim.contrib.signals.builder;
 
 import java.util.Collections;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,7 +64,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TravelTimeOneWayTestIT {
 
-	private static final Logger log = Logger.getLogger(TravelTimeOneWayTestIT.class);
+	private static final Logger log = LogManager.getLogger(TravelTimeOneWayTestIT.class);
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

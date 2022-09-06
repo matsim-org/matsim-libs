@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -44,7 +45,7 @@ import java.util.Stack;
  *
  */
 public class CarrierVehicleTypeReader implements MatsimReader{
-	private static final Logger log = Logger.getLogger(CarrierVehicleTypeReader.class);
+	private static final Logger log = LogManager.getLogger(CarrierVehicleTypeReader.class);
 	private static final String MSG="With early carrier vehicle type file formats, there will be an expected exception in the following." ;
 	private final CarrierVehicleTypeParser reader;
 

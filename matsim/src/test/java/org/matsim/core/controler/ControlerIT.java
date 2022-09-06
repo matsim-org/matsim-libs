@@ -31,7 +31,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,7 +77,7 @@ import com.google.inject.Provider;
 @RunWith(Parameterized.class)
 public class ControlerIT {
 
-	private final static Logger log = Logger.getLogger(ControlerIT.class);
+	private final static Logger log = LogManager.getLogger(ControlerIT.class);
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final boolean isUsingFastCapacityUpdate;

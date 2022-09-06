@@ -26,7 +26,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.minibus.PConfigGroup;
@@ -62,7 +63,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public final class POperatorLogger implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	private final static Logger log = Logger.getLogger(POperatorLogger.class);
+	private final static Logger log = LogManager.getLogger(POperatorLogger.class);
 	
 	public final static String FILESUFFIX = "pOperatorLogger.txt";
 	

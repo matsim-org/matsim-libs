@@ -21,7 +21,8 @@
 
  package org.matsim.core.scenario;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +46,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
  * @author thibautd
  */
 public class ScenarioByConfigInjectionTest {
-	private static final Logger log = Logger.getLogger( ScenarioByConfigInjectionTest.class );
+	private static final Logger log = LogManager.getLogger( ScenarioByConfigInjectionTest.class );
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 

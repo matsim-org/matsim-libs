@@ -8,11 +8,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 public class ApolloParameterReader {
-	private final static Logger logger = Logger.getLogger(ApolloParameterReader.class);
+	private final static Logger logger = LogManager.getLogger(ApolloParameterReader.class);
 
 	public ApolloParameters read(File path) throws MalformedURLException, IOException {
 		return read(path.toURI().toURL());

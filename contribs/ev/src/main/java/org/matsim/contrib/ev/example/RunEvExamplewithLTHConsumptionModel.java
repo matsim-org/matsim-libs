@@ -25,7 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -54,7 +55,7 @@ import org.matsim.vehicles.VehicleType;
  */
 public class RunEvExamplewithLTHConsumptionModel {
 	static final String DEFAULT_CONFIG_FILE = "test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
-	private static final Logger log = Logger.getLogger(RunEvExamplewithLTHConsumptionModel.class);
+	private static final Logger log = LogManager.getLogger(RunEvExamplewithLTHConsumptionModel.class);
 
 	public static void main(String[] args) throws IOException {
 		final URL configUrl;

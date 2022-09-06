@@ -22,8 +22,9 @@ package playground.vsp.andreas.bvgAna.level2;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -39,7 +40,7 @@ import playground.vsp.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMapData;
  */
 public class VehiclePlannedRealizedMissedDepartures {
 
-	private final Logger log = Logger.getLogger(VehiclePlannedRealizedMissedDepartures.class);
+	private final Logger log = LogManager.getLogger(VehiclePlannedRealizedMissedDepartures.class);
 //	private final Level logLevel = Level.OFF;
 
 	private final String planned = "planned";

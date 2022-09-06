@@ -28,7 +28,8 @@ import java.util.HashSet;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -167,7 +168,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 		private final ArrayList<Double> enterTimes = new ArrayList<>(100);
 		private final ArrayList<Double> leaveTimes = new ArrayList<>(100);
 
-		private static final Logger log = Logger.getLogger(TestControlerListener.class);
+		private static final Logger log = LogManager.getLogger(TestControlerListener.class);
 
 		LinkAnalyzer(final String linkId) {
 			this.linkId = linkId;

@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.config;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ConfigBehaviorTest{
 
-        private static final Logger log = Logger.getLogger(ConfigBehaviorTest.class );
+        private static final Logger log = LogManager.getLogger(ConfigBehaviorTest.class );
         @Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 

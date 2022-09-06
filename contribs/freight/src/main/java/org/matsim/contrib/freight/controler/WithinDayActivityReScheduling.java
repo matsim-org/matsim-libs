@@ -25,7 +25,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -54,7 +55,7 @@ import com.google.inject.Inject;
 class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener {
 	public static final String COMPONENT_NAME=WithinDayActivityReScheduling.class.getSimpleName() ;
 
-	private static final  Logger logger = Logger.getLogger(WithinDayActivityReScheduling.class);
+	private static final  Logger logger = LogManager.getLogger(WithinDayActivityReScheduling.class);
 	
 	private FreightAgentSource freightAgentSource;
 	

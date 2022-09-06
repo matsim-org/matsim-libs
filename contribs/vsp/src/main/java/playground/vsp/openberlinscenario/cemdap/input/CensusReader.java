@@ -19,7 +19,8 @@
 
 package playground.vsp.openberlinscenario.cemdap.input;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -32,7 +33,7 @@ import java.util.List;
  * @author dziemke
  */
 public class CensusReader {
-	private static final Logger LOG = Logger.getLogger(CensusReader.class);
+	private static final Logger LOG = LogManager.getLogger(CensusReader.class);
 	
 	private ObjectAttributes municipalities = new ObjectAttributes();
 	private List<String> municipalityList = new ArrayList<>();

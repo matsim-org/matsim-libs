@@ -24,7 +24,8 @@ package org.matsim.contrib.matrixbasedptrouter;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -33,7 +34,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  *
  */
 public final class MatrixBasedPtRouterConfigGroup extends ReflectiveConfigGroup {
-	static final Logger log = Logger.getLogger(MatrixBasedPtRouterConfigGroup.class) ;
+	static final Logger log = LogManager.getLogger(MatrixBasedPtRouterConfigGroup.class) ;
 
 	public static final String GROUP_NAME="matrixBasedPtRouter" ;
 

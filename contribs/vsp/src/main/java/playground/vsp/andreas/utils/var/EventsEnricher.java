@@ -20,7 +20,8 @@ package playground.vsp.andreas.utils.var;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -41,7 +42,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
  */
 public class EventsEnricher implements BasicEventHandler {
 	
-	private static final Logger log = Logger.getLogger(EventsEnricher.class);
+	private static final Logger log = LogManager.getLogger(EventsEnricher.class);
 	
 	private EventWriterXML eventsWriter;
 

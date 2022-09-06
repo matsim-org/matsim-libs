@@ -20,7 +20,8 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -36,7 +37,7 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 
-	private final static Logger log = Logger.getLogger(ExpBetaPlanSelectorTest.class);
+	private final static Logger log = LogManager.getLogger(ExpBetaPlanSelectorTest.class);
 	private Config config = null;
 
 	@Override

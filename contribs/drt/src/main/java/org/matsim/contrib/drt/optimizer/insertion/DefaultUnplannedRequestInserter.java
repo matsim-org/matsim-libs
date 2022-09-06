@@ -29,7 +29,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -50,7 +51,7 @@ import com.google.common.annotations.VisibleForTesting;
  * @author michalm
  */
 public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter {
-	private static final Logger log = Logger.getLogger(DefaultUnplannedRequestInserter.class);
+	private static final Logger log = LogManager.getLogger(DefaultUnplannedRequestInserter.class);
 	public static final String NO_INSERTION_FOUND_CAUSE = "no_insertion_found";
 
 	private final String mode;

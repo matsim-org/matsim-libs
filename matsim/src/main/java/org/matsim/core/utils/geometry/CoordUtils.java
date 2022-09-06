@@ -20,7 +20,8 @@
 
 package org.matsim.core.utils.geometry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
@@ -28,7 +29,7 @@ import org.matsim.core.gbl.Gbl;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class CoordUtils {
-	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
+	final private static Logger LOG = LogManager.getLogger(CoordUtils.class);
 	final private static EucledianDistanceCalculator eucledianDistanceCalculator = new EucledianDistanceCalculator();
 	
 	public static Coordinate createGeotoolsCoordinate( final Coord coord ) {
@@ -297,7 +298,7 @@ public abstract class CoordUtils {
 			return Math.sqrt(dotProduct(m, m));
 		} else{
 			if (!onlyOnceWarnGiven) {
-				Logger.getLogger(CoordUtils.class).warn("Mix of 2D / 3D coordinates. Assuming 2D only.\n" + Gbl.ONLYONCE);
+				LogManager.getLogger(CoordUtils.class).warn("Mix of 2D / 3D coordinates. Assuming 2D only.\n" + Gbl.ONLYONCE);
 				onlyOnceWarnGiven = true;
 			}
 			return distancePointLinesegment(new Coord(lineFrom.getX(), lineFrom.getY()), new Coord(lineTo.getX(), lineTo.getY()), new Coord(point.getX(), point.getY()));
@@ -362,7 +363,7 @@ public abstract class CoordUtils {
 			return q;
 		} else{
 			if (!onlyOnceWarnGiven) {
-				Logger.getLogger(CoordUtils.class).warn("Mix of 2D / 3D coordinates. Assuming 2D only.\n" + Gbl.ONLYONCE);
+				LogManager.getLogger(CoordUtils.class).warn("Mix of 2D / 3D coordinates. Assuming 2D only.\n" + Gbl.ONLYONCE);
 				onlyOnceWarnGiven = true;
 			}
 			return orthogonalProjectionOnLineSegment(new Coord(lineFrom.getX(), lineFrom.getY()), new Coord(lineTo.getX(), lineTo.getY()), new Coord(point.getX(), point.getY()));

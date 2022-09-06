@@ -20,7 +20,8 @@
 
 package org.matsim.analysis.linkpaxvolumes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
@@ -52,7 +53,7 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 		VehicleLeavesTrafficEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler {
 
-	private final static Logger log = Logger.getLogger(LinkPaxVolumesAnalysis.class);
+	private final static Logger log = LogManager.getLogger(LinkPaxVolumesAnalysis.class);
 	private final int timeBinSize;
 	private final int maxTime; // TODO: maybe 24h is too restrictive with plans rather 3:00 - 27:00
 	private final int maxSlotIndex;

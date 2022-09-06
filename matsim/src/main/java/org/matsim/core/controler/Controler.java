@@ -22,7 +22,8 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
@@ -106,7 +107,7 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 
 	public static final String DIVIDER = "###################################################";
 
-	private static final Logger log = Logger.getLogger(Controler.class);
+	private static final Logger log = LogManager.getLogger(Controler.class);
 
 	public static final PatternLayout DEFAULTLOG4JLAYOUT = PatternLayout.newBuilder().withPattern("%d{ISO8601} %5p %C{1}:%L %m%n").build();
 

@@ -31,7 +31,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Leg;
@@ -102,7 +103,7 @@ public class PKMbyModeCalculator {
 
 
         } catch (IOException e) {
-            Logger.getLogger(getClass()).error("Could not write PKM Modestats.");
+            LogManager.getLogger(getClass()).error("Could not write PKM Modestats.");
         }
         if (writePng){
             String[] categories = new String[pmtPerIteration.size()];

@@ -22,7 +22,8 @@
  package org.matsim.core.controler;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -70,7 +71,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	// bind( PrepareForSimImpl.class ) ;
 	// bind( PrepareForSim.class ).to( MyPrepareForSimImpl.class ) ;
 
-	private static Logger log = Logger.getLogger(PrepareForSim.class);
+	private static Logger log = LogManager.getLogger(PrepareForSim.class);
 
 	private final GlobalConfigGroup globalConfigGroup;
 	private final Scenario scenario;

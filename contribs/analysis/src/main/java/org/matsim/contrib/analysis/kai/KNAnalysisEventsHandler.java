@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.analysis.kai;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,7 +60,7 @@ import java.util.Map.Entry;
 public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonMoneyEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler,
 									  VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
+	private final static Logger log = LogManager.getLogger(KNAnalysisEventsHandler.class);
 
 	public static final String PAYMENTS = "payments";
 	public static final String TRAV_TIME = "travTime" ;
@@ -666,9 +667,9 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 			if ( wrnCnt==0 ) {
 				wrnCnt++ ;
 				//				throw new RuntimeException("vehicle arrival for vehicle that never entered link.  teleportation?") ;
-				Logger.getLogger(this.getClass()).warn("vehicle arrival for vehicle that never entered link.  I think this can happen with departures "
+				LogManager.getLogger(this.getClass()).warn("vehicle arrival for vehicle that never entered link.  I think this can happen with departures "
 											     + "that have empty routes, i.e. go to a location on the same link. kai, may'14");
-				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
+				LogManager.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
 			}
 		}
 	}

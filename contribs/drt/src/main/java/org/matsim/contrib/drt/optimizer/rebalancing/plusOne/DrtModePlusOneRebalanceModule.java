@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.plusOne;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
@@ -33,7 +34,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
-	private static final Logger log = Logger.getLogger(DrtModePlusOneRebalanceModule.class);
+	private static final Logger log = LogManager.getLogger(DrtModePlusOneRebalanceModule.class);
 	private final DrtConfigGroup drtCfg;
 
 	public DrtModePlusOneRebalanceModule(DrtConfigGroup drtCfg) {

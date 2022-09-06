@@ -23,7 +23,8 @@ package org.matsim.core.population.routes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -44,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public abstract class AbstractNetworkRouteTest {
 
-	static private final Logger log = Logger.getLogger(AbstractNetworkRouteTest.class);
+	static private final Logger log = LogManager.getLogger(AbstractNetworkRouteTest.class);
 
 	abstract protected NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final Network network);
 

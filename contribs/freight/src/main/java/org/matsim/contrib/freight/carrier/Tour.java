@@ -27,7 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
@@ -44,7 +45,7 @@ import org.matsim.core.population.routes.RouteUtils;
  */
 public class Tour {
 
-	private static final Logger logger = Logger.getLogger(Tour.class);
+	private static final Logger logger = LogManager.getLogger(Tour.class);
 
 	/**
 	 * A builder building a tour.

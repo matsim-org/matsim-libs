@@ -23,7 +23,8 @@
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -76,7 +77,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
     @Inject
     AnalysisMainModeIdentifier mainModeIdentifier;
 
-    Logger log = Logger.getLogger(IterationTravelStatsControlerListener.class);
+    Logger log = LogManager.getLogger(IterationTravelStatsControlerListener.class);
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
@@ -105,7 +106,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
     }
 
     private void writePersonsCSV() {
-        Logger.getLogger(getClass()).info("Writing all Person and Attributes to " + Controler.DefaultFiles.personscsv);
+        LogManager.getLogger(getClass()).info("Writing all Person and Attributes to " + Controler.DefaultFiles.personscsv);
         List<String> attributes = new ArrayList<>(scenario.getPopulation().getPersons().values().parallelStream().flatMap(p -> p.getAttributes().getAsMap().keySet().stream()).collect(Collectors.toSet()));
         attributes.remove("vehicles");
         List<String> header = new ArrayList<>();
@@ -149,6 +150,6 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Logger.getLogger(getClass()).info("...done");
+        LogManager.getLogger(getClass()).info("...done");
     }
 }

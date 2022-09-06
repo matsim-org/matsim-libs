@@ -20,7 +20,8 @@
 package org.matsim.core.scenario;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -74,7 +75,7 @@ import static org.matsim.core.config.groups.PlansConfigGroup.PERSON_ATTRIBUTES_D
 // deliberately non-public.  Use method in ScenarioUtils.
 class ScenarioLoaderImpl {
 
-	private static final Logger log = Logger.getLogger(ScenarioLoaderImpl.class);
+	private static final Logger log = LogManager.getLogger(ScenarioLoaderImpl.class);
 
 	private final Config config;
 

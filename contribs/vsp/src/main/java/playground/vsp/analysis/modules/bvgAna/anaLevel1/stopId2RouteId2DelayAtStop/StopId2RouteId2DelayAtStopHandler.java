@@ -21,8 +21,9 @@ package playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2RouteId2DelayAtS
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -38,7 +39,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
  */
 public class StopId2RouteId2DelayAtStopHandler implements VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler{
 
-	private final Logger log = Logger.getLogger(StopId2RouteId2DelayAtStopHandler.class);
+	private final Logger log = LogManager.getLogger(StopId2RouteId2DelayAtStopHandler.class);
 //	private final Level logLevel = Level.OFF;
 
 	private TreeMap<Id, TransitDriverStartsEvent> veh2LastStartsEvent = new TreeMap<Id, TransitDriverStartsEvent>();

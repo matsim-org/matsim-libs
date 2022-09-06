@@ -26,7 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -69,7 +70,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	}
 
-	private static final Logger log = Logger.getLogger(TransitQSimEngine.class);
+	private static final Logger log = LogManager.getLogger(TransitQSimEngine.class);
 
 	private final QSim qSim;
 

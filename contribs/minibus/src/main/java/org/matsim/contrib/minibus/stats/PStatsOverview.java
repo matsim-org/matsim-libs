@@ -28,7 +28,8 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.hook.Operator;
@@ -63,7 +64,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  */
 final class PStatsOverview implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	private final static Logger log = Logger.getLogger(PStatsOverview.class);
+	private final static Logger log = LogManager.getLogger(PStatsOverview.class);
 	
 	enum INDEX {
 		INDEX_NOPERATORS("N operators", "N operators", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),

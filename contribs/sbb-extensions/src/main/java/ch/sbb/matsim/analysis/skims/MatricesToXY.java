@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -27,7 +28,7 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class MatricesToXY {
 
-    private final static Logger log = Logger.getLogger(MatricesToXY.class);
+    private final static Logger log = LogManager.getLogger(MatricesToXY.class);
 
     public static void main(String[] args) throws IOException {
         String zonesShapeFilename = args[0]; // path to a shape-file, e.g. /path/to/my-zones.shp

@@ -22,8 +22,9 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 import java.util.Collection;
 import java.util.Random;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -33,7 +34,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 
  class DestinationScoring {
- 	private static final Logger log = Logger.getLogger( DestinationScoring.class ) ;
+ 	private static final Logger log = LogManager.getLogger( DestinationScoring.class ) ;
 
 	//As the random number generator is re-seeded here anyway, we do not need a rng given from outside!
 	private Random rnd = new Random();

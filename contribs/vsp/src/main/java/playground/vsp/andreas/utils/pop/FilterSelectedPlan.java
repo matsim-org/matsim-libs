@@ -19,7 +19,8 @@
 
 package playground.vsp.andreas.utils.pop;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
@@ -41,7 +42,7 @@ import playground.vsp.andreas.bvgAna.mrieser.PersonFilterSelectedPlan;
  */
 public class FilterSelectedPlan {
 	
-	private static final Logger log = Logger.getLogger(FilterSelectedPlan.class);
+	private static final Logger log = LogManager.getLogger(FilterSelectedPlan.class);
 
 	public static void filterSelectedPlans(final String[] args) {
 		

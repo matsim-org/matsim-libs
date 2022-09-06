@@ -20,7 +20,8 @@
 
 package org.matsim.core.network.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -59,7 +60,7 @@ final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	// final or settable?
 	private final CoordinateTransformation transformation;
 
-	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
+	private final static Logger log = LogManager.getLogger(NetworkReaderMatsimV1.class);
 
 	public NetworkReaderMatsimV1(Network network) {
 		this( new IdentityTransformation() , network );

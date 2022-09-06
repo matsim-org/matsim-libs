@@ -1,7 +1,8 @@
 package org.matsim.contrib.drt.extension.shifts.analysis;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
  */
 public class ShiftAnalysisControlerListener implements IterationEndsListener {
 
-    private final static Logger logger = Logger.getLogger(ShiftAnalysisControlerListener.class);
+    private final static Logger logger = LogManager.getLogger(ShiftAnalysisControlerListener.class);
 
 	private final String delimiter;
 

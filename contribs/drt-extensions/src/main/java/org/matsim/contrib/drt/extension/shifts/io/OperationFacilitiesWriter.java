@@ -1,7 +1,8 @@
 package org.matsim.contrib.drt.extension.shifts.io;
 
 import com.google.common.collect.Lists;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecification;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class OperationFacilitiesWriter extends MatsimXmlWriter {
 
-	private final static Logger log = Logger.getLogger(OperationFacilitiesWriter.class);
+	private final static Logger log = LogManager.getLogger(OperationFacilitiesWriter.class);
 
     private final static String ROOT = "facilities";
 

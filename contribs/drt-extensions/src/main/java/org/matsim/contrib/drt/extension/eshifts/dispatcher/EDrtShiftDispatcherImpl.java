@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.eshifts.dispatcher;
 
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.eshifts.fleet.EvShiftDvrpVehicle;

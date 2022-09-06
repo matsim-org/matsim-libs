@@ -20,7 +20,8 @@
 
 package org.matsim.facilities;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -47,7 +48,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 
 	private long nextMsg = 1;
 
-	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
+	private static final Logger log = LogManager.getLogger(ActivityFacilitiesImpl.class);
 	private final ActivityFacilitiesFactory factory ;
 	private final Attributes attributes = new Attributes();
 

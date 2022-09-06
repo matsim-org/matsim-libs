@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -63,7 +64,7 @@ import com.google.inject.Inject;
  * @author balmermi
  */
 /* deliberately package */ class PopulationReaderMatsimV6 extends MatsimXmlParser implements MatsimReader {
-    private static final Logger log = Logger.getLogger(PopulationReaderMatsimV6.class);
+    private static final Logger log = LogManager.getLogger(PopulationReaderMatsimV6.class);
 
 	private final static String POPULATION = "population";
 	private final static String PERSON = "person";

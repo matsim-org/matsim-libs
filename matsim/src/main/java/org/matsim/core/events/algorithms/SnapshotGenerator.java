@@ -20,7 +20,8 @@
 
 package org.matsim.core.events.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.*;
@@ -45,7 +46,7 @@ import java.util.List;
 public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, PersonStuckEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private final static Logger log = Logger.getLogger(SnapshotGenerator.class);
+	private final static Logger log = LogManager.getLogger(SnapshotGenerator.class);
 	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;

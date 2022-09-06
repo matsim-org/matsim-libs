@@ -8,7 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -65,7 +66,7 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressPar
 
 //@RunWith(Parameterized.class)
 public class PtAlongALine2Test {
-	private static final Logger log = Logger.getLogger(PtAlongALine2Test.class);
+	private static final Logger log = LogManager.getLogger(PtAlongALine2Test.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();

@@ -22,7 +22,8 @@ package playground.vsp.analysis.modules.taxiTravelStats;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -50,7 +51,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class TaxiTravelStatsHandler implements ActivityEndEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 	
-	private static final Logger log = Logger.getLogger(TaxiTravelStatsHandler.class);
+	private static final Logger log = LogManager.getLogger(TaxiTravelStatsHandler.class);
 	
 	private static final  int STANDARD_TAXI_CAPACITY = 1;
 	

@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -56,7 +57,7 @@ import org.matsim.vehicles.Vehicle;
  */
 final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
 
-	private final static Logger log = Logger.getLogger(CompressedNetworkRouteImpl.class);
+	private final static Logger log = LogManager.getLogger(CompressedNetworkRouteImpl.class);
 
 	private ArrayList<Id<Link>> route = new ArrayList<>(0);
 	private final Map<Id<Link>, Id<Link>> subsequentLinks;

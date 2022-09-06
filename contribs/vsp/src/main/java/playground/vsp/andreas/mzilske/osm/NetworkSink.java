@@ -19,7 +19,8 @@
 
 package playground.vsp.andreas.mzilske.osm;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +48,7 @@ import java.util.Map;
 
 public class NetworkSink implements SinkSource {
 
-	private static final  Logger log = Logger.getLogger(NetworkSink.class);
+	private static final  Logger log = LogManager.getLogger(NetworkSink.class);
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
 	private final CoordinateTransformation transform;

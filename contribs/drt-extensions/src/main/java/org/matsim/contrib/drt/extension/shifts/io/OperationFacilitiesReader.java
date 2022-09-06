@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -16,7 +17,7 @@ import java.util.Stack;
  */
 public class OperationFacilitiesReader extends MatsimXmlParser {
 
-    private final static Logger log = Logger.getLogger(OperationFacilitiesReader.class);
+    private final static Logger log = LogManager.getLogger(OperationFacilitiesReader.class);
 
     private final static String ROOT = "facilities";
 

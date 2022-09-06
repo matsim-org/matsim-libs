@@ -18,7 +18,8 @@
 
 package org.matsim.core.network;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -45,7 +46,7 @@ import java.util.*;
  */
 /*deliberately package*/ final class NetworkImpl implements Network, Lockable, TimeDependentNetwork, SearchableNetwork {
 
-	private final static Logger log = Logger.getLogger(NetworkImpl.class);
+	private final static Logger log = LogManager.getLogger(NetworkImpl.class);
 
 	private double capacityPeriod = 3600.0 ;
 

@@ -21,7 +21,8 @@ package org.matsim.core.mobsim.qsim.pt;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
@@ -36,7 +37,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class ComplexTransitStopHandler implements TransitStopHandler {
 	
-	private final static Logger log = Logger.getLogger(ComplexTransitStopHandler.class);
+	private final static Logger log = LogManager.getLogger(ComplexTransitStopHandler.class);
 
 	private boolean doorsOpen = false;
 	private double passengersLeavingTimeFraction = 0.0;

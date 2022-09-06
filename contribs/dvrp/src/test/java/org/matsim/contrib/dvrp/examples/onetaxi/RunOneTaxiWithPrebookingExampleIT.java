@@ -29,7 +29,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.assertj.core.data.Offset;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -65,7 +66,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunOneTaxiWithPrebookingExampleIT {
 
-	private static final Logger log = Logger.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
+	private static final Logger log = LogManager.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();

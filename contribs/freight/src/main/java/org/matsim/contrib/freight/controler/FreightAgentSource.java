@@ -32,7 +32,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.utils.FreightUtils;
@@ -53,7 +54,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 	public static final String COMPONENT_NAME=FreightAgentSource.class.getSimpleName();
 
-	private static final  Logger log = Logger.getLogger(FreightAgentSource.class);
+	private static final  Logger log = LogManager.getLogger(FreightAgentSource.class);
 	private final CarrierAgentTracker tracker;
 
 	private final Collection<MobsimAgent> mobSimAgents;

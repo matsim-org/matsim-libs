@@ -21,7 +21,8 @@ package playground.vsp.analysis.modules.bvgAna.anaLevel1.personId2DelayAtStop;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -38,7 +39,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  *
  */
 public class PersonId2DelayAtStopHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler{
-	private final Logger log = Logger.getLogger(PersonId2DelayAtStopHandler.class);
+	private final Logger log = LogManager.getLogger(PersonId2DelayAtStopHandler.class);
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private TreeMap<Id, PersonId2DelayAtStopData> id2DelayAtStopMap = new TreeMap<Id, PersonId2DelayAtStopData>();

@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -82,7 +83,7 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public final class EventsManagerImpl implements EventsManager {
 
-	private static final Logger log = Logger.getLogger(EventsManagerImpl.class);
+	private static final Logger log = LogManager.getLogger(EventsManagerImpl.class);
 
 	static private class HandlerData {
 

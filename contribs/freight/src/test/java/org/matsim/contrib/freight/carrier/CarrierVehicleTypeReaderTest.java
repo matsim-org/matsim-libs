@@ -1,6 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 public class CarrierVehicleTypeReaderTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	private static final Logger log = Logger.getLogger(CarrierVehicleTypeReaderTest.class) ;
+	private static final Logger log = LogManager.getLogger(CarrierVehicleTypeReaderTest.class) ;
 
 	private CarrierVehicleTypes types;
 	private String inFilename;

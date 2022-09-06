@@ -1,6 +1,7 @@
 package org.matsim.vehicles;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -8,7 +9,7 @@ import org.xml.sax.Attributes;
 import java.util.Stack;
 
 final class VehicleReaderV1 extends MatsimXmlParser{
-	private static final Logger log = Logger.getLogger(VehicleReaderV1.class) ;
+	private static final Logger log = LogManager.getLogger(VehicleReaderV1.class) ;
 
 	private final Vehicles vehicles;
 	private final VehiclesFactory builder;

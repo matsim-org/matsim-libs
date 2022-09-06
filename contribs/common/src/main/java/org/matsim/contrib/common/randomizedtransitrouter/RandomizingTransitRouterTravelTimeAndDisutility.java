@@ -18,7 +18,8 @@ package org.matsim.contrib.common.randomizedtransitrouter;/* *******************
  *                                                                         *
  * *********************************************************************** */
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -73,11 +74,11 @@ public class RandomizingTransitRouterTravelTimeAndDisutility  extends TransitRou
 
 		// marg utl time wlk should be around -3/h or -(3/3600)/sec.  Give warning if not at least 1/3600:
 		if ( -routerConfig.getMarginalUtilityOfTravelTimeWalk_utl_s() < 1./3600. ) {
-			Logger.getLogger(this.getClass()).warn( "marg utl of walk rather close to zero; randomization may not work") ;
+			LogManager.getLogger(this.getClass()).warn( "marg utl of walk rather close to zero; randomization may not work") ;
 		}
 		// utl of line switch should be around -300sec or -0.5u.  Give warning if not at least 0.1u:
 		if ( -routerConfig.getUtilityOfLineSwitch_utl() < 0.1 ) {
-			Logger.getLogger(this.getClass()).warn( "utl of line switch rather close to zero; randomization may not work") ;
+			LogManager.getLogger(this.getClass()).warn( "utl of line switch rather close to zero; randomization may not work") ;
 		}
 			
 		this.originalTransitRouterConfig = routerConfig ;
@@ -139,7 +140,7 @@ public class RandomizingTransitRouterTravelTimeAndDisutility  extends TransitRou
 	}
 	
 	public final void setDataCollection( DataCollection item, Boolean bbb ) {
-		Logger.getLogger(this.getClass()).info( " settin data collection of " + item.toString() + " to " + bbb.toString() ) ;
+		LogManager.getLogger(this.getClass()).info( " settin data collection of " + item.toString() + " to " + bbb.toString() ) ;
 		dataCollectionConfig.put( item, bbb ) ;
 	}
 

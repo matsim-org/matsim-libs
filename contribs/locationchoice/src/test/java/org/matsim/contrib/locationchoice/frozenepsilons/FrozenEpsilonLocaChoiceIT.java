@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,7 +70,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 public class FrozenEpsilonLocaChoiceIT{
-	private static final Logger log = Logger.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
+	private static final Logger log = LogManager.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 

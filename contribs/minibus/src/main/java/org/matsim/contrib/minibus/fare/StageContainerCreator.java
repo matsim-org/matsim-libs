@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.fare;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -51,7 +52,7 @@ import java.util.List;
  */
 public final class StageContainerCreator implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener{
 	
-	private final static Logger log = Logger.getLogger(StageContainerCreator.class);
+	private final static Logger log = LogManager.getLogger(StageContainerCreator.class);
 	
 	private Network network;
 	private final String pIdentifier;

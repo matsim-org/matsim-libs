@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -34,7 +35,7 @@ import org.xml.sax.Attributes;
 import java.util.Stack;
 
 class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
-	private static final Logger log = Logger.getLogger(CarrierVehicleTypeReaderV1.class) ;
+	private static final Logger log = LogManager.getLogger(CarrierVehicleTypeReaderV1.class) ;
 
 	private static int wrnCnt=10 ;
 

@@ -19,13 +19,14 @@
 
 package org.matsim.contrib.dvrp.benchmark;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
 public class DvrpBenchmarkConfigConsistencyChecker implements ConfigConsistencyChecker {
-	private static final Logger log = Logger.getLogger(DvrpBenchmarkConfigConsistencyChecker.class);
+	private static final Logger log = LogManager.getLogger(DvrpBenchmarkConfigConsistencyChecker.class);
 
 	@Override
 	public void checkConsistency(Config config) {

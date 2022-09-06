@@ -1,6 +1,8 @@
 package org.matsim.contrib.drt.extension.eshifts.scheduler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -44,6 +46,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE;
+import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 
 /**
@@ -51,7 +55,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
  */
 public class EShiftTaskScheduler implements ShiftTaskScheduler {
 
-    private final static Logger logger = Logger.getLogger(EShiftTaskScheduler.class);
+    private final static Logger logger = LogManager.getLogger(EShiftTaskScheduler.class);
 
     private final TravelTime travelTime;
     private final MobsimTimer timer;

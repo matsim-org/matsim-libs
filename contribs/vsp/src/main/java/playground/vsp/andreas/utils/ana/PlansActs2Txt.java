@@ -24,7 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -49,7 +50,7 @@ import playground.vsp.andreas.utils.ana.plans2gexf.GridNode;
  */
 public class PlansActs2Txt extends MatsimJaxbXmlWriter{
 	
-	private static final Logger log = Logger.getLogger(PlansActs2Txt.class);
+	private static final Logger log = LogManager.getLogger(PlansActs2Txt.class);
 	
 	private final double gridSize;
 	

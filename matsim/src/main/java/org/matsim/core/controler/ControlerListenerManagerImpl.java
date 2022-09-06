@@ -20,7 +20,8 @@
 
 package org.matsim.core.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.utils.misc.ClassUtils;
@@ -34,7 +35,7 @@ import javax.swing.event.EventListenerList;
  */
 public final class ControlerListenerManagerImpl implements ControlerListenerManager {
 
-	private final static Logger log = Logger.getLogger(ControlerListenerManagerImpl.class);
+	private final static Logger log = LogManager.getLogger(ControlerListenerManagerImpl.class);
 
     private MatsimServices controler = null;
 

@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
@@ -68,7 +69,7 @@ import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansC
 
 public class CORINELandCoverCoordsModifier {
 
-    private static final Logger LOG = Logger.getLogger(CORINELandCoverCoordsModifier.class);
+    private static final Logger LOG = LogManager.getLogger(CORINELandCoverCoordsModifier.class);
     private static final Coord fakeCoord = new Coord(-1, -1);
 
     private final CorineLandCoverData corineLandCoverData;

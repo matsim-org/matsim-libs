@@ -23,7 +23,8 @@ package org.matsim.contrib.emissions;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -64,7 +65,7 @@ import org.matsim.vehicles.VehicleType;
  * @author benjamin
  */
 final class ColdEmissionAnalysisModule {
-	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
+	private static final Logger logger = LogManager.getLogger(ColdEmissionAnalysisModule.class);
 
 	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;

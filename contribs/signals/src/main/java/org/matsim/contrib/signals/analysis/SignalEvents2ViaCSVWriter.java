@@ -21,7 +21,8 @@
  */
 package org.matsim.contrib.signals.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,7 +56,7 @@ import java.util.Map;
  */
 public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHandler, IterationEndsListener, IterationStartsListener {
 
-	private static final Logger log = Logger.getLogger(SignalEvents2ViaCSVWriter.class);
+	private static final Logger log = LogManager.getLogger(SignalEvents2ViaCSVWriter.class);
 
 	private static final String SIGNAL_ID = "signal id";
 	private static final String X_COORD = "x";

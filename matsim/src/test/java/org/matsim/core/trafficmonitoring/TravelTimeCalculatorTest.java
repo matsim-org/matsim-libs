@@ -27,7 +27,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -64,7 +65,7 @@ import org.xml.sax.SAXException;
  */
 public class TravelTimeCalculatorTest extends MatsimTestCase {
 
-	private final static Logger log = Logger.getLogger(TravelTimeCalculatorTest.class);
+	private final static Logger log = LogManager.getLogger(TravelTimeCalculatorTest.class);
 
 	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 

@@ -22,7 +22,8 @@ package org.matsim.contrib.minibus.hook;
 import java.util.HashSet;
 import java.util.Set;
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.core.config.Config;
@@ -57,7 +58,7 @@ import org.matsim.vehicles.Vehicles;
  */
 final class PControlerListener implements IterationStartsListener, StartupListener, ScoringListener {
 
-	private final static Logger log = Logger.getLogger(PControlerListener.class);
+	private final static Logger log = LogManager.getLogger(PControlerListener.class);
 
 	private final PVehiclesFactory pVehiclesFactory;
 

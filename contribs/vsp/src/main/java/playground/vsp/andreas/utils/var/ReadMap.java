@@ -6,7 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -22,7 +23,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  */
 public class ReadMap implements TabularFileHandler {
 	
-	private static final Logger log = Logger.getLogger(ReadMap.class);
+	private static final Logger log = LogManager.getLogger(ReadMap.class);
 
 	private TabularFileParserConfig tabFileParserConfig;
 	private Map<String, List<String>> String2StingsMap = new HashMap<String, List<String>>();
