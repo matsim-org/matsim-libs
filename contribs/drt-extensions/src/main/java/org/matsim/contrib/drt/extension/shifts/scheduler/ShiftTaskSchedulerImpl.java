@@ -1,15 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.scheduler;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
@@ -37,14 +29,18 @@ import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.facilities.Facility;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 
 /**
  * @author nkuehnel / MOIA
  */
 public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 
-    private final static Logger logger = Logger.getLogger(ShiftTaskSchedulerImpl.class);
+    private final static Logger logger = LogManager.getLogger(ShiftTaskSchedulerImpl.class);
 
 	private final TravelTime travelTime;
     private final MobsimTimer timer;
@@ -52,8 +48,6 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
     private final LeastCostPathCalculator router;
 
     private final DrtShiftParams drtShiftParams;
-	private final OperationFacilities operationFacilities;
-	private final Fleet fleet;
 
 	private final Network network;
 
@@ -65,8 +59,6 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 		this.taskFactory = taskFactory;
 		this.network = network;
 		this.drtShiftParams = drtShiftParams;
-		this.operationFacilities = operationFacilities;
-		this.fleet = fleet;
 		this.router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 
 		ShiftSchedules.initSchedules(operationFacilities, fleet, taskFactory);
