@@ -21,6 +21,8 @@ public class DrtShiftParams extends ReflectiveConfigGroup {
     private static final String SHIFT_SCHEDULE_LOOK_AHEAD = "shiftScheduleLookAhead";
     private static final String SHIFT_END_LOOK_AHEAD = "shiftEndLookAhead";
     private static final String SHIFT_END_RESCHEDULE_LOOK_AHEAD = "shiftEndRescheduleLookAhead";
+
+    private static final String SHIFT_END_RESCHEDULE_INTERVAL = "shiftEndRescheduleInterval";
     private static final String ALLOW_IN_FIELD_CHANGEOVER = "allowInFieldChangeover";
 
     private static final String CHARGE_AT_HUB_THRESHOLD = "chargeAtHubThreshold";
@@ -40,14 +42,14 @@ public class DrtShiftParams extends ReflectiveConfigGroup {
     private double shiftScheduleLookAhead = 1800;
     private double shiftEndLookAhead = 3600;
     private double shiftEndRescheduleLookAhead = 1800;
-
-    private boolean allowInFieldChangeover = true;
+	private double updateShiftEndInterval = 60 * 3;
+	private boolean allowInFieldChangeover = true;
 
 	//electric shifts
     private double chargeAtHubThreshold = 0.5;
     private double chargeDuringBreakThreshold = 0.6;
 	private double chargeAtHubInterval = 3 * 60;
-    private double shiftAssignmentBatteryThreshold = 0.6;
+	private double shiftAssignmentBatteryThreshold = 0.6;
 	private String breakChargerType = ChargerSpecification.DEFAULT_CHARGER_TYPE;
 	private String outOfShiftChargerType = ChargerSpecification.DEFAULT_CHARGER_TYPE;
 
@@ -67,6 +69,7 @@ public class DrtShiftParams extends ReflectiveConfigGroup {
         map.put(SHIFT_END_LOOK_AHEAD, "Time of shift end scheduling (i.e. plan shift end location) before end of shift in [seconds]");
         map.put(SHIFT_END_RESCHEDULE_LOOK_AHEAD, "Time of shift end rescheduling  (i.e. check whether shift should end" +
                 " at a different facillity) before end of shift in [seconds]");
+		map.put(SHIFT_END_RESCHEDULE_INTERVAL, "Time interval for periodic check of shift end re-scheduling for shifts ending within the 'shiftEndRescheduleLookAhead' in [seconds]");
         map.put(ALLOW_IN_FIELD_CHANGEOVER, "set to true if shifts can start and end at in field operational facilities," +
                 " false if changerover is only allowed at hubs");
         map.put(CHARGE_AT_HUB_THRESHOLD, "defines the battery state of charge threshold at which vehicles will start charging" +
@@ -229,5 +232,16 @@ public class DrtShiftParams extends ReflectiveConfigGroup {
 	@StringGetter(CHARGE_AT_HUB_INTERVAL)
 	public double getChargeAtHubInterval() {
 		return chargeAtHubInterval;
+	}
+
+	@StringGetter(SHIFT_END_RESCHEDULE_INTERVAL)
+	public double getUpdateShiftEndInterval() {
+		return updateShiftEndInterval;
+	}
+
+	@StringSetter(SHIFT_END_RESCHEDULE_INTERVAL)
+
+	public void setUpdateShiftEndInterval(double updateShiftEndInterval) {
+		 this.updateShiftEndInterval = updateShiftEndInterval;
 	}
 }
