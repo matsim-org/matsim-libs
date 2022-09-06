@@ -140,10 +140,11 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
 		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
+		// todo can we test if we set another file (not hbefa 3.1 detailed...) as detailed hbefa file source here?
 		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
-		offlineExample.run();
+		offlineExample.run(); // todo here is where the test still fails b/c of no HGVs is hbefa table ~rjg 06.09
 	}
 
 	@Test

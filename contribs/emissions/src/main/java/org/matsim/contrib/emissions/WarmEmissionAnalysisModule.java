@@ -91,7 +91,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		Gbl.assertIf( avgHbefaWarmTable!=null || detailedHbefaWarmTable!=null );
 		this.avgHbefaWarmTable = avgHbefaWarmTable;
 		this.detailedHbefaWarmTable = detailedHbefaWarmTable;
-		this.hbefaRoadTrafficSpeeds = hbefaRoadTrafficSpeeds; // todo where does this come from?
+		this.hbefaRoadTrafficSpeeds = hbefaRoadTrafficSpeeds;
 		this.warmPollutants = warmPollutants;
 
 		Gbl.assertNotNull( eventsManager );
