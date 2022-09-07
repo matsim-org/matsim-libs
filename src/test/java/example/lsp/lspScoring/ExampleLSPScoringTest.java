@@ -2,7 +2,8 @@ package example.lsp.lspScoring;
 
 import lsp.LSP;
 import lsp.LSPUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,7 +13,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ExampleLSPScoringTest {
-	private static final Logger log = Logger.getLogger(ExampleLSPScoringTest.class);
+	private static final Logger log = LogManager.getLogger(ExampleLSPScoringTest.class);
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 

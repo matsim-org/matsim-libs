@@ -20,13 +20,15 @@
 
 package example.lsp.simulationTrackers;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.freight.events.LSPTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPTourStartEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 /*package-private*/ class TourStartHandler implements LSPTourStartEventHandler {
-	private static final Logger log = Logger.getLogger(TourStartHandler.class);
+
+	private static final Logger log = LogManager.getLogger(TourStartHandler.class);
 
 	private double vehicleFixedCosts;
 

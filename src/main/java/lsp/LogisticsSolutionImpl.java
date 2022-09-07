@@ -21,14 +21,14 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 /* package-private */ class LogisticsSolutionImpl extends LSPDataObject<LogisticsSolution> implements LogisticsSolution {
-	private static final Logger log = Logger.getLogger(LogisticsSolutionImpl.class);
+	private static final Logger log = LogManager.getLogger(LogisticsSolutionImpl.class);
 
 	private final Collection<LogisticsSolutionElement> solutionElements;
 	private final Collection<LSPShipment> shipments;

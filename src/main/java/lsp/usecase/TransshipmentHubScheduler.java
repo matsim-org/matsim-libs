@@ -23,7 +23,8 @@ package lsp.usecase;
 import java.util.ArrayList;
 
 import lsp.shipment.ShipmentUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import lsp.LogisticsSolutionElement;
@@ -34,7 +35,7 @@ import lsp.shipment.ShipmentPlanElement;
 
 /*package-private*/ class TransshipmentHubScheduler extends LSPResourceScheduler {
 
-	final Logger log = Logger.getLogger(TransshipmentHubScheduler.class);
+	final Logger log = LogManager.getLogger(TransshipmentHubScheduler.class);
 	private final double capacityNeedLinear;
 	private final double capacityNeedFixed;
 	private TransshipmentHub transshipmentHub;

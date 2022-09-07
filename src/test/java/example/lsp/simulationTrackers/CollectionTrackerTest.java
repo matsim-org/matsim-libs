@@ -23,7 +23,8 @@ package example.lsp.simulationTrackers;
 import lsp.*;
 import lsp.LSPModule;
 import lsp.shipment.ShipmentUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import lsp.LSPResource;
@@ -63,7 +64,7 @@ import static org.junit.Assert.assertTrue;
 
 
 public class CollectionTrackerTest {
-	private static final Logger log = Logger.getLogger(CollectionTrackerTest.class);
+	private static final Logger log = LogManager.getLogger(CollectionTrackerTest.class);
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 	private Network network;

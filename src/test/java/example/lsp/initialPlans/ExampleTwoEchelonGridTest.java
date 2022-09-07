@@ -20,7 +20,8 @@
 
 package example.lsp.initialPlans;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -28,7 +29,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.junit.Assert.fail;
 
 public class ExampleTwoEchelonGridTest {
-	private static final Logger log = Logger.getLogger(ExampleTwoEchelonGridTest.class);
+	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGridTest.class);
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
