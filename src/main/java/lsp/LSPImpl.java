@@ -21,7 +21,8 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.controler.events.ScoringEvent;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 /* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
-	private static final Logger log = Logger.getLogger(LSPImpl.class);
+	private static final Logger log = LogManager.getLogger(LSPImpl.class);
 
 	private final Collection<LSPShipment> shipments;
 	private final ArrayList<LSPPlan> plans;

@@ -27,7 +27,8 @@ import lsp.LSPScorer;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -68,7 +69,7 @@ import java.util.*;
  */
 /*package-private*/ final class ExampleSchedulingOfTransportChainHubsVsDirect {
 
-	private static final Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class);
+	private static final Logger log = LogManager.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class);
 
 	private ExampleSchedulingOfTransportChainHubsVsDirect() {
 	} // so it cannot be instantiated

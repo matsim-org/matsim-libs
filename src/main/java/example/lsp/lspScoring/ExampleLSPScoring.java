@@ -27,7 +27,8 @@ import lsp.LSPSimulationTracker;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -204,7 +205,8 @@ import java.util.*;
 
 
 	/*package-private*/ static class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, FreightServiceEndEventHandler {
-		private static final Logger log = Logger.getLogger(TipScorer.class);
+				
+		private static final Logger log = LogManager.getLogger(TipScorer.class);
 
 		private final Random tipRandom;
 		private double tipSum;

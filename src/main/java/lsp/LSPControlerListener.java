@@ -22,7 +22,8 @@ package lsp;
 
 
 import lsp.shipment.LSPShipment;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -42,7 +43,7 @@ import java.util.List;
 
 class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 							  ReplanningListener, IterationStartsListener{
-	private static final Logger log = Logger.getLogger( LSPControlerListener.class );
+	private static final Logger log = LogManager.getLogger( LSPControlerListener.class );
 	private final Scenario scenario;
 
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();

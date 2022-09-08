@@ -25,7 +25,8 @@ import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -72,7 +73,7 @@ import java.util.*;
 final class ExampleTwoEchelonGrid {
 
 
-	private static final Logger log = Logger.getLogger(ExampleTwoEchelonGrid.class);
+	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGrid.class);
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
 	private static final Id<Link> HUB_LINK_ID = Id.createLinkId("j(5,3)");
 

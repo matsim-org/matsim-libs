@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -41,7 +42,7 @@ import org.matsim.vehicles.Vehicles;
 
 
 /*package-private*/ class DistanceAndTimeHandler implements LinkEnterEventHandler, VehicleLeavesTrafficEventHandler, LinkLeaveEventHandler {
-	private static final Logger log = Logger.getLogger(DistanceAndTimeHandler.class);
+	private static final Logger log = LogManager.getLogger(DistanceAndTimeHandler.class);
 
 	private final Map<Id<Vehicle>, LinkEnterEvent> events;
 	private final Vehicles allVehicles;
