@@ -23,6 +23,7 @@ package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.vehicles.Vehicle;
 
@@ -31,10 +32,9 @@ import java.util.Map;
 import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 /**
- * This informs the world that a shipment has been delivered.
+ * An event, that informs that a Freight {@link CarrierShipment} delivery-activity has started.
  * 
- * @author sschroeder
- * @author kturner
+ * @author Kai Martins-Turner (kturner)
  *
  */
 public class FreightShipmentDeliveryStartEvent extends AbstractFreightEvent {

@@ -31,7 +31,7 @@ import java.util.Map;
 import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 /**
- * This informs the world that a shipment has been delivered.
+ * An event, that informs that a Freight {@link CarrierShipment} delivery-activity has ended.
  * 
  * @author sschroeder
  * @author kturner

@@ -31,9 +31,9 @@ import java.util.Map;
 import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 /**
- * This informs the world that a picking up a shipment has started.
+ *  An event, that informs that a Freight {@link CarrierShipment} pickup-activity has started.
  *
- * @author kturner
+ * @author Kai Martins-Turner (kturner)
  */
 public class FreightShipmentPickupStartEvent extends AbstractFreightEvent {
 

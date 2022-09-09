@@ -31,7 +31,7 @@ import org.matsim.vehicles.Vehicle;
 import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 /**
- * An event, that informs when a Freight {@link CarrierService} activity has ended.
+ * An event, that informs that a Freight {@link CarrierService} activity has ended.
  *
  * @author Tilman Matteis  - creating it for the use in Logistics / LogisticServiceProviders (LSP)s
  * @author Kai Martins-Turner (kturner) - integrating and adapting it into/for the MATSim freight contrib
