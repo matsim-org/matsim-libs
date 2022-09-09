@@ -6,8 +6,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndsEvent;
-import org.matsim.contrib.freight.events.FreightShipmentPickupEndsEvent;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndEvent;
+import org.matsim.contrib.freight.events.FreightShipmentPickupEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightShipmentPickupEventHandler;
 import org.matsim.vehicles.Vehicles;
@@ -37,12 +37,12 @@ public class MyShipmentTrackerEventHandler implements ActivityStartEventHandler,
     }
 
     @Override
-    public void handleEvent(FreightShipmentDeliveryEndsEvent event) {
+    public void handleEvent(FreightShipmentDeliveryEndEvent event) {
         shipmentTracking.trackDeliveryEvent(event);
     }
 
     @Override
-    public void handleEvent(FreightShipmentPickupEndsEvent event) {
+    public void handleEvent(FreightShipmentPickupEndEvent event) {
         shipmentTracking.trackPickedUpEvent(event);
     }
 

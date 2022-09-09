@@ -34,8 +34,8 @@ import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.events.FreightServiceEndEvent;
 import org.matsim.contrib.freight.events.FreightServiceStartEvent;
-import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndsEvent;
-import org.matsim.contrib.freight.events.FreightShipmentPickupEndsEvent;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndEvent;
+import org.matsim.contrib.freight.events.FreightShipmentPickupEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEventHandler;
@@ -156,12 +156,12 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 
 	// LSP Events for Shipments and Services, those are UNTESTED
 	@Override
-	public void handleEvent(FreightShipmentDeliveryEndsEvent event) {
+	public void handleEvent(FreightShipmentDeliveryEndEvent event) {
 		shipmentTracking.trackDeliveryEvent(event);
 	}
 
 	@Override
-	public void handleEvent(FreightShipmentPickupEndsEvent event) {
+	public void handleEvent(FreightShipmentPickupEndEvent event) {
 		shipmentTracking.trackPickedUpEvent(event);
 		// as we know the driver of the shipment now, we can assign the shipment's carrier to the driver's vehicle.
 		//FIXME: We do not have the driver in the events anymore. Need to collect them from other places (if we still need them)
