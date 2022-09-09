@@ -31,7 +31,7 @@ import org.matsim.contrib.freight.carrier.Tour.*;
 
 import java.util.Objects;
 
-/*package-private*/  final class FreightShipmentDeliveryEventCreator implements FreightEventCreator {
+/*package-private*/  final class FreightShipmentDeliveryEndEventCreator implements FreightEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
@@ -39,7 +39,7 @@ import java.util.Objects;
 			if(Objects.equals(endEvent.getActType(), FreightConstants.DELIVERY)) {
 				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
 				if (element instanceof Delivery deliveryActivity) {
-					return new FreightShipmentDeliveryEndsEvent(event.getTime(), carrier.getId(), deliveryActivity.getShipment(), scheduledTour.getVehicle().getId() );
+					return new FreightShipmentDeliveryEndEvent(event.getTime(), carrier.getId(), deliveryActivity.getShipment(), scheduledTour.getVehicle().getId() );
 				}
 			}
 		}

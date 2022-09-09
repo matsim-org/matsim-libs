@@ -31,27 +31,25 @@ import java.util.Map;
 import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 /**
- * This informs the world that a shipment has been picked up.
+ * This informs the world that a shipment has been delivered.
  * 
  * @author sschroeder
  * @author kturner
+ *
  */
-public class FreightShipmentPickupEndsEvent extends AbstractFreightEvent {
+public class FreightShipmentDeliveryEndEvent extends AbstractFreightEvent {
 
-	public static final String EVENT_TYPE = "Freight shipment picked up";
+	public static final String EVENT_TYPE = "Freight shipment delivered";
 
 	private final Id<CarrierShipment> shipmentId;
-	private final double pickupDuration;
+	private final double deliveryDuration;
 	private final int capacityDemand;
-
-	
-	public FreightShipmentPickupEndsEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
-		super(time, carrierId, shipment.getFrom(), vehicleId);
+	public FreightShipmentDeliveryEndEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+		super(time, carrierId, shipment.getTo(), vehicleId);
 		this.shipmentId = shipment.getId();
-		this.pickupDuration = shipment.getPickupServiceTime();
+		this.deliveryDuration = shipment.getDeliveryServiceTime();
 		this.capacityDemand = shipment.getSize();
 	}
-
 
 	@Override
 	public String getEventType() {
@@ -62,12 +60,20 @@ public class FreightShipmentPickupEndsEvent extends AbstractFreightEvent {
 		return shipmentId;
 	}
 
+	public double getDeliveryDuration() {
+		return deliveryDuration;
+	}
+
+	public int getCapacityDemand() {
+		return capacityDemand;
+	}
 
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
-		attr.put(ATTRIBUTE_PICKUP_DURATION, String.valueOf(this.pickupDuration));
+		attr.put(ATTRIBUTE_DROPOFF_DURATION, String.valueOf(this.deliveryDuration));
 		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;
 	}
+
 }

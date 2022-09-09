@@ -21,7 +21,7 @@
 
 package org.matsim.contrib.freight.events.eventhandler;
 
-import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndsEvent;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -32,6 +32,6 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public interface FreightShipmentDeliveryEventHandler extends EventHandler {
 
-	public void handleEvent(FreightShipmentDeliveryEndsEvent event);
+	public void handleEvent(FreightShipmentDeliveryEndEvent event);
 
 }
