@@ -38,7 +38,7 @@ import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
  */
 public class FreightShipmentPickupEndEvent extends AbstractFreightEvent {
 
-	public static final String EVENT_TYPE = "Freight shipment picked up";
+	public static final String EVENT_TYPE = "Freight shipment pickup ends";
 
 	private final Id<CarrierShipment> shipmentId;
 	private final double pickupDuration;
