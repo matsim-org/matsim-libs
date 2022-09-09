@@ -18,9 +18,6 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
 package org.matsim.contrib.taxi.analysis;
 
 import java.awt.Color;

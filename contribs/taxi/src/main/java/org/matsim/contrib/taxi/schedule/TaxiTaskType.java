@@ -24,11 +24,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 
 import org.matsim.contrib.dvrp.schedule.Task;
 
 import com.google.common.base.MoreObjects;
+
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -69,10 +70,9 @@ public class TaxiTaskType implements Task.TaskType {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof TaxiTaskType)) {
+		if (!(o instanceof TaxiTaskType taskType)) {
 			return false;
 		}
-		TaxiTaskType taskType = (TaxiTaskType)o;
 		return hash == taskType.hash && baseType.equals(taskType.baseType) && Objects.equals(name, taskType.name);
 	}
 
