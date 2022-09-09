@@ -127,7 +127,7 @@ public class MultinomialLogitSelector implements PlanSelector {
 
 			printer.println();
 
-			double start = Math.E;
+			double start = 2.5;
 			int n = 100;
 
 			for (int i = 0; i <= n; i++) {
