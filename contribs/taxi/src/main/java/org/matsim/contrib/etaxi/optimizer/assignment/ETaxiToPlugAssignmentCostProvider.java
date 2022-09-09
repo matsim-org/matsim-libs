@@ -58,16 +58,10 @@ public class ETaxiToPlugAssignmentCostProvider {
 		final Mode currentMode = Mode.CHARGING_START_TIME;//FIXME move to config group
 		return (departure, plugEntry, pathData) -> {
 			double arrivalTime = calcArrivalTime(departure, pathData);
-			switch (currentMode) {
-				case ARRIVAL_TIME:
-					return arrivalTime;
-
-				case CHARGING_START_TIME:
-					return Math.max(plugEntry.time, arrivalTime);
-
-				default:
-					throw new IllegalStateException();
-			}
+			return switch (currentMode) {
+				case ARRIVAL_TIME -> arrivalTime;
+				case CHARGING_START_TIME -> Math.max(plugEntry.time, arrivalTime);
+			};
 		};
 	}
 

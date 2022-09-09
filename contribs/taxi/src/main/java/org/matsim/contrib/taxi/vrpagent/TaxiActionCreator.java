@@ -65,26 +65,16 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
-		switch (getBaseTypeOrElseThrow(task)) {
-			case EMPTY_DRIVE:
-			case OCCUPIED_DRIVE:
-				return legFactory.create(vehicle);
+		return switch (getBaseTypeOrElseThrow(task)) {
+			case EMPTY_DRIVE, OCCUPIED_DRIVE -> legFactory.create(vehicle);
 
-			case PICKUP:
-				final TaxiPickupTask pst = (TaxiPickupTask)task;
-				return new SinglePassengerPickupActivity(passengerHandler, dynAgent, pst, pst.getRequest(),
-						PICKUP_ACTIVITY_TYPE);
+			case PICKUP -> new SinglePassengerPickupActivity(passengerHandler, dynAgent, (TaxiPickupTask)task,
+					((TaxiPickupTask)task).getRequest(), PICKUP_ACTIVITY_TYPE);
 
-			case DROPOFF:
-				final TaxiDropoffTask dst = (TaxiDropoffTask)task;
-				return new SinglePassengerDropoffActivity(passengerHandler, dynAgent, dst, dst.getRequest(),
-						DROPOFF_ACTIVITY_TYPE);
+			case DROPOFF -> new SinglePassengerDropoffActivity(passengerHandler, dynAgent, (TaxiDropoffTask)task,
+					((TaxiDropoffTask)task).getRequest(), DROPOFF_ACTIVITY_TYPE);
 
-			case STAY:
-				return new IdleDynActivity(STAY_ACTIVITY_TYPE, task::getEndTime);
-
-			default:
-				throw new IllegalStateException();
-		}
+			case STAY -> new IdleDynActivity(STAY_ACTIVITY_TYPE, task::getEndTime);
+		};
 	}
 }

@@ -148,16 +148,9 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	protected void divertOrAppendDrive(Schedule schedule, VrpPathWithTravelData vrpPath, TaxiTaskType taskType) {
 		Task lastTask = Schedules.getLastTask(schedule);
 		switch (getBaseTypeOrElseThrow(lastTask)) {
-			case EMPTY_DRIVE:
-				divertDrive((TaxiEmptyDriveTask)lastTask, vrpPath);
-				return;
-
-			case STAY:
-				scheduleDrive(schedule, (TaxiStayTask)lastTask, vrpPath, taskType);
-				return;
-
-			default:
-				throw new IllegalStateException();
+			case EMPTY_DRIVE -> divertDrive((TaxiEmptyDriveTask)lastTask, vrpPath);
+			case STAY -> scheduleDrive(schedule, (TaxiStayTask)lastTask, vrpPath, taskType);
+			default -> throw new IllegalStateException();
 		}
 	}
 
@@ -320,33 +313,27 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 
 	protected Integer countUnremovablePlannedTasks(Schedule schedule) {
 		Task currentTask = schedule.getCurrentTask();
-		switch (getBaseTypeOrElseThrow(currentTask)) {
-			case PICKUP:
-				return taxiCfg.isDestinationKnown() ? 2 : null;
+		return switch (getBaseTypeOrElseThrow(currentTask)) {
+			case PICKUP -> taxiCfg.isDestinationKnown() ? 2 : null;
 
-			case OCCUPIED_DRIVE:
-				return 1;
+			case OCCUPIED_DRIVE -> 1;
 
-			case EMPTY_DRIVE:
+			case EMPTY_DRIVE -> {
 				if (taxiCfg.isVehicleDiversion()) {
-					return 0;
+					yield 0;
 				}
 
 				if (PICKUP.isBaseTypeOf(Schedules.getNextTask(schedule))) {
 					// if no diversion and driving to pick up sb then serve that request
-					return taxiCfg.isDestinationKnown() ? 3 : null;
+					yield taxiCfg.isDestinationKnown() ? 3 : null;
 				}
 
 				// potentially: driving back to the rank (e.g. to charge batteries)
 				throw new RuntimeException("Currently won't happen");
+			}
 
-			case DROPOFF:
-			case STAY:
-				return 0;
-
-			default:
-				throw new RuntimeException();
-		}
+			case DROPOFF, STAY -> 0;
+		};
 	}
 
 	protected void removePlannedTasks(DvrpVehicle vehicle, int newLastTaskIdx) {
@@ -381,25 +368,22 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 		double tEnd = Math.max(tBegin, vehicle.getServiceEndTime());
 
 		switch (getBaseTypeOrElseThrow(lastTask)) {
-			case STAY:
-				lastTask.setEndTime(tEnd);
-				return;
+			case STAY -> lastTask.setEndTime(tEnd);
 
-			case DROPOFF:
+			case DROPOFF -> {
 				Link link = Schedules.getLastLinkInSchedule(vehicle);
 				schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
-				return;
+			}
 
-			case EMPTY_DRIVE:
+			case EMPTY_DRIVE -> {
 				if (!taxiCfg.isVehicleDiversion()) {
 					throw new RuntimeException("Currently won't happen");
 				}
 
 				// if diversion -- no STAY afterwards
-				return;
+			}
 
-			default:
-				throw new RuntimeException();
+			default -> throw new RuntimeException();
 		}
 	}
 
