@@ -21,7 +21,7 @@ package org.matsim.contrib.parking.parkingchoice.PC2.analysis;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

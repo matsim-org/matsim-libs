@@ -36,24 +36,19 @@ public final class ZonalTaxiOptimizerParams extends AbstractTaxiOptimizerParams 
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		switch (type) {
-			case RuleBasedTaxiOptimizerParams.SET_NAME:
-				return new RuleBasedTaxiOptimizerParams();
-			case ZonalSystemParams.SET_NAME:
-				return new ZonalSystemParams();
-		}
-		return super.createParameterSet(type);
+		return switch (type) {
+			case RuleBasedTaxiOptimizerParams.SET_NAME -> new RuleBasedTaxiOptimizerParams();
+			case ZonalSystemParams.SET_NAME -> new ZonalSystemParams();
+			default -> super.createParameterSet(type);
+		};
 	}
 
 	@Override
 	public void addParameterSet(ConfigGroup set) {
 		switch (set.getName()) {
-			case RuleBasedTaxiOptimizerParams.SET_NAME:
-				ruleBasedTaxiOptimizerParams = (RuleBasedTaxiOptimizerParams)set;
-				break;
-			case ZonalSystemParams.SET_NAME:
-				zonalSystemParams = (ZonalSystemParams)set;
-				break;
+			case RuleBasedTaxiOptimizerParams.SET_NAME ->
+					ruleBasedTaxiOptimizerParams = (RuleBasedTaxiOptimizerParams)set;
+			case ZonalSystemParams.SET_NAME -> zonalSystemParams = (ZonalSystemParams)set;
 		}
 
 		super.addParameterSet(set);

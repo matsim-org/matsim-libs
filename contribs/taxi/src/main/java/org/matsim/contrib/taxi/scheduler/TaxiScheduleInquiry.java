@@ -83,8 +83,7 @@ public class TaxiScheduleInquiry implements ScheduleInquiry {
 		Schedule schedule = veh.getSchedule();
 
 		switch (schedule.getStatus()) {
-			case PLANNED:
-			case STARTED:
+			case PLANNED, STARTED:
 				Task lastTask = Schedules.getLastTask(schedule);
 
 				switch (getBaseTypeOrElseThrow(lastTask)) {
