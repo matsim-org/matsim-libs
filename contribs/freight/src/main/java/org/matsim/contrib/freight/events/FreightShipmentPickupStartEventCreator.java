@@ -21,34 +21,29 @@
 
 package org.matsim.contrib.freight.events;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour.Pickup;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-/**
- * Utils for {@link FreightEventCreator}s
- *
- * @author kturner
- */
-public final class FreightEventCreatorUtils {
+import java.util.Objects;
 
-	private FreightEventCreatorUtils(){
+/*package-private*/  final class FreightShipmentPickupStartEventCreator implements FreightEventCreator {
+
+	@Override
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
+		if(event instanceof ActivityStartEvent startEvent) {
+			if(Objects.equals((startEvent).getActType(), FreightConstants.PICKUP)) {
+				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+				if (element instanceof Pickup pickupActivity) {
+					return new FreightShipmentPickupStartEvent(event.getTime(), carrier.getId(), pickupActivity.getShipment(), scheduledTour.getVehicle().getId() );
+				}
+			}
+		}
+		return null;
 	}
-
-	/**
-	 * @return a collection of the standard freightEvent creators
-	 */
-	public static Collection<FreightEventCreator> getStandardEventCreators(){
-		List<FreightEventCreator> creators = new ArrayList<>();
-		creators.add(new FreightServiceEndEventCreator());
-		creators.add(new FreightServiceStartEventCreator());
-		creators.add(new FreightShipmentDeliveryStartEventCreator());
-		creators.add(new FreightShipmentDeliveryEndEventCreator());
-		creators.add(new FreightShipmentPickupStartEventCreator());
-		creators.add(new FreightShipmentPickupEndEventCreator());
-		creators.add(new FreightTourEndEventCreator());
-		creators.add(new FreightTourStartEventCreator());
-		return creators;
-	}
-	
 }
