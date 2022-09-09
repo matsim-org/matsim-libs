@@ -15,13 +15,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-core</artifactId>
 			<version>${jsprit.version}</version>

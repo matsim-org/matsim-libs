@@ -1,10 +1,8 @@
 package org.matsim.contrib.accessibility.interpolation;
 
-import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.analysis.BivariateRealFunction;
-import org.apache.commons.math.analysis.interpolation.BicubicSplineInterpolator;
-import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpolator;
+import org.apache.commons.math3.analysis.BivariateFunction;
+import org.apache.commons.math3.analysis.interpolation.BivariateGridInterpolator;
+import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.accessibility.SpatialGrid;
@@ -23,15 +21,14 @@ class BiCubicInterpolator {
 
 	private static final Logger log = LogManager.getLogger(BiCubicInterpolator.class);
 	
-	private BivariateRealFunction interpolatingFunction = null;
+	private BivariateFunction interpolatingFunction = null;
 	
 	private SpatialGrid sg = null;
 	
 	/**
 	 * Prepares bicubic spline interpolation:
-	 * Generates an interpolation function with BicubicSplineInterpolator from apache 
-	 * (http://commons.apache.org/math/apidocs/org/apache/commons/math3/analysis/interpolation/BicubicSplineInterpolator.html).
-	 * 
+	 * Generates an interpolation function with PiecewiseBicubicSplineInterpolator from apache
+	 *
 	 * @param sg the SpatialGrid to interpolate
 	 */
 	BiCubicInterpolator(SpatialGrid sg){
@@ -43,12 +40,8 @@ class BiCubicInterpolator {
 		double[] y_coords= coord(sg.getYmin(), sg.getYmax(), sg.getResolution());
 		double[][] mirroredValues= sg.getMatrix();
 		
-		BivariateRealGridInterpolator interpolator = new BicubicSplineInterpolator();
-		try {
-			interpolatingFunction = interpolator.interpolate(y_coords, x_coords, mirroredValues);
-		} catch (MathException e) {
-			e.printStackTrace();
-		} 
+		BivariateGridInterpolator interpolator = new PiecewiseBicubicSplineInterpolator();
+		interpolatingFunction = interpolator.interpolate(y_coords, x_coords, mirroredValues);
 	}
 	
 	private void sgNaNcheck() {
@@ -71,12 +64,7 @@ class BiCubicInterpolator {
 	 * @return interpolated value on the point (xCoord, yCoord)
 	 */
 	double biCubicInterpolation(double xCoord, double yCoord){
-		try {
-			return interpolatingFunction.value(yCoord, xCoord);
-		} catch (FunctionEvaluationException e) {
-			e.printStackTrace();
-		}
-		return Double.NaN;
+		return interpolatingFunction.value(yCoord, xCoord);
 	}
 
 	/**
