@@ -75,7 +75,7 @@ import com.google.common.base.Preconditions;
  * of methods of the type "<tt>getStringRepresentationOfParameterX()</tt>" or
  * "<tt>setParameterXFromStringRepresentation( String v )</tt>".
  * <br>
- * A commented example can be found at {@link tutorial.programming.reflectiveConfigGroup.MyConfigGroup}.
+ * A commented example can be found at {@link org.matsim.codeexamples.config.reflectiveConfigGroup.MyConfigGroup}.
  * <br>
  * <br>
  * If something is wrong (missing setter or getter, wrong parameter or return type),
@@ -124,22 +124,6 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 
 		if ( !setters.keySet().equals( stringGetters.keySet() ) ) {
 			throw new InconsistentModuleException( "setters and getters inconsistent" );
-		}
-
-		checkConvertNullAnnotations();
-	}
-
-	private void checkConvertNullAnnotations() {
-		final var allMethods = getDeclaredMethodsInSubclasses();
-		for (Method m : allMethods) {
-			final StringGetter annotation = m.getAnnotation( StringGetter.class );
-			if ( annotation != null ) {
-				final Method g = getStringGetters().get( annotation.value() );
-
-				if ( m.isAnnotationPresent( DoNotConvertNull.class ) != g.isAnnotationPresent( DoNotConvertNull.class ) ) {
-					throw new InconsistentModuleException( "Inconsistent annotation of getter and setter with ConvertNull in "+getClass().getName() );
-				}
-			}
 		}
 	}
 
@@ -279,8 +263,8 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 
 		final Class<?> type = params[ 0 ];
 
-		if ( value.equals( "null" ) && !setter.isAnnotationPresent( DoNotConvertNull.class ) ) {
-			setter.invoke( this , new Object[]{ null } );
+		if ( value.equals( "null" ) ) {
+			setter.invoke( this , (Object)null);
 		}
 		else if ( type.equals( String.class ) ) {
 			setter.invoke( this , value );
@@ -361,23 +345,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				final Object result = getter.invoke( this );
 				getter.setAccessible( accessible );
 
-				if ( result == null ) {
-					if ( getter.isAnnotationPresent( DoNotConvertNull.class ) ) {
-						log.error( "getter for parameter "+param_name+" of module "+getName()+" returned null." );
-						log.error( "This is not allowed for this getter." );
-
-						throw new NullPointerException( "getter for parameter "+param_name+" of module "+getClass().getName()+" ("+getName()+") returned null." );
-					}
-					return null;
-				}
-
-				final String value = ""+result;
-
-				if ( value.equals( "null" ) && !getter.isAnnotationPresent( DoNotConvertNull.class ) ) {
-					throw new RuntimeException( "parameter "+param_name+" understands null pointers for IO. As a consequence, the \"null\" String is not a valid value for "+getter.getName() );
-				}
-
-				return value;
+				return result == null ? null : result + "";
 			}
 		}
 		catch (InvocationTargetException e) {
@@ -501,20 +469,6 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		 */
 		String value();
 	}
-
-	/**
-	 * Setters for which the "null" string should NOT be converted
-	 * to the <tt>null</tt> pointer, and getter from which a <tt>null</tt>
-	 * pointer should NOT be accepted and converted to the "null" string,
-	 * should be annotated with this.
-	 * <br>
-	 * Note that both the setter and the getter for a given parameter,
-	 * or none of them, must be annotated. If not, an {@link InconsistentModuleException}
-	 * will be thrown.
-	 */
-	@Documented
-	@Retention( RetentionPolicy.RUNTIME )
-	public static @interface DoNotConvertNull {}
 
 	public static class InconsistentModuleException extends RuntimeException {
 		private static final long serialVersionUID = 1L;

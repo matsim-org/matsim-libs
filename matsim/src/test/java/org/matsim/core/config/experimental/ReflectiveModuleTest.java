@@ -48,7 +48,6 @@ public class ReflectiveModuleTest {
 		dumpedModule.setIdField( Id.create( 123, Link.class ) );
 		dumpedModule.setCoordField(new Coord((double) 265, (double) 463));
 		dumpedModule.setTestEnumField( MyEnum.VALUE2 );
-		dumpedModule.setNonNull( "null" );
 
 		final Config dumpedConfig = new Config();
 		dumpedConfig.addModule( dumpedModule );
@@ -83,21 +82,6 @@ public class ReflectiveModuleTest {
 		readConfig.addModule( readModule );
 
 		assertSame( dumpedModule , readModule );
-	}
-
-	@Test
-	public void testFailsWritingNullIfNoConversion() {
-		final MyModule dumpedModule = new MyModule();
-		dumpedModule.setNonNullToNull();
-		try {
-			dumpedModule.getParams();
-		}
-		catch (RuntimeException e) {
-			log.info( "got exception, as expected" , e );
-			return;
-		}
-
-		Assert.fail( "no failure when non-authorized null value." );
 	}
 
 	@Test

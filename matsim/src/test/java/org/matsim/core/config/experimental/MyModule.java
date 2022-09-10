@@ -127,27 +127,6 @@ public class MyModule extends ReflectiveConfigGroup {
 		this.coordField = new Coord(Double.parseDouble(coords[0]), Double.parseDouble(coords[1]));
 	}
 
-	// /////////////////////////////////////////////////////////////////////////
-	// Non-null string: standard setter and getter
-	@StringGetter( "nonNullField" )
-	@DoNotConvertNull
-	public String getNonNull() {
-		return nonNull;
-	}
-
-	@StringSetter( "nonNullField" )
-	@DoNotConvertNull
-	public void setNonNull( String nonNull ) {
-		// in case the setter is called from user code, we need to check for nullity ourselves.
-		if ( nonNull == null ) throw new IllegalArgumentException();
-		this.nonNull = nonNull;
-	}
-
-	// XXX for test, should not appear in tutorial
-	void setNonNullToNull( ) {
-		this.nonNull = null;
-	}
-
 	// /////////////////////////////////////////////////////////////////////
 	// enum: normal getter and setter suffice
 	@StringGetter( "enumField" )
