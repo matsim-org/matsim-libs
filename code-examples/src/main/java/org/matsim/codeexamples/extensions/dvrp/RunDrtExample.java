@@ -39,14 +39,15 @@ class RunDrtExample{
 	// * make MultiModeDrt and normal DRT the same.  Make config accordingly so that 1-mode drt is just multi-mode with one entry.
 
 
-	private static final Logger log = LogManager.getLogger( RunDrtExample.class ) ;
-
 	private static final String DRT_A = "drt_A";
 	private static final String DRT_B = "drt_B";
 	private static final String DRT_C = "drt_C";
 
-	public static void main( String[] args ){
+	public static void main( String... args ) {
+		run(true, args);
+	}
 
+	public static void run(boolean otfvis, String... args ){
 		Config config;
 		if ( args!=null && args.length>=1 ) {
 			config = ConfigUtils.loadConfig( args );
@@ -127,10 +128,12 @@ class RunDrtExample{
 		controler.configureQSimComponents( DvrpQSimComponents.activateModes( DRT_A, DRT_B, DRT_C ) ) ;
 		// yyyy in long run, try to get rid of the above line
 
-		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
-		otfVisConfigGroup.setLinkWidth( 5 );
-		otfVisConfigGroup.setDrawNonMovingItems( true );
-		controler.addOverridingModule( new OTFVisLiveModule() );
+		if (otfvis) {
+			OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class);
+			otfVisConfigGroup.setLinkWidth(5);
+			otfVisConfigGroup.setDrawNonMovingItems(true);
+			controler.addOverridingModule(new OTFVisLiveModule());
+		}
 
 		controler.run() ;
 	}

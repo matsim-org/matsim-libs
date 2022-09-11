@@ -19,11 +19,10 @@ public class RunDrtExampleTest{
 	@Test
 	public void testMain(){
 		try{
-			RunDrtExample.main( new String []{
+			RunDrtExample.run(false,
 					"scenarios/multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml"
 					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
-					, "--config:controler.lastIteration=1"
-			} );
+					, "--config:controler.lastIteration=1");
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
@@ -42,6 +41,5 @@ public class RunDrtExampleTest{
 			log.fatal(ee) ;
 			fail() ;
 		}
-
 	}
 }
