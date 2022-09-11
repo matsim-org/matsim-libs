@@ -76,15 +76,8 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 	@Inject private Map<String, TravelTime> travelTimes ;
 	@Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories ;
 
-	private final EditRoutes editRoutes;
+	private EditRoutes editRoutes;
 
-	MyWithinDayMobsimListener() {
-		TravelTime travelTime = travelTimes.get( TransportMode.car );
-		TravelDisutility travelDisutility = travelDisutilityFactories.get( TransportMode.car ).createTravelDisutility( travelTimes.get( TransportMode.car ) ) ;
-		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime );
-		this.editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory() );
-	}
-	
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
 		
@@ -165,6 +158,13 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		final Leg leg = (Leg) plan.getPlanElements().get(planElementsIndex);
 		final Person person = ((HasPerson) agent).getPerson();
 		final Integer linkIdx = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
+
+		if (editRoutes == null) { // init editRoutes (only once)
+			TravelTime travelTime = travelTimes.get( TransportMode.car );
+			TravelDisutility travelDisutility = travelDisutilityFactories.get( TransportMode.car ).createTravelDisutility( travelTimes.get( TransportMode.car ) ) ;
+			LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime );
+			editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory() );
+		}
 
 		editRoutes.relocateCurrentLegRoute(leg, person, linkIdx, newDestinationLinkId, now) ;
 		
