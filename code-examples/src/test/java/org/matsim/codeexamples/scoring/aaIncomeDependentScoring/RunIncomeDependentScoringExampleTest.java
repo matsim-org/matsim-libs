@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.scoring.aaIncomeDependentScoring;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,7 +19,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.junit.Assert.fail;
 
 public class RunIncomeDependentScoringExampleTest{
-	private static final Logger log = Logger.getLogger( RunIncomeDependentScoringExampleTest.class );
+	private static final Logger log = LogManager.getLogger( RunIncomeDependentScoringExampleTest.class );
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

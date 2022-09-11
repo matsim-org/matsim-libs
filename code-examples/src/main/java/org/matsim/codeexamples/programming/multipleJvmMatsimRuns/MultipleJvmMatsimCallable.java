@@ -30,7 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -47,7 +48,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author jwjoubert
  */
 public class MultipleJvmMatsimCallable implements Callable<List<Double>> {
-	final private Logger log = Logger.getLogger(MultipleJvmMatsimCallable.class);
+	final private Logger log = LogManager.getLogger(MultipleJvmMatsimCallable.class);
 	final File folder;
 	
 	public MultipleJvmMatsimCallable(String foldername) {

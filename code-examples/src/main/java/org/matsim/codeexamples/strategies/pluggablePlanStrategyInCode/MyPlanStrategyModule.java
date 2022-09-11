@@ -19,7 +19,8 @@
 
 package org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
@@ -30,7 +31,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
 
 class MyPlanStrategyModule implements PlanStrategyModule, ActivityEndEventHandler {
-	private static final Logger log = Logger.getLogger(MyPlanStrategyModule.class);
+	private static final Logger log = LogManager.getLogger(MyPlanStrategyModule.class);
 
 	Scenario sc;
 	Network net;

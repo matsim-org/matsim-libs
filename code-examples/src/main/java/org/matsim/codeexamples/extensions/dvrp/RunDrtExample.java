@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.extensions.dvrp;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -38,7 +39,7 @@ class RunDrtExample{
 	// * make MultiModeDrt and normal DRT the same.  Make config accordingly so that 1-mode drt is just multi-mode with one entry.
 
 
-	private static final Logger log = Logger.getLogger( RunDrtExample.class ) ;
+	private static final Logger log = LogManager.getLogger( RunDrtExample.class ) ;
 
 	private static final String DRT_A = "drt_A";
 	private static final String DRT_B = "drt_B";
@@ -72,7 +73,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_A.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addDrtConfig(drtConfig);
+			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -81,7 +82,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_B.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addDrtConfig(drtConfig);
+			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -90,7 +91,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_C.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addDrtConfig(drtConfig);
+			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {

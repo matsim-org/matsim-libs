@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -66,7 +67,7 @@ import javax.inject.Singleton;
 @Singleton
 class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
     
-	private static final Logger log = Logger.getLogger("dummy");
+	private static final Logger log = LogManager.getLogger("dummy");
 
 	@Inject private Scenario scenario;
 	

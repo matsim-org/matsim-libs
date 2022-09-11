@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
@@ -15,7 +16,7 @@ class MyPlanStrategyProvider implements Provider<PlanStrategy> {
     private EventsManager eventsManager;
     private Scenario scenario;
     
-    private static final Logger log = Logger.getLogger(MyPlanSelector.class);
+    private static final Logger log = LogManager.getLogger(MyPlanSelector.class);
 
     @Inject
     MyPlanStrategyProvider(EventsManager eventsManager, Scenario scenario) {

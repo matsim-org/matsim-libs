@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.mobsim.mobsimListener;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -39,7 +40,7 @@ public class RunMobsimListenerExample {
 
 		@Override
 		public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-			Logger.getLogger(this.getClass()).info("We are at step " + step + ". Note that this restarts counting at zero in every iteration,"
+			LogManager.getLogger(this.getClass()).info("We are at step " + step + ". Note that this restarts counting at zero in every iteration,"
 					+ " implying that the class is re-instantiated in every iteration.");
 			step++ ;
 		}

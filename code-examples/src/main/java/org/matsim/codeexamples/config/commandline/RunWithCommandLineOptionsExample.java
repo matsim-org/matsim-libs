@@ -1,12 +1,13 @@
 package org.matsim.codeexamples.config.commandline;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 class RunWithCommandLineOptionsExample{
-	private static final Logger log = Logger.getLogger(RunWithCommandLineOptionsExample.class) ;
+	private static final Logger log = LogManager.getLogger(RunWithCommandLineOptionsExample.class) ;
 
 	public static void main( String[] args ){
 		Config config = ConfigUtils.createConfig() ;

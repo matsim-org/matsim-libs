@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.extensions.minibus;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.RunMinibus;
@@ -33,7 +34,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  *
  */
 public class RunMinibusExample {
-	private final static Logger log = Logger.getLogger(RunMinibus.class);
+	private final static Logger log = LogManager.getLogger(RunMinibus.class);
 
 	public static void main(final String[] args) {
 

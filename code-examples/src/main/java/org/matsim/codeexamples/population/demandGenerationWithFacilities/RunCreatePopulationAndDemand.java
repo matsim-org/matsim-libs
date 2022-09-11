@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.population.demandGenerationWithFacilities;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
@@ -10,7 +11,7 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 
 public class RunCreatePopulationAndDemand {
 	
-	private final static Logger log = Logger.getLogger(RunCreatePopulationAndDemand.class);
+	private final static Logger log = LogManager.getLogger(RunCreatePopulationAndDemand.class);
 	private Scenario scenario;
 	
 	private static final String facilitiesFile = "output/facilities.xml";

@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +38,7 @@ class CreatePopulation {
 	private Random random = new Random(3838494); 
 	
 	private ObjectAttributes personHomeAndWorkLocations = new ObjectAttributes();
-	private final static Logger log = Logger.getLogger(CreatePopulation.class);
+	private final static Logger log = LogManager.getLogger(CreatePopulation.class);
 
 	// --------------------------------------------------------------------------
 	

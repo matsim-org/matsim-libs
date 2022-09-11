@@ -23,7 +23,8 @@
  */
 package org.matsim.codeexamples.population.personAttributes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -41,7 +42,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author jwjoubert
  */
 public class RunPersonAttributesExample {
-	final private static Logger LOG = Logger.getLogger(RunPersonAttributesExample.class);
+	final private static Logger LOG = LogManager.getLogger(RunPersonAttributesExample.class);
 
 	/**
 	 * Running the example where we show how to add three different attribute

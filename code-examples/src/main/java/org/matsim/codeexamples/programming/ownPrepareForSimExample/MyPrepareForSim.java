@@ -21,7 +21,8 @@
  */
 package org.matsim.codeexamples.programming.ownPrepareForSimExample;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -51,7 +52,7 @@ import java.util.HashSet;
  */
 public class MyPrepareForSim implements PrepareForSim {
 
-	private static final Logger log = Logger.getLogger(PrepareForSim.class);
+	private static final Logger log = LogManager.getLogger(PrepareForSim.class);
 
 	private final GlobalConfigGroup globalConfigGroup;
 	private final Scenario scenario;

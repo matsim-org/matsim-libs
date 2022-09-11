@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.extensions.emissions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
@@ -12,7 +13,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.junit.Assert.fail;
 
 public class RunAverageEmissionToolOfflineExampleTest{
-	private static final Logger log = Logger.getLogger( RunAverageEmissionToolOfflineExampleTest.class );
+	private static final Logger log = LogManager.getLogger( RunAverageEmissionToolOfflineExampleTest.class );
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

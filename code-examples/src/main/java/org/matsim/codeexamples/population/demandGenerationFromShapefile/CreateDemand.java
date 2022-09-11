@@ -5,6 +5,8 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -23,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
  */
 class CreateDemand {
 
-	private static final Logger logger = Logger.getLogger("CreateDemand");
+	private static final Logger logger = LogManager.getLogger("CreateDemand");
 
 	private static final String HOME_REGION = "Wohnort";
 	private static final String WORK_REGION = "Arbeitsort";

@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.strategies.pluggablePlanStrategyInCode;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -32,7 +33,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  */
 class MyPlanSelector implements PlanSelector<Plan, Person>, ActivityEndEventHandler
 {
-	private static final Logger log = Logger.getLogger(MyPlanSelector.class);
+	private static final Logger log = LogManager.getLogger(MyPlanSelector.class);
 
 	@Override
 	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {

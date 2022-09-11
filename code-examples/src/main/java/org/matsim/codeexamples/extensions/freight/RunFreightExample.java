@@ -19,9 +19,9 @@
 package org.matsim.codeexamples.extensions.freight;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,7 +30,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
-import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
 
@@ -79,7 +78,8 @@ public class RunFreightExample {
 
 		// ## MATSim configuration:  ##
 		final Controler controler = new Controler( scenario ) ;
-		Freight.configure( controler );
+		controler.addOverridingModule(new CarrierModule() );
+
 
 		// otfvis (if you want to use):
 //		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );

@@ -25,7 +25,8 @@ import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSe
 
 import java.net.URL;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -41,7 +42,7 @@ import org.matsim.examples.ExamplesUtils;
  * @author jwjoubert
  */
 public class MultipleJvmBlackBox {
-	final private static Logger LOG = Logger.getLogger(MultipleJvmBlackBox.class);
+	final private static Logger LOG = LogManager.getLogger(MultipleJvmBlackBox.class);
 
 	public static void main(String[] args) {
 		LOG.info("Start...");

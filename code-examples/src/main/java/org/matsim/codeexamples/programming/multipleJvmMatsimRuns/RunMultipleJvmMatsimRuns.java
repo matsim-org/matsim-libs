@@ -30,7 +30,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Demonstrating how one can run multiple MATSim runs in paralerll, each within
@@ -39,7 +40,7 @@ import org.apache.log4j.Logger;
  * @author jwjoubert
  */
 public class RunMultipleJvmMatsimRuns {
-	final private static Logger LOG = Logger.getLogger(RunMultipleJvmMatsimRuns.class);
+	final private static Logger LOG = LogManager.getLogger(RunMultipleJvmMatsimRuns.class);
 	final private static int NUMBER_OF_THREADS = 4;
 	final private static int NUMBER_OF_RUNS = 4;
 

@@ -19,7 +19,8 @@
 
 package org.matsim.codeexamples.converter.networkFromEmme;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,7 +58,7 @@ import java.io.IOException;
  * 
  */
 public class RunNetworkEmme2MatsimExample {
-	private static final Logger log = Logger.getLogger(RunNetworkEmme2MatsimExample.class);
+	private static final Logger log = LogManager.getLogger(RunNetworkEmme2MatsimExample.class);
 
 	private static final int PSRC = 0 ;
 	private static final int EUGENE = 1 ;

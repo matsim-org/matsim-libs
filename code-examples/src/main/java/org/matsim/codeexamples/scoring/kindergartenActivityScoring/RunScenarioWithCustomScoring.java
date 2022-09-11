@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.scoring.kindergartenActivityScoring;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -65,7 +66,7 @@ public class RunScenarioWithCustomScoring {
 			
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				Logger.getLogger(getClass()).info("Kids in kindergarten 8142 :"+kindergartenArrivalHandler.kinder );
+				LogManager.getLogger(getClass()).info("Kids in kindergarten 8142 :"+kindergartenArrivalHandler.kinder );
 			}
 		});
 		

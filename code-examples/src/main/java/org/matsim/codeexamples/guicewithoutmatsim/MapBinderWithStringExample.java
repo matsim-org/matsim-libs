@@ -2,14 +2,15 @@ package org.matsim.codeexamples.guicewithoutmatsim;
 
 import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public final class MapBinderWithStringExample{
-	private static final Logger log = Logger.getLogger( MapBinderWithStringExample.class ) ;
+	private static final Logger log = LogManager.getLogger( MapBinderWithStringExample.class ) ;
 
 	public static void main ( String [] args ) {
 		new MapBinderWithStringExample().run() ;

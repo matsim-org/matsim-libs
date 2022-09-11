@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Binding;
@@ -20,7 +21,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
 public final class MultiBinderExample{
-	private static final Logger log = Logger.getLogger( MultiBinderExample.class ) ;
+	private static final Logger log = LogManager.getLogger( MultiBinderExample.class ) ;
 
 	public static void main ( String [] args ) {
 		new MultiBinderExample().run() ;

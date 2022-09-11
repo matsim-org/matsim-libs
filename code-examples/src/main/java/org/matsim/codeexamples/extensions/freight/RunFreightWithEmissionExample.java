@@ -24,9 +24,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -126,7 +126,7 @@ public class RunFreightWithEmissionExample {
 
 		//MATSim configuration:
 		final Controler controler = new Controler( scenario ) ;
-		Freight.configure( controler );
+		controler.addOverridingModule(new CarrierModule() );
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

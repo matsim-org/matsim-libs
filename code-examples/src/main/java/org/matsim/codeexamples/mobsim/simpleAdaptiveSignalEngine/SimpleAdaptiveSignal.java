@@ -29,7 +29,8 @@ import java.util.Queue;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -167,7 +168,7 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, MobsimInitial
 	@Override
 	public void reset(int iteration) {
 		double sum = cnt4 + cnt5 ;
-		Logger.getLogger(this.getClass()).warn("iteration: " + iteration + " cnt4: " + (cnt4/sum) + " cnt5: " + (cnt5/sum) ) ; 
+		LogManager.getLogger(this.getClass()).warn("iteration: " + iteration + " cnt4: " + (cnt4/sum) + " cnt5: " + (cnt5/sum) ) ; 
 		
 		Result result = new Result() ;
 		result.iteration = iteration ;

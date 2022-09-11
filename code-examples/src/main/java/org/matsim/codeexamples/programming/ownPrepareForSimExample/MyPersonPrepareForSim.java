@@ -23,7 +23,8 @@ package org.matsim.codeexamples.programming.ownPrepareForSimExample;
 
 import java.util.HashSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -53,7 +54,7 @@ public class MyPersonPrepareForSim extends AbstractPersonAlgorithm {
 	private final PlanAlgorithm router;
 	private final Network network;
 
-	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
+	private static final Logger log = LogManager.getLogger(PersonPrepareForSim.class);
 
 	/*
 	 * To be used by the controller which creates multiple instances of this class which would

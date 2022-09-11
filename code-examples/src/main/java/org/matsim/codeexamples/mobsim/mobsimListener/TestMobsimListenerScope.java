@@ -1,7 +1,8 @@
 package org.matsim.codeexamples.mobsim.mobsimListener;
 
 import com.google.inject.Singleton;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -13,7 +14,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 class TestMobsimListenerScope{
-	private static final Logger log = Logger.getLogger( TestMobsimListenerScope.class );
+	private static final Logger log = LogManager.getLogger( TestMobsimListenerScope.class );
 
 	private static class MyMobsimListener implements MobsimInitializedListener {
 		MyMobsimListener() {

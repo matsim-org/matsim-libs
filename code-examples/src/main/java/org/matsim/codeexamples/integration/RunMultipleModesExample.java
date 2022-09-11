@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.integration;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -27,7 +28,7 @@ import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 
 final class RunMultipleModesExample{
 
-	private static final Logger log = Logger.getLogger(RunMultipleModesExample.class) ;
+	private static final Logger log = LogManager.getLogger(RunMultipleModesExample.class) ;
 
 	public static void main( String [] args ) {
 		Config config = prepareConfig() ;

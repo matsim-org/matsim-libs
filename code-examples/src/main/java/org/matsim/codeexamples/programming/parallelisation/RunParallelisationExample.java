@@ -40,7 +40,8 @@ package org.matsim.codeexamples.programming.parallelisation;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -57,7 +58,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author jwjoubert
  */
 public class RunParallelisationExample {
-	final private static Logger LOG = Logger.getLogger(Math.class);
+	final private static Logger LOG = LogManager.getLogger(Math.class);
 
 	/**
 	 * Running the Sioux-Falls scenario, first with single thread, and then in

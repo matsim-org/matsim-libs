@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.programming.reuseDefaultBindings;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -12,7 +13,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 class RunReuseDefaultBindingsExample1{
-	private static final Logger log = Logger.getLogger( RunReuseDefaultBindingsExample1.class );
+	private static final Logger log = LogManager.getLogger( RunReuseDefaultBindingsExample1.class );
 
 	public static void main( String[] args ){
 

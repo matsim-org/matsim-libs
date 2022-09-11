@@ -1,7 +1,8 @@
 package org.matsim.codeexamples.scoring.aaIncomeDependentScoring;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -30,7 +31,7 @@ import java.util.TreeMap;
  * @author thibautd
  */
 class RunIncomeDependentScoringExample{
-	private static final Logger log = Logger.getLogger( RunIncomeDependentScoringExample.class ) ;
+	private static final Logger log = LogManager.getLogger( RunIncomeDependentScoringExample.class ) ;
 	
 	static final String NET_INCOME_PER_MONTH="netIncomePerMonth" ;
 

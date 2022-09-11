@@ -1,7 +1,8 @@
 package org.matsim.codeexamples;
 
 import com.jogamp.common.util.SyncedRingbuffer;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -19,7 +20,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.junit.Assert.*;
 
 public class RunAbcSimpleExampleTest{
-	private static final Logger log = Logger.getLogger(RunAbcSimpleExampleTest.class) ;
+	private static final Logger log = LogManager.getLogger(RunAbcSimpleExampleTest.class) ;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 

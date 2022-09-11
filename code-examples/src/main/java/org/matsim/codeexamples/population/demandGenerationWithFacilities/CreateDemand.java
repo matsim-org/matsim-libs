@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.population.demandGenerationWithFacilities;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,7 +39,7 @@ class CreateDemand {
 	private QuadTree<ActivityFacility> leisureFacilitiesTree;
 	private QuadTree<ActivityFacility> educationFacilitiesTree;
 	
-	private final static Logger log = Logger.getLogger(CreateDemand.class);
+	private final static Logger log = LogManager.getLogger(CreateDemand.class);
 	
 	
 	public void run(Scenario scenario, ObjectAttributes personHomeAndWorkLocations) {

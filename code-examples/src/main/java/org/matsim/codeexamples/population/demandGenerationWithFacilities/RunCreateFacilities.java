@@ -1,6 +1,7 @@
 package org.matsim.codeexamples.population.demandGenerationWithFacilities;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -15,7 +16,7 @@ import java.io.IOException;
 
 public class RunCreateFacilities {
 	
-	private final static Logger log = Logger.getLogger(RunCreateFacilities.class);
+	private final static Logger log = LogManager.getLogger(RunCreateFacilities.class);
 	private Scenario scenario;
 	private static final String censusFile = "examples/tutorial/programming/demandGenerationWithFacilities/census.txt";
 	private static final String businessCensusFile = "examples/tutorial/programming/demandGenerationWithFacilities/business_census.txt";

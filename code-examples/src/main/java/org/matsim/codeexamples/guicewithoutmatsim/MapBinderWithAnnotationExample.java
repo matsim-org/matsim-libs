@@ -3,13 +3,15 @@ package org.matsim.codeexamples.guicewithoutmatsim;
 import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
 
 public final class MapBinderWithAnnotationExample{
-	private static final Logger log = Logger.getLogger( MapBinderWithAnnotationExample.class ) ;
+	private static final Logger log = LogManager.getLogger( MapBinderWithAnnotationExample.class ) ;
 
 	public static void main ( String [] args ) {
 		new MapBinderWithAnnotationExample().run() ;
