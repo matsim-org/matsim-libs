@@ -14,6 +14,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import static org.junit.Assert.fail;
 
@@ -32,7 +33,8 @@ public class RunAddToScoringExampleTest{
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				EventsUtils.compareEventsFiles( expected, actual );
+				var result = EventsUtils.compareEventsFiles( expected, actual );
+				Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
 			}
 			{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
