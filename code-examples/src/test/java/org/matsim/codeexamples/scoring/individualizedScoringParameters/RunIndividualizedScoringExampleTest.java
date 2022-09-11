@@ -25,10 +25,10 @@ public class RunIndividualizedScoringExampleTest {
 
 	@Test public void testMain(){
 		try{
-			RunIndividualizedScoringExample.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ).toString()
-					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
-					, "--config:controler.lastIteration=0"
-			} );
+			RunIndividualizedScoringExample.main(
+					IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ).toString(),
+					"--config:controler.outputDirectory=" + utils.getOutputDirectory(),
+					"--config:controler.lastIteration=0");
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;

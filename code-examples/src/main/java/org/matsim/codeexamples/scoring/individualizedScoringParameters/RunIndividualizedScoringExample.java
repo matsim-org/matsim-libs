@@ -13,7 +13,7 @@ import org.matsim.examples.ExamplesUtils;
  * @author thibautd
  */
 public class RunIndividualizedScoringExample{
-	public static void main(String[] args) {
+	public static void main(String... args) {
 		final Config config;
 		if ( args==null || args.length==0 || args[0]==null ){
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
