@@ -20,7 +20,7 @@
 
 package lsp.usecase;
 
-import lsp.controler.LSPSimulationTracker;
+import lsp.LSPSimulationTracker;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
