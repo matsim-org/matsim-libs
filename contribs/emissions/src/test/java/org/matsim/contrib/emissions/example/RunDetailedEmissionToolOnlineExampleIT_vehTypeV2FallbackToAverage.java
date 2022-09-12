@@ -56,7 +56,10 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2FallbackToAverage {
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior(
 					DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //This is the previous behaviour -> Test only passes if falling back to average table :(
-			// TODO missing EF but for PC with HGV info... (strange matching) ~rjg 12.09
+			emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+			emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
+			emissionsConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent );
+
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {
