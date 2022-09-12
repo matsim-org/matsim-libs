@@ -20,17 +20,22 @@
 
 package example.lsp.simulationTrackers;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 /*package-private*/ class TourStartHandler implements FreightTourStartEventHandler {
 
 	private static final Logger log = LogManager.getLogger(TourStartHandler.class);
 
 	private double vehicleFixedCosts;
+
+	@Inject Scenario scenario;
 
 	@Override
 	public void reset(int iteration) {
@@ -40,7 +45,10 @@ import org.matsim.vehicles.Vehicle;
 	@Override
 	public void handleEvent(FreightTourStartEvent event) {
 		log.warn("handling tour start event=" + event);
-		vehicleFixedCosts = vehicleFixedCosts + ((Vehicle) event.getVehicle()).getType().getCostInformation().getFixedCosts();
+		//final Vehicle vehicle = (Vehicle) event.getVehicle();
+		final Vehicle vehicle = VehicleUtils.findVehicle(event.getVehicleId(), scenario);
+		vehicleFixedCosts = vehicleFixedCosts + vehicle.getType().getCostInformation().getFixedCosts();
+
 	}
 
 	public double getVehicleFixedCosts() {
