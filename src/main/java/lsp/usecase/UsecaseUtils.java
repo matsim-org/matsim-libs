@@ -21,10 +21,7 @@
 package lsp.usecase;
 
 import com.google.inject.Inject;
-import lsp.LSP;
-import lsp.LogisticsSolutionElement;
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
+import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -32,10 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.contrib.freight.utils.FreightUtils;
@@ -49,6 +43,7 @@ import java.util.*;
 public class UsecaseUtils {
 
 	@Inject static Scenario scenario;
+
 
 	public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler() {
 		return new CollectionCarrierScheduler();
@@ -103,6 +98,10 @@ public class UsecaseUtils {
 	 * @return Tour
 	 */
 	/*package-private*/ static Tour getTourFromTourStartEvent(FreightTourStartEvent event) {
+		//TODO: Does not work, because scenario is null -> Need help from KN :(
+		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
+		// OR
+		// LSPModule -> provideCarriers ??
 		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
 		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
 		for (ScheduledTour scheduledTour : scheduledTours) {
@@ -128,6 +127,10 @@ public class UsecaseUtils {
 	 * @return Tour
 	 */
 	/*package-private*/ static Tour getTourFromTourEndEvent(FreightTourEndEvent event) {
+		//TODO: Does not work, because scenario is null -> Need help from KN :(
+		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
+		// OR
+		// LSPModule -> provideCarriers ??
 		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
 		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
 		for (ScheduledTour scheduledTour : scheduledTours) {
