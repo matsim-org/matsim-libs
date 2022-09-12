@@ -80,13 +80,14 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 
 	@Override
 	public void handleEvent(FreightTourEndEvent event) {
-		if ((event.getLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(event.getTour()))) {
+		final Tour tour = UsecaseUtils.getTourFromTourEndEvent(event);
+		if ((event.getLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(tour))) {
 
-			for (TourElement tourElement : event.getTour().getTourElements()) {
+			for (TourElement tourElement : tour.getTourElements()) {
 				if (tourElement instanceof ServiceActivity serviceActivity) {
 					if (serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
-							&& allServicesAreInOnePoint(event.getTour())
-							&& (event.getTour().getStartLinkId() != transshipmentHub.getStartLinkId())) {
+							&& allServicesAreInOnePoint(tour)
+							&& (tour.getStartLinkId() != transshipmentHub.getStartLinkId())) {
 						logReloadAfterMainRun(serviceActivity.getService(), event);
 					} else {
 						logReloadAfterCollection(serviceActivity.getService(), event);
@@ -116,7 +117,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
 		builder.setResourceId(resourceId);
-		double startTime = event.getTime() + getUnloadEndTime(event.getTour());
+		double startTime = event.getTime() + getUnloadEndTime(UsecaseUtils.getTourFromTourEndEvent(event));
 		builder.setStartTime(startTime);
 		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);

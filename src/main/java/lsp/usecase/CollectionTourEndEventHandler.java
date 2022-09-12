@@ -64,7 +64,7 @@ import java.util.Collection;
 
 	@Override
 	public void handleEvent(FreightTourEndEvent event) {
-		Tour tour = event.getTour();
+		Tour tour = UsecaseUtils.getTourFromTourEndEvent(event);
 		for (TourElement element : tour.getTourElements()) {
 			if (element instanceof ServiceActivity serviceActivity) {
 				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {

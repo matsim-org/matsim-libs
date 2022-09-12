@@ -20,6 +20,7 @@
 
 package lsp.usecase;
 
+import com.google.inject.Inject;
 import lsp.LSP;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
@@ -28,10 +29,16 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -40,6 +47,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class UsecaseUtils {
+
+	@Inject static Scenario scenario;
 
 	public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler() {
 		return new CollectionCarrierScheduler();
@@ -77,6 +86,56 @@ public class UsecaseUtils {
 			vehicleTypeCollection.add(carrierVehicle.getType());
 		}
 		return vehicleTypeCollection;
+	}
+
+	/**
+	 *
+	 * Search for and returns the (carrier's) {@link Tour} based on the data from the {@link FreightTourStartEvent}.
+	 * This is done to avoid that the tour needs to be part of the events - as it was before.
+	 *
+	 * This is some quickfix to deal with the compile errors after removing the tour element form the events.
+	 * Maybe this can go away later or will be replaced by something else.
+	 * To avoid code duplication, it is placed here in the Utils-class
+	 *
+	 * KMT Sep 22
+	 *
+	 * @param event FreightTourStartEvent
+	 * @return Tour
+	 */
+	/*package-private*/ static Tour getTourFromTourStartEvent(FreightTourStartEvent event) {
+		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+				return scheduledTour.getTour();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 *
+	 * Search for and returns the (carrier's) {@link Tour} based on the data from the {@link FreightTourEndEvent}.
+	 * This is done to avoid that the tour needs to be part of the events - as it was before.
+	 *
+	 * This is some quickfix to deal with the compile errors after removing the tour element form the events.
+	 * Maybe this can go away later or will be replaced by something else.
+	 * To avoid code duplication, it is placed here in the Utils-class
+	 *
+	 * KMT Sep 22
+	 *
+	 * @param event FreightTourEndEvent
+	 * @return Tour
+	 */
+	/*package-private*/ static Tour getTourFromTourEndEvent(FreightTourEndEvent event) {
+		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+				return scheduledTour.getTour();
+			}
+		}
+		return null;
 	}
 
 	public static void printResults(String outputDir, LSP lsp) {

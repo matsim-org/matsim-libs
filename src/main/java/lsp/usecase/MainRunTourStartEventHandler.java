@@ -64,7 +64,7 @@ import java.util.Collection;
 
 	@Override
 	public void handleEvent(FreightTourStartEvent event) {
-		for (TourElement tourElement : event.getTour().getTourElements()) {
+		for (TourElement tourElement : UsecaseUtils.getTourFromTourStartEvent(event).getTourElements()) {
 			if (tourElement instanceof ServiceActivity serviceActivity) {
 				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 					logLoad(event);
@@ -79,7 +79,7 @@ import java.util.Collection;
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getLinkId());
-		double startTime = event.getTime() - getCumulatedLoadingTime(event.getTour());
+		double startTime = event.getTime() - getCumulatedLoadingTime(UsecaseUtils.getTourFromTourStartEvent(event));
 		builder.setStartTime(startTime);
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
@@ -104,7 +104,7 @@ import java.util.Collection;
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getLinkId());
-		builder.setToLinkId(event.getTour().getEndLinkId());
+		builder.setToLinkId(UsecaseUtils.getTourFromTourStartEvent(event).getEndLinkId());
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());

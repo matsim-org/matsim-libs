@@ -20,10 +20,14 @@
 
 package lsp.usecase;
 
+import com.google.inject.Inject;
 import lsp.LSPSimulationTracker;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
@@ -32,6 +36,7 @@ import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.events.handler.EventHandler;
 
 import java.util.ArrayList;
@@ -44,6 +49,8 @@ import java.util.Collection;
 	private final LSPCarrierResource resource;
 	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
 	private LSPShipment lspShipment;
+
+	@Inject Scenario scenario;
 
 	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;
@@ -60,11 +67,18 @@ import java.util.Collection;
 
 	@Override
 	public void handleEvent(FreightTourStartEvent event) {
-		for (TourElement tourElement : event.getTour().getTourElements()) {
-			if (tourElement instanceof ServiceActivity serviceActivity) {
-				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
-					logLoad(event);
-					logTransport(event);
+		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+				Tour tour = scheduledTour.getTour();
+				for (TourElement tourElement : tour.getTourElements()) {
+					if (tourElement instanceof ServiceActivity serviceActivity) {
+						if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
+							logLoad(event);
+							logTransport(event);
+						}
+					}
 				}
 			}
 		}
@@ -77,7 +91,7 @@ import java.util.Collection;
 		builder.setLogisticsSolutionElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setEndTime(event.getTime());
-		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(event.getTour()));
+		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(UsecaseUtils.getTourFromTourStartEvent(event)));
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
@@ -88,7 +102,7 @@ import java.util.Collection;
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getLinkId());
-		builder.setToLinkId(event.getTour().getEndLinkId());
+		builder.setToLinkId(UsecaseUtils.getTourFromTourStartEvent(event).getEndLinkId());
 		builder.setLogisticsSolutionElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setStartTime(event.getTime());
@@ -97,6 +111,8 @@ import java.util.Collection;
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(transportId, transport);
 	}
+
+
 
 	private double getCumulatedLoadingTime(Tour tour) {
 		double cumulatedLoadingTime = 0;

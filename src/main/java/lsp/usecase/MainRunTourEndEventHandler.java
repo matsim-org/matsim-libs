@@ -65,7 +65,7 @@ import java.util.Collection;
 
 	@Override
 	public void handleEvent(FreightTourEndEvent event) {
-		for (TourElement tourElement : event.getTour().getTourElements()) {
+		for (TourElement tourElement : UsecaseUtils.getTourFromTourEndEvent(event).getTourElements()) {
 			if (tourElement instanceof ServiceActivity serviceActivity) {
 				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 					logUnload(event);
@@ -77,7 +77,7 @@ import java.util.Collection;
 
 	private void logUnload(FreightTourEndEvent event) {
 		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
-		builder.setStartTime(event.getTime() - getTotalUnloadingTime(event.getTour()));
+		builder.setStartTime(event.getTime() - getTotalUnloadingTime(UsecaseUtils.getTourFromTourEndEvent(event)));
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
@@ -93,7 +93,7 @@ import java.util.Collection;
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
 		if (abstractPlanElement instanceof ShipmentLeg transport) {
-			transport.setEndTime(event.getTime() - getTotalUnloadingTime(event.getTour()));
+			transport.setEndTime(event.getTime() - getTotalUnloadingTime(UsecaseUtils.getTourFromTourEndEvent(event)));
 			transport.setToLinkId(event.getLinkId());
 		}
 	}
