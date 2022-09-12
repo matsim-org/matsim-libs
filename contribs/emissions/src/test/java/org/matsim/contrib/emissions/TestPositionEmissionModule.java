@@ -89,6 +89,7 @@ public class TestPositionEmissionModule {
         var emissionConfig = new EmissionsConfigGroup();
         emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
         emissionConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+        // TODO changing the consistency checking level does not make a difference -- missing EF ~rjg 12.09
 
         var config = ConfigUtils.loadConfig(configFile, emissionConfig);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

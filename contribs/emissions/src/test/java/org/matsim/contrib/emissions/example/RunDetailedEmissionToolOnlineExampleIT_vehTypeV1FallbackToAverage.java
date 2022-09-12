@@ -61,6 +61,7 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1FallbackToAverage {
 			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 			emissionsConfig.setDetailedVsAverageLookupBehavior(
 					EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //This is the previous behaviour -> Test only pass, if falling back to average table :(
+			// TODO missing EF... ~rjg 12.09
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {

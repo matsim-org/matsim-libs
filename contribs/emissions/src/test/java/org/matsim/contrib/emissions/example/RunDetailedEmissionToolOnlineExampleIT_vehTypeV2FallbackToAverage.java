@@ -56,6 +56,7 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2FallbackToAverage {
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior(
 					DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //This is the previous behaviour -> Test only passes if falling back to average table :(
+			// TODO missing EF but for PC with HGV info... (strange matching) ~rjg 12.09
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {
