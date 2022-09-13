@@ -31,6 +31,6 @@ public class TaxiEmptyDriveTask extends DefaultDriveTask {
 
 	public TaxiEmptyDriveTask(VrpPathWithTravelData path, TaxiTaskType taskType) {
 		super(taskType, path);
-		Preconditions.checkArgument(taskType.getBaseType().get() == EMPTY_DRIVE);
+		Preconditions.checkArgument(taskType.baseType().get() == EMPTY_DRIVE);
 	}
 }
