@@ -138,8 +138,8 @@ import lsp.LSPResourceScheduler;
 							addShipmentLoadElement(tuple, tour, serviceActivity);
 							addShipmentTransportElement(tuple, tour, serviceActivity);
 							addShipmentUnloadElement(tuple, tour, serviceActivity);
-							addCollectionTourEndEventHandler(pair.service, tuple, adapter);
-							addCollectionServiceEventHandler(pair.service, tuple, adapter);
+							addCollectionTourEndEventHandler(pair.service, tuple, adapter, tour);
+							addCollectionServiceEventHandler(pair.service, tuple, adapter, tour);
 							//				break outerLoop;
 						}
 					}
@@ -170,7 +170,7 @@ import lsp.LSPResourceScheduler;
 		tuple.getShipment().getShipmentPlan().addPlanElement(id, load);
 	}
 
-	private void addCollectionServiceEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
+	private void addCollectionServiceEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
 		for (LogisticsSolutionElement element : adapter.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, tuple.getShipment(), element, resource);
@@ -181,10 +181,10 @@ import lsp.LSPResourceScheduler;
 
 	}
 
-	private void addCollectionTourEndEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
+	private void addCollectionTourEndEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
 		for (LogisticsSolutionElement element : adapter.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				CollectionTourEndEventHandler handler = new CollectionTourEndEventHandler(carrierService, tuple.getShipment(), element, resource);
+				CollectionTourEndEventHandler handler = new CollectionTourEndEventHandler(carrierService, tuple.getShipment(), element, resource, tour);
 				tuple.getShipment().addSimulationTracker(handler);
 				break;
 			}
