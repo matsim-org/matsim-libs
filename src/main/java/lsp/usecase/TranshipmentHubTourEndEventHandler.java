@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.inject.Inject;
 import lsp.LSPSimulationTracker;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
@@ -47,16 +46,24 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 
 /*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
 
-	@Inject Scenario scenario;
+//	@Inject Scenario scenario;
+	private final Scenario scenario;
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
 	private final TransshipmentHub transshipmentHub;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
 
-	TranshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub) {
+	/**
+	 * What is a TranshipmentHubTour ??? KMT, Sep 22
+	 *
+	 * @param transshipmentHub
+	 * @param scenario
+	 */
+	TranshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub, Scenario scenario) {
 		this.transshipmentHub = transshipmentHub;
 		this.linkId = transshipmentHub.getEndLinkId();
 		this.resourceId = transshipmentHub.getId();
+		this.scenario = scenario;
 		this.servicesWaitedFor = new HashMap<>();
 	}
 
@@ -109,7 +116,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 							&& (tour.getStartLinkId() != transshipmentHub.getStartLinkId())) {
 						logReloadAfterMainRun(serviceActivity.getService(), event);
 					} else {
-						logReloadAfterCollection(serviceActivity.getService(), event);
+						logReloadAfterCollection(serviceActivity.getService(), event, tour);
 					}
 				}
 
@@ -131,25 +138,12 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		return shipmentsEndInPoint;
 	}
 
-	private void logReloadAfterCollection(CarrierService carrierService, FreightTourEndEvent event) {
+	private void logReloadAfterCollection(CarrierService carrierService, FreightTourEndEvent event, Tour tour) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
 		builder.setResourceId(resourceId);
-		Tour result = null;
-		//TODO: Does not work, because scenario is null -> Need help from KN :(
-		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
-		// OR
-		// LSPModule -> provideCarriers ??
-		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
-		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-		for (ScheduledTour scheduledTour : scheduledTours) {
-			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
-				result = scheduledTour.getTour();
-				break;
-			}
-		}
-		double startTime = event.getTime() + getUnloadEndTime(result);
+		double startTime = event.getTime() + getUnloadEndTime(tour);
 		builder.setStartTime(startTime);
 		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);

@@ -43,7 +43,7 @@ public class FirstHubElementTest {
 
 
 		point = UsecaseUtils.TransshipmentHubBuilder
-				.newInstance(Id.create("TranshipmentHub1", LSPResource.class), Id.createLinkId("(4 2) (4 3)"))
+				.newInstance(Id.create("TranshipmentHub1", LSPResource.class), Id.createLinkId("(4 2) (4 3)"), null)
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
 				.build();
 

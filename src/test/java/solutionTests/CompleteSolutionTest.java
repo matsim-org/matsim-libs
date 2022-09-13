@@ -105,7 +105,7 @@ public class CompleteSolutionTest {
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
 
 		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId,
-				firstTransshipmentHub_LinkId);
+				firstTransshipmentHub_LinkId, scenario);
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 
 		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FiretHubElement",
@@ -160,7 +160,7 @@ public class CompleteSolutionTest {
 		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
 
 		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId,
-				secondTransshipmentHub_LinkId);
+				secondTransshipmentHub_LinkId, scenario);
 		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
 
 		Id<LogisticsSolutionElement> secondHubElementId = Id.create("SecondHubElement",

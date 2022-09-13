@@ -168,13 +168,14 @@ final class ExampleTwoEchelonGrid {
 		}
 
 		log.info("Add LSP to the scenario");
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario.getNetwork()))));
+		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
 
 		return scenario;
 	}
 
-	private static LSP createLSP(Network network) {
+	private static LSP createLSP(Scenario scenario) {
 		log.info("create LSP");
+		Network network = scenario.getNetwork();
 
 		LSPPlan lspPlan_direct;
 		{
@@ -229,7 +230,7 @@ final class ExampleTwoEchelonGrid {
 					.build();
 
 			//The scheduler is added to the Resource and the Resource is created
-			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Hub", LSPResource.class), HUB_LINK_ID)
+			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
 					.setTransshipmentHubScheduler(hubScheduler)
 					.build();
 

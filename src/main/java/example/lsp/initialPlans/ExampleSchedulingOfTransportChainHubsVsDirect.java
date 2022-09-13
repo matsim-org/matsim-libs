@@ -118,7 +118,7 @@ import java.util.*;
 		//########
 
 		log.info("create LSP");
-		LSP lsp = createInitialLSP(scenario.getNetwork(), solutionType);
+		LSP lsp = createInitialLSP(scenario, solutionType);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
@@ -168,7 +168,9 @@ import java.util.*;
 
 	}
 
-	private static LSP createInitialLSP(Network network, SolutionType solutionType) {
+	private static LSP createInitialLSP(Scenario scenario, SolutionType solutionType) {
+
+		Network network = scenario.getNetwork();
 
 		LSPUtils.LSPBuilder lspBuilder = null;
 		switch (solutionType) {
@@ -204,7 +206,7 @@ import java.util.*;
 					.build();
 
 			//The scheduler is added to the Resource and the Resource is created
-			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Depot", LSPResource.class), depotLinkId)
+			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Depot", LSPResource.class), depotLinkId, scenario)
 					.setTransshipmentHubScheduler(depotScheduler)
 					.build();
 
@@ -266,7 +268,7 @@ import java.util.*;
 			//The scheduler is added to the Resource and the Resource is created
 			//The second reloading adapter i.e. the Resource is created
 			Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
-			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, hubLinkId)
+			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, hubLinkId,scenario )
 					.setTransshipmentHubScheduler(hubScheduler)
 					.build();
 

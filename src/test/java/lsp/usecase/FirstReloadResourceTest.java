@@ -45,7 +45,7 @@ public class FirstReloadResourceTest {
 		schedulerBuilder.setCapacityNeedFixed(10);
 		schedulerBuilder.setCapacityNeedLinear(1);
 
-		transshipmentHub = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("TranshipmentHub1", LSPResource.class), hubLinkId)
+		transshipmentHub = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("TranshipmentHub1", LSPResource.class), hubLinkId, null)
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
 				.build();
 	}

@@ -45,7 +45,7 @@ public class SecondReloadResourceTest {
 		Id<LSPResource> reloadingId = Id.create("TranshipmentHub2", LSPResource.class);
 		reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder transshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId);
+		UsecaseUtils.TransshipmentHubBuilder transshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId, null);
 		transshipmentHubBuilder.setTransshipmentHubScheduler(schedulerBuilder.build());
 		transshipmentHub = transshipmentHubBuilder.build();
 

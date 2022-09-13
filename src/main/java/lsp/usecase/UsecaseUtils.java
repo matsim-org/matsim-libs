@@ -20,7 +20,6 @@
 
 package lsp.usecase;
 
-import com.google.inject.Inject;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
@@ -300,15 +299,17 @@ public class UsecaseUtils {
 		private final Id<Link> locationLinkId;
 		private final ArrayList<LogisticsSolutionElement> clientElements;
 		private TransshipmentHubScheduler transshipmentHubScheduler;
+		private final Scenario scenario;
 
-		private TransshipmentHubBuilder(Id<LSPResource> id, Id<Link> locationLinkId) {
+		private TransshipmentHubBuilder(Id<LSPResource> id, Id<Link> locationLinkId, Scenario scenario) {
 			this.id = id;
 			this.clientElements = new ArrayList<>();
 			this.locationLinkId = locationLinkId;
+			this.scenario = scenario;
 		}
 
-		public static TransshipmentHubBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId) {
-			return new TransshipmentHubBuilder(id, locationLinkId);
+		public static TransshipmentHubBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId, Scenario scenario) {
+			return new TransshipmentHubBuilder(id, locationLinkId, scenario);
 		}
 
 		public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler TranshipmentHubScheduler) {
@@ -317,7 +318,7 @@ public class UsecaseUtils {
 		}
 
 		public TransshipmentHub build() {
-			return new TransshipmentHub(this);
+			return new TransshipmentHub(this, scenario);
 		}
 		//--- Getters ---
 
