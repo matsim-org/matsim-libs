@@ -91,7 +91,20 @@ import java.util.Collection;
 		builder.setLogisticsSolutionElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setEndTime(event.getTime());
-		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(UsecaseUtils.getTourFromTourStartEvent(event)));
+		Tour result = null;
+		//TODO: Does not work, because scenario is null -> Need help from KN :(
+		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
+		// OR
+		// LSPModule -> provideCarriers ??
+		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+				result = scheduledTour.getTour();
+				break;
+			}
+		}
+		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(result));
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
@@ -102,7 +115,20 @@ import java.util.Collection;
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getLinkId());
-		builder.setToLinkId(UsecaseUtils.getTourFromTourStartEvent(event).getEndLinkId());
+		Tour result = null;
+		//TODO: Does not work, because scenario is null -> Need help from KN :(
+		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
+		// OR
+		// LSPModule -> provideCarriers ??
+		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+				result = scheduledTour.getTour();
+				break;
+			}
+		}
+		builder.setToLinkId(result.getEndLinkId());
 		builder.setLogisticsSolutionElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setStartTime(event.getTime());

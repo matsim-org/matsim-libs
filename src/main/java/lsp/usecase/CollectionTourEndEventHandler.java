@@ -20,10 +20,14 @@
 
 package lsp.usecase;
 
+import com.google.inject.Inject;
 import lsp.LSPSimulationTracker;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
@@ -33,6 +37,7 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler
 import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
@@ -42,6 +47,7 @@ import java.util.Collection;
 
 /*package-private*/ class CollectionTourEndEventHandler implements AfterMobsimListener, FreightTourEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
+	@Inject Scenario scenario;
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement solutionElement;
 	private final LSPCarrierResource resource;
@@ -64,7 +70,19 @@ import java.util.Collection;
 
 	@Override
 	public void handleEvent(FreightTourEndEvent event) {
-		Tour tour = UsecaseUtils.getTourFromTourEndEvent(event);
+		Tour tour = null;
+		//TODO: Does not work, because scenario is null -> Need help from KN :(
+		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
+		// OR
+		// LSPModule -> provideCarriers ??
+		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+				tour = scheduledTour.getTour();
+				break;
+			}
+		}
 		for (TourElement element : tour.getTourElements()) {
 			if (element instanceof ServiceActivity serviceActivity) {
 				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {

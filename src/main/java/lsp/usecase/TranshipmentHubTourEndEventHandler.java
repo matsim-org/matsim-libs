@@ -20,14 +20,19 @@
 
 package lsp.usecase;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import lsp.LSPSimulationTracker;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
@@ -36,11 +41,13 @@ import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
 /*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
 
+	@Inject Scenario scenario;
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
 	private final TransshipmentHub transshipmentHub;
 	private final Id<LSPResource> resourceId;
@@ -80,7 +87,19 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 
 	@Override
 	public void handleEvent(FreightTourEndEvent event) {
-		final Tour tour = UsecaseUtils.getTourFromTourEndEvent(event);
+		Tour tour = null;
+		//TODO: Does not work, because scenario is null -> Need help from KN :(
+		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
+		// OR
+		// LSPModule -> provideCarriers ??
+		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+				tour = scheduledTour.getTour();
+				break;
+			}
+		}
 		if ((event.getLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(tour))) {
 
 			for (TourElement tourElement : tour.getTourElements()) {
@@ -117,7 +136,20 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
 		builder.setResourceId(resourceId);
-		double startTime = event.getTime() + getUnloadEndTime(UsecaseUtils.getTourFromTourEndEvent(event));
+		Tour result = null;
+		//TODO: Does not work, because scenario is null -> Need help from KN :(
+		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
+		// OR
+		// LSPModule -> provideCarriers ??
+		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+				result = scheduledTour.getTour();
+				break;
+			}
+		}
+		double startTime = event.getTime() + getUnloadEndTime(result);
 		builder.setStartTime(startTime);
 		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);
