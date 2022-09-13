@@ -176,8 +176,8 @@ import org.matsim.vehicles.VehicleType;
 							addShipmentLoadElement(tuple, tour, serviceActivity);
 							addShipmentTransportElement(tuple, tour, serviceActivity);
 							addShipmentUnloadElement(tuple, tour, serviceActivity);
-							addMainRunStartEventHandler(pair.service, tuple, adapter);
-							addMainRunEndEventHandler(pair.service, tuple, adapter);
+							addMainTourRunStartEventHandler(pair.service, tuple, adapter, tour);
+							addMainRunTourEndEventHandler(pair.service, tuple, adapter, tour);
 							//break outerLoop;
 						}
 					}
@@ -266,20 +266,20 @@ import org.matsim.vehicles.VehicleType;
 		tuple.getShipment().getShipmentPlan().addPlanElement(id, unload);
 	}
 
-	private void addMainRunStartEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
+	private void addMainTourRunStartEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
 		for (LogisticsSolutionElement element : adapter.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				MainRunTourStartEventHandler handler = new MainRunTourStartEventHandler(tuple.getShipment(), carrierService, element, resource);
+				MainRunTourStartEventHandler handler = new MainRunTourStartEventHandler(tuple.getShipment(), carrierService, element, resource, tour);
 				tuple.getShipment().addSimulationTracker(handler);
 				break;
 			}
 		}
 	}
 
-	private void addMainRunEndEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
+	private void addMainRunTourEndEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
 		for (LogisticsSolutionElement element : adapter.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				MainRunTourEndEventHandler handler = new MainRunTourEndEventHandler(tuple.getShipment(), carrierService, element, resource);
+				MainRunTourEndEventHandler handler = new MainRunTourEndEventHandler(tuple.getShipment(), carrierService, element, resource, tour);
 				tuple.getShipment().addSimulationTracker(handler);
 				break;
 			}

@@ -20,11 +20,9 @@
 
 package lsp.usecase;
 
-import com.google.inject.Inject;
 import lsp.LSPSimulationTracker;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
@@ -50,13 +48,16 @@ import java.util.Collection;
 	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
 	private LSPShipment lspShipment;
 
-	@Inject Scenario scenario;
+	private final Tour tour;
 
-	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
+//	@Inject Scenario scenario;
+
+	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource, Tour tour) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.element = element;
 		this.resource = resource;
+		this.tour = tour;
 	}
 
 
@@ -67,11 +68,11 @@ import java.util.Collection;
 
 	@Override
 	public void handleEvent(FreightTourStartEvent event) {
-		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
-		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-		for (ScheduledTour scheduledTour : scheduledTours) {
-			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
-				Tour tour = scheduledTour.getTour();
+//		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+//		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+//		for (ScheduledTour scheduledTour : scheduledTours) {
+//			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+//				Tour tour = scheduledTour.getTour();
 				for (TourElement tourElement : tour.getTourElements()) {
 					if (tourElement instanceof ServiceActivity serviceActivity) {
 						if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
@@ -80,8 +81,8 @@ import java.util.Collection;
 						}
 					}
 				}
-			}
-		}
+//			}
+//		}
 	}
 
 	private void logLoad(FreightTourStartEvent event) {
@@ -91,20 +92,20 @@ import java.util.Collection;
 		builder.setLogisticsSolutionElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setEndTime(event.getTime());
-		Tour result = null;
-		//TODO: Does not work, because scenario is null -> Need help from KN :(
-		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
-		// OR
-		// LSPModule -> provideCarriers ??
-		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
-		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-		for (ScheduledTour scheduledTour : scheduledTours) {
-			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
-				result = scheduledTour.getTour();
-				break;
-			}
-		}
-		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(result));
+//		Tour tour = null;
+//		//TODO: Does not work, because scenario is null -> Need help from KN :(
+//		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
+//		// OR
+//		// LSPModule -> provideCarriers ??
+//		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+//		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+//		for (ScheduledTour scheduledTour : scheduledTours) {
+//			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+//				tour = scheduledTour.getTour();
+//				break;
+//			}
+//		}
+		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(tour));
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
@@ -115,20 +116,20 @@ import java.util.Collection;
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getLinkId());
-		Tour result = null;
-		//TODO: Does not work, because scenario is null -> Need help from KN :(
-		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
-		// OR
-		// LSPModule -> provideCarriers ??
-		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
-		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-		for (ScheduledTour scheduledTour : scheduledTours) {
-			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
-				result = scheduledTour.getTour();
-				break;
-			}
-		}
-		builder.setToLinkId(result.getEndLinkId());
+//		Tour result = null;
+//		//TODO: Does not work, because scenario is null -> Need help from KN :(
+//		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
+//		// OR
+//		// LSPModule -> provideCarriers ??
+//		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+//		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+//		for (ScheduledTour scheduledTour : scheduledTours) {
+//			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+//				result = scheduledTour.getTour();
+//				break;
+//			}
+//		}
+		builder.setToLinkId(tour.getEndLinkId());
 		builder.setLogisticsSolutionElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setStartTime(event.getTime());

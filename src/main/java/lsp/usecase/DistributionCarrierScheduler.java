@@ -175,7 +175,7 @@ import org.matsim.vehicles.VehicleType;
 							addShipmentLoadElement(tuple, tour, serviceActivity);
 							addShipmentTransportElement(tuple, tour, serviceActivity);
 							addShipmentUnloadElement(tuple, tour, serviceActivity);
-							addDistributionStartEventHandler(pair.service, tuple, adapter);
+							addDistributionTourStartEventHandler(pair.service, tuple, adapter, tour);
 							addDistributionServiceEventHandler(pair.service, tuple, adapter);
 							//break outerLoop;
 						}
@@ -315,10 +315,10 @@ import org.matsim.vehicles.VehicleType;
 		}
 	}
 
-	private void addDistributionStartEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
+	private void addDistributionTourStartEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
 		for (LogisticsSolutionElement element : adapter.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				DistributionTourStartEventHandler handler = new DistributionTourStartEventHandler(carrierService, tuple.getShipment(), element, resource);
+				DistributionTourStartEventHandler handler = new DistributionTourStartEventHandler(carrierService, tuple.getShipment(), element, resource, tour);
 				tuple.getShipment().addSimulationTracker(handler);
 				break;
 			}
