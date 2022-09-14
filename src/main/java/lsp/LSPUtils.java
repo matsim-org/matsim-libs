@@ -22,6 +22,7 @@ package lsp;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
@@ -47,7 +48,15 @@ public final class LSPUtils {
 	}
 
 	public static void addLSPs(Scenario scenario, LSPs lsps) {
-		FreightUtils.addOrGetCarriers( scenario );
+		Carriers carriers = FreightUtils.addOrGetCarriers( scenario );
+		//Register carriers from all lsps
+		for (LSP lsp : lsps.getLSPs().values()){
+			for (LSPResource lspResource : lsp.getResources()) {
+				if (lspResource instanceof LSPCarrierResource lspCarrierResource) {
+					carriers.addCarrier(lspCarrierResource.getCarrier());
+				}
+			}
+		}
 		scenario.addScenarioElement(lspsString, lsps);
 	}
 
