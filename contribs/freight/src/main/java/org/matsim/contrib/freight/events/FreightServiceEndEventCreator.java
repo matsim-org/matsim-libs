@@ -19,29 +19,27 @@
  *
  */
 
-package org.matsim.contrib.freight.controler;
+package org.matsim.contrib.freight.events;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.events.LSPTourStartEvent;
+import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-/*package-private*/  final class LSPTourStartEventCreator implements LSPEventCreator {
+/*package-private*/  final class FreightServiceEndEventCreator implements FreightEventCreator {
 
 	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter) {
-		if((event instanceof ActivityEndEvent)) {
-			ActivityEndEvent endEvent = (ActivityEndEvent) event;
-			if(endEvent.getActType().equals(FreightConstants.START)) {
-				return new LSPTourStartEvent(carrier.getId(), driverId, scheduledTour.getTour(), event.getTime(), scheduledTour.getVehicle());
-			}	
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
+		if(event instanceof ActivityEndEvent endEvent && FreightConstants.SERVICE.equals(endEvent.getActType())) {
+			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+			if(element instanceof ServiceActivity serviceActivity) {
+				return new FreightServiceEndEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), scheduledTour.getVehicle().getId());
+			}
 		}
-		return null;	
+		return null;
 	}
-
 }

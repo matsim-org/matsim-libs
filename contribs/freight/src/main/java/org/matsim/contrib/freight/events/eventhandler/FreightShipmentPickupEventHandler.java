@@ -19,28 +19,17 @@
  *
  */
 
-package org.matsim.contrib.freight.controler;
+package org.matsim.contrib.freight.events.eventhandler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.matsim.contrib.freight.events.FreightShipmentPickupEndEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-final class LSPEventCreatorUtils {
-
-	private LSPEventCreatorUtils(){
-	}
-	static Collection<LSPEventCreator> getStandardEventCreators(){
-		List<LSPEventCreator> creators = new ArrayList<>();
-//		creators.add(new LSPFreightLinkEnterEventCreator());
-//		creators.add(new LSPFreightLinkLeaveEventCreator());
-//		creators.add(new LSPFreightVehicleLeavesTrafficEventCreator());
-		creators.add(new LSPServiceEndEventCreator());
-		creators.add(new LSPServiceStartEventCreator());
-		creators.add(new LSPShipmentDeliveredEventCreator());
-		creators.add(new LSPShipmentPickedUpEventCreator());
-		creators.add(new LSPTourEndEventCreator());
-		creators.add(new LSPTourStartEventCreator());
-		return creators;
-	}
-	
+/**
+ * Interface to listen to shipmentPickedUpEvents.
+ * 
+ * @author sschroeder
+ *
+ */
+public interface FreightShipmentPickupEventHandler extends EventHandler {
+	public void handleEvent(FreightShipmentPickupEndEvent event);
 }

@@ -19,14 +19,22 @@
  *
  */
 
-package org.matsim.contrib.freight.events.eventhandler;
+package org.matsim.contrib.freight.events;
 
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 
+/*package-private*/  final class FreightTourStartEventCreator implements FreightEventCreator {
 
-public interface LSPServiceStartEventHandler extends EventHandler {
-
-	public void handleEvent( LSPServiceStartEvent event );
-
+	@Override
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
+		if((event instanceof ActivityEndEvent endEvent) && FreightConstants.START.equals(endEvent.getActType()) ) {
+				return new FreightTourStartEvent(endEvent.getTime(), carrier.getId(), scheduledTour.getTour().getStartLinkId(), scheduledTour.getVehicle().getId());
+		}
+		return null;	
+	}
 }

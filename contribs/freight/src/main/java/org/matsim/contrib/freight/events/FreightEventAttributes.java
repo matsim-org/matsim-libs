@@ -19,31 +19,18 @@
  *
  */
 
-package org.matsim.contrib.freight.controler;
+package org.matsim.contrib.freight.events;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
-
-/*package-private*/  final class LSPServiceStartEventCreator implements LSPEventCreator {
-
-	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter) {
-		if( event instanceof ActivityStartEvent startEvent ){
-			if( startEvent.getActType().equals( "service" ) ) {
-				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-				if( element instanceof ServiceActivity serviceActivity ) {
-					return new LSPServiceStartEvent(startEvent, carrier.getId(), driverId, serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle());
-				}
-			}	
-		}
-		return null;
-	}
-}	
+/**
+ *  Some constants, that are used for the Attributes of different FreightEvents.
+ *
+ *  @author Kai Martins-Turner (kturner)
+ */
+public class FreightEventAttributes {
+	public static final String ATTRIBUTE_SERVICE_ID = "serviceId";
+	public static final String ATTRIBUTE_SHIPMENT_ID = "shipmentId";
+	public static final String ATTRIBUTE_SERVICE_DURATION = "serviceDuration";
+	public static final String ATTRIBUTE_PICKUP_DURATION = "pickupDuration";
+	public static final String ATTRIBUTE_DROPOFF_DURATION = "dropoffDuration";
+	public static final String ATTRIBUTE_CAPACITYDEMAND = "capacityDemand";
+}

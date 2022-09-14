@@ -19,14 +19,27 @@
  *
  */
 
-package org.matsim.contrib.freight.carrier;
+package org.matsim.contrib.freight.events;
 
-public abstract class FreightConstants {
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour.Delivery;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-	public static final String PICKUP = "pickup";
-	public static final String DELIVERY = "delivery";
-	public static final String START = "start";
-	public static final String END = "end";
-	public static final String SERVICE = "service";
+/*package-private*/  final class FreightShipmentDeliveryStartEventCreator implements FreightEventCreator {
 
+	@Override
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
+		if(event instanceof ActivityStartEvent startEvent && FreightConstants.DELIVERY.equals(startEvent.getActType()) ) {
+			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+			if (element instanceof Delivery deliveryActivity) {
+				return new FreightShipmentDeliveryStartEvent(event.getTime(), carrier.getId(), deliveryActivity.getShipment(), scheduledTour.getVehicle().getId() );
+			}
+		}
+		return null;
+	}
 }

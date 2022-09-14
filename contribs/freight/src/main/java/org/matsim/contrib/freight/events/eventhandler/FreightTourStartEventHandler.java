@@ -19,14 +19,14 @@
  *
  */
 
-package org.matsim.contrib.freight.carrier;
+package org.matsim.contrib.freight.events.eventhandler;
 
-public abstract class FreightConstants {
+import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-	public static final String PICKUP = "pickup";
-	public static final String DELIVERY = "delivery";
-	public static final String START = "start";
-	public static final String END = "end";
-	public static final String SERVICE = "service";
+
+public interface FreightTourStartEventHandler extends EventHandler {
+
+	public void handleEvent( FreightTourStartEvent event );
 
 }

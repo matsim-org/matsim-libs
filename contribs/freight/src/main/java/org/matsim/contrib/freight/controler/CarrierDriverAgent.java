@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.events.FreightEventCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -44,14 +45,14 @@ final class CarrierDriverAgent{
 	private final ScoringFunction scoringFunction;
 	private final Carrier carrier;
 	private final EventsManager events;
-	private final Collection<LSPEventCreator> lspEventCreators;
+	private final Collection<FreightEventCreator> freightEventCreators;
 
 	CarrierDriverAgent( Id<Person> driverId, ScheduledTour tour, ScoringFunction scoringFunction, Carrier carrier,
-			    EventsManager events, Collection<LSPEventCreator> lspEventCreators ){
+			    EventsManager events, Collection<FreightEventCreator> freightEventCreators){
 		this.scoringFunction = scoringFunction;
 		this.carrier = carrier;
 		this.events = events;
-		this.lspEventCreators = lspEventCreators;
+		this.freightEventCreators = freightEventCreators;
 		log.debug( "creating CarrierDriverAgent with driverId=" + driverId );
 		this.driverId = driverId;
 		this.scheduledTour = tour;
@@ -174,8 +175,8 @@ final class CarrierDriverAgent{
 
 			// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
 			// filled from just listening to events.  kai, jul'22
-			for( LSPEventCreator lspEventCreator : lspEventCreators ) {
-				Event customEvent = lspEventCreator.createEvent( event, carrier, activity, scheduledTour, driverId, activityCounter );
+			for( FreightEventCreator freightEventCreator : freightEventCreators) {
+				Event customEvent = freightEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter );
 				if(customEvent != null) {
 					this.events.processEvent(customEvent );
 				}
