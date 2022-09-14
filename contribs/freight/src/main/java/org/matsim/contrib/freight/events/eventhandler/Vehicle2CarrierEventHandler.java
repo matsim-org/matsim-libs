@@ -25,7 +25,6 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.vehicles.Vehicle;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,6 +37,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class Vehicle2CarrierEventHandler implements FreightTourStartEventHandler, FreightTourEndEventHandler {
 
+
+	// Comment from Janek (in https://github.com/matsim-org/matsim-libs/pull/2128)
+	// Is this handler ever going to be called concurrently? If not a normal HashMap is probably sufficient
+	// At least the default events manager guarantees single threaded invocation of your handler.
+	// --> we can check this. Currently, it was made only analogous to Vehicle2DriverEventHandler  kmt sep'22
 	private final Map<Id<Vehicle>, Id<Carrier>> carrierVehicles = new ConcurrentHashMap<>();
 	
 	@Override
