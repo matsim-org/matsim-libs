@@ -203,7 +203,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.2-3</version>
+			<version>1.5.2-4</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -214,13 +214,13 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>7.0.5.Final</version>
+			<version>8.0.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>7.0.5.Final</version>
+			<version>8.0.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>

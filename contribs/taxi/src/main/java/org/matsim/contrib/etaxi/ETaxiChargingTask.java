@@ -25,7 +25,7 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 
 public class ETaxiChargingTask extends ChargingTaskImpl {
-	public static final TaxiTaskType TYPE = new TaxiTaskType("CHARGING", null);
+	public static final TaxiTaskType TYPE = new TaxiTaskType("CHARGING");
 
 	public ETaxiChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev,
 			double totalEnergy) {
