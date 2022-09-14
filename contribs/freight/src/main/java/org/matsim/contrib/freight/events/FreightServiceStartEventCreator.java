@@ -34,13 +34,11 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
-		if( event instanceof ActivityStartEvent startEvent ){
-			if( startEvent.getActType().equals(FreightConstants.SERVICE) ) {
-				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-				if( element instanceof ServiceActivity serviceActivity ) {
-					return new FreightServiceStartEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), scheduledTour.getVehicle().getId());
-				}
-			}	
+		if( event instanceof ActivityStartEvent startEvent && FreightConstants.SERVICE.equals(startEvent.getActType()) ){
+			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+			if( element instanceof ServiceActivity serviceActivity ) {
+				return new FreightServiceStartEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), scheduledTour.getVehicle().getId());
+			}
 		}
 		return null;
 	}

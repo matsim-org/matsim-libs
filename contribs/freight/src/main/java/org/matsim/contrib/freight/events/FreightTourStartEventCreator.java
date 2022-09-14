@@ -28,18 +28,13 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 
-import java.util.Objects;
-
 /*package-private*/  final class FreightTourStartEventCreator implements FreightEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
-		if((event instanceof ActivityEndEvent endEvent)) {
-			if(Objects.equals(endEvent.getActType(), FreightConstants.START)) {
+		if((event instanceof ActivityEndEvent endEvent) && FreightConstants.START.equals(endEvent.getActType()) ) {
 				return new FreightTourStartEvent(endEvent.getTime(), carrier.getId(), scheduledTour.getTour().getStartLinkId(), scheduledTour.getVehicle().getId());
-			}	
 		}
 		return null;	
 	}
-
 }

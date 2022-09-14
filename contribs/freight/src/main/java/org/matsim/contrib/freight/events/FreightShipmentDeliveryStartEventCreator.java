@@ -30,18 +30,14 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-import java.util.Objects;
-
 /*package-private*/  final class FreightShipmentDeliveryStartEventCreator implements FreightEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
-		if(event instanceof ActivityStartEvent startEvent) {
-			if(Objects.equals(startEvent.getActType(), FreightConstants.DELIVERY)) {
-				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-				if (element instanceof Delivery deliveryActivity) {
-					return new FreightShipmentDeliveryStartEvent(event.getTime(), carrier.getId(), deliveryActivity.getShipment(), scheduledTour.getVehicle().getId() );
-				}
+		if(event instanceof ActivityStartEvent startEvent && FreightConstants.DELIVERY.equals(startEvent.getActType()) ) {
+			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+			if (element instanceof Delivery deliveryActivity) {
+				return new FreightShipmentDeliveryStartEvent(event.getTime(), carrier.getId(), deliveryActivity.getShipment(), scheduledTour.getVehicle().getId() );
 			}
 		}
 		return null;

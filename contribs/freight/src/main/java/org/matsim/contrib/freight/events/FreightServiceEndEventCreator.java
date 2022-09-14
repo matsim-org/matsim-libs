@@ -30,19 +30,15 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-import java.util.Objects;
-
 /*package-private*/  final class FreightServiceEndEventCreator implements FreightEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
-		if(event instanceof ActivityEndEvent endEvent){
-			if(Objects.equals(endEvent.getActType(), FreightConstants.SERVICE)) {
-				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-				if(element instanceof ServiceActivity serviceActivity) {
-					return new FreightServiceEndEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), scheduledTour.getVehicle().getId());
-				}
-			}	
+		if(event instanceof ActivityEndEvent endEvent && FreightConstants.SERVICE.equals(endEvent.getActType())) {
+			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+			if(element instanceof ServiceActivity serviceActivity) {
+				return new FreightServiceEndEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), scheduledTour.getVehicle().getId());
+			}
 		}
 		return null;
 	}
