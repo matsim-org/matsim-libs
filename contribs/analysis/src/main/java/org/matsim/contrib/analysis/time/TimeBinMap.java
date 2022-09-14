@@ -120,7 +120,7 @@ public class TimeBinMap<T> {
 			this.value = value;
 		}
 
-		public T getValue(Supplier<T> computeIfAbsent) {
+		public T computeIfAbsent(Supplier<T> computeIfAbsent) {
 
 			if (!hasValue()) {
 				setValue(computeIfAbsent.get());
