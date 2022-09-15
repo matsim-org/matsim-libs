@@ -169,7 +169,6 @@ public final class EmissionModule {
 		if (shouldCreateDetailedTables()) {
 			this.detailedHbefaColdTable = HbefaTables.loadDetailedCold(emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(coldPollutants, detailedHbefaColdTable.keySet());
-			// todo this comes from "../sample_EFA_HOT_SubSegm_2005detailed.csv" but contains no HGVs (!) ~rjg 06.09
 			this.detailedHbefaWarmTable = HbefaTables.loadDetailedWarm(emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(warmPollutants, detailedHbefaWarmTable.keySet());
 		}

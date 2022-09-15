@@ -103,33 +103,26 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			}
 		}
 
-		// extract event details
 		final double leaveTime = event.getTime();
 		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 
 		double travelTime = leaveTime - this.linkEnterMap.get(vehicleId).getSecond() + 1.0;
+		// this extra second added to travel time is because the vehicleLeavesTrafficEvent is thrown one second earlier (by design)
 
-		// match vehicleId to scenario and test for non-scenario vehicles
-		// if vehicle type is defined calculate warm emissions
 		Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-
 		if (vehicle != null) {
-			// execute emissions calculation method
-			emissionsCalculation(vehicleId, vehicle, link, leaveTime, travelTime );
-			// this extra second added to travel time is because the vehicleLeavesTrafficEvent is thrown one second earlier (by design)
 
-			this.vehicleEntersTrafficMap.remove(vehicleId);
-			this.linkEnterMap.remove(vehicleId);
+			emissionsCalculation( vehicleId, vehicle, link, leaveTime, travelTime );
+
+			this.vehicleEntersTrafficMap.remove( vehicleId );
+			this.linkEnterMap.remove( vehicleId );
 			// this is "so that no second emission event is computed for travel from parking to link leave" (kn)
-			// because after this vehicleLeavesTrafficEvent there can/will be another enterTraffic, linkEnter
-			// (and then later leaveTraffic as well)...
+
 		} else {
 			handleNullVehicle(vehicleId);
 		}
-
 }
-
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
@@ -153,7 +146,6 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 
-		// extract event details
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		Id<Link> linkId = event.getLinkId();
 		Link link = this.scenario.getNetwork().getLinks().get(linkId);
@@ -184,21 +176,20 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			}
 			linkLeaveSomeActWarnCnt++;
 		} else {
-			// the vehicle traversed the entire link, DO calculate emissions IF this was not after an activity...
+			// the vehicle traversed the entire link, DO calculate emissions IF this was not after an activity
 			double travelTime = leaveTime - this.linkEnterMap.get(vehicleId).getSecond();
 
 			if (this.linkEnterMap.containsKey(vehicleId)) {
 				{
-					// match vehicleId to scenario and test for non-scenario vehicles
-					// if vehicle type is defined calculate warm emissions
-					Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
 
+					Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
 					if (vehicle != null) {
-						// execute emissions calculation method
+
 						emissionsCalculation(vehicleId, vehicle, link, leaveTime, travelTime);
+
 						// remove vehicle from data structure (no activity on this link, thus not removing from vehicleEnters/LeavesTraffic)
 						this.linkEnterMap.remove(vehicleId);
-						// because after this linkLeaveEvent there can/will be another linkEnterEvent
+
 					} else {
 						handleNullVehicle(vehicleId);
 					}
@@ -210,7 +201,6 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	}
 
 	private void emissionsCalculation(Id<Vehicle> vehicleId, Vehicle vehicle, Link link, double leaveTime, double travelTime) {
-		// warm emissions calculation
 		VehicleType vehicleType = vehicle.getType();
 		Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
 		warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, link.getId(), vehicleId, warmEmissions);
