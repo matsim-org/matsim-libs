@@ -20,22 +20,29 @@
 
 package example.lsp.simulationTrackers;
 
-import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleUtils;
+import org.matsim.contrib.freight.utils.FreightUtils;
 
 /*package-private*/ class TourStartHandler implements FreightTourStartEventHandler {
 
 	private static final Logger log = LogManager.getLogger(TourStartHandler.class);
 
+//	private final Vehicles allVehicles;
+	private final Carriers carriers;
 	private double vehicleFixedCosts;
 
-	@Inject Scenario scenario;
+	public TourStartHandler(Scenario scenario) {
+//		this.allVehicles = VehicleUtils.getOrCreateAllvehicles(scenario); // I think that would be the better option, but currently we do not have the right VehicleId vor it.
+		this.carriers = FreightUtils.addOrGetCarriers(scenario);
+	}
 
 	@Override
 	public void reset(int iteration) {
@@ -44,13 +51,22 @@ import org.matsim.vehicles.VehicleUtils;
 
 	@Override
 	public void handleEvent(FreightTourStartEvent event) {
-		log.warn("handling tour start event=" + event);
-		//final Vehicle vehicle = (Vehicle) event.getVehicle();
-		final Vehicle vehicle = VehicleUtils.findVehicle(event.getVehicleId(), scenario);
-		vehicleFixedCosts = vehicleFixedCosts + vehicle.getType().getCostInformation().getFixedCosts();
+		log.warn("handling tour start event=" + event.toString());
+//		final Vehicle vehicle = allVehicles.getVehicles().get(event.getVehicleId()); //Does not work, because different vehicleIds;
 
+		Carrier carrier = carriers.getCarriers().get(event.getCarrierId());
+		CarrierVehicle carrierVehicle = CarrierUtils.getCarrierVehicle(carrier, event.getVehicleId());
+		vehicleFixedCosts = vehicleFixedCosts + carrierVehicle.getType().getCostInformation().getFixedCosts();
 	}
 
+	/**
+	 * ATTENTION:
+	 * Does this really give back the costs of the current vehicle?
+	 * Or is the value maybe overwritten if another event happens before calling the getFixedCosts function?
+	 * kmt sep'22
+	 *
+	 * @return the fixedCosts
+	 */
 	public double getVehicleFixedCosts() {
 		return vehicleFixedCosts;
 	}

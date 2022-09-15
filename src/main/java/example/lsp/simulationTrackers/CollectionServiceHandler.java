@@ -20,28 +20,29 @@
 
 package example.lsp.simulationTrackers;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightServiceStartEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
+import org.matsim.contrib.freight.utils.FreightUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.contrib.freight.carrier.CarrierService;
-
-import org.matsim.contrib.freight.events.FreightServiceStartEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.vehicles.Vehicle;
 
 
 /*package-private*/ class CollectionServiceHandler implements FreightServiceStartEventHandler, FreightServiceEndEventHandler {
 
-
+	private final Carriers carriers;
 	private final Collection<ServiceTuple> tuples;
 	private double totalLoadingCosts;
 	private int totalNumberOfShipments;
 	private int totalWeightOfShipments;
 
-	public CollectionServiceHandler() {
+	public CollectionServiceHandler(Scenario scenario) {
+		this.carriers = FreightUtils.addOrGetCarriers(scenario);
 		this.tuples = new ArrayList<>();
 	}
 
@@ -59,7 +60,9 @@ import org.matsim.vehicles.Vehicle;
 		for (ServiceTuple tuple : tuples) {
 			if (tuple.getServiceId() == event.getServiceId()) {
 				double serviceDuration = event.getTime() - tuple.getStartTime();
-				loadingCosts = serviceDuration * ((Vehicle) event.getVehicleId()).getType().getCostInformation().getCostsPerSecond();
+				Carrier carrier = carriers.getCarriers().get(event.getCarrierId());
+				CarrierVehicle carrierVehicle = CarrierUtils.getCarrierVehicle(carrier, event.getVehicleId());
+				loadingCosts = serviceDuration * carrierVehicle.getType().getCostInformation().getCostsPerSecond();
 				totalLoadingCosts = totalLoadingCosts + loadingCosts;
 				tuples.remove(tuple);
 				break;

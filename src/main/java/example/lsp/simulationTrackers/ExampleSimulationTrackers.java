@@ -96,8 +96,8 @@ import lsp.shipment.LSPShipment;
 
 		//Create cost tracker and add it to solution
 		example.lsp.simulationTrackers.LinearCostTracker tracker = new example.lsp.simulationTrackers.LinearCostTracker(0.2);
-		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.TourStartHandler());
-		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.CollectionServiceHandler());
+		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.TourStartHandler(scenario));
+		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.CollectionServiceHandler(scenario));
 		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.DistanceAndTimeHandler(scenario));
 		collectionSolution.addSimulationTracker(tracker);
 

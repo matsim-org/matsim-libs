@@ -131,8 +131,8 @@ public class CollectionTrackerTest {
 		{
 			shareOfFixedCosts = 0.2;
 			LinearCostTracker tracker = new LinearCostTracker(shareOfFixedCosts);
-			tracker.getEventHandlers().add(new TourStartHandler());
-			tracker.getEventHandlers().add(new CollectionServiceHandler());
+			tracker.getEventHandlers().add(new TourStartHandler(scenario));
+			tracker.getEventHandlers().add(new CollectionServiceHandler(scenario));
 			tracker.getEventHandlers().add(new DistanceAndTimeHandler(scenario));
 			// I think that it would be better to use delegation inside LinearCostTracker, i.e. to not expose getEventHandlers(). kai, jun'22
 
