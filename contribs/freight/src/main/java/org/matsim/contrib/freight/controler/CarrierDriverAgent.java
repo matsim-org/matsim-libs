@@ -4,6 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -16,10 +18,13 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This keeps track of a scheduledTour during simulation and can thus be seen as the driver of the vehicle that runs the tour.
@@ -47,6 +52,10 @@ final class CarrierDriverAgent{
 	private final EventsManager events;
 	private final Collection<FreightEventCreator> freightEventCreators;
 
+	private final Driver2VehicleEventHandler driver2EventHandler = new Driver2VehicleEventHandler() ;
+
+
+
 	CarrierDriverAgent( Id<Person> driverId, ScheduledTour tour, ScoringFunction scoringFunction, Carrier carrier,
 			    EventsManager events, Collection<FreightEventCreator> freightEventCreators){
 		this.scoringFunction = scoringFunction;
@@ -58,13 +67,13 @@ final class CarrierDriverAgent{
 		this.scheduledTour = tour;
 	}
 
-	void handleAnEvent( Event event ){
+	void handleAnEvent(Event event){
 		// the event comes to here from CarrierAgent#handleEvent only for events concerning this driver
 
 		int previousPlanElementCounter = this.planElementCounter;
 
 		if( event instanceof PersonArrivalEvent ){
-			handleEvent( (PersonArrivalEvent) event );
+			handleEvent( (PersonArrivalEvent) event);
 		} else if( event instanceof PersonDepartureEvent ){
 			handleEvent( (PersonDepartureEvent) event );
 		} else if( event instanceof LinkEnterEvent ){
@@ -74,7 +83,7 @@ final class CarrierDriverAgent{
 		} else if( event instanceof ActivityStartEvent ){
 			handleEvent( (ActivityStartEvent) event );
 		} else{
-			createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
+			createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter);
 		}
 	}
 
@@ -169,14 +178,17 @@ final class CarrierDriverAgent{
 		// yyyyyy uses the previous activity, not the current (end) activity.  Bug or feature?  Only used by LSP, not by carrier.  kai, jul'22
 	}
 
-	private void createAdditionalEvents( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ){
+	private void createAdditionalEvents( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter){
 //		if( scoringFunction == null ){
 			// (means "called from LSP".  kai, jul'22)
+
+		driver2EventHandler.handleAnEvent(event);
+		Id<Vehicle> vehicleId = driver2EventHandler.getVehicleOfDriver(driverId);
 
 			// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
 			// filled from just listening to events.  kai, jul'22
 			for( FreightEventCreator freightEventCreator : freightEventCreators) {
-				Event customEvent = freightEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter );
+				Event customEvent = freightEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter, vehicleId );
 				if(customEvent != null) {
 					this.events.processEvent(customEvent );
 				}
@@ -201,4 +213,56 @@ final class CarrierDriverAgent{
 			return scheduledTour.getTour().getTourElements().get( index );
 		} else throw new IllegalStateException( "index out of bounds" );
 	}
+
+	/**
+	 * Basic event handler that collects the relation between vehicles and drivers.
+	 * Necessary since link enter and leave events do not contain the driver anymore.
+	 *
+	 * This is the vice-versa implementation of {@link org.matsim.core.events.algorithms.Vehicle2DriverEventHandler}.
+	 *
+	 * In a first step only used internally. When needed more often, I have nothing against putting it more central.
+	 *
+	 * @author kturner
+	 */
+	private final class Driver2VehicleEventHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+
+		private final Map<Id<Person>, Id<Vehicle>> driversVehicles = new ConcurrentHashMap<>();
+
+		@Override
+		public void reset(int iteration) {
+			driversVehicles.clear();
+		}
+
+		@Override
+		public void handleEvent(VehicleEntersTrafficEvent event) {
+			driversVehicles.put(event.getPersonId(), event.getVehicleId());
+		}
+
+		//I do not think, that I need it --> keep the id of the "last" used vehicle in record
+		//maybe change, that it is removed when a ActivityStartEvent- as last point of a leg - is thrown.
+		//kmt sep'22
+		@Override
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+//			driversVehicles.remove(event.getPersonId());
+		}
+
+		/**
+		 * @param personId the unique driver identifier.
+		 * @return vehicle id of the driver's vehicle
+		 */
+		public Id<Vehicle> getVehicleOfDriver(Id<Person> personId){
+			return driversVehicles.get(personId);
+		}
+
+		public void handleAnEvent(Event event){
+			if (event instanceof VehicleEntersTrafficEvent vehicleEntersTrafficEvent) {
+				driver2EventHandler.handleEvent(vehicleEntersTrafficEvent);
+			}
+			if (event instanceof VehicleEntersTrafficEvent vehicleEntersTrafficEvent) {
+				driver2EventHandler.handleEvent(vehicleEntersTrafficEvent);
+			}
+		}
+
+	}
+
 }

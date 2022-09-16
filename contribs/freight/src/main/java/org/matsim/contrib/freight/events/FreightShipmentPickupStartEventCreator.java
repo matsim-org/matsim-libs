@@ -21,6 +21,7 @@
 
 package org.matsim.contrib.freight.events;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
@@ -29,15 +30,16 @@ import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.vehicles.Vehicle;
 
 /*package-private*/  final class FreightShipmentPickupStartEventCreator implements FreightEventCreator {
 
 	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
 		if(event instanceof ActivityStartEvent startEvent && FreightConstants.PICKUP.equals((startEvent).getActType()) ) {
 			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
 			if (element instanceof Pickup pickupActivity) {
-				return new FreightShipmentPickupStartEvent(event.getTime(), carrier.getId(), pickupActivity.getShipment(), scheduledTour.getVehicle().getId() );
+				return new FreightShipmentPickupStartEvent(event.getTime(), carrier.getId(), pickupActivity.getShipment(), vehicleId );
 			}
 		}
 		return null;
