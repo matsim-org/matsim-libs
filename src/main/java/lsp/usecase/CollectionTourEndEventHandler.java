@@ -113,9 +113,9 @@ import java.util.Collection;
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
 		if (abstractPlanElement instanceof ShipmentLeg transport) {
-			//Auskommentiert, im Rahmen des reducing-public-footprint-Prozesses. Kein Test reagiert drauf. Was "sollte" hier geschehen? KMT(&kai) Jun'20
-//			transport.setEndTime(event.getTime());
-//			transport.setToLinkId(tour.getEndLinkId());
+//			Auskommentiert, im Rahmen des reducing-public-footprint-Prozesses. Kein Test reagiert drauf. Was "sollte" hier geschehen? KMT(&kai) Jun'20
+			transport.setEndTime(event.getTime());
+			transport.setToLinkId(tour.getEndLinkId());
 		}
 	}
 

@@ -95,10 +95,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 	@Override
 	public void handleEvent(FreightTourEndEvent event) {
 		Tour tour = null;
-		//TODO: Does not work, because scenario is null -> Need help from KN :(
-		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
-		// OR
-		// LSPModule -> provideCarriers ??
 		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
 		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
 		for (ScheduledTour scheduledTour : scheduledTours) {

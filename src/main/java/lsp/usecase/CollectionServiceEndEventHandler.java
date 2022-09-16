@@ -62,8 +62,8 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightSe
 	@Override
 	public void handleEvent(FreightServiceEndEvent event) {
 		if (event.getServiceId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
-			logTransport(event);
 			logLoad(event);
+			logTransport(event);
 		}
 	}
 
