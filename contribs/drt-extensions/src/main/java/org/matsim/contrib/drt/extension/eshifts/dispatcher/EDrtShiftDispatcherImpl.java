@@ -1,6 +1,5 @@
 package org.matsim.contrib.drt.extension.eshifts.dispatcher;
 
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.eshifts.fleet.EvShiftDvrpVehicle;
@@ -86,6 +85,9 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 				DvrpVehicle dvrpVehicle = fleet.getVehicles().get(vehicle);
 				if (dvrpVehicle instanceof EvShiftDvrpVehicle eShiftVehicle) {
 					if (eShiftVehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
+						if(!eShiftVehicle.getShifts().isEmpty()) {
+							continue;
+						}
 						final ElectricVehicle electricVehicle = eShiftVehicle.getElectricVehicle();
 						if (electricVehicle.getBattery().getSoc() / electricVehicle.getBattery().getCapacity() < drtShiftParams.getChargeAtHubThreshold()) {
 							final Task currentTask = eShiftVehicle.getSchedule().getCurrentTask();
