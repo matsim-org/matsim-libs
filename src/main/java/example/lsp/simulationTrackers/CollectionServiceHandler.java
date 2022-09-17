@@ -27,7 +27,9 @@ import org.matsim.contrib.freight.events.FreightServiceEndEvent;
 import org.matsim.contrib.freight.events.FreightServiceStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,14 +37,14 @@ import java.util.Collection;
 
 /*package-private*/ class CollectionServiceHandler implements FreightServiceStartEventHandler, FreightServiceEndEventHandler {
 
-	private final Carriers carriers;
 	private final Collection<ServiceTuple> tuples;
+	private final Vehicles allVehicles;
 	private double totalLoadingCosts;
 	private int totalNumberOfShipments;
 	private int totalWeightOfShipments;
 
 	public CollectionServiceHandler(Scenario scenario) {
-		this.carriers = FreightUtils.addOrGetCarriers(scenario);
+		this.allVehicles = VehicleUtils.getOrCreateAllvehicles(scenario);
 		this.tuples = new ArrayList<>();
 	}
 
@@ -60,9 +62,9 @@ import java.util.Collection;
 		for (ServiceTuple tuple : tuples) {
 			if (tuple.getServiceId() == event.getServiceId()) {
 				double serviceDuration = event.getTime() - tuple.getStartTime();
-				Carrier carrier = carriers.getCarriers().get(event.getCarrierId());
-				CarrierVehicle carrierVehicle = CarrierUtils.getCarrierVehicle(carrier, event.getVehicleId());
-				loadingCosts = serviceDuration * carrierVehicle.getType().getCostInformation().getCostsPerSecond();
+
+				final Vehicle vehicle = allVehicles.getVehicles().get(event.getVehicleId());
+				loadingCosts = serviceDuration * vehicle.getType().getCostInformation().getCostsPerSecond();
 				totalLoadingCosts = totalLoadingCosts + loadingCosts;
 				tuples.remove(tuple);
 				break;
