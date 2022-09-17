@@ -55,24 +55,46 @@ public class Tour {
 	 *
 	 */
 	public static class Builder {
-		
-		/**
-		 * Returns a new tour builder.
-		 * 
-		 * @return the builder
-		 */
-		public static Builder newInstance(){ return new Builder(); }
-		
-		private Builder(){
-			
-		}
 
+		private final Id<Tour> tourId;
 		private final List<TourElement> tourElements = new ArrayList<>();
 		private final Set<CarrierShipment> openPickups = new HashSet<>();
 		private boolean previousElementIsActivity;
 		private Start start;
 		private End end;
-		
+
+
+		/**
+		 * Returns a new tour builder.
+		 *
+		 * @deprecated
+		 * Please use {@link #newInstance(Id)} instead. kmt' sep22
+		 *
+		 *
+		 *
+		 * @return the builder including "unknown" as tourId
+		 */
+		@Deprecated
+		public static Builder newInstance(){
+			return new Builder(Id.create("unknown", Tour.class));
+		}
+
+		/**
+		 * Returns a new tour builder.
+		 * This now also includes an Id for this tour.
+		 *
+		 * @param tourId Id of this tour
+		 * @return the builder
+		 */
+		public static Builder newInstance(Id<Tour> tourId){
+			return new Builder(tourId);
+		}
+
+
+		private Builder(Id<Tour> tourId) {
+			this.tourId = tourId;
+		}
+
 		/**
 		 * Schedules the start of the tour.
 		 * 
@@ -632,14 +654,18 @@ public class Tour {
 	private final Start start;
 	
 	private final End end;
+
+	private final Id<Tour> tourId;
 	
 	private Tour(Builder builder){
+		tourId = builder.tourId;
 		tourElements = builder.tourElements;
 		start = builder.start;
 		end = builder.end;
 	}
 
 	private Tour(Tour tour) {
+		this.tourId = Id.create(tour.tourId.toString(), Tour.class);
 		this.start = (Start) tour.start.duplicate();
 		this.end = (End) tour.end.duplicate();
 		List<TourElement> elements = new ArrayList<>();
@@ -656,7 +682,11 @@ public class Tour {
 	public List<TourElement> getTourElements() {
 		return Collections.unmodifiableList(tourElements);
 	}
-	
+
+	public Id<Tour> getId(){
+		return tourId;
+	}
+
 	public Start getStart(){
 		return start;
 	}
@@ -672,7 +702,7 @@ public class Tour {
 	public Id<Link> getEndLinkId() {
 		return end.getLocation();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "[ startLinkId="+getStartLinkId()+" ][ endLinkId="+getEndLinkId()+" ][ #tourElements=" + tourElements.size() + "]";

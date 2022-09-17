@@ -21,10 +21,6 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
-
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,21 +38,24 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.VehicleType;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+
 /**
  * A writer that writes carriers and their plans in an xml-file.
  * 
  * @author sschroeder
  *
- * @deprecated Use {@link CarrierPlanWriter} instead which writes the newest format
  */
-public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
+/*pacakge-private*/ class CarrierPlanXmlWriterV2_1 extends MatsimXmlWriter {
 
-	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV2.class);
+	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV2_1.class);
 
 	private final Collection<Carrier> carriers;
 
 	private final Map<CarrierShipment, Id<CarrierShipment>> registeredShipments = new HashMap<>();
-	
+
 	private final Map<CarrierService, Id<CarrierService>> serviceMap = new HashMap<>();
 
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
@@ -65,10 +64,10 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
 	/**
 	 * Constructs the writer with the carriers to be written.
-	 * 
+	 *
 	 * @param carriers to be written
 	 */
-	public CarrierPlanXmlWriterV2(Carriers carriers) {
+	public CarrierPlanXmlWriterV2_1(Carriers carriers) {
 		super();
 		this.carriers = carriers.getCarriers().values();
 	}
