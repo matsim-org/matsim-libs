@@ -98,28 +98,27 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
 		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
 		for (ScheduledTour scheduledTour : scheduledTours) {
-			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
+			if (scheduledTour.getTour().getId() == event.getTourId()) {
 				tour = scheduledTour.getTour();
 				break;
 			}
 		}
-		if ((event.getLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(tour))) {
-
-			for (TourElement tourElement : tour.getTourElements()) {
-				if (tourElement instanceof ServiceActivity serviceActivity) {
-					if (serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
-							&& allServicesAreInOnePoint(tour)
-							&& (tour.getStartLinkId() != transshipmentHub.getStartLinkId())) {
-						logReloadAfterMainRun(serviceActivity.getService(), event);
-					} else {
-						logReloadAfterCollection(serviceActivity.getService(), event, tour);
+		if ((event.getLinkId() == this.linkId)) {
+			assert tour != null;
+			if (shipmentsOfTourEndInPoint(tour)) {
+				for (TourElement tourElement : tour.getTourElements()) {
+					if (tourElement instanceof ServiceActivity serviceActivity) {
+						if (serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
+								&& allServicesAreInOnePoint(tour)
+								&& (tour.getStartLinkId() != transshipmentHub.getStartLinkId())) {
+							logReloadAfterMainRun(serviceActivity.getService(), event);
+						} else {
+							logReloadAfterCollection(serviceActivity.getService(), event, tour);
+						}
 					}
 				}
-
 			}
 		}
-
-
 	}
 
 	private boolean shipmentsOfTourEndInPoint(Tour tour) {
