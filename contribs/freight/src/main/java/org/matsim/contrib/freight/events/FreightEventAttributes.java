@@ -29,6 +29,7 @@ package org.matsim.contrib.freight.events;
 public class FreightEventAttributes {
 	public static final String ATTRIBUTE_SERVICE_ID = "serviceId";
 	public static final String ATTRIBUTE_SHIPMENT_ID = "shipmentId";
+	public static final String ATTRIBUTE_TOUR_ID = "tourId";
 	public static final String ATTRIBUTE_SERVICE_DURATION = "serviceDuration";
 	public static final String ATTRIBUTE_PICKUP_DURATION = "pickupDuration";
 	public static final String ATTRIBUTE_DROPOFF_DURATION = "dropoffDuration";

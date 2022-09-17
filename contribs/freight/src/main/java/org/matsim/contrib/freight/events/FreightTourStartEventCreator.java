@@ -35,7 +35,8 @@ import org.matsim.vehicles.Vehicle;
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
 		if((event instanceof ActivityEndEvent endEvent) && FreightConstants.START.equals(endEvent.getActType()) ) {
-				return new FreightTourStartEvent(endEvent.getTime(), carrier.getId(), scheduledTour.getTour().getStartLinkId(), vehicleId);
+				return new FreightTourStartEvent(endEvent.getTime(), carrier.getId(), scheduledTour.getTour().getStartLinkId(), // TODO: If we have the tourId, we do not need to store the link here, kmt sep 22
+						vehicleId, scheduledTour.getTour().getId());
 		}
 		return null;	
 	}
