@@ -70,7 +70,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		this.fleet = fleet;
 		timeBinSize = strategySpecificParams.timeBinSize;
 
-		rebalanceInterval = generalParams.getInterval();
+		rebalanceInterval = generalParams.interval;
 
 		scaling = strategySpecificParams.feedforwardSignalStrength * rebalanceInterval / timeBinSize;
 		log.info("The feedforward signal strength is: "
