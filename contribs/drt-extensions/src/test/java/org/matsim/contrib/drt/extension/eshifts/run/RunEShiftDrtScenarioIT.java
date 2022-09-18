@@ -72,8 +72,8 @@ public class RunEShiftDrtScenarioIT {
 		((RebalancingParams) rebalancing).setInterval(600);
 
 		MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-		strategyParams.setTargetAlpha(0.3);
-		strategyParams.setTargetBeta(0.3);
+		strategyParams.targetAlpha = 0.3;
+		strategyParams.targetBeta = 0.3;
 
 		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
