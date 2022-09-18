@@ -113,7 +113,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 				log.info("Found following schemeLocation in carriers definition file: " + str);
 				if (str == null){
 					log.warn("Carrier plans file does not contain a valid xsd header. Using CarrierPlanReaderV2.");
-					delegate = new CarrierPlanXmlParserV2_1( carriers, carrierVehicleTypes ) ;
+					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes ) ;
 				} else if ( str.contains( "carriersDefinitions_v1.0.xsd" ) ){
 					log.info("Found carriersDefinitions_v1.0.xsd. Using CarrierPlanReaderV1.");
 					delegate = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
