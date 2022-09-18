@@ -227,37 +227,43 @@ public class PtAlongALine2Test {
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 			{
-				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode(TransportMode.drt)
-						.setMaxTravelTimeAlpha(2.0)
-						.setMaxTravelTimeBeta(5. * 60.)
-						.setStopDuration(60.)
-						.setMaxWaitTime(Double.MAX_VALUE)
-						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
-						.setUseModeFilteredSubnetwork(true)
-						.setAdvanceRequestPlanningHorizon(99999);
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+				drtConfigGroup.mode = TransportMode.drt;
+				drtConfigGroup.maxTravelTimeAlpha = 2.0;
+				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+				drtConfigGroup.stopDuration = 60.;
+				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
+				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				drtConfigGroup.useModeFilteredSubnetwork = true;
+				drtConfigGroup.advanceRequestPlanningHorizon = 99999;
+
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);
 
 			}
 			if (drt2) {
-				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode("drt2")
-						.setMaxTravelTimeAlpha(1.3)
-						.setMaxTravelTimeBeta(5. * 60.)
-						.setStopDuration(60.)
-						.setMaxWaitTime(Double.MAX_VALUE)
-						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
-						.setUseModeFilteredSubnetwork(true);
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+				drtConfigGroup.mode = "drt2";
+				drtConfigGroup.maxTravelTimeAlpha = 1.3;
+				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+				drtConfigGroup.stopDuration = 60.;
+				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
+				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				drtConfigGroup.useModeFilteredSubnetwork = true;
+
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);
 			}
 			if (drt3) {
-				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode("drt3")
-						.setMaxTravelTimeAlpha(1.3)
-						.setMaxTravelTimeBeta(5. * 60.)
-						.setStopDuration(60.)
-						.setMaxWaitTime(Double.MAX_VALUE)
-						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
-						.setUseModeFilteredSubnetwork(true);
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+				drtConfigGroup.mode = "drt3";
+				drtConfigGroup.maxTravelTimeAlpha = 1.3;
+				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+				drtConfigGroup.stopDuration = 60.;
+				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
+				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				drtConfigGroup.useModeFilteredSubnetwork = true;
+
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);
 			}

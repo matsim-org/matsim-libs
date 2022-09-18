@@ -64,7 +64,7 @@ public class RunDrtExampleIT {
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			//disable rejections
-			drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -97,7 +97,7 @@ public class RunDrtExampleIT {
 			drtCfg.addParameterSet(selectiveInsertionSearchParams);
 
 			//disable rejections
-			drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

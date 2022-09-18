@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 
 import com.google.common.base.Preconditions;
@@ -65,10 +66,10 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 
 				case GridFromNetwork:
 					Preconditions.checkNotNull(params.getCellSize());
-					var gridZones = drtCfg.getOperationalScheme() == OperationalScheme.serviceAreaBased ?
+					var gridZones = drtCfg.operationalScheme == OperationalScheme.serviceAreaBased ?
 							createGridFromNetworkWithinServiceArea(network, params.getCellSize(),
-									loadPreparedGeometries(
-											drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()))) :
+									loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
+											drtCfg.drtServiceAreaShapeFile))) :
 							createGridFromNetwork(network, params.getCellSize());
 					return DrtZonalSystem.createFromPreparedGeometries(network, gridZones);
 

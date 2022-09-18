@@ -157,7 +157,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		String occStats = DrtLegsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter,
 				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
-		if (drtCfg.isPlotDetailedCustomerStats()) {
+		if (drtCfg.plotDetailedCustomerStats) {
 			String header = String.join(delimiter, "departureTime",//
 					"personId",//
 					"vehicleId",//
@@ -291,7 +291,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 			if (createChart) {
 				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
-						"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
+						"Initially planned wait time [s]", times, Pair.of(0., drtCfg.maxWaitTime));
 				//			xAxis.setLowerBound(0);
 				//			yAxis.setLowerBound(0);
 				ChartUtils.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);

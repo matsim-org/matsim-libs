@@ -80,8 +80,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.insertionRetryQueue = insertionRetryQueue;
 
 		rebalancingInterval = drtCfg.getRebalancingParams().map(RebalancingParams::getInterval).orElse(null);
-		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
-				drtCfg.getAdvanceRequestPlanningHorizon());
+		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(drtCfg.advanceRequestPlanningHorizon);
 	}
 
 	@Override
@@ -134,7 +133,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		vehicle.getSchedule().nextTask();
 
 		// if STOP->STAY then choose the best depot
-		if (drtCfg.getIdleVehiclesReturnToDepots() && Depots.isSwitchingFromStopToStay(vehicle)) {
+		if (drtCfg.idleVehiclesReturnToDepots && Depots.isSwitchingFromStopToStay(vehicle)) {
 			Link depotLink = depotFinder.findDepot(vehicle);
 			if (depotLink != null) {
 				relocator.relocateVehicle(vehicle, depotLink);

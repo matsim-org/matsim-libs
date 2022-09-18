@@ -46,10 +46,10 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	private final double lookAhead;
 
 	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
-		if (drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated()) {
-			lookAhead = drtCfg.getMaxWaitTime() - drtCfg.getStopDuration();
+		if (drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated) {
+			lookAhead = drtCfg.maxWaitTime - drtCfg.stopDuration;
 			Preconditions.checkArgument(lookAhead >= 0,
-					DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
+					"maxWaitTime must not be smaller than stopDuration");
 		} else {
 			// if no rejection due to max wait time, the look ahead is infinite
 			lookAhead = Double.POSITIVE_INFINITY;
