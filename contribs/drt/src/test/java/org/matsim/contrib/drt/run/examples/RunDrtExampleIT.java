@@ -93,7 +93,8 @@ public class RunDrtExampleIT {
 			//replace extensive with selective search
 			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
 			var selectiveInsertionSearchParams = new SelectiveInsertionSearchParams();
-			selectiveInsertionSearchParams.setRestrictiveBeelineSpeedFactor(1);// using exactly free-speed estimates
+			// using exactly free-speed estimates
+			selectiveInsertionSearchParams.restrictiveBeelineSpeedFactor = 1;
 			drtCfg.addParameterSet(selectiveInsertionSearchParams);
 
 			//disable rejections
