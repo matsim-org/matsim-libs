@@ -124,7 +124,9 @@ public class RunDrtExampleIT {
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			//relatively high max age to prevent rejections
-			drtCfg.addParameterSet(new DrtRequestInsertionRetryParams().setMaxRequestAge(7200));
+			var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
+			drtRequestInsertionRetryParams.maxRequestAge = 7200;
+			drtCfg.addParameterSet(drtRequestInsertionRetryParams);
 		}
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
