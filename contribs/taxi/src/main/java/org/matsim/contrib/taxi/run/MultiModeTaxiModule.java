@@ -86,11 +86,11 @@ public class MultiModeTaxiModule extends AbstractModule {
 
 		taxiCfg.getTaxiFareParams().ifPresent(taxiFareParams -> {
 			var drtFareParams = new DrtFareParams();
-			drtFareParams.setBaseFare(taxiFareParams.getBasefare());
-			drtFareParams.setDistanceFare_m(taxiFareParams.getDistanceFare_m());
-			drtFareParams.setTimeFare_h(taxiFareParams.getTimeFare_h());
-			drtFareParams.setDailySubscriptionFee(taxiFareParams.getDailySubscriptionFee());
-			drtFareParams.setMinFarePerTrip(taxiFareParams.getMinFarePerTrip());
+			drtFareParams.baseFare = taxiFareParams.getBasefare();
+			drtFareParams.distanceFare_m = taxiFareParams.getDistanceFare_m();
+			drtFareParams.timeFare_h = taxiFareParams.getTimeFare_h();
+			drtFareParams.dailySubscriptionFee = taxiFareParams.getDailySubscriptionFee();
+			drtFareParams.minFarePerTrip = taxiFareParams.getMinFarePerTrip();
 			drtCfg.addParameterSet(drtFareParams);
 		});
 
