@@ -57,20 +57,20 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 			Network network = getter.getModal(Network.class);
-			switch (params.getZonesGeneration()) {
+			switch (params.zonesGeneration) {
 				case ShapeFile:
 					final List<PreparedGeometry> preparedGeometries = loadPreparedGeometries(
-							params.getZonesShapeFileURL(getConfig().getContext()));
+							ConfigGroup.getInputFileURL(getConfig().getContext(), params.zonesShapeFile));
 					return DrtZonalSystem.createFromPreparedGeometries(network,
 							EntryStream.of(preparedGeometries).mapKeys(i -> (i + 1) + "").toMap());
 
 				case GridFromNetwork:
-					Preconditions.checkNotNull(params.getCellSize());
+					Preconditions.checkNotNull(params.cellSize);
 					var gridZones = drtCfg.operationalScheme == OperationalScheme.serviceAreaBased ?
-							createGridFromNetworkWithinServiceArea(network, params.getCellSize(),
+							createGridFromNetworkWithinServiceArea(network, params.cellSize,
 									loadPreparedGeometries(ConfigGroup.getInputFileURL(getConfig().getContext(),
 											drtCfg.drtServiceAreaShapeFile))) :
-							createGridFromNetwork(network, params.getCellSize());
+							createGridFromNetwork(network, params.cellSize);
 					return DrtZonalSystem.createFromPreparedGeometries(network, gridZones);
 
 				default:
@@ -79,14 +79,14 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 		})).asEagerSingleton();
 
 		bindModal(DrtZoneTargetLinkSelector.class).toProvider(modalProvider(getter -> {
-			switch (params.getTargetLinkSelection()) {
+			switch (params.targetLinkSelection) {
 				case mostCentral:
 					return new MostCentralDrtZoneTargetLinkSelector(getter.getModal(DrtZonalSystem.class));
 				case random:
 					return new RandomDrtZoneTargetLinkSelector();
 				default:
 					throw new RuntimeException(
-							"Unsupported target link selection = " + params.getTargetLinkSelection());
+							"Unsupported target link selection = " + params.targetLinkSelection);
 			}
 		})).asEagerSingleton();
 

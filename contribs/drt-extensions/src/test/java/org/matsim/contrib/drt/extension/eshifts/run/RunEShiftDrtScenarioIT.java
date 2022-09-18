@@ -78,9 +78,9 @@ public class RunEShiftDrtScenarioIT {
 		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
 		DrtZonalSystemParams drtZonalSystemParams = new DrtZonalSystemParams();
-		drtZonalSystemParams.setZonesGeneration(DrtZonalSystemParams.ZoneGeneration.GridFromNetwork);
-		drtZonalSystemParams.setCellSize(500.);
-		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
+		drtZonalSystemParams.zonesGeneration = DrtZonalSystemParams.ZoneGeneration.GridFromNetwork;
+		drtZonalSystemParams.cellSize = 500.;
+		drtZonalSystemParams.targetLinkSelection = DrtZonalSystemParams.TargetLinkSelection.mostCentral;
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
