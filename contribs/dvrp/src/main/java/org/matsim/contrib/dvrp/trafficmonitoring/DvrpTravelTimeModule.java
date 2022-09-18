@@ -23,6 +23,7 @@ import java.net.URL;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
@@ -43,9 +44,9 @@ public class DvrpTravelTimeModule extends AbstractModule {
 	private DvrpConfigGroup dvrpCfg;
 
 	public void install() {
-		if (dvrpCfg.getInitialTravelTimesFile() != null) {
+		if (dvrpCfg.initialTravelTimesFile != null) {
 			addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).toProvider(() -> {
-				URL url = dvrpCfg.getInitialTravelTimesUrl(getConfig().getContext());
+				URL url = ConfigGroup.getInputFileURL(getConfig().getContext(), dvrpCfg.initialTravelTimesFile);
 				var timeDiscretizer = new TimeDiscretizer(getConfig().travelTimeCalculator());
 				var linkTravelTimes = DvrpOfflineTravelTimes.loadLinkTravelTimes(timeDiscretizer, url);
 				return DvrpOfflineTravelTimes.asTravelTime(timeDiscretizer, linkTravelTimes);
@@ -55,14 +56,14 @@ public class DvrpTravelTimeModule extends AbstractModule {
 					.asEagerSingleton();
 		}
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_OBSERVED).to(
-				Key.get(TravelTime.class, Names.named(dvrpCfg.getMobsimMode())));
+				Key.get(TravelTime.class, Names.named(dvrpCfg.mobsimMode)));
 		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
 
 		bind(DvrpOfflineTravelTimeEstimator.class).asEagerSingleton();
 		addMobsimListenerBinding().to(DvrpOfflineTravelTimeEstimator.class);
 		addControlerListenerBinding().to(DvrpOfflineTravelTimeEstimator.class);
 
-		if (dvrpCfg.getTravelTimeEstimationBeta() > 0) {// online estimation
+		if (dvrpCfg.travelTimeEstimationBeta > 0) {// online estimation
 			bind(DvrpOnlineTravelTimeEstimator.class).asEagerSingleton();
 			addMobsimListenerBinding().to(DvrpOnlineTravelTimeEstimator.class);
 			bind(DvrpTravelTimeEstimator.class).to(DvrpOnlineTravelTimeEstimator.class);

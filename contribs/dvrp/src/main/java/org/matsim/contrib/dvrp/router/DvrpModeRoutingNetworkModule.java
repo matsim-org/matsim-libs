@@ -92,7 +92,7 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	}
 
 	public static void checkUseModeFilteredSubnetworkAllowed(Config config, String mode) {
-		Set<String> dvrpNetworkModes = DvrpConfigGroup.get(config).getNetworkModes();
+		Set<String> dvrpNetworkModes = DvrpConfigGroup.get(config).networkModes;
 		Preconditions.checkArgument(dvrpNetworkModes.isEmpty() || dvrpNetworkModes.contains(mode),
 				"DvrpConfigGroup.networkModes must either be empty or contain DVRP mode: %s when 'useModeFilteredSubnetwork' is enabled for this mode",
 				mode);

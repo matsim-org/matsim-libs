@@ -223,7 +223,7 @@ public class PtAlongALine2Test {
 			// (configure full drt if applicable)
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
-			dvrpConfig.setNetworkModes(ImmutableSet.copyOf(Arrays.asList(TransportMode.drt, "drt2", "drt3")));
+			dvrpConfig.networkModes = ImmutableSet.copyOf(Arrays.asList(TransportMode.drt, "drt2", "drt3"));
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 			{
