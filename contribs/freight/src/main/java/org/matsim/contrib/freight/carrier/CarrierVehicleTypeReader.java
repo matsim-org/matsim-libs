@@ -136,7 +136,7 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 				if ( str==null ){
 					throw new RuntimeException( "should not happen" );
 				} else {
-					log.warn("Using central vehicle parser") ;
+					log.info("Using central vehicle parser") ;
 					vehicles = VehicleUtils.createVehiclesContainer();
 					delegate = new MatsimVehicleReader.VehicleReader(vehicles) ;
 					// only takes a vehicle container as argument :-(

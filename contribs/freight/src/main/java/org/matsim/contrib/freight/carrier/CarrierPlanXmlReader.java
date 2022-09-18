@@ -118,10 +118,10 @@ public class CarrierPlanXmlReader implements MatsimReader {
 					log.info("Found carriersDefinitions_v1.0.xsd. Using CarrierPlanReaderV1.");
 					delegate = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
 				} else if ( str.contains( "carriersDefinitions_v2.0.xsd" ) ) {
-					log.warn("Found carriersDefinitions_v2.0.xsd. Using CarrierPlanReaderV2.");
+					log.info("Found carriersDefinitions_v2.0.xsd. Using CarrierPlanReaderV2.");
 					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes );
 				} else if ( str.contains( "carriersDefinitions_v2.1.xsd" ) ) {
-					log.warn("Found carriersDefinitions_v2.1.xsd. Using CarrierPlanReaderV2.1");
+					log.info("Found carriersDefinitions_v2.1.xsd. Using CarrierPlanReaderV2.1");
 					delegate = new CarrierPlanXmlParserV2_1( carriers, carrierVehicleTypes );
 				}else {
 					throw new RuntimeException("no reader found for " + str ) ;
