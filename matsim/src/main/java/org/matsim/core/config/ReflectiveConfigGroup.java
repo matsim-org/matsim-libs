@@ -460,21 +460,23 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			if (setter != null) {
 				type = setter.getParameterTypes()[0];
 			} else {
-				type = paramFields.get(paramName).getType();
+				var field = paramFields.get(paramName);
+
+				Comment annotation = field.getAnnotation(Comment.class);
+				if (annotation != null) {
+					comments.put(paramName, annotation.value());
+					continue;
+				}
+
+				type = field.getType();
 			}
 
 			if (type.isEnum()) {
 				// generate an automatic comment containing the possible values for enum types
-				final StringBuilder comment = new StringBuilder("Possible values: ");
-				final Object[] consts = type.getEnumConstants();
-
-				for (int i = 0; i < consts.length; i++) {
-					comment.append(consts[i].toString());
-					if (i < consts.length - 1)
-						comment.append(", ");
-				}
-
-				comments.put(paramName, comment.toString());
+				var comment = "Possible values: " + Arrays.stream(type.getEnumConstants())
+						.map(Object::toString)
+						.collect(joining(","));
+				comments.put(paramName, comment);
 			}
 		}
 
@@ -521,8 +523,17 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	public @interface Parameter {
 		/**
 		 * the name of the field in the XML document
-		 *
+		 * <p>
 		 * If empty string (e.g. value is not provided), the name of the annotated field is used instead.
+		 */
+		String value() default "";
+	}
+
+	@Documented
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface Comment {
+		/**
+		 * The comment of the field in the XML document
 		 */
 		String value() default "";
 	}
