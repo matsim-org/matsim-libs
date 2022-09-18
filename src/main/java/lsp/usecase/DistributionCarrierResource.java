@@ -20,18 +20,17 @@
 
 package lsp.usecase;
 
-import java.util.Collection;
-
+import lsp.LSPCarrierResource;
 import lsp.LSPDataObject;
+import lsp.LSPResource;
+import lsp.LogisticsSolutionElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 
-import lsp.LogisticsSolutionElement;
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
+import java.util.Collection;
 
 /*package-private*/ class DistributionCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 

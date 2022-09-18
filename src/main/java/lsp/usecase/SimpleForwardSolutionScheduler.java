@@ -20,14 +20,10 @@
 
 package lsp.usecase;
 
-import java.util.List;
-
-import lsp.LSP;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
-import lsp.SolutionScheduler;
-import lsp.LSPResource;
+import lsp.*;
 import lsp.shipment.LSPShipment;
+
+import java.util.List;
 
 /**
  * In the class SimpleForwardSolutionScheduler two tasks are performed:

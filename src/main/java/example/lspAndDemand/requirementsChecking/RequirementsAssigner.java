@@ -20,14 +20,14 @@
 
 package example.lspAndDemand.requirementsChecking;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import lsp.LSP;
 import lsp.LogisticsSolution;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.Requirement;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 class RequirementsAssigner implements ShipmentAssigner {
 

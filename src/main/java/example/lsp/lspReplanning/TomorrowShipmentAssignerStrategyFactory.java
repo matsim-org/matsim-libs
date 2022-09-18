@@ -20,18 +20,17 @@
 
 package example.lsp.lspReplanning;
 
-import java.util.Collection;
-
+import lsp.LSP;
+import lsp.LSPPlan;
+import lsp.ShipmentAssigner;
+import lsp.shipment.LSPShipment;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 
-import lsp.LSP;
-import lsp.LSPPlan;
-import lsp.ShipmentAssigner;
-import lsp.shipment.LSPShipment;
+import java.util.Collection;
 
 /*package-private*/ class TomorrowShipmentAssignerStrategyFactory {
 

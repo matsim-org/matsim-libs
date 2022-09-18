@@ -20,13 +20,10 @@
 
 package lspShipmentAssignmentTests;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 import lsp.*;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.*;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -42,8 +39,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPResource;
-import lsp.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.junit.Assert.*;
 

@@ -1,7 +1,6 @@
 package lsp;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.GenericStrategyManagerImpl;

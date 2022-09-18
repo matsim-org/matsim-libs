@@ -41,7 +41,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
 

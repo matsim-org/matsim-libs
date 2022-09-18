@@ -20,9 +20,9 @@
 
 package lsp;
 
-import java.util.Collection;
-
 import lsp.shipment.LSPShipment;
+
+import java.util.Collection;
 
 /**
  * Each LogisticsSolutionElement maintains two collections of WaitingShipments.

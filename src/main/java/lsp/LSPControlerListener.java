@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;

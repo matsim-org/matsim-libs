@@ -20,33 +20,25 @@
 
 package lsp.usecase;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import lsp.shipment.*;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.util.Solutions;
+import lsp.*;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.util.Solutions;
-
-import lsp.LogisticsSolutionElement;
-import lsp.ShipmentWithTime;
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Schedules the {@link CollectionCarrierResource}.

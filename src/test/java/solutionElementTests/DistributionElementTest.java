@@ -20,8 +20,10 @@
 
 package solutionElementTests;
 
-import lsp.LSPUtils;
 import lsp.LSPCarrierResource;
+import lsp.LSPResource;
+import lsp.LSPUtils;
+import lsp.LogisticsSolutionElement;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,9 +38,6 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
-import lsp.LogisticsSolutionElement;
-import lsp.LSPResource;
 
 import static org.junit.Assert.*;
 

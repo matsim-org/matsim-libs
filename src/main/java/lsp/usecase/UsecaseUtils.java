@@ -20,7 +20,10 @@
 
 package lsp.usecase;
 
-import lsp.*;
+import lsp.LSP;
+import lsp.LSPResource;
+import lsp.LSPResourceScheduler;
+import lsp.LogisticsSolutionElement;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -28,7 +31,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 

@@ -20,12 +20,11 @@
 
 package solutionTests;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
-import lsp.*;
-import lsp.usecase.*;
+import lsp.LSPResource;
+import lsp.LSPUtils;
+import lsp.LogisticsSolution;
+import lsp.LogisticsSolutionElement;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -40,7 +39,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPResource;
+import java.util.ArrayList;
+
+import static org.junit.Assert.*;
 
 public class CompleteSolutionTest {
 

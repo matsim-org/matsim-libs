@@ -20,18 +20,17 @@
 
 package lsp.usecase;
 
-import java.util.ArrayList;
-
+import lsp.LSPResource;
+import lsp.LSPResourceScheduler;
+import lsp.LogisticsSolutionElement;
+import lsp.ShipmentWithTime;
+import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-import lsp.LogisticsSolutionElement;
-import lsp.ShipmentWithTime;
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
-import lsp.shipment.ShipmentPlanElement;
+import java.util.ArrayList;
 
 /*package-private*/ class TransshipmentHubScheduler extends LSPResourceScheduler {
 

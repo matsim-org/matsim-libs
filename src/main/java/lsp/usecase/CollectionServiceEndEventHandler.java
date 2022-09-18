@@ -20,16 +20,18 @@
 
 package lsp.usecase;
 
-import lsp.LSPSimulationTracker;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
-import lsp.shipment.*;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.CarrierService;
-
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
+import lsp.LSPSimulationTracker;
+import lsp.LogisticsSolutionElement;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentLeg;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;

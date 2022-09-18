@@ -20,23 +20,20 @@
 
 package lsp.usecase;
 
-import com.google.inject.Inject;
+import lsp.LSPCarrierResource;
 import lsp.LSPSimulationTracker;
-import lsp.shipment.*;
+import lsp.LogisticsSolutionElement;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentLeg;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
-import lsp.LogisticsSolutionElement;
-import lsp.LSPCarrierResource;
-import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;

@@ -21,7 +21,6 @@
 package example.lspAndDemand.requirementsChecking;
 
 import lsp.*;
-import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;

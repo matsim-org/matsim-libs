@@ -20,14 +20,8 @@
 
 package lsp;
 
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-
-import lsp.LSP;
-import lsp.LSPs;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
 import lsp.shipment.LSPShipment;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 
 
 /**

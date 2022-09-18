@@ -21,22 +21,19 @@
 package example.lsp.simulationTrackers;
 
 import lsp.*;
-import lsp.LSPModule;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
+import lsp.usecase.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import lsp.LSPResource;
-import lsp.shipment.LSPShipment;
-import lsp.LSPSimulationTracker;
-import lsp.usecase.*;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.carrier.Tour.Leg;

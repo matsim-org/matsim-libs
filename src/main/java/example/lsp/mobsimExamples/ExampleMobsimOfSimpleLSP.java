@@ -20,14 +20,11 @@
 
 package example.lsp.mobsimExamples;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
-
 import lsp.*;
-import lsp.shipment.*;
-import lsp.usecase.*;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
+import lsp.usecase.UsecaseUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,8 +39,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPModule;
-import lsp.LSPResource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
 
 /*package-private*/ class ExampleMobsimOfSimpleLSP {
 

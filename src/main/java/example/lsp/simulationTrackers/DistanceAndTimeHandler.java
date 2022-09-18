@@ -20,10 +20,6 @@
 
 package example.lsp.simulationTrackers;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,10 +31,12 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
-
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /*package-private*/ class DistanceAndTimeHandler implements LinkEnterEventHandler, VehicleLeavesTrafficEventHandler, LinkLeaveEventHandler {

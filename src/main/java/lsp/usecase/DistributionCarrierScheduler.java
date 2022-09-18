@@ -20,11 +20,14 @@
 
 package lsp.usecase;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ListIterator;
-
-import lsp.shipment.*;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.util.Solutions;
+import lsp.*;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
@@ -34,19 +37,11 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.util.Solutions;
-
-import lsp.LogisticsSolutionElement;
-import lsp.ShipmentWithTime;
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.ListIterator;
 
 /**
  * Ähnlich zu {@link CollectionCarrierScheduler}: Nun werden Sendungen verteilt statt eingesammelt.

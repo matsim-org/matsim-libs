@@ -20,10 +20,9 @@
 
 package lsp.shipment;
 
-import org.matsim.api.core.v01.Id;
-
-import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
+import lsp.LogisticsSolutionElement;
+import org.matsim.api.core.v01.Id;
 
 public interface ShipmentPlanElement {
 

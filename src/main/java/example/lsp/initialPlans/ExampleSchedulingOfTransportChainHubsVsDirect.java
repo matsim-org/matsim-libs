@@ -22,8 +22,6 @@ package example.lsp.initialPlans;
 
 import com.google.inject.Provider;
 import lsp.*;
-import lsp.LSPModule;
-import lsp.LSPScorer;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;

@@ -20,12 +20,13 @@
 
 package lsp.usecase;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
+import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
-import lsp.shipment.*;
+import lsp.LogisticsSolutionElement;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentLeg;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -35,14 +36,15 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
-import lsp.LogisticsSolutionElement;
-import lsp.LSPResource;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
 

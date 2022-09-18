@@ -20,12 +20,7 @@
 
 package lspShipmentTest;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +34,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import lsp.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import static org.junit.Assert.*;
 
 public class CollectionShipmentBuilderTest {
 

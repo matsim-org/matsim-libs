@@ -20,15 +20,14 @@
 
 package lsp.usecase;
 
-import static org.junit.Assert.*;
-
+import lsp.LSPResource;
 import lsp.LSPUtils;
+import lsp.LogisticsSolutionElement;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 
-import lsp.LogisticsSolutionElement;
-import lsp.LSPResource;
+import static org.junit.Assert.*;
 
 public class FirstHubElementTest {
 

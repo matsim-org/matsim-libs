@@ -20,16 +20,10 @@
 
 package example.lsp.lspScoring;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import lsp.*;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.*;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -48,9 +42,13 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPModule;
-import lsp.LSPResource;
-import lsp.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MultipleIterationsCollectionLSPScoringTest {
 

@@ -22,8 +22,8 @@ package lsp.shipment;
 
 //import demand.UtilityFunction;
 
-import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
+import lsp.LogisticsSolutionElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;

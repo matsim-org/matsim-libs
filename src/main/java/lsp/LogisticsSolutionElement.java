@@ -21,7 +21,6 @@
 package lsp;
 
 import org.matsim.api.core.v01.Identifiable;
-
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 

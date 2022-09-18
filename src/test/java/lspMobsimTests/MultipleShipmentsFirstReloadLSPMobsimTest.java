@@ -21,7 +21,6 @@
 package lspMobsimTests;
 
 import lsp.*;
-import lsp.LSPModule;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -48,7 +47,6 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import static org.junit.Assert.*;
 

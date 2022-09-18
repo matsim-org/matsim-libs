@@ -20,8 +20,8 @@
 
 package adapterTests;
 
-import java.util.ArrayList;
-
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 

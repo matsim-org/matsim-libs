@@ -21,12 +21,9 @@
 package example.lsp.lspScoring;
 
 import lsp.*;
-import lsp.LSPModule;
-import lsp.LSPResource;
-import lsp.LSPSimulationTracker;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.*;
+import lsp.usecase.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;

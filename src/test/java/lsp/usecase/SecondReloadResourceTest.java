@@ -20,13 +20,12 @@
 
 package lsp.usecase;
 
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
 
 import static org.junit.Assert.*;
 

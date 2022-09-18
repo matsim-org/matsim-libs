@@ -20,31 +20,22 @@
 
 package lsp.usecase;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-
-import lsp.shipment.*;
+import lsp.*;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-
-import lsp.LogisticsSolutionElement;
-import lsp.ShipmentWithTime;
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * In the case of the MainRunResource, the incoming LSPShipments are bundled

@@ -20,10 +20,8 @@
 
 package lspCreationTests;
 
-import java.util.ArrayList;
-
 import lsp.*;
-import lsp.usecase.*;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPResource;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
