@@ -72,20 +72,19 @@ import java.util.Collection;
 			for (TourElement tourElement : tour.getTourElements()) {
 				if (tourElement instanceof ServiceActivity serviceActivity) {
 					if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
-						logLoad(event);
-						logTransport(event);
+						logLoad(event, tour);
+						logTransport(event, tour);
 					}
 				}
 			}
 		}
 	}
 
-	private void logLoad(FreightTourStartEvent event) {
+	private void logLoad(FreightTourStartEvent event, Tour tour) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getLinkId());
-		double startTime = event.getTime() - getCumulatedLoadingTime(tour);
-		builder.setStartTime(startTime);
+		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(tour));
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
@@ -105,7 +104,7 @@ import java.util.Collection;
 		return cumulatedLoadingTime;
 	}
 
-	private void logTransport(FreightTourStartEvent event) {
+	private void logTransport(FreightTourStartEvent event, Tour tour) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getLinkId());

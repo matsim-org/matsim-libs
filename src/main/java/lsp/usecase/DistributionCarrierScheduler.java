@@ -56,7 +56,7 @@ import java.util.ListIterator;
 /*package-private*/ class DistributionCarrierScheduler extends LSPResourceScheduler {
 
 	private Carrier carrier;
-	private DistributionCarrierResource adapter;
+	private DistributionCarrierResource resource;
 	private ArrayList<LSPCarrierPair> pairs;
 
 	DistributionCarrierScheduler() {
@@ -66,8 +66,8 @@ import java.util.ListIterator;
 	@Override protected void initializeValues( LSPResource resource ) {
 		this.pairs = new ArrayList<>();
 		if (resource.getClass() == DistributionCarrierResource.class) {
-			this.adapter = (DistributionCarrierResource) resource;
-			this.carrier = adapter.getCarrier();
+			this.resource = (DistributionCarrierResource) resource;
+			this.carrier = this.resource.getCarrier();
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();
 			this.carrier.getPlans().clear();
@@ -131,8 +131,8 @@ import java.util.ListIterator;
 	}
 
 	private void routeCarrier(Carrier carrier) {
-		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, adapter.getNetwork());
-		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), UsecaseUtils.getVehicleTypeCollection(carrier));
+		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, resource.getNetwork());
+		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(resource.getNetwork(), UsecaseUtils.getVehicleTypeCollection(carrier));
 		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
 		vrpBuilder.setRoutingCost(netbasedTransportcosts);
 		VehicleRoutingProblem vrp = vrpBuilder.build();
@@ -170,8 +170,8 @@ import java.util.ListIterator;
 							addShipmentLoadElement(tuple, tour, serviceActivity);
 							addShipmentTransportElement(tuple, tour, serviceActivity);
 							addShipmentUnloadElement(tuple, tour, serviceActivity);
-							addDistributionTourStartEventHandler(pair.service, tuple, adapter, tour);
-							addDistributionServiceEventHandler(pair.service, tuple, adapter);
+							addDistributionTourStartEventHandler(pair.service, tuple, resource, tour);
+							addDistributionServiceEventHandler(pair.service, tuple, resource);
 							//break outerLoop;
 						}
 					}
@@ -182,8 +182,8 @@ import java.util.ListIterator;
 
 	private void addShipmentLoadElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 		ShipmentUtils.ScheduledShipmentLoadBuilder builder = ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
-		builder.setResourceId(adapter.getId());
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+		builder.setResourceId(resource.getId());
+		for (LogisticsSolutionElement element : resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				builder.setLogisticsSolutionElement(element);
 			}
@@ -213,8 +213,8 @@ import java.util.ListIterator;
 
 	private void addShipmentTransportElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 		ShipmentUtils.ScheduledShipmentTransportBuilder builder = ShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
-		builder.setResourceId(adapter.getId());
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+		builder.setResourceId(resource.getId());
+		for (LogisticsSolutionElement element : resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				builder.setLogisticsSolutionElement(element);
 			}
@@ -238,8 +238,8 @@ import java.util.ListIterator;
 
 	private void addShipmentUnloadElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 		ShipmentUtils.ScheduledShipmentUnloadBuilder builder = ShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
-		builder.setResourceId(adapter.getId());
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+		builder.setResourceId(resource.getId());
+		for (LogisticsSolutionElement element : resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				builder.setLogisticsSolutionElement(element);
 			}
@@ -257,8 +257,11 @@ import java.util.ListIterator;
 		tuple.getShipment().getShipmentPlan().addPlanElement(id, unload);
 	}
 
+	private int carrierCnt = 1;
 	private Carrier createAuxiliaryCarrier(ArrayList<ShipmentWithTime> shipmentsInCurrentTour, double startTime) {
-		Carrier auxiliaryCarrier = CarrierUtils.createCarrier(carrier.getId());
+		final Id<Carrier> carrierId = Id.create(carrier.getId().toString() + carrierCnt, Carrier.class);
+		carrierCnt ++;
+		Carrier auxiliaryCarrier = CarrierUtils.createCarrier(carrierId);
 		CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		final VehicleType vehicleType = carrierVehicle.getType();
 
@@ -301,7 +304,7 @@ import java.util.ListIterator;
 	}
 
 	private void addDistributionServiceEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+		for (LogisticsSolutionElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				DistributionServiceStartEventHandler handler = new DistributionServiceStartEventHandler(carrierService, tuple.getShipment(), element, resource);
 				tuple.getShipment().addSimulationTracker(handler);
@@ -311,7 +314,7 @@ import java.util.ListIterator;
 	}
 
 	private void addDistributionTourStartEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+		for (LogisticsSolutionElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				DistributionTourStartEventHandler handler = new DistributionTourStartEventHandler(carrierService, tuple.getShipment(), element, resource, tour);
 				tuple.getShipment().addSimulationTracker(handler);
