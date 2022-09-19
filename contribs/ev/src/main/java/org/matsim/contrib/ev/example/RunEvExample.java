@@ -24,6 +24,7 @@ package org.matsim.contrib.ev.example;/*
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,47 +47,53 @@ public class RunEvExample {
 	private static final Logger log = LogManager.getLogger(RunEvExample.class);
 
 	public static void main(String[] args) throws IOException {
-		final URL configUrl;
 		if (args.length > 0) {
 			log.info("Starting simulation run with the following arguments:");
-			configUrl = new URL(args[0]);
-			log.info("config URL: " + configUrl);
+			log.info("args: " + Arrays.toString( args ) );
 		} else {
-			File localConfigFile = new File(DEFAULT_CONFIG_FILE);
-			if (localConfigFile.exists()) {
+			if ( new File(DEFAULT_CONFIG_FILE).exists()) {
 				log.info("Starting simulation run with the local example config file");
-				configUrl = localConfigFile.toURI().toURL();
+				args[0] = DEFAULT_CONFIG_FILE;
 			} else {
 				log.info("Starting simulation run with the example config file from GitHub repository");
-				configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/"
-						+ DEFAULT_CONFIG_FILE);
+				args[0] = "https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/" + DEFAULT_CONFIG_FILE;
 			}
 		}
-		new RunEvExample().run(configUrl);
+		new RunEvExample().run(args);
 	}
 
-	public void run(URL configUrl) {
-		Config config = ConfigUtils.loadConfig(configUrl, new EvConfigGroup());
-		config.controler()
-				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+	public void run( String [] args ) {
+		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		//--
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		//--
 		Controler controler = new Controler(scenario);
+
 		controler.addOverridingModule(new EvModule());
+		// (ok)
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+
 				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
+				// (I assume that this is not on EvModule since one might want to evaluate if a standard route leads to an empty battery or not.  ???)
+
 				installQSimModule(new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
+					@Override protected void configureQSim() {
 						bind(VehicleChargingHandler.class).asEagerSingleton();
 						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
+						// (possibly not in EvModule because one wants to leave the decision to generate these events to the user??)
 					}
 				});
 			}
 		});
-		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
 
+		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
+		// (I don't like this syntax.)
+
+		//--
 		controler.run();
 	}
 }
