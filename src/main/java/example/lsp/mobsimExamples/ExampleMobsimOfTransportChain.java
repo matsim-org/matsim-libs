@@ -331,7 +331,7 @@ import java.util.Random;
 		LSPs lsps = new LSPs(lspList);
 		LSPUtils.addLSPs(scenario, lsps);
 
-		Controler controler = new Controler(config);
+		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
