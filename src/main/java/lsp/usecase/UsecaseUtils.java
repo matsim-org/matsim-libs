@@ -81,13 +81,47 @@ public class UsecaseUtils {
 	}
 
 
-	public static void printResults(String outputDir, LSP lsp) {
+	public static void printResults_shipmentPlan(String outputDir, LSP lsp) {
+		System.out.println("Writing out shipmentPlan for LSP");
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_schedules.tsv")) {
 			final String str0 = "LSP: " + lsp.getId();
 			System.out.println(str0);
 			writer.write(str0 + "\n");
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
+				final String str1 = "Shipment: " + shipment.getId();
+				System.out.println(str1);
+				writer.write(str1 + "\n");
+				for (ShipmentPlanElement element : elementList) {
+					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+					System.out.println(str2);
+					writer.write(str2 + "\n");
+				}
+				System.out.println();
+				writer.write("\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Prints out the log of the shipment - this is not the shpipments Plan
+	 *
+	 * Maybe the log will get removed soon.
+	 *
+	 * @param outputDir
+	 * @param lsp
+	 */
+	public static void printResults_shipmentLog(String outputDir, LSP lsp) {
+		System.out.println("Writing out shipmentLog for LSP");
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_shipmentLogs.tsv")) {
+			final String str0 = "LSP: " + lsp.getId();
+			System.out.println(str0);
+			writer.write(str0 + "\n");
+			for (LSPShipment shipment : lsp.getShipments()) {
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getLog().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
 				final String str1 = "Shipment: " + shipment.getId();
 				System.out.println(str1);

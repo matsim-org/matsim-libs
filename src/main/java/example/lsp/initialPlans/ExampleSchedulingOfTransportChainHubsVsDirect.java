@@ -160,7 +160,7 @@ import java.util.*;
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
-		UsecaseUtils.printResults(config.controler().getOutputDirectory(), lsp);
+		UsecaseUtils.printResults_shipmentPlan(config.controler().getOutputDirectory(), lsp);
 
 		log.info("Done.");
 
