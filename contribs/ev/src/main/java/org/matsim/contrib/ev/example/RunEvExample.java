@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +41,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunEvExample {
@@ -65,6 +67,7 @@ public class RunEvExample {
 	public void run( String [] args ) {
 		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
 		//--
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		//--
@@ -76,22 +79,30 @@ public class RunEvExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( this.getConfig(), QSimComponentsConfigGroup.class );
+				List<String> cmps = qsimComponentsConfig.getActiveComponents();
+				cmps.add(  EvModule.EV_COMPONENT ) ;
+				qsimComponentsConfig.setActiveComponents( cmps );
+
 
 				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
 				// (I assume that this is not on EvModule since one might want to evaluate if a standard route leads to an empty battery or not.  ???)
 
 				installQSimModule(new AbstractQSimModule() {
 					@Override protected void configureQSim() {
-						bind(VehicleChargingHandler.class).asEagerSingleton();
-						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
+//						bind(VehicleChargingHandler.class).asEagerSingleton();
+						// this can be added to next line (does not need separate binding).
+
+						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class).asEagerSingleton();
 						// (possibly not in EvModule because one wants to leave the decision to generate these events to the user??)
+						// (leaving this out fails the events equality)
 					}
 				});
 			}
 		});
 
-		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
-		// (I don't like this syntax.)
+//		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
+		// (replaced by "cmps.add( ...)" above.)
 
 		//--
 		controler.run();
