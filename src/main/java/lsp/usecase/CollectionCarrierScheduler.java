@@ -112,11 +112,11 @@ import java.util.Collection;
 	@Override
 	protected void updateShipments() {
 		for (ShipmentWithTime tuple : shipments) {
-			updateShipment(tuple);
+			updateSchedule(tuple);
 		}
 	}
 
-	private void updateShipment(ShipmentWithTime tuple) {
+	private void updateSchedule(ShipmentWithTime tuple) {
 
 		//outerLoop:
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
