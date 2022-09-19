@@ -29,9 +29,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -45,6 +48,69 @@ import java.util.Collections;
 import java.util.Random;
 
 /*package-private*/ class ExampleMobsimOfSimpleLSP {
+
+	public static void main(String[] args) {
+		//Set up required MATSim classes
+		Config config = new Config();
+		config.addCoreModules();
+
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+
+		//Create LSP and shipments
+		Network network = scenario.getNetwork();
+		LSP lsp = createInitialLSP(network);
+		Collection<LSPShipment> shipments = createInitialLSPShipments(network);
+
+		//assign the shipments to the LSP
+		for (LSPShipment shipment : shipments) {
+			lsp.assignShipmentToLSP(shipment);
+		}
+
+		//schedule the LSP with the shipments and according to the scheduler of the Resource
+		lsp.scheduleSolutions();
+
+		//set up simulation controler and LSPModule
+		ArrayList<LSP> lspList = new ArrayList<>();
+		lspList.add(lsp);
+		LSPs lsps = new LSPs(lspList);
+		LSPUtils.addLSPs(scenario, lsps);
+
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(0);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new LSPModule());
+			}
+		});
+		controler.run();
+
+		for (LSPShipment shipment : lsp.getShipments()) {
+			System.out.println("Shipment: " + shipment.getId());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
+			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
+
+			for (int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
+				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
+			}
+			System.out.println();
+			for (int i = 0; i < shipment.getLog().getPlanElements().size(); i++) {
+				System.out.println("Logged: " + logElements.get(i).getSolutionElement().getId() + "  " + logElements.get(i).getResourceId() + "  " + logElements.get(i).getElementType() + " Start: " + logElements.get(i).getStartTime() + " End: " + logElements.get(i).getEndTime());
+			}
+			System.out.println();
+		}
+
+
+	}
 
 	private static LSP createInitialLSP(Network network) {
 
@@ -103,7 +169,7 @@ import java.util.Random;
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 
-		//The exogenous list of Resoruces for the SolutuionScheduler is compiled and the Scheduler is added to the LSPBuilder 
+		//The exogenous list of Resoruces for the SolutuionScheduler is compiled and the Scheduler is added to the LSPBuilder
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionResource);
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
@@ -148,60 +214,6 @@ import java.util.Random;
 		return shipmentList;
 	}
 
-
-	public static void main(String[] args) {
-		//Set up required MATSim classes
-		Config config = new Config();
-		config.addCoreModules();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
-
-		//Create LSP and shipments
-		LSP lsp = createInitialLSP(network);
-		Collection<LSPShipment> shipments = createInitialLSPShipments(network);
-
-		//assign the shipments to the LSP
-		for (LSPShipment shipment : shipments) {
-			lsp.assignShipmentToLSP(shipment);
-		}
-
-		//schedule the LSP with the shipments and according to the scheduler of the Resource
-		lsp.scheduleSolutions();
-
-		//set up simulation controler and LSPModule
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(lsp);
-		LSPs lsps = new LSPs(lspList);
-		LSPUtils.addLSPs(scenario, lsps);
-
-		Controler controler = new Controler(config);
-		controler.addOverridingModule(new LSPModule());
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
-		controler.run();
-
-		for (LSPShipment shipment : lsp.getShipments()) {
-			System.out.println("Shipment: " + shipment.getId());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
-			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
-			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
-
-			for (int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
-				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
-			}
-			System.out.println();
-			for (int i = 0; i < shipment.getLog().getPlanElements().size(); i++) {
-				System.out.println("Logged: " + logElements.get(i).getSolutionElement().getId() + "  " + logElements.get(i).getResourceId() + "  " + logElements.get(i).getElementType() + " Start: " + logElements.get(i).getStartTime() + " End: " + logElements.get(i).getEndTime());
-			}
-			System.out.println();
-		}
-
-
-	}
 
 
 }
