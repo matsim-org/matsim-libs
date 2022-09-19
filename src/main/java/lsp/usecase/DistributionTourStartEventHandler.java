@@ -48,8 +48,6 @@ import java.util.Collection;
 
 	private final Tour tour;
 
-//	@Inject Scenario scenario;
-
 	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource, Tour tour) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
@@ -66,11 +64,7 @@ import java.util.Collection;
 
 	@Override
 	public void handleEvent(FreightTourStartEvent event) {
-//		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
-//		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-//		for (ScheduledTour scheduledTour : scheduledTours) {
-//			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
-//				Tour tour = scheduledTour.getTour();
+		if (event.getTourId().equals(tour.getId())){
 				for (TourElement tourElement : tour.getTourElements()) {
 					if (tourElement instanceof ServiceActivity serviceActivity) {
 						if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
@@ -79,8 +73,7 @@ import java.util.Collection;
 						}
 					}
 				}
-//			}
-//		}
+			}
 	}
 
 	private void logLoad(FreightTourStartEvent event) {
@@ -90,19 +83,6 @@ import java.util.Collection;
 		builder.setLogisticsSolutionElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setEndTime(event.getTime());
-//		Tour tour = null;
-//		//TODO: Does not work, because scenario is null -> Need help from KN :(
-//		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
-//		// OR
-//		// LSPModule -> provideCarriers ??
-//		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
-//		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-//		for (ScheduledTour scheduledTour : scheduledTours) {
-//			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
-//				tour = scheduledTour.getTour();
-//				break;
-//			}
-//		}
 		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(tour));
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
@@ -114,19 +94,6 @@ import java.util.Collection;
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getLinkId());
-//		Tour result = null;
-//		//TODO: Does not work, because scenario is null -> Need help from KN :(
-//		// In the CarrierModul there is already a CarrierProvider returning "return FreightUtils.getCarriers(scenario);" --> How can I access it???
-//		// OR
-//		// LSPModule -> provideCarriers ??
-//		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
-//		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-//		for (ScheduledTour scheduledTour : scheduledTours) {
-//			if (scheduledTour.getVehicle().getId() == event.getVehicleId()) {
-//				result = scheduledTour.getTour();
-//				break;
-//			}
-//		}
 		builder.setToLinkId(tour.getEndLinkId());
 		builder.setLogisticsSolutionElement(element);
 		builder.setResourceId(resource.getId());
