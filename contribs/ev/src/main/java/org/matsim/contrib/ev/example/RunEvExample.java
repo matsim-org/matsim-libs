@@ -55,10 +55,10 @@ public class RunEvExample {
 		} else {
 			if ( new File(DEFAULT_CONFIG_FILE).exists()) {
 				log.info("Starting simulation run with the local example config file");
-				args[0] = DEFAULT_CONFIG_FILE;
+				args = new String [] { DEFAULT_CONFIG_FILE };
 			} else {
 				log.info("Starting simulation run with the example config file from GitHub repository");
-				args[0] = "https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/" + DEFAULT_CONFIG_FILE;
+				args = new String [] {"https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/" + DEFAULT_CONFIG_FILE};
 			}
 		}
 		new RunEvExample().run(args);
@@ -76,30 +76,6 @@ public class RunEvExample {
 		controler.addOverridingModule(new EvModule());
 		// (ok)
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( this.getConfig(), QSimComponentsConfigGroup.class );
-				List<String> cmps = qsimComponentsConfig.getActiveComponents();
-				cmps.add(  EvModule.EV_COMPONENT ) ;
-				qsimComponentsConfig.setActiveComponents( cmps );
-
-
-				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
-				// (I assume that this is not on EvModule since one might want to evaluate if a standard route leads to an empty battery or not.  ???)
-
-				installQSimModule(new AbstractQSimModule() {
-					@Override protected void configureQSim() {
-//						bind(VehicleChargingHandler.class).asEagerSingleton();
-						// this can be added to next line (does not need separate binding).
-
-						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class).asEagerSingleton();
-						// (possibly not in EvModule because one wants to leave the decision to generate these events to the user??)
-						// (leaving this out fails the events equality)
-					}
-				});
-			}
-		});
 
 //		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
 		// (replaced by "cmps.add( ...)" above.)

@@ -91,22 +91,6 @@ public class RunEvExamplewithLTHConsumptionModel {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(DriveEnergyConsumption.Factory.class).toInstance(driveEnergyConsumptionFactory);
-				bind(AuxEnergyConsumption.Factory.class).toInstance(electricVehicle -> (beginTime, duration, linkId) -> 0); //a dummy factory, as aux consumption is part of the drive consumption in the model
-				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
-				installQSimModule(new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						bind(VehicleChargingHandler.class).asEagerSingleton();
-						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
-					}
-				});
-			}
-		});
-		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
 
 		controler.run();
 	}
