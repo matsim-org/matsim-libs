@@ -249,6 +249,12 @@ public class MultipleIterationsMainRunLSPMobsimTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 //			config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
+
+		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
+			UsecaseUtils.printResults_shipmentPlan(controler.getControlerIO().getOutputPath(), lsp);
+			UsecaseUtils.printResults_shipmentLog(controler.getControlerIO().getOutputPath(), lsp);
+		}
+
 	}
 
 	@Test
