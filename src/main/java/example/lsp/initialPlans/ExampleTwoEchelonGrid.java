@@ -117,6 +117,7 @@ final class ExampleTwoEchelonGrid {
 					@Override public LSPStrategyManager get(){
 						LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 						strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+//						strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
 						return strategyManager;
 					}
 				} );
@@ -153,6 +154,7 @@ final class ExampleTwoEchelonGrid {
 
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setWriteEventsInterval(1);
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
@@ -213,11 +215,12 @@ final class ExampleTwoEchelonGrid {
 			Carrier mainCarrier = CarrierUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
 			mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			//TODO: Funktioniert mit DistributionCarrier ... aber nicht mit main Carrier. --> Ansehen! --> Main benötigt eventuell vorher ein Depot?
 			CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_10));
-			LSPResource mainCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("mainCarrierRes", LSPResource.class), network)
+			LSPResource mainCarrierRessource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create("mainCarrierRes", LSPResource.class), network)
 					.setCarrier(mainCarrier)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.setFromLinkId(DEPOT_LINK_ID)
+					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+					.setToLinkId(HUB_LINK_ID)
 					.build();
 
 			LogisticsSolutionElement mainCarrierLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("mainCarrierLSE", LogisticsSolutionElement.class))
@@ -257,7 +260,7 @@ final class ExampleTwoEchelonGrid {
 			mainCarrierLSE.connectWithNextElement(hubLSE);
 			hubLSE.connectWithNextElement(distributionCarrierElement);
 
-			LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("hubSolution", LogisticsSolution.class))
+			LogisticsSolution solution_withHub = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("hubSolution", LogisticsSolution.class))
 					.addSolutionElement(mainCarrierLSE)
 					.addSolutionElement(hubLSE)
 					.addSolutionElement(distributionCarrierElement)
@@ -265,12 +268,12 @@ final class ExampleTwoEchelonGrid {
 
 
 			lspPlan_withHub = LSPUtils.createLSPPlan()
-					.addSolution(solution_direct)
+					.addSolution(solution_withHub)
 					.setAssigner(UsecaseUtils.createSingleSolutionShipmentAssigner());
 
 		}
 
-		//Todo: Auch das ist wirr: Muss hier alle sommeln, damit man die dann im LSPBuilder dem SolutionSceduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu ... urgs KMT'Jul22
+		//Todo: Auch das ist wirr: Muss hier alle sommeln, damit man die dann im LSPBuilder dem SolutionScheduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu ... urgs KMT'Jul22
 		List<LSPPlan> lspPlans = new ArrayList<>();
 		lspPlans.add(lspPlan_withHub);
 		lspPlans.add(lspPlan_direct);
@@ -280,7 +283,6 @@ final class ExampleTwoEchelonGrid {
 				.setInitialPlan(lspPlan_withHub)
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
 				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans))) //Hier müssen irgendwie die Ressourcen beider Pläne rein, oder? - Habe ich jetzt gemacht. kmt ' jul22
-//				.setSolutionScorer(new MyLSPScorer())
 				;
 
 
