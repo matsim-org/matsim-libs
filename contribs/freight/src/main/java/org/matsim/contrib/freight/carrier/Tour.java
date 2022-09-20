@@ -21,12 +21,6 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,6 +29,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+
+import java.util.*;
 
 /**
  * This is a tour of a carrier which is a sequence of activities and legs.
@@ -60,9 +56,11 @@ public class Tour {
 		private final List<TourElement> tourElements = new ArrayList<>();
 		private final Set<CarrierShipment> openPickups = new HashSet<>();
 		private boolean previousElementIsActivity;
-		private Start start;
-		private End end;
 
+
+		private Start start;
+
+		private End end;
 
 		/**
 		 * Returns a new tour builder.
@@ -664,8 +662,8 @@ public class Tour {
 		end = builder.end;
 	}
 
-	private Tour(Tour tour) {
-		this.tourId = Id.create(tour.tourId.toString(), Tour.class);
+	private Tour(Tour tour, Id<Tour> newTourId) {
+		this.tourId = newTourId;
 		this.start = (Start) tour.start.duplicate();
 		this.end = (End) tour.end.duplicate();
 		List<TourElement> elements = new ArrayList<>();
@@ -676,7 +674,14 @@ public class Tour {
 	}
 
 	public Tour duplicate() {
-		return new Tour(this);
+		return new Tour(this, Id.create(this.tourId.toString(), Tour.class));
+	}
+
+	/*
+	 * returns a copy of the tour, but with a new Tour Id.
+	 */
+	public Tour duplicateWithNewId(Id<Tour> newTourId) {
+		return new Tour(this, newTourId);
 	}
 
 	public List<TourElement> getTourElements() {
