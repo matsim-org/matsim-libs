@@ -46,23 +46,20 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 
 	public static final  Logger logger = LogManager.getLogger(CarrierPlanXmlParserV2_1.class);
 
-	public static final String CARRIERS = "carriers";
-	public static final String CARRIER = "carrier";
-	public static final String LINKID = "linkId";
-	public static final String SHIPMENTS = "shipments";
-	public static final String SHIPMENT = "shipment";
-	static final String SERVICES = "services";
-	static final String SERVICE = "service";
-	public static final String ID = "id";
-	public static final String FROM = "from";
-	public static final String TO = "to";
-	public static final String SIZE = "size";
-	public static final String ACTIVITY = "act";
-	public static final String TYPE = "type";
-	public static final String SHIPMENTID = "shipmentId";
-	public static final String START = "start";
-	public static final String VEHICLE = "vehicle";
-	public static final String VEHICLES = "vehicles";
+	private static final String CARRIER = "carrier";
+	private static final String SHIPMENTS = "shipments";
+	private static final String SHIPMENT = "shipment";
+	private static final String SERVICES = "services";
+	private static final String SERVICE = "service";
+	private static final String ID = "id";
+	private static final String FROM = "from";
+	private static final String TO = "to";
+	private static final String SIZE = "size";
+	private static final String ACTIVITY = "act";
+	private static final String TYPE = "type";
+	private static final String SHIPMENTID = "shipmentId";
+	private static final String VEHICLE = "vehicle";
+	private static final String VEHICLES = "vehicles";
 	private static final String VEHICLE_EARLIEST_START = "earliestStart";
 	private static final String VEHICLE_LATEST_END = "latestEnd";
 	private static final String VEHICLE_TYPES_MSG = "It used to be possible to have vehicle types both in the plans file, and in a separate file.  The " +
