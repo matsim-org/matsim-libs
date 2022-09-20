@@ -20,10 +20,12 @@
 
 package lsp;
 
+import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -37,6 +39,8 @@ import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.FreightAgentSource;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.replanning.GenericPlanStrategy;
@@ -104,6 +108,8 @@ public class LSPModule extends AbstractModule {
 		// for iterations, one needs to replace the following with something meaningful.  If nothing else, there are "empty implementations" that do nothing.  kai, jul'22
 		bind( CarrierStrategyManager.class ).toProvider( ()->null );
 		bind( LSPStrategyManager.class ).toProvider( ()->null );
+
+		this.addControlerListenerBinding().to( DumpLSPPlans.class );
 	}
 
 	@Provides Carriers provideCarriers( LSPControlerListener lspControlerListener ) {
@@ -168,4 +174,17 @@ public class LSPModule extends AbstractModule {
 			throw new RuntimeException( "not implemented" );
 		}
 	}
+
+	public static final class DumpLSPPlans implements BeforeMobsimListener {
+		@Inject Scenario scenario;
+		@Override public void notifyBeforeMobsim( BeforeMobsimEvent event ){
+			LSPs lsps = LSPUtils.getLSPs( scenario );
+			for( LSP lsp : lsps.getLSPs().values() ){
+				for( LSPPlan plan : lsp.getPlans() ){
+					log.warn( plan ) ;
+				}
+			}
+		}
+	}
+
 }

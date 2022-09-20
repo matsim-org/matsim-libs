@@ -87,4 +87,15 @@ import java.util.Collection;
 		}
 	}
 
+	@Override public String toString() {
+		StringBuilder strb = new StringBuilder();
+		for( LogisticsSolution solution : this.solutions ){
+			strb.append("solutionId=").append( solution.getId() );
+			for( LogisticsSolutionElement solutionElement : solution.getSolutionElements() ){
+//				solutionElement.getResource().toString();
+			}
+		}
+		return strb.toString();
+	}
+
 }
