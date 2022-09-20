@@ -39,9 +39,7 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * Ähnlich zu {@link CollectionCarrierScheduler}: Nun werden Sendungen verteilt statt eingesammelt.
@@ -81,7 +79,7 @@ import java.util.ListIterator;
 		double availiabilityTimeOfLastShipment = 0;
 		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
 		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
-		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
+		List<ScheduledTour> scheduledTours = new LinkedList<>();
 
 		for (ShipmentWithTime tuple : copyOfAssignedShipments) {
 			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber weas ist, wenn es mehrer gibt???
@@ -115,8 +113,40 @@ import java.util.ListIterator;
 			shipmentsInCurrentTour.clear();
 		}
 
-		CarrierPlan plan = new CarrierPlan(carrier, scheduledTours);
+		CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledTours));
 		carrier.setSelectedPlan(plan);
+	}
+
+
+
+	/**
+	 * This method unifies the tourIds of the CollectionCarrier.
+	 * <p>
+	 * It is done because in the current setup, there is one (auxiliary) Carrier per Tour. ---> in each Carrier the Tour has the Id 1.
+	 * In a second step all of that tours were put together in one single carrier {@link #scheduleResource()}
+	 * But now, this carrier can have several tours, all with the same Id (1)-
+	 * <p>
+	 * In this method all tours copied but with a new (unique) TourId.
+	 * <p>
+	 * This is a workaround. In my (KMT, sep'22) opinion it would be better to switch so {@CarrierShipment}s insteaf of {@link CarrierService}
+	 * and use only on DistributionCarrier with only one VRP and only one jsprit-Run. This would avoid this workaround and
+	 * also improve the solution, because than the DistributionCarrier can decide on it one which shipments will go into which tours
+	 *
+	 * @param scheduledTours Collection of scheduledTours
+	 * @return Collection<ScheduledTour> the scheduledTours with unified tour Ids.
+	 */
+	private Collection<ScheduledTour> unifyTourIds(Collection<ScheduledTour> scheduledTours) {
+		int tourIdindex = 1;
+		List<ScheduledTour> scheduledToursUnified = new LinkedList<>();
+
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			var newTour = scheduledTour.getTour().duplicateWithNewId(Id.create("dist_"+tourIdindex, Tour.class));
+			tourIdindex++;
+			var newScheduledTour = ScheduledTour.newInstance(newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture() );
+			scheduledToursUnified.add(newScheduledTour);
+		}
+
+		return scheduledToursUnified;
 	}
 
 	private CarrierService convertToCarrierService(ShipmentWithTime tuple) {
