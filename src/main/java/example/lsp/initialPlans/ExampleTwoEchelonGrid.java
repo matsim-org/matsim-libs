@@ -365,7 +365,7 @@ final class ExampleTwoEchelonGrid {
 
 
 	private static class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
-		private double score = -10;
+		private double score = 0;
 
 		@Override
 		public double getScoreForCurrentPlan() {
@@ -378,8 +378,8 @@ final class ExampleTwoEchelonGrid {
 
 		@Override
 		public void handleEvent(FreightTourEndEvent event) {
-			score++;
-			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
+			score--;
+			// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
 		}
 
 		@Override
@@ -389,8 +389,8 @@ final class ExampleTwoEchelonGrid {
 
 		@Override
 		public void handleEvent(FreightServiceEndEvent event) {
-			score++;
-			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
+			score--;
+			// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
 		}
 	}
 }
