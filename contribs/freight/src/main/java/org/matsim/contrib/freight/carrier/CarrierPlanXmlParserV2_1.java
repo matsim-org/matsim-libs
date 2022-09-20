@@ -279,33 +279,30 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				if (type == null) throw new IllegalStateException("activity type is missing");
 				String actEndTime = atts.getValue("end_time");
 				switch (type) {
-					case "start":
+					case "start" -> {
 						if (actEndTime == null)
 							throw new IllegalStateException("endTime of activity \"" + type + "\" missing.");
 						currentStartTime = parseTimeToDouble(actEndTime);
 						previousActLoc = currentVehicle.getLinkId();
-						currentTourBuilder.scheduleStart(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
-
-						break;
-					case "pickup": {
+						currentTourBuilder.scheduleStart(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+					}
+					case "pickup" -> {
 						String id = atts.getValue(SHIPMENTID);
 						if (id == null) throw new IllegalStateException("pickup.shipmentId is missing.");
 						CarrierShipment s = currentShipments.get(id);
 						finishLeg(s.getFrom());
 						currentTourBuilder.schedulePickup(s);
 						previousActLoc = s.getFrom();
-						break;
 					}
-					case "delivery": {
+					case "delivery" -> {
 						String id = atts.getValue(SHIPMENTID);
 						if (id == null) throw new IllegalStateException("delivery.shipmentId is missing.");
 						CarrierShipment s = currentShipments.get(id);
 						finishLeg(s.getTo());
 						currentTourBuilder.scheduleDelivery(s);
 						previousActLoc = s.getTo();
-						break;
 					}
-					case "service": {
+					case "service" -> {
 						String id = atts.getValue("serviceId");
 						if (id == null) throw new IllegalStateException("act.serviceId is missing.");
 						CarrierService s = serviceMap.get(Id.create(id, CarrierService.class));
@@ -313,27 +310,20 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 						finishLeg(s.getLocationLinkId());
 						currentTourBuilder.scheduleService(s);
 						previousActLoc = s.getLocationLinkId();
-						break;
 					}
-					case "end":
-						finishLeg(currentVehicle.getLinkId() );
-						currentTourBuilder.scheduleEnd(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
-						break;
+					case "end" -> {
+						finishLeg(currentVehicle.getLinkId());
+						currentTourBuilder.scheduleEnd(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+					}
 				}
 				break;
 			case ATTRIBUTES:
 				switch (context.peek()) {
-					case CARRIER:
-						currAttributes = currentCarrier.getAttributes();
-						break;
-					case SERVICE:
-						currAttributes = currentService.getAttributes();
-						break;
-					case SHIPMENT:
-						currAttributes = currentShipment.getAttributes();
-						break;
-					default:
-						throw new RuntimeException("could not derive context for attributes. context=" + context.peek());
+					case CARRIER -> currAttributes = currentCarrier.getAttributes();
+					case SERVICE -> currAttributes = currentService.getAttributes();
+					case SHIPMENT -> currAttributes = currentShipment.getAttributes();
+					default ->
+							throw new RuntimeException("could not derive context for attributes. context=" + context.peek());
 				}
 				attributesReader.startTag(name, atts, context, currAttributes);
 				break;
@@ -351,47 +341,34 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		switch (name) {
-			case "capabilities":
-				currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
-				break;
-			case "vehicleType":
-				throw new RuntimeException("I am confused now if, for carriers, vehicleType is in the plans file, or in a separate file.");
-			case "route":
-				this.previousRouteContent = content;
-				break;
-			case "carrier":
+			case "capabilities" -> currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
+			case "vehicleType" ->
+					throw new RuntimeException("I am confused now if, for carriers, vehicleType is in the plans file, or in a separate file.");
+			case "route" -> this.previousRouteContent = content;
+			case "carrier" -> {
 				Gbl.assertNotNull(currentCarrier);
 				Gbl.assertNotNull(carriers);
 				Gbl.assertNotNull(carriers.getCarriers());
 				carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 				currentCarrier = null;
-				break;
-			case "plan":
+			}
+			case "plan" -> {
 				CarrierPlan currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
 				currentPlan.setScore(currentScore);
 				currentCarrier.getPlans().add(currentPlan);
 				if (this.selected) {
 					currentCarrier.setSelectedPlan(currentPlan);
 				}
-				break;
-			case "tour":
+			}
+			case "tour" -> {
 				ScheduledTour sTour = ScheduledTour.newInstance(currentTourBuilder.build(), currentVehicle, currentStartTime);
 				scheduledTours.add(sTour);
-				break;
-			case "description":
-				throw new RuntimeException(VEHICLE_TYPES_MSG);
-			case SERVICE:
-				this.currentService = null;
-				break;
-			case SHIPMENT:
-				this.currentShipment = null;
-				break;
-			case ATTRIBUTE:
-				this.attributesReader.endTag(name, content, context);
-				break;
-			case ATTRIBUTES:
-				this.currAttributes = null;
-				break;
+			}
+			case "description" -> throw new RuntimeException(VEHICLE_TYPES_MSG);
+			case SERVICE -> this.currentService = null;
+			case SHIPMENT -> this.currentShipment = null;
+			case ATTRIBUTE -> this.attributesReader.endTag(name, content, context);
+			case ATTRIBUTES -> this.currAttributes = null;
 		}
 	}
 
