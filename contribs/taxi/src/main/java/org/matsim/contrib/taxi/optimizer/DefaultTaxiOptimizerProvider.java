@@ -116,7 +116,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	}
 
 	private ZonalRegisters createZonalRegisters(RuleBasedTaxiOptimizerParams params) {
-		ZonalSystem zonalSystem = new SquareGridSystem(network.getNodes().values(), params.getCellSize());
+		ZonalSystem zonalSystem = new SquareGridSystem(network.getNodes().values(), params.cellSize);
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		return new ZonalRegisters(idleTaxiRegistry, unplannedRequestRegistry);
