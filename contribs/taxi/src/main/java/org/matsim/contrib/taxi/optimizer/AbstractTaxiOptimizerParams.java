@@ -30,7 +30,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  */
 public abstract class AbstractTaxiOptimizerParams extends ReflectiveConfigGroup {
 	public static final String REOPTIMIZATION_TIME_STEP = "reoptimizationTimeStep";
-	static final String REOPTIMIZATION_TIME_STEP_EXP = "Specifies how often the reoptimization algorithm is executed."
+	protected static final String REOPTIMIZATION_TIME_STEP_EXP = "Specifies how often the reoptimization algorithm is executed."
 			+ " Must be a positive integer value. Smaller values mean lower reaction time."
 			+ " However, algorithms that find more than 1 taxi-request matching in each run,"
 			+ " such as AssignmentTaxiOptimizer, may produce better results"
