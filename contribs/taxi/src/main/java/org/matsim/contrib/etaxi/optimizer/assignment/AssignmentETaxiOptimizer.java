@@ -97,7 +97,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 		this.fleet = fleet;
 		this.timer = timer;
 
-		if (taxiCfg.isVehicleDiversion() && taxiCfg.isDestinationKnown()) {
+		if (taxiCfg.vehicleDiversion && taxiCfg.destinationKnown) {
 			throw new IllegalArgumentException("Unsupported");
 		}
 

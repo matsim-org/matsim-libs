@@ -60,7 +60,7 @@ public class MultiModeTaxiModule extends AbstractModule {
 		var drtCfg = new DrtConfigGroup();
 
 		drtCfg.mode = taxiCfg.getMode();
-		drtCfg.useModeFilteredSubnetwork = taxiCfg.isUseModeFilteredSubnetwork();
+		drtCfg.useModeFilteredSubnetwork = taxiCfg.useModeFilteredSubnetwork;
 		drtCfg.stopDuration = Double.NaN;//used only inside the DRT optimiser
 
 		// Taxi optimisers do not reject, so time constraints are only used for routing plans (DrtRouteCreator).
@@ -72,15 +72,15 @@ public class MultiModeTaxiModule extends AbstractModule {
 		drtCfg.maxAbsoluteDetour = Double.MAX_VALUE;
 
 		drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
-		drtCfg.changeStartLinkToLastLinkInSchedule = taxiCfg.isChangeStartLinkToLastLinkInSchedule();
+		drtCfg.changeStartLinkToLastLinkInSchedule = taxiCfg.changeStartLinkToLastLinkInSchedule;
 		drtCfg.idleVehiclesReturnToDepots = false;
 		drtCfg.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
 		drtCfg.maxWalkDistance = Double.MAX_VALUE;
-		drtCfg.vehiclesFile = taxiCfg.getTaxisFile();
+		drtCfg.vehiclesFile = taxiCfg.taxisFile;
 		drtCfg.transitStopFile = null;
 		drtCfg.drtServiceAreaShapeFile = null;
-		drtCfg.plotDetailedCustomerStats = taxiCfg.getDetailedStats() || taxiCfg.getTimeProfiles();
-		drtCfg.numberOfThreads = taxiCfg.getNumberOfThreads();
+		drtCfg.plotDetailedCustomerStats = taxiCfg.detailedStats || taxiCfg.timeProfiles;
+		drtCfg.numberOfThreads = taxiCfg.numberOfThreads;
 		drtCfg.advanceRequestPlanningHorizon = 0;
 		drtCfg.storeUnsharedPath = false;
 
