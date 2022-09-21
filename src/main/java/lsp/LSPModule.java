@@ -180,9 +180,11 @@ public class LSPModule extends AbstractModule {
 		@Override public void notifyBeforeMobsim( BeforeMobsimEvent event ){
 			LSPs lsps = LSPUtils.getLSPs( scenario );
 			for( LSP lsp : lsps.getLSPs().values() ){
+				log.warn("Dumping plan(s) of [LSP="+lsp.getId() + "] ; [No of plans=" + lsp.getPlans().size() + "]");
 				for( LSPPlan plan : lsp.getPlans() ){
-					log.warn( plan ) ;
+					log.warn( "[LSPPlan: " + plan.toString() + "]") ;
 				}
+				log.warn("Plan(s) of [LSP="+lsp.getId() + "] dumped.");
 			}
 		}
 	}
