@@ -149,7 +149,7 @@ final class ExampleTwoEchelonGrid {
 			CommandLine cmd = ConfigUtils.getCommandLine(args);
 		} else {
 			config.controler().setOutputDirectory("output/2echelon/");
-			config.controler().setLastIteration(10);
+			config.controler().setLastIteration(2);
 		}
 
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
@@ -279,16 +279,16 @@ final class ExampleTwoEchelonGrid {
 		lspPlans.add(lspPlan_direct);
 
 		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(lspPlan_direct)
-//				.setInitialPlan(lspPlan_withHub)
+//				.setInitialPlan(lspPlan_direct)
+				.setInitialPlan(lspPlan_withHub)
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
 				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans))) //Hier müssen irgendwie die Ressourcen beider Pläne rein, oder? - Habe ich jetzt gemacht. kmt ' jul22
 				;
 
 
 		LSP lsp = lspBuilder.build();
-		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
-//		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
+//		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
+		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
 
 		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
 //		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
