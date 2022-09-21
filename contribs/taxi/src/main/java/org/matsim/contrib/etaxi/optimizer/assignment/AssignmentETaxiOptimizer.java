@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -36,9 +37,9 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
-import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
@@ -48,7 +49,6 @@ import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -101,7 +101,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 			throw new IllegalArgumentException("Unsupported");
 		}
 
-		if (params.getSocCheckTimeStep() % params.getReoptimizationTimeStep() != 0) {
+		if (params.socCheckTimeStep % params.getReoptimizationTimeStep() != 0) {
 			throw new RuntimeException("charge-scheduling must be followed up by req-scheduling");
 		}
 
@@ -113,7 +113,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (isNewDecisionEpoch(e, params.getSocCheckTimeStep())) {
+		if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
 			if (chargingTaskRemovalEnabled) {
 				unscheduleAwaitingRequestsAndCharging();
 			} else {
@@ -201,7 +201,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 	private boolean isChargingSchedulable(EvDvrpVehicle eTaxi, TaxiScheduleInquiry scheduleInquiry,
 			double maxDepartureTime) {
 		Battery b = eTaxi.getElectricVehicle().getBattery();
-		boolean undercharged = b.getSoc() < params.getMinRelativeSoc() * b.getCapacity();
+		boolean undercharged = b.getSoc() < params.minRelativeSoc * b.getCapacity();
 		if (!undercharged || !scheduledForCharging.containsKey(eTaxi.getId())) {
 			return false;// not needed or already planned
 		}
