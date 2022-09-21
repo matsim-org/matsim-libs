@@ -78,11 +78,6 @@ public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerPa
 		return ruleBasedTaxiOptimizerParams.getReoptimizationTimeStep();
 	}
 
-	@Override
-	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
-		ruleBasedTaxiOptimizerParams.setReoptimizationTimeStep(reoptimizationTimeStep);
-	}
-
 	/**
 	 * @return {@value #MIN_RELATIVE_SOC_EXP}
 	 */

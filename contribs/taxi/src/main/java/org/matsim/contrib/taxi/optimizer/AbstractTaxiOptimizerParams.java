@@ -59,9 +59,4 @@ public abstract class AbstractTaxiOptimizerParams extends ReflectiveConfigGroup 
 	 */
 	@Positive
 	public abstract int getReoptimizationTimeStep();
-
-	/**
-	 * @param reoptimizationTimeStep {@value #REOPTIMIZATION_TIME_STEP_EXP}
-	 */
-	public abstract void setReoptimizationTimeStep(int reoptimizationTimeStep);
 }

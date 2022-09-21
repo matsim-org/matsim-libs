@@ -78,11 +78,6 @@ public final class AssignmentETaxiOptimizerParams extends AbstractTaxiOptimizerP
 		return assignmentTaxiOptimizerParams.getReoptimizationTimeStep();
 	}
 
-	@Override
-	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
-		assignmentTaxiOptimizerParams.setReoptimizationTimeStep(reoptimizationTimeStep);
-	}
-
 	/**
 	 * @return {@value #MIN_RELATIVE_SOC_EXP}
 	 */
