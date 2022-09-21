@@ -22,6 +22,8 @@ package org.matsim.core.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -86,6 +88,21 @@ public class ReflectiveConfigGroupTest {
 		readConfig.addModule(readModule);
 
 		assertThat(readModule).usingRecursiveComparison().isEqualTo(dumpedModule);
+	}
+
+	@Test
+	public void testComments() {
+		var expectedComments = Map.of("floatField", "float",//
+				"longField", "long",//
+				"intField", "int",//
+				"shortField", "short",//
+				"charField", "char",//
+				"byteField", "byte",//
+				"booleanField", "boolean",//
+				"enumField", "Possible values: VALUE1,VALUE2"//
+		);
+
+		assertThat(new MyModule().getComments()).isEqualTo(expectedComments);
 	}
 
 	@Test
@@ -275,18 +292,31 @@ public class ReflectiveConfigGroupTest {
 
 		private double doubleField;
 
+		@Comment("float")
 		@Parameter
 		private float floatField;
+
+		@Comment("long")
 		@Parameter
 		private long longField;
+
+		@Comment("int")
 		@Parameter
 		private int intField;
+
+		@Comment("short")
 		@Parameter
 		private short shortField;
+
+		@Comment("char")
 		@Parameter
 		private char charField = ' ';
+
+		@Comment("byte")
 		@Parameter
 		private byte byteField;
+
+		@Comment("boolean")
 		@Parameter
 		private boolean booleanField;
 
