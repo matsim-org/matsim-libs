@@ -45,6 +45,13 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.setIdField(Id.create(123, Link.class));
 		dumpedModule.setCoordField(new Coord(265, 463));
 		dumpedModule.setTestEnumField(MyEnum.VALUE2);
+		dumpedModule.floatField = 123;
+		dumpedModule.longField = 234;
+		dumpedModule.intField = 345;
+		dumpedModule.shortField = 456;
+		dumpedModule.charField = 'z';
+		dumpedModule.byteField = 78;
+		dumpedModule.booleanField = true;
 
 		final Config dumpedConfig = new Config();
 		dumpedConfig.addModule(dumpedModule);
@@ -266,8 +273,22 @@ public class ReflectiveConfigGroupTest {
 	private static class MyModule extends ReflectiveConfigGroup {
 		public static final String GROUP_NAME = "testModule";
 
-		// TODO: test for ALL primitive types
 		private double doubleField;
+
+		@Parameter
+		private float floatField;
+		@Parameter
+		private long longField;
+		@Parameter
+		private int intField;
+		@Parameter
+		private short shortField;
+		@Parameter
+		private char charField = ' ';
+		@Parameter
+		private byte byteField;
+		@Parameter
+		private boolean booleanField;
 
 		// Object fields:
 		// Id: string representation is toString
