@@ -76,7 +76,7 @@ public class AuxDischargingHandler
 	@Inject
 	public AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg) {
 		this.vehicleProvider = vehicleProvider;
-		this.auxDischargeTimeStep = evCfg.getAuxDischargeTimeStep();
+		this.auxDischargeTimeStep = evCfg.auxDischargeTimeStep;
 	}
 
 	@Override

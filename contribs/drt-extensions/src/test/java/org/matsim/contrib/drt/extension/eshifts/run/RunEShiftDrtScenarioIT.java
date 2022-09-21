@@ -147,10 +147,10 @@ public class RunEShiftDrtScenarioIT {
 		drtWithShiftsConfigGroup.addParameterSet(drtShiftParams);
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.setChargersFile(chargersFile);
-		evConfigGroup.setMinimumChargeTime(0);
-		evConfigGroup.setVehiclesFile(evsFile);
-		evConfigGroup.setTimeProfiles(true);
+		evConfigGroup.chargersFile = chargersFile;
+		evConfigGroup.minimumChargeTime = 0;
+		evConfigGroup.vehiclesFile = evsFile;
+		evConfigGroup.timeProfiles = true;
 		config.addModule(evConfigGroup);
 
 
