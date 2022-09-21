@@ -341,11 +341,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		} else if (type.equals(Float.class) || type.equals(Float.TYPE)) {
 			return Float.parseFloat(value);
 		} else if (type.equals(Double.class) || type.equals(Double.TYPE)) {
-			try {
-				return Double.parseDouble(value);
-			} catch (NumberFormatException e) {
-				throw e;
-			}
+			return Double.parseDouble(value);
 		} else if (type.equals(Integer.class) || type.equals(Integer.TYPE)) {
 			return Integer.parseInt(value);
 		} else if (type.equals(Long.class) || type.equals(Long.TYPE)) {
@@ -355,8 +351,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 					"Incorrect value of the boolean parameter: %s", value);
 			return Boolean.parseBoolean(value);
 		} else if (type.equals(Character.class) || type.equals(Character.TYPE)) {
-			if (value.length() != 1)
-				throw new IllegalArgumentException(value + " is not a single char!");
+			Preconditions.checkArgument(value.length() == 1, "%s is not a single char!", value);
 			return value.toCharArray()[0];
 		} else if (type.equals(Byte.class) || type.equals(Byte.TYPE)) {
 			return Byte.parseByte(value);
