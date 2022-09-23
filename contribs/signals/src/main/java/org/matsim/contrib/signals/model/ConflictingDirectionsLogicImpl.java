@@ -24,7 +24,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -49,7 +50,7 @@ import org.matsim.lanes.Lanes;
  */
 public final class ConflictingDirectionsLogicImpl implements ConflictingDirectionsLogic {
 
-	private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImpl.class);
+	private static final Logger log = LogManager.getLogger(ConflictingDirectionsLogicImpl.class);
 
 	private ActionOnSignalSpecsViolation actionOnConflictingDirectionsViolation;
 	private Map<Id<Signal>, Set<Tuple<Id<Link>, Id<Link>>>> setOfLinkTuplesPerSignal = new HashMap<>();

@@ -25,7 +25,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
 
@@ -37,7 +38,7 @@ import org.matsim.api.core.v01.Id;
  */
 public class Carriers {
 
-	private static final  Logger log = Logger.getLogger(Carriers.class);
+	private static final  Logger log = LogManager.getLogger(Carriers.class);
 	private final Map<Id<Carrier>, Carrier> carriers = new HashMap<>();
 
 	public Carriers(Collection<Carrier> carriers) {

@@ -1,6 +1,7 @@
 package playground.vsp.analysis.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.List;
  * @author dziemke, tthunig, gthunig
  */
 public class GnuplotUtils {
-	public static final Logger LOG = Logger.getLogger(GnuplotUtils.class);
+	public static final Logger LOG = LogManager.getLogger(GnuplotUtils.class);
 
 	public static void runGnuplotScript(String pathToSpecificAnalysisDir, String relativePathToGnuplotScript) {
 		runGnuplotScript(pathToSpecificAnalysisDir, relativePathToGnuplotScript, "");

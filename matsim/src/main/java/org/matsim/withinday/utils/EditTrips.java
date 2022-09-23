@@ -28,7 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -83,7 +84,7 @@ import org.matsim.withinday.events.ReplanningEvent;
  * @author kainagel
  */
 public final class EditTrips {
-	private static final Logger log = Logger.getLogger(EditTrips.class) ;
+	private static final Logger log = LogManager.getLogger(EditTrips.class) ;
 
 	private final TripRouter tripRouter;
 	private final PopulationFactory pf;

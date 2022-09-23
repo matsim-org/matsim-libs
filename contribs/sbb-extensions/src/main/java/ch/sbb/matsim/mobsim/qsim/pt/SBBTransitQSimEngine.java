@@ -14,7 +14,8 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -64,7 +65,7 @@ import org.matsim.vehicles.Vehicles;
  */
 public class SBBTransitQSimEngine extends TransitQSimEngine /*implements DepartureHandler, MobsimEngine, AgentSource*/ {
 
-    private static final Logger log = Logger.getLogger(SBBTransitQSimEngine.class);
+    private static final Logger log = LogManager.getLogger(SBBTransitQSimEngine.class);
 
     private final SBBTransitConfigGroup config;
     private final TransitConfigGroup ptConfig;

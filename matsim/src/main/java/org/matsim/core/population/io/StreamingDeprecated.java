@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.population.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 
@@ -27,7 +28,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
  *
  */
 public final class StreamingDeprecated {
-	private static final Logger log = Logger.getLogger( StreamingDeprecated.class ) ;
+	private static final Logger log = LogManager.getLogger( StreamingDeprecated.class ) ;
 	
 	@SuppressWarnings("unused")
 	public static void addAlgorithm( Population pop, PersonAlgorithm algo ) {

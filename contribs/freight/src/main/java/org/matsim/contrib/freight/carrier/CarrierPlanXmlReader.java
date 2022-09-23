@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -38,7 +39,7 @@ import java.util.Stack;
  *
  */
 public class CarrierPlanXmlReader implements MatsimReader {
-	private static final Logger log = Logger.getLogger( CarrierPlanXmlReader.class );
+	private static final Logger log = LogManager.getLogger( CarrierPlanXmlReader.class );
 	private static final String MSG="With early carrier plans file formats, there will be an expected exception in the following." ;
 
 	private static final String CARRIERS = "carriers";
@@ -111,15 +112,18 @@ public class CarrierPlanXmlReader implements MatsimReader {
 				String str = attributes.getValue( "xsi:schemaLocation" );
 				log.info("Found following schemeLocation in carriers definition file: " + str);
 				if (str == null){
-					log.warn("No validation information found. Using ReaderV2 instead.");
+					log.warn("Carrier plans file does not contain a valid xsd header. Using CarrierPlanReaderV2.");
 					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes ) ;
 				} else if ( str.contains( "carriersDefinitions_v1.0.xsd" ) ){
 					log.info("Found carriersDefinitions_v1.0.xsd. Using CarrierPlanReaderV1.");
 					delegate = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
-				} else if ( str.contains( "carriersDefinitions_v2.0.xsd" ) ) { //This is the current one - but no validation file existing, kmt aug19
-					log.warn("Found carriersDefinitions_v2.0.xsd. Using CarrierPlanReaderV2.");
+				} else if ( str.contains( "carriersDefinitions_v2.0.xsd" ) ) {
+					log.info("Found carriersDefinitions_v2.0.xsd. Using CarrierPlanReaderV2.");
 					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes );
-				} else {
+				} else if ( str.contains( "carriersDefinitions_v2.1.xsd" ) ) {
+					log.info("Found carriersDefinitions_v2.1.xsd. Using CarrierPlanReaderV2.1");
+					delegate = new CarrierPlanXmlParserV2_1( carriers, carrierVehicleTypes );
+				}else {
 					throw new RuntimeException("no reader found for " + str ) ;
 				}
 			} else{

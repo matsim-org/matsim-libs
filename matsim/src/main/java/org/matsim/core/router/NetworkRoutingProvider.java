@@ -21,7 +21,8 @@
 
  package org.matsim.core.router;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -45,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class NetworkRoutingProvider implements Provider<RoutingModule> {
-	private static final Logger log = Logger.getLogger( NetworkRoutingProvider.class ) ;
+	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
 	
 	private final String routingMode;
 
@@ -59,6 +60,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	@Inject LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	@Inject Scenario scenario ;
 	@Inject TimeInterpretation timeInterpretation;
+	@Inject MultimodalLinkChooser multimodalLinkChooser;
 	@Inject
 	@Named(TransportMode.walk)
 	private RoutingModule walkRouter;
@@ -135,9 +137,9 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 			 */
 			//null only works because walk is hardcoded and treated uniquely in the routing module. tschlenther june '20
 			if (mode.equals(TransportMode.walk)) {
-				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null, timeInterpretation);
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null, timeInterpretation, multimodalLinkChooser);
 			} else {
-				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation) ;
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser) ;
 			}
 			
 		} else {

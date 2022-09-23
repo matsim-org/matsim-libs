@@ -1,8 +1,11 @@
 package org.matsim.application.options;
 
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -60,5 +63,29 @@ public class ShpOptionsTest {
 				.hasSize(578)
 				.hasSize(Set.copyOf(ft).size());
 
+	}
+
+	@Test
+	public void testGetGeometry() {
+
+		Path input = Path.of(utils.getClassInputDirectory()
+						.replace("ShpOptionsTest", "CreateLandUseShpTest")
+						.replace("options", "prepare"))
+				.resolve("andorra-latest-free.shp.zip");
+
+		Assume.assumeTrue(Files.exists(input));
+
+		ShpOptions shp = new ShpOptions(input, null, null);
+		Geometry geometry = shp.getGeometry() ;
+		Geometry expectedGeometry = new GeometryFactory().createEmpty(2);
+
+		List<SimpleFeature> features = shp.readFeatures();
+
+		for(SimpleFeature feature : features) {
+			Geometry geometryToJoin = (Geometry) feature.getDefaultGeometry();
+			expectedGeometry = expectedGeometry.union(geometryToJoin);
+		}
+
+		Assert.assertTrue(geometry.equals(expectedGeometry));
 	}
 }

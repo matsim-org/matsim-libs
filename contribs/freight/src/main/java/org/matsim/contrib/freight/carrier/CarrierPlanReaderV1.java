@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
@@ -48,7 +49,7 @@ import org.xml.sax.Attributes;
  */
 class CarrierPlanReaderV1 extends MatsimXmlParser {
 
-	private static final Logger logger = Logger.getLogger(CarrierPlanReaderV1.class);
+	private static final Logger logger = LogManager.getLogger(CarrierPlanReaderV1.class);
 	private static final String CARRIERS = "carriers";
 	private static final String CARRIER = "carrier";
 	private static final String LINK_ID = "linkId";
@@ -208,8 +209,8 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				switch( attributes.getValue( TYPE ) ){
 					case "start":
 						currentStartTime = getDouble( attributes.getValue( "end_time" ) );
-						previousActLoc = currentVehicle.getLocation();
-						currentTourBuilder.scheduleStart( currentVehicle.getLocation(),
+						previousActLoc = currentVehicle.getLinkId();
+						currentTourBuilder.scheduleStart( currentVehicle.getLinkId(),
 							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 						break;
 					case "pickup":{
@@ -229,8 +230,8 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 						break;
 					}
 					case "end":
-						finishLeg( currentVehicle.getLocation() );
-						currentTourBuilder.scheduleEnd( currentVehicle.getLocation(),
+						finishLeg( currentVehicle.getLinkId() );
+						currentTourBuilder.scheduleEnd( currentVehicle.getLinkId(),
 							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 						break;
 				}

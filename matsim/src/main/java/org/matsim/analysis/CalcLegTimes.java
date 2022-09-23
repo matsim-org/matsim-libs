@@ -20,7 +20,8 @@
 
 package org.matsim.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -53,7 +54,7 @@ import java.util.TreeMap;
 public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
 	ActivityEndEventHandler, ActivityStartEventHandler {
 
-	private final static Logger log = Logger.getLogger(CalcLegTimes.class);
+	private final static Logger log = LogManager.getLogger(CalcLegTimes.class);
 
 	private static final int SLOT_SIZE = 300;    // 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above

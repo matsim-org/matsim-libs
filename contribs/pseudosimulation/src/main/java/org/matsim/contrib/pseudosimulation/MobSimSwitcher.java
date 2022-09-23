@@ -2,7 +2,8 @@ package org.matsim.contrib.pseudosimulation;
 
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -55,10 +56,10 @@ public class MobSimSwitcher implements IterationEndsListener,
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (determineIfQSimIter(event.getIteration())) {
-			Logger.getLogger(this.getClass()).warn("Running full queue simulation");
+			LogManager.getLogger(this.getClass()).warn("Running full queue simulation");
 
 		} else {
-			Logger.getLogger(this.getClass()).info("Running PSim");
+			LogManager.getLogger(this.getClass()).info("Running PSim");
 			plancatcher.init();
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 					plancatcher.addPlansForPsim(person.getSelectedPlan());

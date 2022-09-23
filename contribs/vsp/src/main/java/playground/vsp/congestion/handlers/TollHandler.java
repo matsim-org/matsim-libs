@@ -31,7 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -48,7 +49,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  *
  */
 public class TollHandler implements CongestionEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
-	private static final Logger log = Logger.getLogger(TollHandler.class);
+	private static final Logger log = LogManager.getLogger(TollHandler.class);
 	private double timeBinSize = 900.;
 	
 	private Map<Id<Link>, Map<Double, Double>> linkId2timeBin2tollSum = new HashMap<Id<Link>, Map<Double, Double>>();

@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import cadyts.demand.PlanBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -43,7 +44,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 class ModalCountsPlansTranslatorBasedOnEvents implements PlansTranslator<ModalCountsLinkIdentifier>, LinkLeaveEventHandler,
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
-	private static final Logger log = Logger.getLogger(ModalCountsPlansTranslatorBasedOnEvents.class);
+	private static final Logger log = LogManager.getLogger(ModalCountsPlansTranslatorBasedOnEvents.class);
 
 	private final Scenario scenario;
 

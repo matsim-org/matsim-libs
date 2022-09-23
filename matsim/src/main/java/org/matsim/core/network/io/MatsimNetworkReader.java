@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -42,7 +43,7 @@ import org.xml.sax.SAXException;
  */
 public final class MatsimNetworkReader extends MatsimXmlParser {
 
-	private final static Logger log = Logger.getLogger(MatsimNetworkReader.class);
+	private final static Logger log = LogManager.getLogger(MatsimNetworkReader.class);
 	private final static String NETWORK_V1 = "network_v1.dtd";
 	private final static String NETWORK_V2 = "network_v2.dtd";
 

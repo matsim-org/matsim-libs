@@ -23,16 +23,15 @@
 package org.matsim.core.controler;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.google.inject.spi.LinkedKeyBinding;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -49,11 +48,12 @@ import com.google.inject.spi.DefaultElementVisitor;
 import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
 import com.google.inject.util.Modules;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 public final class Injector {
 	private Injector(){} // namespace only, do not instantiate
 
-	private static final  Logger logger = Logger.getLogger(Injector.class);
+	private static final  Logger logger = LogManager.getLogger(Injector.class);
 
 	public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
 		com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
@@ -131,5 +131,28 @@ public final class Injector {
 			}
 		};
 	}
+
+	/**
+	 * This is (or should be) the minimum bindings that are needed to create a MATSim injector.  It can, for example, be used to construct MATSim
+	 * objects where the standard constructor is deliberately package-private so that the object can only be constructed via injection.  It could also
+	 * be used to create MATSim instances that do not use the "override" syntax.  kai, jun'22
+	 */
+	public static com.google.inject.Injector createMinimalMatsimInjector( Config config, Scenario scenario, Module... modules ){
+
+		final Collection<Module> theModules = new ArrayList<>();
+		theModules.add( new AbstractModule(){
+			@Override
+			public void install(){
+				install( new NewControlerModule() );
+				install( new ControlerDefaultCoreListenersModule() );
+				install( new ControlerDefaultsModule() );
+				install( new ScenarioByInstanceModule( scenario ) );
+			}
+		});
+		theModules.addAll( Arrays.asList( modules ) );
+
+		return Injector.createInjector( config, theModules.toArray(new Module[0]) );
+	}
+
 
 }

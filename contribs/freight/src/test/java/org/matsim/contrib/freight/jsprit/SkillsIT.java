@@ -129,7 +129,6 @@ public class SkillsIT {
 				CarrierVehicle vehicleOne = CarrierVehicle.Builder.newInstance(Id.createVehicleId("1"), carrierLocation, typeOne )
 						.setEarliestStart(0.0)
 						.setLatestEnd(Time.parseTime("24:00:00"))
-						.setType(typeOne)
 						.build();
 				capabilitiesBuilder.addVehicle(vehicleOne);
 
@@ -144,7 +143,6 @@ public class SkillsIT {
 				CarrierVehicle vehicleTwo = CarrierVehicle.Builder.newInstance(Id.createVehicleId("2"), carrierLocation, typeTwo )
 						.setEarliestStart(0.0)
 						.setLatestEnd(Time.parseTime("24:00:00"))
-						.setType(typeTwo)
 						.build();
 				capabilitiesBuilder.addVehicle(vehicleTwo);
 

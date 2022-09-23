@@ -23,7 +23,8 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand.examples;/*
 
 import static org.matsim.core.config.ConfigUtils.loadConfig;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommercialJobOperator;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandConfigGroup;
@@ -54,7 +55,7 @@ import java.net.URL;
 class RunJointDemandDRTExample {
 
     private static final  String EXAMPLE_CONFIG = "scenarios/grid/jointDemand_config.xml";
-    private static final Logger log = Logger.getLogger(RunJointDemandDRTExample.class);
+    private static final Logger log = LogManager.getLogger(RunJointDemandDRTExample.class);
 
     public static void main(String[] args) throws IOException {
         final URL configUrl;

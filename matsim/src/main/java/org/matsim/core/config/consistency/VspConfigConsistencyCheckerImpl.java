@@ -20,8 +20,9 @@
 
 package org.matsim.core.config.consistency;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -48,7 +49,7 @@ import java.util.Set;
  *
  */
 public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
-	private static final  Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class);
+	private static final  Logger log = LogManager.getLogger(VspConfigConsistencyCheckerImpl.class);
 	
 	public VspConfigConsistencyCheckerImpl() {
 		// empty.  only here to find out where it is called.
@@ -329,6 +330,22 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				log.log( lvl, "<module name=\"TimeAllocationMutator\">");
 				log.log( lvl, "	<param name=\"affectingDuration\" value=\"false\" />");
 				log.log( lvl, "</module>");
+			}
+		}
+
+		// added jun'22
+		boolean usingSMC = false ;
+		for ( StrategySettings it : config.strategy().getStrategySettings() ) {
+			if ( DefaultStrategy.SubtourModeChoice.equals( it.getName() ) ) {
+				usingSMC = true ;
+				break ;
+			}
+		}
+		if (usingSMC) {
+			if (config.subtourModeChoice().getProbaForRandomSingleTripMode() < 0.2) {
+				problem = true;
+				System.out.flush();
+				log.log(lvl, "SubTourModeChoice 'probaForRandomSingleTripMode' is very small and below 0.2. Recommendation is, to set this to a value around 0.5.");
 			}
 		}
 

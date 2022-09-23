@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -50,7 +51,7 @@ public class InitialPlanKeeperPlanRemoval implements PlanSelector<Plan, Person> 
     public InitialPlanKeeperPlanRemoval(StrategyConfigGroup strategyConfigGroup, Population population){
         this.delegate = new WorstPlanForRemovalSelector();
         if ( strategyConfigGroup.getMaxAgentPlanMemorySize() < 12) {
-            Logger.getLogger(InitialPlanKeeperPlanRemoval.class).warn("A plans remover is used which keeps the initial plans or at least their copy \n " +
+            LogManager.getLogger(InitialPlanKeeperPlanRemoval.class).warn("A plans remover is used which keeps the initial plans or at least their copy \n " +
                     "and maximum number of plans in the choice set is limited to "+ strategyConfigGroup.getMaxAgentPlanMemorySize()+
             ".\n Lower number of plans in choice set is likely to end up in infinite loop. Setting it to 15.");
             strategyConfigGroup.setMaxAgentPlanMemorySize(15);

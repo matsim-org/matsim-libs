@@ -20,7 +20,8 @@
 
 package org.matsim.core.utils.charts;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A simple demonstration how to use classes in this package to quickly create charts.
@@ -29,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class Demo {
 
-	private static final Logger log = Logger.getLogger(Demo.class);
+	private static final Logger log = LogManager.getLogger(Demo.class);
 
 	private static final String TITLE = "TITLE";
 	private static final String X_AXIS = "x-axis";

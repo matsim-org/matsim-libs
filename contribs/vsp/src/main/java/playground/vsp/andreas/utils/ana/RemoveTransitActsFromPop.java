@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package playground.vsp.andreas.utils.ana;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,7 +33,7 @@ import org.matsim.pt.router.TransitActsRemover;
 
 public class RemoveTransitActsFromPop{
 
-	private final static Logger log = Logger.getLogger(RemoveTransitActsFromPop.class);
+	private final static Logger log = LogManager.getLogger(RemoveTransitActsFromPop.class);
 
 	/**
 	 * @param args

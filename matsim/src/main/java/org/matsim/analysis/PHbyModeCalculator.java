@@ -31,7 +31,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Activity;
@@ -142,7 +143,7 @@ public class PHbyModeCalculator {
 
 
         } catch (IOException e) {
-			Logger.getLogger(getClass()).error("Could not write PH Modestats.");
+			LogManager.getLogger(getClass()).error("Could not write PH Modestats.");
 		}
         if (writePng){
             String[] categories = new String[phtPerIteration.size()];
@@ -157,11 +158,11 @@ public class PHbyModeCalculator {
 
             for (String mode : allModes){
                 double[] valueTravelTime =  phtPerIteration.values().stream()
-                        .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).travelTime/1000.0)
+                        .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).travelTime/3600.0)
                         .toArray();
                 chart.addSeries(mode + TRAVEL_TIME_SUFFIX, valueTravelTime);
                 double[] valueWaitTime =  phtPerIteration.values().stream()
-                        .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).waitTime/1000.0)
+                        .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).waitTime/3600.0)
                         .toArray();
                 chart.addSeries(mode + WAIT_TIME_SUFFIX, valueWaitTime);
             }

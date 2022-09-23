@@ -54,24 +54,20 @@ public class TaxiToRequestAssignmentCostProvider {
 		final Mode currentMode = getCurrentMode(rData, vData);
 		return (departure, reqEntry, pathData) -> {
 			double pickupBeginTime = calcPickupBeginTime(departure, reqEntry, pathData);
-			switch (currentMode) {
-				case PICKUP_TIME:
-					// this will work different than ARRIVAL_TIME at oversupply -> will reduce T_P and fairness
-					return pickupBeginTime - departure.time;
+			return switch (currentMode) {
+				// this will work different than ARRIVAL_TIME at oversupply -> will reduce T_P and fairness
+				case PICKUP_TIME -> pickupBeginTime - departure.time;
 
-				case ARRIVAL_TIME:
-					// less fairness, higher throughput
-					return pickupBeginTime;
+				// less fairness, higher throughput
+				case ARRIVAL_TIME -> pickupBeginTime;
 
-				case TOTAL_WAIT_TIME:
-					// more fairness, lower throughput
-					// this will work different than ARRIVAL_TIME at undersupply -> will reduce unfairness and
-					// throughput
-					return pickupBeginTime - reqEntry.destination.getEarliestStartTime();
+				// more fairness, lower throughput
+				// this will work different than ARRIVAL_TIME at undersupply -> will reduce unfairness and
+				// throughput
+				case TOTAL_WAIT_TIME -> pickupBeginTime - reqEntry.destination.getEarliestStartTime();
 
-				default:
-					throw new IllegalStateException();
-			}
+				default -> throw new IllegalStateException();
+			};
 		};
 	}
 
@@ -84,8 +80,7 @@ public class TaxiToRequestAssignmentCostProvider {
 		}
 	}
 
-	private double calcPickupBeginTime(VehicleData.Entry departure, DestEntry<DrtRequest> reqEntry,
-			PathData pathData) {
+	private double calcPickupBeginTime(VehicleData.Entry departure, DestEntry<DrtRequest> reqEntry, PathData pathData) {
 		double travelTime = pathData == null ? params.getNullPathCost() : pathData.getTravelTime();
 		return Math.max(reqEntry.destination.getEarliestStartTime(), departure.time + travelTime);
 	}

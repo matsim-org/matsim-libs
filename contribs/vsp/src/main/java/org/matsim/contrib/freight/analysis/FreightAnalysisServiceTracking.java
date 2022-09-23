@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightServiceStartEvent;
 
 import java.util.LinkedHashMap;
 
@@ -87,19 +87,19 @@ class FreightAnalysisServiceTracking {
 	}
 
 	// UNTESTED handling of LSP Service events that provided reliable info about driver and timestamps.
-	public void handleStartEvent(LSPServiceStartEvent event) {
+	public void handleStartEvent(FreightServiceStartEvent event) {
 		if (carrierServiceTrackers.containsKey(event.getCarrierId())){
-			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getService().getId())){
-				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getService().getId());
-				service.driverId = event.getDriverId();
+			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getServiceId())){
+				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getServiceId());
+//				service.driverId = event.getDriverId();
 				service.startTime = event.getTime();
 			}
 		}
 	}
-	public void handleEndEvent(LSPServiceEndEvent event) {
+	public void handleEndEvent(FreightServiceEndEvent event) {
 		if (carrierServiceTrackers.containsKey(event.getCarrierId())){
-			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getService().getId())){
-				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getService().getId());
+			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getServiceId())){
+				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getServiceId());
 				service.endTime = event.getTime();
 			}
 		}
@@ -114,8 +114,7 @@ class FreightAnalysisServiceTracking {
 					if (tourElement instanceof Tour.Leg) {
 						calculatedArrivalTime = ((Tour.Leg) tourElement).getExpectedDepartureTime() + ((Tour.Leg) tourElement).getExpectedTransportTime();
 					}
-					if (tourElement instanceof Tour.ServiceActivity) {
-						Tour.ServiceActivity serviceAct = (Tour.ServiceActivity) tourElement;
+					if (tourElement instanceof Tour.ServiceActivity serviceAct) {
 						Id<CarrierService> serviceId = serviceAct.getService().getId();
 						setExpectedArrival(carrier.getId(),serviceId, serviceAct.getExpectedArrival());
 						if (calculatedArrivalTime > 0.0) {

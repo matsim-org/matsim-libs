@@ -20,7 +20,8 @@
 
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -31,10 +32,12 @@ import java.util.*;
 
 
 public final class ControlerConfigGroup extends ReflectiveConfigGroup {
-	private static final Logger log = Logger.getLogger( ControlerConfigGroup.class );
+	private static final Logger log = LogManager.getLogger( ControlerConfigGroup.class );
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks, SpeedyALT}
-
+	
+	public enum EventTypeToCreateScoringFunctions {IterationStarts, BeforeMobsim}
+	
 	public enum EventsFileFormat {xml, pb, json}
 
 	public enum CompressionType {
@@ -67,7 +70,8 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String CREATE_GRAPHS = "createGraphs";
 	private static final String DUMP_DATA_AT_END = "dumpDataAtEnd";
 	private static final String COMPRESSION_TYPE = "compressionType";
-
+	private static final String EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS = "createScoringFunctionType";
+	
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim, hermes}
 
@@ -78,7 +82,8 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
 	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.AStarLandmarks;
-
+	private EventTypeToCreateScoringFunctions eventTypeToCreateScoringFunctions = EventTypeToCreateScoringFunctions.IterationStarts;
+	
 	private boolean linkToLinkRoutingEnabled = false;
 
 	private String runId = null;
@@ -121,7 +126,8 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 				" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +
 				" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );
 		map.put(COMPRESSION_TYPE, "Compression algorithm to use when writing out data to files. Possible values: " + Arrays.toString(CompressionType.values()));
-
+		map.put(EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS, "Defines when the scoring functions for the population are created. Default=IterationStarts. Possible values: " + Arrays.toString(EventTypeToCreateScoringFunctions.values()));
+		
 		StringBuilder mobsimTypes = new StringBuilder();
 		for ( MobsimType mtype : MobsimType.values() ) {
 			mobsimTypes.append(mtype.toString());
@@ -380,6 +386,15 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(DUMP_DATA_AT_END)
 	public void setDumpDataAtEnd(boolean dumpDataAtEnd) {
 		this.dumpDataAtEnd = dumpDataAtEnd;
+	}
+	@StringGetter(EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS)
+	public EventTypeToCreateScoringFunctions getEventTypeToCreateScoringFunctions() {
+		return eventTypeToCreateScoringFunctions;
+	}
+
+	@StringSetter(EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS)
+	public void setEventTypeToCreateScoringFunctions(EventTypeToCreateScoringFunctions eventTypeToCreateScoringFunctions) {
+		this.eventTypeToCreateScoringFunctions = eventTypeToCreateScoringFunctions;
 	}
 	// ---
 	int writePlansUntilIteration = 1 ;

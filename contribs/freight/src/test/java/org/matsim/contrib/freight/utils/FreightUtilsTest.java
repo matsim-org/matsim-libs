@@ -22,7 +22,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,7 +62,7 @@ public class FreightUtilsTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private static final Logger log = Logger.getLogger(FreightUtilsTest.class);
+	private static final Logger log = LogManager.getLogger(FreightUtilsTest.class);
 
 	private final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
@@ -110,7 +111,7 @@ public class FreightUtilsTest {
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 
 		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
-				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).setTypeId(carrierVehType.getId() ).build();
+				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance()
 				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)

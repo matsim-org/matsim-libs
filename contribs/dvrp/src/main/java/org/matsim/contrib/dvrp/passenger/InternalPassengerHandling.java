@@ -25,7 +25,8 @@ import static java.lang.String.format;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -41,7 +42,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
  * @author Michal Maciejewski (michalm)
  */
 class InternalPassengerHandling {
-	private static final Logger LOGGER = Logger.getLogger(InternalPassengerHandling.class);
+	private static final Logger LOGGER = LogManager.getLogger(InternalPassengerHandling.class);
 
 	private final String mode;
 	private final EventsManager eventsManager;

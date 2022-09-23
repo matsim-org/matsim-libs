@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -51,7 +52,7 @@ import java.util.Set;
  *
  */
 class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
-	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
+	private static final Logger logger = LogManager.getLogger(WarmEmissionHandler.class);
 
 	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
 	private final Scenario scenario;

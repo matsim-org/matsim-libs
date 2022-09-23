@@ -1,7 +1,8 @@
 package org.matsim.contrib.drt.extension.shifts.analysis;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
@@ -9,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.analysis.DensityScatterPlots;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -26,7 +28,9 @@ import java.util.stream.Collectors;
  */
 public class ShiftAnalysisControlerListener implements IterationEndsListener {
 
-    private final static Logger logger = Logger.getLogger(ShiftAnalysisControlerListener.class);
+    private final static Logger logger = LogManager.getLogger(ShiftAnalysisControlerListener.class);
+
+	private final String delimiter;
 
 	private DrtConfigGroup drtConfigGroup;
 	private final ShiftDurationXY shiftDurationXY;
@@ -34,13 +38,15 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
     private final MatsimServices matsimServices;
 
     @Inject
-    public ShiftAnalysisControlerListener(DrtConfigGroup drtConfigGroup, ShiftDurationXY shiftDurationXY,
+    public ShiftAnalysisControlerListener(Config config, DrtConfigGroup drtConfigGroup,
+										  ShiftDurationXY shiftDurationXY,
 										  BreakCorridorXY breakCorridorXY,
 										  MatsimServices matsimServices) {
 		this.drtConfigGroup = drtConfigGroup;
 		this.shiftDurationXY = shiftDurationXY;
         this.breakCorridorXY = breakCorridorXY;
         this.matsimServices = matsimServices;
+		this.delimiter = config.global().getDefaultDelimiter();
     }
 
 
@@ -148,7 +154,7 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
                 .getIterationFilename(event.getIteration(), prefix + "_" + drtConfigGroup.getMode() + extension);
     }
 
-	private static String line(Object... cells) {
-        return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(";", "", "\n"));
+	private String line(Object... cells) {
+        return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(delimiter, "", "\n"));
     }
 }

@@ -31,7 +31,8 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -102,7 +103,7 @@ import com.google.inject.Inject;
 public class EditTripsTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils(); 
-	private static final Logger log = Logger.getLogger(EditTripsTest.class);
+	private static final Logger log = LogManager.getLogger(EditTripsTest.class);
 	// this is messy, but DisturbanceAndReplanningEngine needs to be static and there is no 
 	// constructor or similar to pass the replanning time
 	private static double testReplanTime = 0;

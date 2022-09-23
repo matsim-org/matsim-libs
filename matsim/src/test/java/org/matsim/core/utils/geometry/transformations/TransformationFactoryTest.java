@@ -22,12 +22,13 @@ package org.matsim.core.utils.geometry.transformations;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 public class TransformationFactoryTest extends TestCase {
 
-	private final static Logger log = Logger.getLogger(TransformationFactoryTest.class);
+	private final static Logger log = LogManager.getLogger(TransformationFactoryTest.class);
 
 	/**
 	 * Test if a custom implemented, non-GeoTools coordinate transformation can

@@ -22,7 +22,8 @@
  package org.matsim.utils.objectattributes;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.utils.objectattributes.attributeconverters.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.vehicles.PersonVehicles;
@@ -35,7 +36,7 @@ import java.util.*;
  * @author thibautd
  */
 public class ObjectAttributesConverter {
-	private static final Logger log = Logger.getLogger(ObjectAttributesConverter.class);
+	private static final Logger log = LogManager.getLogger(ObjectAttributesConverter.class);
 	private final Map<String, AttributeConverter<?>> converters = new HashMap<>();
 
 	private final Set<String> missingConverters = new HashSet<>();

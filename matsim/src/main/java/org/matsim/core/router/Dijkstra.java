@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -84,7 +85,7 @@ import org.matsim.vehicles.Vehicle;
  	// yyyyyy I don't think that we should make this class publicly inheritable; as we know, will eventually lead
 	// to problems.  kai, feb'18
 
-	private final static Logger log = Logger.getLogger(Dijkstra.class);
+	private final static Logger log = LogManager.getLogger(Dijkstra.class);
 
 	/**
 	 * The network on which we find routes.

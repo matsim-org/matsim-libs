@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -55,7 +56,7 @@ import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.CreateRscript;
 public class PtLines2PaxAnalysis extends AbstractAnalysisModule {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(PtLines2PaxAnalysis.class);
+	private static final Logger log = LogManager.getLogger(PtLines2PaxAnalysis.class);
 	private final String SEP = "--";
 	private PtLines2PaxAnalysisHandler handler;
 	private double interval;

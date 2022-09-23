@@ -25,7 +25,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -49,7 +50,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	private final Network network;
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 
-	private final static Logger log = Logger.getLogger(PopulationWriter.class);
+	private final static Logger log = LogManager.getLogger(PopulationWriter.class);
 	private Map<Class<?>,AttributeConverter<?>> converters = new HashMap<>();
 
 

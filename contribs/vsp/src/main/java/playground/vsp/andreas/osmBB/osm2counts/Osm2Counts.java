@@ -3,14 +3,15 @@ package playground.vsp.andreas.osmBB.osm2counts;
 import java.io.File;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 
 import playground.vsp.andreas.mzilske.osm.JOSMTolerantFastXMLReader;
 
 public class Osm2Counts {
 	
-	private final static Logger log = Logger.getLogger(Osm2Counts.class);
+	private final static Logger log = LogManager.getLogger(Osm2Counts.class);
 	
 	private final String infFile;
 	private HashMap<String, String> shortNameMap;

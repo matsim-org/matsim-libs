@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,7 +38,7 @@ import java.util.Set;
 final class PersonReRouteStuck extends AbstractPersonReRouteStuck {
 
 
-	private static final Logger log = Logger.getLogger(PersonReRouteStuck.class);
+	private static final Logger log = LogManager.getLogger(PersonReRouteStuck.class);
 	
 	private final TransitActsRemover transitActsRemover;
 

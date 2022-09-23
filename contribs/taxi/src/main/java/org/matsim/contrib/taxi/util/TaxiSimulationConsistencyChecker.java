@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.util;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -46,7 +46,7 @@ public class TaxiSimulationConsistencyChecker implements MobsimBeforeCleanupList
 					throw new IllegalStateException(
 							"Not all taxi requests served at simulation end time. This exception can be disabled in the taxi config group.");
 				} else {
-					Logger.getLogger(getClass())
+					LogManager.getLogger(getClass())
 							.warn("Taxi request not performed. Request time:\t" + Time.writeTime(
 									seq.getSubmitted().getTime()) + "\tPassenger:\t" + seq.getSubmitted()
 									.getPersonId());

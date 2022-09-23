@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
@@ -15,7 +16,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 public class ReadNce implements TabularFileHandler {
 	
-	private static final Logger log = Logger.getLogger(ReadNce.class);
+	private static final Logger log = LogManager.getLogger(ReadNce.class);
 
 	private TabularFileParserConfig tabFileParserConfig;
 	private LinkedList<NceContainer> nceContainterList = new LinkedList<NceContainer>();

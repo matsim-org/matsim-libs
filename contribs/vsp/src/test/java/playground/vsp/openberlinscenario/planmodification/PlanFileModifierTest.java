@@ -1,6 +1,7 @@
 package playground.vsp.openberlinscenario.planmodification;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -16,7 +17,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author gthunig on 08.05.2018
  */
 public class PlanFileModifierTest {
-    private final static Logger LOG = Logger.getLogger(PlanFileModifierTest.class);
+    private final static Logger LOG = LogManager.getLogger(PlanFileModifierTest.class);
 
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();

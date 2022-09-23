@@ -18,7 +18,8 @@
 
 package org.matsim.contrib.parking.parkingproxy.run;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +33,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result;
 
 public class RunWithParkingProxyIT {
-        private static final Logger log = Logger.getLogger(RunWithParkingProxyIT.class);
+        private static final Logger log = LogManager.getLogger(RunWithParkingProxyIT.class);
         @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
         @Test

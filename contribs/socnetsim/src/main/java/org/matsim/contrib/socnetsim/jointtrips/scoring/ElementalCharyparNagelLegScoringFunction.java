@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.scoring;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -35,7 +36,7 @@ import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
  */
 public class ElementalCharyparNagelLegScoringFunction implements LegScoring, ScoringFunctionAccumulator.LegScoring {
 	private static final Logger log =
-		Logger.getLogger(ElementalCharyparNagelLegScoringFunction.class);
+		LogManager.getLogger(ElementalCharyparNagelLegScoringFunction.class);
 
 	private double score = 0;
 

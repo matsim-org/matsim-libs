@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -69,7 +69,7 @@ import javax.annotation.Nullable;
  */
 public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
 
-	private static final Logger log = Logger.getLogger(NetworkRoutingInclAccessEgressModule.class);
+	private static final Logger log = LogManager.getLogger(NetworkRoutingInclAccessEgressModule.class);
 
 	private final String mode;
 	private final PopulationFactory populationFactory;
@@ -86,6 +86,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private PlansCalcRouteConfigGroup.AccessEgressType accessEgressType;
 	private final TimeInterpretation timeInterpretation;
 
+	private final MultimodalLinkChooser multimodalLinkChooser;
+
 	/**
 	 * If not null given, the main routing will be performed on an inverted network.
 	 */
@@ -97,7 +99,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork, @Nullable Network invertedNetwork,
 			final RoutingModule accessToNetworkRouter,
 			final RoutingModule egressFromNetworkRouter,
-			final TimeInterpretation timeInterpretation) {
+			final TimeInterpretation timeInterpretation,
+			final MultimodalLinkChooser multimodalLinkChooser) {
+		this.multimodalLinkChooser = multimodalLinkChooser;
 		Gbl.assertNotNull(scenario.getNetwork());
 		Gbl.assertIf(scenario.getNetwork().getLinks().size() > 0); // otherwise network for mode probably not defined
 		this.filteredNetwork = filteredNetwork;
@@ -137,9 +141,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
 
-		Link accessActLink = FacilitiesUtils.decideOnLink(fromFacility, filteredNetwork);
+		Link accessActLink = multimodalLinkChooser.decideOnLink(fromFacility, filteredNetwork);
 
-		Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, filteredNetwork);
+		Link egressActLink = multimodalLinkChooser.decideOnLink(toFacility, filteredNetwork);
 
 		double now = departureTime;
 

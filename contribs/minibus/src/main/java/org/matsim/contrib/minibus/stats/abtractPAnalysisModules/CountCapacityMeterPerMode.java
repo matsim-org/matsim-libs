@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats.abtractPAnalysisModules;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -45,7 +46,7 @@ import java.util.HashMap;
  */
 final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler{
 	
-	private final static Logger log = Logger.getLogger(CountCapacityMeterPerMode.class);
+	private final static Logger log = LogManager.getLogger(CountCapacityMeterPerMode.class);
 	
 	private final Network network;
 	private HashMap<Id<Vehicle>, Double> vehId2VehicleCapacity = new HashMap<>();

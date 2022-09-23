@@ -24,7 +24,8 @@
 
 package playground.vsp.congestion.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -42,7 +43,7 @@ import playground.vsp.congestion.handlers.TollHandler;
  */
 
 public class MarginalCongestionPricingContolerListener implements StartupListener, IterationEndsListener {
-	private final Logger log = Logger.getLogger(MarginalCongestionPricingContolerListener.class);
+	private final Logger log = LogManager.getLogger(MarginalCongestionPricingContolerListener.class);
 
 	private final Scenario scenario;
 	private final TollHandler tollHandler;

@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.multimodal.tools;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
@@ -28,7 +29,7 @@ import org.matsim.core.config.ConfigUtils;
 
 public class PrepareMultiModalScenario {
 
-	private static final Logger log = Logger.getLogger(PrepareMultiModalScenario.class);
+	private static final Logger log = LogManager.getLogger(PrepareMultiModalScenario.class);
 	
 	public static void run(Scenario scenario) {
 		Config config = scenario.getConfig();

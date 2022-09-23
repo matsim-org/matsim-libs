@@ -79,23 +79,18 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 	}
 
 	private boolean isReduceTP(Collection<DrtRequest> unplannedRequests) {
-		switch (params.getGoal()) {
-			case MIN_PICKUP_TIME:
-				return true;
+		return switch (params.getGoal()) {
+			case MIN_PICKUP_TIME -> true;
 
-			case MIN_WAIT_TIME:
-				return false;
+			case MIN_WAIT_TIME -> false;
 
-			case DEMAND_SUPPLY_EQUIL:
+			case DEMAND_SUPPLY_EQUIL -> {
 				double now = timer.getTimeOfDay();
 				long awaitingReqCount = unplannedRequests.stream()
 						.filter(r -> ((PassengerRequest)r).getEarliestStartTime() <= now)//urgent requests
 						.count();
-				return awaitingReqCount > idleTaxiRegistry.getVehicleCount();
-
-			default:
-				throw new IllegalStateException();
-		}
+				yield awaitingReqCount > idleTaxiRegistry.getVehicleCount();}
+		};
 	}
 
 	// request-initiated scheduling

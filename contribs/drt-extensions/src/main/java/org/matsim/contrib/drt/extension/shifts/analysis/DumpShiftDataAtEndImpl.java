@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.drt.extension.shifts.io.DrtShiftsWriter;
 import org.matsim.contrib.drt.extension.shifts.io.OperationFacilitiesWriter;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecification;
@@ -15,7 +16,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
  * @author nkuehnel / MOIA
  */
 final public class DumpShiftDataAtEndImpl implements ShutdownListener {
-	private static final Logger log = Logger.getLogger( DumpShiftDataAtEndImpl.class );
+	private static final Logger log = LogManager.getLogger( DumpShiftDataAtEndImpl.class );
 
 	private final DrtShiftsSpecification shifts;
 

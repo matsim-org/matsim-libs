@@ -19,7 +19,8 @@
 package org.matsim.contrib.common.diversitygeneration.planselectors;
 
 import com.google.inject.Provider;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -127,7 +128,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		this.sameModePenalty = sameModePenalty;
 	}
 
-	static private final Logger log = Logger.getLogger(DiversityGeneratingPlansRemover.class);
+	static private final Logger log = LogManager.getLogger(DiversityGeneratingPlansRemover.class);
 
 	private final Network network;
 

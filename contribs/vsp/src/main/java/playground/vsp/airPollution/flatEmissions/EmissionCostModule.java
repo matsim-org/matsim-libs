@@ -21,7 +21,8 @@ package playground.vsp.airPollution.flatEmissions;
 
 import java.util.Map;
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 
@@ -31,7 +32,7 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
  *
  */
 public class EmissionCostModule {
-	private static final Logger logger = Logger.getLogger(EmissionCostModule.class);
+	private static final Logger logger = LogManager.getLogger(EmissionCostModule.class);
 	
 	private final double emissionCostFactor = 1.;
 	private boolean considerCO2Costs = false;

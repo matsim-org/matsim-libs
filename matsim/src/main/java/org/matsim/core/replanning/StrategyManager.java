@@ -20,14 +20,15 @@
 
 package org.matsim.core.replanning;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -44,24 +45,37 @@ import java.util.Map;
  */
 @Singleton
 public class StrategyManager implements MatsimManager {
+	// I understand the way in which this is integrated into the framwork as follows:
+	// * The PlansReplanning interface is the one that is bound as ReplanningListener, and it calls StrategyManager.
+	// * On the other hand, StrategyManager is also independently bound.
+	// * This has the consequence that users (possibly via the config) may configure StrategyManager, but it is effectively ignored if the bound
+	// implementation of ReplanningListener does not use it.
+	// * This is the design that I found.  Not sure if I should change it, but I need something for Carrier and later for LSP.
+	// * A possible way out would be to unbind StrategyManager (for someone who implements a ReplanningListener that does not use
+	// StrategyManager).  This is not immediately possible, but the internet gives possibilities.  Could be added as a utility method, which would
+	// (I think) make sense together with the MATSim overall design which overrides defaults instead of asking the user to plug everything together.
 
-	private static final Logger log = Logger.getLogger(StrategyManager.class);
+	// Not sure if that would work: There is other code that tries to obtain StrategyManager via injection, and all of this would then fail.
+	// Not sure if one could unbind all of these.
 
-	private final GenericStrategyManager<Plan, Person> delegate;
+	// kai, jun'22
+
+	private static final Logger log = LogManager.getLogger(StrategyManager.class);
+
+	private final GenericStrategyManagerImpl<Plan, Person> delegate;
 
 	@Inject
-	StrategyManager(StrategyConfigGroup strategyConfigGroup, PlansConfigGroup plansConfigGroup,
-					ControlerConfigGroup controlerConfigGroup,
-					Map<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategies) {
+	StrategyManager( StrategyConfigGroup strategyConfigGroup,
+			 ControlerConfigGroup controlerConfigGroup, StrategyChooser<Plan, Person> strategyChooser,
+			 Map<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategies ) {
 
-		this();
+		this(strategyChooser);
 		setMaxPlansPerAgent(strategyConfigGroup.getMaxAgentPlanMemorySize());
 
 		int globalInnovationDisableAfter = (int) ((controlerConfigGroup.getLastIteration() - controlerConfigGroup.getFirstIteration())
 				* strategyConfigGroup.getFractionOfIterationsToDisableInnovation() + controlerConfigGroup.getFirstIteration());
 		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
 
-//		setSubpopulationAttributeName(plansConfigGroup.getSubpopulationAttributeName());
 		for (Map.Entry<StrategyConfigGroup.StrategySettings, PlanStrategy> entry : planStrategies.entrySet()) {
 			PlanStrategy strategy = entry.getValue();
 			StrategyConfigGroup.StrategySettings settings = entry.getKey();
@@ -88,7 +102,11 @@ public class StrategyManager implements MatsimManager {
 	}
 
 	public StrategyManager() {
-		this.delegate = new GenericStrategyManager<>();
+		this.delegate = new GenericStrategyManagerImpl<>();
+	}
+
+	StrategyManager(StrategyChooser<Plan, Person> strategyChooser) {
+		this.delegate = new GenericStrategyManagerImpl<>(strategyChooser);
 	}
 
 //	/**
@@ -99,12 +117,12 @@ public class StrategyManager implements MatsimManager {
 //		delegate.setSubpopulationAttributeName(name);
 //	}
 
-	@Deprecated
-	public final void addStrategyForDefaultSubpopulation(
-			final PlanStrategy strategy,
-			final double weight) {
-		addStrategy(strategy, null, weight);
-	}
+//	@Deprecated
+//	public final void addStrategyForDefaultSubpopulation(
+//			final PlanStrategy strategy,
+//			final double weight) {
+//		addStrategy(strategy, null, weight);
+//	}
 
 	/**
 	 * Adds a strategy to this manager with the specified weight. This weight
@@ -120,11 +138,11 @@ public class StrategyManager implements MatsimManager {
 	}
 
 
-	@Deprecated
-	public final boolean removeStrategyForDefaultSubpopulation(
-			final PlanStrategy strategy) {
-		return removeStrategy(strategy, null);
-	}
+//	@Deprecated
+//	public final boolean removeStrategyForDefaultSubpopulation(
+//			final PlanStrategy strategy) {
+//		return removeStrategy(strategy, null);
+//	}
 
 	/**
 	 * removes the specified strategy from this manager for the specified subpopulation
@@ -140,12 +158,12 @@ public class StrategyManager implements MatsimManager {
 		return delegate.removeStrategy(strategy, subpopulation) ;
 	}
 
-	@Deprecated
-	public final boolean changeWeightOfStrategyForDefaultSubpopulation(
-			final GenericPlanStrategy<Plan, Person> strategy,
-			final double newWeight) {
-		return changeWeightOfStrategy(strategy, null, newWeight);
-	}
+//	@Deprecated
+//	public final boolean changeWeightOfStrategyForDefaultSubpopulation(
+//			final GenericPlanStrategy<Plan, Person> strategy,
+//			final double newWeight) {
+//		return changeWeightOfStrategy(strategy, null, newWeight);
+//	}
 
 	/**
 	 * changes the weight of the specified strategy
@@ -173,31 +191,33 @@ public class StrategyManager implements MatsimManager {
 		run(population, replanningContext);
 	}
 
-	/**
-	 * @param population  
-	 * @param replanningContext 
-	 */
-	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
-		// left empty for inheritance
-	}
+//	/**
+//	 * @param population
+//	 * @param replanningContext
+//	 */
+//	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
+//		// left empty for inheritance
+//	}
 
 	/**
 	 * Randomly chooses for each person of the population a strategy and uses that
 	 * strategy on the person.
 	 *
 	 */
-	public final void run(final Population population, final ReplanningContext replanningContext) {
-		beforePopulationRunHook(population, replanningContext);
-		delegate.run(population.getPersons().values(), population, replanningContext);
-		afterRunHook(population);
+	final void run(final Population population, final ReplanningContext replanningContext) {
+		// (this is not public in the delegate; making it also non-public here.  kai, jun'22)
+
+//		beforePopulationRunHook(population, replanningContext);
+		delegate.run(population.getPersons().values(), replanningContext );
+//		afterRunHook(population);
 	}
 
-	/**
-	 * @param population  
-	 */
-	protected void afterRunHook(Population population) {
-		// left empty for inheritance
-	}
+//	/**
+//	 * @param population
+//	 */
+//	protected void afterRunHook(Population population) {
+//		// left empty for inheritance
+//	}
 
 
 	/**
@@ -206,9 +226,8 @@ public class StrategyManager implements MatsimManager {
 	 * @param person The person for which the strategy should be chosen
 	 * @return the chosen strategy
 	 */
-	public GenericPlanStrategy<Plan, Person> chooseStrategy(final Person person, final String subpopulation) {
-		final GenericPlanStrategy<Plan, Person> strategy = delegate.chooseStrategy(person, subpopulation);
-		return strategy;
+	public GenericPlanStrategy<Plan, Person> chooseStrategy(final Person person, final String subpopulation, ReplanningContext replanningContext) {
+		return delegate.chooseStrategy(person, subpopulation, replanningContext );
 	}
 
 	/**
@@ -226,13 +245,13 @@ public class StrategyManager implements MatsimManager {
 		return delegate.getMaxPlansPerAgent();
 	}
 
-	@Deprecated
-	public final void addChangeRequestForDefaultSubpopulation(
-			final int iteration,
-			final PlanStrategy strategy,
-			final double newWeight) {
-		addChangeRequest(iteration, strategy, null, newWeight);
-	}
+//	@Deprecated
+//	public final void addChangeRequestForDefaultSubpopulation(
+//			final int iteration,
+//			final PlanStrategy strategy,
+//			final double newWeight) {
+//		addChangeRequest(iteration, strategy, null, newWeight);
+//	}
 
 	/**
 	 * Schedules a command for a later iteration. The
@@ -278,22 +297,22 @@ public class StrategyManager implements MatsimManager {
 		delegate.setPlanSelectorForRemoval(planSelector);
 	}
 
-	@Deprecated
-	public final List<GenericPlanStrategy<Plan, Person>> getStrategiesOfDefaultSubpopulation() {
-		return getStrategies(null);
-	}
+//	@Deprecated
+//	public final List<GenericPlanStrategy<Plan, Person>> getStrategiesOfDefaultSubpopulation() {
+//		return getStrategies(null);
+//	}
 
 	public final List<GenericPlanStrategy<Plan, Person>> getStrategies(final String subpopulation) {
 		return delegate.getStrategies(subpopulation) ;
 	}
 
-	/**
-	 * @return the weights of the strategies for the default subpopulation, in the same order as the strategies returned by {@link #getStrategiesOfDefaultSubpopulation()}
-	 */
-	@Deprecated
-	public final List<Double> getWeightsOfDefaultSubpopulation() {
-		return getWeights(null);
-	}
+//	/**
+//	 * @return the weights of the strategies for the default subpopulation, in the same order as the strategies returned by {@link #getStrategiesOfDefaultSubpopulation()}
+//	 */
+//	@Deprecated
+//	public final List<Double> getWeightsOfDefaultSubpopulation() {
+//		return getWeights(null);
+//	}
 
 	/**
 	 * @return the weights of the strategies for the given subpopulation, in the same order as the strategies returned by {@link #getStrategies(java.lang.String)}

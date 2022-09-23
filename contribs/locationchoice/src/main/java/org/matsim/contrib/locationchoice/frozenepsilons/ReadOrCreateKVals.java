@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -30,7 +31,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
  class ReadOrCreateKVals {
 	
-	private static final Logger log = Logger.getLogger(ReadOrCreateKVals.class);
+	private static final Logger log = LogManager.getLogger(ReadOrCreateKVals.class);
 	
 	private Scenario scenario;
 	private ObjectAttributes facilitiesKValues = new ObjectAttributes();

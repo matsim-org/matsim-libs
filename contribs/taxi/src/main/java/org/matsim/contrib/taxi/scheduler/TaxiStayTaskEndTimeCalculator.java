@@ -39,7 +39,7 @@ public class TaxiStayTaskEndTimeCalculator implements ScheduleTimingUpdater.Stay
 	@Override
 	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
 		switch (getBaseTypeOrElseThrow(task)) {
-			case STAY: {
+			case STAY -> {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
 					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT
 					return Math.max(newBeginTime, vehicle.getServiceEndTime());
@@ -54,18 +54,16 @@ public class TaxiStayTaskEndTimeCalculator implements ScheduleTimingUpdater.Stay
 					}
 				}
 			}
-			case PICKUP: {
+			case PICKUP -> {
 				double t0 = ((TaxiPickupTask)task).getRequest().getEarliestStartTime();
 				// the actual pickup starts at max(t, t0)
 				return Math.max(newBeginTime, t0) + taxiConfigGroup.getPickupDuration();
 			}
-			case DROPOFF: {
+			case DROPOFF -> {
 				// cannot be shortened/lengthen, therefore must be moved forward/backward
 				return newBeginTime + taxiConfigGroup.getDropoffDuration();
 			}
-
-			default:
-				throw new IllegalStateException();
+			default -> throw new IllegalStateException();
 		}
 	}
 }
