@@ -21,7 +21,7 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.ReplanningEvent;
 
 
 /**
@@ -49,13 +49,18 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
  * This is reasonable for example in cases where also other traffic takes place on the
  * network, for example passenger traffic, and the network conditions change between
  * subsequent iterations of the simulation due to congestion.
+ * <p>
+ * ---
+ * Let's do it in replanning.
+ * If doing so, we have the time to handle the result (on Carrier level) in the beforeMobsim step of the CarrierControlerListern
+ * kmt sep'22
  */
 final class LSPRescheduler {
 	private LSPRescheduler() {
 	}
 
-	static void notifyBeforeMobsim(LSPs lsps, BeforeMobsimEvent arg0) {
-		if (arg0.getIteration() != 0) {
+	static void notifyReplanning(LSPs lsps, ReplanningEvent event) {
+		if (event.getIteration() != 0) {
 			for (LSP lsp : lsps.getLSPs().values()) {
 				for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 					solution.getShipments().clear();

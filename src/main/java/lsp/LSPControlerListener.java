@@ -38,7 +38,6 @@ import org.matsim.core.events.handler.EventHandler;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -65,16 +64,9 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 
-		LSPRescheduler.notifyBeforeMobsim(lsps, event);
-
-		//Update carriers in scenario and CarrierAgentTracker
-		carrierAgentTracker.getCarriers().getCarriers().clear();
-		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
-			FreightUtils.getCarriers(scenario).addCarrier(carrier);
-			carrierAgentTracker.getCarriers().addCarrier(carrier);
-		}
-
-
+		//TODO: Why do we add all simTrackers in every iteration beforeMobsim starts?
+		// Doing so results in a lot of "not adding eventsHandler since already added" warnings.
+		// @KN: Would it be possible to do it in (simulation) startup and therefor only oce?
 		for (LSP lsp : lsps.getLSPs().values()) {
 			((LSPImpl) lsp).setScorer( lspScoringFunctionFactory.createScoringFunction( lsp ) );
 
@@ -126,12 +118,22 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		if ( strategyManager==null ) {
 			throw new RuntimeException( "You need to set LSPStrategyManager to something meaningful to run iterations." );
 		}
-		final Collection<LSP> lsps = LSPUtils.getLSPs( scenario ).getLSPs().values();
-		strategyManager.run( lsps, event.getIteration(), event.getReplanningContext() );
-		for( LSP lsp : lsps ){
+
+		LSPs lsps = LSPUtils.getLSPs(scenario);
+		strategyManager.run( lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext() );
+		for( LSP lsp : lsps.getLSPs().values() ){
 			lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels weird, but getting NullPointer because of missing lsp inside the assigner
 			//TODO: Do we need to do it for each plan, if it gets selected???
 			// yyyyyy Means IMO that something is incomplete with the plans copying.  kai, jul'22
+		}
+
+		LSPRescheduler.notifyReplanning(lsps, event);
+
+		//Update carriers in scenario and CarrierAgentTracker
+		carrierAgentTracker.getCarriers().getCarriers().clear();
+		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
+			FreightUtils.getCarriers(scenario).addCarrier(carrier);
+			carrierAgentTracker.getCarriers().addCarrier(carrier);
 		}
 
 	}
