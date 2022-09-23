@@ -112,8 +112,8 @@ public class LSPModule extends AbstractModule {
 		this.addControlerListenerBinding().to( DumpLSPPlans.class );
 	}
 
-	@Provides Carriers provideCarriers( LSPControlerListener lspControlerListener ) {
-		return lspControlerListener.getCarriers();
+	@Provides Carriers provideCarriers(LSPControlerListener lspControlerListener ) {
+		return lspControlerListener.getCarriersFromLSP();
 	}
 
 	private static class LSPScoringFunctionFactoryDummyImpl implements LSPScorerFactory{

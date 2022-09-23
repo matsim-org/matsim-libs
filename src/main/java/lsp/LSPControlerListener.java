@@ -27,6 +27,8 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.controler.CarrierAgentTracker;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
@@ -53,6 +55,8 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	@Inject private LSPScorerFactory lspScoringFunctionFactory;
 	@Inject @Nullable private LSPStrategyManager strategyManager;
 
+	@Inject private CarrierAgentTracker carrierAgentTracker;
+
 	@Inject LSPControlerListener( Scenario scenario ) {
 		this.scenario = scenario;
 	}
@@ -62,6 +66,14 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 
 		LSPRescheduler.notifyBeforeMobsim(lsps, event);
+
+		//Update carriers in scenario and CarrierAgentTracker
+		carrierAgentTracker.getCarriers().getCarriers().clear();
+		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
+			FreightUtils.getCarriers(scenario).addCarrier(carrier);
+			carrierAgentTracker.getCarriers().addCarrier(carrier);
+		}
+
 
 		for (LSP lsp : lsps.getLSPs().values()) {
 			((LSPImpl) lsp).setScorer( lspScoringFunctionFactory.createScoringFunction( lsp ) );
@@ -121,6 +133,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 			//TODO: Do we need to do it for each plan, if it gets selected???
 			// yyyyyy Means IMO that something is incomplete with the plans copying.  kai, jul'22
 		}
+
 	}
 
 	@Override
@@ -137,7 +150,8 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	}
 
 
-	Carriers getCarriers() {
+
+	Carriers getCarriersFromLSP() {
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 
 		Carriers carriers = new Carriers();
