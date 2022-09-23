@@ -29,6 +29,8 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.vehicles.Vehicle;
 
+import static org.matsim.contrib.freight.events.FreightEventAttributes.ATTRIBUTE_TOUR_ID;
+
 /**
  * An event, that informs when a Freight {@link Tour} has ended.
  * There are NO specific information of the tour given, because the {@link Tour} is determined by the {@link Vehicle} and its {@link Carrier}.
@@ -40,8 +42,11 @@ public final class FreightTourEndEvent extends AbstractFreightEvent {
 
 	public static final String EVENT_TYPE = "Freight tour ends";
 
-	public FreightTourEndEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId) {
+	private final Id<Tour> tourId;
+
+	public FreightTourEndEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId, Id<Tour> tourId) {
 		super(time, carrierId, linkId, vehicleId);
+		this.tourId = tourId;
 	}
 
 	@Override
@@ -49,8 +54,14 @@ public final class FreightTourEndEvent extends AbstractFreightEvent {
 		return EVENT_TYPE;
 	}
 
+	public Id<Tour> getTourId() {
+		return tourId;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
-		return super.getAttributes();
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_TOUR_ID, this.tourId.toString());
+		return attr;
 	}
 }
