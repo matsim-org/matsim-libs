@@ -66,7 +66,7 @@ class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupListener
 
 	SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime,
 			TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
-		this(network, travelTime, travelDisutility, drtCfg.getNumberOfThreads(), new SpeedyALTFactory());
+		this(network, travelTime, travelDisutility, drtCfg.numberOfThreads, new SpeedyALTFactory());
 	}
 
 	@VisibleForTesting

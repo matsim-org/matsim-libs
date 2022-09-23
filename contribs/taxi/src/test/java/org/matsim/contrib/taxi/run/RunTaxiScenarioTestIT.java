@@ -50,7 +50,7 @@ public class RunTaxiScenarioTestIT {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
-		TaxiConfigGroup.getSingleModeTaxiConfig(config).setTaxisFile(taxisFile);
+		TaxiConfigGroup.getSingleModeTaxiConfig(config).taxisFile = taxisFile;
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
 		TaxiControlerCreator.createControler(config, false).run();

@@ -44,23 +44,23 @@ public class ZonalTaxiOptimizerIT {
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
 		ZonalSystemParams zsParams = new ZonalSystemParams();
-		zsParams.setZonesShpFile("zones/zones.shp");
-		zsParams.setZonesXmlFile("zones/zones.xml");
-		zsParams.setExpansionDistance(3000);
+		zsParams.zonesShpFile = "zones/zones.shp";
+		zsParams.zonesXmlFile = "zones/zones.xml";
+		zsParams.expansionDistance = 3000;
 		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
 		params.addParameterSet(rbParams);
 		params.addParameterSet(zsParams);
 
-		rbParams.setGoal(Goal.DEMAND_SUPPLY_EQUIL);
-		rbParams.setNearestRequestsLimit(99999);
-		rbParams.setNearestVehiclesLimit(99999);
-		rbParams.setCellSize(99999.);
+		rbParams.goal = Goal.DEMAND_SUPPLY_EQUIL;
+		rbParams.nearestRequestsLimit = 99999;
+		rbParams.nearestVehiclesLimit = 99999;
+		rbParams.cellSize = 99999.;
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_A");
 
-		rbParams.setGoal(Goal.MIN_WAIT_TIME);
-		rbParams.setNearestRequestsLimit(10);
-		rbParams.setNearestVehiclesLimit(10);
-		rbParams.setCellSize(1000.);
+		rbParams.goal = Goal.MIN_WAIT_TIME;
+		rbParams.nearestRequestsLimit = 10;
+		rbParams.nearestVehiclesLimit = 10;
+		rbParams.cellSize = 1000.;
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
 	}
 }

@@ -62,7 +62,6 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,9 +79,9 @@ public class RunUrbanEVExample {
 
 	public static void main(String[] args) {
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.setVehiclesFile("this is not important because we use standard matsim vehicles");
-		evConfigGroup.setTimeProfiles(true);
-		evConfigGroup.setChargersFile("chargers.xml");
+		evConfigGroup.vehiclesFile = "this is not important because we use standard matsim vehicles";
+		evConfigGroup.timeProfiles = true;
+		evConfigGroup.chargersFile = "chargers.xml";
 
 		String pathToConfig = args.length > 0 ? args[0] : "contribs/vsp/test/input/playground/vsp/ev/chessboard-config.xml";
 

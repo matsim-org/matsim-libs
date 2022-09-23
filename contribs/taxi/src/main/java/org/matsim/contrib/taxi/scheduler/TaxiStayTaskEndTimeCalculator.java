@@ -57,11 +57,11 @@ public class TaxiStayTaskEndTimeCalculator implements ScheduleTimingUpdater.Stay
 			case PICKUP -> {
 				double t0 = ((TaxiPickupTask)task).getRequest().getEarliestStartTime();
 				// the actual pickup starts at max(t, t0)
-				return Math.max(newBeginTime, t0) + taxiConfigGroup.getPickupDuration();
+				return Math.max(newBeginTime, t0) + taxiConfigGroup.pickupDuration;
 			}
 			case DROPOFF -> {
 				// cannot be shortened/lengthen, therefore must be moved forward/backward
-				return newBeginTime + taxiConfigGroup.getDropoffDuration();
+				return newBeginTime + taxiConfigGroup.dropoffDuration;
 			}
 			default -> throw new IllegalStateException();
 		}
