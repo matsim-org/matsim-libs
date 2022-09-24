@@ -3,11 +3,11 @@ package org.matsim.contrib.drt.extension.operations.shifts.run;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.extension.operations.shifts.run.ShiftDrtControlerCreator;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -123,15 +123,18 @@ public class RunMultiHubShiftDrtScenarioIT {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_shifts_multiHub");
 
-		DrtOperationsParams opertionParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
-		ShiftsParams shiftsParams = opertionParams.getShiftsParams().orElseThrow();
-		OperationFacilitiesParams operationFacilitiesParams = opertionParams.getOperationFacilitiesParams().orElseThrow();
+		DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
+		ShiftsParams shiftsParams = (ShiftsParams) operationsParams.createParameterSet(ShiftsParams.SET_NAME);
+		OperationFacilitiesParams operationFacilitiesParams = (OperationFacilitiesParams) operationsParams.createParameterSet(OperationFacilitiesParams.SET_NAME);
+		operationsParams.addParameterSet(shiftsParams);
+		operationsParams.addParameterSet(operationFacilitiesParams);
+		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
+
 		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
 		shiftsParams.setShiftInputFile(shiftsFile);
 		shiftsParams.setAllowInFieldChangeover(true);
-		drtWithShiftsConfigGroup.addParameterSet(opertionParams);
 
-		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
+		final Controler run = DrtOperationsControlerCreator.createControler(config, false);
 		run.run();
 	}
 }

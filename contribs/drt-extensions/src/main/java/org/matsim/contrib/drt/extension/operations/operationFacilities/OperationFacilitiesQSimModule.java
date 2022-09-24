@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2022 MOIA GmbH - All Rights Reserved
+ *
+ * You may use, distribute and modify this code under the terms
+ * of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License,
+ * or (at your option) any later version.
+ */
 package org.matsim.contrib.drt.extension.operations.operationFacilities;
 
 import com.google.common.collect.ImmutableList;
@@ -24,13 +32,8 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 
-	private final DrtConfigGroup drtCfg;
-	private final DrtOperationsParams drtShiftParams;
-
 	public OperationFacilitiesQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
-		this.drtCfg = drtCfg;
-		this.drtShiftParams = ((DrtWithOperationsConfigGroup) drtCfg).getDrtOperationsParams();
 	}
 
 	@Override

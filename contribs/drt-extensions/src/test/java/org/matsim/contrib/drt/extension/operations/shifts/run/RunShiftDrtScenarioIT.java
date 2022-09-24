@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.run;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
@@ -133,7 +134,7 @@ public class RunShiftDrtScenarioIT {
 		shiftsParams.setAllowInFieldChangeover(true);
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
-		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
+		final Controler run = DrtOperationsControlerCreator.createControler(config, false);
 		run.run();
 	}
 }

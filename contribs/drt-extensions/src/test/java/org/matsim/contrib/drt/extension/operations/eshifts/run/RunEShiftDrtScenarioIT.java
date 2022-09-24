@@ -3,8 +3,8 @@ package org.matsim.contrib.drt.extension.operations.eshifts.run;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.extension.operations.EDrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
-import org.matsim.contrib.drt.extension.operations.eshifts.run.EvShiftDrtControlerCreator;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
@@ -136,19 +136,23 @@ public class RunEShiftDrtScenarioIT {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_eshifts");
 
-		ShiftsParams drtShiftParams = ((DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME)).getShiftsParams().orElseThrow();
-		OperationFacilitiesParams operationFacilitiesParams = ((DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME)).getOperationFacilitiesParams().orElseThrow();
+		DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
+		ShiftsParams shiftsParams = (ShiftsParams) operationsParams.createParameterSet(ShiftsParams.SET_NAME);
+		OperationFacilitiesParams operationFacilitiesParams = (OperationFacilitiesParams) operationsParams.createParameterSet(OperationFacilitiesParams.SET_NAME);
+		operationsParams.addParameterSet(shiftsParams);
+		operationsParams.addParameterSet(operationFacilitiesParams);
+
 		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
-		drtShiftParams.setShiftInputFile(shiftsFile);
-		drtShiftParams.setAllowInFieldChangeover(true);
+		shiftsParams.setShiftInputFile(shiftsFile);
+		shiftsParams.setAllowInFieldChangeover(true);
 
 		//e shifts
-		drtShiftParams.setShiftAssignmentBatteryThreshold(0.6);
-		drtShiftParams.setChargeAtHubThreshold(0.8);
-		drtShiftParams.setOutOfShiftChargerType("slow");
-		drtShiftParams.setBreakChargerType("fast");
+		shiftsParams.setShiftAssignmentBatteryThreshold(0.6);
+		shiftsParams.setChargeAtHubThreshold(0.8);
+		shiftsParams.setOutOfShiftChargerType("slow");
+		shiftsParams.setBreakChargerType("fast");
 
-		drtWithShiftsConfigGroup.addParameterSet(drtShiftParams);
+		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.chargersFile = chargersFile;
@@ -158,7 +162,7 @@ public class RunEShiftDrtScenarioIT {
 
 		config.vehicles().setVehiclesFile(evsFile);
 
-		final Controler run = EvShiftDrtControlerCreator.createControler(config, false);
+		final Controler run = EDrtOperationsControlerCreator.createControler(config, false);
 
 		for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			run.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
