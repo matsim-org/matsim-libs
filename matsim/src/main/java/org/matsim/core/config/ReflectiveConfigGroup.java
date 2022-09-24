@@ -21,6 +21,7 @@ package org.matsim.core.config;
 
 import static java.util.stream.Collectors.joining;
 
+import java.io.Serial;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -42,6 +43,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 /**
@@ -133,12 +135,9 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		paramFields = getParamFields();
 		registeredParams = Sets.union(stringGetters.keySet(), paramFields.keySet());
 
-		if (!setters.keySet().equals(stringGetters.keySet())) {
-			throw new InconsistentModuleException("setters and getters inconsistent");
-		}
-		if (paramFields.keySet().stream().anyMatch(setters::containsKey)) {
-			throw new InconsistentModuleException("Use either getters/setters or parameter annotations");
-		}
+		checkModuleConsistency(setters.keySet().equals(stringGetters.keySet()), "setters and getters inconsistent");
+		checkModuleConsistency(paramFields.keySet().stream().noneMatch(setters::containsKey),
+				"Use either StringGetter/Setter or Parameter annotations");
 	}
 
 	private Map<String, Method> getStringGetters() {
@@ -150,9 +149,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			if (annotation != null) {
 				checkGetterValidity(m);
 				final Method old = gs.put(annotation.value(), m);
-				if (old != null) {
-					throw new InconsistentModuleException("several string getters for " + annotation.value());
-				}
+				checkModuleConsistency(old == null, "several string getters for: %s", annotation.value());
 			}
 		}
 
@@ -160,13 +157,8 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	}
 
 	private static void checkGetterValidity(final Method m) {
-		if (m.getParameterTypes().length > 0) {
-			throw new InconsistentModuleException("getter " + m + " has parameters");
-		}
-
-		if (m.getReturnType().equals(Void.TYPE)) {
-			throw new InconsistentModuleException("getter " + m + " has void return type");
-		}
+		checkModuleConsistency(m.getParameterTypes().length == 0, "getter %s has parameters", m);
+		checkModuleConsistency(!m.getReturnType().equals(Void.TYPE), "getter %s has void return type", m);
 	}
 
 	private Map<String, Method> getSetters() {
@@ -178,9 +170,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			if (annotation != null) {
 				checkSetterValidity(m);
 				final Method old = ss.put(annotation.value(), m);
-				if (old != null) {
-					throw new InconsistentModuleException("several string setters for " + annotation.value());
-				}
+				checkModuleConsistency(old == null, "several string setters for: %s", annotation.value());
 			}
 		}
 
@@ -199,20 +189,14 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 
 	private static void checkSetterValidity(final Method m) {
 		final Class<?>[] params = m.getParameterTypes();
+		checkModuleConsistency(params.length == 1, "setter %s has %s parameters instead of 1.", m, params.length);
 
-		if (params.length != 1) {
-			throw new InconsistentModuleException(
-					"setter " + m + " has " + params.length + " parameters instead of one");
-		}
-
-		if (!ALLOWED_PARAMETER_TYPES.contains(params[0]) && !params[0].isEnum()) {
-			throw new InconsistentModuleException("setter "
-					+ m
-					+ " gets a "
-					+ params[0]
-					+ ". Valid types are String, primitive types and their wrapper classes, and enumerations. "
-					+ "Other types are fine as parameters, but you will need to implement conversion strategies in the String setters.");
-		}
+		var param = params[0];
+		checkModuleConsistency(ALLOWED_PARAMETER_TYPES.contains(param) || param.isEnum(),
+				"setter %s takes a %s argument."
+						+ " Valid types are String, primitive types and their wrapper classes, and enumerations."
+						+ " Other types are fine as parameters, but you will need to implement conversion strategies in the String setters.",
+				m, param);
 	}
 
 	private Map<String, Field> getParamFields() {
@@ -225,9 +209,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				checkParamFieldValidity(f);
 				var paramName = annotation.value().isEmpty() ? f.getName() : annotation.value();
 				Field old = pf.put(paramName, f);
-				if (old != null) {
-					throw new InconsistentModuleException("several parameter fields for " + paramName);
-				}
+				checkModuleConsistency(old == null, "several parameter fields for: %s", paramName);
 			}
 		}
 
@@ -246,14 +228,10 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 
 	private static void checkParamFieldValidity(Field field) {
 		var type = field.getType();
-		if (!ALLOWED_PARAMETER_TYPES.contains(type) && !type.isEnum()) {
-			throw new InconsistentModuleException("field "
-					+ field
-					+ " is of type "
-					+ type
-					+ ". Valid types are String, primitive types and their wrapper classes, and enumerations. "
-					+ "Other types are fine as parameters, but you will need to implement conversion strategies in the String setters.");
-		}
+		checkModuleConsistency(ALLOWED_PARAMETER_TYPES.contains(type) || type.isEnum(), "field %s is of type %s."
+						+ " Valid types are String, primitive types and their wrapper classes, and enumerations."
+						+ " Other types are fine as parameters, but you will need to implement conversion strategies in the String setters.",
+				field, type);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -533,7 +511,14 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		String value() default "";
 	}
 
+	private static void checkModuleConsistency(boolean condition, String messageTemplate, Object... args) {
+		if (!condition) {
+			throw new InconsistentModuleException(Strings.lenientFormat(messageTemplate, args));
+		}
+	}
+
 	public static class InconsistentModuleException extends RuntimeException {
+		@Serial
 		private static final long serialVersionUID = 1L;
 
 		private InconsistentModuleException(final String msg) {
