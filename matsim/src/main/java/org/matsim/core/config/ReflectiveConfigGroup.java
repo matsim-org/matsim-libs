@@ -20,6 +20,7 @@
 package org.matsim.core.config;
 
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import java.io.Serial;
 import java.lang.annotation.Documented;
@@ -31,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -95,7 +97,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 
 	private static final Set<Class<?>> ALLOWED_PARAMETER_TYPES = Set.of(String.class, Float.class, Double.class,
 			Integer.class, Long.class, Boolean.class, Character.class, Byte.class, Short.class, Float.TYPE, Double.TYPE,
-			Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE);
+			Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE, Set.class, List.class);
 
 	private final boolean storeUnknownParameters;
 
@@ -350,6 +352,10 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 						+ Arrays.stream(type.getEnumConstants()).map(Object::toString).collect(joining(","));
 				throw new IllegalArgumentException(comment, e);
 			}
+		} else if (type.equals(Set.class)) {
+			return Arrays.stream(value.split(",")).map(String::trim).collect(toUnmodifiableSet());
+		} else if (type.equals(List.class)) {
+			return Arrays.stream(value.split(",")).map(String::trim).toList();
 		} else {
 			throw new RuntimeException("Unsupported type: " + type);
 		}
@@ -378,8 +384,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	private String invokeGetter(Method getter) {
 		boolean accessible = enforceAccessible(getter);
 		try {
-			var result = getter.invoke(this);
-			return result == null ? null : result + "";
+			return toString(getter.invoke(this));
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
@@ -392,12 +397,22 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	private String getParamField(Field paramField) {
 		boolean accessible = enforceAccessible(paramField);
 		try {
-			var result = paramField.get(this);
-			return result == null ? null : result + "";
+			return toString(paramField.get(this));
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} finally {
 			paramField.setAccessible(accessible);
+		}
+	}
+
+	private String toString(Object result) {
+		if (result == null) {
+			return null;
+		} else if (result instanceof Set<?> || result instanceof List<?>) {
+			//we only support Set<String> and List<String>, therefore we can safely cast to Collection<String>
+			return String.join(", ", ((Collection<String>)result));
+		} else {
+			return result + "";
 		}
 	}
 

@@ -22,7 +22,9 @@ package org.matsim.core.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -54,6 +56,8 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.charField = 'z';
 		dumpedModule.byteField = 78;
 		dumpedModule.booleanField = true;
+		dumpedModule.setField = Set.of("a", "b", "c");
+		dumpedModule.listField = List.of("1", "2", "3");
 
 		final Config dumpedConfig = new Config();
 		dumpedConfig.addModule(dumpedModule);
@@ -99,8 +103,8 @@ public class ReflectiveConfigGroupTest {
 				"charField", "char",//
 				"byteField", "byte",//
 				"booleanField", "boolean",//
-				"enumField", "Possible values: VALUE1,VALUE2"//
-		);
+				"enumField", "Possible values: VALUE1,VALUE2",//
+				"setField", "set");
 
 		assertThat(new MyModule().getComments()).isEqualTo(expectedComments);
 	}
@@ -358,6 +362,14 @@ public class ReflectiveConfigGroupTest {
 		@Parameter
 		private boolean booleanField;
 
+		@Comment("set")
+		@Parameter
+		private Set<String> setField;
+
+		//		@Comment("list")
+		//		@Parameter
+		//		private List<String> listField;
+
 		// Object fields:
 		// Id: string representation is toString
 		private Id<Link> idField;
@@ -365,9 +377,20 @@ public class ReflectiveConfigGroupTest {
 		private Coord coordField;
 		// enum: handled especially
 		private MyEnum enumField;
+		private List<String> listField;
 
 		public MyModule() {
 			super(GROUP_NAME);
+		}
+
+		@StringGetter("list")
+		public List<String> getListField() {
+			return listField;
+		}
+
+		@StringSetter("list")
+		public void setListField(List<String> listField) {
+			this.listField = listField;
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -462,4 +485,3 @@ public class ReflectiveConfigGroupTest {
 		}
 	}
 }
-
