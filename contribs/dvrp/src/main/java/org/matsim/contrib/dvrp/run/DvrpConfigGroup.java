@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -30,9 +30,6 @@ import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
-import org.matsim.core.utils.misc.StringUtils;
-
-import com.google.common.collect.ImmutableSet;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotBlank;
@@ -50,18 +47,17 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		return (DvrpConfigGroup)config.getModule(GROUP_NAME);// will fail if not in the config
 	}
 
-	private static final String NETWORK_MODES = "networkModes";
-	private static final String NETWORK_MODES_EXP = ""
-			+ "Set of modes of which the network will be used for DVRP travel time "
+	@Parameter
+	@Comment("Set of modes of which the network will be used for DVRP travel time "
 			+ "estimation and routing DVRP vehicles. "
 			+ "Each specific DVRP mode may use a subnetwork of this network for routing vehicles (e.g. DRT buses "
 			+ "travelling only along a specified links or serving a limited area). "
 			+ "Default is \"car\" (i.e. single-element set of modes), i.e. the car network is used. "
 			+ "Empty value \"\" (i.e. empty set of modes) means no network filtering, i.e. "
-			+ "the original scenario.network is used";
+			+ "the original scenario.network is used")
 	// used for building route; empty ==> no filtering (routing network equals scenario.network)
 	@NotNull
-	public ImmutableSet<String> networkModes = ImmutableSet.of(TransportMode.car);
+	public Set<String> networkModes = Set.of(TransportMode.car);
 
 	@Parameter
 	@Comment("Mode of which the network will be used for throwing events and hence calculating travel times. "
@@ -150,30 +146,6 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		if (!config.parallelEventHandling().getSynchronizeOnSimSteps()) {
 			throw new RuntimeException("Synchronization on sim steps is required");
 		}
-	}
-
-	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> map = super.getComments();
-		map.put(NETWORK_MODES, NETWORK_MODES_EXP);
-		return map;
-	}
-
-	/**
-	 * @return {@value #NETWORK_MODES_EXP}
-	 */
-	@StringGetter(NETWORK_MODES)
-	public String getNetworkModesAsString() {
-		return String.join(",", networkModes);
-	}
-
-	/**
-	 * @param networkModesString {@value #NETWORK_MODES_EXP}
-	 */
-	@StringSetter(NETWORK_MODES)
-	public DvrpConfigGroup setNetworkModesAsString(String networkModesString) {
-		this.networkModes = ImmutableSet.copyOf(StringUtils.explode(networkModesString, ','));
-		return this;
 	}
 
 	public DvrpTravelTimeMatrixParams getTravelTimeMatrixParams() {
