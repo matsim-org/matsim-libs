@@ -22,6 +22,8 @@ package org.matsim.core.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -247,6 +249,30 @@ public class ReflectiveConfigGroupTest {
 
 			@Parameter("field")
 			private double stuff;
+		}).isInstanceOf(InconsistentModuleException.class);
+	}
+
+	@Test
+	public void testFailUnsupportedType_StringCollections() {
+		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
+			@Parameter("field")
+			private Collection<String> stuff;
+		}).isInstanceOf(InconsistentModuleException.class);
+	}
+
+	@Test
+	public void testFailUnsupportedType_NonStringList() {
+		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
+			@Parameter("field")
+			private List<Double> stuff;
+		}).isInstanceOf(InconsistentModuleException.class);
+	}
+
+	@Test
+	public void testFailUnsupportedType_StringHashSet() {
+		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
+			@Parameter("field")
+			private HashSet<String> stuff;
 		}).isInstanceOf(InconsistentModuleException.class);
 	}
 

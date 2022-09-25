@@ -30,6 +30,8 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -94,10 +96,6 @@ import com.google.common.collect.Sets;
  */
 public abstract class ReflectiveConfigGroup extends ConfigGroup implements MatsimExtensionPoint {
 	private static final Logger log = LogManager.getLogger(ReflectiveConfigGroup.class);
-
-	private static final Set<Class<?>> ALLOWED_PARAMETER_TYPES = Set.of(String.class, Float.class, Double.class,
-			Integer.class, Long.class, Boolean.class, Character.class, Byte.class, Short.class, Float.TYPE, Double.TYPE,
-			Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE, Set.class, List.class);
 
 	private final boolean storeUnknownParameters;
 
@@ -190,15 +188,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	}
 
 	private static void checkSetterValidity(final Method m) {
-		final Class<?>[] params = m.getParameterTypes();
+		var params = m.getGenericParameterTypes();
 		checkModuleConsistency(params.length == 1, "setter %s has %s parameters instead of 1.", m, params.length);
 
 		var param = params[0];
-		checkModuleConsistency(ALLOWED_PARAMETER_TYPES.contains(param) || param.isEnum(),
-				"setter %s takes a %s argument."
-						+ " Valid types are String, primitive types and their wrapper classes, and enumerations."
-						+ " Other types are fine as parameters, but you will need to implement conversion strategies in the String setters.",
-				m, param);
+		checkModuleConsistency(checkType(param), "Setter %s takes a %s argument." + HINT, m, param);
 	}
 
 	private Map<String, Field> getParamFields() {
@@ -229,11 +223,32 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	}
 
 	private static void checkParamFieldValidity(Field field) {
-		var type = field.getType();
-		checkModuleConsistency(ALLOWED_PARAMETER_TYPES.contains(type) || type.isEnum(), "field %s is of type %s."
-						+ " Valid types are String, primitive types and their wrapper classes, and enumerations."
-						+ " Other types are fine as parameters, but you will need to implement conversion strategies in the String setters.",
-				field, type);
+		var type = field.getGenericType();
+		checkModuleConsistency(checkType(type), "Field %s is of type %s." + HINT, field, type);
+	}
+
+	private static final Set<Class<?>> ALLOWED_PARAMETER_TYPES = Set.of(String.class, Float.class, Double.class,
+			Integer.class, Long.class, Boolean.class, Character.class, Byte.class, Short.class, Float.TYPE, Double.TYPE,
+			Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE);
+
+	private static final String HINT = " Valid types are String, primitive types and their wrapper classes,"
+			+ " enumerations, List<String> and Set<String>."
+			+ " Other types are fine as parameters, but you will need to implement conversion strategies"
+			+ " in corresponding StringGetters andStringSetters.";
+
+	private static boolean checkType(Type type) {
+		if (ALLOWED_PARAMETER_TYPES.contains(type)) {
+			return true;
+		} else if (type instanceof Class<?> c && c.isEnum()) {
+			return true;
+		} else if (type instanceof ParameterizedType pType) {
+			var rawType = pType.getRawType();
+			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
+				var typeArgument = pType.getActualTypeArguments()[0];
+				return typeArgument.equals(String.class);
+			}
+		}
+		return false;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
