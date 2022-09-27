@@ -79,10 +79,10 @@ public class DrtRoutingModuleTest {
 				networkTravelSpeed, beelineFactor);
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
-		drtCfg.setMode(drtMode);
-		drtCfg.setMaxTravelTimeAlpha(1.5);
-		drtCfg.setMaxTravelTimeBeta(5 * 60);
-		drtCfg.setMaxWaitTime(5 * 60);
+		drtCfg.mode = drtMode;
+		drtCfg.maxTravelTimeAlpha = 1.5;
+		drtCfg.maxTravelTimeBeta = 5 * 60;
+		drtCfg.maxWaitTime = 5 * 60;
 
 		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
 				.getFacilities()
@@ -91,7 +91,7 @@ public class DrtRoutingModuleTest {
 				.map(DrtStopFacilityImpl::createFromFacility)
 				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
 
-		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.maxWalkDistance,
 				scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
 		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
 				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new);
@@ -108,7 +108,8 @@ public class DrtRoutingModuleTest {
 		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
 		Facility wf = FacilitiesUtils.toFacility(w, facilities);
 
-		List<? extends PlanElement> routedList = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf, wf, 8 * 3600, p1));
+		List<? extends PlanElement> routedList = dvrpRoutingModule.calcRoute(
+				DefaultRoutingRequest.withoutAttributes(hf, wf, 8 * 3600, p1));
 
 		Assert.assertEquals(5, routedList.size());
 
@@ -163,7 +164,8 @@ public class DrtRoutingModuleTest {
 		Activity w2 = (Activity)p2.getSelectedPlan().getPlanElements().get(2);
 		Facility wf2 = FacilitiesUtils.toFacility(w2, facilities);
 
-		List<? extends PlanElement> routedList2 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf2, wf2, 8 * 3600, p2));
+		List<? extends PlanElement> routedList2 = dvrpRoutingModule.calcRoute(
+				DefaultRoutingRequest.withoutAttributes(hf2, wf2, 8 * 3600, p2));
 
 		Assert.assertNull(routedList2);
 
@@ -175,7 +177,8 @@ public class DrtRoutingModuleTest {
 		Activity w3 = (Activity)p3.getSelectedPlan().getPlanElements().get(2);
 		Facility wf3 = FacilitiesUtils.toFacility(w3, facilities);
 
-		List<? extends PlanElement> routedList3 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf3, wf3, 8 * 3600, p3));
+		List<? extends PlanElement> routedList3 = dvrpRoutingModule.calcRoute(
+				DefaultRoutingRequest.withoutAttributes(hf3, wf3, 8 * 3600, p3));
 
 		Assert.assertNull(routedList3);
 
@@ -187,7 +190,8 @@ public class DrtRoutingModuleTest {
 		Activity w4 = (Activity)p4.getSelectedPlan().getPlanElements().get(2);
 		Facility wf4 = FacilitiesUtils.toFacility(w4, facilities);
 
-		List<? extends PlanElement> routedList4 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf4, wf4, 8 * 3600, p4));
+		List<? extends PlanElement> routedList4 = dvrpRoutingModule.calcRoute(
+				DefaultRoutingRequest.withoutAttributes(hf4, wf4, 8 * 3600, p4));
 
 		Assert.assertNull(routedList4);
 
@@ -199,7 +203,8 @@ public class DrtRoutingModuleTest {
 		Activity w5 = (Activity)p5.getSelectedPlan().getPlanElements().get(2);
 		Facility wf5 = FacilitiesUtils.toFacility(w5, facilities);
 
-		List<? extends PlanElement> routedList5 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf5, wf5, 8 * 3600, p5));
+		List<? extends PlanElement> routedList5 = dvrpRoutingModule.calcRoute(
+				DefaultRoutingRequest.withoutAttributes(hf5, wf5, 8 * 3600, p5));
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList5);
@@ -212,13 +217,14 @@ public class DrtRoutingModuleTest {
 		Activity w6 = (Activity)p6.getSelectedPlan().getPlanElements().get(2);
 		Facility wf6 = FacilitiesUtils.toFacility(w6, facilities);
 
-		List<? extends PlanElement> routedList6 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf6, wf6, 8 * 3600, p6));
+		List<? extends PlanElement> routedList6 = dvrpRoutingModule.calcRoute(
+				DefaultRoutingRequest.withoutAttributes(hf6, wf6, 8 * 3600, p6));
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList6);
 
 	}
-	
+
 	@Test
 	public void testRouteDescriptionHandling() {
 		String oldRouteFormat = "600 400";
@@ -234,15 +240,15 @@ public class DrtRoutingModuleTest {
 		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
 		Facility wf = FacilitiesUtils.toFacility(w, facilities);
 
-		DrtRoute drtRoute = new DrtRoute(h.getLinkId(),w.getLinkId());
+		DrtRoute drtRoute = new DrtRoute(h.getLinkId(), w.getLinkId());
 
 		drtRoute.setRouteDescription(oldRouteFormat);
-		Assert.assertTrue(drtRoute.getMaxWaitTime()==600.);
-		Assert.assertTrue(drtRoute.getDirectRideTime()==400);
+		Assert.assertTrue(drtRoute.getMaxWaitTime() == 600.);
+		Assert.assertTrue(drtRoute.getDirectRideTime() == 400);
 
 		drtRoute.setRouteDescription(newRouteFormat);
-		Assert.assertTrue(drtRoute.getMaxWaitTime()==600.);
-		Assert.assertTrue(drtRoute.getDirectRideTime()==400);
+		Assert.assertTrue(drtRoute.getMaxWaitTime() == 600.);
+		Assert.assertTrue(drtRoute.getDirectRideTime() == 400);
 		Assert.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
 
 	}
@@ -253,8 +259,8 @@ public class DrtRoutingModuleTest {
 	private Scenario createTestScenario() {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		drtConfigGroup.setMaxWalkDistance(200);
-		drtConfigGroup.setTransitStopFile(utils.getClassInputDirectory() + "testCottbus/drtstops.xml.gz");
+		drtConfigGroup.maxWalkDistance = 200;
+		drtConfigGroup.transitStopFile = utils.getClassInputDirectory() + "testCottbus/drtstops.xml.gz";
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 		config.addModule(multiModeDrtConfigGroup);
@@ -263,7 +269,7 @@ public class DrtRoutingModuleTest {
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(
 				utils.getClassInputDirectory() + "testCottbus/network.xml.gz");
-		new TransitScheduleReader(scenario).readFile(drtConfigGroup.getTransitStopFile());
+		new TransitScheduleReader(scenario).readFile(drtConfigGroup.transitStopFile);
 		createSomeAgents(scenario);
 		return scenario;
 	}

@@ -79,7 +79,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 	}
 
 	private boolean isReduceTP(Collection<DrtRequest> unplannedRequests) {
-		return switch (params.getGoal()) {
+		return switch (params.goal) {
 			case MIN_PICKUP_TIME -> true;
 
 			case MIN_WAIT_TIME -> false;
@@ -97,7 +97,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 	private void scheduleUnplannedRequestsImpl(Collection<DrtRequest> unplannedRequests) {
 		// vehicles are not immediately removed so calculate 'idleCount' locally
 		int idleCount = idleTaxiRegistry.getVehicleCount();
-		int nearestVehiclesLimit = params.getNearestVehiclesLimit();
+		int nearestVehiclesLimit = params.nearestVehiclesLimit;
 
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext() && idleCount > 0) {
@@ -129,7 +129,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 	// vehicle-initiated scheduling
 	private void scheduleIdleVehiclesImpl(Collection<DrtRequest> unplannedRequests) {
-		int nearestRequestsLimit = params.getNearestRequestsLimit();
+		int nearestRequestsLimit = params.nearestRequestsLimit;
 		Iterator<DvrpVehicle> vehIter = idleTaxiRegistry.vehicles().iterator();
 		while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
 			DvrpVehicle veh = vehIter.next();

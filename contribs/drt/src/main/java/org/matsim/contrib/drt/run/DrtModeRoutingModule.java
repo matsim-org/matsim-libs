@@ -44,6 +44,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.RoutingModule;
@@ -84,13 +85,13 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 
-		if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.door2door) {
+		if (drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.door2door) {
 			bindModal(AccessEgressFacilityFinder.class).toProvider(
 							modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
 					.asEagerSingleton();
 		} else {
 			bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
-							getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+							getter -> new ClosestAccessEgressFacilityFinder(drtCfg.maxWalkDistance,
 									getter.get(Network.class),
 									QuadTrees.createQuadTree(getter.getModal(DrtStopNetwork.class).getDrtStops().values()))))
 					.asEagerSingleton();
@@ -147,7 +148,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtStopNetwork get() {
-			switch (drtCfg.getOperationalScheme()) {
+			switch (drtCfg.operationalScheme) {
 				case door2door:
 					return ImmutableMap::of;
 				case stopbased:
@@ -155,7 +156,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 				case serviceAreaBased:
 					return createDrtStopNetworkFromServiceArea(config, drtCfg, getModalInstance(Network.class));
 				default:
-					throw new RuntimeException("Unsupported operational scheme: " + drtCfg.getOperationalScheme());
+					throw new RuntimeException("Unsupported operational scheme: " + drtCfg.operationalScheme);
 			}
 		}
 	}
@@ -163,7 +164,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 	private static DrtStopNetwork createDrtStopNetworkFromServiceArea(Config config, DrtConfigGroup drtCfg,
 			Network drtNetwork) {
 		final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-				drtCfg.getDrtServiceAreaShapeFileURL(config.getContext()));
+				ConfigGroup.getInputFileURL(config.getContext(), drtCfg.drtServiceAreaShapeFile));
 		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = drtNetwork.getLinks()
 				.values()
 				.stream()
@@ -175,7 +176,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 	}
 
 	private static DrtStopNetwork createDrtStopNetworkFromTransitSchedule(Config config, DrtConfigGroup drtCfg) {
-		URL url = drtCfg.getTransitStopsFileUrl(config.getContext());
+		URL url = ConfigGroup.getInputFileURL(config.getContext(), drtCfg.transitStopFile);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readURL(url);
 		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()

@@ -101,7 +101,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 		} else if (currentTaskType.baseType().get() == EMPTY_DRIVE //
 				&& Schedules.getNextTask(schedule).getTaskType().equals(ETaxiChargingTask.TYPE)) {
 			//drive task to charging station
-			if (taxiCfg.isVehicleDiversion()) {
+			if (taxiCfg.vehicleDiversion) {
 				return 0;// though questionable
 			}
 

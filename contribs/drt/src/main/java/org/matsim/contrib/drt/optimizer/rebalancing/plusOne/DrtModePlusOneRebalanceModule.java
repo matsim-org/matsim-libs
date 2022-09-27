@@ -56,7 +56,7 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 								getter.getModal(LinkBasedRelocationCalculator.class)))).asEagerSingleton();
 
 				// binding zone free relocation calculator
-				switch (specificParams.getZoneFreeRelocationCalculatorType()) {
+				switch (specificParams.zoneFreeRelocationCalculatorType) {
 					case FastHeuristic:
 						bindModal(LinkBasedRelocationCalculator.class).toProvider(
 								modalProvider(getter -> new FastHeuristicLinkBasedRelocationCalculator()))
@@ -65,7 +65,7 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 
 					default:
 						throw new IllegalArgumentException("Unsupported rebalancingTargetCalculatorType="
-								+ specificParams.getZoneFreeRelocationCalculatorType());
+								+ specificParams.zoneFreeRelocationCalculatorType);
 				}
 
 				// binding event handler

@@ -18,12 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
-import java.util.Map;
-
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
-
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
@@ -33,37 +27,38 @@ import org.matsim.core.config.ConfigGroup;
 
 import com.google.common.base.Preconditions;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
 /**
  * @author michalm
  */
 public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
-	public interface RebalancingStrategyParams {
-	}
 
 	public static final String SET_NAME = "rebalancing";
 
-	public static final String INTERVAL = "interval";
-	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
-			+ " Must be positive. Default is 1800 s. Expects an Integer Value";
+	@Parameter
+	@Comment("Specifies how often empty vehicle rebalancing is executed."
+			+ " Must be positive. Default is 1800 s. Expects an Integer Value")
+	@Positive
+	public int interval = 1800;// [s]
 
-	public static final String MIN_SERVICE_TIME = "minServiceTime";
-	static final String MIN_SERVICE_TIME_EXP = //
+	@Parameter
+	@Comment(
 			"Minimum remaining service time of an idle/busy vehicle to be considered as rebalancable/soon-idle (respectively)."
-					+ " Default is 3600 s. In general, should be higher than interval (e.g. 2 x interval).";
-
-	public static final String MAX_TIME_BEFORE_IDLE = "maxTimeBeforeIdle";
-	static final String MAX_TIME_BEFORE_IDLE_EXP = //
-			"Maximum remaining time before busy vehicle becomes idle to be considered as soon-idle vehicle."
-					+ " Default is 900 s. In general should be lower than interval (e.g. 0.5 x interval)";
-
+					+ " Default is 3600 s. In general, should be higher than interval (e.g. 2 x interval).")
 	@Positive
-	private int interval = 1800;// [s]
+	public double minServiceTime = 2 * interval;// [s]
 
-	@Positive
-	private double minServiceTime = 2 * interval;// [s]
-
+	@Parameter
+	@Comment("Maximum remaining time before busy vehicle becomes idle to be considered as soon-idle vehicle."
+			+ " Default is 900 s. In general should be lower than interval (e.g. 0.5 x interval)")
 	@PositiveOrZero
-	private double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
+	public double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
+
+	public interface RebalancingStrategyParams {
+	}
 
 	@NotNull
 	private RebalancingStrategyParams rebalancingStrategyParams;
@@ -90,65 +85,8 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		Preconditions.checkArgument(getMinServiceTime() > getMaxTimeBeforeIdle(),
-				RebalancingParams.MIN_SERVICE_TIME + "must be greater than" + RebalancingParams.MAX_TIME_BEFORE_IDLE);
-	}
-
-	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> map = super.getComments();
-		map.put(INTERVAL, INTERVAL_EXP);
-		map.put(MIN_SERVICE_TIME, MIN_SERVICE_TIME_EXP);
-		map.put(MAX_TIME_BEFORE_IDLE, MAX_TIME_BEFORE_IDLE_EXP);
-		return map;
-	}
-
-	/**
-	 * @return -- {@value #INTERVAL_EXP}
-	 */
-	@StringGetter(INTERVAL)
-	public int getInterval() {
-		return interval;
-	}
-
-	/**
-	 * @param interval -- {@value #INTERVAL_EXP}
-	 */
-	@StringSetter(INTERVAL)
-	public void setInterval(int interval) {
-		this.interval = interval;
-	}
-
-	/**
-	 * @return -- {@value #MIN_SERVICE_TIME_EXP}
-	 */
-	@StringGetter(MIN_SERVICE_TIME)
-	public double getMinServiceTime() {
-		return minServiceTime;
-	}
-
-	/**
-	 * @param minServiceTime -- {@value #MIN_SERVICE_TIME_EXP}
-	 */
-	@StringSetter(MIN_SERVICE_TIME)
-	public void setMinServiceTime(double minServiceTime) {
-		this.minServiceTime = minServiceTime;
-	}
-
-	/**
-	 * @return -- {@value #MAX_TIME_BEFORE_IDLE_EXP}
-	 */
-	@StringGetter(MAX_TIME_BEFORE_IDLE)
-	public double getMaxTimeBeforeIdle() {
-		return maxTimeBeforeIdle;
-	}
-
-	/**
-	 * @param maxTimeBeforeIdle-- {@value #MAX_TIME_BEFORE_IDLE_EXP}
-	 */
-	@StringSetter(MAX_TIME_BEFORE_IDLE)
-	public void setMaxTimeBeforeIdle(double maxTimeBeforeIdle) {
-		this.maxTimeBeforeIdle = maxTimeBeforeIdle;
+		Preconditions.checkArgument(minServiceTime > maxTimeBeforeIdle,
+				"minServiceTime must be greater than maxTimeBeforeIdle");
 	}
 
 	public RebalancingStrategyParams getRebalancingStrategyParams() {

@@ -51,7 +51,7 @@ public final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreato
 			DvrpConfigGroup dvrpCfg) {
 		this.passengerHandler = passengerHandler;
 		this.timer = timer;
-		this.mobsimMode = dvrpCfg.getMobsimMode();
+		this.mobsimMode = dvrpCfg.mobsimMode;
 	}
 
 	@Override

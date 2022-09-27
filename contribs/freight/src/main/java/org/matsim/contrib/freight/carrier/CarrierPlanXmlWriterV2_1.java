@@ -21,10 +21,6 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
-
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,40 +31,43 @@ import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.VehicleType;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * A writer that writes carriers and their plans in an xml-file.
+ * A writer that writes carriers and their plans in a xml-file.
  * 
  * @author sschroeder
  *
- * @deprecated Use {@link CarrierPlanWriter} instead which writes the newest format
  */
-public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
+/*package-private*/ class CarrierPlanXmlWriterV2_1 extends MatsimXmlWriter {
 
-	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV2.class);
+	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV2_1.class);
 
 	private final Collection<Carrier> carriers;
 
 	private final Map<CarrierShipment, Id<CarrierShipment>> registeredShipments = new HashMap<>();
-	
+
 	private final Map<CarrierService, Id<CarrierService>> serviceMap = new HashMap<>();
 
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
-	private final List<Tuple<String, String>> atts = new ArrayList<>();
 
 
 	/**
 	 * Constructs the writer with the carriers to be written.
-	 * 
+	 *
 	 * @param carriers to be written
 	 */
-	public CarrierPlanXmlWriterV2(Carriers carriers) {
+	public CarrierPlanXmlWriterV2_1(Carriers carriers) {
 		super();
 		this.carriers = carriers.getCarriers().values();
 	}
@@ -88,11 +87,6 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		try {
 			openFile(filename);
 			writeXmlHead();
-//			atts.clear();
-//			atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
-//			atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
-//			atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "carriersDefinitions_v2.0.xsd"));
-//			this.writeStartTag("carriers", atts);
 
 			startCarriers(this.writer);
 			for (Carrier carrier : carriers) {
@@ -125,17 +119,6 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
 	private void writeVehiclesAndTheirTypes(Carrier carrier, BufferedWriter writer)throws IOException {
 		writer.write("\t\t\t<capabilities fleetSize=\""+ carrier.getCarrierCapabilities().getFleetSize().toString() + "\">\n");
-//		writer.write("\t\t\t\t<vehicleTypes>\n");
-//		for(VehicleType type : carrier.getCarrierCapabilities().getVehicleTypes()){
-//			writer.write("\t\t\t\t\t<vehicleType id=\"" + type.getId() + "\">\n");
-//			writer.write("\t\t\t\t\t\t<description>" + type.getDescription() + "</description>\n");
-//			writer.write("\t\t\t\t\t\t<engineInformation fuelType=\"" + type.getEngineInformation().getFuelType().toString() + "\" gasConsumption=\"" + type.getEngineInformation().getFuelConsumption() + "\"/>\n");
-//			writer.write("\t\t\t\t\t\t<capacity>" + type.getCapacity() + "</capacity>\n");
-//			writer.write("\t\t\t\t\t\t<costInformation fix=\"" + type.getCostInformation().getFixedCosts() + "\" perMeter=\"" + type.getCostInformation().getCostsPerMeter() +
-//					"\" perSecond=\"" + type.getCostInformation().getCostsPerSecond() + "\"/>\n");
-//			writer.write("\t\t\t\t\t</vehicleType>\n");
-//		}
-//		writer.write("\t\t\t\t</vehicleTypes>\n\n");
 		//vehicles
 		writer.write("\t\t\t\t<vehicles>\n");
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
@@ -144,7 +127,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
 			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getId()
 					+ "\" depotLinkId=\"" + v.getLinkId()
-					+ "\" typeId=\"" + vehicleTypeId.toString()
+					+ "\" typeId=\"" + vehicleTypeId
 					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
 					+ "\" latestEnd=\"" + getTime(v.getLatestEndTime())
 					+ "\"/>\n");
@@ -157,7 +140,6 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		if(carrier.getShipments().isEmpty()) return;
 		writer.write("\t\t\t<shipments>\n");
 		for (CarrierShipment s : carrier.getShipments().values()) {
-			// CarrierShipment s = contract.getShipment();
 			Id<CarrierShipment> shipmentId = s.getId();
 			registeredShipments.put(s, shipmentId);
 			writer.write("\t\t\t\t<shipment ");
@@ -250,8 +232,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())
 						+ "\"/>\n");
 				for (TourElement tourElement : tour.getTour().getTourElements()) {
-					if (tourElement instanceof Leg) {
-						Leg leg = (Leg) tourElement;
+					if (tourElement instanceof Leg leg) {
 						writer.write("\t\t\t\t\t<leg expected_dep_time=\""
 								+ Time.writeTime(leg.getExpectedDepartureTime())
 								+ "\" expected_transp_time=\""
@@ -276,15 +257,13 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 							writer.write("</leg>\n");
 						}
 					}
-					else if (tourElement instanceof ShipmentBasedActivity) {
-						ShipmentBasedActivity act = (ShipmentBasedActivity) tourElement;
+					else if (tourElement instanceof ShipmentBasedActivity act) {
 						writer.write("\t\t\t\t\t<act ");
 						writer.write("type=\"" + act.getActivityType() + "\" ");
 						writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\" ");
 						writer.write("/>\n");
 					}
-					else if (tourElement instanceof ServiceActivity){
-						ServiceActivity act = (ServiceActivity) tourElement;
+					else if (tourElement instanceof ServiceActivity act){
 						writer.write("\t\t\t\t\t<act ");
 						writer.write("type=\"" + act.getActivityType() + "\" ");
 						writer.write("serviceId=\"" + serviceMap.get(act.getService()) + "\" ");
