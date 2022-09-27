@@ -19,6 +19,8 @@
 
 package org.matsim.codeexamples.config.reflectiveConfigGroup;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,7 +35,16 @@ public class MyConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "testModule";
 
-	// TODO: test for ALL primitive types
+	// Comments via @Comment are automatically added to auto-generated parameter comments
+	@Comment("int")
+	// Use @Parameter annotation if you do not want to create getter/setter methods with @StringSetter/@StringGetter annotations
+	@Parameter
+	private int intField;
+
+	@Comment("set")
+	@Parameter
+	private Set<String> setField;
+
 	private double doubleField = Double.NaN;
 
 	// Object fields:
@@ -43,8 +54,6 @@ public class MyConfigGroup extends ReflectiveConfigGroup {
 	private Coord coordField = null;
 	// enum: handled especially
 	private MyEnum enumField = null;
-	// field without null conversion
-	private String nonNull = "some arbitrary default value.";
 
 	public MyConfigGroup() {
 		super( GROUP_NAME );
@@ -126,22 +135,6 @@ public class MyConfigGroup extends ReflectiveConfigGroup {
 		if ( coords.length != 2 ) throw new IllegalArgumentException( coordField );
 
 		this.coordField = new Coord(Double.parseDouble(coords[0]), Double.parseDouble(coords[1]));
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	// Non-null string: standard setter and getter
-	@StringGetter( "nonNullField" )
-	@DoNotConvertNull
-	public String getNonNull() {
-		return nonNull;
-	}
-
-	@StringSetter( "nonNullField" )
-	@DoNotConvertNull
-	public void setNonNull( String nonNull ) {
-		// in case the setter is called from user code, we need to check for nullity ourselves.
-		if ( nonNull == null ) throw new IllegalArgumentException();
-		this.nonNull = nonNull;
 	}
 
 	// /////////////////////////////////////////////////////////////////////
