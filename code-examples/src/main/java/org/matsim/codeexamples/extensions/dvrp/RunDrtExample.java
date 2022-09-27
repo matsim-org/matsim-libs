@@ -69,28 +69,40 @@ class RunDrtExample{
 		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMode( DRT_A ).setStopDuration(60.).setMaxWaitTime(900.).setMaxTravelTimeAlpha(1.3).setMaxTravelTimeBeta(10. * 60.);
-			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
-			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_A.xml");
-			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
+			drtConfig.mode = DRT_A;
+			drtConfig.stopDuration = 60.;
+			drtConfig.maxWaitTime=900;
+			drtConfig.maxTravelTimeAlpha = 1.3;
+			drtConfig.maxTravelTimeBeta=10. * 60.;
+			drtConfig.rejectRequestIfMaxWaitOrTravelTimeViolated= false ;
+			drtConfig.vehiclesFile="one_shared_taxi_vehicles_A.xml";
+			drtConfig.changeStartLinkToLastLinkInSchedule=true;
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMode( DRT_B ).setStopDuration(60.).setMaxWaitTime(900.).setMaxTravelTimeAlpha(1.3).setMaxTravelTimeBeta(10. * 60.);
-			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
-			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_B.xml");
-			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
+			drtConfig.mode = DRT_B;
+			drtConfig.stopDuration = 60.;
+			drtConfig.maxWaitTime=900;
+			drtConfig.maxTravelTimeAlpha = 1.3;
+			drtConfig.maxTravelTimeBeta=10. * 60.;
+			drtConfig.rejectRequestIfMaxWaitOrTravelTimeViolated= false ;
+			drtConfig.vehiclesFile="one_shared_taxi_vehicles_B.xml";
+			drtConfig.changeStartLinkToLastLinkInSchedule=true;
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMode( DRT_C ).setStopDuration(60.).setMaxWaitTime(900.).setMaxTravelTimeAlpha(1.3).setMaxTravelTimeBeta(10. * 60.);
-			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
-			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_C.xml");
-			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
+			drtConfig.mode = DRT_C;
+			drtConfig.stopDuration = 60.;
+			drtConfig.maxWaitTime=900;
+			drtConfig.maxTravelTimeAlpha = 1.3;
+			drtConfig.maxTravelTimeBeta=10. * 60.;
+			drtConfig.rejectRequestIfMaxWaitOrTravelTimeViolated= false ;
+			drtConfig.vehiclesFile="one_shared_taxi_vehicles_C.xml";
+			drtConfig.changeStartLinkToLastLinkInSchedule=true;
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
