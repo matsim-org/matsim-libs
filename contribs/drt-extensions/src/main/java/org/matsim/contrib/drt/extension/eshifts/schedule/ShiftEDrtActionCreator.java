@@ -37,7 +37,7 @@ public class ShiftEDrtActionCreator implements DynActionCreator {
         this.timer = timer;
         this.passengerHandler = passengerHandler;
         drtActionCreator = new ShiftDrtActionCreator(passengerHandler, new DrtActionCreator(passengerHandler,
-                v -> createLeg(dvrpCfg.getMobsimMode(), v, timer)));
+				v -> createLeg(dvrpCfg.mobsimMode, v, timer)));
     }
 
     public ShiftEDrtActionCreator(DynActionCreator delegate, MobsimTimer timer, PassengerHandler passengerHandler) {

@@ -47,6 +47,7 @@ import org.matsim.vehicles.VehicleType;
  * 
  * @author sschroeder
  *
+ * @deprecated Use {@link CarrierPlanWriter} instead which writes the newest format
  */
 public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 

@@ -39,35 +39,36 @@ public class RunMultiHubShiftDrtScenarioIT {
 
 		DrtWithShiftsConfigGroup drtWithShiftsConfigGroup = (DrtWithShiftsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
-		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup.setMode(TransportMode.drt)
-				.setMaxTravelTimeAlpha(1.5)
-				.setMaxTravelTimeBeta(10. * 60.)
-				.setStopDuration(30.)
-				.setMaxWaitTime(600.)
-				.setRejectRequestIfMaxWaitOrTravelTimeViolated(true)
-				.setUseModeFilteredSubnetwork(false)
-				.setVehiclesFile(fleetFile)
-				.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door)
-				.setPlotDetailedCustomerStats(true)
-				.setMaxWalkDistance(1000.)
-				.setIdleVehiclesReturnToDepots(false);
+		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
+		drtConfigGroup.mode = TransportMode.drt;
+		drtConfigGroup.maxTravelTimeAlpha = 1.5;
+		drtConfigGroup.maxTravelTimeBeta = 10. * 60.;
+		drtConfigGroup.stopDuration = 30.;
+		drtConfigGroup.maxWaitTime = 600.;
+		drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+		drtConfigGroup.useModeFilteredSubnetwork = false;
+		drtConfigGroup.vehiclesFile = fleetFile;
+		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
+		drtConfigGroup.plotDetailedCustomerStats = true;
+		drtConfigGroup.maxWalkDistance = 1000.;
+		drtConfigGroup.idleVehiclesReturnToDepots = false;
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
 		ConfigGroup rebalancing = drtConfigGroup.createParameterSet("rebalancing");
 		drtConfigGroup.addParameterSet(rebalancing);
-		((RebalancingParams) rebalancing).setInterval(600);
+		((RebalancingParams) rebalancing).interval = 600;
 
 		MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-		strategyParams.setTargetAlpha(0.3);
-		strategyParams.setTargetBeta(0.3);
+		strategyParams.targetAlpha = 0.3;
+		strategyParams.targetBeta = 0.3;
 
-		drtConfigGroup.getRebalancingParams().get().addParameterSet((ConfigGroup) strategyParams);
+		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
 		DrtZonalSystemParams drtZonalSystemParams = new DrtZonalSystemParams();
-		drtZonalSystemParams.setZonesGeneration(DrtZonalSystemParams.ZoneGeneration.GridFromNetwork);
-		drtZonalSystemParams.setCellSize(500.);
-		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
+		drtZonalSystemParams.zonesGeneration = DrtZonalSystemParams.ZoneGeneration.GridFromNetwork;
+		drtZonalSystemParams.cellSize = 500.;
+		drtZonalSystemParams.targetLinkSelection = DrtZonalSystemParams.TargetLinkSelection.mostCentral;
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);

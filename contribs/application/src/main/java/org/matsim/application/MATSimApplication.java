@@ -185,7 +185,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		if (runId != null)
 			config.controler().setRunId(runId);
 
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = createScenario(config);
 
 		prepareScenario(scenario);
 
@@ -339,6 +339,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * Preparation step for the controller.
 	 */
 	protected void prepareControler(Controler controler) {
+	}
+
+	/**
+	 * Allows scenario creation with other loadScenario signatures
+	 * e.g. with AttributeConverter
+	 */
+	protected Scenario createScenario(Config config) {
+		return ScenarioUtils.loadScenario(config);
 	}
 
 	/**
@@ -535,7 +543,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			ConfigUtils.applyCommandline(config, extraArgs);
 		}
 
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = app.createScenario(config);
 		app.prepareScenario(scenario);
 
 		final Controler controler = new Controler(scenario);

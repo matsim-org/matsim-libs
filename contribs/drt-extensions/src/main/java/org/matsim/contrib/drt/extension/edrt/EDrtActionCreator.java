@@ -50,7 +50,7 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	public EDrtActionCreator(PassengerHandler passengerHandler, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
 		this.timer = timer;
-		drtActionCreator = new DrtActionCreator(passengerHandler, v -> createLeg(dvrpCfg.getMobsimMode(), v, timer));
+		drtActionCreator = new DrtActionCreator(passengerHandler, v -> createLeg(dvrpCfg.mobsimMode, v, timer));
 	}
 
 	@Override

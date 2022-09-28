@@ -93,9 +93,9 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 
 		router = routerCreator.get();
 
-		executorService = taxiCfg.isDestinationKnown() ?
+		executorService = taxiCfg.destinationKnown ?
 				null :
-				new ExecutorServiceWithResource<>(IntStream.range(0, taxiCfg.getNumberOfThreads())
+				new ExecutorServiceWithResource<>(IntStream.range(0, taxiCfg.numberOfThreads)
 						.mapToObj(i -> routerCreator.get())
 						.collect(toList()));
 
@@ -120,13 +120,13 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 		divertOrAppendDrive(schedule, vrpPath, TaxiEmptyDriveTask.TYPE);
 
 		double pickupEndTime = Math.max(vrpPath.getArrivalTime(), request.getEarliestStartTime())
-				+ taxiCfg.getPickupDuration();
+				+ taxiCfg.pickupDuration;
 		schedule.addTask(new TaxiPickupTask(vrpPath.getArrivalTime(), pickupEndTime, request));
 
 		Link reqFromLink = request.getFromLink();
 		Link reqToLink = request.getToLink();
 		final double dropoffStartTime;
-		if (taxiCfg.isDestinationKnown()) {
+		if (taxiCfg.destinationKnown) {
 			// TODO use an estimate to set up the occupied drive task and then start computing the actual path in the background
 			VrpPathWithTravelData path = calcPath(reqFromLink, reqToLink, pickupEndTime);
 			appendOccupiedDriveAndDropoff(schedule, request, path);
@@ -155,7 +155,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	}
 
 	protected void divertDrive(TaxiEmptyDriveTask lastTask, VrpPathWithTravelData vrpPath) {
-		if (!taxiCfg.isVehicleDiversion()) {
+		if (!taxiCfg.vehicleDiversion) {
 			throw new IllegalStateException();
 		}
 
@@ -205,7 +205,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	}
 
 	public void stopVehicle(DvrpVehicle vehicle) {
-		if (!taxiCfg.isVehicleDiversion()) {
+		if (!taxiCfg.vehicleDiversion) {
 			throw new RuntimeException("Diversion must be on");
 		}
 
@@ -231,7 +231,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 			return;
 		}
 
-		if (!taxiCfg.isDestinationKnown()) {
+		if (!taxiCfg.destinationKnown) {
 			Task currentTask = schedule.getCurrentTask();
 			if (PICKUP.isBaseTypeOf(currentTask)) {
 				// use pre-computed path (occupied drive)
@@ -248,7 +248,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 		schedule.addTask(new TaxiOccupiedDriveTask(path, req));
 
 		double arrivalTime = path.getArrivalTime();
-		double departureTime = arrivalTime + taxiCfg.getDropoffDuration();
+		double departureTime = arrivalTime + taxiCfg.dropoffDuration;
 		schedule.addTask(new TaxiDropoffTask(arrivalTime, departureTime, req));
 	}
 
@@ -314,18 +314,18 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	protected Integer countUnremovablePlannedTasks(Schedule schedule) {
 		Task currentTask = schedule.getCurrentTask();
 		return switch (getBaseTypeOrElseThrow(currentTask)) {
-			case PICKUP -> taxiCfg.isDestinationKnown() ? 2 : null;
+			case PICKUP -> taxiCfg.destinationKnown ? 2 : null;
 
 			case OCCUPIED_DRIVE -> 1;
 
 			case EMPTY_DRIVE -> {
-				if (taxiCfg.isVehicleDiversion()) {
+				if (taxiCfg.vehicleDiversion) {
 					yield 0;
 				}
 
 				if (PICKUP.isBaseTypeOf(Schedules.getNextTask(schedule))) {
 					// if no diversion and driving to pick up sb then serve that request
-					yield taxiCfg.isDestinationKnown() ? 3 : null;
+					yield taxiCfg.destinationKnown ? 3 : null;
 				}
 
 				// potentially: driving back to the rank (e.g. to charge batteries)
@@ -376,7 +376,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 			}
 
 			case EMPTY_DRIVE -> {
-				if (!taxiCfg.isVehicleDiversion()) {
+				if (!taxiCfg.vehicleDiversion) {
 					throw new RuntimeException("Currently won't happen");
 				}
 

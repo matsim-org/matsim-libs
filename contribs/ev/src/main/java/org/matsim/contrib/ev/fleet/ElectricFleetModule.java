@@ -56,11 +56,11 @@ public class ElectricFleetModule extends AbstractModule {
 		// - vehicle specifications derived from the "standard" matsim vehicles (only if they are read from a file,
 		//     i.e. VehiclesSource.fromVehiclesData)
 		// - vehicle specifications provided via a custom binding for ElectricFleetSpecification
-		if (evCfg.getVehiclesFile() != null) {
+		if (evCfg.vehiclesFile != null) {
 			bind(ElectricFleetSpecification.class).toProvider(() -> {
 				ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
 				new ElectricFleetReader(fleetSpecification).parse(
-						ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getVehiclesFile()));
+						ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.vehiclesFile));
 				return fleetSpecification;
 			}).asEagerSingleton();
 		} else if (getConfig().qsim().getVehiclesSource() == QSimConfigGroup.VehiclesSource.fromVehiclesData) {
@@ -96,7 +96,7 @@ public class ElectricFleetModule extends AbstractModule {
 					}
 				}).asEagerSingleton();
 
-				if (evCfg.getTransferFinalSoCToNextIteration()) {
+				if (evCfg.transferFinalSoCToNextIteration) {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toInstance(new MobsimBeforeCleanupListener() {
 						@Inject
 						private ElectricFleetSpecification electricFleetSpecification;

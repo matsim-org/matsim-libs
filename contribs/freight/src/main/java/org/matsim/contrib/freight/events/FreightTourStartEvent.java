@@ -19,34 +19,49 @@
  *
  */
 
-package org.matsim.contrib.freight.controler;
+package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
+import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.vehicles.Vehicle;
 
-/*package-private*/  final class LSPServiceEndEventCreator implements LSPEventCreator {
+import java.util.Map;
+
+import static org.matsim.contrib.freight.events.FreightEventAttributes.ATTRIBUTE_TOUR_ID;
+
+/**
+ * An event, that informs when a Freight {@link Tour} has started.
+ * There are NO specific information of the tour given, because the {@link Tour} is determined by the {@link Vehicle} and its {@link Carrier}.
+ *
+ * @author Tilman Matteis  - creating it for the use in Logistics / LogisticServiceProviders (LSP)s
+ * @author Kai Martins-Turner (kturner) - integrating and adapting it into/for the MATSim freight contrib
+ */
+public final class FreightTourStartEvent extends AbstractFreightEvent {
+
+	public static final String EVENT_TYPE = "Freight tour starts";
+
+	private final Id<Tour> tourId;
+
+	public FreightTourStartEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId, Id<Tour> tourId) {
+		super(time, carrierId, linkId, vehicleId);
+		this.tourId = tourId;
+	}
 
 	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
-			Id<Person> driverId, int activityCounter) {
-		if(event instanceof ActivityEndEvent){
-			ActivityEndEvent endEvent = (ActivityEndEvent) event;
-			if(endEvent.getActType() == "service") {
-				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-				if(element instanceof ServiceActivity) {
-					ServiceActivity serviceActivity = (ServiceActivity) element;
-					return new LSPServiceEndEvent(endEvent, carrier.getId(), driverId, serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle());
-				}
-			}	
-		}
-		return null;
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	public Id<Tour> getTourId() {
+		return tourId;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_TOUR_ID, this.tourId.toString());
+		return attr;
 	}
 }

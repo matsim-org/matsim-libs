@@ -19,14 +19,29 @@
  *
  */
 
-package org.matsim.contrib.freight.events.eventhandler;
+package org.matsim.contrib.freight.events;
 
-import org.matsim.contrib.freight.events.LSPTourEndEvent;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour.Delivery;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.vehicles.Vehicle;
 
+/*package-private*/  final class FreightShipmentDeliveryEndEventCreator implements FreightEventCreator {
 
-public interface LSPTourEndEventHandler extends EventHandler {
-
-	public void handleEvent( LSPTourEndEvent event );
-
+	@Override
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
+		if(event instanceof ActivityEndEvent endEvent && FreightConstants.DELIVERY.equals(endEvent.getActType()) ) {
+			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+			if (element instanceof Delivery deliveryActivity) {
+				return new FreightShipmentDeliveryEndEvent(event.getTime(), carrier.getId(), deliveryActivity.getShipment(), vehicleId );
+			}
+		}
+		return null;
+	}
 }

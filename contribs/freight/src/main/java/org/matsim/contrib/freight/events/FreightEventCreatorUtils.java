@@ -19,16 +19,36 @@
  *
  */
 
-package org.matsim.contrib.freight.events.eventhandler;
+package org.matsim.contrib.freight.events;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.core.events.handler.EventHandler;
+/**
+ * Utils for {@link FreightEventCreator}s
+ *
+ * @author kturner
+ */
+public final class FreightEventCreatorUtils {
 
-public interface LSPServiceEndEventHandler extends EventHandler{
-	
+	private FreightEventCreatorUtils(){
+	}
 
-		public void handleEvent( LSPServiceEndEvent event );
-
+	/**
+	 * @return a collection of the standard freightEvent creators
+	 */
+	public static Collection<FreightEventCreator> getStandardEventCreators(){
+		List<FreightEventCreator> creators = new ArrayList<>();
+		creators.add(new FreightServiceEndEventCreator());
+		creators.add(new FreightServiceStartEventCreator());
+		creators.add(new FreightShipmentDeliveryStartEventCreator());
+		creators.add(new FreightShipmentDeliveryEndEventCreator());
+		creators.add(new FreightShipmentPickupStartEventCreator());
+		creators.add(new FreightShipmentPickupEndEventCreator());
+		creators.add(new FreightTourEndEventCreator());
+		creators.add(new FreightTourStartEventCreator());
+		return creators;
+	}
 	
 }

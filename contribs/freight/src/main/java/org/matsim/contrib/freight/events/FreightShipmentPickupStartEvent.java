@@ -21,66 +21,52 @@
 
 package org.matsim.contrib.freight.events;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.vehicles.Vehicle;
+
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.Tour;
+import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
-public final class LSPTourStartEvent extends Event{
+/**
+ *  An event, that informs that a Freight {@link CarrierShipment} pickup-activity has started.
+ *
+ * @author Kai Martins-Turner (kturner)
+ */
+public class FreightShipmentPickupStartEvent extends AbstractFreightEvent {
 
-	public static final String EVENT_TYPE = "LspFreightTourStarted";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_CARRIER = "carrier";
-	public static final String ATTRIBUTE_DRIVER = "driver";
-	public static final String ATTRIBUTE_TOUR = "tour";	
-	
-	private final Id<Carrier> carrierId;
-	private final Id<Person> driverId;
-	private final Tour tour;
-	private final CarrierVehicle vehicle;
-	
-	public LSPTourStartEvent(Id<Carrier>  carrierId, Id<Person> driverId, Tour tour, double time, CarrierVehicle vehicle) {
-		super(time);
-		this.carrierId = carrierId;
-		this.driverId = driverId;
-		this.tour = tour;
-		this.vehicle = vehicle;
+	public static final String EVENT_TYPE = "Freight shipment pickup starts";
+
+	private final Id<CarrierShipment> shipmentId;
+	private final double pickupDuration;
+	private final int capacityDemand;
+
+
+	public FreightShipmentPickupStartEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+		super(time, carrierId, shipment.getFrom(), vehicleId);
+		this.shipmentId = shipment.getId();
+		this.pickupDuration = shipment.getPickupServiceTime();
+		this.capacityDemand = shipment.getSize();
 	}
+
 
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
 
-	public Id<Carrier> getCarrierId() {
-		return carrierId;
+	public Id<CarrierShipment> getShipmentId() {
+		return shipmentId;
 	}
 
-	public Id<Person> getDriverId() {
-		return driverId;
-	}
 
-	public Tour getTour() {
-		return tour;
-	}
-
-	public CarrierVehicle getVehicle() {
-		return vehicle;
-	}
-	
-	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicle.getId().toString() );
-		attr.put(ATTRIBUTE_LINK, this.tour.getStartLinkId().toString());
-		attr.put(ATTRIBUTE_CARRIER, this.carrierId.toString());
-		attr.put(ATTRIBUTE_DRIVER, this.driverId.toString());
-		attr.put(ATTRIBUTE_TOUR, this.tour.toString());
+		attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
+		attr.put(ATTRIBUTE_PICKUP_DURATION, String.valueOf(this.pickupDuration));
+		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;
 	}
 }
