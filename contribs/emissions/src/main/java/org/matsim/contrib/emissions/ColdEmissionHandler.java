@@ -86,8 +86,6 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
 
     @Override
     public void handleEvent(LinkLeaveEvent event) {
-
-        // extract event details
 		Id<Vehicle> vehicleId = event.getVehicleId();
         Id<Link> linkId = event.getLinkId();
         Link link = this.scenario.getNetwork().getLinks().get(linkId);
@@ -105,7 +103,7 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
 
             if ( vehicle==null ){
                 handleNullVehicleECG( vehicleId, emissionsConfigGroup );
-            } else{
+            } else {
 
                 if( (distance / 1000) > 1.0 ){
                     Map<Pollutant, Double> coldEmissions = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(),
@@ -117,7 +115,7 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
                     coldEmissionAnalysisModule.throwColdEmissionEvent(vehicle.getId(), linkId, event.getTime(), coldEmissions);
 
                     this.vehicleId2accumulatedDistance.remove( vehicleId );
-                } else{
+                } else {
                     this.vehicleId2accumulatedDistance.put( vehicleId, distance );
                 }
                 // yyyy I have absolutely no clue what the distance stuff is doing here.  kai, jan'20
@@ -126,22 +124,22 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
     }
 
     static void handleNullVehicleECG(Id<Vehicle> vehicleId, EmissionsConfigGroup emissionsConfigGroup ){
-        if( emissionsConfigGroup.getNonScenarioVehicles().equals( EmissionsConfigGroup.NonScenarioVehicles.abort ) ){
-            throw new RuntimeException(
-                    "No vehicle defined for id " + vehicleId + ". " +
-                            "Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
-                            + " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
-                            + " Aborting..." );
-        } else if( emissionsConfigGroup.getNonScenarioVehicles().equals(
-                EmissionsConfigGroup.NonScenarioVehicles.ignore ) ){
-            if( noVehWarnCnt < 10 ){
-                logger.warn(
-                        "No vehicle defined for id " + vehicleId + ". The vehicle will be ignored." );
-                noVehWarnCnt++;
-                if( noVehWarnCnt == 10 ) logger.warn( Gbl.FUTURE_SUPPRESSED );
-            }
-        } else{
-            throw new RuntimeException( "Not yet implemented. Aborting..." );
+        switch ( emissionsConfigGroup.getNonScenarioVehicles() ) {
+            case abort:
+                throw new RuntimeException(
+                        "No vehicle defined for id " + vehicleId + ". " +
+                                "Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
+                                + " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
+                                + " Aborting..." );
+            case ignore:
+                if ( noVehWarnCnt < 10 ){
+                    logger.warn(
+                            "No vehicle defined for id " + vehicleId + ". The vehicle will be ignored." );
+                    noVehWarnCnt++;
+                    if ( noVehWarnCnt == 10 ) logger.warn( Gbl.FUTURE_SUPPRESSED );
+                } 
+            default:
+                throw new RuntimeException( "Not yet implemented. Aborting..." );
         }
     }
 
