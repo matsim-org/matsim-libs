@@ -152,20 +152,22 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		if ( !warnIfZeroLinkLength( linkId, linkLength ) ) { linkLeaveCnt++; }
 		// excluding links with zero lengths from leaveCnt. Amit July'17
 
-		if (!this.linkEnterMap.containsKey(vehicleId)) { linkLeaveFirstActWarnCnt++; }
-
-		if ( this.linkEnterMap.containsKey( vehicleId ) && this.linkEnterMap.get( vehicleId ).getFirst().equals( linkId ) ) {
-			// the vehicle traversed the entire link, DO calculate emissions IF this was not after an activity
-			double travelTime = leaveTime - this.linkEnterMap.get(vehicleId).getSecond();
-			Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-			if (vehicle != null) {
-				emissionsCalculation(vehicleId, vehicle, link, leaveTime, travelTime);
-				// remove vehicle from data structure (no activity on this link, thus not removing from vehicleEnters/LeavesTraffic)
-				this.linkEnterMap.remove(vehicleId);
-			} else {
-				handleNullVehicle(vehicleId);
+		if (this.linkEnterMap.containsKey( vehicleId )) {
+			Tuple<Id<Link>, Double> linkEnterMapEntry = this.linkEnterMap.get( vehicleId );
+			if (linkEnterMapEntry.getFirst().equals( linkId )) {
+				// the vehicle traversed the entire link, calculate emissions if this was not after an activity
+				double travelTime = leaveTime - this.linkEnterMap.get(vehicleId).getSecond();
+				Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
+				if (vehicle != null) {
+					emissionsCalculation(vehicleId, vehicle, link, leaveTime, travelTime);
+					// remove vehicle from data structure (no activity on this link, thus not removing from vehicleEnters/LeavesTraffic)
+					this.linkEnterMap.remove(vehicleId);
+				} else {
+					handleNullVehicle(vehicleId);
+				}
 			}
-		}
+		} else { linkLeaveFirstActWarnCnt++; }
+
 	}
 
 	private void emissionsCalculation(Id<Vehicle> vehicleId, Vehicle vehicle, Link link, double leaveTime, double travelTime) {
