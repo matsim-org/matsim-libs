@@ -72,8 +72,8 @@ public class TaxiToRequestAssignmentCostProvider {
 	}
 
 	private Mode getCurrentMode(AssignmentRequestData rData, VehicleData vData) {
-		if (params.getMode() != Mode.DSE) {
-			return params.getMode();
+		if (params.mode != Mode.DSE) {
+			return params.mode;
 		} else {
 			return rData.getUrgentReqCount() > vData.getIdleCount() ? Mode.PICKUP_TIME : // undersupply
 					Mode.ARRIVAL_TIME; // oversupply
@@ -81,7 +81,7 @@ public class TaxiToRequestAssignmentCostProvider {
 	}
 
 	private double calcPickupBeginTime(VehicleData.Entry departure, DestEntry<DrtRequest> reqEntry, PathData pathData) {
-		double travelTime = pathData == null ? params.getNullPathCost() : pathData.getTravelTime();
+		double travelTime = pathData == null ? params.nullPathCost : pathData.getTravelTime();
 		return Math.max(reqEntry.destination.getEarliestStartTime(), departure.time + travelTime);
 	}
 }

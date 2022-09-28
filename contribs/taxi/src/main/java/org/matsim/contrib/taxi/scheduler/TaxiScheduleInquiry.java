@@ -62,7 +62,7 @@ public class TaxiScheduleInquiry implements ScheduleInquiry {
 	 * If the returned LinkTimePair is not null, then time is not smaller than the current time
 	 */
 	public LinkTimePair getImmediateDiversionOrEarliestIdleness(DvrpVehicle veh) {
-		if (taxiCfg.isVehicleDiversion()) {
+		if (taxiCfg.vehicleDiversion) {
 			LinkTimePair diversion = getImmediateDiversion(veh);
 			if (diversion != null) {
 				return diversion;
@@ -93,7 +93,7 @@ public class TaxiScheduleInquiry implements ScheduleInquiry {
 						return createValidLinkTimePair(link, time, veh);
 
 					case PICKUP:
-						if (!taxiCfg.isDestinationKnown()) {
+						if (!taxiCfg.destinationKnown) {
 							return null;
 						}
 						// otherwise: IllegalStateException -- the schedule should end with STAY (or PICKUP if
@@ -116,7 +116,7 @@ public class TaxiScheduleInquiry implements ScheduleInquiry {
 	 * If the returned LinkTimePair is not null, then time is not smaller than the current time
 	 */
 	public LinkTimePair getImmediateDiversion(DvrpVehicle veh) {
-		if (!taxiCfg.isVehicleDiversion()) {
+		if (!taxiCfg.vehicleDiversion) {
 			throw new RuntimeException("Diversion must be on");
 		}
 

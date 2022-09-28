@@ -46,7 +46,7 @@ public class DvrpBenchmarkConfigConsistencyChecker implements ConfigConsistencyC
 			log.warn("StorageCapFactor should be large enough (e.g. 100) to obtain deterministic (fixed) travel times");
 		}
 
-		if (config.network().isTimeVariantNetwork() && !DvrpConfigGroup.get(config).getNetworkModes().isEmpty()) {
+		if (config.network().isTimeVariantNetwork() && !DvrpConfigGroup.get(config).networkModes.isEmpty()) {
 			throw new RuntimeException("The current version of RunTaxiBenchmark does not support this case: "
 					+ "@Named(DvrpModule.DVRP_ROUTING) Network would consist of links having "
 					+ "VariableIntervalTimeVariantAttributes instead of FixedIntervalTimeVariantAttributes.");

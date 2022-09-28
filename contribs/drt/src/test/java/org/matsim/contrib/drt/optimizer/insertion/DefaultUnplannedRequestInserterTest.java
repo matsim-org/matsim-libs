@@ -125,9 +125,11 @@ public class DefaultUnplannedRequestInserterTest {
 		double now = 15;
 		int retryInterval = 10;
 		VehicleEntry.EntryFactory entryFactory = null;//should not be used
+		var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
+		drtRequestInsertionRetryParams.maxRequestAge = Double.POSITIVE_INFINITY;
+		drtRequestInsertionRetryParams.retryInterval = retryInterval;
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
-				new DrtRequestInsertionRetryParams().setMaxRequestAge(Double.POSITIVE_INFINITY)
-						.setRetryInterval(retryInterval));//retry ON, empty queue
+				drtRequestInsertionRetryParams);//retry ON, empty queue
 		DrtInsertionSearch insertionSearch = //
 				(drtRequest, vEntries) -> drtRequest == request1 && vEntries.isEmpty() ?
 						Optional.empty() :
@@ -161,9 +163,11 @@ public class DefaultUnplannedRequestInserterTest {
 		int retryInterval = 10;
 		VehicleEntry.EntryFactory entryFactory = null;//should not be used
 
+		var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
+		drtRequestInsertionRetryParams.maxRequestAge = Double.POSITIVE_INFINITY;
+		drtRequestInsertionRetryParams.retryInterval = retryInterval;
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
-				new DrtRequestInsertionRetryParams().setMaxRequestAge(Double.POSITIVE_INFINITY)
-						.setRetryInterval(retryInterval));//retry ON
+				drtRequestInsertionRetryParams);//retry ON
 		var oldRequest = request("r0", "from0", "to0");
 		retryQueue.tryAddFailedRequest(oldRequest, now - retryInterval);// will be retried at time 15
 		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> Optional.empty();

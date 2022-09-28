@@ -52,12 +52,12 @@ public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
 	public Network get() {
 		//input/output network may not be connected
 		logNetworkSize("unfiltered", network);
-		if (dvrpCfg.getNetworkModes().isEmpty()) { // no mode filtering
+		if (dvrpCfg.networkModes.isEmpty()) { // no mode filtering
 			return network;
 		}
 
 		Network filteredNetwork = NetworkUtils.createNetwork(networkConfigGroup);
-		new TransportModeNetworkFilter(network).filter(filteredNetwork, dvrpCfg.getNetworkModes());
+		new TransportModeNetworkFilter(network).filter(filteredNetwork, dvrpCfg.networkModes);
 		logNetworkSize("filtered", filteredNetwork);
 		return filteredNetwork;
 	}

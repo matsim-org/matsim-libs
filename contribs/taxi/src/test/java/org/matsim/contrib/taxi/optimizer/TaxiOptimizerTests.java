@@ -52,11 +52,11 @@ public class TaxiOptimizerTests {
 		}
 
 		void updateTaxiConfig(TaxiConfigGroup taxiCfg) {
-			taxiCfg.setDestinationKnown(destinationKnown);
-			taxiCfg.setVehicleDiversion(vehicleDiversion);
-			taxiCfg.setPickupDuration(pickupDuration);
-			taxiCfg.setDropoffDuration(dropoffDuration);
-			taxiCfg.setOnlineVehicleTracker(onlineVehicleTracker);
+			taxiCfg.destinationKnown = destinationKnown;
+			taxiCfg.vehicleDiversion = vehicleDiversion;
+			taxiCfg.pickupDuration = pickupDuration;
+			taxiCfg.dropoffDuration = dropoffDuration;
+			taxiCfg.onlineVehicleTracker = onlineVehicleTracker;
 		}
 	}
 
@@ -92,7 +92,7 @@ public class TaxiOptimizerTests {
 			TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
 
 			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
-			taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");
+			taxiCfg.taxisFile = "taxis_mini_benchmark-" + taxisSuffix + ".xml";
 
 			controler = RunTaxiBenchmark.createControler(config, 1);
 		}
