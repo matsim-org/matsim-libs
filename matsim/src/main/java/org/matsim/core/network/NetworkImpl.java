@@ -342,10 +342,7 @@ import java.util.*;
 	}
 
 	@Override public Link getNearestLinkExactly(final Coord coord) {
-		if (this.linkQuadTree == null) {
-			buildLinkQuadTree();
-		}
-		return this.linkQuadTree.getNearest(coord.getX(), coord.getY());
+		return this.getLinkQuadTree().getNearest(coord.getX(), coord.getY());
 	}
 
 	/**
@@ -355,8 +352,7 @@ import java.util.*;
 	 * @return the closest node found, null if none
 	 */
 	@Override public Node getNearestNode(final Coord coord) {
-		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		return this.nodeQuadTree.getClosest(coord.getX(), coord.getY());
+		return this.getNodeQuadTree().getClosest(coord.getX(), coord.getY());
 	}
 
 	/**
@@ -367,8 +363,7 @@ import java.util.*;
 	 * @return all nodes within distance to <code>coord</code>
 	 */
 	@Override public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
-		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		return this.nodeQuadTree.getDisk(coord.getX(), coord.getY(), distance);
+		return this.getNodeQuadTree().getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 	@Override
@@ -503,10 +498,12 @@ import java.util.*;
 	@Override public Attributes getAttributes() {
 		return attributes;
 	}
-	@Override public final LinkQuadTree getLinkQuadTree() {
+	@Override public LinkQuadTree getLinkQuadTree() {
+		if (this.linkQuadTree == null) buildLinkQuadTree();
 		return this.linkQuadTree ;
 	}
-	@Override public final QuadTree<Node> getNodeQuadTree() {
+	@Override public QuadTree<Node> getNodeQuadTree() {
+		if (this.nodeQuadTree == null) buildQuadTree();
 		return this.nodeQuadTree ;
 	}
 }
