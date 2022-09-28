@@ -79,8 +79,7 @@ public class RunEvExamplewithLTHConsumptionModel {
 
 	public void run(URL configUrl) {
 		Config config = ConfigUtils.loadConfig(configUrl, new EvConfigGroup());
-		config.controler()
-				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("output/evExampleLTH");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

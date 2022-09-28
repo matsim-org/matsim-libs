@@ -24,6 +24,8 @@ import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsim
 
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.EvUnits;
@@ -46,6 +48,8 @@ import com.google.inject.Provider;
  * @author Michal Maciejewski (michalm)
  */
 public class ElectricFleetModule extends AbstractModule {
+	private static final Logger log = LogManager.getLogger(ElectricFleetModule.class );
+
 	@Inject
 	private EvConfigGroup evCfg;
 
@@ -74,6 +78,8 @@ public class ElectricFleetModule extends AbstractModule {
 							vehicles);
 				}
 			}).asEagerSingleton();
+		} else {
+			log.info( "ElectricFleetSpecification neither coming from ev vehicles file nor from matsim vehicles file; needs to be specified by custom binding in user code." );
 		}
 
 		installQSimModule(new AbstractQSimModule() {
