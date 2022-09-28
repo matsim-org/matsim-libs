@@ -45,7 +45,7 @@ public class RunSimpleAdaptiveSignalExample {
 	 * @param args if not null it gives the output directory for the intergreens file
 	 */
 	public static void main(String[] args) {
-		if (args != null){
+		if (args != null && args.length != 0){
 			// use the given output if args is not null
 			outputDir = args[0];
 		}
@@ -53,6 +53,7 @@ public class RunSimpleAdaptiveSignalExample {
 		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("daganzo"), "config.xml"));
 		config.controler().setOutputDirectory(outputDir);
 		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
+		config.qsim().setUsingFastCapacityUpdate(false);
 		config.vspExperimental().setWritingOutputEvents(true);
 		// remove unmaterialized module from the config
 		config.removeModule("otfvis");
