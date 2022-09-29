@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -64,6 +65,7 @@ public class NoiseOnlineExampleIT {
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
+		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
@@ -85,6 +87,7 @@ public class NoiseOnlineExampleIT {
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
+		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
@@ -185,6 +188,7 @@ public class NoiseOnlineExampleIT {
 		Config config = ConfigUtils.loadConfig( testUtils.getPackageInputDirectory() + "config.xml", new NoiseConfigGroup() );
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
+		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
