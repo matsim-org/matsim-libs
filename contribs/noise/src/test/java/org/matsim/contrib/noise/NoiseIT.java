@@ -1059,6 +1059,7 @@ public class NoiseIT {
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		controler.getConfig().controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 		controler.run();
 		
 		// run the noise analysis for the final iteration (offline)
