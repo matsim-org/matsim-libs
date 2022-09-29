@@ -22,6 +22,7 @@ package org.matsim.core.controler.corelisteners;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -42,9 +43,12 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(3);
+		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+
 		Controler c = new Controler(config);
 		c.getConfig().controler().setWriteEventsInterval(0);
         c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 
         c.run();
 
@@ -90,9 +94,11 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(1);
+		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 		Controler c = new Controler(config);
 		c.getConfig().controler().setWriteEventsInterval(0);
         c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 
         c.run();
 
