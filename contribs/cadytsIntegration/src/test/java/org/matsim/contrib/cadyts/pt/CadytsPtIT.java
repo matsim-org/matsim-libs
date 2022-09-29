@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
@@ -145,6 +146,7 @@ public class CadytsPtIT {
 		final Config config = createTestConfig(inputDir, outputDir);
 
 		config.controler().setLastIteration(lastIteration) ;
+		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 
 		config.planCalcScore().setBrainExpBeta(beta) ;
 
@@ -300,6 +302,7 @@ public class CadytsPtIT {
 
 		config.controler().setWriteEventsInterval(0) ;
 		config.controler().setLastIteration(lastIteration) ;
+		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 		// seems to need 15 iterations as "warm-up"; at least the cadyts corrections are much smaller until then.
 
 		config.planCalcScore().setBrainExpBeta(beta) ;
@@ -451,6 +454,7 @@ public class CadytsPtIT {
 		config.controler().setLastIteration(lastIteration) ;
 		config.controler().setWritePlansInterval(1) ;
 		config.controler().setWriteEventsInterval(1) ;
+		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 
 		config.ptCounts().setPtCountsInterval(1) ;
 

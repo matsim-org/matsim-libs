@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.accidents.AccidentsConfigGroup.AccidentsComputationMethod;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -37,6 +38,7 @@ public class RunTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		config.controler().setOutputDirectory(outputDirectory);
+		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
 		config.controler().setRunId(runId);
 		
 		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
