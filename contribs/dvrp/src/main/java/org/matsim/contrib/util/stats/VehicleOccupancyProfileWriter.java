@@ -20,10 +20,6 @@
 package org.matsim.contrib.util.stats;
 
 import java.awt.Paint;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -50,7 +46,6 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
 import com.google.common.collect.ImmutableMap;
@@ -183,13 +178,7 @@ public class VehicleOccupancyProfileWriter implements IterationEndsListener, Shu
 
 	private void dumpOutput(String prefix, String extension) {
 		try {
-			File toFile = new File(outputFilename(prefix) + extension);
-			File fromFile = new File(filename(prefix) + extension);
-			try {
-				Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			IOUtils.copyFile(filename(prefix) + extension, outputFilename(prefix) + extension);
 		} catch (Exception ee) {
 			LogManager.getLogger(this.getClass()).error("writing output " + outputFilename(prefix + extension) +
 					"did not work; probably parameters were such that no such output was generated in the final iteration");
