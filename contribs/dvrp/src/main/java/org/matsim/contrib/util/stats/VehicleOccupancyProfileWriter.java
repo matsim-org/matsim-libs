@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultTableXYDataset;
@@ -41,7 +42,9 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -53,7 +56,7 @@ import one.util.streamex.EntryStream;
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class VehicleOccupancyProfileWriter implements IterationEndsListener {
+public class VehicleOccupancyProfileWriter implements IterationEndsListener, ShutdownListener {
 
 	private static final String DEFAULT_FILE_NAME = "occupancy_time_profiles";
 	private final String outputFile;
@@ -159,5 +162,26 @@ public class VehicleOccupancyProfileWriter implements IterationEndsListener {
 	private String filename(String prefix) {
 		return matsimServices.getControlerIO()
 				.getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + mode);
+	}
+
+	private String outputFilename(String prefix) {
+		return matsimServices.getControlerIO()
+				.getOutputFilenameWithOutputPrefix(prefix + "_" + mode);
+	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		dumpOutput(outputFile, ".txt");
+		dumpOutput(outputFile + "_" + TimeProfileCharts.ChartType.Line, ".png");
+		dumpOutput(outputFile + "_" + TimeProfileCharts.ChartType.StackedArea, ".png");
+	}
+
+	private void dumpOutput(String prefix, String extension) {
+		try {
+			IOUtils.copyFile(filename(prefix) + extension, outputFilename(prefix) + extension);
+		} catch (Exception ee) {
+			LogManager.getLogger(this.getClass()).error("writing output " + outputFilename(prefix + extension) +
+					"did not work; probably parameters were such that no such output was generated in the final iteration");
+		}
 	}
 }
