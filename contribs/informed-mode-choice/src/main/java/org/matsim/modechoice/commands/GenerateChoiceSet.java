@@ -1,14 +1,13 @@
 package org.matsim.modechoice.commands;
 
 
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.MATSimApplication;
+import org.matsim.application.options.ScenarioOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -40,17 +39,8 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 	private static final Logger log = LogManager.getLogger(GenerateChoiceSet.class);
 
-	@CommandLine.Option(names = "--config", description = "Path to scenario config", required = true)
-	private Path configPath;
-
-	@CommandLine.Option(names = "--scenario", description = "Full qualified classname of the MATSim application scenario class. The IMC modules must be specified there.", required = true)
-	private Class<? extends MATSimApplication> scenario;
-
-	@CommandLine.Option(names = "--args", description = "Arguments passed to the scenario")
-	private String scenarioArgs;
-
-	@CommandLine.Option(names = "--population", description = "Path to input population")
-	private Path populationPath;
+	@CommandLine.Mixin
+	private ScenarioOptions scenario;
 
 	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter", defaultValue = "person")
 	private String subpopulation;
@@ -82,22 +72,14 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 	@Override
 	public Integer call() throws Exception {
 
-		Config config = ConfigUtils.loadConfig(configPath.toString());
-
-		if (populationPath != null)
-			config.plans().setInputFile(populationPath.toString());
+		Config config = scenario.getConfig();
 
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
-		Controler controler;
-
-		if (scenarioArgs == null || scenarioArgs.isBlank())
-			controler = MATSimApplication.prepare(scenario, config);
-		else
-			controler = MATSimApplication.prepare(scenario, config, scenarioArgs.split(" "));
+		Controler controler = scenario.createControler();
 
 		log.info("Using k={}, pruning={}", topK, pruning);
 
@@ -127,8 +109,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 			persons++;
 		}
 
-
-		// THis is currently needed because vehicle id mapping needs to be initialized
+		// This is currently needed because vehicle id mapping needs to be initialized
 		controler.run();
 
 		injector.injectMembers(this);
