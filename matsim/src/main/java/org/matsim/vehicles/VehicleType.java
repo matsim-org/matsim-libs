@@ -20,6 +20,7 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -27,7 +28,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /**
  * @author dgrether
  */
-public final class VehicleType implements Attributable{
+public final class VehicleType implements Attributable, Identifiable<VehicleType> {
 	// deliberately final, please do not change.
 	// If something like inheritance is needed, please change this class to VehicleTypeImpl, and extract interface under previous name VehicleType.
 	// And then use delegation. kai, sep'19
@@ -57,9 +58,12 @@ public final class VehicleType implements Attributable{
 	public final VehicleCapacity getCapacity() {
 		return capacity;
 	}
+
+	@Override
 	public final Id<VehicleType> getId() {
 		return id;
 	}
+
 	public final double getPcuEquivalents() {
 		return pcuEquivalents;
 	}
