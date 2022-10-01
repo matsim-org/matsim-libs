@@ -14,16 +14,13 @@ import javax.inject.Provider;
  */
 public final class GeneratorContext {
 
-	final TopKChoicesGenerator generator;
-
-	final SingleTripChoicesGenerator singleGenerator;
-
-	final PlanSelector selector;
-
-	final PlanRouter planRouter;
+	public final TopKChoicesGenerator generator;
+	public final SingleTripChoicesGenerator singleGenerator;
+	public final PlanSelector selector;
+	public final PlanRouter planRouter;
 
 	@Nullable
-	final CandidatePruner pruner;
+	public final CandidatePruner pruner;
 
 	@Inject
 	public GeneratorContext(TopKChoicesGenerator generator, SingleTripChoicesGenerator singleGenerator, PlanSelector selector, PlanRouter planRouter, Provider<CandidatePruner> pruner) {

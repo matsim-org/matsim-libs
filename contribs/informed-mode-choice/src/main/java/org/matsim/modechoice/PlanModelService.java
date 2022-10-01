@@ -1,7 +1,14 @@
 package org.matsim.modechoice;
 
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.modechoice.constraints.TripConstraint;
@@ -10,17 +17,14 @@ import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.MinMaxEstimate;
 import org.matsim.modechoice.estimators.TripEstimator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
  * A service for working with {@link PlanModel} and creating estimates.
  */
 @SuppressWarnings("unchecked")
-public final class PlanModelService {
+public final class PlanModelService implements StartupListener {
 
 	@Inject
 	private Map<String, LegEstimator<?>> legEstimators;
@@ -37,6 +41,12 @@ public final class PlanModelService {
 	@Inject
 	private TimeInterpretation timeInterpretation;
 
+	@Inject
+	private EventsManager eventsManager;
+
+	@Inject
+	private ControlerListenerManager controlerListenerManager;
+
 	private final InformedModeChoiceConfigGroup config;
 	private final Map<String, ModeOptions<?>> options;
 
@@ -49,6 +59,28 @@ public final class PlanModelService {
 
 			if (!options.containsKey(mode))
 				throw new IllegalArgumentException(String.format("No estimators configured for mode %s", mode));
+		}
+	}
+
+	@Override
+	public void notifyStartup(StartupEvent event) {
+
+		// Estimators are registered as event handlers if needed
+		Set<Object> registered = new HashSet<>();
+		for (Object v : Iterables.concat(legEstimators.values(), tripEstimator.values())) {
+			if (v instanceof EventHandler ev && !registered.contains(v)) {
+				eventsManager.addHandler(ev);
+				registered.add(v);
+			}
+		}
+		registered.clear();
+
+		// also register as controler listener
+		for (Object v : Iterables.concat(legEstimators.values(), tripEstimator.values())) {
+			if (v instanceof ControlerListener ev && !registered.contains(v)) {
+				controlerListenerManager.addControlerListener(ev);
+				registered.add(v);
+			}
 		}
 	}
 
@@ -185,6 +217,13 @@ public final class PlanModelService {
 	}
 
 	/**
+	 * Return whether any constraints are registered.
+	 */
+	public boolean hasConstraints() {
+		return !constraints.isEmpty();
+	}
+
+	/**
 	 * Check whether all registered constraints are met.
 	 */
 	public boolean isValidOption(PlanModel model, String[] modes) {
@@ -209,6 +248,12 @@ public final class PlanModelService {
 		return true;
 	}
 
+	/**
+	 * Return the trip estimator for one specific mode.
+	 */
+	public TripEstimator<?> getTripEstimator(String mode) {
+		return tripEstimator.get(mode);
+	}
 
 	public record ConstraintHolder<T>(TripConstraint<T> constraint, T context) implements Predicate<String[]> {
 

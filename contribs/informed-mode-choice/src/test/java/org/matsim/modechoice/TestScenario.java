@@ -15,6 +15,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.modechoice.constraints.RelaxedMassConservationConstraint;
+import org.matsim.modechoice.estimators.ComplexTripEstimator;
 import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.PtTripEstimator;
@@ -35,6 +36,9 @@ public class TestScenario extends MATSimApplication {
 
 	@CommandLine.Option(names = "--mc", description = "Mass-conservation constraint", defaultValue = "false")
 	private boolean mc;
+
+	@CommandLine.Option(names = "--complex", description = "Use the complex estimator", defaultValue = "false")
+	private boolean complex;
 
 	/**
 	 * Hand-picked agents that have trajectories fully within scenario area.
@@ -149,7 +153,7 @@ public class TestScenario extends MATSimApplication {
 				.withFixedCosts(FixedCostsEstimator.DailyConstant.class, "car")
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.AlwaysAvailable.class, "ride", "bike", "walk")
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.ConsiderIfCarAvailable.class, "car")
-				.withTripEstimator(PtTripEstimator.class, ModeOptions.AlwaysAvailable.class, "pt");
+				.withTripEstimator(complex ? ComplexTripEstimator.class : PtTripEstimator.class, ModeOptions.AlwaysAvailable.class, "pt");
 
 		if (mc)
 			builder.withConstraint(RelaxedMassConservationConstraint.class);

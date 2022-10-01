@@ -70,7 +70,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		bind(SingleTripChoicesGenerator.class);
 		bind(GeneratorContext.class);
 
-		bind(PlanModelService.class).in(Singleton.class);
+		bind(PlanModelService.class).asEagerSingleton();
+		addControlerListenerBinding().to(PlanModelService.class).asEagerSingleton();
 
 		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 		});
@@ -92,6 +93,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		// Ensure that only one instance exists
 		bind(ModeChoiceWeightScheduler.class).in(Singleton.class);
 		addControlerListenerBinding().to(ModeChoiceWeightScheduler.class).in(Singleton.class);
+		addControlerListenerBinding().to(ModeConstraintChecker.class).in(Singleton.class);
 
 		bind(PlanSelector.class).toProvider(MultinomialLogitSelectorProvider.class);
 	}
@@ -118,13 +120,15 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	/**
 	 * Binds all entries in map to their modes.
 	 */
+	@SuppressWarnings("unchecked")
 	private <T> void bindAllModes(Map<String, Class<? extends T>> map, TypeLiteral<T> value) {
 
 		// Ensure to bind to internal strings
 		MapBinder<String, T> mapBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 		}, value);
 		for (Map.Entry<String, Class<? extends T>> e : map.entrySet()) {
-			mapBinder.addBinding(e.getKey().intern()).to(e.getValue()).in(Singleton.class);
+			Class<? extends T> clazz = e.getValue();
+			mapBinder.addBinding(e.getKey().intern()).to(clazz).in(Singleton.class);
 		}
 	}
 

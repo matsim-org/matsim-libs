@@ -13,9 +13,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.functions.ScoringParameters;
@@ -53,6 +55,12 @@ public class TopKMinMaxTest {
 
 	@Mock
 	private TripRouter router;
+
+	@Mock
+	private ControlerListenerManager cl;
+
+	@Mock
+	private EventsManager em;
 
 	@Before
 	public void setUp() throws Exception {
@@ -171,6 +179,9 @@ public class TopKMinMaxTest {
 		protected void configure() {
 
 			PopulationFactory f = PopulationUtils.getFactory();
+
+			bind(EventsManager.class).toInstance(em);
+			bind(ControlerListenerManager.class).toInstance(cl);
 
 			bind(TimeInterpretation.class).toInstance(TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes, 0));
 
