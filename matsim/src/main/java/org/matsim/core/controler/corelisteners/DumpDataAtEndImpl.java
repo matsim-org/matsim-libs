@@ -265,9 +265,6 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpTransitSchedule() {
 		try {
 			if (this.transitSchedule != null ) {
-				final String inputCRS = this.config.transit().getInputScheduleCRS();
-				final String internalCRS = this.config.global().getCoordinateSystem();
-
 				new TransitScheduleWriter(this.transitSchedule).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.transitSchedule));
 			}
 		} catch ( Exception ee ) {
@@ -285,9 +282,6 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpFacilities() {
 		// dump facilities
 		try {
-			final String inputCRS = this.config.facilities().getInputCRS();
-			final String internalCRS = this.config.global().getCoordinateSystem();
-
 			new FacilitiesWriter(this.activityFacilities).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.facilities));
 		} catch ( Exception ee ) {
 			log.error("Exception writing facilities.", ee);

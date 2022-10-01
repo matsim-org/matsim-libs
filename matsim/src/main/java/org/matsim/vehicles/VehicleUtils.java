@@ -57,6 +57,7 @@ public final class VehicleUtils {
 	private static final String COST_PER_SECOND_WAITING = "costsPerSecondWaiting";
 	private static final String COST_PER_SECOND_INSERVICE = "costsPerSecondInService";
 	private static final String FUEL_TYPE = "fuelType";
+
 	public static VehicleType createVehicleType( Id<VehicleType> typeId ){
 		return new VehicleType( typeId );
 	}
@@ -298,7 +299,7 @@ public final class VehicleUtils {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
 	}
 
-	public static VehicleImpl createVehicle( Id<Vehicle> id , VehicleType type ){
+	public static Vehicle createVehicle( Id<Vehicle> id , VehicleType type ){
 		return new VehicleImpl( id , type );
 	}
 

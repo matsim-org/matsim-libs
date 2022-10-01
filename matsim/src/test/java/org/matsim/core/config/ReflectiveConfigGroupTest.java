@@ -392,10 +392,6 @@ public class ReflectiveConfigGroupTest {
 		@Parameter
 		private Set<String> setField;
 
-		//		@Comment("list")
-		//		@Parameter
-		//		private List<String> listField;
-
 		// Object fields:
 		// Id: string representation is toString
 		private Id<Link> idField;
