@@ -149,10 +149,10 @@ public class RunEShiftDrtScenarioIT {
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.chargersFile = chargersFile;
 		evConfigGroup.minimumChargeTime = 0;
-		evConfigGroup.vehiclesFile = evsFile;
 		evConfigGroup.timeProfiles = true;
 		config.addModule(evConfigGroup);
 
+		config.vehicles().setVehiclesFile(evsFile);
 
 		final Controler run = EvShiftDrtControlerCreator.createControler(config, false);
 
