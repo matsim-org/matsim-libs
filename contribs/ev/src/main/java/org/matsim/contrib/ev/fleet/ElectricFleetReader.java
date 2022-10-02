@@ -34,6 +34,8 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author Michal Maciejewski (michalm)
  */
+// after switching from the custom EV format to the standard matsim vehicle format, this class should not be used
+@Deprecated(forRemoval = true)
 public class ElectricFleetReader extends MatsimXmlParser {
 	private static final String VEHICLE = "vehicle";
 
