@@ -37,7 +37,6 @@ class CreateUrbanEVTestScenario {
 
 	static Scenario createTestScenario(){
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.vehiclesFile = "this is not important because we use standard matsim vehicles";
 		evConfigGroup.timeProfiles = true;
 		evConfigGroup.chargersFile = "chargers.xml";
 
