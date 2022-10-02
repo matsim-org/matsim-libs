@@ -56,13 +56,6 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@NotNull
 	public String chargersFile = null;
 
-	@Parameter
-	@Comment("Location of the vehicles file."
-			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
-			+ " See ElectricFleetModule.")
-	@Nullable
-	public String vehiclesFile = null;
-
 	// output
 	@Parameter
 	@Comment("If true, SOC time profile plots will be created")

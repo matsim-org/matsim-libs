@@ -79,7 +79,6 @@ public class RunUrbanEVExample {
 
 	public static void main(String[] args) {
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.vehiclesFile = "this is not important because we use standard matsim vehicles";
 		evConfigGroup.timeProfiles = true;
 		evConfigGroup.chargersFile = "chargers.xml";
 

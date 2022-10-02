@@ -85,8 +85,8 @@ public class RunEvExamplewithLTHConsumptionModel {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
-		driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory("defaultVehicleType",
-				new LTHConsumptionModelReader(Id.create("defaultVehicleType", VehicleType.class)).readURL(
+		driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory("EV_60.0kWh",
+				new LTHConsumptionModelReader(Id.create("EV_60.0kWh", VehicleType.class)).readURL(
 						ConfigGroup.getInputFileURL(config.getContext(), "MidCarMap.csv")));
 
 		Controler controler = new Controler(scenario);
@@ -95,7 +95,8 @@ public class RunEvExamplewithLTHConsumptionModel {
 			@Override
 			public void install() {
 				bind(DriveEnergyConsumption.Factory.class).toInstance(driveEnergyConsumptionFactory);
-				bind(AuxEnergyConsumption.Factory.class).toInstance(electricVehicle -> (beginTime, duration, linkId) -> 0); //a dummy factory, as aux consumption is part of the drive consumption in the model
+				bind(AuxEnergyConsumption.Factory.class).toInstance(
+						electricVehicle -> (beginTime, duration, linkId) -> 0); //a dummy factory, as aux consumption is part of the drive consumption in the model
 				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
 				installQSimModule(new AbstractQSimModule() {
 					@Override
