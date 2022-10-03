@@ -3,10 +3,10 @@ package org.matsim.contrib.drt.extension.operations.eshifts.run;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
+import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.EDrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
-import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
-import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -143,14 +143,14 @@ public class RunEShiftDrtScenarioIT {
 		operationsParams.addParameterSet(operationFacilitiesParams);
 
 		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
-		shiftsParams.setShiftInputFile(shiftsFile);
-		shiftsParams.setAllowInFieldChangeover(true);
+		shiftsParams.shiftInputFile = shiftsFile;
+		shiftsParams.allowInFieldChangeover = true;
 
 		//e shifts
-		shiftsParams.setShiftAssignmentBatteryThreshold(0.6);
-		shiftsParams.setChargeAtHubThreshold(0.8);
-		shiftsParams.setOutOfShiftChargerType("slow");
-		shiftsParams.setBreakChargerType("fast");
+		shiftsParams.shiftAssignmentBatteryThreshold= 0.6;
+		shiftsParams.chargeAtHubThreshold = 0.8;
+		shiftsParams.outOfShiftChargerType = "slow";
+		shiftsParams.breakChargerType = "fast";
 
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 

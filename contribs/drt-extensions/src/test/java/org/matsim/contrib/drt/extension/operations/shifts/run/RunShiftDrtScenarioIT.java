@@ -130,8 +130,8 @@ public class RunShiftDrtScenarioIT {
 		operationsParams.addParameterSet(operationFacilitiesParams);
 
 		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
-		shiftsParams.setShiftInputFile(shiftsFile);
-		shiftsParams.setAllowInFieldChangeover(true);
+		shiftsParams.shiftInputFile = shiftsFile;
+		shiftsParams.allowInFieldChangeover = true;
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
 		final Controler run = DrtOperationsControlerCreator.createControler(config, false);

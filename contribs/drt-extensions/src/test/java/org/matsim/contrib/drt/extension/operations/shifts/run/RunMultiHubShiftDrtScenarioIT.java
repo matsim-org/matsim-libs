@@ -131,8 +131,8 @@ public class RunMultiHubShiftDrtScenarioIT {
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
 		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
-		shiftsParams.setShiftInputFile(shiftsFile);
-		shiftsParams.setAllowInFieldChangeover(true);
+		shiftsParams.shiftInputFile = shiftsFile;
+		shiftsParams.allowInFieldChangeover = true;
 
 		final Controler run = DrtOperationsControlerCreator.createControler(config, false);
 		run.run();

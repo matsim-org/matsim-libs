@@ -118,7 +118,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     @Override
     public void dispatch(double timeStep) {
-		if(timeStep % drtShiftParams.getLoggingInterval() == 0) {
+		if(timeStep % drtShiftParams.loggingInterval == 0) {
 			logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
 					activeShifts.size(), assignedShifts.size(), unscheduledShifts.size()));
 			for (Map.Entry<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> queueEntry : idleVehiclesQueues.entrySet()) {
@@ -126,7 +126,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 			}
 		}
         endShifts(timeStep);
-		if (timeStep % (drtShiftParams.getUpdateShiftEndInterval()) == 0) {
+		if (timeStep % (drtShiftParams.updateShiftEndInterval) == 0) {
 			updateShiftEnds(timeStep);
 		}
 		assignShifts(timeStep);
@@ -266,7 +266,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         while (iterator.hasNext()) {
             final ShiftEntry next = iterator.next();
 
-            if (timeStep + drtShiftParams.getShiftEndLookAhead() < next.shift.getEndTime()) {
+            if (timeStep + drtShiftParams.shiftEndLookAhead < next.shift.getEndTime()) {
                 continue;
             }
 
@@ -291,7 +291,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 				endingShiftsIterator.remove();
 				continue;
 			}
-			if (timeStep + drtShiftParams.getShiftEndRescheduleLookAhead() > next.shift.getEndTime()) {
+			if (timeStep + drtShiftParams.shiftEndRescheduleLookAhead > next.shift.getEndTime()) {
 				if (next.vehicle.getShifts().size() > 1) {
 					updateShiftEnd(next);
 				}
@@ -350,7 +350,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         }
 
         final OperationFacility shiftChangeFacility;
-        if (drtShiftParams.isAllowInFieldChangeover()) {
+        if (drtShiftParams.allowInFieldChangeover) {
             shiftChangeFacility = breakFacilityFinder.findFacility(start.link.getCoord());
         } else {
             shiftChangeFacility = breakFacilityFinder.findFacilityOfType(start.link.getCoord(),
@@ -487,7 +487,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     private boolean isSchedulable(DrtShift shift, double timeStep) {
-        return shift.getStartTime() <= timeStep + drtShiftParams.getShiftScheduleLookAhead(); // && shift.getEndTime() > timeStep;
+        return shift.getStartTime() <= timeStep + drtShiftParams.shiftScheduleLookAhead; // && shift.getEndTime() > timeStep;
     }
 
 

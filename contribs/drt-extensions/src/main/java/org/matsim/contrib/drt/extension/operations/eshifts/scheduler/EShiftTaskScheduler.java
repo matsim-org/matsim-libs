@@ -180,7 +180,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
 			final double waitTime = ChargingEstimations
 					.estimateMaxWaitTimeForNextVehicle(chargerImpl);
 
-			if (ev.getBattery().getSoc() / ev.getBattery().getCapacity() < shiftsParams.getChargeDuringBreakThreshold() ||
+			if (ev.getBattery().getSoc() / ev.getBattery().getCapacity() < shiftsParams.chargeDuringBreakThreshold ||
 			waitTime > 0) {
                 dropoffStopTask = taskFactory.createShiftBreakTask(vehicle, startTime,
                         endTime, link, shiftBreak, breakFacility);
@@ -213,7 +213,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
 				Optional<Charger> selectedCharger = chargerIds
 						.stream()
 						.map(id -> chargingInfrastructure.getChargers().get(id))
-						.filter(charger -> shiftsParams.getBreakChargerType().equals(charger.getChargerType()))
+						.filter(charger -> shiftsParams.breakChargerType.equals(charger.getChargerType()))
 						.min((c1, c2) -> {
 							final double waitTime = ChargingEstimations
 									.estimateMaxWaitTimeForNextVehicle(c1);
@@ -262,7 +262,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
             }
 
             final double startTime = Math.max(shift.getEndTime(), path.getArrivalTime());
-            final double endTime = startTime + shiftsParams.getChangeoverDuration();
+            final double endTime = startTime + shiftsParams.changeoverDuration;
             if (path.getArrivalTime() > shift.getEndTime()) {
                 logger.warn("Shift changeover of shift " + shift.getId() + " will probably be delayed by "
                         + (path.getArrivalTime() - shift.getEndTime()) + " seconds.");
@@ -297,7 +297,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
                 schedule.addTask(taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)); // add RELOCATE
 
                 final double startTime = Math.max(shift.getEndTime(), path.getArrivalTime());
-                final double endTime = startTime + shiftsParams.getChangeoverDuration();
+                final double endTime = startTime + shiftsParams.changeoverDuration;
                 if (path.getArrivalTime() > shift.getEndTime()) {
                     logger.warn("Shift changeover of shift " + shift.getId() + " will probably be delayed by "
                             + (path.getArrivalTime() - shift.getEndTime()) + " seconds.");
@@ -308,7 +308,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
             } else {
                 drtStayTask.setEndTime(shift.getEndTime());
                 final double startTime = shift.getEndTime();
-                final double endTime = shift.getEndTime() + shiftsParams.getChangeoverDuration();
+                final double endTime = shift.getEndTime() + shiftsParams.changeoverDuration;
                 appendShiftChange(vehicle, shift, breakFacility, startTime, endTime, link);
             }
         }
@@ -329,7 +329,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
 			final double waitTime = ChargingEstimations
 					.estimateMaxWaitTimeForNextVehicle(chargingImpl);
 
-			if (ev.getBattery().getSoc() / ev.getBattery().getCapacity() < shiftsParams.getChargeDuringBreakThreshold()
+			if (ev.getBattery().getSoc() / ev.getBattery().getCapacity() < shiftsParams.chargeDuringBreakThreshold
                     || ((ChargingWithAssignmentLogic) chargingImpl.getLogic()).getAssignedVehicles().contains(ev)
 			|| waitTime >0) {
                 dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, startTime,
@@ -406,7 +406,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
                     vrpPath.getToLink()));
         }
         // append SHIFT_CHANGEOVER task
-        final double endTime = Math.max(shift.getEndTime(), vrpPath.getArrivalTime()) + shiftsParams.getChangeoverDuration();
+        final double endTime = Math.max(shift.getEndTime(), vrpPath.getArrivalTime()) + shiftsParams.changeoverDuration;
         ShiftChangeOverTask dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, Math.max(shift.getEndTime(), vrpPath.getArrivalTime()),
                 endTime, vrpPath.getToLink(), shift, facility);
         schedule.addTask(dropoffStopTask);

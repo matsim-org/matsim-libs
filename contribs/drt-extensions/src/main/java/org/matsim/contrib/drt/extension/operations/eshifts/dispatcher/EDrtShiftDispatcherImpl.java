@@ -90,14 +90,14 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 							continue;
 						}
 						final ElectricVehicle electricVehicle = eShiftVehicle.getElectricVehicle();
-						if (electricVehicle.getBattery().getSoc() / electricVehicle.getBattery().getCapacity() < drtShiftParams.getChargeAtHubThreshold()) {
+						if (electricVehicle.getBattery().getSoc() / electricVehicle.getBattery().getCapacity() < drtShiftParams.chargeAtHubThreshold) {
 							final Task currentTask = eShiftVehicle.getSchedule().getCurrentTask();
 							if (currentTask instanceof EDrtWaitForShiftStayTask
 									&& ((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
 								Optional<Charger> selectedCharger = chargerIds
 										.stream()
 										.map(id -> chargingInfrastructure.getChargers().get(id))
-										.filter(charger -> drtShiftParams.getOutOfShiftChargerType().equals(charger.getChargerType()))
+										.filter(charger -> drtShiftParams.outOfShiftChargerType.equals(charger.getChargerType()))
 										.min((c1, c2) -> {
 											final double waitTime = ChargingEstimations
 													.estimateMaxWaitTimeForNextVehicle(c1);

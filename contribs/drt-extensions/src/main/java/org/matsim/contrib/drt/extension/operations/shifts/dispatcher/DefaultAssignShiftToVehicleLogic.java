@@ -41,15 +41,15 @@ public class DefaultAssignShiftToVehicleLogic implements AssignShiftToVehicleLog
 		final Iterator<DrtShift> iterator = vehicle.getShifts().iterator();
 		DrtShift previous = iterator.next();
 		if (!iterator.hasNext()) {
-			if (previous.getEndTime() + drtShiftParams.getChangeoverDuration() < shift.getStartTime()) {
+			if (previous.getEndTime() + drtShiftParams.changeoverDuration < shift.getStartTime()) {
 				return true;
 			}
 		}
 
 		while (iterator.hasNext()) {
 			DrtShift next = iterator.next();
-			if (shift.getEndTime() + drtShiftParams.getChangeoverDuration() < next.getStartTime()
-					&& previous.getEndTime() + drtShiftParams.getChangeoverDuration() < shift.getStartTime()) {
+			if (shift.getEndTime() + drtShiftParams.changeoverDuration < next.getStartTime()
+					&& previous.getEndTime() + drtShiftParams.changeoverDuration < shift.getStartTime()) {
 				return true;
 			}
 			previous = next;
