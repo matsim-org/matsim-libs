@@ -130,7 +130,7 @@ public class RunMultiHubShiftDrtScenarioIT {
 		operationsParams.addParameterSet(operationFacilitiesParams);
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
-		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
+		operationFacilitiesParams.operationFacilityInputFile = opFacilitiesFile;
 		shiftsParams.shiftInputFile = shiftsFile;
 		shiftsParams.allowInFieldChangeover = true;
 

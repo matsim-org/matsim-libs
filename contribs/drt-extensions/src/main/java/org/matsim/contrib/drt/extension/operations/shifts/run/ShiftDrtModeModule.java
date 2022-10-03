@@ -91,7 +91,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		OperationFacilitiesParams operationFacilitiesParams = drtOperationsParams.getOperationFacilitiesParams().orElseThrow();
-		if (operationFacilitiesParams.getOperationFacilityInputFile() != null) {
+		if (operationFacilitiesParams.operationFacilityInputFile != null) {
 			bindModal(OperationFacilitiesSpecification.class).toProvider(() -> {
 				OperationFacilitiesSpecification operationFacilitiesSpecification = new OperationFacilitiesSpecificationImpl();
 				new OperationFacilitiesReader(operationFacilitiesSpecification)

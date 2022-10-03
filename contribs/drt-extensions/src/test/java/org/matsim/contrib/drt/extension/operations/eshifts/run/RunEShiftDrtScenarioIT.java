@@ -142,7 +142,7 @@ public class RunEShiftDrtScenarioIT {
 		operationsParams.addParameterSet(shiftsParams);
 		operationsParams.addParameterSet(operationFacilitiesParams);
 
-		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
+		operationFacilitiesParams.operationFacilityInputFile = opFacilitiesFile;
 		shiftsParams.shiftInputFile = shiftsFile;
 		shiftsParams.allowInFieldChangeover = true;
 
