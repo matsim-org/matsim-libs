@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -23,6 +24,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	 */
 	private List<String> modes = List.of(TransportMode.car, TransportMode.walk, TransportMode.pt, TransportMode.bike);
 
+	@Parameter
 	@Comment("Defines how many top k best trips of each category should be generated.")
 	private int topK = 5;
 
@@ -40,7 +42,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Annealing for the invBeta parameter.")
-	private Schedule anneal = Schedule.off;
+	private Schedule anneal = Schedule.quadratic;
 
 	@Parameter
 	@Comment("Defines how constraint violations are handled.")
@@ -132,6 +134,12 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		return modes;
 	}
 
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> comments = super.getComments();
+		comments.put(CONFIG_PARAM_MODES, "Defines all modes that are available and open for mode choice.");
+		return comments;
+	}
 
 	public enum Schedule {
 		off,

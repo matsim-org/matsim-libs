@@ -10,6 +10,7 @@ import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
 import org.matsim.modechoice.pruning.CandidatePruner;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,7 +54,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	 * @param diffThreshold allowed difference to the best solution (if positive)
 	 * @param absThreshold  minimal required estimate score (use NaN or negative infinity if not needed)
 	 */
-	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask,
+	public Collection<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask,
 	                                          int topK, double diffThreshold, double absThreshold) {
 
 		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
@@ -193,7 +194,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 				if (estimate > best)
 					best = estimate;
 
-				if (diffThreshold >= 0 && best - estimate > diffThreshold)
+				if (!Double.isNaN(diffThreshold) && diffThreshold >= 0 && best - estimate > diffThreshold)
 					break;
 
 				// absolute threshold
@@ -218,7 +219,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		List<PlanCandidate> result = candidates.keySet().stream().sorted().limit(topK).collect(Collectors.toList());
 
 		// threshold need to be rechecked again on the global best
-		if (diffThreshold >= 0) {
+		if (!Double.isNaN(diffThreshold) && diffThreshold >= 0) {
 			double best = result.get(0).getUtility();
 
 			// absolute threshold

@@ -20,6 +20,7 @@ import org.matsim.modechoice.estimators.ActivityEstimator;
 import picocli.CommandLine;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -27,8 +28,8 @@ import java.util.stream.Collectors;
  * Command line parameters that can be included in any {@link org.matsim.application.MATSimApplication} to configurable mode-choice strategies.
  *
  * <code>
- *      {@code @Mixin
- *      StrategyOptions strategy = new StrategyOptions();
+ * {@code @Mixin
+ * StrategyOptions strategy = new StrategyOptions();
  * </code>
  */
 public final class StrategyOptions {
@@ -85,10 +86,10 @@ public final class StrategyOptions {
 		if (!group.timeMutation)
 			log.accept(config, "no-tm", "");
 
-		if (group.anneal != InformedModeChoiceConfigGroup.Schedule.off)
+		if (group.anneal != InformedModeChoiceConfigGroup.Schedule.quadratic)
 			log.accept(config, "anneal", group.anneal);
 
-		if (group.invBeta != Math.E)
+		if (group.invBeta != 2.5)
 			log.accept(config, "invBeta", group.invBeta);
 
 		if (group.forceInnovation != 10)
@@ -103,17 +104,28 @@ public final class StrategyOptions {
 
 	/**
 	 * Apply and bind the {@link InformedModeChoiceModule}.
-	 * @param setup procedure to configure the module
 	 *
+	 * @param setup procedure to configure the module
 	 * @return prepared module that needs to be installed with guice
 	 */
 	public Module applyModule(Binder binder, Config config, Consumer<InformedModeChoiceModule.Builder> setup) {
 
+		// remove all mode choice strategies + time allocation
+		Set<String> filtered = Set.of(
+				DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice,
+				DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode,
+				DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode,
+				DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator,
+				ModeChoice.selectSubtourMode.name,
+				ModeChoice.selectBestKPlanModes.name,
+				ModeChoice.selectSubtourMode.name,
+				ModeChoice.randomSubtourMode.name,
+				ModeChoice.informedModeChoice.name
+		);
+
 		// Always collect all strategies (without the common MCs first)
 		List<StrategyConfigGroup.StrategySettings> strategies = config.strategy().getStrategySettings().stream()
-				.filter(s -> !s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice) &&
-						!s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode) &&
-						!s.getStrategyName().equals(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator)
+				.filter(s -> !filtered.contains(s.getStrategyName())
 				).collect(Collectors.toList());
 
 
@@ -208,13 +220,13 @@ public final class StrategyOptions {
 		private int forceInnovation;
 
 		@CommandLine.Option(names = "--inv-beta", description = "Inv beta parameter (0 = best choice)")
-		private double invBeta = Math.E;
+		private double invBeta = 2.5;
 
 		@CommandLine.Option(names = "--prune", description = "Name of pruner to enable")
 		private String prune;
 
-		@CommandLine.Option(names = "--anneal", defaultValue = "off", description = "Parameter annealing: ${COMPLETION-CANDIDATES}")
-		private InformedModeChoiceConfigGroup.Schedule anneal = InformedModeChoiceConfigGroup.Schedule.off;
+		@CommandLine.Option(names = "--anneal", defaultValue = "quadratic", description = "Parameter annealing: ${COMPLETION-CANDIDATES}")
+		private InformedModeChoiceConfigGroup.Schedule anneal = InformedModeChoiceConfigGroup.Schedule.quadratic;
 	}
 
 }

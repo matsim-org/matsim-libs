@@ -46,8 +46,14 @@ public class ModeConstraintChecker implements IterationEndsListener, PersonAlgor
 		Population population = event.getServices().getScenario().getPopulation();
 
 		if (event.getIteration() == 0 && service.hasConstraints() && config.getConstraintCheck() != InformedModeChoiceConfigGroup.ConstraintCheck.none) {
+
 			generator = ThreadLocal.withInitial(() -> provider.get());
+			violations.clear();
+
 			ParallelPersonAlgorithmUtils.run(population, event.getServices().getConfig().global().getNumberOfThreads(), this);
+
+			// reset field so it can be garbage collected
+			generator = null;
 		}
 
 		if (violations.size() > 0) {
@@ -56,7 +62,7 @@ public class ModeConstraintChecker implements IterationEndsListener, PersonAlgor
 			log.error("Violating persons are: {}", violations.stream().map(Person::getId).collect(Collectors.toList()));
 
 			if (config.getConstraintCheck() == InformedModeChoiceConfigGroup.ConstraintCheck.abort)
-				throw new IllegalStateException("Aborting due to constraint violations in input plans. Set constraintCheck to 'warn' or 'repair' to avoid this error.");
+				throw new IllegalStateException(String.format("Aborting due to %d constraint violations in input plans. Set constraintCheck to 'warn' or 'repair' to avoid this error.", violations.size()));
 		}
 	}
 
@@ -94,7 +100,7 @@ public class ModeConstraintChecker implements IterationEndsListener, PersonAlgor
 
 			GeneratorContext ctx = generator.get();
 
-			Collection<PlanCandidate> candidates = ctx.generator.generate(PlanModel.newInstance(first));
+			Collection<PlanCandidate> candidates = ctx.generator.generate(PlanModel.newInstance(first), null, null, 1, Double.NaN, Double.NaN);
 
 			PlanCandidate candidate = candidates.iterator().next();
 			candidate.applyTo(first);
