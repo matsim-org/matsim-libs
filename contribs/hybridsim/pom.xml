@@ -10,8 +10,8 @@
   <name>hybridsim</name>
 
   <properties>
-    <protobuf.version>3.21.6</protobuf.version>
-    <grpc.version>1.49.1</grpc.version>
+    <protobuf.version>3.21.7</protobuf.version>
+    <grpc.version>1.49.2</grpc.version>
   </properties>
 
   <dependencies>

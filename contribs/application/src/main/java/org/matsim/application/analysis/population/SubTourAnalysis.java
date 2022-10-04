@@ -103,6 +103,14 @@ public class SubTourAnalysis implements MATSimAppCommand {
 				massConserving++;
 		}
 
+		if (person != null && persons.size() > 0) {
+
+			Person p = persons.get(0);
+
+			log.info(p.getAttributes());
+			log.info(p.getSelectedPlan());
+		}
+
 		log.info("Subtours: {} | closed: {}% | massConserving: {}%", subtours.size(), 100d * closed / subtours.size(), 100d * massConserving / subtours.size());
 
 		DoubleList nChoices = new DoubleArrayList(persons.size());
