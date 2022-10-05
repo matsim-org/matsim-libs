@@ -41,7 +41,9 @@ package playground.vsp.ev;
  *                                                                         *
  * *********************************************************************** */
 
-
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,10 +63,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * this is an example of how to run MATSim with the UrbanEV module which inserts charging activities for all legs which use a EV.
  * By default, {@link MATSimVehicleWrappingEVSpecificationProvider} is used, which declares any vehicle as an EV
@@ -82,7 +80,9 @@ public class RunUrbanEVExample {
 		evConfigGroup.timeProfiles = true;
 		evConfigGroup.chargersFile = "chargers.xml";
 
-		String pathToConfig = args.length > 0 ? args[0] : "contribs/vsp/test/input/playground/vsp/ev/chessboard-config.xml";
+		String pathToConfig = args.length > 0 ?
+				args[0] :
+				"contribs/vsp/test/input/playground/vsp/ev/chessboard-config.xml";
 
 		Config config = ConfigUtils.loadConfig(pathToConfig, evConfigGroup);
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
@@ -112,31 +112,35 @@ public class RunUrbanEVExample {
 		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
 
 		//register charging interaction activities for car
-		config.planCalcScore().addActivityParams(
-				new PlanCalcScoreConfigGroup.ActivityParams(TransportMode.car + UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)
-						.setScoringThisActivityAtAll(false));
-		config.planCalcScore().addActivityParams(
-				new PlanCalcScoreConfigGroup.ActivityParams(TransportMode.car + UrbanVehicleChargingHandler.PLUGIN_INTERACTION)
-						.setScoringThisActivityAtAll(false));
+		config.planCalcScore()
+				.addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams(TransportMode.car
+						+ UrbanVehicleChargingHandler.PLUGOUT_INTERACTION).setScoringThisActivityAtAll(false));
+		config.planCalcScore()
+				.addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams(
+						TransportMode.car + UrbanVehicleChargingHandler.PLUGIN_INTERACTION).setScoringThisActivityAtAll(
+						false));
 	}
 
-
-	static void createAndRegisterPersonalCarAndBikeVehicles(Scenario scenario){
+	static void createAndRegisterPersonalCarAndBikeVehicles(Scenario scenario) {
 		VehiclesFactory vehicleFactory = scenario.getVehicles().getFactory();
 
-		for(Person person : scenario.getPopulation().getPersons().values()) {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
 
-			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString(), VehicleType.class)); //TODO should at least have a suffix "_car"
+			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString(),
+					VehicleType.class)); //TODO should at least have a suffix "_car"
 			VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
 			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
-			EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), CAR_INITIAL_ENERGY);
 			EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 			scenario.getVehicles().addVehicleType(carVehicleType);
-			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car), carVehicleType);
+			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
+					carVehicleType);
+			EVUtils.setInitialEnergy(carVehicle, CAR_INITIAL_ENERGY);
 			scenario.getVehicles().addVehicle(carVehicle);
 
-			VehicleType bikeVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString() + "_bike", VehicleType.class));
-			Vehicle bikeVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.bike), bikeVehicleType);
+			VehicleType bikeVehicleType = vehicleFactory.createVehicleType(
+					Id.create(person.getId().toString() + "_bike", VehicleType.class));
+			Vehicle bikeVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.bike),
+					bikeVehicleType);
 
 			scenario.getVehicles().addVehicleType(bikeVehicleType);
 			scenario.getVehicles().addVehicle(bikeVehicle);
