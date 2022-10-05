@@ -22,7 +22,7 @@ package playground.vsp.ev;
 
 import java.util.Collection;
 
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
 
@@ -35,7 +35,7 @@ public class EVUtils {
 	 */
 	static Double getInitialEnergy(Vehicle vehicle) {
 		return (Double)vehicle.getAttributes()
-				.getAttribute(ElectricVehicleSpecificationWithMatsimVehicle.INITIAL_ENERGY_kWh);
+				.getAttribute(ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh);
 	}
 
 	/**
@@ -44,16 +44,16 @@ public class EVUtils {
 	 */
 	public static void setInitialEnergy(Vehicle vehicle, double initialEnergyInKWh) {
 		vehicle.getAttributes()
-				.putAttribute(ElectricVehicleSpecificationWithMatsimVehicle.INITIAL_ENERGY_kWh, initialEnergyInKWh);
+				.putAttribute(ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh, initialEnergyInKWh);
 	}
 
 	static ImmutableList<String> getChargerTypes(EngineInformation engineInformation) {
 		return ImmutableList.copyOf((Collection<String>)engineInformation.getAttributes()
-				.getAttribute(ElectricVehicleSpecificationWithMatsimVehicle.CHARGER_TYPES));
+				.getAttribute(ElectricVehicleSpecificationImpl.CHARGER_TYPES));
 	}
 
 	public static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes) {
 		engineInformation.getAttributes()
-				.putAttribute(ElectricVehicleSpecificationWithMatsimVehicle.CHARGER_TYPES, chargerTypes);
+				.putAttribute(ElectricVehicleSpecificationImpl.CHARGER_TYPES, chargerTypes);
 	}
 }

@@ -20,7 +20,7 @@
 
 package playground.vsp.ev;
 
-import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle.EV_ENGINE_HBEFA_TECHNOLOGY;
+import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl.EV_ENGINE_HBEFA_TECHNOLOGY;
 
 import javax.inject.Provider;
 
@@ -30,8 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecificationImpl;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripStructureUtils;
@@ -77,7 +76,7 @@ class MATSimVehicleWrappingEVSpecificationProvider
 	private void createEV(Vehicle vehicle) {
 		var evId = Id.create(vehicle.getId(), Vehicle.class);
 		if (!fleetSpecification.getVehicleSpecifications().containsKey(evId)) {
-			fleetSpecification.addVehicleSpecification(new ElectricVehicleSpecificationWithMatsimVehicle(vehicle));
+			fleetSpecification.addVehicleSpecification(new ElectricVehicleSpecificationImpl(vehicle));
 		}
 	}
 }

@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class ElectricVehicleSpecificationWithMatsimVehicle implements ElectricVehicleSpecification {
+public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecification {
 	public static final String EV_ENGINE_HBEFA_TECHNOLOGY = "electricity";
 
 	public static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
@@ -46,14 +46,14 @@ public class ElectricVehicleSpecificationWithMatsimVehicle implements ElectricVe
 				.stream()
 				.filter(vehicle -> EV_ENGINE_HBEFA_TECHNOLOGY.equals(
 						VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())))
-				.map(ElectricVehicleSpecificationWithMatsimVehicle::new)
+				.map(ElectricVehicleSpecificationImpl::new)
 				.forEach(fleetSpecification::addVehicleSpecification);
 		return fleetSpecification;
 	}
 
-	private final Vehicle matsimVehicle;// matsim vehicle is mutable!
+	private final Vehicle matsimVehicle;
 
-	public ElectricVehicleSpecificationWithMatsimVehicle(Vehicle matsimVehicle) {
+	public ElectricVehicleSpecificationImpl(Vehicle matsimVehicle) {
 		this.matsimVehicle = matsimVehicle;
 		//provided per vehicle type (in engine info)
 		if (getInitialSoc() < 0 || getInitialSoc() > getBatteryCapacity()) {

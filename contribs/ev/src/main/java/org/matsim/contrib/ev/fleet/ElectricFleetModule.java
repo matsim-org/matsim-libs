@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle.INITIAL_ENERGY_kWh;
+import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh;
 
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
@@ -52,7 +52,7 @@ public class ElectricFleetModule extends AbstractModule {
 
 			@Override
 			public ElectricFleetSpecification get() {
-				return ElectricVehicleSpecificationWithMatsimVehicle.createFleetSpecificationFromMatsimVehicles(
+				return ElectricVehicleSpecificationImpl.createFleetSpecificationFromMatsimVehicles(
 						vehicles);
 			}
 		}).asEagerSingleton();
