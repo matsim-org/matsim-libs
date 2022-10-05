@@ -50,5 +50,10 @@ public final class ElectricFleetSpecificationImpl implements ElectricFleetSpecif
 	public void removeVehicleSpecification(Id<ElectricVehicle> vehicleId) {
 		container.removeSpecification(vehicleId);
 	}
+
+	@Override
+	public void clear() {
+		container.clear();
+	}
 }
 

@@ -22,7 +22,6 @@ package org.matsim.contrib.ev.fleet;
 
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
@@ -84,8 +83,8 @@ public class ElectricVehicleSpecificationWithMatsimVehicle implements ElectricVe
 	}
 
 	@Override
-	public Optional<Vehicle> getMatsimVehicle() {
-		return Optional.of(matsimVehicle);
+	public Vehicle getMatsimVehicle() {
+		return matsimVehicle;
 	}
 
 	@Override

@@ -20,20 +20,18 @@
 
 package playground.vsp.ev;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle.EV_ENGINE_HBEFA_TECHNOLOGY;
 
 import javax.inject.Provider;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecificationImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripStructureUtils;
@@ -43,7 +41,8 @@ import org.matsim.vehicles.Vehicles;
 
 import com.google.inject.Inject;
 
-class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricFleetSpecification>, IterationStartsListener {
+class MATSimVehicleWrappingEVSpecificationProvider
+		implements Provider<ElectricFleetSpecification>, IterationStartsListener {
 
 	@Inject
 	Population population;
@@ -51,7 +50,7 @@ class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricF
 	@Inject
 	Vehicles vehicles;
 
-	private ElectricFleetSpecification fleetSpecification;
+	private final ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
 
 	@Override
 	public ElectricFleetSpecification get() {
@@ -60,38 +59,25 @@ class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricF
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		//idk whether clearing the existing one or replacing the object is better.
-		//but as clearing is not too straightforward (3-5 lines), i chose replacing. tschlenther sep '20
-		this.fleetSpecification = new ElectricFleetSpecificationImpl();
+		fleetSpecification.clear();
 
 		//collect EV ids needed this iteration
-		Set<Id<Vehicle>> evIds = new HashSet<>();
-		population.getPersons().values().stream()
-				.map(person -> person.getSelectedPlan())
-				.forEach(plan -> registerEVs(plan));
+		population.getPersons().values().stream().map(HasPlansAndId::getSelectedPlan).forEach(this::registerEVs);
 	}
 
-	private void registerEVs(Plan plan){
-		Set<Vehicle> vehSet = TripStructureUtils.getLegs(plan).stream()
+	private void registerEVs(Plan plan) {
+		TripStructureUtils.getLegs(plan)
+				.stream()
 				.map(leg -> vehicles.getVehicles().get(VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode())))
-				.filter(vehicle -> VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation()) != null &&
-						VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation()).equals("electricity"))
-				.collect(Collectors.toSet());
-		vehSet.forEach(vehicle -> createEV(vehicle));
+				.filter(vehicle -> EV_ENGINE_HBEFA_TECHNOLOGY.equals(
+						VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())))
+				.forEach(this::createEV);
 	}
 
 	private void createEV(Vehicle vehicle) {
-		if (this.fleetSpecification.getVehicleSpecifications().containsKey(getWrappedElectricVehicleId(vehicle.getId()))) return;
-		var electricVehicleSpecification = ImmutableElectricVehicleSpecification.newBuilder()
-				.vehicleType(vehicle.getType().getId().toString())
-				.chargerTypes(EVUtils.getChargerTypes(vehicle.getType().getEngineInformation()))
-				.initialSoc(EVUtils.getInitialEnergy(vehicle) * EvUnits.J_PER_kWh)
-				.batteryCapacity(VehicleUtils.getEnergyCapacity(vehicle.getType().getEngineInformation()) * EvUnits.J_PER_kWh)
-				.id(getWrappedElectricVehicleId(vehicle.getId()))
-				.build();
-		this.fleetSpecification.addVehicleSpecification(electricVehicleSpecification);
+		var evId = Id.create(vehicle.getId(), ElectricVehicle.class);
+		if (!fleetSpecification.getVehicleSpecifications().containsKey(evId)) {
+			fleetSpecification.addVehicleSpecification(new ElectricVehicleSpecificationWithMatsimVehicle(vehicle));
+		}
 	}
-
-	static Id<ElectricVehicle> getWrappedElectricVehicleId(Id<Vehicle> vehicleId) { return Id.create(vehicleId, ElectricVehicle.class); }
-
 }
