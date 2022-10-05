@@ -62,8 +62,8 @@ public class ElectricVehicleSpecificationWithMatsimVehicle implements ElectricVe
 	}
 
 	@Override
-	public Id<ElectricVehicle> getId() {
-		return Id.create(matsimVehicle.getId(), ElectricVehicle.class);
+	public Id<Vehicle> getId() {
+		return matsimVehicle.getId();
 	}
 
 	@Override

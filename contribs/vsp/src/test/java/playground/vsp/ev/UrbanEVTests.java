@@ -21,6 +21,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -899,8 +900,8 @@ public class UrbanEVTests {
 		private Map<Id<Person>, List<ActivityEndEvent>> plugOutCntPerPerson = new HashMap<>();
 		private Map<Id<Person>, List<ActivityStartEvent>> plugInCntPerPerson = new HashMap<>();
 		private Map<Id<Person>, List<ActivityStartEvent>> normalActStarts = new HashMap<>();
-		private Map<Id<ElectricVehicle>, List<ChargingStartEvent>> chargingStarts = new HashMap<>();
-		private Map<Id<ElectricVehicle>, List<ChargingEndEvent>> chargingEnds = new HashMap<>();
+		private Map<Id<Vehicle>, List<ChargingStartEvent>> chargingStarts = new HashMap<>();
+		private Map<Id<Vehicle>, List<ChargingEndEvent>> chargingEnds = new HashMap<>();
 
 
 		@Override

@@ -75,7 +75,7 @@ class MATSimVehicleWrappingEVSpecificationProvider
 	}
 
 	private void createEV(Vehicle vehicle) {
-		var evId = Id.create(vehicle.getId(), ElectricVehicle.class);
+		var evId = Id.create(vehicle.getId(), Vehicle.class);
 		if (!fleetSpecification.getVehicleSpecifications().containsKey(evId)) {
 			fleetSpecification.addVehicleSpecification(new ElectricVehicleSpecificationWithMatsimVehicle(vehicle));
 		}

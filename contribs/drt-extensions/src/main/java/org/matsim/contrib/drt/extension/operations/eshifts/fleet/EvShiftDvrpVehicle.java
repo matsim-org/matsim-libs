@@ -10,6 +10,7 @@ import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.DefaultShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.Queue;
 
@@ -20,7 +21,7 @@ public class EvShiftDvrpVehicle extends EvDvrpVehicle implements ShiftDvrpVehicl
 
 	static EvShiftDvrpVehicle create(DvrpVehicle vehicle, ElectricFleet evFleet) {
 		return new EvShiftDvrpVehicle(new DefaultShiftDvrpVehicle(vehicle),
-				evFleet.getElectricVehicles().get(Id.create(vehicle.getId(), ElectricVehicle.class)));
+				evFleet.getElectricVehicles().get(Id.create(vehicle.getId(), Vehicle.class)));
 	}
 
 	private final ShiftDvrpVehicle vehicle;

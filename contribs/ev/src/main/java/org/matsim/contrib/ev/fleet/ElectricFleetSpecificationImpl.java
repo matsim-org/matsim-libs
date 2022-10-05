@@ -20,30 +20,35 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.collections.SpecificationContainer;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public final class ElectricFleetSpecificationImpl implements ElectricFleetSpecification {
-	private final SpecificationContainer<ElectricVehicle, ElectricVehicleSpecification> container = new SpecificationContainer<>();
+	private final Map<Id<Vehicle>, ElectricVehicleSpecification> specifications = new LinkedHashMap<>();
 
 	@Override
-	public Map<Id<ElectricVehicle>, ElectricVehicleSpecification> getVehicleSpecifications() {
-		return container.getSpecifications();
+	public Map<Id<Vehicle>, ElectricVehicleSpecification> getVehicleSpecifications() {
+		return Collections.unmodifiableMap(specifications);
 	}
 
 	@Override
 	public void addVehicleSpecification(ElectricVehicleSpecification specification) {
-		container.addSpecification(specification);
+		if (specifications.putIfAbsent(specification.getId(), specification) != null) {
+			throw new RuntimeException("A specification with id=" + specification.getId() + " already exists");
+		}
 	}
 
 	@Override
 	public void clear() {
-		container.clear();
+		specifications.clear();
 	}
 }
 

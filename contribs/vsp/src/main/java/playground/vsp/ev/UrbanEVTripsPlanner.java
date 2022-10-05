@@ -184,7 +184,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 	private boolean isEV(Id<Vehicle> vehicleId) {
 		return this.electricFleetSpecification.getVehicleSpecifications()
-				.containsKey(Id.create(vehicleId, ElectricVehicle.class));
+				.containsKey(Id.create(vehicleId, Vehicle.class));
 	}
 
 	private void processPlans(Map<Plan, Set<Id<Vehicle>>> selectedEVPlans) {
@@ -210,7 +210,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				 * ts, nov' 27, 2020
 				 */
 				ElectricVehicleSpecification electricVehicleSpecification = electricFleetSpecification.getVehicleSpecifications()
-						.get(Id.create(ev, ElectricVehicle.class));
+						.get(Id.create(ev, Vehicle.class));
 				Leg legWithCriticalSOC;
 				ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification,
 						driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);

@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface ElectricVehicleSpecification extends Identifiable<ElectricVehicle> {
+public interface ElectricVehicleSpecification extends Identifiable<Vehicle> {
 	Vehicle getMatsimVehicle();
 
 	String getVehicleType();
