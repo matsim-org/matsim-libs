@@ -39,6 +39,7 @@ class CreateUrbanEVTestScenario {
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.timeProfiles = true;
 		evConfigGroup.chargersFile = "chargers.xml";
+		evConfigGroup.transferFinalSoCToNextIteration = true;
 
 		//prepare config
 		Config config = ConfigUtils.loadConfig("test/input/playground/vsp/ev/chessboard-config.xml", evConfigGroup);

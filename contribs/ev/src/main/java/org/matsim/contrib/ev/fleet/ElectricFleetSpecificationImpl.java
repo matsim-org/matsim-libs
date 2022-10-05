@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.common.collections.SpecificationContainer;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -41,9 +40,7 @@ public final class ElectricFleetSpecificationImpl implements ElectricFleetSpecif
 
 	@Override
 	public void addVehicleSpecification(ElectricVehicleSpecification specification) {
-		if (specifications.putIfAbsent(specification.getId(), specification) != null) {
-			throw new RuntimeException("A specification with id=" + specification.getId() + " already exists");
-		}
+		specifications.put(specification.getId(), specification);
 	}
 
 	@Override

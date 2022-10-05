@@ -52,8 +52,10 @@ public class ElectricFleetModule extends AbstractModule {
 
 			@Override
 			public ElectricFleetSpecification get() {
-				return ElectricVehicleSpecificationImpl.createFleetSpecificationFromMatsimVehicles(
-						vehicles);
+				ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
+				ElectricVehicleSpecificationImpl.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification,
+						vehicles.getVehicles().values());
+				return fleetSpecification;
 			}
 		}).asEagerSingleton();
 

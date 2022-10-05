@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,16 +38,13 @@ public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecific
 	public static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
 	public static final String CHARGER_TYPES = "chargerTypes";
 
-	public static ElectricFleetSpecification createFleetSpecificationFromMatsimVehicles(Vehicles vehicles) {
-		ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
-		vehicles.getVehicles()
-				.values()
-				.stream()
+	public static void createAndAddVehicleSpecificationsFromMatsimVehicles(ElectricFleetSpecification fleetSpecification,
+			Collection<Vehicle> vehicles) {
+		vehicles.stream()
 				.filter(vehicle -> EV_ENGINE_HBEFA_TECHNOLOGY.equals(
 						VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())))
 				.map(ElectricVehicleSpecificationImpl::new)
 				.forEach(fleetSpecification::addVehicleSpecification);
-		return fleetSpecification;
 	}
 
 	private final Vehicle matsimVehicle;
