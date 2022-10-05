@@ -31,10 +31,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 class CreateUrbanEVTestScenario {
-
-	@ClassRule
-	static MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
-
 	static Scenario createTestScenario(){
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.timeProfiles = true;
@@ -59,5 +55,4 @@ class CreateUrbanEVTestScenario {
 		RunUrbanEVExample.createAndRegisterPersonalCarAndBikeVehicles(scenario);
 		return scenario;
 	}
-
 }
