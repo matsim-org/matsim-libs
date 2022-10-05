@@ -94,11 +94,9 @@ public class ElectricFleetModule extends AbstractModule {
 										.getBattery()
 										.getSoc();
 
-								//should (and need to) overwrite the matsimVehicle attribute. careful: this attribute is in kWh, the SoC is in J
+								// INITIAL_ENERGY_kWh attribute is in kWh, the SoC is in J
 								matsimVehicle.getAttributes()
 										.putAttribute(INITIAL_ENERGY_kWh, EvUnits.J_to_kWh(socAtEndOfCurrentIteration));
-								electricFleetSpecification.replaceVehicleSpecification(
-										new ElectricVehicleSpecificationWithMatsimVehicle(matsimVehicle));
 							}
 						}
 					});

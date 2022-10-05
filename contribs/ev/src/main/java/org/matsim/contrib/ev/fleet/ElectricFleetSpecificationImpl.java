@@ -42,16 +42,6 @@ public final class ElectricFleetSpecificationImpl implements ElectricFleetSpecif
 	}
 
 	@Override
-	public void replaceVehicleSpecification(ElectricVehicleSpecification specification) {
-		container.replaceSpecification(specification);
-	}
-
-	@Override
-	public void removeVehicleSpecification(Id<ElectricVehicle> vehicleId) {
-		container.removeSpecification(vehicleId);
-	}
-
-	@Override
 	public void clear() {
 		container.clear();
 	}

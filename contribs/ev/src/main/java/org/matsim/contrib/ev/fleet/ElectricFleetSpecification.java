@@ -38,9 +38,5 @@ public interface ElectricFleetSpecification {
 
 	void addVehicleSpecification(ElectricVehicleSpecification specification);
 
-	void replaceVehicleSpecification(ElectricVehicleSpecification specification);
-
-	void removeVehicleSpecification(Id<ElectricVehicle> vehicleId);
-
 	void clear();
 }
