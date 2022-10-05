@@ -239,7 +239,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				
 
 				do {
-					double newSoC = EVUtils.getInitialEnergy(vehicles.getVehicles().get(ev).getType().getEngineInformation())* EvUnits.J_PER_kWh;
+					double newSoC = EVUtils.getInitialEnergy(vehicles.getVehicles().get(ev))* EvUnits.J_PER_kWh;
 					pseudoVehicle.getBattery().setSoc(newSoC);
 					double capacityThreshold = pseudoVehicle.getBattery().getCapacity() * (configGroup.getCriticalRelativeSOC());
 					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);

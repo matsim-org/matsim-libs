@@ -85,7 +85,7 @@ class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricF
 		var electricVehicleSpecification = ImmutableElectricVehicleSpecification.newBuilder()
 				.vehicleType(vehicle.getType().getId().toString())
 				.chargerTypes(EVUtils.getChargerTypes(vehicle.getType().getEngineInformation()))
-				.initialSoc(EVUtils.getInitialEnergy(vehicle.getType().getEngineInformation()) * EvUnits.J_PER_kWh)
+				.initialSoc(EVUtils.getInitialEnergy(vehicle) * EvUnits.J_PER_kWh)
 				.batteryCapacity(VehicleUtils.getEnergyCapacity(vehicle.getType().getEngineInformation()) * EvUnits.J_PER_kWh)
 				.id(getWrappedElectricVehicleId(vehicle.getId()))
 				.build();
