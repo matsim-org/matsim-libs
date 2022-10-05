@@ -31,11 +31,7 @@ import com.google.common.collect.ImmutableList;
  * @author Michal Maciejewski (michalm)
  */
 public interface ElectricVehicleSpecification extends Identifiable<ElectricVehicle> {
-	String DEFAULT_VEHICLE_TYPE = "defaultVehicleType";
-
-	//provided only if the vehicle specification is created from a corresponding standard matsim vehicle
-	//(see ElectricFleetModule)
-	Optional<Vehicle> getMatsimVehicle();
+	Vehicle getMatsimVehicle();
 
 	String getVehicleType();
 
