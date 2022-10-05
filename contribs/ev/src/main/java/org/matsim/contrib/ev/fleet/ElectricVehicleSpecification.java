@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.Optional;
-
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.vehicles.Vehicle;
 
