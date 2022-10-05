@@ -107,8 +107,9 @@ public class RunETaxiBenchmark {
 			}
 		});
 
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+//		controler.configureQSimComponents( DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+		controler.configureQSimComponents( DvrpQSimComponents.activateModes(List.of(), List.of(mode)));
+		// EV_COMPONENT now loaded in EvModule.  kai, oct'22
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
