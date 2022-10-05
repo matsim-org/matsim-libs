@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.Optional;
-
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.vehicles.Vehicle;
 
@@ -30,7 +28,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface ElectricVehicleSpecification extends Identifiable<ElectricVehicle> {
+public interface ElectricVehicleSpecification extends Identifiable<Vehicle> {
 	Vehicle getMatsimVehicle();
 
 	String getVehicleType();

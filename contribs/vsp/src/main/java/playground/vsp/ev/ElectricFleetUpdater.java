@@ -20,42 +20,29 @@
 
 package playground.vsp.ev;
 
-import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle.EV_ENGINE_HBEFA_TECHNOLOGY;
-
-import javax.inject.Provider;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
-import org.matsim.contrib.ev.fleet.ElectricFleetSpecificationImpl;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import com.google.inject.Inject;
 
-class MATSimVehicleWrappingEVSpecificationProvider
-		implements Provider<ElectricFleetSpecification>, IterationStartsListener {
+class ElectricFleetUpdater implements IterationStartsListener {
 
 	@Inject
-	Population population;
+	private Population population;
 
 	@Inject
-	Vehicles vehicles;
+	private Vehicles vehicles;
 
-	private final ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
-
-	@Override
-	public ElectricFleetSpecification get() {
-		return fleetSpecification;
-	}
+	@Inject
+	private ElectricFleetSpecification fleetSpecification;
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
@@ -66,18 +53,10 @@ class MATSimVehicleWrappingEVSpecificationProvider
 	}
 
 	private void registerEVs(Plan plan) {
-		TripStructureUtils.getLegs(plan)
+		var evs = TripStructureUtils.getLegs(plan)
 				.stream()
 				.map(leg -> vehicles.getVehicles().get(VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode())))
-				.filter(vehicle -> EV_ENGINE_HBEFA_TECHNOLOGY.equals(
-						VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())))
-				.forEach(this::createEV);
-	}
-
-	private void createEV(Vehicle vehicle) {
-		var evId = Id.create(vehicle.getId(), ElectricVehicle.class);
-		if (!fleetSpecification.getVehicleSpecifications().containsKey(evId)) {
-			fleetSpecification.addVehicleSpecification(new ElectricVehicleSpecificationWithMatsimVehicle(vehicle));
-		}
+				.toList();
+		ElectricVehicleSpecificationImpl.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification, evs);
 	}
 }

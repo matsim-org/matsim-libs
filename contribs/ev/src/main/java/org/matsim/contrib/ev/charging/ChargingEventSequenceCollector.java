@@ -31,6 +31,7 @@ import javax.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Preconditions;
 
@@ -64,7 +65,7 @@ public class ChargingEventSequenceCollector
 		}
 	}
 
-	private final Map<Id<ElectricVehicle>, ChargingSequence> ongoingSequences = new IdMap<>(ElectricVehicle.class);
+	private final Map<Id<Vehicle>, ChargingSequence> ongoingSequences = new IdMap<>(Vehicle.class);
 	private final List<ChargingSequence> completedSequences = new ArrayList<>();
 
 	public List<ChargingSequence> getCompletedSequences() {

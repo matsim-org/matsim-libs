@@ -31,14 +31,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 class CreateUrbanEVTestScenario {
-
-	@ClassRule
-	static MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
-
 	static Scenario createTestScenario(){
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.timeProfiles = true;
 		evConfigGroup.chargersFile = "chargers.xml";
+		evConfigGroup.transferFinalSoCToNextIteration = true;
 
 		//prepare config
 		Config config = ConfigUtils.loadConfig("test/input/playground/vsp/ev/chessboard-config.xml", evConfigGroup);
@@ -58,5 +55,4 @@ class CreateUrbanEVTestScenario {
 		RunUrbanEVExample.createAndRegisterPersonalCarAndBikeVehicles(scenario);
 		return scenario;
 	}
-
 }

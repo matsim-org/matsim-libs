@@ -28,11 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -40,35 +35,30 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 
-//TODO: remove or better move to EV contrib
-public class FinalSoc2VehicleTypeTest {
+public class TransferFinalSocToNextIterTest {
 
 	private final Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
 	private final SOCHandler handler = new SOCHandler(scenario);
-	private static final Integer LAST_ITERATION = 2;
+	private static final Integer LAST_ITERATION = 1;
 	private static final double INITIAL_ENERGY = 9.5;
 
 	@Rule
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
-	private void runSim() {
+	@Test
+	public void test() {
+		//adapt scenario
 		scenario.getConfig().controler().setLastIteration(LAST_ITERATION);
 		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 
-		var vehicle = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		EVUtils.setInitialEnergy(vehicle, INITIAL_ENERGY);
+		var vehicle1 = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
+		EVUtils.setInitialEnergy(vehicle1, INITIAL_ENERGY);
 
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
 		controler.addControlerListener(handler);
 		controler.run();
-	}
-
-	@Test
-	public void test() {
-		runSim();
 
 		// testInitialEnergyInIter0
 		Assert.assertEquals(INITIAL_ENERGY, handler.iterationInitialSOC.get(0), 0.0);
@@ -80,7 +70,7 @@ public class FinalSoc2VehicleTypeTest {
 		Assert.assertEquals(10, EVUtils.getInitialEnergy(vehicle), MatsimTestUtils.EPSILON); //should be fully charged
 
 		// testSOCisTransferredToNextIteration
-		for (int i = 0; i <= LAST_ITERATION - 1; i++) {
+		for (int i = 0; i < LAST_ITERATION; i++) {
 			Assert.assertEquals(handler.iterationEndSOC.get(i), handler.iterationInitialSOC.get(i + 1));
 		}
 	}

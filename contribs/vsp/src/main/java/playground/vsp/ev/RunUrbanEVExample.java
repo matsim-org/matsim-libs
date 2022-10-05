@@ -65,7 +65,7 @@ import org.matsim.vehicles.VehiclesFactory;
 
 /**
  * this is an example of how to run MATSim with the UrbanEV module which inserts charging activities for all legs which use a EV.
- * By default, {@link MATSimVehicleWrappingEVSpecificationProvider} is used, which declares any vehicle as an EV
+ * By default, {@link ElectricFleetUpdater} is used, which declares any vehicle as an EV
  * that has a vehicle type with HbefaTechnology set to 'electricity'.
  * At the beginning of each iteration, the consumption is estimated. Charging is planned to take place during the latest possible activity in the agent's plan
  * that fits certain criteria (ActivityType and minimum duration) and takes place before the estimated SOC drops below a defined threshold.
