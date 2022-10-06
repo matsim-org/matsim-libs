@@ -1,6 +1,7 @@
 package org.matsim.contrib.parking.parkingsearch.search;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -24,7 +25,7 @@ import java.util.Random;
  *
  */
 public class BenensonParkingSearchLogic implements ParkingSearchLogic {
-	private static final Logger logger = Logger.getLogger(BenensonDynLeg.class);
+	private static final Logger logger = LogManager.getLogger(BenensonDynLeg.class);
 	private static final boolean logForDebug = false;
 	
 	private Network network;

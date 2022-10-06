@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.decongestion.routing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -39,7 +40,7 @@ import org.matsim.contrib.decongestion.data.LinkInfo;
  * @author ikaddoura
  */
 public final class TollTimeDistanceTravelDisutility implements TravelDisutility {
-	private static final Logger log = Logger.getLogger(TollTimeDistanceTravelDisutility.class);
+	private static final Logger log = LogManager.getLogger(TollTimeDistanceTravelDisutility.class);
 
 	private final TravelDisutility delegate;
 	private final DecongestionInfo info;

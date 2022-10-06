@@ -3,7 +3,8 @@ package org.matsim.contrib.osm.networkReader;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 class OsmNetworkParser {
 
-	private static final Logger log = Logger.getLogger(OsmNetworkParser.class);
+	private static final Logger log = LogManager.getLogger(OsmNetworkParser.class);
 	private static final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.UK);
 
 	private final CoordinateTransformation transformation;

@@ -20,13 +20,14 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 public class LanesBasedWidthCalculator implements WidthCalculator {
 
-	private static final Logger log = Logger.getLogger(LanesBasedWidthCalculator.class);
+	private static final Logger log = LogManager.getLogger(LanesBasedWidthCalculator.class);
 
 	private final double effectiveLaneWidth;
 	private final double widthCoefficient;

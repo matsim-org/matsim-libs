@@ -1,6 +1,7 @@
 package org.matsim.core.router;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -11,7 +12,7 @@ import org.matsim.facilities.Facility;
 
 class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
 
-    private static final Logger log = Logger.getLogger( FacilitiesUtils.class ) ;
+    private static final Logger log = LogManager.getLogger( FacilitiesUtils.class ) ;
 
     @Override
     public Link decideOnLink(Facility facility, Network network) {

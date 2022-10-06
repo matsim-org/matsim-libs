@@ -30,7 +30,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -64,7 +65,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  */
 public final class CongestionHandlerImplV9 implements CongestionHandler, ActivityEndEventHandler {
 
-	private final static Logger log = Logger.getLogger(CongestionHandlerImplV9.class);
+	private final static Logger log = LogManager.getLogger(CongestionHandlerImplV9.class);
 
 	private CongestionHandlerBaseImpl delegate;
 	private EventsManager events;

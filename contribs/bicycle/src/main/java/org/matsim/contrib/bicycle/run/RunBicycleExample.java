@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,7 +44,7 @@ import java.util.List;
  * @author dziemke
  */
 public class RunBicycleExample {
-	private static final Logger LOG = Logger.getLogger(RunBicycleExample.class);
+	private static final Logger LOG = LogManager.getLogger(RunBicycleExample.class);
 
 	public static void main(String[] args) {
 		Config config;

@@ -20,7 +20,8 @@
 
 package org.matsim.core.gbl;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +37,7 @@ import java.nio.charset.StandardCharsets;
  */
 public abstract class Gbl {
 	
-	private static final Logger log = Logger.getLogger(Gbl.class);
+	private static final Logger log = LogManager.getLogger(Gbl.class);
 	
 	public final static String ONLYONCE = " This message given only once.";
 	

@@ -21,9 +21,9 @@ package org.matsim.core.controler;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -42,7 +42,7 @@ public final class OutputDirectoryHierarchy {
 
 	private static final String DIRECTORY_ITERS = "ITERS";
 	
-	private static final  Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
+	private static final  Logger log = LogManager.getLogger(OutputDirectoryHierarchy.class);
 	
 	private String runId = null;
 	
@@ -166,6 +166,10 @@ public final class OutputDirectoryHierarchy {
 		}
 		s.append(filename);
 		return s.toString();
+	}
+
+	public final String getOutputFilenameWithOutputPrefix(final String filename) {
+		return getOutputFilename(Controler.OUTPUT_PREFIX + filename);
 	}
 
 	public final String getOutputFilename(Controler.DefaultFiles file) {

@@ -11,7 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -36,7 +37,7 @@ import ch.sbb.matsim.routing.pt.raptor.RaptorRoute.RoutePart;
  */
 public class SwissRailRaptor implements TransitRouter {
 
-    private static final Logger log = Logger.getLogger(SwissRailRaptor.class);
+    private static final Logger log = LogManager.getLogger(SwissRailRaptor.class);
 
     private final SwissRailRaptorData data;
     private final SwissRailRaptorCore raptor;

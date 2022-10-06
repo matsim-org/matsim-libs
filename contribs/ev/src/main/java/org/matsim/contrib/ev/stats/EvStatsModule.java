@@ -43,7 +43,7 @@ public class EvStatsModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				if (evCfg.getTimeProfiles()) {
+				if (evCfg.timeProfiles) {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
 							SocHistogramTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(

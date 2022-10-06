@@ -21,19 +21,16 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+
+import java.util.*;
 
 /**
  * This is a tour of a carrier which is a sequence of activities and legs.
@@ -44,7 +41,7 @@ import org.matsim.core.population.routes.RouteUtils;
  */
 public class Tour {
 
-	private static final Logger logger = Logger.getLogger(Tour.class);
+	private static final Logger logger = LogManager.getLogger(Tour.class);
 
 	/**
 	 * A builder building a tour.
@@ -54,24 +51,48 @@ public class Tour {
 	 *
 	 */
 	public static class Builder {
-		
-		/**
-		 * Returns a new tour builder.
-		 * 
-		 * @return the builder
-		 */
-		public static Builder newInstance(){ return new Builder(); }
-		
-		private Builder(){
-			
-		}
 
+		private final Id<Tour> tourId;
 		private final List<TourElement> tourElements = new ArrayList<>();
 		private final Set<CarrierShipment> openPickups = new HashSet<>();
 		private boolean previousElementIsActivity;
+
+
 		private Start start;
+
 		private End end;
-		
+
+		/**
+		 * Returns a new tour builder.
+		 *
+		 * @deprecated
+		 * Please use {@link #newInstance(Id)} instead. kmt' sep22
+		 *
+		 *
+		 *
+		 * @return the builder including "unknown" as tourId
+		 */
+		@Deprecated
+		public static Builder newInstance(){
+			return new Builder(Id.create("unknown", Tour.class));
+		}
+
+		/**
+		 * Returns a new tour builder.
+		 * This now also includes an Id for this tour.
+		 *
+		 * @param tourId Id of this tour
+		 * @return the builder
+		 */
+		public static Builder newInstance(Id<Tour> tourId){
+			return new Builder(tourId);
+		}
+
+
+		private Builder(Id<Tour> tourId) {
+			this.tourId = tourId;
+		}
+
 		/**
 		 * Schedules the start of the tour.
 		 * 
@@ -307,7 +328,11 @@ public class Tour {
 		private Leg(Leg leg) {
 			this.expTransportTime = leg.getExpectedTransportTime();
 			this.departureTime = leg.getExpectedDepartureTime();
-			this.route = leg.getRoute().clone();
+			if ( leg.getRoute() == null ) {
+				this.route = null ;
+			} else{
+				this.route = leg.getRoute().clone();
+			}
 		}
 
 		public Route getRoute() {
@@ -627,14 +652,18 @@ public class Tour {
 	private final Start start;
 	
 	private final End end;
+
+	private final Id<Tour> tourId;
 	
 	private Tour(Builder builder){
+		tourId = builder.tourId;
 		tourElements = builder.tourElements;
 		start = builder.start;
 		end = builder.end;
 	}
 
-	private Tour(Tour tour) {
+	private Tour(Tour tour, Id<Tour> newTourId) {
+		this.tourId = newTourId;
 		this.start = (Start) tour.start.duplicate();
 		this.end = (End) tour.end.duplicate();
 		List<TourElement> elements = new ArrayList<>();
@@ -645,13 +674,24 @@ public class Tour {
 	}
 
 	public Tour duplicate() {
-		return new Tour(this);
+		return new Tour(this, Id.create(this.tourId.toString(), Tour.class));
+	}
+
+	/*
+	 * returns a copy of the tour, but with a new Tour Id.
+	 */
+	public Tour duplicateWithNewId(Id<Tour> newTourId) {
+		return new Tour(this, newTourId);
 	}
 
 	public List<TourElement> getTourElements() {
 		return Collections.unmodifiableList(tourElements);
 	}
-	
+
+	public Id<Tour> getId(){
+		return tourId;
+	}
+
 	public Start getStart(){
 		return start;
 	}
@@ -667,7 +707,7 @@ public class Tour {
 	public Id<Link> getEndLinkId() {
 		return end.getLocation();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "[ startLinkId="+getStartLinkId()+" ][ endLinkId="+getEndLinkId()+" ][ #tourElements=" + tourElements.size() + "]";

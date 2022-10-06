@@ -1,6 +1,7 @@
 package org.matsim.utils.objectattributes.attributeconverters;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.vehicles.PersonVehicles;
@@ -11,7 +12,7 @@ import java.util.Map;
 
 public class PersonVehiclesAttributeConverter implements AttributeConverter<PersonVehicles> {
 
-    private final Logger logger = Logger.getLogger(PersonVehiclesAttributeConverter.class);
+    private final Logger logger = LogManager.getLogger(PersonVehiclesAttributeConverter.class);
 
     @Override
     public PersonVehicles convert(String value) {

@@ -20,19 +20,17 @@
 
 package org.matsim.api.core.v01.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-public class LinkEnterEvent extends Event implements HasLinkId {
+import java.util.Map;
+
+public class LinkEnterEvent extends Event implements HasLinkId, HasVehicleId{
 
 	public static final String EVENT_TYPE = "entered link";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_LINK = "link";
-	
+
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 

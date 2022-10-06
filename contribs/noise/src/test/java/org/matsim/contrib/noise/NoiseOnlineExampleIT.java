@@ -23,7 +23,8 @@
 package org.matsim.contrib.noise;
 
 import com.google.inject.multibindings.Multibinder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,7 +52,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class NoiseOnlineExampleIT {
-	private static final Logger log = Logger.getLogger( NoiseOnlineExampleIT.class ) ;
+	private static final Logger log = LogManager.getLogger( NoiseOnlineExampleIT.class ) ;
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

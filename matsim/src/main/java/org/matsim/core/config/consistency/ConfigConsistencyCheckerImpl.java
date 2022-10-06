@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.config.consistency;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -36,8 +37,7 @@ import org.matsim.pt.PtConstants;
  */
 public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 
-	private static final Logger log = Logger
-			.getLogger(ConfigConsistencyCheckerImpl.class);
+	private static final Logger log = LogManager.getLogger(ConfigConsistencyCheckerImpl.class);
 
 	public ConfigConsistencyCheckerImpl() { // explicit constructor so that I can eclipse-search for instantiation.  kai, may'11
 		// nothing to do

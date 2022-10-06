@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -44,7 +45,7 @@ import com.google.inject.Inject;
  */
 public class CharyparNagelWithJointModesScoringFunctionFactory implements ScoringFunctionFactory {
 	private static final Logger log =
-		Logger.getLogger(CharyparNagelWithJointModesScoringFunctionFactory.class);
+		LogManager.getLogger(CharyparNagelWithJointModesScoringFunctionFactory.class);
 
 
 	private final Set<String> blackList; // formerly StageActivityTypes

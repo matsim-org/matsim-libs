@@ -20,12 +20,13 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -46,7 +47,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class QueryAgentEvents extends AbstractQuery implements BasicEventHandler {
 
-	private static final  Logger logger = Logger.getLogger(QueryAgentEvents.class);
+	private static final  Logger logger = LogManager.getLogger(QueryAgentEvents.class);
 
 	public static class Result implements OTFQueryResult {
 

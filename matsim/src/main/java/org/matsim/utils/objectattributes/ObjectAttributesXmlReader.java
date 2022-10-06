@@ -32,7 +32,8 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
 import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
@@ -52,7 +53,7 @@ import org.xml.sax.SAXException;
  * @author mrieser
  */
 public class ObjectAttributesXmlReader extends MatsimXmlParser {
-	private final static Logger log = Logger.getLogger(ObjectAttributesXmlReader.class);
+	private final static Logger log = LogManager.getLogger(ObjectAttributesXmlReader.class);
 	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 	private final ObjectAttributes attributes;
 	private boolean readCharacters = false;

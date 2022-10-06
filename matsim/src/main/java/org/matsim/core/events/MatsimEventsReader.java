@@ -27,7 +27,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -45,7 +46,7 @@ import org.xml.sax.SAXException;
  */
 public final class MatsimEventsReader implements MatsimReader {
 
-	private final static Logger log = Logger.getLogger(MatsimEventsReader.class);
+	private final static Logger log = LogManager.getLogger(MatsimEventsReader.class);
 	private final EventsManager events;
 
 	private final Map<String, CustomEventMapper> customEventMappers = new LinkedHashMap<>();

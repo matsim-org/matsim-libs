@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
@@ -35,9 +36,9 @@ import org.matsim.vehicles.VehicleType;
  * @author sschroeder
  *
  */
-public class CarrierVehicle implements Vehicle {
+public final class CarrierVehicle implements Vehicle {
 
-	private static final Logger log = Logger.getLogger(CarrierVehicle.class);
+	private static final Logger log = LogManager.getLogger(CarrierVehicle.class);
 
 	/**
 	 * Returns a new instance of carrierVehicle.
@@ -105,7 +106,7 @@ public class CarrierVehicle implements Vehicle {
 		 * @deprecated The vehicleTypeId is no longer needed and was confusing -> Use getType().getId kai/kai jan'22
 		 */
 		@Deprecated
-		public Builder setTypeId(Id<org.matsim.vehicles.VehicleType> typeId ){
+		public Builder setTypeId(Id<VehicleType> typeId ){
 			log.warn(".setTypeId has no functionality anymore and is deprecated");
 //			this.typeId = typeId;
 			return this;
@@ -143,9 +144,16 @@ public class CarrierVehicle implements Vehicle {
 		latestEndTime = builder.latestEnd;
 	}
 
-	public Id<Link> getLocation() {
+	/**
+	 * Used to be getLocation.  Can't say if this is meant to contain only the starting position, or if it is meant to be changed over the day.  kai, jul'22
+	 */
+	public final Id<Link> getLinkId() {
 		return locationId;
 	}
+	/**
+	 * @deprecated -- please inline.  kai, jul'22
+	 */
+	public final Id<Link> getLocation() { return getLinkId(); }
 	@Override
 	public Id<Vehicle> getId() {
 		return vehicleId;
@@ -189,7 +197,7 @@ public class CarrierVehicle implements Vehicle {
 	}
 
 	
-	public Id<org.matsim.vehicles.VehicleType> getVehicleTypeId() {
+	public Id<VehicleType> getVehicleTypeId() {
 //		return typeId;
 		return vehicleType.getId();
 	}

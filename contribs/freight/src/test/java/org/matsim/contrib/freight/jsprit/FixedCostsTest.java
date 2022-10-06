@@ -41,7 +41,8 @@ import org.matsim.vehicles.*;
 
 import java.net.URL;
 import java.util.Collection;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -50,7 +51,7 @@ import org.apache.log4j.Logger;
  */
 public class FixedCostsTest extends MatsimTestCase {
 
-	private final static Logger log = Logger.getLogger(FixedCostsTest.class);
+	private final static Logger log = LogManager.getLogger(FixedCostsTest.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -94,7 +95,7 @@ public class FixedCostsTest extends MatsimTestCase {
 			vehicleTypes.getVehicleTypes().put( carrierVehType_A.getId(), carrierVehType_A );
 		}
 		CarrierVehicle carrierVehicle_A = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_A", Vehicle.class), Id.createLinkId("i(1,0)"),
-				carrierVehType_A ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).setTypeId(carrierVehType_A.getId() ).build();
+				carrierVehType_A ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 
 		//only fixed costs, no variable costs
 		final Id<VehicleType> vehicleTypeId1 = Id.create( "gridType_B", VehicleType.class );
@@ -109,7 +110,7 @@ public class FixedCostsTest extends MatsimTestCase {
 			vehicleTypes.getVehicleTypes().put( carrierVehType_B.getId(), carrierVehType_B );
 		}
 		CarrierVehicle carrierVehicle_B = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_B", Vehicle.class), Id.createLinkId("i(1,0)"),
-				carrierVehType_B ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).setTypeId(carrierVehType_B.getId() ).build();
+				carrierVehType_B ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 
 		//carrier1: only vehicles of Type A (no fixed costs, variable costs: 1 EUR/km)
 		CarrierCapabilities cc1 = CarrierCapabilities.Builder.newInstance()

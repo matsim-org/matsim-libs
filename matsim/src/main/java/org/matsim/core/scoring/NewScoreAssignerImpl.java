@@ -22,7 +22,8 @@
  package org.matsim.core.scoring;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -35,7 +36,7 @@ import java.util.Map;
 
 class NewScoreAssignerImpl implements NewScoreAssigner {
 
-	static private final Logger log = Logger.getLogger(NewScoreAssignerImpl.class);
+	static private final Logger log = LogManager.getLogger(NewScoreAssignerImpl.class);
 
 	private Map<Plan,Integer> msaContributions = new HashMap<>() ;
 	private Integer scoreMSAstartsAtIteration;

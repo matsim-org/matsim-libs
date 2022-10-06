@@ -77,10 +77,6 @@
 <!--			<artifactId>dvrp</artifactId>-->
 <!--			<version>13.0-SNAPSHOT</version>-->
 <!--		</dependency>-->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-		</dependency>
 		<!-- This dependency is required to be able to push to the GeoServer -->
 		<dependency>
 			<groupId>org.geotools.jdbc</groupId>

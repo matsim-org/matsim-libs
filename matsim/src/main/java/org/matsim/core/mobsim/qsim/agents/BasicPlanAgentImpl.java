@@ -25,7 +25,8 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -59,7 +60,7 @@ import com.google.common.base.Preconditions;
 
 public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
 	
-	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
+	private static final Logger log = LogManager.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;
 	private static int noRouteWrnCnt = 0;
 	

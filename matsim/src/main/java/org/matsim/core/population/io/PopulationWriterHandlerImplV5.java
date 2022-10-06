@@ -25,7 +25,8 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -48,7 +49,7 @@ import org.matsim.core.utils.misc.Time;
  */
 /*package*/ class PopulationWriterHandlerImplV5 implements PopulationWriterHandler {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger( PopulationWriterHandlerImplV5.class );
+	private static final Logger log = LogManager.getLogger( PopulationWriterHandlerImplV5.class );
 
 	private final CoordinateTransformation coordinateTransformation;
 

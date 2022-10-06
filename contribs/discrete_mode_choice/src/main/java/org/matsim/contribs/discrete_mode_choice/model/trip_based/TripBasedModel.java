@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
@@ -25,7 +26,7 @@ import org.matsim.core.utils.timing.TimeTracker;
  *
  */
 public class TripBasedModel implements DiscreteModeChoiceModel {
-	private final static Logger logger = Logger.getLogger(TripBasedModel.class);
+	private final static Logger logger = LogManager.getLogger(TripBasedModel.class);
 
 	private final TripEstimator estimator;
 	private final TripFilter tripFilter;

@@ -1,0 +1,42 @@
+name: deploy-weekly
+
+on:
+  schedule:
+    - cron: '30 0 * * 1' # Mon 0:30 UTC
+
+jobs:
+  deploy-weekly-build:
+    name: deploy weekly build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+          cache: 'maven'
+          server-id: 'matsim-releases'
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Set MATSim weekly version
+        run: mvn versions:set --batch-mode -DnewVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/SNAPSHOT//')$(date +"%Yw%V") -DgenerateBackupPoms=false
+
+      # Build and publish are separated so we start deploying only after all jars are built successfully
+      - name: Build and verify jars
+        run: mvn verify --batch-mode
+
+      - name: Publish jars to matsim maven repo
+        # fail at end to deploy as many jars as possible
+        run: mvn deploy --batch-mode --fail-at-end -DskipTests -Dmaven.resources.skip=true -Dmaven.install.skip=true
+        env:
+          MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
+
+    env:
+      MAVEN_OPTS: -Xmx2g

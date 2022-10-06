@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.signals.data.ambertimes.v10;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,7 +41,7 @@ import java.io.IOException;
  */
 public class AmberTimesData10ReaderWriterTest {
 
-	private static final Logger log = Logger.getLogger(AmberTimesData10ReaderWriterTest.class);
+	private static final Logger log = LogManager.getLogger(AmberTimesData10ReaderWriterTest.class);
 
 	private static final String TESTXML = "testAmberTimes_v1.0.xml";
 

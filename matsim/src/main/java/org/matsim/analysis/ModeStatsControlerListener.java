@@ -30,7 +30,8 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -90,7 +91,7 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 	// Keep all modes encountered so far in a sorted set to ensure output is written for modes sorted by mode.
 	private final Set<String> modes = new TreeSet<>();
 
-	private final static Logger log = Logger.getLogger(ModeStatsControlerListener.class);
+	private final static Logger log = LogManager.getLogger(ModeStatsControlerListener.class);
 
 	@Inject
 	ModeStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,

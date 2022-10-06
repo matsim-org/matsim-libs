@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package playground.vsp.openberlinscenario.cemdap.input;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -43,7 +44,7 @@ import java.util.*;
  * @author dziemke
  */
 public class SynPopCreatorChildren {
-	private static final Logger LOG = Logger.getLogger(SynPopCreatorChildren.class);
+	private static final Logger LOG = LogManager.getLogger(SynPopCreatorChildren.class);
 
 	private static final Random random = MatsimRandom.getLocalInstance(); // Make sure that stream of random variables is reproducible.
 

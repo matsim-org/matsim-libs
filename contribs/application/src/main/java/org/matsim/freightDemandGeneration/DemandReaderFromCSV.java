@@ -30,7 +30,8 @@ import java.util.Set;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -58,7 +59,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author Ricardo Ewert
  */
 public final class DemandReaderFromCSV {
-	private static final Logger log = Logger.getLogger(DemandReaderFromCSV.class);
+	private static final Logger log = LogManager.getLogger(DemandReaderFromCSV.class);
 	private static Random rand = new Random(4711);
 
 	/**

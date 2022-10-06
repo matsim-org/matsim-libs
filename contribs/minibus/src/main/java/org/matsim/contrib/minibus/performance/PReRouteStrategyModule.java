@@ -20,7 +20,8 @@
 package org.matsim.contrib.minibus.performance;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -38,7 +39,7 @@ final class PReRouteStrategyModule extends AbstractMultithreadedModule{
 	private Provider<TripRouter> tripRouterProvider;
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(PReRouteStrategyModule.class);
+	private static final Logger log = LogManager.getLogger(PReRouteStrategyModule.class);
 
 	private final Scenario scenario;
 

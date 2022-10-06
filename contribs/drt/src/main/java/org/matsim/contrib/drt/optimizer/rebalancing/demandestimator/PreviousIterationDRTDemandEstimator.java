@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
@@ -45,7 +46,7 @@ import com.google.common.base.Preconditions;
  * @author michalm
  */
 public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEstimator, PersonDepartureEventHandler {
-	private static final Logger logger = Logger.getLogger(PreviousIterationDRTDemandEstimator.class);
+	private static final Logger logger = LogManager.getLogger(PreviousIterationDRTDemandEstimator.class);
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;

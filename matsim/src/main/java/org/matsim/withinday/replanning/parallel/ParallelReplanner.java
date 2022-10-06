@@ -31,7 +31,8 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
@@ -48,7 +49,7 @@ import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
  */
 public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? extends AgentSelector>> { 
 
-	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
+	private final static Logger log = LogManager.getLogger(ParallelReplanner.class);
 
 	/*
 	 * All replanners from the same type can either share one queue that contains all 

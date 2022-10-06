@@ -21,7 +21,8 @@
 
  package org.matsim.pt.transitSchedule;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,7 +53,7 @@ import java.net.URL;
  * @author thibautd
  */
 public class TransitScheduleReprojectionIOTest {
-	private static final Logger log = Logger.getLogger( TransitScheduleReprojectionIOTest.class ) ;
+	private static final Logger log = LogManager.getLogger( TransitScheduleReprojectionIOTest.class ) ;
 	
 	private static final String INITIAL_CRS = TransformationFactory.CH1903_LV03_GT;
 	private static final String TARGET_CRS = "EPSG:3857";

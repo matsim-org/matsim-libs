@@ -22,7 +22,8 @@ package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -52,7 +53,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 class AreaBtwLinksVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
-	final static Logger log = Logger.getLogger(AreaBtwLinksVsTerminiBeelinePenalty.class);
+	final static Logger log = LogManager.getLogger(AreaBtwLinksVsTerminiBeelinePenalty.class);
 	private final RouteDesignScoreParams params;
 	private final Network network;
 

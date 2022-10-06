@@ -1,6 +1,34 @@
-<?xml version="1.0" ?>
-<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/electric_vehicles_v1.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
 
-<vehicles>
-	<vehicle id="taxi_one" battery_capacity="20" initial_soc="16.0"/>
-</vehicles>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="EV_20.0kWh">
+
+		<capacity seats="0" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="chargerTypes" class="java.util.ImmutableCollections$List12">["default"]</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">20.0</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="taxi_one" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialEnergyInKWh" class="java.lang.Double">16.0</attribute>
+		</attributes>
+	</vehicle>
+		
+
+</vehicleDefinitions>

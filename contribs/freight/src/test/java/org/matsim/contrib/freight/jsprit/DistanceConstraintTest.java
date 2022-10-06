@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.jsprit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,7 +69,7 @@ public class DistanceConstraintTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	static final Logger log = Logger.getLogger(DistanceConstraintTest.class);
+	static final Logger log = LogManager.getLogger(DistanceConstraintTest.class);
 
 	final static URL SCENARIO_URL = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
@@ -678,8 +679,7 @@ public class DistanceConstraintTest {
 											   double latestFinishingTime, VehicleType singleVehicleType) {
 
 		return CarrierVehicle.Builder.newInstance(Id.create(vehicleName, Vehicle.class), Id.createLinkId("i(1,8)"), singleVehicleType )
-				.setEarliestStart(earliestStartingTime).setLatestEnd(latestFinishingTime)
-				.setTypeId(singleVehicleType.getId()).setType(singleVehicleType).build();
+				.setEarliestStart(earliestStartingTime).setLatestEnd(latestFinishingTime).build();
 	}
 
 	/**

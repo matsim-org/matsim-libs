@@ -24,7 +24,8 @@
  */
 package playground.vsp.analysis.modules.emissionsAnalyzer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionUtils;
@@ -58,7 +59,7 @@ import java.util.SortedMap;
  *
  */
 public class EmissionsAnalyzer extends AbstractAnalysisModule{
-	private final static Logger log = Logger.getLogger(EmissionsAnalyzer.class);
+	private final static Logger log = LogManager.getLogger(EmissionsAnalyzer.class);
 	private MutableScenario scenario;
 	private final String emissionEventsFile;
 	private EmissionsPerPersonWarmEventHandler warmHandler;

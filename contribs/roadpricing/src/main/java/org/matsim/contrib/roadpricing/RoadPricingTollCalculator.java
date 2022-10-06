@@ -25,7 +25,8 @@ import java.util.stream.Collector;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -53,7 +54,7 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
  */
 public final class RoadPricingTollCalculator implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	Logger log = Logger.getLogger( RoadPricingTollCalculator.class ) ;
+	Logger log = LogManager.getLogger( RoadPricingTollCalculator.class ) ;
 
 
 	/**

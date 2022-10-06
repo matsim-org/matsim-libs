@@ -28,7 +28,8 @@ import java.util.HashSet;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -167,7 +168,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 		private final ArrayList<Double> enterTimes = new ArrayList<Double>(100);
 		private final ArrayList<Double> leaveTimes = new ArrayList<Double>(100);
 
-		private static final Logger log = Logger.getLogger(TestControlerListener.class);
+		private static final Logger log = LogManager.getLogger(TestControlerListener.class);
 
 		protected LinkAnalyzer(final String linkId) {
 			this.linkId = linkId;
@@ -265,7 +266,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 			manager.setMaxPlansPerAgent(5);
 
 			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector<Plan, Person>(config.planCalcScore()));
-			manager.addStrategyForDefaultSubpopulation(strategy1, 0.80);
+			manager.addStrategy( strategy1, null, 0.80 );
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(config.global().getNumberOfThreads()));
@@ -275,13 +276,13 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 //			boolean affectingDuration = false ;
 //			strategy2.addStrategyModule( new TimeAllocationMutator(config, mutationRange, affectingDuration));
 			// ... but the test result looks different. kai, sep'15
-			
-			manager.addStrategyForDefaultSubpopulation(strategy2, 0.80);
+
+			manager.addStrategy( strategy2, null, 0.80 );
 
 			// reduce the replanning probabilities over the iterations
-			manager.addChangeRequestForDefaultSubpopulation(50, strategy2, 0.30);
-			manager.addChangeRequestForDefaultSubpopulation(75, strategy2, 0.10);
-			manager.addChangeRequestForDefaultSubpopulation(95, strategy2, 0.00);
+			manager.addChangeRequest( 50, strategy2, null, 0.30 );
+			manager.addChangeRequest( 75, strategy2, null, 0.10 );
+			manager.addChangeRequest( 95, strategy2, null, 0.00 );
 
 			return manager;
 		}

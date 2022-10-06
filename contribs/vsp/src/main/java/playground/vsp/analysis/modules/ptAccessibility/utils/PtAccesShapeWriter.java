@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Coord;
@@ -47,7 +48,7 @@ import playground.vsp.analysis.utils.GridNode;
  */
 public class PtAccesShapeWriter {
 
-	private static final Logger log = Logger.getLogger(PtAccesShapeWriter.class);
+	private static final Logger log = LogManager.getLogger(PtAccesShapeWriter.class);
 
 	private PtAccesShapeWriter() {
 	}

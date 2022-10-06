@@ -2,7 +2,8 @@ package org.matsim.contrib.pseudosimulation.trafficinfo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -33,7 +34,7 @@ public class PSimWaitTimeCalculator extends WaitTimeCalculatorSerializable {
 	@Override
 	public void reset(int iteration) {
 		if (switcher.isQSimIteration()) {
-			Logger.getLogger(this.getClass()).error(
+			LogManager.getLogger(this.getClass()).error(
 					"Calling reset on traveltimecalc");
 			super.reset(iteration);
 		}

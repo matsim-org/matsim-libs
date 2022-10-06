@@ -29,7 +29,8 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
@@ -51,7 +52,7 @@ import org.matsim.contrib.signals.model.Signal;
  */
 public final class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 	
-		private static final Logger log = Logger.getLogger(AmberTimesWriter10.class);
+		private static final Logger log = LogManager.getLogger(AmberTimesWriter10.class);
 		
 		private AmberTimesData amberTimesData;
 	

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -43,7 +44,7 @@ import java.io.IOException;
  *
  */
 public final class NoiseOfflineCalculation{
-	private static final Logger log = Logger.getLogger( NoiseOfflineCalculation.class );
+	private static final Logger log = LogManager.getLogger( NoiseOfflineCalculation.class );
 
 	private String outputDirectory;
 	private Scenario scenario;

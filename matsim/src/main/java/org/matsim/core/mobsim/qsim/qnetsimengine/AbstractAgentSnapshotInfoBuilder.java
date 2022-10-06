@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -48,7 +49,7 @@ import java.util.TreeMap;
  * @author knagel
  */
 abstract class AbstractAgentSnapshotInfoBuilder {
-	private static final Logger log = Logger.getLogger(AbstractAgentSnapshotInfoBuilder.class);
+	private static final Logger log = LogManager.getLogger(AbstractAgentSnapshotInfoBuilder.class);
 	private static int wrnCnt = 0;
 
 	private final Scenario scenario;

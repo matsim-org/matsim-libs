@@ -21,8 +21,9 @@ package playground.vsp.andreas.bvgAna.level2;
 
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -41,7 +42,7 @@ import playground.vsp.andreas.bvgAna.level1.VehId2OccupancyHandler;
  */
 public class VehId2LoadMap implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 
-	private final Logger log = Logger.getLogger(VehId2LoadMap.class);
+	private final Logger log = LogManager.getLogger(VehId2LoadMap.class);
 //	private final Level logLevel = Level.DEBUG;
 	
 	private VehId2OccupancyHandler vehId2OccupancyHandler;

@@ -25,7 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -54,7 +55,7 @@ import org.matsim.vehicles.VehicleType;
  */
 public class RunEvExamplewithLTHConsumptionModel {
 	static final String DEFAULT_CONFIG_FILE = "test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
-	private static final Logger log = Logger.getLogger(RunEvExamplewithLTHConsumptionModel.class);
+	private static final Logger log = LogManager.getLogger(RunEvExamplewithLTHConsumptionModel.class);
 
 	public static void main(String[] args) throws IOException {
 		final URL configUrl;
@@ -84,8 +85,8 @@ public class RunEvExamplewithLTHConsumptionModel {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
-		driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory("defaultVehicleType",
-				new LTHConsumptionModelReader(Id.create("defaultVehicleType", VehicleType.class)).readURL(
+		driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory("EV_60.0kWh",
+				new LTHConsumptionModelReader(Id.create("EV_60.0kWh", VehicleType.class)).readURL(
 						ConfigGroup.getInputFileURL(config.getContext(), "MidCarMap.csv")));
 
 		Controler controler = new Controler(scenario);
@@ -94,7 +95,8 @@ public class RunEvExamplewithLTHConsumptionModel {
 			@Override
 			public void install() {
 				bind(DriveEnergyConsumption.Factory.class).toInstance(driveEnergyConsumptionFactory);
-				bind(AuxEnergyConsumption.Factory.class).toInstance(electricVehicle -> (beginTime, duration, linkId) -> 0); //a dummy factory, as aux consumption is part of the drive consumption in the model
+				bind(AuxEnergyConsumption.Factory.class).toInstance(
+						electricVehicle -> (beginTime, duration, linkId) -> 0); //a dummy factory, as aux consumption is part of the drive consumption in the model
 				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
 				installQSimModule(new AbstractQSimModule() {
 					@Override

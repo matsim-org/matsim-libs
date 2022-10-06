@@ -21,7 +21,8 @@ package org.matsim.contrib.parking.parkingsearch.manager;
 
 import com.google.inject.Inject;
 import org.apache.commons.lang3.mutable.MutableLong;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -54,7 +55,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		this.network = scenario.getNetwork();
 		parkingFacilities = scenario.getActivityFacilities()
 				.getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE);
-		Logger.getLogger(getClass()).info(parkingFacilities.toString());
+		LogManager.getLogger(getClass()).info(parkingFacilities.toString());
 
 		for (ActivityFacility fac : this.parkingFacilities.values()) {
 			Id<Link> linkId = fac.getLinkId();
@@ -75,7 +76,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 		if (linkIdHasAvailableParkingForVehicle(linkId, vehicleId)) {
 			canPark = true;
-			// Logger.getLogger(getClass()).info("veh: "+vehicleId+" link
+			// LogManager.getLogger(getClass()).info("veh: "+vehicleId+" link
 			// "+linkId + " can park "+canPark);
 		}
 
@@ -83,13 +84,13 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	}
 
 	private boolean linkIdHasAvailableParkingForVehicle(Id<Link> linkId, Id<Vehicle> vid) {
-		// Logger.getLogger(getClass()).info("link "+linkId+" vehicle "+vid);
+		// LogManager.getLogger(getClass()).info("link "+linkId+" vehicle "+vid);
 		if (!this.facilitiesPerLink.containsKey(linkId)) {
 			// this implies: If no parking facility is present, we suppose that
 			// we can park freely (i.e. the matsim standard approach)
 			// it also means: a link without any parking spaces should have a
 			// parking facility with 0 capacity.
-			// Logger.getLogger(getClass()).info("link not listed as parking
+			// LogManager.getLogger(getClass()).info("link not listed as parking
 			// space, we will say yes "+linkId);
 
 			return true;
@@ -99,7 +100,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE)
 					.getCapacity();
 			if (this.occupation.get(fac).doubleValue() < cap) {
-				// Logger.getLogger(getClass()).info("occ:
+				// LogManager.getLogger(getClass()).info("occ:
 				// "+this.occupation.get(fac).toString()+" cap: "+cap);
 				this.occupation.get(fac).increment();
 				this.parkingReservation.put(vid, fac);

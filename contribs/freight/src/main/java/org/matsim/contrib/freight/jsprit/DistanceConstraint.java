@@ -28,7 +28,8 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.DeliverShipme
 import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupShipment;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.vehicles.VehicleType;
@@ -49,7 +50,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 /* package-private */ class DistanceConstraint implements HardActivityConstraint {
 
-	static final Logger log = Logger.getLogger(DistanceConstraint.class);
+	static final Logger log = LogManager.getLogger(DistanceConstraint.class);
 
 	private final CarrierVehicleTypes vehicleTypes;
 

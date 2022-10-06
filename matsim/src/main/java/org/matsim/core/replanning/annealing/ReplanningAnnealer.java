@@ -24,7 +24,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -49,14 +50,14 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class ReplanningAnnealer implements IterationStartsListener, StartupListener {
 
-	private static final Logger log = Logger.getLogger(ReplanningAnnealer.class);
+	private static final Logger log = LogManager.getLogger(ReplanningAnnealer.class);
 	private static final String ANNEAL_FILENAME = "annealingRates.txt";
 	private static final String COL_IT = "it";
 	private final Config config;
 	private final ReplanningAnnealerConfigGroup saConfig;
 	private final int innovationStop;
 	private final String sep;
-	private EnumMap<AnnealParameterOption, Double> currentValues;
+	private final EnumMap<AnnealParameterOption, Double> currentValues;
 	private int currentIter;
 	private List<String> header;
 	@Inject
@@ -208,7 +209,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 		}
 	}
 
-	private List<Double> annealReplanning(double globalInnovationValue, StrategyManager stratMan, String subpopulation) {
+	private List<Double> annealReplanning( double globalInnovationValue, StrategyManager stratMan, String subpopulation ) {
 		List<Double> annealValues = new ArrayList<>();
 		double totalInnovationWeights = getStrategyWeights(stratMan, subpopulation, StratType.allInnovation);
 		double totalSelectorWeights = getStrategyWeights(stratMan, subpopulation, StratType.allSelectors);

@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -44,7 +45,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private String type = null;
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(Plan.class);
+	private final static Logger log = LogManager.getLogger(Plan.class);
 
 	private Customizable customizableDelegate;
 	

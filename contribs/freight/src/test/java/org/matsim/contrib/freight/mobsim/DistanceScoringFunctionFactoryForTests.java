@@ -3,7 +3,8 @@ package org.matsim.contrib.freight.mobsim;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -104,7 +105,6 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 			
 			private double getFixEmploymentCost(CarrierVehicle vehicle) {
 				return 0;
-//				return vehicle.getVehicleType().getCostInformation().fix;
 			}
 
 			private double getToll(Id<Link> linkId, CarrierVehicle vehicle, Person driver) {
@@ -113,12 +113,10 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 			private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
 				return 1.0;
-//				return vehicle.getVehicleType().getCostInformation().perDistanceUnit;
 			}
 
 			private double getTimeParameter(CarrierVehicle vehicle, Person driver) {
 				return 0.0;
-//				return vehicle.getVehicleType().getCostInformation().perTimeUnit;
 			}
 
 //			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {

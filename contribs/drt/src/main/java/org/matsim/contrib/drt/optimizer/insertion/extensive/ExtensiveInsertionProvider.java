@@ -46,7 +46,7 @@ class ExtensiveInsertionProvider {
 											 IncrementalStopDurationEstimator incrementalStopDurationEstimator) {
 		var insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var admissibleTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
-				insertionParams.getAdmissibleBeelineSpeedFactor(), travelTimeMatrix, travelTime);
+				insertionParams.admissibleBeelineSpeedFactor, travelTimeMatrix, travelTime);
 		return new ExtensiveInsertionProvider((ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams(),
 				insertionCostCalculator, new InsertionGenerator(incrementalStopDurationEstimator, admissibleTimeEstimator),
 				forkJoinPool);
@@ -82,7 +82,7 @@ class ExtensiveInsertionProvider {
 			return List.of();
 		}
 
-		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(insertionParams.getNearestInsertionsAtEndLimit(),
+		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(insertionParams.nearestInsertionsAtEndLimit,
 				preFilteredInsertions);
 	}
 }

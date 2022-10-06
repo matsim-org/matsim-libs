@@ -20,7 +20,8 @@
 
 package org.matsim.core.utils.gis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
@@ -41,7 +42,7 @@ import java.util.Collection;
  */
 public class ShapeFileWriter implements MatsimSomeWriter {
 
-	private static final Logger log = Logger.getLogger(ShapeFileWriter.class);
+	private static final Logger log = LogManager.getLogger(ShapeFileWriter.class);
 	
 	public static void writeGeometries(final Collection<SimpleFeature> features, final String filename) {
 		if (features.isEmpty()) {

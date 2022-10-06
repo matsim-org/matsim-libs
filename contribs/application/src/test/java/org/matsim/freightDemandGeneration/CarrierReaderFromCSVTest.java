@@ -78,9 +78,9 @@ public class CarrierReaderFromCSVTest {
 		Object2IntMap<String> depotSums = new Object2IntOpenHashMap<>();
 		Map<String, List<String>> typesPerDepot = new HashMap<>();
 		for (CarrierVehicle carrierVehicle : testCarrier1.getCarrierCapabilities().getCarrierVehicles().values()) {
-			typesPerDepot.computeIfAbsent(carrierVehicle.getLocation().toString(), (k) -> new ArrayList<>())
+			typesPerDepot.computeIfAbsent(carrierVehicle.getLinkId().toString(), ( k) -> new ArrayList<>() )
 					.add(carrierVehicle.getVehicleTypeId().toString());
-			depotSums.merge(carrierVehicle.getLocation().toString(), 1, Integer::sum);
+			depotSums.merge(carrierVehicle.getLinkId().toString(), 1, Integer::sum );
 			Assert.assertEquals(3600, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals(50000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
 		}
@@ -108,9 +108,9 @@ public class CarrierReaderFromCSVTest {
 		depotSums = new Object2IntOpenHashMap<>();
 		typesPerDepot = new HashMap<>();
 		for (CarrierVehicle carrierVehicle : testCarrier2.getCarrierCapabilities().getCarrierVehicles().values()) {
-			typesPerDepot.computeIfAbsent(carrierVehicle.getLocation().toString(), (k) -> new ArrayList<>())
+			typesPerDepot.computeIfAbsent(carrierVehicle.getLinkId().toString(), ( k) -> new ArrayList<>() )
 					.add(carrierVehicle.getVehicleTypeId().toString());
-			depotSums.merge(carrierVehicle.getLocation().toString(), 1, Integer::sum);
+			depotSums.merge(carrierVehicle.getLinkId().toString(), 1, Integer::sum );
 			Assert.assertEquals(3600, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals(50000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
 		}
@@ -133,9 +133,9 @@ public class CarrierReaderFromCSVTest {
 		depotSums = new Object2IntOpenHashMap<>();
 		typesPerDepot = new HashMap<>();
 		for (CarrierVehicle carrierVehicle : testCarrier3.getCarrierCapabilities().getCarrierVehicles().values()) {
-			typesPerDepot.computeIfAbsent(carrierVehicle.getLocation().toString(), (k) -> new ArrayList<>())
+			typesPerDepot.computeIfAbsent(carrierVehicle.getLinkId().toString(), ( k) -> new ArrayList<>() )
 					.add(carrierVehicle.getVehicleTypeId().toString());
-			depotSums.merge(carrierVehicle.getLocation().toString(), 1, Integer::sum);
+			depotSums.merge(carrierVehicle.getLinkId().toString(), 1, Integer::sum );
 			Assert.assertEquals(50000, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals(80000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
 		}

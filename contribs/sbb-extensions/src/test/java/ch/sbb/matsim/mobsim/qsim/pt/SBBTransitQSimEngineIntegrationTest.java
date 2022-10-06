@@ -7,7 +7,8 @@ package ch.sbb.matsim.mobsim.qsim.pt;
 import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +24,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class SBBTransitQSimEngineIntegrationTest {
 
-    private static final Logger log = Logger.getLogger(SBBTransitQSimEngineIntegrationTest.class);
+    private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineIntegrationTest.class);
     @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test

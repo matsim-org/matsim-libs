@@ -21,7 +21,8 @@
 
  package org.matsim.core.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,7 +34,7 @@ class MatsimRuntimeModifications {
 
 	private AtomicBoolean unexpectedShutdown = new AtomicBoolean(false);
 
-	private static final  Logger log = Logger.getLogger(MatsimRuntimeModifications.class);
+	private static final  Logger log = LogManager.getLogger(MatsimRuntimeModifications.class);
 
 	interface MyRunnable {
 		void run() throws UnexpectedShutdownException;

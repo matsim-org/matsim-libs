@@ -24,7 +24,8 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -88,7 +89,7 @@ public class CalculateSkimMatrices {
     public static final String PT_TRANSFERCOUNTS_FILENAME = "pt_transfer_counts.csv.gz";
     public static final String BEELINE_DISTANCE_FILENAME = "beeline_distances.csv.gz";
     public static final String ZONE_LOCATIONS_FILENAME = "zone_coordinates.csv";
-    private static final Logger log = Logger.getLogger(CalculateSkimMatrices.class);
+    private static final Logger log = LogManager.getLogger(CalculateSkimMatrices.class);
     private final static GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
 
     private final String outputDirectory;

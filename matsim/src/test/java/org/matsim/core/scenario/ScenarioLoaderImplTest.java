@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -80,7 +79,7 @@ public class ScenarioLoaderImplTest {
 		Population population = scenario.getPopulation();
 		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
 		Gbl.assertNotNull( person );
-		Assert.assertEquals("world", PopulationUtils.getPersonAttribute( person, "hello") );
+		Assert.assertEquals("world", person.getAttributes().getAttribute( "hello" ) );
 	}
 
 	@Test

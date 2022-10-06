@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -61,7 +62,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String BIKE_SPEED = "bikeSpeed";
 	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
 	
-	private static final Logger log = Logger.getLogger(PlansCalcRouteConfigGroup.class) ;
+	private static final Logger log = LogManager.getLogger(PlansCalcRouteConfigGroup.class) ;
 	
 	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
 
@@ -325,7 +326,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		if ( val ) {
 			clearModeRoutingParams();
 		} else if ( clearingDefaultModeRoutingParams ) {
-			throw new RuntimeException( "you cannot set the clearing of the default mode routing params to false after you have already cleared once." ) ;
+			throw new RuntimeException( "you cannot set the clearing of the default mode routing (= teleportation mode) params to false after you have already cleared once." ) ;
 		}
 	}
 	public void clearTeleportedModeParams() {
@@ -352,9 +353,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
 			clearParameterSetsForType( set.getName() );
 			this.acceptModeParamsWithoutClearing = true;
-			log.warn( "The first mode routing params that are explicitly defined clear the default mode routing params.  This functionality was removed for " );
-			log.warn( "    some weeks in the development head, after release 11.x, and before release 12.x; it is now back.  If you want to avoid this " );
-			log.warn( "    warning, use clearModeRoutingParams(true) in code, and \"" + CLEAR_MODE_ROUTING_PARAMS + "\"=true in xml config.");
+			log.warn( "The first mode routing (= teleported mode) params that are explicitly defined clear the default mode routing (= teleported mode) params.  If you want to avoid this " );
+			log.warn( "    warning, use clearTeleportedModeParams(true) in code, and \"" + CLEAR_MODE_ROUTING_PARAMS + "\"=true in xml config.");
+
+//						  "This functionality was removed for " );
+//			log.warn( "    some weeks in the development head, after release 11.x, and before release 12.x; it is now back.  " +
+
 			// A bit more info:
 			//
 			// (1) I wanted to keep the default teleportation routers ... since for novice users I find it better if they all use the same teleportation
@@ -378,7 +382,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		this.addModeRoutingParams( pars );
 	}
 	/**
-	 * @deprecated -- try to use {@link #addTeleportedModeParams(TeleportedModeParams)} instead.
+	 * @deprecated -- use {@link #addTeleportedModeParams(TeleportedModeParams)} instead.
 	 */
 	public void addModeRoutingParams(final ModeRoutingParams pars) {
 		testForLocked() ;
@@ -388,7 +392,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		this.removeModeRoutingParams( key );
 	}
 	/**
-	 * @deprecated -- try to use {@link #removeTeleportedModeParams(String)} instead.
+	 * @deprecated -- use {@link #removeTeleportedModeParams(String)} instead.
 	 */
 	public void removeModeRoutingParams( String key ) {
 		testForLocked() ;
@@ -400,13 +404,18 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			}
 		}
 		if ( getParameterSets( ModeRoutingParams.SET_TYPE ).isEmpty() ) {
-			log.warn( "You have removed the last mode routing parameter with the removeModeRoutingParams method.  If you wrote the resulting config to " ) ;
+			log.warn( "You have removed the last mode routing (= teleported mode) parameter with the removeModeRoutingParams method.  If you wrote the resulting config to " ) ;
 			log.warn("    file, and read it back in, all default teleported modes would be resurrected.  The code will therefore also call  " );
-			log.warn( "    \"clearModeRoutingParams()\".  It would be better if you did this yourself." ) ;
+			log.warn( "    \"clearTeleportedModeParams()\".  It would be better if you did this yourself." ) ;
 			this.clearModeRoutingParams();
 		}
 	}
-
+	public Map<String, ModeRoutingParams> getTeleportedModeParams() {
+		return getModeRoutingParams();
+	}
+	/**
+	 * @deprecated -- use {@link #getTeleportedModeParams()} instead.
+	 */
 	public Map<String, ModeRoutingParams> getModeRoutingParams() {
 		final Map<String, ModeRoutingParams> map = new LinkedHashMap< >();
 

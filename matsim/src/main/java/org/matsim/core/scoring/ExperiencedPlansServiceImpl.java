@@ -22,7 +22,8 @@
  package org.matsim.core.scoring;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +38,7 @@ import java.util.Map;
 
 class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
 
-	private final static Logger log = Logger.getLogger(ExperiencedPlansServiceImpl.class);
+	private final static Logger log = LogManager.getLogger(ExperiencedPlansServiceImpl.class);
 
 	@Inject private Config config;
 	@Inject private Population population;
