@@ -26,12 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -146,17 +141,13 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		double l_d = DrtLegsAnalyser.getTotalDistance(drtVehicleStats.getVehicleStates()) / (legs.size()
 				* directDistanceMean);
 
-		var stayTaskProfile = vehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles()
-				.getOrDefault(new DrtTaskType(DrtTaskBaseType.STAY), new double[0]);
-		var minStayTaskVehicleCountOverDay = Arrays.stream(stayTaskProfile).min();
-
 		String vehStats = DrtLegsAnalyser.summarizeVehicles(drtVehicleStats.getVehicleStates(), delimiter)
 				+ delimiter
 				+ format.format(l_d)
 				+ delimiter
-				+ (minStayTaskVehicleCountOverDay.isPresent() ?
-				format.format(minStayTaskVehicleCountOverDay.getAsDouble()) :
-				notAvailableString);
+				+ getMinShareIdleVehiclesOverDayFormatted()
+				+ delimiter
+				+ getMinCountIdleVehiclesOverDayFormatted();
 		String occStats = DrtLegsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter,
 				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
@@ -214,6 +205,38 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				filename(event, "drt_boardings", ".csv"), filename(event, "drt_alightments", ".csv"), network);
 	}
 
+	private String getMinCountIdleVehiclesOverDayFormatted() {
+		double minCountIdleVehiclesOverDay = Double.MAX_VALUE;
+		double[] stayTaskProfile = vehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles().get(new DrtTaskType(DrtTaskBaseType.STAY));
+		double[] numberOfVehiclesInServiceProfile = vehicleOccupancyProfileCalculator.getNumberOfVehiclesInServiceProfile();
+		if (stayTaskProfile != null) {
+			for (int i = 0; i < numberOfVehiclesInServiceProfile.length; i++) {
+				if (numberOfVehiclesInServiceProfile[i] > 0) {
+					// only consider time intervals in which vehicles were in operation. Otherwise, any time period without a vehicle in operation will make for count 0.
+					minCountIdleVehiclesOverDay = Math.min(minCountIdleVehiclesOverDay, stayTaskProfile[i]);
+				}
+			}
+		}
+		return minCountIdleVehiclesOverDay < Double.MAX_VALUE ?
+				format.format(minCountIdleVehiclesOverDay) : notAvailableString;
+	}
+
+	private String getMinShareIdleVehiclesOverDayFormatted() {
+		double minShareIdleVehiclesOverDay = Double.MAX_VALUE;
+		double[] stayTaskProfile = vehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles().get(new DrtTaskType(DrtTaskBaseType.STAY));
+		double[] numberOfVehiclesInServiceProfile = vehicleOccupancyProfileCalculator.getNumberOfVehiclesInServiceProfile();
+		if (stayTaskProfile != null) {
+			for (int i = 0; i < numberOfVehiclesInServiceProfile.length; i++) {
+				if (numberOfVehiclesInServiceProfile[i] > 0) {
+					// only consider time intervals in which vehicles were in operation. Otherwise, any time period without a vehicle in operation will make for share 0.
+					minShareIdleVehiclesOverDay = Math.min(minShareIdleVehiclesOverDay, stayTaskProfile[i] / numberOfVehiclesInServiceProfile[i]);
+				}
+			}
+		}
+		return minShareIdleVehiclesOverDay < Double.MAX_VALUE ?
+				format.format(minShareIdleVehiclesOverDay) : notAvailableString;
+	}
+
 	private String filename(IterationEndsEvent event, String prefix) {
 		return filename(event, prefix, "");
 	}
@@ -261,7 +284,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			if (!vheaderWritten) {
 				bw.write(line("runId", "iteration", "vehicles", "totalDistance", "totalEmptyDistance", "emptyRatio",
 						"totalPassengerDistanceTraveled", "averageDrivenDistance", "averageEmptyDistance",
-						"averagePassengerDistanceTraveled", "d_p/d_t", "l_det", "minShareIdleVehicles"));
+						"averagePassengerDistanceTraveled", "d_p/d_t", "l_det", "minShareIdleVehicles", "minCountIdleVehicles"));
 			}
 			bw.write(line(runId, it, summarizeVehicles));
 		} catch (IOException e) {
