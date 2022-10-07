@@ -38,7 +38,6 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -166,7 +165,6 @@ public class CadytsCarIT {
 		final Config config = createTestConfig(inputDir, outputDir);
 		
 		config.controler().setLastIteration(lastIteration);
-		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		
 		config.planCalcScore().setBrainExpBeta(beta);
 

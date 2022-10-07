@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -59,7 +58,6 @@ public class PtTutorialIT {
 	public void ensure_tutorial_runs() throws MalformedURLException {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
 		config.controler().setLastIteration(1);
-		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		try {
 			Controler controler = new Controler(config);
