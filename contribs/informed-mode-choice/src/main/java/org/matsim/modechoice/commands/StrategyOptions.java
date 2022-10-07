@@ -118,7 +118,6 @@ public final class StrategyOptions {
 				DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator,
 				ModeChoice.selectSubtourMode.name,
 				ModeChoice.selectBestKPlanModes.name,
-				ModeChoice.selectSubtourMode.name,
 				ModeChoice.randomSubtourMode.name,
 				ModeChoice.informedModeChoice.name
 		);
