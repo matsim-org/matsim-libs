@@ -43,12 +43,12 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(3);
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		Controler c = new Controler(config);
 		c.getConfig().controler().setWriteEventsInterval(0);
         c.getConfig().controler().setCreateGraphs(false);
-		c.getConfig().controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		c.getConfig().controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
         c.run();
 
@@ -94,11 +94,11 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(1);
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		Controler c = new Controler(config);
 		c.getConfig().controler().setWriteEventsInterval(0);
         c.getConfig().controler().setCreateGraphs(false);
-		c.getConfig().controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		c.getConfig().controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
         c.run();
 

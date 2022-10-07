@@ -101,7 +101,7 @@ public class ControlerIT {
 
 		// need to run the controler to get Scenario initilized
 		controler.getConfig().controler().setLastIteration( 0 );
-		controler.getConfig().controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		controler.getConfig().controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		controler.run();
 
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
@@ -503,7 +503,7 @@ public class ControlerIT {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setCompressionType( CompressionType.zst );
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		final Controler controler = new Controler(config);
 

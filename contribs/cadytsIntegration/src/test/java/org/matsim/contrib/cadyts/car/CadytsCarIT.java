@@ -166,7 +166,7 @@ public class CadytsCarIT {
 		final Config config = createTestConfig(inputDir, outputDir);
 		
 		config.controler().setLastIteration(lastIteration);
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		
 		config.planCalcScore().setBrainExpBeta(beta);
 

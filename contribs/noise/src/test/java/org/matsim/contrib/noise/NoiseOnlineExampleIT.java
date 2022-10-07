@@ -65,7 +65,7 @@ public class NoiseOnlineExampleIT {
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
@@ -87,7 +87,7 @@ public class NoiseOnlineExampleIT {
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
@@ -188,7 +188,7 @@ public class NoiseOnlineExampleIT {
 		Config config = ConfigUtils.loadConfig( testUtils.getPackageInputDirectory() + "config.xml", new NoiseConfigGroup() );
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);

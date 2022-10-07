@@ -38,7 +38,7 @@ public class RunTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		config.controler().setOutputDirectory(outputDirectory);
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		config.controler().setRunId(runId);
 		
 		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);

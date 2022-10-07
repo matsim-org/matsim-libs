@@ -136,7 +136,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
         dumpOutputLegs(event.getIteration());
 		dumpExperiencedPlans(event.getIteration()) ;
 
-		if (controlerConfigGroup.getHandleItersAtEnd() == ControlerConfigGroup.HandleIterations.delete) {
+		if (controlerConfigGroup.getCleanItersAtEnd() == ControlerConfigGroup.CleanIterations.delete) {
 			this.controlerIO.deleteIterationDirectory();
 		}
 	}

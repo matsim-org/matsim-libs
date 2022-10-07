@@ -53,7 +53,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		}
 	}
 
-	public enum HandleIterations {
+	public enum CleanIterations {
 		keep,
 		delete,
 	}
@@ -74,7 +74,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String OVERWRITE_FILE = "overwriteFiles";
 	private static final String CREATE_GRAPHS = "createGraphs";
 	private static final String DUMP_DATA_AT_END = "dumpDataAtEnd";
-	private static final String HANDLE_ITERS_AT_END = "handleItersAtEnd";
+	private static final String CLEAN_ITERS_AT_END = "cleanItersAtEnd";
 	private static final String COMPRESSION_TYPE = "compressionType";
 	private static final String EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS = "createScoringFunctionType";
 	
@@ -104,9 +104,10 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private boolean createGraphs = true;
 	private boolean dumpDataAtEnd = true;
 
-	private HandleIterations handleItersAtEnd = HandleIterations.delete;
 	private CompressionType compressionType = CompressionType.gzip;
 	private OverwriteFileSetting overwriteFileSetting = OverwriteFileSetting.failIfDirectoryExists;
+
+	private CleanIterations cleanItersAtEnd = CleanIterations.keep;
 
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
@@ -149,7 +150,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
 				"to a file. `0' disables snapshots writing completely");
 		map.put(DUMP_DATA_AT_END, "true if at the end of a run, plans, network, config etc should be dumped to a file");
-		map.put(HANDLE_ITERS_AT_END, "Defines what should be done with the ITERS directory when a simulation finished successfully");
+		map.put(CLEAN_ITERS_AT_END, "Defines what should be done with the ITERS directory when a simulation finished successfully");
 		return map;
 	}
 
@@ -397,14 +398,14 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		this.dumpDataAtEnd = dumpDataAtEnd;
 	}
 
-	@StringSetter(HANDLE_ITERS_AT_END)
-	public void setHandleItersAtEnd(HandleIterations handleItersAtEnd) {
-		this.handleItersAtEnd = handleItersAtEnd;
+	@StringSetter(CLEAN_ITERS_AT_END)
+	public void setCleanItersAtEnd(CleanIterations cleanItersAtEnd) {
+		this.cleanItersAtEnd = cleanItersAtEnd;
 	}
 
-	@StringGetter(HANDLE_ITERS_AT_END)
-	public HandleIterations getHandleItersAtEnd() {
-		return handleItersAtEnd;
+	@StringGetter(CLEAN_ITERS_AT_END)
+	public CleanIterations getCleanItersAtEnd() {
+		return cleanItersAtEnd;
 	}
 
 	@StringGetter(EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS)

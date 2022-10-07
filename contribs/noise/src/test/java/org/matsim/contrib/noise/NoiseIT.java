@@ -84,7 +84,7 @@ public class NoiseIT {
 
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
@@ -157,7 +157,7 @@ public class NoiseIT {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
 		runTest2a( config ) ;
 	}
@@ -167,7 +167,7 @@ public class NoiseIT {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 //		{
 //			ModeRoutingParams params = new ModeRoutingParams( TransportMode.non_network_walk );
@@ -193,7 +193,7 @@ public class NoiseIT {
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
 		
@@ -1059,7 +1059,7 @@ public class NoiseIT {
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		controler.getConfig().controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		controler.getConfig().controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		controler.run();
 		
 		// run the noise analysis for the final iteration (offline)
@@ -1071,7 +1071,7 @@ public class NoiseIT {
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
-		config.controler().setHandleItersAtEnd(ControlerConfigGroup.HandleIterations.keep);
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		// adjust the default noise parameters
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
