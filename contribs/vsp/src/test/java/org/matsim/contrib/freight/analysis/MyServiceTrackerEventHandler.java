@@ -5,16 +5,14 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightServiceStartEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
 import org.matsim.vehicles.Vehicles;
 
- class MyServiceTrackerEventHandler implements ActivityStartEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
+ class MyServiceTrackerEventHandler implements ActivityStartEventHandler, FreightServiceStartEventHandler, FreightServiceEndEventHandler {
     private final Vehicles vehicles;
     private final Network network;
     private final Carriers carriers;
@@ -39,12 +37,12 @@ import org.matsim.vehicles.Vehicles;
     }
 
     @Override
-    public void handleEvent(LSPServiceEndEvent event) {
+    public void handleEvent(FreightServiceEndEvent event) {
         serviceTracking.handleEndEvent(event);
     }
 
     @Override
-    public void handleEvent(LSPServiceStartEvent event) {
+    public void handleEvent(FreightServiceStartEvent event) {
         serviceTracking.handleStartEvent(event);
     }
 

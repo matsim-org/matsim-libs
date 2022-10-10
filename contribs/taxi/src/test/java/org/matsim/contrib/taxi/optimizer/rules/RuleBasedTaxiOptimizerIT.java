@@ -41,22 +41,22 @@ public class RuleBasedTaxiOptimizerIT {
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
 		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
 
-		params.setGoal(Goal.DEMAND_SUPPLY_EQUIL);
-		params.setNearestRequestsLimit(99999);
-		params.setNearestVehiclesLimit(99999);
-		params.setCellSize(99999.);
+		params.goal = Goal.DEMAND_SUPPLY_EQUIL;
+		params.nearestRequestsLimit = 99999;
+		params.nearestVehiclesLimit = 99999;
+		params.cellSize = 99999.;
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_A");
 
-		params.setGoal(Goal.MIN_WAIT_TIME);
-		params.setNearestRequestsLimit(10);
-		params.setNearestVehiclesLimit(10);
-		params.setCellSize(1000.);
+		params.goal = Goal.MIN_WAIT_TIME;
+		params.nearestRequestsLimit = 10;
+		params.nearestVehiclesLimit = 10;
+		params.cellSize = 1000.;
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
 
-		params.setGoal(Goal.MIN_PICKUP_TIME);
-		params.setNearestRequestsLimit(1);
-		params.setNearestVehiclesLimit(1);
-		params.setCellSize(100.);
+		params.goal = Goal.MIN_PICKUP_TIME;
+		params.nearestRequestsLimit = 1;
+		params.nearestVehiclesLimit = 1;
+		params.cellSize = 100.;
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_C");
 	}
 }

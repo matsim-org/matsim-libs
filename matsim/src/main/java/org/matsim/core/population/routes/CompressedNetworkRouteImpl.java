@@ -21,13 +21,17 @@
 package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -53,21 +57,21 @@ import org.matsim.vehicles.Vehicle;
  */
 final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
 
-	private final static Logger log = Logger.getLogger(CompressedNetworkRouteImpl.class);
+	private final static Logger log = LogManager.getLogger(CompressedNetworkRouteImpl.class);
 
-	private ArrayList<Id<Link>> route = new ArrayList<Id<Link>>(0);
+	private ArrayList<Id<Link>> route = new ArrayList<>(0);
 	private final Map<Id<Link>, Id<Link>> subsequentLinks;
 	private double travelCost = Double.NaN;
 	/** number of links in uncompressed route */
 	private int uncompressedLength = -1;
-	private int modCount = 0;
-	private int routeModCountState = 0;
 	private Id<Vehicle> vehicleId = null;
 	private final Network network;
+	private final Map<Id<Link>, ? extends Link> links;
 
 	public CompressedNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId, Network network, final Map<Id<Link>, Id<Link>> subsequentLinks) {
 		super(startLinkId, endLinkId);
 		this.network = network;
+		this.links = network.getLinks();
 		this.subsequentLinks = subsequentLinks;
 	}
 
@@ -75,26 +79,22 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 	public CompressedNetworkRouteImpl clone() {
 		CompressedNetworkRouteImpl cloned = (CompressedNetworkRouteImpl) super.clone();
 		ArrayList<Id<Link>> tmpRoute = cloned.route;
-		cloned.route = new ArrayList<Id<Link>>(tmpRoute); // deep copy
+		cloned.route = new ArrayList<>(tmpRoute); // deep copy
 		return cloned;
 	}
 
 	@Override
 	public List<Id<Link>> getLinkIds() {
 		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
-			return new ArrayList<Id<Link>>(0);
+			return new ArrayList<>(0);
 		}
-		ArrayList<Id<Link>> links = new ArrayList<Id<Link>>(this.uncompressedLength);
-		if (this.modCount != this.routeModCountState) {
-			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
-			return links;
-		}
+		ArrayList<Id<Link>> links = new ArrayList<>(this.uncompressedLength);
 		Id<Link> previousLinkId = getStartLinkId();
 		Id<Link> endLinkId = getEndLinkId();
 		if ((previousLinkId == null) || (endLinkId == null)) {
 			return links;
 		}
-		if (previousLinkId.equals(endLinkId)) {
+		if (previousLinkId.equals(endLinkId) && this.uncompressedLength == 0) {
 			return links;
 		}
 		for (Id<Link> linkId : this.route) {
@@ -109,9 +109,9 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 
 	private void getLinksTillLink(final List<Id<Link>> links, final Id<Link> nextLinkId, final Id<Link> startLinkId) {
 		Id<Link> linkId = startLinkId;
-		Link nextLink = this.network.getLinks().get(nextLinkId);
+		Link nextLink = this.links.get(nextLinkId);
 		while (true) { // loop until we hit "return;"
-			Link link = this.network.getLinks().get(linkId);
+			Link link = this.links.get(linkId);
 			if (link.getToNode() == nextLink.getFromNode()) {
 				return;
 			}
@@ -120,22 +120,9 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 		}
 	}
 
-//	@Override
-//	public void setEndLinkId(final Id<Link> linkId) {
-//		this.modCount++;
-//		super.setEndLinkId(linkId);
-//	}
-//
-//	@Override
-//	public void setStartLinkId(final Id<Link> linkId) {
-//		this.modCount++;
-//		super.setStartLinkId(linkId);
-//	}
-	// AbstractRoute is now implements Lockable and I have addressed this via that feature.  kai, sep/17
-
 	@Override
 	public NetworkRoute getSubRoute(Id<Link> fromLinkId, Id<Link> toLinkId) {
-		List<Id<Link>> newLinkIds = new ArrayList<Id<Link>>(10);
+		List<Id<Link>> newLinkIds = new ArrayList<>(10);
 		boolean foundFromLink = fromLinkId.equals(this.getStartLinkId());
 		boolean collectLinks = foundFromLink;
 		boolean equalFromTo = fromLinkId.equals(toLinkId);
@@ -193,20 +180,50 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 	@Override
 	public void setLinkIds(final Id<Link> startLinkId, final List<Id<Link>> srcRoute, final Id<Link> endLinkId) {
 		this.route.clear();
+		Set<Id<Node>> visitedNodes = new HashSet<>();
+		Set<Id<Node>> multiplyVisitedNodes = new HashSet<>();
 		setStartLinkId(startLinkId);
 		setEndLinkId(endLinkId);
-		this.routeModCountState = this.modCount;
 		if ((srcRoute == null) || (srcRoute.size() == 0)) {
 			this.uncompressedLength = 0;
 			return;
 		}
+		// compress route
 		Id<Link> previousLinkId = startLinkId;
 		for (Id<Link> linkId : srcRoute) {
+			Link link = this.links.get(linkId);
+			Id<Node> fromNodeId = link.getFromNode().getId();
+			if (!visitedNodes.add(fromNodeId)) {
+				// the node was already visited
+				multiplyVisitedNodes.add(fromNodeId);
+			}
 			if (!this.subsequentLinks.get(previousLinkId).equals(linkId)) {
 				this.route.add(linkId);
 			}
 			previousLinkId = linkId;
 		}
+		Link endLink = this.links.get(endLinkId);
+		Id<Node> fromNodeId = endLink.getFromNode().getId();
+		if (!visitedNodes.add(fromNodeId)) {
+			// the node was already visited
+			multiplyVisitedNodes.add(fromNodeId);
+		}
+
+		if (!multiplyVisitedNodes.isEmpty()) {
+			// the route contains at least one loop, we need to re-encode it and make sure
+			// that no loop is left out when reconstructing the uncompressed route
+			this.route.clear();
+			previousLinkId = startLinkId;
+			for (Id<Link> linkId : srcRoute) {
+				Link link = this.links.get(linkId);
+				fromNodeId = link.getFromNode().getId();
+				if (!this.subsequentLinks.get(previousLinkId).equals(linkId) || multiplyVisitedNodes.contains(fromNodeId)) {
+					this.route.add(linkId);
+				}
+				previousLinkId = linkId;
+			}
+		}
+
 		this.route.trimToSize();
 		this.uncompressedLength = srcRoute.size();
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());

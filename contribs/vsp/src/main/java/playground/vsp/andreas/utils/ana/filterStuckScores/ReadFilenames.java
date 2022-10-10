@@ -22,14 +22,15 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 public class ReadFilenames implements TabularFileHandler {
 	
-	private static final Logger log = Logger.getLogger(ReadFilenames.class);
+	private static final Logger log = LogManager.getLogger(ReadFilenames.class);
 
 	private TabularFileParserConfig tabFileParserConfig;
 	private List<String> filenames = new LinkedList<String>();

@@ -20,7 +20,8 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -47,7 +48,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 		MAXIMUM
 	}
 
-	private final static Logger log = Logger.getLogger(NetworkMergeDoubleLinks.class);
+	private final static Logger log = LogManager.getLogger(NetworkMergeDoubleLinks.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.emissions.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
-	private static final Logger log = Logger.getLogger( EmissionsConfigGroup.class );
+	private static final Logger log = LogManager.getLogger( EmissionsConfigGroup.class );
 
 	public static final String GROUP_NAME = "emissions";
 

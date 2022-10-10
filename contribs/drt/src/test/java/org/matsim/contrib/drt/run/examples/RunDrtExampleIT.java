@@ -64,7 +64,7 @@ public class RunDrtExampleIT {
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			//disable rejections
-			drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -93,11 +93,12 @@ public class RunDrtExampleIT {
 			//replace extensive with selective search
 			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
 			var selectiveInsertionSearchParams = new SelectiveInsertionSearchParams();
-			selectiveInsertionSearchParams.setRestrictiveBeelineSpeedFactor(1);// using exactly free-speed estimates
+			// using exactly free-speed estimates
+			selectiveInsertionSearchParams.restrictiveBeelineSpeedFactor = 1;
 			drtCfg.addParameterSet(selectiveInsertionSearchParams);
 
 			//disable rejections
-			drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -124,7 +125,9 @@ public class RunDrtExampleIT {
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			//relatively high max age to prevent rejections
-			drtCfg.addParameterSet(new DrtRequestInsertionRetryParams().setMaxRequestAge(7200));
+			var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
+			drtRequestInsertionRetryParams.maxRequestAge = 7200;
+			drtCfg.addParameterSet(drtRequestInsertionRetryParams);
 		}
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

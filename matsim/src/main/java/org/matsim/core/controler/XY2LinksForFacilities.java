@@ -19,7 +19,8 @@
 
 package org.matsim.core.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
@@ -34,7 +35,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 
 public class XY2LinksForFacilities {
 
-    public static final Logger LOGGER = Logger.getLogger(XY2LinksForFacilities.class);
+    public static final Logger LOGGER = LogManager.getLogger(XY2LinksForFacilities.class);
 
     public static void run(Network network, ActivityFacilities facilities){
 

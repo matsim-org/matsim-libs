@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,7 +31,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class HafasReader {
 	
-	private static final Logger log = Logger.getLogger(HafasReader.class);
+	private static final Logger log = LogManager.getLogger(HafasReader.class);
 	
 	private static String PATH_PREFIX = "D:/Berlin/BVG/berlin-bvg09/urdaten/BVG-Fahrplan_2008/Daten/1_Mo-Do/";
 	private static String FILENAME = "D:/Berlin/BVG/berlin-bvg09/urdaten/BVG-Fahrplan_2008/Daten/1_Mo-Do/alldat";

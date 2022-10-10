@@ -28,7 +28,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
@@ -116,7 +117,7 @@ public final class Config implements MatsimExtensionPoint {
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<>();
 
 	/** static Logger-instance. */
-	private static final Logger log = Logger.getLogger(Config.class);
+	private static final Logger log = LogManager.getLogger(Config.class);
 
 	private boolean locked = false;
 	private URL context;

@@ -23,7 +23,8 @@ package org.matsim.contrib.cadyts.car;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.supply.SimResults;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,7 +58,7 @@ import static org.matsim.contrib.cadyts.general.CadytsBuilderImpl.*;
  */
 public class CadytsContext implements CadytsContextI<Link>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
-	private final static Logger log = Logger.getLogger(CadytsContext.class);
+	private final static Logger log = LogManager.getLogger(CadytsContext.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";

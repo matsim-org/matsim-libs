@@ -25,7 +25,8 @@ package org.matsim.contrib.signals.builder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.controller.SignalControllerFactory;
@@ -58,7 +59,7 @@ class SignalsModule extends AbstractModule {
 	// This is no longer public since there is now also material that needs to be injected at the QSim level (see
 	// Signals.configure(...)), and making SignalsModule nonpublic seems the best way of forcibly notifying users.  kai, nov'18
 
-	private static final Logger log = Logger.getLogger( SignalsModule.class ) ;
+	private static final Logger log = LogManager.getLogger( SignalsModule.class ) ;
 
 	private MapBinder<String, SignalControllerFactory> signalControllerFactoryMultibinder;
 	private Map<String, Class<? extends SignalControllerFactory>> signalControllerFactoryClassNames = new HashMap<>();

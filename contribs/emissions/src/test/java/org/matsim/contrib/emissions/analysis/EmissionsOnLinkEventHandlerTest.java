@@ -13,8 +13,7 @@ import org.matsim.vehicles.Vehicle;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 import static org.matsim.contrib.emissions.Pollutant.HC;
 
 public class EmissionsOnLinkEventHandlerTest {
@@ -55,9 +54,12 @@ public class EmissionsOnLinkEventHandlerTest {
         handler.handleEvent(event);
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> timeBin = handler.getTimeBins().getTimeBin(time);
+        Map<Id<Link>, Map<Pollutant, Double>> link2pollutantsMap = handler.getLink2pollutants();
 
         assertTrue(timeBin.hasValue());
         emissions.forEach((key, value) -> assertEquals(value, timeBin.getValue().get(linkId).getEmission(key), 0.0001));
+        assertFalse(link2pollutantsMap.isEmpty());
+        emissions.forEach((key, value) -> assertEquals(value, link2pollutantsMap.get(linkId).get(key), 0.0001));
     }
 
     @Test
@@ -75,9 +77,12 @@ public class EmissionsOnLinkEventHandlerTest {
         handler.handleEvent(event);
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> timeBin = handler.getTimeBins().getTimeBin(time);
+        Map<Id<Link>, Map<Pollutant, Double>> link2pollutantsMap = handler.getLink2pollutants();
 
         assertTrue(timeBin.hasValue());
         emissions.forEach((key, value) -> assertEquals(value, timeBin.getValue().get(linkId).getEmission(key), 0.0001));
+        assertFalse(link2pollutantsMap.isEmpty());
+        emissions.forEach((key, value) -> assertEquals(value, link2pollutantsMap.get(linkId).get(key), 0.0001));
     }
 
     @Test
@@ -97,6 +102,7 @@ public class EmissionsOnLinkEventHandlerTest {
         thirdTimestep.forEach(handler::handleEvent);
 
         TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> summedEmissions = handler.getTimeBins();
+        Map<Id<Link>, Map<Pollutant, Double>> link2pollutantsMap = handler.getLink2pollutants();
 
         assertEquals(2, summedEmissions.getTimeBins().size());
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> firstBin = summedEmissions.getTimeBin(18);
@@ -106,6 +112,9 @@ public class EmissionsOnLinkEventHandlerTest {
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> secondBin = summedEmissions.getTimeBin(20);
         assertTrue(secondBin.hasValue());
         assertEquals(numberOfEvents * emissionValue, secondBin.getValue().get(linkId).getEmission(HC));
+
+        link2pollutantsMap.get(linkId).forEach((pollutant, value) ->
+                assertEquals(3 * numberOfEvents * emissionValue, value, 0.0001));
     }
 
     @Test
@@ -124,9 +133,11 @@ public class EmissionsOnLinkEventHandlerTest {
         handler.handleEvent(event);
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> timeBin = handler.getTimeBins().getTimeBin(time);
+        Map<Id<Link>, Map<Pollutant, Double>> link2pollutantsMap = handler.getLink2pollutants();
 
         timeBin.getValue().values().forEach(emissionsByPollutant ->
                 emissionsByPollutant.getEmissions().values().forEach(value -> assertEquals(emissionValue, value, 0.0001)));
+        link2pollutantsMap.get(linkId).forEach((pollutant, value) -> assertEquals(emissionValue, value, 0.0001));
     }
 
     @Test
@@ -145,8 +156,11 @@ public class EmissionsOnLinkEventHandlerTest {
         handler.handleEvent(new WarmEmissionEvent(time, linkId, vehicleId, emissions));
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> timeBin = handler.getTimeBins().getTimeBin(time);
+        Map<Id<Link>, Map<Pollutant, Double>> link2pollutantsMap = handler.getLink2pollutants();
 
         timeBin.getValue().values().forEach(emissionsByPollutant ->
                 emissionsByPollutant.getEmissions().values().forEach(value -> assertEquals(emissionValue * 3, value, 0.0001)));
+        link2pollutantsMap.get(linkId).forEach((pollutant, value) ->
+                assertEquals(emissionValue * 3, value, 0.0001));
     }
 }

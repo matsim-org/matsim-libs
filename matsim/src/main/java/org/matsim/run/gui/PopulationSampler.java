@@ -42,7 +42,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
@@ -59,7 +60,7 @@ import com.github.luben.zstd.ZstdInputStream;
  */
 final class PopulationSampler extends JDialog {
 
-	private final static Logger log = Logger.getLogger(PopulationSampler.class);
+	private final static Logger log = LogManager.getLogger(PopulationSampler.class);
 
 	private static final long serialVersionUID = 1L;
 

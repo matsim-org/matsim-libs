@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.bicycle.network;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +47,7 @@ import java.util.Set;
  */
 @Deprecated
 public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
-	private final static Logger LOG = Logger.getLogger(BicycleOsmNetworkReaderV2.class);
+	private final static Logger LOG = LogManager.getLogger(BicycleOsmNetworkReaderV2.class);
 
 	private ElevationDataParser elevationDataParser;
 

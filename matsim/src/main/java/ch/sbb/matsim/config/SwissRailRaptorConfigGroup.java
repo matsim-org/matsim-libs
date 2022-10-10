@@ -12,7 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -24,7 +25,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
  */
 public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 
-	private static final Logger log = Logger.getLogger(SwissRailRaptorConfigGroup.class);
+	private static final Logger log = LogManager.getLogger(SwissRailRaptorConfigGroup.class);
     public static final String GROUP = "swissRailRaptor";
 
     private static final String PARAM_USE_RANGE_QUERY = "useRangeQuery";

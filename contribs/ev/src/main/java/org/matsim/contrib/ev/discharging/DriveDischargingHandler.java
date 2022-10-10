@@ -64,7 +64,7 @@ public class DriveDischargingHandler
 	}
 
 	private final Network network;
-	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
+	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
 	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 

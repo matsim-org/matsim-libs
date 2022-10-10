@@ -22,7 +22,8 @@ package org.matsim.contrib.socnetsim.jointtrips.qsim;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -41,7 +42,7 @@ import com.google.inject.Provider;
  */
 public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 	private static final Logger log =
-		Logger.getLogger(JointQSimFactory.class);
+		LogManager.getLogger(JointQSimFactory.class);
 	
 	private final Scenario sc;
 	private final EventsManager events;

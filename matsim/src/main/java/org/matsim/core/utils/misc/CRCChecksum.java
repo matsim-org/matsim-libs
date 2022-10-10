@@ -29,10 +29,11 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CRCChecksum {
-	private static final Logger log = Logger.getLogger( CRCChecksum.class );
+	private static final Logger log = LogManager.getLogger( CRCChecksum.class );
 
 	private static long getCRCFromStream(final InputStream in) {
 		long check = 0;

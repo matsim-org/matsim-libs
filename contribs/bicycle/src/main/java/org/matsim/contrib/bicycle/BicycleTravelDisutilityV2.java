@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -32,7 +33,7 @@ import org.matsim.vehicles.Vehicle;
 // Used version seesm to be BicycleTravelDisutility (without V2)
 @Deprecated
 class BicycleTravelDisutilityV2 implements TravelDisutility {
-	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutilityV2.class);
+	private static final Logger LOG = LogManager.getLogger(BicycleTravelDisutilityV2.class);
 
 	private final double marginalCostOfInfrastructure_m;
 	private final double marginalCostOfComfort_m;

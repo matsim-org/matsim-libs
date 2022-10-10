@@ -20,7 +20,8 @@
 
 package org.matsim.core.utils.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.gbl.Gbl;
 import org.xml.sax.*;
@@ -51,7 +52,7 @@ import java.util.zip.GZIPInputStream;
  */
 public abstract class MatsimXmlParser extends DefaultHandler implements MatsimReader {
 
-	private static final Logger log = Logger.getLogger(MatsimXmlParser.class);
+	private static final Logger log = LogManager.getLogger(MatsimXmlParser.class);
 
 	private final Stack<StringBuffer> buffers = new Stack<>();
 	private final Stack<String> theContext = new Stack<>();

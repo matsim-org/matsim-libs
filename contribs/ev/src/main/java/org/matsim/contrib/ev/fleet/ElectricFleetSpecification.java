@@ -23,6 +23,7 @@ package org.matsim.contrib.ev.fleet;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * A container of ElectricVehicleSpecifications. Its lifespan covers all iterations.
@@ -34,11 +35,9 @@ import org.matsim.api.core.v01.Id;
  * @author Michal Maciejewski (michalm)
  */
 public interface ElectricFleetSpecification {
-	Map<Id<ElectricVehicle>, ElectricVehicleSpecification> getVehicleSpecifications();
+	Map<Id<Vehicle>, ElectricVehicleSpecification> getVehicleSpecifications();
 
 	void addVehicleSpecification(ElectricVehicleSpecification specification);
 
-	void replaceVehicleSpecification(ElectricVehicleSpecification specification);
-
-	void removeVehicleSpecification(Id<ElectricVehicle> vehicleId);
+	void clear();
 }

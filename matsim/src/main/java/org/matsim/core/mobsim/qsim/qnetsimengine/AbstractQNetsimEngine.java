@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -73,7 +74,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		}
 	} ;
 
-	private static final Logger log = Logger.getLogger(AbstractQNetsimEngine.class);
+	private static final Logger log = LogManager.getLogger(AbstractQNetsimEngine.class);
 	private static final int INFO_PERIOD = 3600;
 
 	// for detailed run time analysis - used in combination with QSim.analyzeRunTimes

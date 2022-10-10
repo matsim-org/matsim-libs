@@ -19,7 +19,8 @@
 
 package playground.vsp.parkAndRide.scoring;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -41,7 +42,7 @@ import org.matsim.core.scoring.functions.ScoringParameters;
  */
 public class PRScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	private static final Logger log = Logger.getLogger(PRScoringFunctionFactory.class);
+	private static final Logger log = LogManager.getLogger(PRScoringFunctionFactory.class);
 	private final ScoringParametersForPerson charyparNagelConfigParameters;
 	private final double interModalTransferPenalty;
 	private final Network network;

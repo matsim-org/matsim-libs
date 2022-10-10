@@ -21,11 +21,12 @@ package org.matsim.contrib.parking.parkingchoice.lib.obj;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CollectionLib {
 
-	private static final Logger log = Logger.getLogger(CollectionLib.class);
+	private static final Logger log = LogManager.getLogger(CollectionLib.class);
 
 	/**
 	 * TODO: move method to approporaite place where the data structures are

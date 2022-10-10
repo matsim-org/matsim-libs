@@ -23,7 +23,8 @@ package org.matsim.contrib.signals.controller.laemmerFix;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,7 +62,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class LaemmerIT {
 
-	private static final Logger log = Logger.getLogger(LaemmerIT.class);
+	private static final Logger log = LogManager.getLogger(LaemmerIT.class);
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

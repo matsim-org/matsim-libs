@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -31,7 +32,7 @@ public class ElectricFleets {
 	public static ElectricFleet createDefaultFleet(ElectricFleetSpecification fleetSpecification,
 			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
 			ChargingPower.Factory chargingFactory) {
-		ImmutableMap<Id<ElectricVehicle>, ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
+		ImmutableMap<Id<Vehicle>, ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
 				.values()
 				.stream()
 				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory,

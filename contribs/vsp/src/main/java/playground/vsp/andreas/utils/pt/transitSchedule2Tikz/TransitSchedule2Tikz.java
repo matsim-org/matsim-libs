@@ -26,7 +26,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,8 +48,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class TransitSchedule2Tikz {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(TransitSchedule2Tikz.class);
+	private static final Logger log = LogManager.getLogger(TransitSchedule2Tikz.class);
 	private HashMap<Id, Id> stopId2tikzId;
 	private HashMap<Id, TikzNode> tikzNodes;
 	private double maxX = - Double.MAX_VALUE;

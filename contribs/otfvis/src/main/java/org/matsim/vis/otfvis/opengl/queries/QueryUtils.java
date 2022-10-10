@@ -22,7 +22,8 @@ package org.matsim.vis.otfvis.opengl.queries;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 
@@ -32,7 +33,7 @@ import org.matsim.api.core.v01.Id;
  */
 public class QueryUtils {
 	
-	private static final Logger log = Logger.getLogger(QueryUtils.class);
+	private static final Logger log = LogManager.getLogger(QueryUtils.class);
 	
 	/**
 	 * Method that can be used to parse multiple matsim.org Ids from the query input text field.

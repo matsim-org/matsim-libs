@@ -20,7 +20,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,7 +34,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
  */
 public class AbstractMultithreadedModuleTest {
 
-	private final static Logger log = Logger.getLogger(AbstractMultithreadedModuleTest.class);
+	private final static Logger log = LogManager.getLogger(AbstractMultithreadedModuleTest.class);
 
 	@Test
 	public void testGetNumOfThreads() {

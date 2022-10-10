@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22
@@ -34,7 +35,7 @@ import org.apache.log4j.Logger;
 @Deprecated
 public class CarrierVehicleTypeLoader {
 	
-	private static final  Logger logger = Logger.getLogger(CarrierVehicleTypeLoader.class);
+	private static final  Logger logger = LogManager.getLogger(CarrierVehicleTypeLoader.class);
 
 	private final Carriers carriers;
 

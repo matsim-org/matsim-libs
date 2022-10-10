@@ -24,10 +24,11 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.ImmutableList;
 
-public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
+public interface ElectricVehicle extends Identifiable<Vehicle> {
 	DriveEnergyConsumption getDriveEnergyConsumption();
 
 	AuxEnergyConsumption getAuxEnergyConsumption();

@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesWriter10;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
@@ -44,7 +45,7 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
  */
 public final class SignalsScenarioWriter {
 	
-	private static final Logger log = Logger.getLogger(SignalsScenarioWriter.class);
+	private static final Logger log = LogManager.getLogger(SignalsScenarioWriter.class);
 	
 	public static final String FILENAME_SIGNAL_SYSTEMS = "output_signal_systems_v2.0.xml.gz";
 	public static final String FILENAME_SIGNAL_GROUPS = "output_signal_groups_v2.0.xml.gz";

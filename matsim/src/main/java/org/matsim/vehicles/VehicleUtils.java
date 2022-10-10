@@ -20,7 +20,8 @@
 
 package org.matsim.vehicles;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -37,7 +38,7 @@ import java.util.Map;
  *
  */
 public final class VehicleUtils {
-	private static final Logger log = Logger.getLogger( VehicleUtils.class ) ;
+	private static final Logger log = LogManager.getLogger( VehicleUtils.class ) ;
 
 	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
 	private static final String VEHICLE_ATTRIBUTE_KEY = "vehicles";
@@ -56,6 +57,7 @@ public final class VehicleUtils {
 	private static final String COST_PER_SECOND_WAITING = "costsPerSecondWaiting";
 	private static final String COST_PER_SECOND_INSERVICE = "costsPerSecondInService";
 	private static final String FUEL_TYPE = "fuelType";
+
 	public static VehicleType createVehicleType( Id<VehicleType> typeId ){
 		return new VehicleType( typeId );
 	}
@@ -297,7 +299,7 @@ public final class VehicleUtils {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
 	}
 
-	public static VehicleImpl createVehicle( Id<Vehicle> id , VehicleType type ){
+	public static Vehicle createVehicle( Id<Vehicle> id , VehicleType type ){
 		return new VehicleImpl( id , type );
 	}
 

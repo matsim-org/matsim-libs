@@ -1,6 +1,7 @@
 package playground.vsp.andreas.osmBB;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -26,7 +27,7 @@ import java.io.IOException;
  */
 public class OsmTransitMain {
 	
-	private final static Logger log = Logger.getLogger(OsmTransitMain.class);
+	private final static Logger log = LogManager.getLogger(OsmTransitMain.class);
 	
 	String inFile;
 	String fromCoordSystem;

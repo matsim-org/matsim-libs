@@ -20,7 +20,8 @@
 package org.matsim.contrib.accessibility;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
@@ -53,7 +54,7 @@ import java.util.*;
  * @author dziemke
  */
 public final class AccessibilityModule extends AbstractModule {
-	private static final Logger LOG = Logger.getLogger(AccessibilityModule.class);
+	private static final Logger LOG = LogManager.getLogger(AccessibilityModule.class);
 
 	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ; 
 	private ActivityFacilities measuringPoints;

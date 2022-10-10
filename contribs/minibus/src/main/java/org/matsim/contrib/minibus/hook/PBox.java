@@ -25,7 +25,8 @@ import java.util.Map;
 
 //import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
@@ -54,7 +55,7 @@ import com.google.inject.Inject;
 public final class PBox implements POperators {
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(PBox.class);
+	private final static Logger log = LogManager.getLogger(PBox.class);
 
 	private LinkedList<Operator> operators;
 

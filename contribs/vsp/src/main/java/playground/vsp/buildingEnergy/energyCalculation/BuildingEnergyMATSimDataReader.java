@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,8 +65,7 @@ import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
  */
 class BuildingEnergyMATSimDataReader {
 
-	private static final Logger log = Logger
-			.getLogger(BuildingEnergyMATSimDataReader.class);
+	private static final Logger log = LogManager.getLogger(BuildingEnergyMATSimDataReader.class);
 	private List<Integer> timeBins;
 	private Set<String> activityTypes;
 	private double tmax;

@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -68,7 +69,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	// h--wlk--iact--car--iact--wlk--work--wlk--iact--car--iact--wlk--home  ==> car = 9
 
 
-	static private final Logger log = Logger.getLogger(EditRoutesTest.class);
+	static private final Logger log = LogManager.getLogger(EditRoutesTest.class);
 
 	private Scenario scenario;
 	private Plan plan;

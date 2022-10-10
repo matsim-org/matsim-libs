@@ -19,8 +19,9 @@
 
 package playground.vsp.analysis.modules.bvgAna.delayAtStopHistogram;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
@@ -34,7 +35,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
  */
 public class VehDelayAtStopHistogramEventHandler implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
 	
-	private final Logger log = Logger.getLogger(VehDelayAtStopHistogramEventHandler.class);
+	private final Logger log = LogManager.getLogger(VehDelayAtStopHistogramEventHandler.class);
 //	private final Level logLevel = Level.DEBUG;
 	
 	private int[] arrivalDelay;

@@ -107,8 +107,8 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 			// --- Change input to hbefa4 sample
-			emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.txt");
-			emissionsConfig.setDetailedWarmEmissionFactorsFile("../sample_41_EFA_HOT_SubSegm_2020detailed.txt");
+			emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.csv");
+			emissionsConfig.setDetailedWarmEmissionFactorsFile("../sample_41_EFA_HOT_SubSegm_2020detailed.csv");
 
 			config.controler().setOutputDirectory(utils.getOutputDirectory());
 			offlineExample.run();
@@ -138,10 +138,11 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.txt");
-		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.txt" );
+		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
 		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
+		emissionsConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent ); // because we only use a sample hbefa file "allCombinations" is irrelevant.
 
 		offlineExample.run();
 	}
@@ -158,9 +159,10 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.txt");
-		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.txt" );
+		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
 		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
+		emissionsConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent ); // because we only use a sample hbefa file "allCombinations" is irrelevant.
 
 		offlineExample.run();
 	}
@@ -178,10 +180,10 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
-		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.txt");
-		emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.txt");
-		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.txt" );
-		emissionsConfig.setDetailedWarmEmissionFactorsFile("../sample_41_EFA_HOT_SubSegm_2020detailed.txt");
+		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+		emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.csv");
+		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
+		emissionsConfig.setDetailedWarmEmissionFactorsFile("../sample_41_EFA_HOT_SubSegm_2020detailed.csv");
 
 		offlineExample.run();
 	}

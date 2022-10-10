@@ -1,6 +1,7 @@
 package playground.vsp.andreas.utils.pt.transitSchedule2shape;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.PConstants;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -12,7 +13,7 @@ import java.util.TreeSet;
 
 public class ReadCoopLoggerFileAndReturnCoopsInBusiness implements TabularFileHandler {
 	
-	private static final Logger log = Logger.getLogger(ReadCoopLoggerFileAndReturnCoopsInBusiness.class);
+	private static final Logger log = LogManager.getLogger(ReadCoopLoggerFileAndReturnCoopsInBusiness.class);
 
 	private TabularFileParserConfig tabFileParserConfig;
 	private Set<String> coopIdInBusiness = new TreeSet<String>();

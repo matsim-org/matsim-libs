@@ -32,7 +32,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -63,7 +64,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  *
  */
 public class LegModeDistanceDistribution extends AbstractAnalysisModule{
-	private final static Logger log = Logger.getLogger(LegModeDistanceDistribution.class);
+	private final static Logger log = LogManager.getLogger(LegModeDistanceDistribution.class);
 
 	private Scenario scenario;
 	private final List<Integer> distanceClasses;

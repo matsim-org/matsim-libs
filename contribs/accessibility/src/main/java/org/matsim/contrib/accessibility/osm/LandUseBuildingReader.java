@@ -29,7 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -52,7 +53,7 @@ import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
  * @see <a href="http://wiki.openstreetmap.org/wiki/Key:landuse">OpenStreetMap: Land Use</a>
  */
 public class LandUseBuildingReader {
-	private final static Logger log = Logger.getLogger(LandUseBuildingReader.class);
+	private final static Logger log = LogManager.getLogger(LandUseBuildingReader.class);
 	private QuadTree<Id<ActivityFacility>> linkQT;
 	private ActivityFacilities landuse;
 	private ObjectAttributes amenityAttributes;

@@ -11,7 +11,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 
 import java.util.List;
 
-public class CarrierStrategyManagerImpl implements CarrierStrategyManager {
+public class CarrierStrategyManagerImpl implements CarrierStrategyManager{
 	final GenericStrategyManager<CarrierPlan, Carrier> delegate = new GenericStrategyManagerImpl<>();
 	@Override public void addStrategy( GenericPlanStrategy<CarrierPlan, Carrier> strategy, String subpopulation, double weight ){
 		delegate.addStrategy( strategy, subpopulation, weight );

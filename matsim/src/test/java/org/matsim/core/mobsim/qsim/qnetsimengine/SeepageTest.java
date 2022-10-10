@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +62,7 @@ import java.util.*;
  */
 @RunWith(Parameterized.class)
 public class SeepageTest {
-	static private final Logger log = Logger.getLogger( SeepageTest.class);
+	static private final Logger log = LogManager.getLogger( SeepageTest.class);
 
 	private final boolean isUsingFastCapacityUpdate;
 	

@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -47,7 +48,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
  */
 public class GroupStrategyManager {
 	private static final Logger log =
-		Logger.getLogger(GroupStrategyManager.class);
+		LogManager.getLogger(GroupStrategyManager.class);
 
 	private IterationStopWatch stopWatch;
 

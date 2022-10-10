@@ -97,7 +97,7 @@ public class FixSubtourModes implements MATSimAppCommand, PersonAlgorithm {
 			String[] modes = chainBasedModes.toArray(new String[0]);
 			strategy = new ChooseRandomLegModeForSubtour(new DefaultAnalysisMainModeIdentifier(), null,
 					modes, modes, new Random(1234),
-					SubtourModeChoice.Behavior.betweenAllAndFewerConstraints, 0);
+					SubtourModeChoice.Behavior.betweenAllAndFewerConstraints, 0, coordDist);
 		}
 	}
 

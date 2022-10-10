@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -47,7 +48,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class MultiNodeDijkstraTest {
 
-	private final static Logger log = Logger.getLogger(MultiNodeDijkstraTest.class);
+	private final static Logger log = LogManager.getLogger(MultiNodeDijkstraTest.class);
 
 	private MultiNodeDijkstra makeMultiNodeDikstra(Network network, TravelDisutility travelDisutility, TravelTime travelTime,
 			boolean fastRouter) {

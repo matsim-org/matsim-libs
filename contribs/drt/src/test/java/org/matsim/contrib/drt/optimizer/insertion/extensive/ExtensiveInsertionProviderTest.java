@@ -37,8 +37,6 @@ import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -88,7 +86,8 @@ public class ExtensiveInsertionProviderTest {
 				any())).thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
 
 		//test insertionProvider
-		var params = new ExtensiveInsertionSearchParams().setNearestInsertionsAtEndLimit(nearestInsertionsAtEndLimit);
+		var params = new ExtensiveInsertionSearchParams();
+		params.nearestInsertionsAtEndLimit = nearestInsertionsAtEndLimit;
 		//pretend all insertions are at end to check KNearestInsertionsAtEndFilter
 		when(vehicleEntry.isAfterLastStop(anyInt())).thenReturn(true);
 		var insertionProvider = new ExtensiveInsertionProvider(params, admissibleCostCalculator, insertionGenerator,

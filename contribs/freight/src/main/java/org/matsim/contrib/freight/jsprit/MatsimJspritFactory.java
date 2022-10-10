@@ -36,7 +36,8 @@ import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -68,7 +69,7 @@ import java.util.List;
  */
 public final class MatsimJspritFactory {
 
-	private static final  Logger log = Logger.getLogger(MatsimJspritFactory.class);
+	private static final  Logger log = LogManager.getLogger(MatsimJspritFactory.class);
 
 	// How to deal with a multi-depot VRP? Which depotLink should be used? kmt
 	// jul/18
@@ -366,7 +367,7 @@ public final class MatsimJspritFactory {
 	 * @return ScheduledTour
 	 * @throws IllegalStateException if tourActivity is NOT {@link ServiceActivity}.
 	 */
-	static ScheduledTour createTour(VehicleRoute jspritRoute) {
+	static ScheduledTour createTour(VehicleRoute jspritRoute, Id<Tour> tourId) {
 		// have made this non-public for the time being since it is nowhere used within the freight contrib, and we might want to add the
 		// vehicle types as argument.  If this is publicly used, please move back to public.  kai, jan'22
 
@@ -377,7 +378,7 @@ public final class MatsimJspritFactory {
 		CarrierVehicle carrierVehicle = createCarrierVehicle(jspritRoute.getVehicle());
 		double depTime = jspritRoute.getStart().getEndTime();
 
-		Tour.Builder matsimFreightTourBuilder = Tour.Builder.newInstance();
+		Tour.Builder matsimFreightTourBuilder = Tour.Builder.newInstance(tourId);
 		matsimFreightTourBuilder.scheduleStart(Id.create(jspritRoute.getStart().getLocation().getId(), Link.class));
 		for (TourActivity act : tour.getActivities()) {
 			if (act instanceof ServiceActivity || act instanceof PickupService) {
@@ -727,8 +728,10 @@ public final class MatsimJspritFactory {
 	 */
 	public static CarrierPlan createPlan(Carrier carrier, VehicleRoutingProblemSolution solution) {
 		Collection<ScheduledTour> tours = new ArrayList<>();
+		int tourIdindex = 1;
 		for (VehicleRoute route : solution.getRoutes()) {
-			ScheduledTour scheduledTour = createTour(route);
+			ScheduledTour scheduledTour = createTour(route, Id.create(tourIdindex, Tour.class));
+			tourIdindex++;
 			tours.add(scheduledTour);
 		}
 		CarrierPlan carrierPlan = new CarrierPlan(carrier, tours);

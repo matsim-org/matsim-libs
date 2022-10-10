@@ -24,7 +24,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,7 +37,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /*deliberately package*/ class LinkImpl implements Link {
 
-	private final static Logger log = Logger.getLogger(Link.class);
+	private final static Logger log = LogManager.getLogger(Link.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

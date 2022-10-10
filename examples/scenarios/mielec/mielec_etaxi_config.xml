@@ -29,9 +29,12 @@
 		<param name="auxDischargeTimeStep" value="10"/>
 
 		<param name="chargersFile" value="chargers-2-plugs-2.xml"/>
-		<param name="vehiclesFile" value="etaxis-25.xml"/>
 
 		<param name="timeProfiles" value="true"/>
+	</module>
+
+	<module name="vehicles">
+		<param name="vehiclesFile" value="etaxis-25.xml"/>
 	</module>
 
 	<module name="network">

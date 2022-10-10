@@ -23,7 +23,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -68,7 +69,7 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 	private final AtomicReference<Throwable> hadException = new AtomicReference<>();
 	private final ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException);
 
-	private final static Logger log = Logger.getLogger(ParallelEventsManagerImpl.class);
+	private final static Logger log = LogManager.getLogger(ParallelEventsManagerImpl.class);
 
 	// this number should be set in the following way:
 	// if the number of events is estimated as x, then this number

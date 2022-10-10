@@ -22,7 +22,8 @@
 package org.matsim.contrib.emissions;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,7 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -57,7 +58,7 @@ import java.util.stream.Stream;
 
 public class PositionEmissionsModule extends AbstractModule {
 
-	private static final Logger log = Logger.getLogger(PositionEmissionsModule.class);
+	private static final Logger log = LogManager.getLogger(PositionEmissionsModule.class);
 
 	@Inject
 	private Config config;

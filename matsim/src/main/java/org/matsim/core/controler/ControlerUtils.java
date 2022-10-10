@@ -21,7 +21,8 @@ package org.matsim.core.controler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -34,7 +35,7 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
  *
  */
 public final class ControlerUtils {
-	private static final Logger log = Logger.getLogger( ControlerUtils.class ) ;
+	private static final Logger log = LogManager.getLogger( ControlerUtils.class ) ;
 	/**
 	 * This is meant for creating the matsim injector if one does not need/want {@link Controler}.  Technical reason is that {@link Controler} creates
 	 * the injector in the run method, and then it is too late to extract material in a direct way.

@@ -55,6 +55,7 @@ import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * This network Routing module adds stages for re-charging into the Route.
@@ -107,7 +108,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		final Person person = request.getPerson();
 
 		List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
-		Id<ElectricVehicle> evId = Id.create(person.getId() + vehicleSuffix, ElectricVehicle.class);
+		Id<Vehicle> evId = Id.create(person.getId() + vehicleSuffix, Vehicle.class);
 		if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
 			return basicRoute;
 		} else {
@@ -160,7 +161,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 							selectedChargerLink.getId(), stageActivityModePrefix);
 					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
-					chargeAct.setMaximumDuration(Math.max(evConfigGroup.getMinimumChargeTime(), estimatedChargingTime));
+					chargeAct.setMaximumDuration(Math.max(evConfigGroup.minimumChargeTime, estimatedChargingTime));
 					lastArrivaltime += chargeAct.getMaximumDuration().seconds();
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;

@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -56,7 +57,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author nagel, dziemke
  */
 class TripRouterAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger LOG = Logger.getLogger( TripRouterAccessibilityContributionCalculator.class );
+	private static final Logger LOG = LogManager.getLogger( TripRouterAccessibilityContributionCalculator.class );
 	private TripRouter tripRouter ;
 	private String mode;
 	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;

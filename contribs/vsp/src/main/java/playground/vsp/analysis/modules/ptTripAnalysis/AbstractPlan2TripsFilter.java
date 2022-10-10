@@ -25,7 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,7 +39,7 @@ import org.matsim.contrib.analysis.filters.population.AbstractPersonFilter;
  *
  */
 public abstract class AbstractPlan2TripsFilter extends AbstractPersonFilter{
-	private static final Logger log = Logger.getLogger(AbstractPlan2TripsFilter.class);
+	private static final Logger log = LogManager.getLogger(AbstractPlan2TripsFilter.class);
 
 	protected Map<Id, LinkedList<AbstractAnalysisTrip>> id2Trips = new HashMap<Id, LinkedList<AbstractAnalysisTrip>>();
 	private List<Id> unprocessedAgents = new ArrayList<Id>();

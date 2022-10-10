@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
 /**
@@ -81,7 +82,7 @@ public class EllipseObjective implements Objective {
 
 	private ParamPoint[] initPPoints;
 
-	private final static Logger log = Logger.getLogger(EllipseObjective.class);
+	private final static Logger log = LogManager.getLogger(EllipseObjective.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructor

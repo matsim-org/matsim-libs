@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -49,7 +50,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
  */
 public class JointModesDepartureHandler implements DepartureHandler , MobsimEngine {
 	private static final Logger log =
-		Logger.getLogger(JointModesDepartureHandler.class);
+		LogManager.getLogger(JointModesDepartureHandler.class);
 
 	private final QVehicleProvider vehicleProvider;
 	private final DepartureHandler departureHandler;

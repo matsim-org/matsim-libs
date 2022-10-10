@@ -33,7 +33,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -48,7 +49,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  *
  */
 public class AgentId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalysisModule{
-	private final static Logger log = Logger.getLogger(AgentId2PersonEnterLeaveVehicleAnalyzer.class);
+	private final static Logger log = LogManager.getLogger(AgentId2PersonEnterLeaveVehicleAnalyzer.class);
 	private MutableScenario scenario;
 	
 	private List<AbstractAnalysisModule> anaModules = new LinkedList<AbstractAnalysisModule>();

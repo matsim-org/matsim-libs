@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package playground.vsp.andreas.utils.pt.transitSchedule2Tikz;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -30,7 +31,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class TikzNode {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(TikzNode.class);
+	private static final Logger log = LogManager.getLogger(TikzNode.class);
 	private Coord coord;
 	private Id<TikzNode> id;
 

@@ -32,7 +32,8 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
@@ -69,7 +70,7 @@ import playground.vsp.gexf.viz.PositionContent;
  */
 public class Nce2Gexf extends MatsimJaxbXmlWriter{
 	
-	private static final Logger log = Logger.getLogger(Nce2Gexf.class);
+	private static final Logger log = LogManager.getLogger(Nce2Gexf.class);
 	
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
 	

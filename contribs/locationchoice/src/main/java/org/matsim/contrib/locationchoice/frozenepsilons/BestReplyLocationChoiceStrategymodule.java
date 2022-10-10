@@ -21,7 +21,8 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -57,7 +58,7 @@ import javax.inject.Provider;
  */
 final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedModule {
 
-	private static final Logger log = Logger.getLogger( BestReplyLocationChoiceStrategymodule.class );
+	private static final Logger log = LogManager.getLogger( BestReplyLocationChoiceStrategymodule.class );
 	private final Provider<TripRouter> tripRouterProvider;
 
 	private ObjectAttributes personsMaxEpsUnscaled;

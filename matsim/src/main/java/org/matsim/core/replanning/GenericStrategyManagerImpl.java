@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.choosers.StrategyChooser;
@@ -52,7 +53,7 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 	// the "I extends ... <, I>" is correct, although it feels odd.  kai, nov'15
 	
 	private static final Logger log =
-			Logger.getLogger( GenericStrategyManagerImpl.class );
+			LogManager.getLogger( GenericStrategyManagerImpl.class );
 
 
 	static class StrategyWeights<T extends BasicPlan, I> implements StrategyChooser.Weights<T, I> {
@@ -184,7 +185,7 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 		if (idx != -1) {
 			double oldWeight = weights.weights.set(idx, newWeight);
 			weights.totalWeights += (newWeight - oldWeight);
-			Logger.getLogger(this.getClass()).info( strategy.toString() + ": oldWeight=" + oldWeight + " newWeight=" + newWeight );
+			LogManager.getLogger(this.getClass()).info( strategy.toString() + ": oldWeight=" + oldWeight + " newWeight=" + newWeight );
 			return true;
 		}
 		return false;
@@ -331,7 +332,7 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 			weights.changeRequests.put(iter, iterationRequests);
 		}
 		iterationRequests.put(strategy, newWeight);
-		Logger.getLogger(this.getClass()).info( "added change request: "
+		LogManager.getLogger(this.getClass()).info( "added change request: "
 				+ " iteration=" + iter + " newWeight=" + newWeight + " strategy=" + strategy.toString() );
 	}
 
@@ -363,7 +364,7 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 	 * @see #setMaxPlansPerAgent(int)
 	 */
 	@Override public final void setPlanSelectorForRemoval( final PlanSelector<PL, AG> planSelector ) {
-		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
+		LogManager.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector = planSelector;
 	}
 
