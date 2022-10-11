@@ -97,6 +97,8 @@ import com.google.common.collect.Sets;
 public abstract class ReflectiveConfigGroup extends ConfigGroup implements MatsimExtensionPoint {
 	private static final Logger log = LogManager.getLogger(ReflectiveConfigGroup.class);
 
+	private static final String NULL_STRING = "null";
+
 	private final boolean storeUnknownParameters;
 
 	private final Map<String, Method> setters;
@@ -329,7 +331,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	}
 
 	private Object fromString(String value, Class<?> type) {
-		if (value.equals("null")) {
+		if (value.equals(NULL_STRING) && !(type.equals(Set.class) || type.equals(List.class))) {
 			return null;
 		} else if (type.equals(String.class)) {
 			return value;
@@ -368,8 +370,14 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				throw new IllegalArgumentException(comment, e);
 			}
 		} else if (type.equals(Set.class)) {
+			if (value.equals(NULL_STRING)) {
+				return Collections.emptySet();
+			}
 			return Arrays.stream(value.split(",")).map(String::trim).collect(toUnmodifiableSet());
 		} else if (type.equals(List.class)) {
+			if (value.equals(NULL_STRING)) {
+				return Collections.emptyList();
+			}
 			return Arrays.stream(value.split(",")).map(String::trim).toList();
 		} else {
 			throw new RuntimeException("Unsupported type: " + type);
@@ -425,7 +433,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			return null;
 		} else if (result instanceof Set<?> || result instanceof List<?>) {
 			//we only support Set<String> and List<String>, therefore we can safely cast to Collection<String>
-			return String.join(", ", ((Collection<String>)result));
+			Collection<String> collection = (Collection<String>) result;
+			if (collection.isEmpty()) {
+				return NULL_STRING;
+			}
+			return String.join(", ", collection);
 		} else {
 			return result + "";
 		}
