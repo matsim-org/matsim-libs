@@ -29,10 +29,10 @@
 	<module name="emissions" >
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average cold emission factors -->
-		<param name="averageFleetColdEmissionFactorsFile" value="../sample_EFA_ColdStart_vehcat_2005average.txt" />
+		<param name="averageFleetColdEmissionFactorsFile" value="../sample_EFA_ColdStart_vehcat_2005average.csv" />
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average warm emission factors -->
-		<param name="averageFleetWarmEmissionFactorsFile" value="../sample_EFA_HOT_vehcat_2005average.txt" />
+		<param name="averageFleetWarmEmissionFactorsFile" value="../sample_EFA_HOT_vehcat_2005average.csv" />
 
 		<param name="detailedVsAverageLookupBehavior" value="directlyTryAverageTable"/>
 
