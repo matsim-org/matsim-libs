@@ -1,4 +1,4 @@
-﻿Case;VehCat;Year;TrafficScenario;Component;RoadCat;AmbientCondPattern;EFA_weighted;EFA_km_weighted;EFA_WTT_weighted;EFA_WTT_km_weighted;EFA_WTW_weighted;EFA_WTW_km_weighted
+Case;VehCat;Year;TrafficScenario;Component;RoadCat;AmbientCondPattern;EFA_weighted;EFA_km_weighted;EFA_WTT_weighted;EFA_WTT_km_weighted;EFA_WTW_weighted;EFA_WTW_km_weighted
 2020ColdAverage[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;0.280542612;;;;;
 2020ColdAverage[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,1-2h,0-1km;0.698604047;;;;;
 2020ColdAverage[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,2-3h,0-1km;0.883359611;;;;;
