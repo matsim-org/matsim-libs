@@ -20,64 +20,40 @@
 
 package playground.vsp.ev;
 
-import com.google.common.collect.ImmutableList;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.vehicles.*;
-
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl;
+import org.matsim.vehicles.EngineInformation;
+import org.matsim.vehicles.Vehicle;
+
+import com.google.common.collect.ImmutableList;
 
 public class EVUtils {
-
-	private static final String INITIALENERGY_KWH = "initialEnergyInKWh";
-	private static final String CHARGERTYPES = "chargerTypes";
-
 	/**
-	 *
-	 * @param engineInformation
+	 * @param vehicle
 	 * @return the initial energy in kWh
 	 */
-	static Double getInitialEnergy(EngineInformation engineInformation ){
-		return (Double) engineInformation.getAttributes().getAttribute(INITIALENERGY_KWH);
+	static Double getInitialEnergy(Vehicle vehicle) {
+		return (Double)vehicle.getAttributes()
+				.getAttribute(ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh);
 	}
 
 	/**
-	 *
-	 * @param engineInformation
+	 * @param vehicle
 	 * @param initialEnergyInKWh initial energy [kWh]
 	 */
-	public static void setInitialEnergy(EngineInformation engineInformation, double initialEnergyInKWh){
-		engineInformation.getAttributes().putAttribute(INITIALENERGY_KWH,  initialEnergyInKWh);
+	public static void setInitialEnergy(Vehicle vehicle, double initialEnergyInKWh) {
+		vehicle.getAttributes()
+				.putAttribute(ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh, initialEnergyInKWh);
 	}
 
-	static ImmutableList<String> getChargerTypes(EngineInformation engineInformation ){
-		return ImmutableList.copyOf((Collection<String>) engineInformation.getAttributes().getAttribute( CHARGERTYPES));
+	static ImmutableList<String> getChargerTypes(EngineInformation engineInformation) {
+		return ImmutableList.copyOf((Collection<String>)engineInformation.getAttributes()
+				.getAttribute(ElectricVehicleSpecificationImpl.CHARGER_TYPES));
 	}
 
-	public static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes){
-		engineInformation.getAttributes().putAttribute(CHARGERTYPES,  chargerTypes);
+	public static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes) {
+		engineInformation.getAttributes()
+				.putAttribute(ElectricVehicleSpecificationImpl.CHARGER_TYPES, chargerTypes);
 	}
-
-	static void createAndRegisterEVForPersonsAndMode(Scenario scenario, Set<Id<Person>> persons, VehicleType eVehiclyType, String mode){
-		if(! VehicleUtils.getHbefaTechnology(eVehiclyType.getEngineInformation()).equals("electricity")) throw new IllegalArgumentException();
-
-		VehiclesFactory vFactory = scenario.getVehicles().getFactory();
-
-		for (Id<Person> personId : persons) {
-			Person person = scenario.getPopulation().getPersons().get(personId);
-			Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, mode);
-
-			Vehicle vehicle = vFactory.createVehicle(vehicleId, eVehiclyType);
-			scenario.getVehicles().addVehicle(vehicle);
-
-			Map<String, Id<Vehicle>> mode2Vehicle = VehicleUtils.getVehicleIds(person);
-			mode2Vehicle.put(mode, vehicleId);
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, mode2Vehicle);//probably unnecessary
-		}
-
-	}
-
 }
