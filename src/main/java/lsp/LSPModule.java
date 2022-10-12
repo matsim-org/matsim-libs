@@ -156,7 +156,7 @@ public class LSPModule extends AbstractModule {
 			throw new RuntimeException( "not implemented" );
 		}
 		@Override public void run( Iterable<? extends HasPlansAndId<LSPPlan, LSP>> persons, int iteration, ReplanningContext replanningContext ){
-			// "run" is possible, but will not do anything. kai, jul'22
+			log.warn("Running iterations without a strategy may lead to unclear results.");// "run" is possible, but will not do anything. kai, jul'22
 		}
 		@Override public void setMaxPlansPerAgent( int maxPlansPerAgent ){
 			throw new RuntimeException( "not implemented" );
