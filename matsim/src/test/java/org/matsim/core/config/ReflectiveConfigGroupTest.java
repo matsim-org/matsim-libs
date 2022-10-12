@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ReflectiveConfigGroup.InconsistentModuleException;
 import org.matsim.testcases.MatsimTestUtils;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * @author thibautd
  */
@@ -58,7 +60,7 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.charField = 'z';
 		dumpedModule.byteField = 78;
 		dumpedModule.booleanField = true;
-		dumpedModule.setField = Set.of("a", "b", "c");
+		dumpedModule.setField = ImmutableSet.of("a", "b", "c");
 		dumpedModule.listField = List.of("1", "2", "3");
 		assertEqualAfterDumpAndRead(dumpedModule);
 	}
@@ -73,7 +75,7 @@ public class ReflectiveConfigGroupTest {
 	public void testDumpAndReadEmptyCollections() {
 		MyModule dumpedModule = new MyModule();
 		dumpedModule.listField = List.of();
-		dumpedModule.setField = Set.of();
+		dumpedModule.setField = ImmutableSet.of();
 		assertEqualAfterDumpAndRead(dumpedModule);
 	}
 
@@ -89,7 +91,7 @@ public class ReflectiveConfigGroupTest {
 
 		//fail on set
 		dumpedModule.listField = null;
-		dumpedModule.setField = Set.of("");
+		dumpedModule.setField = ImmutableSet.of("");
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Collection [] contains blank elements. Only non-blank elements are supported.");
 	}
@@ -100,13 +102,13 @@ public class ReflectiveConfigGroupTest {
 
 		//fail on list
 		dumpedModule.listField = List.of("non-empty", "");
-		dumpedModule.setField = Set.of("non-empty");
+		dumpedModule.setField = ImmutableSet.of("non-empty");
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Collection [non-empty, ] contains blank elements. Only non-blank elements are supported.");
 
 		//fail on set
 		dumpedModule.listField = List.of("non-empty");
-		dumpedModule.setField = Set.of("non-empty", "");
+		dumpedModule.setField = ImmutableSet.of("non-empty", "");
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Collection [non-empty, ] contains blank elements. Only non-blank elements are supported.");
 	}
