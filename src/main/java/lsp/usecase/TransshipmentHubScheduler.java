@@ -67,10 +67,15 @@ import java.util.ArrayList;
 
 	private void handleWaitingShipment(ShipmentWithTime tupleToBeAssigned) {
 		updateSchedule(tupleToBeAssigned);
-		addShipmentToEventHandler(tupleToBeAssigned);
+//		addShipmentToEventHandler(tupleToBeAssigned);
 	}
 
 	private void updateSchedule(ShipmentWithTime tuple) {
+		addShipmentHandleElement(tuple);
+		addShipmentToEventHandler(tuple);
+	}
+
+	private void addShipmentHandleElement(ShipmentWithTime tuple) {
 		ShipmentUtils.ScheduledShipmentHandleBuilder builder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
 		builder.setStartTime(tuple.getTime());
 		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getSize());
