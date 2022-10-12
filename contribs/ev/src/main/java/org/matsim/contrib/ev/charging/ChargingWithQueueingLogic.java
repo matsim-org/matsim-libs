@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Preconditions;
 
@@ -40,9 +41,9 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final ChargingStrategy chargingStrategy;
 	private final EventsManager eventsManager;
 
-	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
-	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, ChargingListener> listeners = new LinkedHashMap<>();
 
 	public ChargingWithQueueingLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy,
 			EventsManager eventsManager) {
@@ -76,7 +77,8 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 	@Override
 	public void addVehicle(ElectricVehicle ev, double now) {
-		addVehicle(ev, new ChargingListener() {}, now);
+		addVehicle(ev, new ChargingListener() {
+		}, now);
 	}
 
 	@Override

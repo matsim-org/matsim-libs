@@ -416,6 +416,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
+			route.setVehicleId(VehicleUtils.getVehicleId(person, leg.getMode()));
 			leg.setRoute(route);
 			travTime = 0;
 		}

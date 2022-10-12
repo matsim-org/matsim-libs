@@ -23,7 +23,6 @@ import java.util.function.Function;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
@@ -232,12 +231,12 @@ public class DrtLegsAnalyser {
 
 			final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travel time [s]",
 					"unshared ride time [s]", travelTimes,
-					Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
+					Pair.of(drtCfg.maxTravelTimeAlpha, drtCfg.maxTravelTimeBeta));
 			ChartSaveUtils.saveAsPNG(chart2, fileName + "_travelTimePlot", 1500, 1500);
 
 			final JFreeChart chart3 = DensityScatterPlots.createPlot("Ride Times", "ride time [s]",
 					"unshared ride time [s]", rideTimes,
-					Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
+					Pair.of(drtCfg.maxTravelTimeAlpha, drtCfg.maxTravelTimeBeta));
 			ChartSaveUtils.saveAsPNG(chart3, fileName + "_rideTimePlot", 1500, 1500);
 		}
 	}

@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
@@ -51,14 +52,16 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
  *
  * @author jbischoff
  */
-public class DrtAnalysisControlerListener implements IterationEndsListener {
+public class DrtAnalysisControlerListener implements IterationEndsListener, ShutdownListener {
 
 	private final DrtVehicleDistanceStats drtVehicleStats;
 	private final MatsimServices matsimServices;
@@ -157,7 +160,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		String occStats = DrtLegsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter,
 				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
-		if (drtCfg.isPlotDetailedCustomerStats()) {
+		if (drtCfg.plotDetailedCustomerStats) {
 			String header = String.join(delimiter, "departureTime",//
 					"personId",//
 					"vehicleId",//
@@ -216,8 +219,17 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	}
 
 	private String filename(IterationEndsEvent event, String prefix, String extension) {
+		return filename(event.getIteration(), prefix, extension);
+	}
+
+	private String filename(int iteration, String prefix, String extension) {
 		return matsimServices.getControlerIO()
-				.getIterationFilename(event.getIteration(), prefix + "_" + drtCfg.getMode() + extension);
+				.getIterationFilename(iteration, prefix + "_" + drtCfg.getMode() + extension);
+	}
+
+	private String outputFilename(String prefix, String extension) {
+		return matsimServices.getControlerIO()
+				.getOutputFilenameWithOutputPrefix(prefix + "_" + drtCfg.getMode() + extension);
 	}
 
 	/**
@@ -291,7 +303,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 			if (createChart) {
 				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
-						"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
+						"Initially planned wait time [s]", times, Pair.of(0., drtCfg.maxWaitTime));
 				//			xAxis.setLowerBound(0);
 				//			yAxis.setLowerBound(0);
 				ChartUtils.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
@@ -309,4 +321,35 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		return IOUtils.getAppendingBufferedWriter(
 				matsimServices.getControlerIO().getOutputFilename(prefix + "_" + drtCfg.getMode() + extension));
 	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		// copy analysis output from last iteration to output directory
+		dumpOutput(event.getIteration(), "waitTimeComparison", ".png");
+		dumpOutput(event.getIteration(), "waitTimeComparison", ".csv");
+		dumpOutput(event.getIteration(), "drt_rejections", ".csv");
+		dumpOutput(event.getIteration(), "drt_legs", ".csv");
+		dumpOutput(event.getIteration(), "vehicleDistanceStats", ".csv");
+		dumpOutput(event.getIteration(), "drt_detours", ".csv");
+		dumpOutput(event.getIteration(), "drt_detours", "_distancePlot.png");
+		dumpOutput(event.getIteration(), "drt_detours", "_travelTimePlot.png");
+		dumpOutput(event.getIteration(), "drt_detours", "_rideTimePlot.png");
+		dumpOutput(event.getIteration(), "waitStats", ".csv");
+		dumpOutput(event.getIteration(), "waitStats", ".png");
+		dumpOutput(event.getIteration(), "waitStats", "_requests.png");
+		dumpOutput(event.getIteration(), "constraints", "_waiting_time.png");
+		dumpOutput(event.getIteration(), "constraints", "_travel_time.png");
+		dumpOutput(event.getIteration(), "drt_boardings", ".csv");
+		dumpOutput(event.getIteration(), "drt_alightments", ".csv");
+	}
+
+	private void dumpOutput(int iteration, String prefix, String extension) {
+		try {
+			IOUtils.copyFile(filename(iteration, prefix, extension), outputFilename(prefix, extension));
+		} catch (Exception ee) {
+			LogManager.getLogger(this.getClass()).error("writing output " + outputFilename(prefix, extension) +
+					" did not work; probably parameters were such that no such output was generated in the final iteration");
+		}
+	}
+
 }

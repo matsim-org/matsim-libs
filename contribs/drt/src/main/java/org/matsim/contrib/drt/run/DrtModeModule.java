@@ -35,6 +35,7 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
@@ -56,12 +57,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
-		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.isUseModeFilteredSubnetwork()));
+		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.useModeFilteredSubnetwork));
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		install(new FleetModule(getMode(), drtCfg.getVehiclesFileUrl(getConfig().getContext()),
-				drtCfg.isChangeStartLinkToLastLinkInSchedule()));
+		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
+				null :
+				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
+				drtCfg.changeStartLinkToLastLinkInSchedule));
 		install(new RebalancingModule(drtCfg));
 		install(new DrtModeRoutingModule(drtCfg));
 
@@ -80,8 +83,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		});
 
 		bindModal(StopDurationEstimator.class).toInstance(
-				(vehicle, dropoffRequests, pickupRequests) -> drtCfg.getStopDuration());
+				(vehicle, dropoffRequests, pickupRequests) -> drtCfg.stopDuration);
 		bindModal(IncrementalStopDurationEstimator.class).toInstance(
-				new DefaultIncrementalStopDurationEstimator(drtCfg.getStopDuration()));
+				new DefaultIncrementalStopDurationEstimator(drtCfg.stopDuration));
 	}
 }

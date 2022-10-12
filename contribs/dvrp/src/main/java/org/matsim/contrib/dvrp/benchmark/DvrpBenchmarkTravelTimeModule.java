@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpOfflineTravelTimes;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
 
@@ -42,9 +43,9 @@ public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
 	private DvrpConfigGroup dvrpCfg;
 
 	public void install() {
-		if (dvrpCfg.getInitialTravelTimesFile() != null) {
+		if (dvrpCfg.initialTravelTimesFile != null) {
 			addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toProvider(() -> {
-				URL url = dvrpCfg.getInitialTravelTimesUrl(getConfig().getContext());
+				URL url = ConfigGroup.getInputFileURL(getConfig().getContext(), dvrpCfg.initialTravelTimesFile);
 				var timeDiscretizer = new TimeDiscretizer(getConfig().travelTimeCalculator());
 				var linkTravelTimes = DvrpOfflineTravelTimes.loadLinkTravelTimes(timeDiscretizer, url);
 				return DvrpOfflineTravelTimes.asTravelTime(timeDiscretizer, linkTravelTimes);

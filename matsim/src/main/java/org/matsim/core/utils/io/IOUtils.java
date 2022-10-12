@@ -49,10 +49,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -543,5 +540,16 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 */
 	public static BufferedWriter getAppendingBufferedWriter(String filename) {
 		return getBufferedWriter(getFileUrl(filename), CHARSET_UTF8, true);
+	}
+
+	/**
+	 * Takes an inputFilename and copies it to the outputFilename without any further modification of the file paths.
+	 * @param inputFilename
+	 * @param outputFilename
+	 */
+	public static void copyFile(String inputFilename, String outputFilename) throws IOException {
+		File fromFile = new File(inputFilename);
+		File toFile = new File(outputFilename);
+		Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
 	}
 }

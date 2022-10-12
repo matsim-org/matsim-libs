@@ -66,9 +66,4 @@ public final class ZonalTaxiOptimizerParams extends AbstractTaxiOptimizerParams 
 	public int getReoptimizationTimeStep() {
 		return ruleBasedTaxiOptimizerParams.getReoptimizationTimeStep();
 	}
-
-	@Override
-	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
-		ruleBasedTaxiOptimizerParams.setReoptimizationTimeStep(reoptimizationTimeStep);
-	}
 }
