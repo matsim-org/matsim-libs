@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.config;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import java.io.Serial;
 import java.lang.annotation.Documented;
@@ -49,6 +49,7 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 /**
@@ -369,7 +370,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				throw new IllegalArgumentException(comment, e);
 			}
 		} else if (type.equals(Set.class)) {
-			return value.isBlank() ? Set.of() : splitStringToStream(value).collect(toUnmodifiableSet());
+			return value.isBlank() ? ImmutableSet.of() : splitStringToStream(value).collect(toImmutableSet());
 		} else if (type.equals(List.class)) {
 			return value.isBlank() ? List.of() : splitStringToStream(value).toList();
 		} else {
