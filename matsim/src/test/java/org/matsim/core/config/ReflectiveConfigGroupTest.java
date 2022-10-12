@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -390,7 +391,7 @@ public class ReflectiveConfigGroupTest {
 
 		@Comment("set")
 		@Parameter
-		private Set<String> setField;
+		private Set<String> setField = Collections.emptySet();
 
 		// Object fields:
 		// Id: string representation is toString
@@ -399,7 +400,7 @@ public class ReflectiveConfigGroupTest {
 		private Coord coordField;
 		// enum: handled especially
 		private MyEnum enumField;
-		private List<String> listField;
+		private List<String> listField = Collections.emptyList();
 
 		public MyModule() {
 			super(GROUP_NAME);
