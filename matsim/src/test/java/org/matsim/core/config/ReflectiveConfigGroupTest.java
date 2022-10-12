@@ -46,7 +46,7 @@ public class ReflectiveConfigGroupTest {
 
 	@Test
 	public void testDumpAndRead() {
-		final MyModule dumpedModule = new MyModule();
+		MyModule dumpedModule = new MyModule();
 		dumpedModule.setDoubleField(1000);
 		dumpedModule.setIdField(Id.create(123, Link.class));
 		dumpedModule.setCoordField(new Coord(265, 463));
@@ -60,15 +60,66 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.booleanField = true;
 		dumpedModule.setField = Set.of("a", "b", "c");
 		dumpedModule.listField = List.of("1", "2", "3");
+		assertEqualAfterDumpAndRead(dumpedModule);
+	}
 
-		final Config dumpedConfig = new Config();
+	@Test
+	public void testDumpAndReadNulls() {
+		MyModule dumpedModule = new MyModule();
+		assertEqualAfterDumpAndRead(dumpedModule);
+	}
+
+	@Test
+	public void testDumpAndReadEmptyCollections() {
+		MyModule dumpedModule = new MyModule();
+		dumpedModule.listField = List.of();
+		dumpedModule.setField = Set.of();
+		assertEqualAfterDumpAndRead(dumpedModule);
+	}
+
+	@Test
+	public void testDumpAndReadCollectionsWithExactlyOneEmptyString() {
+		MyModule dumpedModule = new MyModule();
+
+		//fail on list
+		dumpedModule.listField = List.of("");
+		dumpedModule.setField = null;
+		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Collection [] contains blank elements. Only non-blank elements are supported.");
+
+		//fail on set
+		dumpedModule.listField = null;
+		dumpedModule.setField = Set.of("");
+		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Collection [] contains blank elements. Only non-blank elements are supported.");
+	}
+
+	@Test
+	public void testDumpAndReadCollectionsIncludingEmptyString() {
+		MyModule dumpedModule = new MyModule();
+
+		//fail on list
+		dumpedModule.listField = List.of("non-empty", "");
+		dumpedModule.setField = Set.of("non-empty");
+		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Collection [non-empty, ] contains blank elements. Only non-blank elements are supported.");
+
+		//fail on set
+		dumpedModule.listField = List.of("non-empty");
+		dumpedModule.setField = Set.of("non-empty", "");
+		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Collection [non-empty, ] contains blank elements. Only non-blank elements are supported.");
+	}
+
+	private void assertEqualAfterDumpAndRead(MyModule dumpedModule) {
+		Config dumpedConfig = new Config();
 		dumpedConfig.addModule(dumpedModule);
 
-		final String fileName = utils.getOutputDirectory() + "/dump.xml";
+		String fileName = utils.getOutputDirectory() + "/dump.xml";
 
 		new ConfigWriter(dumpedConfig).write(fileName);
-		final Config readConfig = ConfigUtils.loadConfig(fileName);
-		final MyModule readModule = new MyModule();
+		Config readConfig = ConfigUtils.loadConfig(fileName);
+		MyModule readModule = new MyModule();
 		// as a side effect, this loads the information
 		readConfig.addModule(readModule);
 
@@ -76,24 +127,14 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	public void testDumpAndReadNulls() {
-		final MyModule dumpedModule = new MyModule();
-		dumpedModule.setIdField(null);
-		dumpedModule.setCoordField(null);
-		dumpedModule.setTestEnumField(null);
-
-		final Config dumpedConfig = new Config();
-		dumpedConfig.addModule(dumpedModule);
-
-		final String fileName = utils.getOutputDirectory() + "/dump.xml";
-
-		new ConfigWriter(dumpedConfig).write(fileName);
+	public void testReadCollectionsIncludingEmptyString() {
+		String fileName = utils.getInputDirectory() + "/config_with_blank_comma_separated_elements.xml";
 		final Config readConfig = ConfigUtils.loadConfig(fileName);
 		final MyModule readModule = new MyModule();
 		// as a side effect, this loads the information
-		readConfig.addModule(readModule);
-
-		assertThat(readModule).usingRecursiveComparison().isEqualTo(dumpedModule);
+		assertThatThrownBy(() -> readConfig.addModule(readModule)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage(
+						"String 'str1, , str2' contains comma-separated blank elements. Only non-blank elements are supported.");
 	}
 
 	@Test
