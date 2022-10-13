@@ -54,7 +54,7 @@ import java.util.List;
 		this.locationLinkId = builder.getLocationLinkId();
 		this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
 		transshipmentHubScheduler.setTranshipmentHub(this);
-		TranshipmentHubTourEndEventHandler eventHandler = new TranshipmentHubTourEndEventHandler(this, scenario);
+		TransshipmentHubTourEndEventHandler eventHandler = new TransshipmentHubTourEndEventHandler(this, scenario);
 		transshipmentHubScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
 		this.addSimulationTracker(eventHandler);

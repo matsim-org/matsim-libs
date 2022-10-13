@@ -324,10 +324,10 @@ public class MainRunLSPSchedulingTest {
 
 		assertEquals(1, firstTranshipmentHubResource.getSimulationTrackers().size());
 		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
-		assertTrue(eventHandlers.iterator().next() instanceof TranshipmentHubTourEndEventHandler);
-		TranshipmentHubTourEndEventHandler reloadEventHandler = (TranshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
+		assertTrue(eventHandlers.iterator().next() instanceof TransshipmentHubTourEndEventHandler);
+		TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
 
-		for (Entry<CarrierService, TranshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
+		for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;

@@ -46,7 +46,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
+/*package-private*/  class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
 
 //	@Inject Scenario scenario;
 	private final Scenario scenario;
@@ -61,7 +61,7 @@ import java.util.Map;
 	 * @param transshipmentHub
 	 * @param scenario
 	 */
-	TranshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub, Scenario scenario) {
+	TransshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub, Scenario scenario) {
 		this.transshipmentHub = transshipmentHub;
 		this.linkId = transshipmentHub.getEndLinkId();
 		this.resourceId = transshipmentHub.getId();

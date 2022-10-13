@@ -363,12 +363,12 @@ public class SecondReloadLSPSchedulingTest {
 
 		assertEquals(1, firstTranshipmentHubResource.getSimulationTrackers().size());
 		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
-		assertTrue(eventHandlers.iterator().next() instanceof TranshipmentHubTourEndEventHandler);
-		TranshipmentHubTourEndEventHandler reloadEventHandler = (TranshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
-		Iterator<Entry<CarrierService, TranshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>> iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
+		assertTrue(eventHandlers.iterator().next() instanceof TransshipmentHubTourEndEventHandler);
+		TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
+		Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>> iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
 		while (iter.hasNext()) {
-			Entry<CarrierService, TranshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
+			Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;
@@ -389,12 +389,12 @@ public class SecondReloadLSPSchedulingTest {
 
 		assertEquals(1, secondTranshipmentHubResource.getSimulationTrackers().size());
 		eventHandlers = new ArrayList<>(secondTranshipmentHubResource.getSimulationTrackers());
-		assertTrue(eventHandlers.iterator().next() instanceof TranshipmentHubTourEndEventHandler);
-		reloadEventHandler = (TranshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
+		assertTrue(eventHandlers.iterator().next() instanceof TransshipmentHubTourEndEventHandler);
+		reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
 		iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
 		while (iter.hasNext()) {
-			Entry<CarrierService, TranshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
+			Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;

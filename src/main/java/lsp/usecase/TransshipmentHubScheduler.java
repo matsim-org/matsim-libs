@@ -38,7 +38,7 @@ import java.util.ArrayList;
 	private final double capacityNeedLinear;
 	private final double capacityNeedFixed;
 	private TransshipmentHub transshipmentHub;
-	private TranshipmentHubTourEndEventHandler eventHandler;
+	private TransshipmentHubTourEndEventHandler eventHandler;
 
 	TransshipmentHubScheduler(UsecaseUtils.TranshipmentHubSchedulerBuilder builder) {
 		this.shipments = new ArrayList<>();
