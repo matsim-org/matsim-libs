@@ -25,10 +25,13 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
@@ -39,6 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,6 +54,8 @@ import java.util.Collections;
 import static org.junit.Assert.*;
 
 public class MultipleIterationsFirstReloadLSPMobsimTest {
+	private static final Logger log = LogManager.getLogger(MultipleIterationsFirstReloadLSPMobsimTest.class);
+
 	private LSP lsp;
 
 	@Before
@@ -203,6 +209,13 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
+
+				//write out Events to console for debugging reasons, kmt oct'22
+				this.addEventHandlerBinding().toInstance(new BasicEventHandler() {
+					@Override public void handleEvent(Event event) {
+						log.warn(event.toString()); // TODO Mal was raus schreiben auf console :)
+					}
+				});
 			}
 		} );
 		config.controler().setFirstIteration(0);
