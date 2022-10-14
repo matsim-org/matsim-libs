@@ -77,6 +77,8 @@ import java.util.Map;
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 	}
 
+	//TODO: KMT Ok 14: Das Reset scheint nach nem Update der Werte für die neue Iteration zu kommen.
+	// nochmal updaten oder adden einfügen? --> prüfen wie das bei den Carriern gemacht ist.
 	@Override
 	public void reset(int iteration) {
 		servicesWaitedFor.clear();
