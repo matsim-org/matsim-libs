@@ -146,4 +146,7 @@ public final class CarrierAgentTracker implements BasicEventHandler
 	}
 
 
+	public Carriers getCarriers() {
+		return carriers;
+	}
 }
