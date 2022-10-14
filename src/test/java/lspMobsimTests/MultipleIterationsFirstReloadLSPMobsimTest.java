@@ -150,8 +150,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		lsp = completeLSPBuilder.build();
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
-//		int numberOfShipments = 1 + MatsimRandom.getRandom().nextInt(50);
-		int numberOfShipments = 1;
+		int numberOfShipments = 1 + MatsimRandom.getRandom().nextInt(50);
 
 		for (int i = 1; i < 1 + numberOfShipments; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -219,8 +218,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 			}
 		} );
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
-//		config.controler().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
+		config.controler().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 //		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
