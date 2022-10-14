@@ -26,12 +26,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.fleet.ElectricFleet;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.common.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.common.timeprofile.TimeProfiles;
+import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
@@ -63,7 +62,7 @@ public class VehicleTypeAggregatedSocTimeProfileCollectorProvider implements Pro
 		Set<String> vehicleTypes = evFleet.getElectricVehicles()
 				.values()
 				.stream()
-				.map(ElectricVehicle::getVehicleType)
+				.map(ev -> ev.getVehicleSpecification().getMatsimVehicle().getType().getId() + "")
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		vehicleTypes.add(ALL_VEHICLES_ID);
 		ImmutableList<String> header = ImmutableList.copyOf(vehicleTypes);
@@ -71,7 +70,7 @@ public class VehicleTypeAggregatedSocTimeProfileCollectorProvider implements Pro
 			Map<String, Double> averageSocByType = evFleet.getElectricVehicles()
 					.values()
 					.stream()
-					.collect(groupingBy(ElectricVehicle::getVehicleType,
+					.collect(groupingBy(ev -> ev.getVehicleSpecification().getMatsimVehicle().getType().getId() + "",
 							mapping(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()), averagingDouble(soc -> soc))));
 			double averageSoc = evFleet.getElectricVehicles()
 					.values()

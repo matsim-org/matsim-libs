@@ -37,7 +37,7 @@ public interface ElectricVehicle extends Identifiable<Vehicle> {
 
 	Battery getBattery();
 
-	String getVehicleType();
+	ElectricVehicleSpecification getVehicleSpecification();
 
 	ImmutableList<String> getChargerTypes();
 }
