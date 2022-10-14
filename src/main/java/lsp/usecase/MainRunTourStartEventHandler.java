@@ -36,10 +36,6 @@ import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.handler.EventHandler;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /*package-private*/ class MainRunTourStartEventHandler implements AfterMobsimListener, FreightTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 
@@ -47,7 +43,6 @@ import java.util.Collection;
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement solutionElement;
 	private final LSPCarrierResource resource;
-	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
 	private LSPShipment lspShipment;
 
 
@@ -63,7 +58,6 @@ import java.util.Collection;
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

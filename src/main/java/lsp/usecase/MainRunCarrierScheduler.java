@@ -161,8 +161,7 @@ import java.util.List;
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Tour tour = scheduledTour.getTour();
 			for (TourElement element : tour.getTourElements()) {
-				if (element instanceof Tour.ServiceActivity) {
-					Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
+				if (element instanceof Tour.ServiceActivity serviceActivity) {
 					LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
 					for (LSPCarrierPair pair : pairs) {
 						if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
@@ -192,8 +191,7 @@ import java.util.List;
 		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
 		double cumulatedLoadingTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity) {
-				Tour.ServiceActivity activity = (Tour.ServiceActivity) element;
+			if (element instanceof Tour.ServiceActivity activity) {
 				cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
 			}
 		}
@@ -241,8 +239,7 @@ import java.util.List;
 		}
 		double cumulatedLoadingTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity) {
-				Tour.ServiceActivity activity = (Tour.ServiceActivity) element;
+			if (element instanceof Tour.ServiceActivity activity) {
 				cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
 			}
 		}

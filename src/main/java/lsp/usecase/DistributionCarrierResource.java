@@ -41,7 +41,6 @@ import java.util.Collection;
 
 	DistributionCarrierResource(UsecaseUtils.DistributionCarrierResourceBuilder builder) {
 		super(builder.id);
-		Id<Link> locationLinkId = builder.locationLinkId;
 		this.distributionHandler = builder.distributionHandler;
 		this.clientElements = builder.clientElements;
 		this.carrier = builder.carrier;
@@ -55,11 +54,9 @@ import java.util.Collection;
 			if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
 				depotLinkId = vehicle.getLinkId();
 			}
-
 		}
 
 		return depotLinkId;
-
 	}
 
 	@Override
@@ -69,11 +66,9 @@ import java.util.Collection;
 			if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
 				depotLinkId = vehicle.getLinkId();
 			}
-
 		}
 
 		return depotLinkId;
-
 	}
 
 	@Override
@@ -84,7 +79,6 @@ import java.util.Collection;
 	@Override
 	public void schedule(int bufferTime) {
 		distributionHandler.scheduleShipments(this, bufferTime);
-
 	}
 
 	public Network getNetwork() {

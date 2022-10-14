@@ -48,9 +48,7 @@ import java.util.ArrayList;
 	}
 	
 	@Override protected void initializeValues( LSPResource resource ) {
-//		if(resource.getClass() == TranshipmentHub.class){
 		this.transshipmentHub = (TransshipmentHub) resource;
-//		}
 	}
 	
 	@Override protected void scheduleResource() {

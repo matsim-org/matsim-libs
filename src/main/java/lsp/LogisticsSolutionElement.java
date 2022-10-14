@@ -40,7 +40,7 @@ public interface LogisticsSolutionElement extends Identifiable<LogisticsSolution
 	LogisticsSolutionElement getNextElement();
 
 	/**
-	 * This collections stores LSPShipments that are waiting for their treatment in this element or more precisely the Resource that is in
+	 * This collection stores LSPShipments that are waiting for their treatment in this element or more precisely the Resource that is in
 	 * charge of the actual physical handling.
 	 *
 	 * @return WaitingShipments

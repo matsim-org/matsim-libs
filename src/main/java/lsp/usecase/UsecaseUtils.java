@@ -65,7 +65,7 @@ public class UsecaseUtils {
 	/**
 	 * Collects all the vehicleTyps from the different Vehicle of the carrier.
 	 * This is needed since we do not use carrier.getCarrierCapabilities().getVehicleTypes() any more as second field to safe vehicleTypes ...
-	 * TODO: Maybe move to CarrierUtils in MATSim-libs / freigth contrib.
+	 * TODO: Maybe move to CarrierUtils in MATSim-libs / freight contrib.
 	 * <p>
 	 * KMT/Jul22
 	 *
@@ -107,9 +107,8 @@ public class UsecaseUtils {
 	}
 
 	/**
-	 * Prints out the log of the shipment - this is not the shpipments Plan
-	 *
-	 * Maybe the log will get removed soon.
+	 * Prints out the log of the shipment - this is not the shipment's plan
+	 * Maybe the log will get removed soon. kmt sep/oct'22
 	 *
 	 * @param outputDir
 	 * @param lsp

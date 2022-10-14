@@ -77,6 +77,7 @@ import java.util.List;
 		for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 			LogisticsSolutionElement firstElement = getFirstElement(solution);
 			for (LSPShipment shipment : solution.getShipments()) {
+				assert firstElement != null;
 				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment);
 			}
 		}
@@ -87,7 +88,6 @@ import java.util.List;
 			if (element.getPreviousElement() == null) {
 				return element;
 			}
-
 		}
 		return null;
 	}

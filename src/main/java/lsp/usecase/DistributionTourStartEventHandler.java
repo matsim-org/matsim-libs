@@ -33,17 +33,12 @@ import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
-import org.matsim.core.events.handler.EventHandler;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /*package-private*/  class DistributionTourStartEventHandler implements FreightTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement element;
 	private final LSPCarrierResource resource;
-	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
 	private LSPShipment lspShipment;
 
 	private final Tour tour;

@@ -109,7 +109,6 @@ import java.util.*;
 			Carrier auxiliaryCarrier = createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime);
 			routeCarrier(auxiliaryCarrier);
 			scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
-			cumulatedLoadingTime = 0;
 			shipmentsInCurrentTour.clear();
 		}
 
@@ -128,7 +127,7 @@ import java.util.*;
 	 * <p>
 	 * In this method all tours copied but with a new (unique) TourId.
 	 * <p>
-	 * This is a workaround. In my (KMT, sep'22) opinion it would be better to switch so {@CarrierShipment}s insteaf of {@link CarrierService}
+	 * This is a workaround. In my (KMT, sep'22) opinion it would be better to switch so {@link CarrierShipment}s insteaf of {@link CarrierService}
 	 * and use only on DistributionCarrier with only one VRP and only one jsprit-Run. This would avoid this workaround and
 	 * also improve the solution, because than the DistributionCarrier can decide on it one which shipments will go into which tours
 	 *
@@ -192,8 +191,7 @@ import java.util.*;
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Tour tour = scheduledTour.getTour();
 			for (TourElement element : tour.getTourElements()) {
-				if (element instanceof Tour.ServiceActivity) {
-					Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
+				if (element instanceof ServiceActivity serviceActivity) {
 					LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
 					for (LSPCarrierPair pair : pairs) {
 						if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
@@ -223,8 +221,7 @@ import java.util.*;
 		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
 		double cumulatedLoadingTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity) {
-				Tour.ServiceActivity activity = (Tour.ServiceActivity) element;
+			if (element instanceof ServiceActivity activity) {
 				cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
 			}
 		}
@@ -317,8 +314,7 @@ import java.util.*;
 		outerLoop:
 		while (iterator.hasPrevious()) {
 			TourElement element = iterator.previous();
-			if (element instanceof Tour.ServiceActivity) {
-				Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
+			if (element instanceof ServiceActivity serviceActivity) {
 				LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
 				for (LSPCarrierPair pair : pairs) {
 					if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
