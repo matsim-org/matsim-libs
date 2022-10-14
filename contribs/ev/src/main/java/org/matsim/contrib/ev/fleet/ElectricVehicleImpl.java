@@ -65,8 +65,8 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 	}
 
 	@Override
-	public String getVehicleType() {
-		return vehicleSpecification.getVehicleType();
+	public ElectricVehicleSpecification getVehicleSpecification() {
+		return vehicleSpecification;
 	}
 
 	@Override

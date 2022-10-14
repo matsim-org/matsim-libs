@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.config;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import java.io.Serial;
 import java.lang.annotation.Documented;
@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +49,7 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 /**
@@ -368,12 +370,20 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				throw new IllegalArgumentException(comment, e);
 			}
 		} else if (type.equals(Set.class)) {
-			return Arrays.stream(value.split(",")).map(String::trim).collect(toUnmodifiableSet());
+			return value.isBlank() ? ImmutableSet.of() : splitStringToStream(value).collect(toImmutableSet());
 		} else if (type.equals(List.class)) {
-			return Arrays.stream(value.split(",")).map(String::trim).toList();
+			return value.isBlank() ? List.of() : splitStringToStream(value).toList();
 		} else {
 			throw new RuntimeException("Unsupported type: " + type);
 		}
+	}
+
+	private Stream<String> splitStringToStream(String value) {
+		return Arrays.stream(value.split(","))
+				.peek(e -> Preconditions.checkArgument(!e.isBlank(),
+						"String '%s' contains comma-separated blank elements. Only non-blank elements are supported.",
+						value))
+				.map(String::trim);
 	}
 
 	@Override
@@ -425,7 +435,10 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			return null;
 		} else if (result instanceof Set<?> || result instanceof List<?>) {
 			//we only support Set<String> and List<String>, therefore we can safely cast to Collection<String>
-			return String.join(", ", ((Collection<String>)result));
+			var collection = ((Collection<String>)result);
+			Preconditions.checkArgument(collection.stream().noneMatch(String::isBlank),
+					"Collection %s contains blank elements. Only non-blank elements are supported.", collection);
+			return String.join(", ", collection);
 		} else {
 			return result + "";
 		}
