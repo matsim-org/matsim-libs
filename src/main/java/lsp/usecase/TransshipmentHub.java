@@ -39,7 +39,7 @@ import java.util.List;
  * ScheduledShipmentHandle. There, the name of the Resource
  * and the client element are entered, so that the way that the {@link lsp.shipment.LSPShipment}
  * takes is specified. In addition, the planned start and end time of the handling
- * (i.e. crossdocking) of the shipment is entered. In the example, crossdocking
+ * (i.e. cross-docking) of the shipment is entered. In the example, cross-docking
  * starts as soon as the considered LSPShipment arrives at the {@link TransshipmentHub}
  * and ends after a fixed and a size dependent amount of time.
  */

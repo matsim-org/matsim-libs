@@ -110,9 +110,6 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	}
 
 
-	//Hier muss noch die Moeglichkeit reinkommen, dass nicht alle LSPs nach jeder Iteration neu planen, sondern nur ein Teil von denen
-	//Das kann durch ein entsprechendes replanningModule erreicht werden. Hier muss man dann nix aendern. kmt
-	// das geht jetzt nicht mehr.  kai, jun'22
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
 		if ( strategyManager==null ) {
@@ -148,7 +145,6 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-//		eventsManager.removeHandler(carrierResourceTracker);
 	}
 
 
@@ -172,10 +168,6 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		}
 		return carriers;
 	}
-
-//	public CarrierAgentTracker getCarrierResourceTracker() {
-//		return carrierResourceTracker;
-//	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {

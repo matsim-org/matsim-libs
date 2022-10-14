@@ -55,20 +55,15 @@ import java.util.ArrayList;
 	
 	@Override protected void scheduleResource() {
 		for( ShipmentWithTime tupleToBeAssigned: shipments){
-			handleWaitingShipment(tupleToBeAssigned);
+			updateSchedule(tupleToBeAssigned);
 		}
 	}
 
-	@Override @Deprecated //TODO Method has no content, KMT Jul'20
+	@Override @Deprecated
 	protected void updateShipments() {
 		log.error("This method is not implemented. Nothing will happen here. ");
 	}
 
-
-	private void handleWaitingShipment(ShipmentWithTime tupleToBeAssigned) {
-		updateSchedule(tupleToBeAssigned);
-//		addShipmentToEventHandler(tupleToBeAssigned);
-	}
 
 	private void updateSchedule(ShipmentWithTime tuple) {
 		addShipmentHandleElement(tuple);

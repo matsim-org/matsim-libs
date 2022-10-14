@@ -75,13 +75,13 @@ import java.util.Map;
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		servicesWaitedFor.clear(); // cleanup after Mobsim ends (instest in reset() -> bfore mobsim starts. kmt oct'22
+		servicesWaitedFor.clear(); // cleanup after Mobsim ends (instead of doing it in reset() = before Mobsim starts.) kmt oct'22
 	}
 
 	@Override
 	public void reset(int iteration) {
-		// not implemented; cleanup is done after Mobsim end, because the internal state is (re)set before mobsim starts,
-		// so cleaning up here is too late.
+		// not implemented; cleanup is done after Mobsim ends, because the internal state is (re)set before Mobsim starts.
+		// --> cleaning up here is too late.
 		// This is maybe not ideal, but works; kmt oct'22
 	}
 

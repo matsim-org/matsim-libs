@@ -102,9 +102,6 @@ public final class LSPUtils {
 		Id<LSP> id;
 		SolutionScheduler solutionScheduler;
 		LSPPlan initialPlan;
-//		LSPScorer scorer;
-//		LSPReplanner replanner;
-
 
 		private LSPBuilder(Id<LSP> id) {
 			this.id = id; // this line was not there until today.  kai, may'22
@@ -169,7 +166,6 @@ public final class LSPUtils {
 
 		private LogisticsSolutionBuilder(Id<LogisticsSolution> id) {
 			this.elements = new ArrayList<>();
-//			this.eventHandlers = new ArrayList<>();
 			this.trackers = new ArrayList<LSPSimulationTracker<LogisticsSolution>>();
 			this.id = id;
 		}
@@ -182,11 +178,6 @@ public final class LSPUtils {
 			elements.add(element);
 			return this;
 		}
-
-//		public LogisticsSolutionBuilder addEventHandler( EventHandler handler ) {
-//			eventHandlers.add(handler);
-//			return this;
-//		}
 
 		public LogisticsSolutionBuilder addTracker(LSPSimulationTracker<LogisticsSolution> tracker) {
 			trackers.add(tracker);

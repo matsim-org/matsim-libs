@@ -27,7 +27,7 @@ import org.matsim.core.controler.events.ReplanningEvent;
 /**
  * There is a possibility and also sometimes a need for rescheduling before each
  * new iteration. This need results from changes to the plan of the LSP during
- * the replanning process. There, changes of the structure and/or number of the
+ * the re-planning process. There, changes of the structure and/or number of the
  * active LogisticsSolutions or to the assignment of the LSPShipments to the
  * LogisticsSolutions can happen. Consequently, the transport operations that
  * result from this change in behavior of the corresponding LSP will also change
@@ -43,16 +43,16 @@ import org.matsim.core.controler.events.ReplanningEvent;
  * Then, all LSPShipments of each LSP are assigned to the corresponding
  * LogisticsSolutions by the Assigner of the LSP in order to account for possible
  * changes in the LogisticsSolutions as well as in the assignment itself due to
- * the replanning that took place before. After this assignment is done, the actual
- * scheduling takes place. In cases, where no replanning takes place (further details of
- * the replanning algorithm follow in 3.8), rescheduling will nevertheless take place.
+ * the re-planning that took place before. After this assignment is done, the actual
+ * scheduling takes place. In cases, where no re-planning takes place (further details of
+ * the re-planning algorithm follow in 3.8), rescheduling will nevertheless take place.
  * This is reasonable for example in cases where also other traffic takes place on the
  * network, for example passenger traffic, and the network conditions change between
  * subsequent iterations of the simulation due to congestion.
  * <p>
  * ---
- * Let's do it in replanning.
- * If doing so, we have the time to handle the result (on Carrier level) in the beforeMobsim step of the CarrierControlerListern
+ * Let's do it in re-planning.
+ * If doing so, we have the time to handle the result (on Carrier level) in the beforeMobsim step of the CarrierControlerListener.
  * kmt sep'22
  */
 final class LSPRescheduler {

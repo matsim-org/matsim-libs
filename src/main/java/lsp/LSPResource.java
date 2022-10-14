@@ -34,10 +34,6 @@ public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTra
 
 	Id<Link> getStartLinkId();
 
-//	Class<?> getClassOfResource();
-//	// yyyyyy is it really necessary to use reflection in a code that we fully own?  kai, may'18
-//	//One could also leave this method signature out tm, august'18
-
 	Id<Link> getEndLinkId();
 
 	Collection<LogisticsSolutionElement> getClientElements();

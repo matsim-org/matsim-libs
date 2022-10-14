@@ -29,7 +29,6 @@ import java.util.List;
 
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
-
 	private final List<ShipmentWithTime> shipments;
 
 	WaitingShipmentsImpl() {

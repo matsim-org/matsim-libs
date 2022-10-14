@@ -55,11 +55,9 @@ import java.util.List;
 			if (depotLinkId == null || depotLinkId == vehicle.getLocation()) {
 				depotLinkId = vehicle.getLocation();
 			}
-
 		}
 
 		return depotLinkId;
-
 	}
 
 	@Override
@@ -69,11 +67,9 @@ import java.util.List;
 			if (depotLinkId == null || depotLinkId == vehicle.getLocation()) {
 				depotLinkId = vehicle.getLocation();
 			}
-
 		}
 
 		return depotLinkId;
-
 	}
 
 	@Override

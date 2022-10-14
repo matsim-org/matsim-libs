@@ -122,8 +122,7 @@ import java.util.Collection;
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Tour tour = scheduledTour.getTour();
 			for (TourElement element : tour.getTourElements()) {
-				if (element instanceof Tour.ServiceActivity) {
-					Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
+				if (element instanceof Tour.ServiceActivity serviceActivity) {
 					LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
 					for (LSPCarrierPair pair : pairs) {
 						if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
@@ -233,8 +232,7 @@ import java.util.Collection;
 	private double getUnloadEndTime(Tour tour) {
 		double unloadEndTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity) {
-				Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
+			if (element instanceof Tour.ServiceActivity serviceActivity) {
 				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
 			}
 		}

@@ -51,19 +51,12 @@ import java.util.List;
 		this.selectedPlan.setLSP(this);
 		this.plans.add(builder.initialPlan);
 		this.resources = builder.resources;
-//		if (builder.scorer != null) {
-//			setScorer( builder.scorer);
-//		}
-//		this.replanner = builder.replanner;
-//		if (this.replanner != null) {
-//			this.replanner.setEmbeddingContainer(this);
-//		}
 	}
+
 	/**
 	 * This is used from {@link LSPControlerListener} and not meant to be used from user code.  Users should bind {@link LSPScorerFactory}.
 	 */
 	/* package-private */ void setScorer(LSPScorer scorer){
-
 		this.scorer = scorer;
 		scorer.setEmbeddingContainer(this);
 		this.addSimulationTracker(scorer);
@@ -157,19 +150,6 @@ import java.util.List;
 		shipments.add(shipment);
 		selectedPlan.getAssigner().assignToSolution(shipment);
 	}
-
-//	public void replan(final ReplanningEvent arg0) {
-//		if (this.replanner != null) {
-//			this.replanner.replan(arg0);
-//		}
-//	}
-//
-//	@Override
-//	public void setReplanner(LSPReplanner replanner) {
-//		replanner.setEmbeddingContainer(this);
-//		this.replanner = replanner;
-//	}
-
 
 	@Override
 	public Collection<LSPShipment> getShipments() {
