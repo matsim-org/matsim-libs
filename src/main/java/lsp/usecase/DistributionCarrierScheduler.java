@@ -295,7 +295,7 @@ import java.util.*;
 		CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		final VehicleType vehicleType = carrierVehicle.getType();
 
-		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLocation(), vehicleType);
+		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLinkId(), vehicleType);
 		vBuilder.setEarliestStart(startTime);
 		vBuilder.setLatestEnd(24 * 60 * 60);
 		CarrierVehicle cv = vBuilder.build();

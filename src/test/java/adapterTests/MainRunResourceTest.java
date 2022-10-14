@@ -134,7 +134,7 @@ public class MainRunResourceTest {
 				if (vehicles.size() == 1) {
 					assertSame(vehicles.get(0), carrierVehicle);
 					assertSame(carrierVehicle.getType(), mainRunType);
-					assertSame(carrierVehicle.getLocation(), fromLinkId);
+					assertSame(carrierVehicle.getLinkId(), fromLinkId);
 				}
 			}
 		}

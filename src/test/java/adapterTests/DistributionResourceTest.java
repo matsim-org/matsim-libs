@@ -134,7 +134,7 @@ public class DistributionResourceTest {
 				if (vehicles.size() == 1) {
 					assertSame(vehicles.get(0), distributionCarrierVehicle);
 					assertSame(distributionCarrierVehicle.getType(), distributionType);
-					assertSame(distributionCarrierVehicle.getLocation(), distributionLinkId);
+					assertSame(distributionCarrierVehicle.getLinkId(), distributionLinkId);
 				}
 			}
 		}

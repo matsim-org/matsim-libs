@@ -52,8 +52,8 @@ import java.util.Collection;
 	public Id<Link> getStartLinkId() {
 		Id<Link> depotLinkId = null;
 		for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
-			if (depotLinkId == null || depotLinkId == vehicle.getLocation()) {
-				depotLinkId = vehicle.getLocation();
+			if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
+				depotLinkId = vehicle.getLinkId();
 			}
 
 		}
@@ -66,8 +66,8 @@ import java.util.Collection;
 	public Id<Link> getEndLinkId() {
 		Id<Link> depotLinkId = null;
 		for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
-			if (depotLinkId == null || depotLinkId == vehicle.getLocation()) {
-				depotLinkId = vehicle.getLocation();
+			if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
+				depotLinkId = vehicle.getLinkId();
 			}
 
 		}

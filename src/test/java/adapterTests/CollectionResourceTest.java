@@ -134,7 +134,7 @@ public class CollectionResourceTest {
 				if (vehicles.size() == 1) {
 					assertSame(vehicles.get(0), collectionCarrierVehicle);
 					assertSame(collectionCarrierVehicle.getType(), collectionType);
-					assertSame(collectionCarrierVehicle.getLocation(), collectionLinkId);
+					assertSame(collectionCarrierVehicle.getLinkId(), collectionLinkId);
 				}
 			}
 		}
