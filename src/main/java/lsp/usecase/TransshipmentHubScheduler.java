@@ -115,7 +115,7 @@ import java.util.ArrayList;
 		this.transshipmentHub = transshipmentHub;
 	}
 
-	public void setEventHandler(TranshipmentHubTourEndEventHandler eventHandler) {
+	public void setEventHandler(TransshipmentHubTourEndEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
 	}
 
