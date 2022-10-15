@@ -33,10 +33,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.LSPTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -132,7 +132,8 @@ final class ExampleTwoEchelonGrid {
 		log.info("Some results ....");
 		printScores(LSPUtils.getLSPs(controler.getScenario()).getLSPs().values());
 		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
-			UsecaseUtils.printResults(controler.getControlerIO().getOutputPath(), lsp);
+			UsecaseUtils.printResults_shipmentPlan(controler.getControlerIO().getOutputPath(), lsp);
+			UsecaseUtils.printResults_shipmentLog(controler.getControlerIO().getOutputPath(), lsp);
 		}
 		log.info("Done.");
 	}
@@ -148,7 +149,7 @@ final class ExampleTwoEchelonGrid {
 			CommandLine cmd = ConfigUtils.getCommandLine(args);
 		} else {
 			config.controler().setOutputDirectory("output/2echelon/");
-			config.controler().setLastIteration(10);
+			config.controler().setLastIteration(2);
 		}
 
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
@@ -170,13 +171,14 @@ final class ExampleTwoEchelonGrid {
 		}
 
 		log.info("Add LSP to the scenario");
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario.getNetwork()))));
+		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
 
 		return scenario;
 	}
 
-	private static LSP createLSP(Network network) {
+	private static LSP createLSP(Scenario scenario) {
 		log.info("create LSP");
+		Network network = scenario.getNetwork();
 
 		LSPPlan lspPlan_direct;
 		{
@@ -232,7 +234,7 @@ final class ExampleTwoEchelonGrid {
 					.build();
 
 			//The scheduler is added to the Resource and the Resource is created
-			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Hub", LSPResource.class), HUB_LINK_ID)
+			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
 					.setTransshipmentHubScheduler(hubScheduler)
 					.build();
 
@@ -277,16 +279,16 @@ final class ExampleTwoEchelonGrid {
 		lspPlans.add(lspPlan_direct);
 
 		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-//				.setInitialPlan(lspPlan_direct)
-				.setInitialPlan(lspPlan_withHub)
+				.setInitialPlan(lspPlan_direct)
+//				.setInitialPlan(lspPlan_withHub)
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
 				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans))) //Hier müssen irgendwie die Ressourcen beider Pläne rein, oder? - Habe ich jetzt gemacht. kmt ' jul22
 				;
 
 
 		LSP lsp = lspBuilder.build();
-//		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
-		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
+		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
+//		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
 
 		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
 //		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
@@ -362,8 +364,8 @@ final class ExampleTwoEchelonGrid {
 	}
 
 
-	private static class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEventHandler {
-		private double score = 0.;
+	private static class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
+		private double score = 0;
 
 		@Override
 		public double getScoreForCurrentPlan() {
@@ -375,9 +377,9 @@ final class ExampleTwoEchelonGrid {
 		}
 
 		@Override
-		public void handleEvent(LSPTourEndEvent event) {
-			score++;
-			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
+		public void handleEvent(FreightTourEndEvent event) {
+			score--;
+			// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
 		}
 
 		@Override
@@ -386,9 +388,9 @@ final class ExampleTwoEchelonGrid {
 		}
 
 		@Override
-		public void handleEvent(LSPServiceEndEvent event) {
-			score++;
-			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
+		public void handleEvent(FreightServiceEndEvent event) {
+			score--;
+			// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
 		}
 	}
 }

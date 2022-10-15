@@ -20,9 +20,9 @@
 
 package lsp;
 
-import java.util.ArrayList;
-
 import lsp.shipment.LSPShipment;
+
+import java.util.ArrayList;
 
 /**
  * ....

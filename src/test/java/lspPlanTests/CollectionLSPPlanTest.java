@@ -20,8 +20,6 @@
 
 package lspPlanTests;
 
-import static org.junit.Assert.*;
-
 import lsp.*;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
@@ -37,7 +35,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPResource;
+import static org.junit.Assert.*;
 
 public class CollectionLSPPlanTest {
 

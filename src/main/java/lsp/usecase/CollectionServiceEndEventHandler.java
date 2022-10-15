@@ -20,16 +20,18 @@
 
 package lsp.usecase;
 
-import lsp.LSPSimulationTracker;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
-import lsp.shipment.*;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.CarrierService;
-
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
+import lsp.LSPSimulationTracker;
+import lsp.LogisticsSolutionElement;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentLeg;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
@@ -37,7 +39,7 @@ import org.matsim.core.events.handler.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
+class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement solutionElement;
@@ -60,20 +62,20 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 	}
 
 	@Override
-	public void handleEvent(LSPServiceEndEvent event) {
-		if (event.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
-			logTransport(event);
+	public void handleEvent(FreightServiceEndEvent event) {
+		if (event.getServiceId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 			logLoad(event);
+			logTransport(event);
 		}
 	}
 
-	private void logLoad(LSPServiceEndEvent event) {
+	private void logLoad(FreightServiceEndEvent event) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
-		builder.setStartTime(event.getTime() - event.getService().getServiceDuration());
+		builder.setStartTime(event.getTime() - event.getServiceDuration());
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
-		builder.setLinkId(event.getService().getLocationLinkId());
+		builder.setLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
@@ -81,12 +83,12 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
 
-	private void logTransport(LSPServiceEndEvent event) {
+	private void logTransport(FreightServiceEndEvent event) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
-		builder.setFromLinkId(event.getService().getLocationLinkId());
+		builder.setFromLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		ShipmentLeg transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();

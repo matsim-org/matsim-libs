@@ -21,13 +21,14 @@
 package lsp.usecase;
 
 import lsp.LSP;
-import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 import lsp.LSPResourceScheduler;
+import lsp.LogisticsSolutionElement;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -64,7 +65,7 @@ public class UsecaseUtils {
 	/**
 	 * Collects all the vehicleTyps from the different Vehicle of the carrier.
 	 * This is needed since we do not use carrier.getCarrierCapabilities().getVehicleTypes() any more as second field to safe vehicleTypes ...
-	 * TODO: Maybe move to CarrierUtils in MATSim-libs / freigth contrib.
+	 * TODO: Maybe move to CarrierUtils in MATSim-libs / freight contrib.
 	 * <p>
 	 * KMT/Jul22
 	 *
@@ -79,13 +80,47 @@ public class UsecaseUtils {
 		return vehicleTypeCollection;
 	}
 
-	public static void printResults(String outputDir, LSP lsp) {
+
+	public static void printResults_shipmentPlan(String outputDir, LSP lsp) {
+		System.out.println("Writing out shipmentPlan for LSP");
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_schedules.tsv")) {
 			final String str0 = "LSP: " + lsp.getId();
 			System.out.println(str0);
 			writer.write(str0 + "\n");
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
+				final String str1 = "Shipment: " + shipment.getId();
+				System.out.println(str1);
+				writer.write(str1 + "\n");
+				for (ShipmentPlanElement element : elementList) {
+					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+					System.out.println(str2);
+					writer.write(str2 + "\n");
+				}
+				System.out.println();
+				writer.write("\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Prints out the log of the shipment - this is not the shipment's plan
+	 * Maybe the log will get removed soon. kmt sep/oct'22
+	 *
+	 * @param outputDir
+	 * @param lsp
+	 */
+	public static void printResults_shipmentLog(String outputDir, LSP lsp) {
+		System.out.println("Writing out shipmentLog for LSP");
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_shipmentLogs.tsv")) {
+			final String str0 = "LSP: " + lsp.getId();
+			System.out.println(str0);
+			writer.write(str0 + "\n");
+			for (LSPShipment shipment : lsp.getShipments()) {
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getLog().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
 				final String str1 = "Shipment: " + shipment.getId();
 				System.out.println(str1);
@@ -301,15 +336,17 @@ public class UsecaseUtils {
 		private final Id<Link> locationLinkId;
 		private final ArrayList<LogisticsSolutionElement> clientElements;
 		private TransshipmentHubScheduler transshipmentHubScheduler;
+		private final Scenario scenario;
 
-		private TransshipmentHubBuilder(Id<LSPResource> id, Id<Link> locationLinkId) {
+		private TransshipmentHubBuilder(Id<LSPResource> id, Id<Link> locationLinkId, Scenario scenario) {
 			this.id = id;
 			this.clientElements = new ArrayList<>();
 			this.locationLinkId = locationLinkId;
+			this.scenario = scenario;
 		}
 
-		public static TransshipmentHubBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId) {
-			return new TransshipmentHubBuilder(id, locationLinkId);
+		public static TransshipmentHubBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId, Scenario scenario) {
+			return new TransshipmentHubBuilder(id, locationLinkId, scenario);
 		}
 
 		public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler TranshipmentHubScheduler) {
@@ -318,7 +355,7 @@ public class UsecaseUtils {
 		}
 
 		public TransshipmentHub build() {
-			return new TransshipmentHub(this);
+			return new TransshipmentHub(this, scenario);
 		}
 		//--- Getters ---
 

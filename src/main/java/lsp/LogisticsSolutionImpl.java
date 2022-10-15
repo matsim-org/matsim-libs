@@ -68,4 +68,27 @@ import java.util.Collection;
 		shipments.add(shipment);
 	}
 
+	@Override public String toString() {
+		StringBuilder strb = new StringBuilder();
+		strb.append("LogisticsSolutionImpl{")
+				.append("[No of SolutionsElements=").append(solutionElements.size()).append("] \n");
+		if (!solutionElements.isEmpty()){
+			strb.append("{SolutionElements=");
+			for  (LogisticsSolutionElement solutionElement : solutionElements) {
+				strb.append("\n [" + solutionElement.toString() + "]");
+			}
+			strb.append("}");
+		}
+		strb.append("[No of Shipments=").append(shipments.size()).append("] \n");
+		if (!shipments.isEmpty()){
+			strb.append("{ShipmentIds=");
+			for (LSPShipment shipment : shipments) {
+				strb.append("[" + shipment.getId().toString() + "]");
+			}
+			strb.append("}");
+		}
+		strb.append('}');
+		return strb.toString();
+	}
+
 }

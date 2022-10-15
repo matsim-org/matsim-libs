@@ -20,12 +20,11 @@
 
 package lsp;
 
+import org.matsim.api.core.v01.Id;
+
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 
 public class LSPs {
 

@@ -2,10 +2,10 @@ package example.lsp.initialPlans;
 
 import lsp.LSP;
 import lsp.LSPScorer;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.LSPTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 
 /**
  * Todo: Put in some plausible values ... ->
@@ -17,7 +17,7 @@ import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
  *
  * @author Kai Martins-Turner (kturner)
  */
-class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEventHandler {
+class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
 	private double score = 0.;
 
 	@Override
@@ -30,7 +30,7 @@ class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEve
 	}
 
 	@Override
-	public void handleEvent(LSPTourEndEvent event) {
+	public void handleEvent(FreightTourEndEvent event) {
 		score++;
 		// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 	}
@@ -41,7 +41,7 @@ class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEve
 	}
 
 	@Override
-	public void handleEvent(LSPServiceEndEvent event) {
+	public void handleEvent(FreightServiceEndEvent event) {
 		score = score + 0.1;
 		// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 	}

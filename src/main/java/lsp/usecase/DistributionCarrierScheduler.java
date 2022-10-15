@@ -20,11 +20,14 @@
 
 package lsp.usecase;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ListIterator;
-
-import lsp.shipment.*;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.util.Solutions;
+import lsp.*;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
@@ -34,19 +37,9 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.util.Solutions;
-
-import lsp.LogisticsSolutionElement;
-import lsp.ShipmentWithTime;
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.*;
 
 /**
  * Ähnlich zu {@link CollectionCarrierScheduler}: Nun werden Sendungen verteilt statt eingesammelt.
@@ -61,7 +54,7 @@ import org.matsim.vehicles.VehicleType;
 /*package-private*/ class DistributionCarrierScheduler extends LSPResourceScheduler {
 
 	private Carrier carrier;
-	private DistributionCarrierResource adapter;
+	private DistributionCarrierResource resource;
 	private ArrayList<LSPCarrierPair> pairs;
 
 	DistributionCarrierScheduler() {
@@ -71,8 +64,8 @@ import org.matsim.vehicles.VehicleType;
 	@Override protected void initializeValues( LSPResource resource ) {
 		this.pairs = new ArrayList<>();
 		if (resource.getClass() == DistributionCarrierResource.class) {
-			this.adapter = (DistributionCarrierResource) resource;
-			this.carrier = adapter.getCarrier();
+			this.resource = (DistributionCarrierResource) resource;
+			this.carrier = this.resource.getCarrier();
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();
 			this.carrier.getPlans().clear();
@@ -86,7 +79,7 @@ import org.matsim.vehicles.VehicleType;
 		double availiabilityTimeOfLastShipment = 0;
 		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
 		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
-		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
+		List<ScheduledTour> scheduledTours = new LinkedList<>();
 
 		for (ShipmentWithTime tuple : copyOfAssignedShipments) {
 			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber weas ist, wenn es mehrer gibt???
@@ -116,12 +109,43 @@ import org.matsim.vehicles.VehicleType;
 			Carrier auxiliaryCarrier = createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime);
 			routeCarrier(auxiliaryCarrier);
 			scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
-			cumulatedLoadingTime = 0;
 			shipmentsInCurrentTour.clear();
 		}
 
-		CarrierPlan plan = new CarrierPlan(carrier, scheduledTours);
+		CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledTours));
 		carrier.setSelectedPlan(plan);
+	}
+
+
+
+	/**
+	 * This method unifies the tourIds of the CollectionCarrier.
+	 * <p>
+	 * It is done because in the current setup, there is one (auxiliary) Carrier per Tour. ---> in each Carrier the Tour has the Id 1.
+	 * In a second step all of that tours were put together in one single carrier {@link #scheduleResource()}
+	 * But now, this carrier can have several tours, all with the same Id (1)-
+	 * <p>
+	 * In this method all tours copied but with a new (unique) TourId.
+	 * <p>
+	 * This is a workaround. In my (KMT, sep'22) opinion it would be better to switch so {@link CarrierShipment}s insteaf of {@link CarrierService}
+	 * and use only on DistributionCarrier with only one VRP and only one jsprit-Run. This would avoid this workaround and
+	 * also improve the solution, because than the DistributionCarrier can decide on it one which shipments will go into which tours
+	 *
+	 * @param scheduledTours Collection of scheduledTours
+	 * @return Collection<ScheduledTour> the scheduledTours with unified tour Ids.
+	 */
+	private Collection<ScheduledTour> unifyTourIds(Collection<ScheduledTour> scheduledTours) {
+		int tourIdindex = 1;
+		List<ScheduledTour> scheduledToursUnified = new LinkedList<>();
+
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			var newTour = scheduledTour.getTour().duplicateWithNewId(Id.create("dist_"+tourIdindex, Tour.class));
+			tourIdindex++;
+			var newScheduledTour = ScheduledTour.newInstance(newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture() );
+			scheduledToursUnified.add(newScheduledTour);
+		}
+
+		return scheduledToursUnified;
 	}
 
 	private CarrierService convertToCarrierService(ShipmentWithTime tuple) {
@@ -136,8 +160,8 @@ import org.matsim.vehicles.VehicleType;
 	}
 
 	private void routeCarrier(Carrier carrier) {
-		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, adapter.getNetwork());
-		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), UsecaseUtils.getVehicleTypeCollection(carrier));
+		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, resource.getNetwork());
+		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(resource.getNetwork(), UsecaseUtils.getVehicleTypeCollection(carrier));
 		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
 		vrpBuilder.setRoutingCost(netbasedTransportcosts);
 		VehicleRoutingProblem vrp = vrpBuilder.build();
@@ -167,16 +191,15 @@ import org.matsim.vehicles.VehicleType;
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Tour tour = scheduledTour.getTour();
 			for (TourElement element : tour.getTourElements()) {
-				if (element instanceof Tour.ServiceActivity) {
-					Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
+				if (element instanceof ServiceActivity serviceActivity) {
 					LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
 					for (LSPCarrierPair pair : pairs) {
 						if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
 							addShipmentLoadElement(tuple, tour, serviceActivity);
 							addShipmentTransportElement(tuple, tour, serviceActivity);
 							addShipmentUnloadElement(tuple, tour, serviceActivity);
-							addDistributionStartEventHandler(pair.service, tuple, adapter);
-							addDistributionServiceEventHandler(pair.service, tuple, adapter);
+							addDistributionTourStartEventHandler(pair.service, tuple, resource, tour);
+							addDistributionServiceEventHandler(pair.service, tuple, resource);
 							//break outerLoop;
 						}
 					}
@@ -187,8 +210,8 @@ import org.matsim.vehicles.VehicleType;
 
 	private void addShipmentLoadElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 		ShipmentUtils.ScheduledShipmentLoadBuilder builder = ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
-		builder.setResourceId(adapter.getId());
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+		builder.setResourceId(resource.getId());
+		for (LogisticsSolutionElement element : resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				builder.setLogisticsSolutionElement(element);
 			}
@@ -198,8 +221,7 @@ import org.matsim.vehicles.VehicleType;
 		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
 		double cumulatedLoadingTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity) {
-				Tour.ServiceActivity activity = (Tour.ServiceActivity) element;
+			if (element instanceof ServiceActivity activity) {
 				cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
 			}
 		}
@@ -218,8 +240,8 @@ import org.matsim.vehicles.VehicleType;
 
 	private void addShipmentTransportElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 		ShipmentUtils.ScheduledShipmentTransportBuilder builder = ShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
-		builder.setResourceId(adapter.getId());
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+		builder.setResourceId(resource.getId());
+		for (LogisticsSolutionElement element : resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				builder.setLogisticsSolutionElement(element);
 			}
@@ -243,8 +265,8 @@ import org.matsim.vehicles.VehicleType;
 
 	private void addShipmentUnloadElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 		ShipmentUtils.ScheduledShipmentUnloadBuilder builder = ShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
-		builder.setResourceId(adapter.getId());
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+		builder.setResourceId(resource.getId());
+		for (LogisticsSolutionElement element : resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				builder.setLogisticsSolutionElement(element);
 			}
@@ -262,12 +284,15 @@ import org.matsim.vehicles.VehicleType;
 		tuple.getShipment().getShipmentPlan().addPlanElement(id, unload);
 	}
 
+	private int carrierCnt = 1;
 	private Carrier createAuxiliaryCarrier(ArrayList<ShipmentWithTime> shipmentsInCurrentTour, double startTime) {
-		Carrier auxiliaryCarrier = CarrierUtils.createCarrier(carrier.getId());
+		final Id<Carrier> carrierId = Id.create(carrier.getId().toString() + carrierCnt, Carrier.class);
+		carrierCnt ++;
+		Carrier auxiliaryCarrier = CarrierUtils.createCarrier(carrierId);
 		CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		final VehicleType vehicleType = carrierVehicle.getType();
 
-		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLocation(), vehicleType);
+		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLinkId(), vehicleType);
 		vBuilder.setEarliestStart(startTime);
 		vBuilder.setLatestEnd(24 * 60 * 60);
 		CarrierVehicle cv = vBuilder.build();
@@ -289,8 +314,7 @@ import org.matsim.vehicles.VehicleType;
 		outerLoop:
 		while (iterator.hasPrevious()) {
 			TourElement element = iterator.previous();
-			if (element instanceof Tour.ServiceActivity) {
-				Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
+			if (element instanceof ServiceActivity serviceActivity) {
 				LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
 				for (LSPCarrierPair pair : pairs) {
 					if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
@@ -306,7 +330,7 @@ import org.matsim.vehicles.VehicleType;
 	}
 
 	private void addDistributionServiceEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+		for (LogisticsSolutionElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				DistributionServiceStartEventHandler handler = new DistributionServiceStartEventHandler(carrierService, tuple.getShipment(), element, resource);
 				tuple.getShipment().addSimulationTracker(handler);
@@ -315,10 +339,10 @@ import org.matsim.vehicles.VehicleType;
 		}
 	}
 
-	private void addDistributionStartEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
-		for (LogisticsSolutionElement element : adapter.getClientElements()) {
+	private void addDistributionTourStartEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
+		for (LogisticsSolutionElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				DistributionTourStartEventHandler handler = new DistributionTourStartEventHandler(carrierService, tuple.getShipment(), element, resource);
+				DistributionTourStartEventHandler handler = new DistributionTourStartEventHandler(carrierService, tuple.getShipment(), element, resource, tour);
 				tuple.getShipment().addSimulationTracker(handler);
 				break;
 			}

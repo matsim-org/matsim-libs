@@ -20,14 +20,10 @@
 
 package lsp.usecase;
 
-import java.util.List;
-
-import lsp.LSP;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
-import lsp.SolutionScheduler;
-import lsp.LSPResource;
+import lsp.*;
 import lsp.shipment.LSPShipment;
+
+import java.util.List;
 
 /**
  * In the class SimpleForwardSolutionScheduler two tasks are performed:
@@ -81,6 +77,7 @@ import lsp.shipment.LSPShipment;
 		for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 			LogisticsSolutionElement firstElement = getFirstElement(solution);
 			for (LSPShipment shipment : solution.getShipments()) {
+				assert firstElement != null;
 				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment);
 			}
 		}
@@ -91,7 +88,6 @@ import lsp.shipment.LSPShipment;
 			if (element.getPreviousElement() == null) {
 				return element;
 			}
-
 		}
 		return null;
 	}

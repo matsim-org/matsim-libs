@@ -20,36 +20,52 @@
 
 package lsp.usecase;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
-import lsp.shipment.*;
+import lsp.LogisticsSolutionElement;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentLeg;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-
-import org.matsim.contrib.freight.events.LSPTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
-import lsp.LogisticsSolutionElement;
-import lsp.LSPResource;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
-/*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, LSPTourEndEventHandler {
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+/*package-private*/  class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
+
+//	@Inject Scenario scenario;
+	private final Scenario scenario;
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
 	private final TransshipmentHub transshipmentHub;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
 
-	TranshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub) {
+	/**
+	 * What is a TranshipmentHubTour ??? KMT, Sep 22
+	 *
+	 * @param transshipmentHub
+	 * @param scenario
+	 */
+	TransshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub, Scenario scenario) {
 		this.transshipmentHub = transshipmentHub;
 		this.linkId = transshipmentHub.getEndLinkId();
 		this.resourceId = transshipmentHub.getId();
+		this.scenario = scenario;
 		this.servicesWaitedFor = new HashMap<>();
 	}
 
@@ -59,19 +75,21 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		servicesWaitedFor.clear(); // cleanup after Mobsim ends (instead of doing it in reset() = before Mobsim starts.) kmt oct'22
 	}
 
 	@Override
 	public void reset(int iteration) {
-		servicesWaitedFor.clear();
+		// not implemented; cleanup is done after Mobsim ends, because the internal state is (re)set before Mobsim starts.
+		// --> cleaning up here is too late.
+		// This is maybe not ideal, but works; kmt oct'22
 	}
 
 	public void addShipment(LSPShipment shipment, LogisticsSolutionElement solutionElement) {
 		TransshipmentHubEventHandlerPair pair = new TransshipmentHubEventHandlerPair(shipment, solutionElement);
 
 		for (ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values()) {
-			if (planElement instanceof ShipmentLeg) {
-				ShipmentLeg transport = (ShipmentLeg) planElement;
+			if (planElement instanceof ShipmentLeg transport) {
 				if (transport.getSolutionElement().getNextElement() == solutionElement) {
 					servicesWaitedFor.put(transport.getCarrierService(), pair);
 				}
@@ -80,32 +98,38 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 	}
 
 	@Override
-	public void handleEvent(LSPTourEndEvent event) {
-		if ((event.getTour().getEndLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(event.getTour()))) {
-
-			for (TourElement tourElement : event.getTour().getTourElements()) {
-				if (tourElement instanceof ServiceActivity) {
-					ServiceActivity serviceActivity = (ServiceActivity) tourElement;
-					if (serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
-							&& allServicesAreInOnePoint(event.getTour())
-							&& (event.getTour().getStartLinkId() != transshipmentHub.getStartLinkId())) {
-						logReloadAfterMainRun(serviceActivity.getService(), event);
-					} else {
-						logReloadAfterCollection(serviceActivity.getService(), event);
-					}
-				}
-
+	public void handleEvent(FreightTourEndEvent event) {
+		Tour tour = null;
+		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+		for (ScheduledTour scheduledTour : scheduledTours) {
+			if (scheduledTour.getTour().getId() == event.getTourId()) {
+				tour = scheduledTour.getTour();
+				break;
 			}
 		}
-
-
+		if ((event.getLinkId() == this.linkId)) {
+			assert tour != null;
+			if (shipmentsOfTourEndInPoint(tour)) {
+				for (TourElement tourElement : tour.getTourElements()) {
+					if (tourElement instanceof ServiceActivity serviceActivity) {
+						if (serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
+								&& allServicesAreInOnePoint(tour)
+								&& (tour.getStartLinkId() != transshipmentHub.getStartLinkId())) {
+							logReloadAfterMainRun(serviceActivity.getService(), event);
+						} else {
+							logReloadAfterCollection(serviceActivity.getService(), event, tour);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private boolean shipmentsOfTourEndInPoint(Tour tour) {
 		boolean shipmentsEndInPoint = true;
 		for (TourElement tourElement : tour.getTourElements()) {
-			if (tourElement instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
+			if (tourElement instanceof ServiceActivity serviceActivity) {
 				if (!servicesWaitedFor.containsKey(serviceActivity.getService())) {
 					return false;
 				}
@@ -114,12 +138,12 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		return shipmentsEndInPoint;
 	}
 
-	private void logReloadAfterCollection(CarrierService carrierService, LSPTourEndEvent event) {
+	private void logReloadAfterCollection(CarrierService carrierService, FreightTourEndEvent event, Tour tour) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
 		builder.setResourceId(resourceId);
-		double startTime = event.getTime() + getUnloadEndTime(event.getTour());
+		double startTime = event.getTime() + getUnloadEndTime(tour);
 		builder.setStartTime(startTime);
 		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);
@@ -135,8 +159,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 	private double getUnloadEndTime(Tour tour) {
 		double unloadEndTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity) {
-				Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
+			if (element instanceof ServiceActivity serviceActivity) {
 				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
 			}
 		}
@@ -145,7 +168,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		return unloadEndTime;
 	}
 
-	private void logReloadAfterMainRun(CarrierService carrierService, LSPTourEndEvent event) {
+	private void logReloadAfterMainRun(CarrierService carrierService, FreightTourEndEvent event) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
@@ -165,8 +188,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 
 	private boolean allServicesAreInOnePoint(Tour tour) {
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity) {
-				ServiceActivity activity = (ServiceActivity) element;
+			if (element instanceof ServiceActivity activity) {
 				if (activity.getLocation() != tour.getEndLinkId()) {
 					return false;
 				}

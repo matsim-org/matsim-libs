@@ -29,7 +29,6 @@ import java.util.List;
 
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
-
 	private final List<ShipmentWithTime> shipments;
 
 	WaitingShipmentsImpl() {
@@ -59,4 +58,19 @@ import java.util.List;
 		return shipments;
 	}
 
+	@Override public String toString() {
+		StringBuilder strb = new StringBuilder();
+		strb.append("WaitingShipmentsImpl{")
+				.append("No of Shipments= ").append(shipments.size());
+		if (shipments.size() >0 ){
+			strb.append("; ShipmentIds=");
+			for (ShipmentWithTime shipment : getSortedShipments()) {
+				strb.append("[")
+						.append(shipment.getShipment().getId())
+						.append("]");
+			}
+		}
+		strb.append('}');
+		return strb.toString();
+	}
 }

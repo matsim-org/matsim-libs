@@ -21,12 +21,9 @@
 package example.lsp.lspScoring;
 
 import lsp.*;
-import lsp.LSPModule;
-import lsp.LSPResource;
-import lsp.LSPSimulationTracker;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.*;
+import lsp.usecase.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,8 +33,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -204,8 +201,8 @@ import java.util.*;
 	}
 
 
-	/*package-private*/ static class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, LSPServiceEndEventHandler {
-		
+	/*package-private*/ static class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, FreightServiceEndEventHandler {
+				
 		private static final Logger log = LogManager.getLogger(TipScorer.class);
 
 		private final Random tipRandom;
@@ -224,7 +221,7 @@ import java.util.*;
 			// backpointer not needed here, therefor not memorizing it.  kai, jun'22
 		}
 
-		@Override public void handleEvent( LSPServiceEndEvent event ) {
+		@Override public void handleEvent( FreightServiceEndEvent event ) {
 			double tip = tipRandom.nextDouble() * 5;
 			log.warn("tipSum=" + tipSum + "; tip=" + tip);
 			tipSum += tip;

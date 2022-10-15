@@ -87,4 +87,18 @@ import java.util.Collection;
 		}
 	}
 
+	@Override public String toString() {
+		StringBuilder strb = new StringBuilder();
+			strb.append("[score=" + this.score + "]");
+			for (LogisticsSolution solution : this.solutions) {
+				strb.append(", [solutionId=").append(solution.getId()  + "], [No of SolutionElements=" + solution.getSolutionElements().size()+ "] \n" );
+				if (!solution.getSolutionElements().isEmpty()){
+					for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+						strb.append("\t \t" + solutionElement.toString()).append("\n");
+					}
+				}
+			}
+		return strb.toString();
+	}
+
 }

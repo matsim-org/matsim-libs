@@ -20,11 +20,10 @@
 
 package lsp.shipment;
 
+import lsp.LSPResource;
+import lsp.LogisticsSolutionElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
-import lsp.LogisticsSolutionElement;
-import lsp.LSPResource;
 
 
 /*package*/ class LoggedShipmentHandle implements ShipmentActivity {

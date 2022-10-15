@@ -22,8 +22,6 @@
 package lsp;
 
 import com.google.inject.Provider;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.core.replanning.GenericStrategyManager;
 
 /**

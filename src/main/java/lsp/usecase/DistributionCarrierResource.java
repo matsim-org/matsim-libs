@@ -20,18 +20,17 @@
 
 package lsp.usecase;
 
-import java.util.Collection;
-
+import lsp.LSPCarrierResource;
 import lsp.LSPDataObject;
+import lsp.LSPResource;
+import lsp.LogisticsSolutionElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 
-import lsp.LogisticsSolutionElement;
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
+import java.util.Collection;
 
 /*package-private*/ class DistributionCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 
@@ -42,7 +41,6 @@ import lsp.LSPResource;
 
 	DistributionCarrierResource(UsecaseUtils.DistributionCarrierResourceBuilder builder) {
 		super(builder.id);
-		Id<Link> locationLinkId = builder.locationLinkId;
 		this.distributionHandler = builder.distributionHandler;
 		this.clientElements = builder.clientElements;
 		this.carrier = builder.carrier;
@@ -53,28 +51,24 @@ import lsp.LSPResource;
 	public Id<Link> getStartLinkId() {
 		Id<Link> depotLinkId = null;
 		for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
-			if (depotLinkId == null || depotLinkId == vehicle.getLocation()) {
-				depotLinkId = vehicle.getLocation();
+			if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
+				depotLinkId = vehicle.getLinkId();
 			}
-
 		}
 
 		return depotLinkId;
-
 	}
 
 	@Override
 	public Id<Link> getEndLinkId() {
 		Id<Link> depotLinkId = null;
 		for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
-			if (depotLinkId == null || depotLinkId == vehicle.getLocation()) {
-				depotLinkId = vehicle.getLocation();
+			if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
+				depotLinkId = vehicle.getLinkId();
 			}
-
 		}
 
 		return depotLinkId;
-
 	}
 
 	@Override
@@ -85,7 +79,6 @@ import lsp.LSPResource;
 	@Override
 	public void schedule(int bufferTime) {
 		distributionHandler.scheduleShipments(this, bufferTime);
-
 	}
 
 	public Network getNetwork() {

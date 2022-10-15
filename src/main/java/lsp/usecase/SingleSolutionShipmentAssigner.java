@@ -57,5 +57,4 @@ class SingleSolutionShipmentAssigner implements ShipmentAssigner {
 		singleSolution.assignShipment(shipment);
 	}
 
-
 }

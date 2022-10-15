@@ -21,7 +21,6 @@
 package lspMobsimTests;
 
 import lsp.*;
-import lsp.LSPModule;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -42,6 +41,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -49,7 +49,6 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import static lsp.usecase.UsecaseUtils.*;
 import static org.junit.Assert.*;
@@ -151,8 +150,7 @@ public class CollectionLSPMobsimTest {
 			for (int i = 1; i < 2; i++) {
 				Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 				ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
-				//Random random = new Random(1);
-				int capacityDemand = 1 + new Random().nextInt(4);
+				int capacityDemand = 1 + MatsimRandom.getRandom().nextInt(4);
 				builder.setCapacityDemand(capacityDemand);
 
 				while (true) {

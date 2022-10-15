@@ -21,10 +21,8 @@
 package example.lsp.lspScoring;
 
 import lsp.*;
-import lsp.LSPModule;
-import lsp.shipment.ShipmentUtils;
-import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;

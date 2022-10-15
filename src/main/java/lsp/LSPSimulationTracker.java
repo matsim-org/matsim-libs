@@ -20,7 +20,6 @@
 
 package lsp;
 
-import lsp.HasBackpointer;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 

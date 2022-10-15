@@ -20,12 +20,7 @@
 
 package solutionTests;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
 import lsp.*;
-import lsp.LSPCarrierResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +35,9 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPResource;
+import java.util.ArrayList;
+
+import static org.junit.Assert.*;
 
 public class CollectionSolutionTest {
 

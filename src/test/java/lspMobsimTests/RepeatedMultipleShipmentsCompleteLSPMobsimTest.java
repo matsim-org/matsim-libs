@@ -21,7 +21,6 @@
 package lspMobsimTests;
 
 import lsp.*;
-import lsp.LSPModule;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -39,6 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -46,7 +46,6 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -110,7 +109,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId);
+		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 		LSPResource firstTranshipmentHubResource = firstTransshipmentHubBuilder.build();
 
@@ -164,7 +163,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
 		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId);
+		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario);
 
 		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
 		LSPResource secondTranshipmentHubResource = secondTransshipmentHubBuilder.build();
@@ -245,12 +244,12 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 		//Random rand = new Random(1);
-		int numberOfShipments = new Random().nextInt(50);
+		int numberOfShipments = MatsimRandom.getRandom().nextInt(50);
 
 		for (int i = 1; i < 1 + numberOfShipments; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
-			int capacityDemand = 1 + new Random().nextInt(4);
+			int capacityDemand = 1 + MatsimRandom.getRandom().nextInt(4);
 			builder.setCapacityDemand(capacityDemand);
 
 			while (true) {
@@ -313,7 +312,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 
 	@Test
 	public void testCompleteLSPMobsim() {
-		int numberOfIterations = 1 + new Random().nextInt(10);
+		int numberOfIterations = 1 + MatsimRandom.getRandom().nextInt(10);
 		for (int i = 0; i < numberOfIterations; i++) {
 			initialize();
 			for (LSPShipment shipment : completeLSP.getShipments()) {

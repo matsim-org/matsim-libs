@@ -20,10 +20,10 @@
 
 package lsp.shipment;
 
-import java.util.Map;
-
 import lsp.HasBackpointer;
 import org.matsim.api.core.v01.Id;
+
+import java.util.Map;
 
 public interface ShipmentPlan extends HasBackpointer<LSPShipment> {
 

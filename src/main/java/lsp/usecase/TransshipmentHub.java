@@ -20,15 +20,15 @@
 
 package lsp.usecase;
 
-import java.util.Collection;
-import java.util.List;
-
 import lsp.LSPDataObject;
+import lsp.LSPResource;
+import lsp.LogisticsSolutionElement;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 
-import lsp.LogisticsSolutionElement;
-import lsp.LSPResource;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * {@link LSPResource} bei der die geplanten Tätigkeiten NICHT am Verkehr teilnehmen.
@@ -36,10 +36,10 @@ import lsp.LSPResource;
  * Thus, these activities are entered directly in the Schedule of the LSPShipments that pass through the TranshipmentHub.
  * <p>
  * An entry is added to the schedule of the shipments that is an instance of
- * {@link lsp.shipment.ScheduledShipmentHandle}. There, the name of the Resource
+ * ScheduledShipmentHandle. There, the name of the Resource
  * and the client element are entered, so that the way that the {@link lsp.shipment.LSPShipment}
  * takes is specified. In addition, the planned start and end time of the handling
- * (i.e. crossdocking) of the shipment is entered. In the example, crossdocking
+ * (i.e. cross-docking) of the shipment is entered. In the example, cross-docking
  * starts as soon as the considered LSPShipment arrives at the {@link TransshipmentHub}
  * and ends after a fixed and a size dependent amount of time.
  */
@@ -49,12 +49,12 @@ import lsp.LSPResource;
 	private final TransshipmentHubScheduler transshipmentHubScheduler;
 	private final List<LogisticsSolutionElement> clientElements;
 
-	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder) {
+	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder, Scenario scenario) {
 		super(builder.getId());
 		this.locationLinkId = builder.getLocationLinkId();
 		this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
 		transshipmentHubScheduler.setTranshipmentHub(this);
-		TranshipmentHubTourEndEventHandler eventHandler = new TranshipmentHubTourEndEventHandler(this);
+		TransshipmentHubTourEndEventHandler eventHandler = new TransshipmentHubTourEndEventHandler(this, scenario);
 		transshipmentHubScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
 		this.addSimulationTracker(eventHandler);

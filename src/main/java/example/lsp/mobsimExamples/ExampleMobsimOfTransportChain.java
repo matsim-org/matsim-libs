@@ -21,7 +21,6 @@
 package example.lsp.mobsimExamples;
 
 import lsp.*;
-import lsp.LSPModule;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -48,7 +47,9 @@ import java.util.Random;
 
 /*package-private*/ class ExampleMobsimOfTransportChain {
 
-	private static LSP createInitialLSP(Network network) {
+	private static LSP createInitialLSP(Scenario scenario) {
+
+		Network network = scenario.getNetwork();
 
 		//The Carrier for collection is created
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -94,7 +95,7 @@ import java.util.Random;
 		//The first reloading adapter i.e. the Resource is created
 		Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
-		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId);
+		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
 
 		//The scheduler for the first reloading point is created
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
@@ -157,7 +158,7 @@ import java.util.Random;
 		//The second reloading adapter i.e. the Resource is created       
 		Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
 		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
-		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId);
+		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario);
 
 		//The scheduler for the second reloading point is created
 		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
@@ -311,11 +312,10 @@ import java.util.Random;
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
 
 		//Create LSP and shipments
-		LSP lsp = createInitialLSP(network);
-		Collection<LSPShipment> shipments = createInitialLSPShipments(network);
+		LSP lsp = createInitialLSP(scenario);
+		Collection<LSPShipment> shipments = createInitialLSPShipments(scenario.getNetwork());
 
 		//assign the shipments to the LSP
 		for (LSPShipment shipment : shipments) {
@@ -331,7 +331,7 @@ import java.util.Random;
 		LSPs lsps = new LSPs(lspList);
 		LSPUtils.addLSPs(scenario, lsps);
 
-		Controler controler = new Controler(config);
+		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

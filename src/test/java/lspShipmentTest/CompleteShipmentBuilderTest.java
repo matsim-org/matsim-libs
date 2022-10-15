@@ -20,14 +20,7 @@
 
 package lspShipmentTest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,10 +30,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import lsp.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import static org.junit.Assert.*;
 
 public class CompleteShipmentBuilderTest {
 
@@ -60,7 +57,7 @@ public class CompleteShipmentBuilderTest {
 		for (int i = 1; i < 11; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
-			int capacityDemand = new Random().nextInt(10);
+			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
 
 			while (true) {

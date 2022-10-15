@@ -20,9 +20,9 @@
 
 package solutionElementTests;
 
-import static org.junit.Assert.*;
-
+import lsp.LSPResource;
 import lsp.LSPUtils;
+import lsp.LogisticsSolutionElement;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LogisticsSolutionElement;
-import lsp.LSPResource;
+import static org.junit.Assert.*;
 
 public class MainRunElementTest {
 

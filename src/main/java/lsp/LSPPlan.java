@@ -20,10 +20,10 @@
 
 package lsp;
 
-import java.util.Collection;
-
 import lsp.shipment.LSPShipment;
 import org.matsim.api.core.v01.population.BasicPlan;
+
+import java.util.Collection;
 
 /**
  * This interface has the following properties:<ul>

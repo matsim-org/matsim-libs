@@ -20,16 +20,15 @@
 
 package lsp.shipment;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import lsp.LSPDataObject;
+import lsp.LogisticsSolution;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 
-import lsp.LogisticsSolution;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment {
 

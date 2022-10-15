@@ -20,15 +20,14 @@
 
 package lsp.usecase;
 
-import static org.junit.Assert.*;
-
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
+import static org.junit.Assert.*;
 
 
 public class FirstReloadResourceTest {
@@ -45,7 +44,7 @@ public class FirstReloadResourceTest {
 		schedulerBuilder.setCapacityNeedFixed(10);
 		schedulerBuilder.setCapacityNeedLinear(1);
 
-		transshipmentHub = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("TranshipmentHub1", LSPResource.class), hubLinkId)
+		transshipmentHub = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("TranshipmentHub1", LSPResource.class), hubLinkId, null)
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
 				.build();
 	}

@@ -20,12 +20,12 @@
 
 package example.lsp.lspReplanning;
 
-import java.util.Random;
-
 import lsp.LSP;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 import org.matsim.core.gbl.Gbl;
+
+import java.util.Random;
 
 /*package-private*/ class MaybeTodayAssigner implements ShipmentAssigner {
 

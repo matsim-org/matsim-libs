@@ -20,10 +20,8 @@
 
 package adapterTests;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,8 +37,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
+import java.util.ArrayList;
+
+import static org.junit.Assert.*;
 
 
 public class MainRunResourceTest {
@@ -126,16 +125,16 @@ public class MainRunResourceTest {
 				if (types.size() == 1) {
 					assertSame(types.get(0), mainRunType);
 					assertEquals(30, mainRunType.getCapacity().getOther().intValue());
-					assertEquals(0.0008, mainRunType.getCostInformation().getPerDistanceUnit(), 0.0);
-					assertEquals(0.38, mainRunType.getCostInformation().getPerTimeUnit(), 0.0);
-					assertEquals(120, mainRunType.getCostInformation().getFix(), 0.0);
+					assertEquals(0.0008, mainRunType.getCostInformation().getCostsPerMeter(), 0.0);
+					assertEquals(0.38, mainRunType.getCostInformation().getCostsPerSecond(), 0.0);
+					assertEquals(120, mainRunType.getCostInformation().getFixedCosts(), 0.0);
 					assertEquals((50 / 3.6), mainRunType.getMaximumVelocity(), 0.0);
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
 					assertSame(vehicles.get(0), carrierVehicle);
 					assertSame(carrierVehicle.getType(), mainRunType);
-					assertSame(carrierVehicle.getLocation(), fromLinkId);
+					assertSame(carrierVehicle.getLinkId(), fromLinkId);
 				}
 			}
 		}

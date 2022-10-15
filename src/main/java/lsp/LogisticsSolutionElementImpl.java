@@ -76,4 +76,26 @@ package lsp;
 		return nextElement;
 	}
 
+	@Override public String toString() {
+		StringBuilder strb = new StringBuilder();
+		strb.append("LogisticsSolutionElementImpl{")
+				.append("resourceId=").append(resource.getId())
+				.append(", incomingShipments=").append(incomingShipments)
+				.append(", outgoingShipments=").append(outgoingShipments);
+
+		if (previousElement != null) {
+			strb.append(", previousElementId=").append(previousElement.getId());
+		} else {
+			strb.append(", previousElementId=").append("null");
+		}
+
+		if (nextElement != null) {
+			strb.append(", nextElementId=").append(nextElement.getId());
+		} else {
+			strb.append(", nextElementId=").append("null");
+		}
+
+		strb.append('}');
+		return strb.toString();
+	}
 }

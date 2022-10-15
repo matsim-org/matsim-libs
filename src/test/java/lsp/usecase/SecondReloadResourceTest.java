@@ -20,13 +20,12 @@
 
 package lsp.usecase;
 
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
 
 import static org.junit.Assert.*;
 
@@ -45,7 +44,7 @@ public class SecondReloadResourceTest {
 		Id<LSPResource> reloadingId = Id.create("TranshipmentHub2", LSPResource.class);
 		reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder transshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId);
+		UsecaseUtils.TransshipmentHubBuilder transshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId, null);
 		transshipmentHubBuilder.setTransshipmentHubScheduler(schedulerBuilder.build());
 		transshipmentHub = transshipmentHubBuilder.build();
 

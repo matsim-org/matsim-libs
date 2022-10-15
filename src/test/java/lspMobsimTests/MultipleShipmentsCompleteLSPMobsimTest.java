@@ -21,11 +21,12 @@
 package lspMobsimTests;
 
 import lsp.*;
-import lsp.LSPModule;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -40,6 +41,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -47,11 +49,12 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import static org.junit.Assert.*;
 
 public class MultipleShipmentsCompleteLSPMobsimTest {
+
+	private static final Logger log = LogManager.getLogger(MultipleShipmentsCompleteLSPMobsimTest.class);
 	private LSP completeLSP;
 
 	@Before
@@ -111,7 +114,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId);
+		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 		LSPResource firstTranshipmentHubResource = firstTransshipmentHubBuilder.build();
 
@@ -165,7 +168,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
 		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId);
+		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario);
 
 		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
 		LSPResource secondTranshipmentHubResource = secondTransshipmentHubBuilder.build();
@@ -177,13 +180,13 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 
 		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder dsitributionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
-		dsitributionVehicleTypeBuilder.setCapacity(10);
-		dsitributionVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		dsitributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		dsitributionVehicleTypeBuilder.setFixCost(49);
-		dsitributionVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
+		CarrierVehicleType.Builder distributionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
+		distributionVehicleTypeBuilder.setCapacity(10);
+		distributionVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
+		distributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
+		distributionVehicleTypeBuilder.setFixCost(49);
+		distributionVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
+		org.matsim.vehicles.VehicleType distributionType = distributionVehicleTypeBuilder.build();
 
 		Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
@@ -246,12 +249,12 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 		//Random rand = new Random(1);
-		int numberOfShipments = new Random().nextInt(50);
+		int numberOfShipments = MatsimRandom.getRandom().nextInt(50);
 
 		for (int i = 1; i < 1 + numberOfShipments; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
-			int capacityDemand = 1 + new Random().nextInt(4);
+			int capacityDemand = 1 + MatsimRandom.getRandom().nextInt(4);
 			builder.setCapacityDemand(capacityDemand);
 
 			while (true) {
@@ -306,15 +309,21 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 			}
 		} );
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1 + new Random().nextInt(10));
+		config.controler().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 //		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
+
+		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
+			UsecaseUtils.printResults_shipmentPlan(controler.getControlerIO().getOutputPath(), lsp);
+			UsecaseUtils.printResults_shipmentLog(controler.getControlerIO().getOutputPath(), lsp);
+		}
 	}
 
 	@Test
 	public void testCompleteLSPMobsim() {
 		for (LSPShipment shipment : completeLSP.getShipments()) {
+			log.info("comparing shipment: " + shipment.getId());
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());

@@ -20,39 +20,38 @@
 
 package lsp.usecase;
 
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
-import lsp.shipment.*;
+import lsp.LogisticsSolutionElement;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentLeg;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-
-import org.matsim.contrib.freight.events.LSPTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
-import lsp.LogisticsSolutionElement;
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.handler.EventHandler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-/*package-private*/ class CollectionTourEndEventHandler implements AfterMobsimListener, LSPTourEndEventHandler, LSPSimulationTracker<LSPShipment> {
+/*package-private*/ class CollectionTourEndEventHandler implements AfterMobsimListener, FreightTourEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement solutionElement;
 	private final LSPCarrierResource resource;
-	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
 	private LSPShipment lspShipment;
+	private final Tour tour;
 
-	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
+	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource, Tour tour) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;
 		this.resource = resource;
+		this.tour = tour;
 	}
 
 
@@ -63,20 +62,20 @@ import java.util.Collection;
 	}
 
 	@Override
-	public void handleEvent(LSPTourEndEvent event) {
-		Tour tour = event.getTour();
-		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) element;
-				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
-					logTransport(event, tour);
-					logUnload(event, tour);
+	public void handleEvent(FreightTourEndEvent event) {
+		if (event.getTourId().equals(tour.getId())){
+			for (TourElement element : tour.getTourElements()) {
+				if (element instanceof ServiceActivity serviceActivity) {
+					if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
+						logTransport(event, tour);
+						logUnload(event, tour);
+					}
 				}
 			}
 		}
 	}
 
-	private void logUnload(LSPTourEndEvent event, Tour tour) {
+	private void logUnload(FreightTourEndEvent event, Tour tour) {
 		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setEndTime(event.getTime() + getTotalUnloadingTime(tour));
@@ -89,23 +88,20 @@ import java.util.Collection;
 		lspShipment.getLog().addPlanElement(unloadId, unload);
 	}
 
-	private void logTransport(LSPTourEndEvent event, Tour tour) {
+	private void logTransport(FreightTourEndEvent event, Tour tour) {
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
-		if (abstractPlanElement instanceof ShipmentLeg) {
-			ShipmentLeg transport = (ShipmentLeg) abstractPlanElement;
-			//Auskommentiert, im Rahmen des reducing-public-footprint-Prozesses. Kein Test reagiert drauf. Was "sollte" hier geschehen? KMT(&kai) Jun'20
-//			transport.setEndTime(event.getTime());
-//			transport.setToLinkId(tour.getEndLinkId());
+		if (abstractPlanElement instanceof ShipmentLeg transport) {
+			transport.setEndTime(event.getTime());
+			transport.setToLinkId(tour.getEndLinkId());
 		}
 	}
 
 	private double getTotalUnloadingTime(Tour tour) {
 		double totalTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) element;
+			if (element instanceof ServiceActivity serviceActivity) {
 				totalTime = totalTime + serviceActivity.getDuration();
 			}
 		}

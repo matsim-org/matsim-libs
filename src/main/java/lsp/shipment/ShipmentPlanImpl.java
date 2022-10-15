@@ -20,9 +20,9 @@
 
 package lsp.shipment;
 
-import java.util.*;
-
 import org.matsim.api.core.v01.Id;
+
+import java.util.*;
 
 /*package-private*/ class ShipmentPlanImpl implements ShipmentPlan {
 

@@ -21,22 +21,19 @@
 package example.lsp.simulationTrackers;
 
 import lsp.*;
-import lsp.LSPModule;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
+import lsp.usecase.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import lsp.LSPResource;
-import lsp.shipment.LSPShipment;
-import lsp.LSPSimulationTracker;
-import lsp.usecase.*;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
@@ -71,12 +68,11 @@ public class CollectionTrackerTest {
 	private Carrier carrier;
 	private LogisticsSolution collectionSolution;
 	private double shareOfFixedCosts;
-	private Config config;
 
 	@Before
 	public void initialize() {
 
-		this.config = new Config();
+		Config config = new Config();
 		config.addCoreModules();
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
@@ -131,8 +127,8 @@ public class CollectionTrackerTest {
 		{
 			shareOfFixedCosts = 0.2;
 			LinearCostTracker tracker = new LinearCostTracker(shareOfFixedCosts);
-			tracker.getEventHandlers().add(new TourStartHandler());
-			tracker.getEventHandlers().add(new CollectionServiceHandler());
+			tracker.getEventHandlers().add(new TourStartHandler(scenario));
+			tracker.getEventHandlers().add(new CollectionServiceHandler(scenario));
 			tracker.getEventHandlers().add(new DistanceAndTimeHandler(scenario));
 			// I think that it would be better to use delegation inside LinearCostTracker, i.e. to not expose getEventHandlers(). kai, jun'22
 
@@ -213,7 +209,7 @@ public class CollectionTrackerTest {
 	public void testCollectionTracker() {
 
 		assertEquals(1, collectionSolution.getSimulationTrackers().size());
-		LSPSimulationTracker tracker = collectionSolution.getSimulationTrackers().iterator().next();
+		LSPSimulationTracker<LogisticsSolution> tracker = collectionSolution.getSimulationTrackers().iterator().next();
 		assertTrue(tracker instanceof LinearCostTracker);
 		LinearCostTracker linearTracker = (LinearCostTracker) tracker;
 		double totalScheduledCosts = 0;
@@ -223,28 +219,25 @@ public class CollectionTrackerTest {
 		int totalNumberOfScheduledShipments = 0;
 		int totalNumberOfTrackedShipments = 0;
 		for (EventHandler handler : linearTracker.getEventHandlers()) {
-			if (handler instanceof TourStartHandler) {
-				TourStartHandler startHandler = (TourStartHandler) handler;
+			if (handler instanceof TourStartHandler startHandler) {
 				double scheduledCosts = 0;
 				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-					scheduledCosts += ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getFix();
+					scheduledCosts += ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getFixedCosts();
 					totalScheduledCosts += scheduledCosts;
 				}
 				double trackedCosts = startHandler.getVehicleFixedCosts();
 				totalTrackedCosts += trackedCosts;
 				assertEquals(trackedCosts, scheduledCosts, 0.1);
 			}
-			if (handler instanceof CollectionServiceHandler) {
-				CollectionServiceHandler serviceHandler = (CollectionServiceHandler) handler;
+			if (handler instanceof CollectionServiceHandler serviceHandler) {
 				totalTrackedWeight = serviceHandler.getTotalWeightOfShipments();
 				totalNumberOfTrackedShipments = serviceHandler.getTotalNumberOfShipments();
 				double scheduledCosts = 0;
 				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 					Tour tour = scheduledTour.getTour();
 					for (TourElement element : tour.getTourElements()) {
-						if (element instanceof ServiceActivity) {
-							ServiceActivity activity = (ServiceActivity) element;
-							scheduledCosts += activity.getService().getServiceDuration() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerTimeUnit();
+						if (element instanceof ServiceActivity activity) {
+							scheduledCosts += activity.getService().getServiceDuration() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerSecond();
 							totalScheduledCosts += scheduledCosts;
 							totalScheduledWeight += activity.getService().getCapacityDemand();
 							totalNumberOfScheduledShipments++;
@@ -255,17 +248,15 @@ public class CollectionTrackerTest {
 				totalTrackedCosts += trackedCosts;
 				assertEquals(trackedCosts, scheduledCosts, 0.1);
 			}
-			if (handler instanceof DistanceAndTimeHandler) {
-				DistanceAndTimeHandler distanceHandler = (DistanceAndTimeHandler) handler;
+			if (handler instanceof DistanceAndTimeHandler distanceHandler) {
 				double trackedTimeCosts = distanceHandler.getTimeCosts();
 				totalTrackedCosts += trackedTimeCosts;
 				double scheduledTimeCosts = 0;
 				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 					Tour tour = scheduledTour.getTour();
 					for (TourElement element : tour.getTourElements()) {
-						if (element instanceof Leg) {
-							Leg leg = (Leg) element;
-							scheduledTimeCosts += leg.getExpectedTransportTime() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerTimeUnit();
+						if (element instanceof Leg leg) {
+							scheduledTimeCosts += leg.getExpectedTransportTime() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerSecond();
 						}
 					}
 				}
@@ -276,19 +267,17 @@ public class CollectionTrackerTest {
 				double trackedDistanceCosts = distanceHandler.getDistanceCosts();
 				totalTrackedCosts += trackedDistanceCosts;
 				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-					scheduledDistanceCosts += network.getLinks().get(scheduledTour.getTour().getEndLinkId()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerDistanceUnit();
+					scheduledDistanceCosts += network.getLinks().get(scheduledTour.getTour().getEndLinkId()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerMeter();
 					for (TourElement element : scheduledTour.getTour().getTourElements()) {
 						System.out.println(element);
-						if (element instanceof Leg) {
-							Leg leg = (Leg) element;
+						if (element instanceof Leg leg) {
 							NetworkRoute linkRoute = (NetworkRoute) leg.getRoute();
 							for (Id<Link> linkId : linkRoute.getLinkIds()) {
-								scheduledDistanceCosts += network.getLinks().get(linkId).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerDistanceUnit();
+								scheduledDistanceCosts += network.getLinks().get(linkId).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerMeter();
 							}
 						}
-						if (element instanceof ServiceActivity) {
-							ServiceActivity activity = (ServiceActivity) element;
-							scheduledDistanceCosts += network.getLinks().get(activity.getLocation()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerDistanceUnit();
+						if (element instanceof ServiceActivity activity) {
+							scheduledDistanceCosts += network.getLinks().get(activity.getLocation()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerMeter();
 							// (I think that we need this since the last link is not in the route.  Or is it?  kai, jul'22)
 							// (yy I do not understand why we do not need to do this for the end activity of the tour.)
 						}

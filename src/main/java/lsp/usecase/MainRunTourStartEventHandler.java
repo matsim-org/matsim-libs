@@ -20,68 +20,65 @@
 
 package lsp.usecase;
 
+import lsp.LSPCarrierResource;
 import lsp.LSPSimulationTracker;
-import lsp.shipment.*;
+import lsp.LogisticsSolutionElement;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentLeg;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-
-import org.matsim.contrib.freight.events.LSPTourStartEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPTourStartEventHandler;
-import lsp.LogisticsSolutionElement;
-import lsp.LSPCarrierResource;
+import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.handler.EventHandler;
 
-import java.util.ArrayList;
-import java.util.Collection;
+/*package-private*/ class MainRunTourStartEventHandler implements AfterMobsimListener, FreightTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 
-/*package-private*/ class MainRunTourStartEventHandler implements AfterMobsimListener, LSPTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
-
+	private final Tour tour;
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement solutionElement;
 	private final LSPCarrierResource resource;
-	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
 	private LSPShipment lspShipment;
 
 
-	public MainRunTourStartEventHandler(LSPShipment lspShipment, CarrierService carrierService, LogisticsSolutionElement solutionElement, LSPCarrierResource resource) {
+	public MainRunTourStartEventHandler(LSPShipment lspShipment, CarrierService carrierService, LogisticsSolutionElement solutionElement, LSPCarrierResource resource, Tour tour) {
 		this.lspShipment = lspShipment;
 		this.carrierService = carrierService;
 		this.solutionElement = solutionElement;
 		this.resource = resource;
+		this.tour = tour;
 	}
 
 
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void handleEvent(LSPTourStartEvent event) {
-		for (TourElement tourElement : event.getTour().getTourElements()) {
-			if (tourElement instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
-				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
-					logLoad(event);
-					logTransport(event);
+	public void handleEvent(FreightTourStartEvent event) {
+		if (event.getTourId().equals(tour.getId())) {
+			for (TourElement tourElement : tour.getTourElements()) {
+				if (tourElement instanceof ServiceActivity serviceActivity) {
+					if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
+						logLoad(event, tour);
+						logTransport(event, tour);
+					}
 				}
 			}
 		}
-
 	}
 
-	private void logLoad(LSPTourStartEvent event) {
+	private void logLoad(FreightTourStartEvent event, Tour tour) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
-		builder.setLinkId(event.getTour().getStartLinkId());
-		double startTime = event.getTime() - getCumulatedLoadingTime(event.getTour());
-		builder.setStartTime(startTime);
+		builder.setLinkId(event.getLinkId());
+		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(tour));
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
@@ -94,19 +91,18 @@ import java.util.Collection;
 	private double getCumulatedLoadingTime(Tour tour) {
 		double cumulatedLoadingTime = 0;
 		for (TourElement tourElement : tour.getTourElements()) {
-			if (tourElement instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
+			if (tourElement instanceof ServiceActivity serviceActivity) {
 				cumulatedLoadingTime = cumulatedLoadingTime + serviceActivity.getDuration();
 			}
 		}
 		return cumulatedLoadingTime;
 	}
 
-	private void logTransport(LSPTourStartEvent event) {
+	private void logTransport(FreightTourStartEvent event, Tour tour) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
-		builder.setFromLinkId(event.getTour().getStartLinkId());
-		builder.setToLinkId(event.getTour().getEndLinkId());
+		builder.setFromLinkId(event.getLinkId());
+		builder.setToLinkId(tour.getEndLinkId());
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());

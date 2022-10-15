@@ -20,13 +20,12 @@
 
 package lsp;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-
 import org.matsim.utils.objectattributes.attributable.Attributable;
+
+import java.util.Collection;
 
 /**
  *
@@ -34,10 +33,6 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTrackers<LSPResource>, Attributable {
 
 	Id<Link> getStartLinkId();
-
-//	Class<?> getClassOfResource();
-//	// yyyyyy is it really necessary to use reflection in a code that we fully own?  kai, may'18
-//	//One could also leave this method signature out tm, august'18
 
 	Id<Link> getEndLinkId();
 

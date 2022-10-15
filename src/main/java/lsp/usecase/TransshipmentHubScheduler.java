@@ -20,18 +20,17 @@
 
 package lsp.usecase;
 
-import java.util.ArrayList;
-
+import lsp.LSPResource;
+import lsp.LSPResourceScheduler;
+import lsp.LogisticsSolutionElement;
+import lsp.ShipmentWithTime;
+import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-import lsp.LogisticsSolutionElement;
-import lsp.ShipmentWithTime;
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
-import lsp.shipment.ShipmentPlanElement;
+import java.util.ArrayList;
 
 /*package-private*/ class TransshipmentHubScheduler extends LSPResourceScheduler {
 
@@ -39,7 +38,7 @@ import lsp.shipment.ShipmentPlanElement;
 	private final double capacityNeedLinear;
 	private final double capacityNeedFixed;
 	private TransshipmentHub transshipmentHub;
-	private TranshipmentHubTourEndEventHandler eventHandler;
+	private TransshipmentHubTourEndEventHandler eventHandler;
 
 	TransshipmentHubScheduler(UsecaseUtils.TranshipmentHubSchedulerBuilder builder) {
 		this.shipments = new ArrayList<>();
@@ -49,29 +48,27 @@ import lsp.shipment.ShipmentPlanElement;
 	}
 	
 	@Override protected void initializeValues( LSPResource resource ) {
-//		if(resource.getClass() == TranshipmentHub.class){
 		this.transshipmentHub = (TransshipmentHub) resource;
-//		}
 	}
 	
 	@Override protected void scheduleResource() {
 		for( ShipmentWithTime tupleToBeAssigned: shipments){
-			handleWaitingShipment(tupleToBeAssigned);
+			updateSchedule(tupleToBeAssigned);
 		}
 	}
 
-	@Override @Deprecated //TODO Method has no content, KMT Jul'20
+	@Override @Deprecated
 	protected void updateShipments() {
 		log.error("This method is not implemented. Nothing will happen here. ");
 	}
 
 
-	private void handleWaitingShipment(ShipmentWithTime tupleToBeAssigned) {
-		updateSchedule(tupleToBeAssigned);
-		addShipmentToEventHandler(tupleToBeAssigned);
+	private void updateSchedule(ShipmentWithTime tuple) {
+		addShipmentHandleElement(tuple);
+		addShipmentToEventHandler(tuple);
 	}
 
-	private void updateSchedule(ShipmentWithTime tuple) {
+	private void addShipmentHandleElement(ShipmentWithTime tuple) {
 		ShipmentUtils.ScheduledShipmentHandleBuilder builder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
 		builder.setStartTime(tuple.getTime());
 		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getSize());
@@ -111,7 +108,7 @@ import lsp.shipment.ShipmentPlanElement;
 		this.transshipmentHub = transshipmentHub;
 	}
 
-	public void setEventHandler(TranshipmentHubTourEndEventHandler eventHandler) {
+	public void setEventHandler(TransshipmentHubTourEndEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
 	}
 

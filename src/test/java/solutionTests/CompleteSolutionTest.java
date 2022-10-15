@@ -20,12 +20,11 @@
 
 package solutionTests;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
-import lsp.*;
-import lsp.usecase.*;
+import lsp.LSPResource;
+import lsp.LSPUtils;
+import lsp.LogisticsSolution;
+import lsp.LogisticsSolutionElement;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -40,7 +39,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSPResource;
+import java.util.ArrayList;
+
+import static org.junit.Assert.*;
 
 public class CompleteSolutionTest {
 
@@ -105,7 +106,7 @@ public class CompleteSolutionTest {
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
 
 		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId,
-				firstTransshipmentHub_LinkId);
+				firstTransshipmentHub_LinkId, scenario);
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 
 		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FiretHubElement",
@@ -160,7 +161,7 @@ public class CompleteSolutionTest {
 		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
 
 		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId,
-				secondTransshipmentHub_LinkId);
+				secondTransshipmentHub_LinkId, scenario);
 		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
 
 		Id<LogisticsSolutionElement> secondHubElementId = Id.create("SecondHubElement",
