@@ -144,8 +144,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
             Coord endCoord = endActivity.getCoord();
             double departureTime = startActivity.getEndTime().orElse(0);
 
-            boolean originIsInside = relevantArea.contains(MGC.coord2Point(startCoord));
-            boolean destinationIsInside = relevantArea.contains(MGC.coord2Point(endCoord));
+			boolean originIsInside = relevantArea.contains(MGC.coord2Point(sct.transform(startCoord)));
+			boolean destinationIsInside = relevantArea.contains(MGC.coord2Point(sct.transform(endCoord)));
 
             Activity act0 = populationFactory.createActivityFromCoord("freight_start", null);
             Leg leg = populationFactory.createLeg("freight");
