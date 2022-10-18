@@ -110,15 +110,15 @@ import java.util.Map;
 		}
 		if ((event.getLinkId() == this.linkId)) {
 			assert tour != null;
-			if (shipmentsOfTourEndInPoint(tour)) {
+			if (allShipmentsOfTourEndInOnePoint(tour)) {
 				for (TourElement tourElement : tour.getTourElements()) {
 					if (tourElement instanceof ServiceActivity serviceActivity) {
 						if (serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
 								&& allServicesAreInOnePoint(tour)
 								&& (tour.getStartLinkId() != transshipmentHub.getStartLinkId())) {
-							logReloadAfterMainRun(serviceActivity.getService(), event);
+							logHandlingInHub(serviceActivity.getService(), event.getTime());
 						} else {
-							logReloadAfterCollection(serviceActivity.getService(), event, tour);
+							logHandlingInHub(serviceActivity.getService(), event.getTime() + getUnloadEndTime(tour));
 						}
 					}
 				}
@@ -126,8 +126,8 @@ import java.util.Map;
 		}
 	}
 
-	private boolean shipmentsOfTourEndInPoint(Tour tour) {
-		boolean shipmentsEndInPoint = true;
+	private boolean allShipmentsOfTourEndInOnePoint(Tour tour) {
+		boolean allShipmentsOfTourEndInOnePoint = true;
 		for (TourElement tourElement : tour.getTourElements()) {
 			if (tourElement instanceof ServiceActivity serviceActivity) {
 				if (!servicesWaitedFor.containsKey(serviceActivity.getService())) {
@@ -135,45 +135,14 @@ import java.util.Map;
 				}
 			}
 		}
-		return shipmentsEndInPoint;
+		return allShipmentsOfTourEndInOnePoint;
 	}
 
-	private void logReloadAfterCollection(CarrierService carrierService, FreightTourEndEvent event, Tour tour) {
+	private void logHandlingInHub(CarrierService carrierService, double startTime) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
 		builder.setResourceId(resourceId);
-		double startTime = event.getTime() + getUnloadEndTime(tour);
-		builder.setStartTime(startTime);
-		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
-		builder.setEndTime(startTime + handlingTime);
-		builder.setLogisticsSolutionElement(servicesWaitedFor.get(carrierService).element);
-		ShipmentPlanElement loggedShipmentHandle = builder.build();
-		String idString = loggedShipmentHandle.getResourceId() + "" + loggedShipmentHandle.getSolutionElement().getId() + "" + loggedShipmentHandle.getElementType();
-		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-			lspShipment.getLog().addPlanElement(loadId, loggedShipmentHandle);
-		}
-	}
-
-	private double getUnloadEndTime(Tour tour) {
-		double unloadEndTime = 0;
-		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity serviceActivity) {
-				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
-			}
-		}
-
-
-		return unloadEndTime;
-	}
-
-	private void logReloadAfterMainRun(CarrierService carrierService, FreightTourEndEvent event) {
-		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
-		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
-		builder.setLinkId(linkId);
-		builder.setResourceId(resourceId);
-		double startTime = event.getTime();
 		builder.setStartTime(startTime);
 		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);
@@ -184,6 +153,17 @@ import java.util.Map;
 		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
 			lspShipment.getLog().addPlanElement(loadId, handle);
 		}
+
+	}
+
+	private double getUnloadEndTime(Tour tour) {
+		double unloadEndTime = 0;
+		for (TourElement element : tour.getTourElements()) {
+			if (element instanceof ServiceActivity serviceActivity) {
+				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
+			}
+		}
+		return unloadEndTime;
 	}
 
 	private boolean allServicesAreInOnePoint(Tour tour) {
