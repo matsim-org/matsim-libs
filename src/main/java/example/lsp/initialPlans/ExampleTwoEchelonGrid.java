@@ -24,6 +24,7 @@ import com.google.inject.Provider;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
+import lsp.usecase.TransshipmentHub;
 import lsp.usecase.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -237,6 +238,7 @@ final class ExampleTwoEchelonGrid {
 			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
 					.setTransshipmentHubScheduler(hubScheduler)
 					.build();
+			LSPUtils.setFixedCost(hubResource, 120.); //Set fixed costs (per day) for the availability of the hub.
 
 			LogisticsSolutionElement hubLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("HubLSE", LogisticsSolutionElement.class))
 					.setResource(hubResource)
@@ -367,24 +369,46 @@ final class ExampleTwoEchelonGrid {
 	private static class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
 		private double score = 0;
 
+		private LSP lsp;
+
+		@Override
+		public void reset(int iteration) {
+			score = 0.;
+		}
+
 		@Override
 		public double getScoreForCurrentPlan() {
+			scoreHub();
 			return score;
+		}
+
+		/**
+		 * If a hub resource is in the selected plan of the LSP, it will get scored.
+		 * <p>
+		 * This is somehow a quickfix, because the hubs do **not** have any own events yet.
+		 * This needs to be implemented later
+		 * KMT oct'22
+		 */
+		private void scoreHub() {
+			var lspPlan = lsp.getSelectedPlan();
+			for (LogisticsSolution solution : lspPlan.getSolutions()) {
+				for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+					if (solutionElement.getResource() instanceof TransshipmentHub hub){
+						score = score - LSPUtils.getFixedCost(hub);
+					}
+				}
+			}
 		}
 
 		@Override
 		public void setEmbeddingContainer(LSP pointer) {
+			this.lsp = pointer;
 		}
 
 		@Override
 		public void handleEvent(FreightTourEndEvent event) {
 			score--;
 			// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
-		}
-
-		@Override
-		public void reset(int iteration) {
-			score = 0.;
 		}
 
 		@Override
