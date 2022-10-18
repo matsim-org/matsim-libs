@@ -42,12 +42,23 @@ import java.util.List;
  * (i.e. cross-docking) of the shipment is entered. In the example, cross-docking
  * starts as soon as the considered LSPShipment arrives at the {@link TransshipmentHub}
  * and ends after a fixed and a size dependent amount of time.
+ * <p>
+ * I (KMT, oct'22) have done this temporally public - including a "do not instantiate" constructor , because I need it the class for
+ * an instanceOf check for a quick scoring of hubs. This can be reverted, once hubs will appear in the MATSim events stream.
  */
-/*package-private*/ class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPResource {
+public class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPResource {
 
 	private final Id<Link> locationLinkId;
 	private final TransshipmentHubScheduler transshipmentHubScheduler;
 	private final List<LogisticsSolutionElement> clientElements;
+
+	private TransshipmentHub() { // Do not instantiate. (removable once this class is package-private again) KMT oct'22
+		super(null);
+		this.locationLinkId = null;
+		this.transshipmentHubScheduler = null;
+		this.clientElements = null;
+		throw new RuntimeException("This should have never been called, because it is not planed for getting instantiated.");
+	}
 
 	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder, Scenario scenario) {
 		super(builder.getId());
