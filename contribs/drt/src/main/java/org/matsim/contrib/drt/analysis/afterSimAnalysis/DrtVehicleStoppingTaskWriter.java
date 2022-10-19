@@ -14,6 +14,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -71,15 +72,14 @@ public class DrtVehicleStoppingTaskWriter {
 
 		List<StoppingTaskRecorder.DrtTaskInformation> drtStoppingTaskEntries = stoppingTaskRecorder.getDrtTasksEntries();
 
-		System.out.println("There are " + drtStoppingTaskEntries.size() + " drt stopping tasks in total");
+		log.info("There are " + drtStoppingTaskEntries.size() + " drt stopping tasks in total");
 
 		writeResultIntoCSVFile(drtStoppingTaskEntries, network, stoppingTasksOutputPath);
 	}
 
 	private void writeResultIntoCSVFile(List<StoppingTaskRecorder.DrtTaskInformation> drtStoppingTaskEntries, Network network, String outputFile)
 			throws IOException {
-		System.out.println("Writing CSV File now");
-		FileWriter csvWriter = new FileWriter(outputFile);
+		BufferedWriter csvWriter = new BufferedWriter(new FileWriter(outputFile));
 
 		csvWriter.append("Task_name");
 		csvWriter.append(",");
