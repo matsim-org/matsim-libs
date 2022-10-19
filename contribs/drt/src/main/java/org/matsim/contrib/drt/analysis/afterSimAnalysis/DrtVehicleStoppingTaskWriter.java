@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.util.DrtEventsReaders;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -41,17 +42,9 @@ public class DrtVehicleStoppingTaskWriter {
 		this.stoppingTaskRecorder = new StoppingTaskRecorder();
 	}
 
-	/**
-	 * When non-standard task types are also needed to be recorded, build the writer with this constructor and provide
-	 * corresponding customized StoppingTaskRecorder.
-	 */
-	public DrtVehicleStoppingTaskWriter(Path directory, StoppingTaskRecorder stoppingTaskRecorder) {
-		Path eventsPath = glob(directory, "*output_events*").orElseThrow(() -> new IllegalStateException("No events file found."));
-		Path networkPath = glob(directory, "*output_network*").orElseThrow(() -> new IllegalStateException("No network file found."));
-		this.eventsFile = eventsPath.toString();
-		this.networkFile = networkPath.toString();
-		this.stoppingTasksOutputPath = directory + "/drt-stopping-tasks-XY-plot.csv";
-		this.stoppingTaskRecorder = stoppingTaskRecorder;
+	public DrtVehicleStoppingTaskWriter addingCustomizedTaskToAnalyze(Task.TaskType customizedTaskType) {
+		stoppingTaskRecorder.addExtraTaskTypeToAnalyze(customizedTaskType);
+		return this;
 	}
 
 	public static void main(String[] args) throws IOException {

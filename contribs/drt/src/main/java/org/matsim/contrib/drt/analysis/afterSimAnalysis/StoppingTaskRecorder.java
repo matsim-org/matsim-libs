@@ -10,6 +10,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEventHandler;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
@@ -25,6 +26,7 @@ public class StoppingTaskRecorder implements TaskEndedEventHandler, TaskStartedE
 	Map<Id<DvrpVehicle>, MutableInt> vehicleOccupancyTracker = new HashMap<>();
 	Map<Id<DvrpVehicle>, DrtTaskInformation> startedTasks = new HashMap<>();
 	List<DrtTaskInformation> drtTasksEntries = new ArrayList<>();
+	List<Task.TaskType> extraTaskTypesToAnalyze = new ArrayList<>();
 
 	public static class DrtTaskInformation {
 		private final String taskName;
@@ -71,14 +73,19 @@ public class StoppingTaskRecorder implements TaskEndedEventHandler, TaskStartedE
 		}
 	}
 
+	public void addExtraTaskTypeToAnalyze(Task.TaskType customizedTaskType) {
+		extraTaskTypesToAnalyze.add(customizedTaskType);
+	}
+
 	@Override
 	public void handleEvent(TaskStartedEvent taskStartedEvent) {
 		Id<DvrpVehicle> vehicleId = taskStartedEvent.getDvrpVehicleId();
 		Id<Link> linkId = taskStartedEvent.getLinkId();
 		double time = taskStartedEvent.getTime();
+		Task.TaskType taskType = taskStartedEvent.getTaskType();
 
 		// Stay task
-		if (taskStartedEvent.getTaskType().equals(DrtStayTask.TYPE)) {
+		if (taskType.equals(DrtStayTask.TYPE)) {
 			if (!vehicleOccupancyTracker.containsKey(vehicleId)) {
 				vehicleOccupancyTracker.put(vehicleId, new MutableInt());
 			}
@@ -89,17 +96,22 @@ public class StoppingTaskRecorder implements TaskEndedEventHandler, TaskStartedE
 
 		int occupancy = vehicleOccupancyTracker.get(vehicleId).intValue();
 		// Stop task
-		if (taskStartedEvent.getTaskType().equals(DefaultDrtStopTask.TYPE)) {
+		if (taskType.equals(DefaultDrtStopTask.TYPE)) {
 			startedTasks.put(vehicleId,
 					new DrtTaskInformation(DefaultDrtStopTask.TYPE.name(), linkId, time, vehicleId, occupancy));
 		}
 
+		// Extra task type
+		if (extraTaskTypesToAnalyze.contains(taskType)) {
+			startedTasks.put(vehicleId, new DrtTaskInformation(taskType.name(), linkId, time, vehicleId, occupancy));
+		}
 	}
 
 	@Override
 	public void handleEvent(TaskEndedEvent taskEndedEvent) {
-		if (taskEndedEvent.getTaskType().equals(DefaultDrtStopTask.TYPE) ||
-				taskEndedEvent.getTaskType().equals(DrtStayTask.TYPE)) {
+		Task.TaskType taskType = taskEndedEvent.getTaskType();
+		if (taskType.equals(DefaultDrtStopTask.TYPE) || taskType.equals(DrtStayTask.TYPE) ||
+				extraTaskTypesToAnalyze.contains(taskType)) {
 			Id<DvrpVehicle> vehicleId = taskEndedEvent.getDvrpVehicleId();
 			DrtTaskInformation drtTaskInformation = startedTasks.get(vehicleId);
 			drtTaskInformation.setEndTime(taskEndedEvent.getTime());
@@ -107,7 +119,6 @@ public class StoppingTaskRecorder implements TaskEndedEventHandler, TaskStartedE
 			startedTasks.remove(vehicleId);
 		}
 	}
-
 
 	@Override
 	public void handleEvent(PassengerPickedUpEvent passengerPickedUpEvent) {
