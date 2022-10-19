@@ -31,7 +31,7 @@ public class DrtVehicleStoppingTaskWriter {
 	private final StoppingTaskRecorder stoppingTaskRecorder;
 
 	/**
-	 * Constructor with default StoppingTaskRecorder. Stay task and stop task will be written down.
+	 * Constructor with default StoppingTaskRecorder. Stay task and stop task will be written down. *
 	 */
 	public DrtVehicleStoppingTaskWriter(Path directory) {
 		Path eventsPath = glob(directory, "*output_events*").orElseThrow(() -> new IllegalStateException("No events file found."));
@@ -42,6 +42,10 @@ public class DrtVehicleStoppingTaskWriter {
 		this.stoppingTaskRecorder = new StoppingTaskRecorder();
 	}
 
+	/**
+	 * Use this function to add customized task type to be included in the analysis. The customized task type should *
+	 * also be added to the arguments of the run function (as they are not standard task type)*
+	 */
 	public DrtVehicleStoppingTaskWriter addingCustomizedTaskToAnalyze(Task.TaskType customizedTaskType) {
 		stoppingTaskRecorder.addExtraTaskTypeToAnalyze(customizedTaskType);
 		return this;
@@ -49,8 +53,7 @@ public class DrtVehicleStoppingTaskWriter {
 
 	public static void main(String[] args) throws IOException {
 		// Input in argument: directory of the simulation output
-		DrtVehicleStoppingTaskWriter drtVehicleStoppingTaskWriter = new DrtVehicleStoppingTaskWriter(Path.of(args[0]));
-		drtVehicleStoppingTaskWriter.run();
+		new DrtVehicleStoppingTaskWriter(Path.of(args[0])).run();
 	}
 
 	public void run(DrtTaskType... nonStandardTaskTypes) throws IOException {
@@ -90,7 +93,7 @@ public class DrtVehicleStoppingTaskWriter {
 		csvWriter.append(",");
 		csvWriter.append("Driver_id");
 		csvWriter.append(",");
-		csvWriter.append("Vehicle_occupancy");
+		csvWriter.append("Occupancy_at_task_start");
 		csvWriter.append("\n");
 
 		for (StoppingTaskRecorder.DrtTaskInformation drtStoppingTaskDataEntry : drtStoppingTaskEntries) {
