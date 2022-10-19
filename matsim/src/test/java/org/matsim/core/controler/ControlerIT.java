@@ -54,6 +54,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -100,6 +101,7 @@ public class ControlerIT {
 
 		// need to run the controler to get Scenario initilized
 		controler.getConfig().controler().setLastIteration( 0 );
+		controler.getConfig().controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		controler.run();
 
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
@@ -501,6 +503,7 @@ public class ControlerIT {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setCompressionType( CompressionType.zst );
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		final Controler controler = new Controler(config);
 

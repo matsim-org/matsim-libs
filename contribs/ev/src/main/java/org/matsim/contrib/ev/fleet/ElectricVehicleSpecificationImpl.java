@@ -38,8 +38,8 @@ public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecific
 	public static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
 	public static final String CHARGER_TYPES = "chargerTypes";
 
-	public static void createAndAddVehicleSpecificationsFromMatsimVehicles(ElectricFleetSpecification fleetSpecification,
-			Collection<Vehicle> vehicles) {
+	public static void createAndAddVehicleSpecificationsFromMatsimVehicles(
+			ElectricFleetSpecification fleetSpecification, Collection<Vehicle> vehicles) {
 		vehicles.stream()
 				.filter(vehicle -> EV_ENGINE_HBEFA_TECHNOLOGY.equals(
 						VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())))
@@ -65,11 +65,6 @@ public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecific
 	@Override
 	public Vehicle getMatsimVehicle() {
 		return matsimVehicle;
-	}
-
-	@Override
-	public String getVehicleType() {
-		return matsimVehicle.getType().getId().toString();
 	}
 
 	@Override
