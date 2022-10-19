@@ -78,19 +78,14 @@ public class StoppingTaskRecorder implements TaskEndedEventHandler, TaskStartedE
 
 	@Override
 	public void handleEvent(TaskStartedEvent taskStartedEvent) {
-		Id<DvrpVehicle> vehicleId = taskStartedEvent.getDvrpVehicleId();
-		Id<Link> linkId = taskStartedEvent.getLinkId();
-		double time = taskStartedEvent.getTime();
 		Task.TaskType taskType = taskStartedEvent.getTaskType();
+		if (DrtTaskBaseType.STAY.isBaseTypeOf(taskType) || DrtTaskBaseType.STOP.isBaseTypeOf(taskType) ||
+				extraTaskTypesToAnalyze.contains(taskType)) {
+			Id<DvrpVehicle> vehicleId = taskStartedEvent.getDvrpVehicleId();
+			Id<Link> linkId = taskStartedEvent.getLinkId();
+			double time = taskStartedEvent.getTime();
+			int occupancy = vehicleOccupancyTracker.computeIfAbsent(vehicleId, v -> new MutableInt()).intValue();
 
-		// Stay task and stop task
-		int occupancy = vehicleOccupancyTracker.computeIfAbsent(vehicleId, v -> new MutableInt()).intValue();
-		if (DrtTaskBaseType.STAY.isBaseTypeOf(taskType) || DrtTaskBaseType.STOP.isBaseTypeOf(taskType)) {
-			startedTasks.put(vehicleId, new DrtTaskInformation(taskType.name(), linkId, time, vehicleId, occupancy));
-		}
-
-		// Extra task type
-		if (extraTaskTypesToAnalyze.contains(taskType)) {
 			startedTasks.put(vehicleId, new DrtTaskInformation(taskType.name(), linkId, time, vehicleId, occupancy));
 		}
 	}
