@@ -3,8 +3,7 @@ package org.matsim.contrib.drt.analysis.afterSimAnalysis;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
@@ -84,21 +83,10 @@ public class StoppingTaskRecorder implements TaskEndedEventHandler, TaskStartedE
 		double time = taskStartedEvent.getTime();
 		Task.TaskType taskType = taskStartedEvent.getTaskType();
 
-		// Stay task
-		if (taskType.equals(DrtStayTask.TYPE)) {
-			if (!vehicleOccupancyTracker.containsKey(vehicleId)) {
-				vehicleOccupancyTracker.put(vehicleId, new MutableInt());
-			}
-			assert vehicleOccupancyTracker.get(vehicleId).intValue() == 0;
-			startedTasks.put(vehicleId,
-					new DrtTaskInformation(DrtStayTask.TYPE.name(), linkId, time, vehicleId, 0));
-		}
-
-		int occupancy = vehicleOccupancyTracker.get(vehicleId).intValue();
-		// Stop task
-		if (taskType.equals(DefaultDrtStopTask.TYPE)) {
-			startedTasks.put(vehicleId,
-					new DrtTaskInformation(DefaultDrtStopTask.TYPE.name(), linkId, time, vehicleId, occupancy));
+		// Stay task and stop task
+		int occupancy = vehicleOccupancyTracker.computeIfAbsent(vehicleId, v -> new MutableInt()).intValue();
+		if (DrtTaskBaseType.STAY.isBaseTypeOf(taskType) || DrtTaskBaseType.STOP.isBaseTypeOf(taskType)) {
+			startedTasks.put(vehicleId, new DrtTaskInformation(taskType.name(), linkId, time, vehicleId, occupancy));
 		}
 
 		// Extra task type
@@ -110,7 +98,7 @@ public class StoppingTaskRecorder implements TaskEndedEventHandler, TaskStartedE
 	@Override
 	public void handleEvent(TaskEndedEvent taskEndedEvent) {
 		Task.TaskType taskType = taskEndedEvent.getTaskType();
-		if (taskType.equals(DefaultDrtStopTask.TYPE) || taskType.equals(DrtStayTask.TYPE) ||
+		if (DrtTaskBaseType.STAY.isBaseTypeOf(taskType) || DrtTaskBaseType.STOP.isBaseTypeOf(taskType) ||
 				extraTaskTypesToAnalyze.contains(taskType)) {
 			Id<DvrpVehicle> vehicleId = taskEndedEvent.getDvrpVehicleId();
 			DrtTaskInformation drtTaskInformation = startedTasks.get(vehicleId);
