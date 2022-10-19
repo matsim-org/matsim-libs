@@ -39,8 +39,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
@@ -141,13 +140,14 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		double l_d = DrtLegsAnalyser.getTotalDistance(drtVehicleStats.getVehicleStates()) / (legs.size()
 				* directDistanceMean);
 
+		MinCountAndShareIdleVehiclesOverDay minCountAndShareIdleVehiclesOverDay = getMinCountAndShareIdleVehiclesOverDay();
 		String vehStats = DrtLegsAnalyser.summarizeVehicles(drtVehicleStats.getVehicleStates(), delimiter)
 				+ delimiter
 				+ format.format(l_d)
 				+ delimiter
-				+ getMinShareIdleVehiclesOverDayFormatted()
+				+ format.format(minCountAndShareIdleVehiclesOverDay.minShareIdleVehiclesOverDay)
 				+ delimiter
-				+ getMinCountIdleVehiclesOverDayFormatted();
+				+ format.format(minCountAndShareIdleVehiclesOverDay.minCountIdleVehiclesOverDay);
 		String occStats = DrtLegsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter,
 				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
@@ -205,36 +205,28 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				filename(event, "drt_boardings", ".csv"), filename(event, "drt_alightments", ".csv"), network);
 	}
 
-	private String getMinCountIdleVehiclesOverDayFormatted() {
+	private record MinCountAndShareIdleVehiclesOverDay(double minCountIdleVehiclesOverDay,
+													   double minShareIdleVehiclesOverDay) {
+	}
+
+	private MinCountAndShareIdleVehiclesOverDay getMinCountAndShareIdleVehiclesOverDay() {
 		double minCountIdleVehiclesOverDay = Double.MAX_VALUE;
-		double[] stayTaskProfile = vehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles().get(new DrtTaskType(DrtTaskBaseType.STAY));
+		double minShareIdleVehiclesOverDay = Double.MAX_VALUE;
+		double[] stayTaskProfile = vehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles().get(DrtStayTask.TYPE);
 		double[] numberOfVehiclesInServiceProfile = vehicleOccupancyProfileCalculator.getNumberOfVehiclesInServiceProfile();
 		if (stayTaskProfile != null) {
 			for (int i = 0; i < numberOfVehiclesInServiceProfile.length; i++) {
 				if (numberOfVehiclesInServiceProfile[i] > 0) {
 					// only consider time intervals in which vehicles were in operation. Otherwise, any time period without a vehicle in operation will make for count 0.
 					minCountIdleVehiclesOverDay = Math.min(minCountIdleVehiclesOverDay, stayTaskProfile[i]);
-				}
-			}
-		}
-		return minCountIdleVehiclesOverDay < Double.MAX_VALUE ?
-				format.format(minCountIdleVehiclesOverDay) : notAvailableString;
-	}
-
-	private String getMinShareIdleVehiclesOverDayFormatted() {
-		double minShareIdleVehiclesOverDay = Double.MAX_VALUE;
-		double[] stayTaskProfile = vehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles().get(new DrtTaskType(DrtTaskBaseType.STAY));
-		double[] numberOfVehiclesInServiceProfile = vehicleOccupancyProfileCalculator.getNumberOfVehiclesInServiceProfile();
-		if (stayTaskProfile != null) {
-			for (int i = 0; i < numberOfVehiclesInServiceProfile.length; i++) {
-				if (numberOfVehiclesInServiceProfile[i] > 0) {
-					// only consider time intervals in which vehicles were in operation. Otherwise, any time period without a vehicle in operation will make for share 0.
 					minShareIdleVehiclesOverDay = Math.min(minShareIdleVehiclesOverDay, stayTaskProfile[i] / numberOfVehiclesInServiceProfile[i]);
 				}
 			}
 		}
-		return minShareIdleVehiclesOverDay < Double.MAX_VALUE ?
-				format.format(minShareIdleVehiclesOverDay) : notAvailableString;
+
+		return new MinCountAndShareIdleVehiclesOverDay(
+				minCountIdleVehiclesOverDay < Double.MAX_VALUE ? minCountIdleVehiclesOverDay : Double.NaN,
+				minShareIdleVehiclesOverDay < Double.MAX_VALUE ? minShareIdleVehiclesOverDay : Double.NaN);
 	}
 
 	private String filename(IterationEndsEvent event, String prefix) {
