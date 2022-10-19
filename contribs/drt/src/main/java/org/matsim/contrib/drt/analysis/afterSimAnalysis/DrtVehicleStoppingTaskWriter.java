@@ -27,13 +27,31 @@ public class DrtVehicleStoppingTaskWriter {
 	private final String eventsFile;
 	private final String networkFile;
 	private final String stoppingTasksOutputPath;
+	private final StoppingTaskRecorder stoppingTaskRecorder;
 
+	/**
+	 * Constructor with default StoppingTaskRecorder. Stay task and stop task will be written down.
+	 */
 	public DrtVehicleStoppingTaskWriter(Path directory) {
 		Path eventsPath = glob(directory, "*output_events*").orElseThrow(() -> new IllegalStateException("No events file found."));
 		Path networkPath = glob(directory, "*output_network*").orElseThrow(() -> new IllegalStateException("No network file found."));
 		this.eventsFile = eventsPath.toString();
 		this.networkFile = networkPath.toString();
 		this.stoppingTasksOutputPath = directory + "/drt-stopping-tasks-XY-plot.csv";
+		this.stoppingTaskRecorder = new StoppingTaskRecorder();
+	}
+
+	/**
+	 * When non-standard task types are also needed to be recorded, build the writer with this constructor and provide
+	 * corresponding customized StoppingTaskRecorder.
+	 */
+	public DrtVehicleStoppingTaskWriter(Path directory, StoppingTaskRecorder stoppingTaskRecorder) {
+		Path eventsPath = glob(directory, "*output_events*").orElseThrow(() -> new IllegalStateException("No events file found."));
+		Path networkPath = glob(directory, "*output_network*").orElseThrow(() -> new IllegalStateException("No network file found."));
+		this.eventsFile = eventsPath.toString();
+		this.networkFile = networkPath.toString();
+		this.stoppingTasksOutputPath = directory + "/drt-stopping-tasks-XY-plot.csv";
+		this.stoppingTaskRecorder = stoppingTaskRecorder;
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -46,17 +64,16 @@ public class DrtVehicleStoppingTaskWriter {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		Network network = scenario.getNetwork();
-		StoppingTaskRecorder drtStoppingTaskRecorder = new StoppingTaskRecorder();
 
 		EventsManager eventManager = EventsUtils.createEventsManager();
-		eventManager.addHandler(drtStoppingTaskRecorder);
+		eventManager.addHandler(stoppingTaskRecorder);
 		eventManager.initProcessing();
 
 		MatsimEventsReader matsimEventsReader = DrtEventsReaders.createEventsReader(eventManager, nonStandardTaskTypes);
 		matsimEventsReader.readFile(eventsFile);
 		eventManager.finishProcessing();
 
-		List<StoppingTaskRecorder.DrtTaskInformation> drtStoppingTaskEntries = drtStoppingTaskRecorder.getDrtTasksEntries();
+		List<StoppingTaskRecorder.DrtTaskInformation> drtStoppingTaskEntries = stoppingTaskRecorder.getDrtTasksEntries();
 
 		System.out.println("There are " + drtStoppingTaskEntries.size() + " drt stopping tasks in total");
 
