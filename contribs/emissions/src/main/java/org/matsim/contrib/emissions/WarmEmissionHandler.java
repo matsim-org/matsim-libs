@@ -63,6 +63,9 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private int zeroLinkLengthWarnCnt = 0;
 	private int nonCarWarn = 0;
 	private int noVehWarnCnt = 0;
+	private int trafficLeaveCnt = 0;
+	private int sameLinkTrafficLeaveWarnCnt = 0;
+	private int unusualTrafficLeaveWarnCnt = 0;
 
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> linkEnterMap = new HashMap<>();
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleEntersTrafficMap = new HashMap<>();
@@ -88,6 +91,9 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		linkEnterMap.clear();
 		vehicleEntersTrafficMap.clear();
 		warmEmissionAnalysisModule.reset();
+		trafficLeaveCnt = 0;
+		sameLinkTrafficLeaveWarnCnt = 0;
+		unusualTrafficLeaveWarnCnt = 0;
 	}
 
 	@Override
@@ -96,23 +102,34 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			if( nonCarWarn <=1) {
 				logger.warn("non-car modes are supported, however, not properly tested yet.");
 				logger.warn(Gbl.ONLYONCE);
-				nonCarWarn++;
-			}
+				nonCarWarn++; }
 		}
+		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
+		if ( warnIfZeroLinkLength( link.getId(), link.getLength() ) ) { trafficLeaveCnt++; }
 
 		final double leaveTime = event.getTime();
-		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
 		final Id<Vehicle> vehicleId = event.getVehicleId();
-		double travelTime = leaveTime - this.linkEnterMap.get(vehicleId).getSecond() + 1.0;
-		// this extra second added to travel time is needed because the vehicleLeavesTrafficEvent is thrown one second earlier (by design) ~kn,kmt,rjg 08.22
-		Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-		if (vehicle != null) {
-			emissionsCalculation( vehicleId, vehicle, link, leaveTime, travelTime );
-			this.vehicleEntersTrafficMap.remove( vehicleId );
-			this.linkEnterMap.remove( vehicleId );
-			// clearing these maps "so that no second emission event is computed for travel from parking to link leave" (kn)
+		if ( this.linkEnterMap.containsKey( vehicleId ) ) {
+			double travelTime = leaveTime - this.linkEnterMap.get(vehicleId).getSecond() + 1.0;
+			// this extra second added to travelTime is needed because the vehicleLeavesTrafficEvent
+			// is thrown one second earlier (by design) ~kn,kmt,rjg 08.22
+			Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
+			if (vehicle != null) {
+				emissionsCalculation( vehicleId, vehicle, link, leaveTime, travelTime );
+				this.vehicleEntersTrafficMap.remove( vehicleId );
+				this.linkEnterMap.remove( vehicleId );
+				// clearing these maps so that no second emission event is computed for travel from parking to link leave
+			} else {
+				handleNullVehicle(vehicleId);
+			}
+		} else if ( this.vehicleEntersTrafficMap.containsKey( vehicleId ) ) {
+			logger.warn("At time " + event.getTime() + ", vehicle " + event.getVehicleId() + " enters and leaves traffic without" +
+					"having entered link " + event.getLinkId() + ". Thus, no emissions are calculated for (negligible) travel along this link.");
+			sameLinkTrafficLeaveWarnCnt++;
 		} else {
-			handleNullVehicle(vehicleId);
+			logger.warn("At time " + event.getTime() + ", vehicle " + event.getVehicleId() + " left traffic without entering traffic " +
+					"or any link. Thus, no emissions are calculated for this (unusual) event.");
+			unusualTrafficLeaveWarnCnt++;
 		}
 }
 
@@ -144,7 +161,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		double linkLength = link.getLength();
 		double leaveTime = event.getTime();
 
-		if ( !warnIfZeroLinkLength( linkId, linkLength ) ) { linkLeaveCnt++; }
+		if ( warnIfZeroLinkLength( linkId, linkLength ) ) { linkLeaveCnt++; }
 		// excluding links with zero lengths from leaveCnt. Amit July'17
 
 		if (this.linkEnterMap.containsKey( vehicleId )) {
@@ -174,12 +191,12 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private boolean warnIfZeroLinkLength( Id<Link> linkId, double linkLength) {
 		if (linkLength == 0.) {
 			if (zeroLinkLengthWarnCnt == 0) {
-				logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
+				logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure that this is intentional.");
 				logger.warn(Gbl.ONLYONCE);
 				zeroLinkLengthWarnCnt++;
 			}
-			return true;
-		} else { return false; }
+			return false;
+		} else { return true; }
 	}
 
 	private void handleNullVehicle(Id<Vehicle> vehicleId) {
@@ -207,12 +224,19 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	/*package-private*/ int getLinkLeaveCnt() {
 		return linkLeaveCnt;
 	}
-
 	/*package-private*/ int getLinkLeaveWarnCnt() {
 		return linkLeaveFirstActWarnCnt;
 	}
-
 	/*package-private*/ WarmEmissionAnalysisModule getWarmEmissionAnalysisModule(){
 		return warmEmissionAnalysisModule;
+	}
+	/*package-private*/ int getSameLinkTrafficLeaveWarnCnt() {
+		return sameLinkTrafficLeaveWarnCnt;
+	}
+	/*package-private*/ int getUnusualTrafficLeaveWarnCnt() {
+		return unusualTrafficLeaveWarnCnt;
+	}
+	/*package-private*/ int getTrafficLeaveCnt() {
+		return trafficLeaveCnt;
 	}
 }
