@@ -33,8 +33,7 @@ public interface ElectricVehicleSpecification extends Identifiable<Vehicle> {
 
 	ImmutableList<String> getChargerTypes();
 
-	//FIXME consider renaming to getInitialCharge -- SOC suggest [%] not [J]
-	double getInitialSoc();//[J]
+	double getInitialCharge();//[J]
 
 	double getBatteryCapacity();//[J]
 }

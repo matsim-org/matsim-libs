@@ -25,7 +25,6 @@ import org.assertj.core.data.Percentage;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -82,13 +81,12 @@ public class VariableSpeedChargingTest {
 	private void assertCalcChargingPower(double capacity_kWh, double charge_kWh, double chargerPower_kW,
 			double expectedChargingPower_kW) {
 		// this record is a bit hacky implementation of ElectricVehicleSpecification just meant for tests
-		record TestEvSpecification(Id<Vehicle> getId, Vehicle getMatsimVehicle,
-								   String getVehicleType, ImmutableList<String> getChargerTypes,
-								   double getBatteryCapacity, double getInitialSoc)
-				implements ElectricVehicleSpecification {
+		record TestEvSpecification(Id<Vehicle> getId, Vehicle getMatsimVehicle, String getVehicleType,
+								   ImmutableList<String> getChargerTypes, double getBatteryCapacity,
+								   double getInitialCharge) implements ElectricVehicleSpecification {
 		}
-		var specification = new TestEvSpecification(Id.create("ev_id", Vehicle.class), null,
-				"vt", ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), EvUnits.kWh_to_J(charge_kWh));
+		var specification = new TestEvSpecification(Id.create("ev_id", Vehicle.class), null, "vt",
+				ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), EvUnits.kWh_to_J(charge_kWh));
 
 		var charger = ImmutableChargerSpecification.newBuilder()
 				.id(Id.create("charger_id", Charger.class))

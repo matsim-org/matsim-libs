@@ -133,8 +133,8 @@ public class FastThenSlowChargingTest {
 				.hasMessageStartingWith("End charge greater than battery capacity: ");
 	}
 
-	private void assertCalcChargingTime(double capacity_kWh, double charge_kWh, double energy_kWh, double chargerPower_kW,
-			double expectedChargingTime_s) {
+	private void assertCalcChargingTime(double capacity_kWh, double charge_kWh, double energy_kWh,
+			double chargerPower_kW, double expectedChargingTime_s) {
 		ChargerSpecification charger = createCharger(chargerPower_kW);
 		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, charge_kWh);
 		Assertions.assertThat(((FastThenSlowCharging)electricVehicle.getChargingPower()).calcChargingTime(charger,
@@ -155,7 +155,7 @@ public class FastThenSlowChargingTest {
 		// this record is a bit hacky implementation of ElectricVehicleSpecification just meant for tests
 		record TestEvSpecification(Id<Vehicle> getId, Vehicle getMatsimVehicle, String getVehicleType,
 								   ImmutableList<String> getChargerTypes, double getBatteryCapacity,
-								   double getInitialSoc) implements ElectricVehicleSpecification {
+								   double getInitialCharge) implements ElectricVehicleSpecification {
 		}
 		var specification = new TestEvSpecification(Id.create("ev_id", Vehicle.class), null, "vt",
 				ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), EvUnits.kWh_to_J(charge_kWh));

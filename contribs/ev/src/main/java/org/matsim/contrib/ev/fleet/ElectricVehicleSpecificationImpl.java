@@ -52,7 +52,7 @@ public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecific
 	public ElectricVehicleSpecificationImpl(Vehicle matsimVehicle) {
 		this.matsimVehicle = matsimVehicle;
 		//provided per vehicle type (in engine info)
-		if (getInitialSoc() < 0 || getInitialSoc() > getBatteryCapacity()) {
+		if (getInitialCharge() < 0 || getInitialCharge() > getBatteryCapacity()) {
 			throw new IllegalArgumentException("Invalid initialSoc/batteryCapacity of vehicle: " + getId());
 		}
 	}
@@ -74,7 +74,7 @@ public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecific
 	}
 
 	@Override
-	public double getInitialSoc() {
+	public double getInitialCharge() {
 		return (double)matsimVehicle.getAttributes().getAttribute(INITIAL_ENERGY_kWh) * EvUnits.J_PER_kWh;
 	}
 
