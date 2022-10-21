@@ -197,11 +197,11 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 		return new VehicleData(timer.getTimeOfDay(), eScheduler.getScheduleInquiry(), leastChargedVehicles.stream());
 	}
 
-	// TODO MIN_RELATIVE_SOC should depend on %idle
+	// TODO MIN_SOC should depend on %idle
 	private boolean isChargingSchedulable(EvDvrpVehicle eTaxi, TaxiScheduleInquiry scheduleInquiry,
 			double maxDepartureTime) {
 		Battery b = eTaxi.getElectricVehicle().getBattery();
-		boolean undercharged = b.getCharge() < params.minRelativeSoc * b.getCapacity();
+		boolean undercharged = b.getCharge() < params.minSoc * b.getCapacity();
 		if (!undercharged || !scheduledForCharging.containsKey(eTaxi.getId())) {
 			return false;// not needed or already planned
 		}

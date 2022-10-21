@@ -17,7 +17,7 @@
 			<parameterset type="RuleBasedETaxiOptimizer">
 				<parameterset type="RuleBasedTaxiOptimizer"/>
 
-				<param name="minRelativeSoc" value="0.7"/>
+				<param name="minSoc" value="0.7"/>
 				<param name="socCheckTimeStep" value="60"/>
 			</parameterset>
 		</parameterset>

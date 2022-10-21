@@ -43,11 +43,11 @@ public class FastThenSlowCharging implements BatteryCharging {
 
 	public double calcChargingPower(double maxPower) {
 		Battery b = electricVehicle.getBattery();
-		double relativeSoc = b.getCharge() / b.getCapacity();
+		double soc = b.getCharge() / b.getCapacity();
 		double c = b.getCapacity() / 3600;
-		if (relativeSoc <= 0.5) {
+		if (soc <= 0.5) {
 			return Math.min(maxPower, 1.75 * c);
-		} else if (relativeSoc <= 0.75) {
+		} else if (soc <= 0.75) {
 			return Math.min(maxPower, 1.25 * c);
 		} else {
 			return Math.min(maxPower, 0.5 * c);
@@ -65,31 +65,31 @@ public class FastThenSlowCharging implements BatteryCharging {
 
 		final Battery battery = electricVehicle.getBattery();
 		double maxRemainingEnergy = battery.getCapacity() - battery.getCharge();
-		double relativeSoc = battery.getCharge() / battery.getCapacity();
+		double soc = battery.getCharge() / battery.getCapacity();
 
 		double c = battery.getCapacity() / 3600;
 		double capB = 0.5 * battery.getCapacity();
 		double capC = 0.75 * battery.getCapacity();
 
-		if (relativeSoc <= 0.5 && maxRemainingEnergy > 0) {
+		if (soc <= 0.5 && maxRemainingEnergy > 0) {
 			double diff = capB - battery.getCharge();
 			final double chargingSpeed = Math.min(maxChargingPower, 1.75 * c);
 			double maxTime = diff / chargingSpeed;
 			energyCharged += Math.min(maxTime, remainingTime) * chargingSpeed;
 			remainingTime -= maxTime;
-			relativeSoc = (battery.getCharge() + energyCharged) / battery.getCapacity();
+			soc = (battery.getCharge() + energyCharged) / battery.getCapacity();
 		}
 
-		if (remainingTime > 0 && relativeSoc <= 0.75 && maxRemainingEnergy > energyCharged) {
+		if (remainingTime > 0 && soc <= 0.75 && maxRemainingEnergy > energyCharged) {
 			double diff = capC - (battery.getCharge() + energyCharged);
 			final double chargingSpeed = Math.min(maxChargingPower, 1.25 * c);
 			double maxTime = diff / chargingSpeed;
 			energyCharged += Math.min(maxTime, remainingTime) * chargingSpeed;
 			remainingTime -= maxTime;
-			relativeSoc = (battery.getCharge() + energyCharged) / battery.getCapacity();
+			soc = (battery.getCharge() + energyCharged) / battery.getCapacity();
 		}
 
-		if (remainingTime > 0 && relativeSoc < 1. && maxRemainingEnergy > energyCharged) {
+		if (remainingTime > 0 && soc < 1. && maxRemainingEnergy > energyCharged) {
 			double diff = battery.getCapacity() - (battery.getCharge() + energyCharged);
 			final double chargingSpeed = Math.min(maxChargingPower, 0.5 * c);
 			double maxTime = diff / chargingSpeed;
