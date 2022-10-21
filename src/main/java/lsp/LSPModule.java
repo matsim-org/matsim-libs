@@ -37,6 +37,7 @@ import org.matsim.contrib.freight.controler.CarrierAgentTracker;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.FreightAgentSource;
+import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -102,7 +103,8 @@ public class LSPModule extends AbstractModule {
 		});
 
 		// the scorers are necessary to run a zeroth iteration to the end:
-		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFactoryDummyImpl.class );
+//		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFactoryDummyImpl.class );
+		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFunctionFactoryImpl.class );
 		bind( LSPScorerFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
 
 		// for iterations, one needs to replace the following with something meaningful.  If nothing else, there are "empty implementations" that do nothing.  kai, jul'22

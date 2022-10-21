@@ -354,8 +354,23 @@ final class ExampleTwoEchelonGrid {
 
 		@Override
 		public double getScoreForCurrentPlan() {
+			scoreLspCarriers();
 			scoreHub();
 			return score;
+		}
+
+		private void scoreLspCarriers() {
+			var lspPlan = lsp.getSelectedPlan();
+			for (LogisticsSolution solution : lspPlan.getSolutions()) {
+				for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+					if (solutionElement.getResource() instanceof LSPCarrierResource carrierResource) {
+						var carriersScore = carrierResource.getCarrier().getSelectedPlan().getScore();
+						 if (carriersScore != null) {
+							 score = score + carriersScore;
+						 }
+					}
+				}
+			}
 		}
 
 		/**
