@@ -43,7 +43,7 @@ public class FastThenSlowCharging implements BatteryCharging {
 
 	public double calcChargingPower(double maxPower) {
 		Battery b = electricVehicle.getBattery();
-		double relativeSoc = b.getSoc() / b.getCapacity();
+		double relativeSoc = b.getCharge() / b.getCapacity();
 		double c = b.getCapacity() / 3600;
 		if (relativeSoc <= 0.5) {
 			return Math.min(maxPower, 1.75 * c);
@@ -56,7 +56,7 @@ public class FastThenSlowCharging implements BatteryCharging {
 
 	@Override
 	public double calcEnergyCharged(ChargerSpecification charger, double chargingPeriod) {
-		Preconditions.checkArgument(chargingPeriod  >= 0, "Charging period is negative: %s", chargingPeriod );
+		Preconditions.checkArgument(chargingPeriod >= 0, "Charging period is negative: %s", chargingPeriod);
 
 		double remainingTime = chargingPeriod;
 
@@ -64,33 +64,33 @@ public class FastThenSlowCharging implements BatteryCharging {
 		double energyCharged = 0;
 
 		final Battery battery = electricVehicle.getBattery();
-		double maxRemainingEnergy = battery.getCapacity() - battery.getSoc();
-		double relativeSoc = battery.getSoc() / battery.getCapacity();
+		double maxRemainingEnergy = battery.getCapacity() - battery.getCharge();
+		double relativeSoc = battery.getCharge() / battery.getCapacity();
 
 		double c = battery.getCapacity() / 3600;
 		double capB = 0.5 * battery.getCapacity();
 		double capC = 0.75 * battery.getCapacity();
 
 		if (relativeSoc <= 0.5 && maxRemainingEnergy > 0) {
-			double diff = capB - battery.getSoc();
+			double diff = capB - battery.getCharge();
 			final double chargingSpeed = Math.min(maxChargingPower, 1.75 * c);
 			double maxTime = diff / chargingSpeed;
 			energyCharged += Math.min(maxTime, remainingTime) * chargingSpeed;
 			remainingTime -= maxTime;
-			relativeSoc = (battery.getSoc() + energyCharged) / battery.getCapacity();
+			relativeSoc = (battery.getCharge() + energyCharged) / battery.getCapacity();
 		}
 
 		if (remainingTime > 0 && relativeSoc <= 0.75 && maxRemainingEnergy > energyCharged) {
-			double diff = capC - (battery.getSoc() + energyCharged);
+			double diff = capC - (battery.getCharge() + energyCharged);
 			final double chargingSpeed = Math.min(maxChargingPower, 1.25 * c);
 			double maxTime = diff / chargingSpeed;
 			energyCharged += Math.min(maxTime, remainingTime) * chargingSpeed;
 			remainingTime -= maxTime;
-			relativeSoc = (battery.getSoc() + energyCharged) / battery.getCapacity();
+			relativeSoc = (battery.getCharge() + energyCharged) / battery.getCapacity();
 		}
 
 		if (remainingTime > 0 && relativeSoc < 1. && maxRemainingEnergy > energyCharged) {
-			double diff = battery.getCapacity() - (battery.getSoc() + energyCharged);
+			double diff = battery.getCapacity() - (battery.getCharge() + energyCharged);
 			final double chargingSpeed = Math.min(maxChargingPower, 0.5 * c);
 			double maxTime = diff / chargingSpeed;
 			energyCharged += Math.min(maxTime, remainingTime) * chargingSpeed;
@@ -103,23 +103,23 @@ public class FastThenSlowCharging implements BatteryCharging {
 		Preconditions.checkArgument(energy >= 0, "Energy is negative: %s", energy);
 
 		Battery b = electricVehicle.getBattery();
-		double startSoc = b.getSoc();
-		double endSoc = startSoc + energy;
-		Preconditions.checkArgument(endSoc <= b.getCapacity(), "End SOC greater than battery capacity: %s", endSoc);
+		double startCharge = b.getCharge();
+		double endCharge = startCharge + energy;
+		Preconditions.checkArgument(endCharge <= b.getCapacity(), "End charge greater than battery capacity: %s", endCharge);
 
 		double threshold1 = 0.5 * b.getCapacity();
 		double threshold2 = 0.75 * b.getCapacity();
 		double c = b.getCapacity() / 3600;
 
-		double energyA = startSoc >= threshold1 ? 0 : Math.min(threshold1, endSoc) - startSoc;
+		double energyA = startCharge >= threshold1 ? 0 : Math.min(threshold1, endCharge) - startCharge;
 		double timeA = energyA / Math.min(charger.getPlugPower(), 1.75 * c);
 
-		double energyB = startSoc >= threshold2 || endSoc <= threshold1 ?
+		double energyB = startCharge >= threshold2 || endCharge <= threshold1 ?
 				0 :
-				Math.min(threshold2, endSoc) - Math.max(threshold1, startSoc);
+				Math.min(threshold2, endCharge) - Math.max(threshold1, startCharge);
 		double timeB = energyB / Math.min(charger.getPlugPower(), 1.25 * c);
 
-		double energyC = endSoc <= threshold2 ? 0 : endSoc - Math.max(threshold2, startSoc);
+		double energyC = endCharge <= threshold2 ? 0 : endCharge - Math.max(threshold2, startCharge);
 		double timeC = energyC / Math.min(charger.getPlugPower(), 0.5 * c);
 
 		return timeA + timeB + timeC;

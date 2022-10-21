@@ -192,7 +192,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 		// assumption: all b.capacities are equal
 		List<DvrpVehicle> leastChargedVehicles = PartialSort.kSmallestElements(pData.getSize(),
 				vehiclesBelowMinSocLevel,
-				Comparator.comparingDouble(v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc()));
+				Comparator.comparingDouble(v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getCharge()));
 
 		return new VehicleData(timer.getTimeOfDay(), eScheduler.getScheduleInquiry(), leastChargedVehicles.stream());
 	}
@@ -201,7 +201,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 	private boolean isChargingSchedulable(EvDvrpVehicle eTaxi, TaxiScheduleInquiry scheduleInquiry,
 			double maxDepartureTime) {
 		Battery b = eTaxi.getElectricVehicle().getBattery();
-		boolean undercharged = b.getSoc() < params.minRelativeSoc * b.getCapacity();
+		boolean undercharged = b.getCharge() < params.minRelativeSoc * b.getCapacity();
 		if (!undercharged || !scheduledForCharging.containsKey(eTaxi.getId())) {
 			return false;// not needed or already planned
 		}

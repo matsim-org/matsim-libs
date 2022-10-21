@@ -273,7 +273,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 				do {
 					double newSoC = EVUtils.getInitialEnergy(vehicles.getVehicles().get(ev)) * EvUnits.J_PER_kWh;
-					pseudoVehicle.getBattery().setSoc(newSoC);
+					pseudoVehicle.getBattery().setCharge(newSoC);
 					double capacityThreshold = pseudoVehicle.getBattery().getCapacity()
 							* (configGroup.getCriticalRelativeSOC());
 					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);
@@ -299,7 +299,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							break;
 						} else if (evLegs.get(evLegs.size() - 1).equals(legWithCriticalSOC)
 								&& isHomeChargingTrip(mobsimagent, modifiablePlan, evLegs, pseudoVehicle)
-								&& pseudoVehicle.getBattery().getSoc() > 0) {
+								&& pseudoVehicle.getBattery().getCharge() > 0) {
 							//trip leads to location of the first (ev-leg-preceding-) activity in the plan and there is a charger and so we can charge at home do not search for opportunity charge before
 							//if SoC == 0, we should search for an earlier charge
 
@@ -322,7 +322,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							break;
 
 						} else if (evLegs.get(evLegs.size() - 1).equals(legWithCriticalSOC)
-								&& pseudoVehicle.getBattery().getSoc() > capacityThreshold) {
+								&& pseudoVehicle.getBattery().getCharge() > capacityThreshold) {
 							//critical leg is the last of the day but energy is above the threshold
 							//TODO: plan for the next day! that means, check at least if the first leg can be done!
 							cnt = 0;
@@ -388,7 +388,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 						leg.getMode()).equals(originalVehicleId)) {
 					lastLegWithVehicle = leg;
 					emulateVehicleDischarging(pseudoVehicle, leg);
-					if (pseudoVehicle.getBattery().getSoc() <= capacityThreshold) {
+					if (pseudoVehicle.getBattery().getCharge() <= capacityThreshold) {
 						return leg;
 					}
 				}
@@ -416,7 +416,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							.orElseThrow();
 
 					pseudoVehicle.getBattery()
-							.changeSoc(pseudoVehicle.getChargingPower().calcChargingPower(chargerSpecification)
+							.changeCharge(pseudoVehicle.getChargingPower().calcChargingPower(chargerSpecification)
 									* chargingDuration);
 				}
 			} else
@@ -717,7 +717,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			//			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
 			//					+ auxEnergyConsumption.calcEnergyConsumption(leg.getDepartureTime().seconds(), travelT, l.getId());
 			double consumption = driveConsumption + auxConsumption;
-			ev.getBattery().changeSoc(-consumption);
+			ev.getBattery().changeCharge(-consumption);
 			linkEnterTime += travelT;
 		}
 	}

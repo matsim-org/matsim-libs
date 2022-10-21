@@ -58,7 +58,7 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 
 	// output
 	@Parameter
-	@Comment("If true, SOC time profile plots will be created")
+	@Comment("If true, charge/SoC time profile plots will be created")
 	public boolean timeProfiles = false;
 
 	@Parameter

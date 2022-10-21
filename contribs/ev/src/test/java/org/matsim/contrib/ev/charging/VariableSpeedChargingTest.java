@@ -79,7 +79,7 @@ public class VariableSpeedChargingTest {
 		assertCalcChargingPower(100, 100, 50, 5);
 	}
 
-	private void assertCalcChargingPower(double capacity_kWh, double soc_kWh, double chargerPower_kW,
+	private void assertCalcChargingPower(double capacity_kWh, double charge_kWh, double chargerPower_kW,
 			double expectedChargingPower_kW) {
 		// this record is a bit hacky implementation of ElectricVehicleSpecification just meant for tests
 		record TestEvSpecification(Id<Vehicle> getId, Vehicle getMatsimVehicle,
@@ -88,7 +88,7 @@ public class VariableSpeedChargingTest {
 				implements ElectricVehicleSpecification {
 		}
 		var specification = new TestEvSpecification(Id.create("ev_id", Vehicle.class), null,
-				"vt", ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), EvUnits.kWh_to_J(soc_kWh));
+				"vt", ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), EvUnits.kWh_to_J(charge_kWh));
 
 		var charger = ImmutableChargerSpecification.newBuilder()
 				.id(Id.create("charger_id", Charger.class))

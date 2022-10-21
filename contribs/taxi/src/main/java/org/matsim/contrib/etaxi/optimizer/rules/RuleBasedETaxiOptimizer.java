@@ -94,6 +94,6 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
 	private boolean isUndercharged(EvDvrpVehicle v) {
 		Battery b = v.getElectricVehicle().getBattery();
-		return b.getSoc() < params.minRelativeSoc * b.getCapacity();
+		return b.getCharge() < params.minRelativeSoc * b.getCapacity();
 	}
 }

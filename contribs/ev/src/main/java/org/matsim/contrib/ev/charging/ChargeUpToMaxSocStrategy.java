@@ -42,7 +42,7 @@ public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
 	@Override
 	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
 		Battery battery = ev.getBattery();
-		return maxRelativeSoc * battery.getCapacity() - battery.getSoc();
+		return maxRelativeSoc * battery.getCapacity() - battery.getCharge();
 	}
 
 	@Override

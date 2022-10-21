@@ -100,7 +100,7 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 	@Override
 	public double calcChargingPower(ChargerSpecification charger) {
 		Battery b = electricVehicle.getBattery();
-		double relativeSoc = b.getSoc() / b.getCapacity();
+		double relativeSoc = b.getCharge() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
 
 		if (relativeSoc <= pointB.relativeSoc) {
@@ -120,7 +120,7 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 	//TODO convert to: calcChargingTime(Charger charger, double energy)
 	public double calcRemainingTimeToCharge(Charger charger) {
 		Battery b = electricVehicle.getBattery();
-		double relativeSoc = b.getSoc() / b.getCapacity();
+		double relativeSoc = b.getCharge() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
 		double relativeChargerPower = charger.getPlugPower() / c;
 

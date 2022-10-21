@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.operations.eshifts.fleet.EvShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftStayTask;
 import org.matsim.contrib.drt.extension.operations.eshifts.scheduler.EShiftTaskScheduler;
-import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
@@ -90,7 +89,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 							continue;
 						}
 						final ElectricVehicle electricVehicle = eShiftVehicle.getElectricVehicle();
-						if (electricVehicle.getBattery().getSoc() / electricVehicle.getBattery().getCapacity() < drtShiftParams.chargeAtHubThreshold) {
+						if (electricVehicle.getBattery().getCharge() / electricVehicle.getBattery().getCapacity() < drtShiftParams.chargeAtHubThreshold) {
 							final Task currentTask = eShiftVehicle.getSchedule().getCurrentTask();
 							if (currentTask instanceof EDrtWaitForShiftStayTask
 									&& ((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
