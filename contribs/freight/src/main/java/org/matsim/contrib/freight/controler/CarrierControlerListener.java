@@ -49,9 +49,15 @@ import javax.inject.Inject;
  * to set custom scoring- and replanning-functionalities.
  *
  * @author sschroeder, mzilske
+ *
+ * // not sure if this _should_ be public, but current LSP design makes this necessary.  kai, sep'20
  */
 
-class CarrierControlerListener implements ScoringListener, ReplanningListener {
+public class CarrierControlerListener implements ScoringListener, ReplanningListener {
+	// not sure if this _should_ be public, but current LSP design makes this necessary.
+	// It is done analogue to CarrierAgentTracker. kmt oct'22
+
+
 	private static final Logger log = LogManager.getLogger( CarrierControlerListener.class ) ;
 
 	private final CarrierStrategyManager strategyManager;
