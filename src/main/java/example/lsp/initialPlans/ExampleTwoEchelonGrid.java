@@ -29,10 +29,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
+import org.matsim.contrib.freight.controler.CarrierStrategyManagerImpl;
 import org.matsim.contrib.freight.events.FreightServiceEndEvent;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
@@ -47,6 +53,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.VehicleType;
@@ -112,6 +119,15 @@ final class ExampleTwoEchelonGrid {
 		});
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
+				bind( CarrierScoringFunctionFactory.class ).toInstance( new MyCarrierScorer());
+//				bind (CarrierStrategyManager.class).toInstance(new CarrierStrategyManagerImpl());
+				bind( CarrierStrategyManager.class ).toProvider(() -> {
+					CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+					return strategyManager;
+				});
+
+
 				bind( LSPStrategyManager.class ).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
@@ -341,6 +357,38 @@ final class ExampleTwoEchelonGrid {
 		}
 	}
 
+
+	private static class MyCarrierScorer implements CarrierScoringFunctionFactory {
+
+		@Override public ScoringFunction createScoringFunction(Carrier carrier ){
+
+			return new ScoringFunction(){
+
+				private double score;
+
+				@Override public void handleActivity( Activity activity ){
+					score--;
+				}
+				@Override public void handleLeg( Leg leg ){
+					score = score - 10;
+				}
+				@Override public void agentStuck( double time ){
+				}
+				@Override public void addMoney( double amount ){
+				}
+				@Override public void addScore( double amount ){
+				}
+				@Override public void finish(){
+				}
+				@Override public double getScore(){
+					return score;
+				}
+				@Override public void handleEvent( Event event ){
+					score = score - 0.01;
+				}
+			};
+		}
+	}
 
 	private static class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
 		private double score = 0;
