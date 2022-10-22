@@ -69,7 +69,7 @@ import java.util.List;
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();
 			this.carrier.getPlans().clear();
-			this.carrier.setSelectedPlan(null);
+//			this.carrier.setSelectedPlan(null);
 		}
 	}
 	@Override protected void scheduleResource() {
