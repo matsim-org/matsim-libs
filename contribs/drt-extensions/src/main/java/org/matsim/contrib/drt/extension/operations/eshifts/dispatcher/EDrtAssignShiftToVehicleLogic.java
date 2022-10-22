@@ -49,7 +49,7 @@ public class EDrtAssignShiftToVehicleLogic implements AssignShiftToVehicleLogic 
 		// no, if below battery threshold
 		if (vehicle instanceof EvShiftDvrpVehicle) {
 			final Battery battery = ((EvShiftDvrpVehicle) vehicle).getElectricVehicle().getBattery();
-			if (battery.getSoc() / battery.getCapacity() < drtShiftParams.shiftAssignmentBatteryThreshold) {
+			if (battery.getCharge() / battery.getCapacity() < drtShiftParams.shiftAssignmentBatteryThreshold) {
 				return false;
 			}
 		}

@@ -25,7 +25,7 @@
 					<param name="nearestVehiclesLimit" value="99"/>
 				</parameterset>
 
-				<param name="minRelativeSoc" value="0.5"/>
+				<param name="minSoc" value="0.5"/>
 				<param name="socCheckTimeStep" value="60"/>
 			</parameterset>
 		</parameterset>
