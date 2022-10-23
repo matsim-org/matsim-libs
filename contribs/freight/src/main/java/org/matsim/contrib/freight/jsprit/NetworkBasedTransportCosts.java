@@ -31,6 +31,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -95,7 +96,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private org.matsim.vehicles.VehicleType type;
 
-		private Attributes attributes = new Attributes();
+		private Attributes attributes = new AttributesImpl();
 
 		public MatsimVehicleWrapper(com.graphhopper.jsprit.core.problem.vehicle.Vehicle vehicle) {
 			this.id = Id.create(vehicle.getId(), org.matsim.vehicles.Vehicle.class);

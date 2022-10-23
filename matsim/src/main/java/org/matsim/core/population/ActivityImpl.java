@@ -28,6 +28,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * Some comments:<ul>
@@ -60,7 +61,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private Id<Link> linkId = null;
 	private Id<ActivityFacility> facilityId = null;
 
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	
 	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();

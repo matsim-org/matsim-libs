@@ -64,7 +64,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -460,7 +460,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 		//add leg to charger
 		routedSegment = tripRouter.calcRoute(TransportMode.walk, fromFacility, chargerFacility,
-				now, plan.getPerson(), new Attributes());
+				now, plan.getPerson(), new AttributesImpl());
 		Leg accessLeg = (Leg) routedSegment.get(0);
 		now = timeInterpretation.decideOnElementEndTime(accessLeg, now).seconds();
 
@@ -474,7 +474,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		now = timeInterpretation.decideOnElementEndTime(accessLeg, now).seconds();
 
 		//add leg to destination
-		routedSegment = tripRouter.calcRoute(routingMode, chargerFacility, toFacility, now, plan.getPerson(), new Attributes());
+		routedSegment = tripRouter.calcRoute(routingMode, chargerFacility, toFacility, now, plan.getPerson(), new AttributesImpl());
 		trip.addAll(routedSegment);
 
 		for (PlanElement element : routedSegment) {
@@ -506,7 +506,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		List<PlanElement> trip = new ArrayList<>();
 		//add leg to charger
 		List<? extends PlanElement> routedSegment = tripRouter.calcRoute(routingMode, fromFacility, chargerFacility,
-				timeInterpretation.decideOnActivityEndTimeAlongPlan(actBeforeCharging, plan).seconds(), plan.getPerson(), new Attributes());
+				timeInterpretation.decideOnActivityEndTimeAlongPlan(actBeforeCharging, plan).seconds(), plan.getPerson(), new AttributesImpl());
 
 		//set the vehicle id
 		for (Leg leg : TripStructureUtils.getLegs(routedSegment)) {
@@ -528,7 +528,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		now = timeInterpretation.decideOnActivityEndTime(pluginAct, now).seconds();
 
 		//add walk leg to destination
-		routedSegment = tripRouter.calcRoute(TransportMode.walk, chargerFacility, toFacility, now, plan.getPerson(), new Attributes());
+		routedSegment = tripRouter.calcRoute(TransportMode.walk, chargerFacility, toFacility, now, plan.getPerson(), new AttributesImpl());
 		Leg egress = (Leg) routedSegment.get(0);
 		TripStructureUtils.setRoutingMode(egress, routingMode);
 		trip.add(egress);

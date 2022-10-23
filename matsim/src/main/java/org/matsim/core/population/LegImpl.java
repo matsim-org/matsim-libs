@@ -26,6 +26,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /* deliberately package */  final class LegImpl  implements Leg {
 
@@ -35,7 +36,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private OptionalTime travTime = OptionalTime.undefined();
 	private String mode;
 
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	/* deliberately package */  LegImpl(final String transportMode) {
 		this.mode = transportMode;

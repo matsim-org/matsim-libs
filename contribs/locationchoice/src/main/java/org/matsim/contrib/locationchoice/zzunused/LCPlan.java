@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * Optimized data structure used in the location choice contribution. There, a huge amount of plans are created and
@@ -70,7 +71,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	/*package*/ OptionalTime[] travTimes;
 	/*package*/ String[] modes;
 	
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	@Override
 	public final Attributes getAttributes() {
 		return this.attributes;
