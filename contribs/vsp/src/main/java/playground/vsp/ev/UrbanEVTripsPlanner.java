@@ -214,7 +214,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				Leg legWithCriticalSOC;
 				ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification,
 						driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
-				;
 				//TODO: erase hardcoding of car mode!
 				List<Leg> evCarLegs = TripStructureUtils.getLegs(modifiablePlan)
 						.stream()
@@ -272,10 +271,10 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				}
 
 				do {
-					double newSoC = EVUtils.getInitialEnergy(vehicles.getVehicles().get(ev)) * EvUnits.J_PER_kWh;
-					pseudoVehicle.getBattery().setCharge(newSoC);
+					double newCharge = EVUtils.getInitialEnergy(vehicles.getVehicles().get(ev)) * EvUnits.J_PER_kWh;
+					pseudoVehicle.getBattery().setCharge(newCharge);
 					double capacityThreshold = pseudoVehicle.getBattery().getCapacity()
-							* (configGroup.getCriticalRelativeSOC());
+							* (configGroup.getCriticalSOC());
 					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);
 
 					if (legWithCriticalSOC != null) {
@@ -371,7 +370,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup)config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
 
 		double capacityThreshold = pseudoVehicle.getBattery().getCapacity()
-				* (configGroup.getCriticalRelativeSOC()); //TODO randomize? Might also depend on the battery size!
+				* (configGroup.getCriticalSOC()); //TODO randomize? Might also depend on the battery size!
 
 		Double chargingBegin = null;
 
