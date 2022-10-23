@@ -40,7 +40,7 @@ public final class LazyAllocationAttributes implements Attributes {
 		final Attributes attributes = new AttributesImpl();
 		attributes.putAttribute(attribute, value);
 		this.consumer.accept(attributes);
-		return value;
+		return null;
 	}
 
 	@Override
