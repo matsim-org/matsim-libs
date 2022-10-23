@@ -53,7 +53,7 @@ public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecific
 		this.matsimVehicle = matsimVehicle;
 		//provided per vehicle type (in engine info)
 		if (getInitialCharge() < 0 || getInitialCharge() > getBatteryCapacity()) {
-			throw new IllegalArgumentException("Invalid initialSoc/batteryCapacity of vehicle: " + getId());
+			throw new IllegalArgumentException("Invalid initialCharge or batteryCapacity of vehicle: " + getId());
 		}
 	}
 
