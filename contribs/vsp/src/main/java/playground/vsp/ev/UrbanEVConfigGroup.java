@@ -46,11 +46,11 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
      */
     private int maximumChargingProceduresPerAgent = 3;
 
-    private static final String CRITICAL_RELATIVE_SOC = "criticalRelativeSOC";
+    private static final String CRITICAL_SOC = "criticalSOC";
     /**
-     * agents intend to charge their vehicle prior to the relative SOC falling under the given value
+     * agents intend to charge their vehicle prior to the SOC falling under the given value
      */
-    private double criticalRelativeSOC = 0.2;
+    private double criticalSOC = 0.2;
 
     private static final String MIN_WHILE_CHARGING_ACT_DURATION_s = "minWhileChargingActivityDuration_s";
     /**
@@ -91,14 +91,14 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
         this.maximumChargingProceduresPerAgent = maximumChargingProceduresPerAgent;
     }
 
-    //	@StringGetter(CRITICAL_RELATIVE_SOC)
-    public double getCriticalRelativeSOC() {
-        return criticalRelativeSOC;
+    //	@StringGetter(CRITICAL_SOC)
+    public double getCriticalSOC() {
+        return criticalSOC;
     }
 
-    //	@StringSetter(CRITICAL_RELATIVE_SOC)
-    public void setCriticalRelativeSOC(double criticalRelativeSOC) {
-        this.criticalRelativeSOC = criticalRelativeSOC;
+    //	@StringSetter(CRITICAL_SOC)
+    public void setCriticalSOC(double criticalSOC) {
+        this.criticalSOC = criticalSOC;
     }
 
     //	@StringGetter(MIN_WHILE_CHARGING_ACT_DURATION_s)
