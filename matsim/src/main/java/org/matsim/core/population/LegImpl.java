@@ -26,7 +26,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-import org.matsim.utils.objectattributes.attributable.AttributesImpl;
+import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 /* deliberately package */  final class LegImpl  implements Leg {
 
@@ -36,7 +36,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	private OptionalTime travTime = OptionalTime.undefined();
 	private String mode;
 
-	private final Attributes attributes = new AttributesImpl();
+	private Attributes attributes = null;
 
 	/* deliberately package */  LegImpl(final String transportMode) {
 		this.mode = transportMode;
@@ -119,7 +119,10 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 	@Override
 	public Attributes getAttributes() {
-		return attributes;
+		if (this.attributes != null) {
+			return this.attributes;
+		}
+		return new LazyAllocationAttributes(attributes -> this.attributes = attributes);
 	}
 
 	//	private boolean locked;

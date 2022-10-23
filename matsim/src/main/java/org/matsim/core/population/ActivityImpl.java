@@ -28,7 +28,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-import org.matsim.utils.objectattributes.attributable.AttributesImpl;
+import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 /**
  * Some comments:<ul>
@@ -61,7 +61,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	private Id<Link> linkId = null;
 	private Id<ActivityFacility> facilityId = null;
 
-	private final Attributes attributes = new AttributesImpl();
+	private Attributes attributes = null;
 	
 	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();
@@ -185,7 +185,10 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 	@Override
 	public Attributes getAttributes() {
-		return attributes;
+		if (this.attributes != null) {
+			return this.attributes;
+		}
+		return new LazyAllocationAttributes(attributes -> this.attributes = attributes);
 	}
 
 //	private boolean locked = false ;
