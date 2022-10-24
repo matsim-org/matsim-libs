@@ -40,6 +40,8 @@ public final class PersonUtils {
     private static final String AGE = "age";
     private static final String TRAVEL_CARDS = "travelcards";
     public static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
+    public static final String PERSONAL_SCORING_PREFIX = "scoring_";
+    public static final String PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX = PERSONAL_SCORING_PREFIX + "constant_";
     private final static Logger log = LogManager.getLogger(Person.class);
 
     @Deprecated // use methods of interface Person
