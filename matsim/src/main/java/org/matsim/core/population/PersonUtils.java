@@ -39,7 +39,7 @@ public final class PersonUtils {
     private static final String EMPLOYED = "employed";
     private static final String AGE = "age";
     private static final String TRAVEL_CARDS = "travelcards";
-    private static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
+    public static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
     private final static Logger log = LogManager.getLogger(Person.class);
 
     @Deprecated // use methods of interface Person
@@ -87,6 +87,13 @@ public final class PersonUtils {
      */
     public static Double getIncome(Person person) {
         return (Double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
+    }
+
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static Double getPersonalScoringModeConstant(Person person, String mode) {
+        return (Double) person.getAttributes().getAttribute(PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX + mode);
     }
 
     /**
@@ -174,8 +181,12 @@ public final class PersonUtils {
      * convenience method for often used demographic attribute
      */
     public static void setIncome(Person person, final double income) {
-        person.getCustomAttributes().put(PERSONAL_INCOME_ATTRIBUTE_NAME, income);
+        person.getCustomAttributes().put(PERSONAL_INCOME_ATTRIBUTE_NAME, income); // deprecated, should not be necessary anymore
         person.getAttributes().putAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME, income);
+    }
+
+    public static void setPersonalScoringModeConstant(Person person, final String mode, final double constant) {
+        person.getAttributes().putAttribute(PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX + mode, constant);
     }
 
     @Deprecated // yyyy is there a way to use person.getAttributes instead??  kai, nov'16

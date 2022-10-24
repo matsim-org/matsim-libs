@@ -11,13 +11,12 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
-
-import static playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters.PERSONAL_INCOME_ATTRIBUTE_NAME;
 
 /**
  * this class tests {@link IncomeDependentUtilityOfMoneyPersonScoringParameters}
@@ -49,23 +48,23 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersNoSubpopulation
 
 		{ //fill population
 			Person negativeIncome = factory.createPerson(Id.createPersonId("negativeIncome"));
-			PopulationUtils.putPersonAttribute(negativeIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, -100d);
+			PopulationUtils.putPersonAttribute(negativeIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, -100d);
 			population.addPerson(negativeIncome);
 
 			Person zeroIncome = factory.createPerson(Id.createPersonId("zeroIncome"));
-			PopulationUtils.putPersonAttribute(zeroIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 0d);
+			PopulationUtils.putPersonAttribute(zeroIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 0d);
 			population.addPerson(zeroIncome);
 
 			Person lowIncome = factory.createPerson(Id.createPersonId("lowIncome"));
-			PopulationUtils.putPersonAttribute(lowIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
+			PopulationUtils.putPersonAttribute(lowIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
 			population.addPerson(lowIncome);
 
 			Person mediumIncome = factory.createPerson(Id.createPersonId("mediumIncome"));
-			PopulationUtils.putPersonAttribute(mediumIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 1d);
+			PopulationUtils.putPersonAttribute(mediumIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 1d);
 			population.addPerson(mediumIncome);
 
 			Person highIncome = factory.createPerson(Id.createPersonId("highIncome"));
-			PopulationUtils.putPersonAttribute(highIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 1.5d);
+			PopulationUtils.putPersonAttribute(highIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 1.5d);
 			population.addPerson(highIncome);
 
 		}
