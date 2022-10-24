@@ -69,7 +69,6 @@ import java.util.List;
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();
 			this.carrier.getPlans().clear();
-//			this.carrier.setSelectedPlan(null);
 		}
 	}
 	@Override protected void scheduleResource() {
@@ -126,7 +125,6 @@ import java.util.List;
 			CarrierService carrierService = convertToCarrierService(tuple);
 			tourBuilder.scheduleService(carrierService);
 		}
-
 
 		tourBuilder.addLeg(new Leg());
 		tourBuilder.scheduleEnd(Id.create(resource.getEndLinkId(), Link.class));
@@ -274,7 +272,6 @@ import java.util.List;
 				break;
 			}
 		}
-
 	}
 
 	static class LSPCarrierPair {
@@ -285,6 +282,5 @@ import java.util.List;
 			this.tuple = tuple;
 			this.service = service;
 		}
-
 	}
 }

@@ -69,7 +69,6 @@ import java.util.*;
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();
 			this.carrier.getPlans().clear();
-//			this.carrier.setSelectedPlan(null);
 		}
 	}
 
