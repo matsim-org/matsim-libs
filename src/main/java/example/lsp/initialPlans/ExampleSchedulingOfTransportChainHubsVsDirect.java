@@ -20,7 +20,6 @@
 
 package example.lsp.initialPlans;
 
-import com.google.inject.Provider;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
@@ -34,6 +33,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
+import org.matsim.contrib.freight.controler.CarrierStrategyManagerImpl;
 import org.matsim.contrib.freight.events.FreightServiceEndEvent;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
@@ -44,9 +45,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
@@ -141,17 +140,16 @@ import java.util.*;
 
 //				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
 				// The above means there will be no replanning.  The below needs at least one strategy to be happy.  kai, jul'22
-				bind( LSPStrategyManager.class ).toProvider( new Provider<LSPStrategyManager>(){
-					@Override public LSPStrategyManager get(){
-						LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-						{
-							PlanSelector<LSPPlan, LSP> planSelector = new RandomPlanSelector<>();
-							GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<LSPPlan, LSP>( planSelector );
-							strategyManager.addStrategy( strategy, null, 1. );
-						}
-						return strategyManager;
-					}
-				} );
+				bind( LSPStrategyManager.class ).toProvider(() -> {
+					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1. );
+					return strategyManager;
+				});
+				bind( CarrierStrategyManager.class ).toProvider(() -> {
+					CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
+					return strategyManager;
+				});
 			}
 		} );
 
@@ -170,20 +168,12 @@ import java.util.*;
 
 		Network network = scenario.getNetwork();
 
-		LSPUtils.LSPBuilder lspBuilder = null;
-		switch (solutionType) {
-			case onePlan_withHub:
-				lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("LSPwithReloading", LSP.class));
-				break;
-			case onePlan_direct:
-				lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
-				break;
-			case twoPlans_directAndHub:
-				lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
-				break;
-			default:
-				throw new IllegalStateException("Unexpected value: " + solutionType);
-		}
+		LSPUtils.LSPBuilder lspBuilder = switch (solutionType) {
+			case onePlan_withHub -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPwithReloading", LSP.class));
+			case onePlan_direct -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
+			case twoPlans_directAndHub -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
+			default -> throw new IllegalStateException("Unexpected value: " + solutionType);
+		};
 
 //		lspBuilder.setSolutionScorer(new MyLSPScorer());
 
@@ -352,7 +342,7 @@ import java.util.*;
 		//Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten Vorgänger/Nachfolger bestimmt wurden.
 
 		switch (solutionType) {
-			case onePlan_withHub: {
+			case onePlan_withHub -> {
 				// ### This is the original solution with mainRun - TranshipmentHub - distributionRun
 				log.info("Creating LSP with one plan: reloading at hub");
 
@@ -363,7 +353,7 @@ import java.util.*;
 						.build();
 
 			}
-			case onePlan_direct: {
+			case onePlan_direct -> {
 				// ### This is the new solution with  directDistribution from the Depot.
 				log.info("Creating LSP with one plan: direct distribution from the depot");
 
@@ -374,8 +364,7 @@ import java.util.*;
 						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
 						.build();
 			}
-
-			case twoPlans_directAndHub: {
+			case twoPlans_directAndHub -> {
 				log.info("Creating LSP with two plans: i) direct distribution from the depot ii) reloading at hub");
 
 				log.error("This is totally untested. I can neither say if it will work nor if it will do anything useful - kmt feb22");
@@ -400,8 +389,7 @@ import java.util.*;
 
 				return lsp;
 			}
-			default:
-				throw new IllegalStateException("Unexpected value: " + solutionType);
+			default -> throw new IllegalStateException("Unexpected value: " + solutionType);
 		}
 
 	}
