@@ -20,11 +20,6 @@
 
 package lsp.usecase;
 
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.util.Solutions;
 import lsp.*;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -34,9 +29,6 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -92,8 +84,7 @@ import java.util.*;
 				availiabilityTimeOfLastShipment = tuple.getTime();
 			} else {
 				load = 0;
-				Carrier auxiliaryCarrier = createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime);
-				routeCarrier(auxiliaryCarrier);
+				Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime) , resource.getNetwork());
 				scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
 				cumulatedLoadingTime = 0;
 				shipmentsInCurrentTour.clear();
@@ -105,8 +96,7 @@ import java.util.*;
 		}
 
 		if (!shipmentsInCurrentTour.isEmpty()) {
-			Carrier auxiliaryCarrier = createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime);
-			routeCarrier(auxiliaryCarrier);
+			Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime), resource.getNetwork());
 			scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
 			shipmentsInCurrentTour.clear();
 		}
@@ -156,24 +146,6 @@ import java.util.*;
 		CarrierService service = builder.build();
 		pairs.add(new LSPCarrierPair(tuple, service));
 		return service;
-	}
-
-	private void routeCarrier(Carrier carrier) {
-		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, resource.getNetwork());
-		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(resource.getNetwork(), UsecaseUtils.getVehicleTypeCollection(carrier));
-		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
-		vrpBuilder.setRoutingCost(netbasedTransportcosts);
-		VehicleRoutingProblem vrp = vrpBuilder.build();
-
-		VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(vrp);
-		algorithm.setMaxIterations(1);
-		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-
-		VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
-
-		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
-		NetworkRouter.routePlan(plan, netbasedTransportcosts);
-		carrier.setSelectedPlan(plan);
 	}
 
 	@Override

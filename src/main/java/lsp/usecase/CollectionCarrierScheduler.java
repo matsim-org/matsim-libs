@@ -20,11 +20,6 @@
 
 package lsp.usecase;
 
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.util.Solutions;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
@@ -33,12 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Schedules the {@link CollectionCarrierResource}.
@@ -75,8 +66,7 @@ import java.util.Collection;
 			CarrierService carrierService = convertToCarrierService(tupleToBeAssigned);
 			carrier.getServices().put(carrierService.getId(), carrierService);
 		}
-
-		routeCarrier();
+		carrier = CarrierSchedulerUtils.routeCarrier(carrier, resource.getNetwork());
 	}
 
 	private CarrierService convertToCarrierService(ShipmentWithTime tuple) {
@@ -88,24 +78,6 @@ import java.util.Collection;
 		CarrierService service = builder.build();
 		pairs.add(new LSPCarrierPair(tuple, service));
 		return service;
-	}
-
-	private void routeCarrier() {
-		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, resource.getNetwork());
-		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(resource.getNetwork(), UsecaseUtils.getVehicleTypeCollection(carrier));
-		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
-		vrpBuilder.setRoutingCost(netbasedTransportcosts);
-		VehicleRoutingProblem vrp = vrpBuilder.build();
-
-		VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(vrp);
-		algorithm.setMaxIterations(1);
-		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-
-		VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
-
-		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
-		NetworkRouter.routePlan(plan, netbasedTransportcosts);
-		carrier.setSelectedPlan(plan);
 	}
 
 	@Override
@@ -235,7 +207,6 @@ import java.util.Collection;
 				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
 			}
 		}
-
 		return unloadEndTime;
 	}
 
