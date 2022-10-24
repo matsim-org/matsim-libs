@@ -1,39 +1,24 @@
 package example.lsp.initialPlans;
 
-import lsp.LSP;
-import lsp.LSPScorer;
+import lsp.*;
+import lsp.usecase.TransshipmentHub;
 import org.matsim.contrib.freight.events.FreightServiceEndEvent;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 
 /**
- * Todo: Put in some plausible values ... ->
- * - fixed, time and distance costs for Tours.
- * - time for services (duration)
- * <p>
- * TODO: Wie komme ich beim TourEndEvent an die passenden Daten ran um das vernüftig zu scoren?
- * Was ist mit handling in Hubs? ist das in "Service" mit drinnen??
+ * A scorer for the LSP.
+ * It uses the scores of the
+ * - carriers: Take the carrier's score and add it to the LSP's score
+ * - hubs: currently a very simple fixed costs scoring (see below {@link #scoreHub()})
  *
  * @author Kai Martins-Turner (kturner)
  */
-class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
-	private double score = 0.;
+/*package-private*/ class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
+	private double score = 0;
 
-	@Override
-	public double getScoreForCurrentPlan() {
-		return score;
-	}
-
-	@Override
-	public void setEmbeddingContainer(LSP pointer) {
-	}
-
-	@Override
-	public void handleEvent(FreightTourEndEvent event) {
-		score++;
-		// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
-	}
+	private LSP lsp;
 
 	@Override
 	public void reset(int iteration) {
@@ -41,8 +26,58 @@ class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServi
 	}
 
 	@Override
+	public double getScoreForCurrentPlan() {
+		scoreLspCarriers();
+		scoreHub();
+		return score;
+	}
+
+	private void scoreLspCarriers() {
+		var lspPlan = lsp.getSelectedPlan();
+		for (LogisticsSolution solution : lspPlan.getSolutions()) {
+			for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+				if (solutionElement.getResource() instanceof LSPCarrierResource carrierResource) {
+					var carriersScore = carrierResource.getCarrier().getSelectedPlan().getScore();
+					if (carriersScore != null) {
+						score = score + carriersScore;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * If a hub resource is in the selected plan of the LSP, it will get scored.
+	 * <p>
+	 * This is somehow a quickfix, because the hubs do **not** have any own events yet.
+	 * This needs to be implemented later
+	 * KMT oct'22
+	 */
+	private void scoreHub() {
+		var lspPlan = lsp.getSelectedPlan();
+		for (LogisticsSolution solution : lspPlan.getSolutions()) {
+			for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+				if (solutionElement.getResource() instanceof TransshipmentHub hub){
+					score = score - LSPUtils.getFixedCost(hub);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void setEmbeddingContainer(LSP pointer) {
+		this.lsp = pointer;
+	}
+
+	@Override
+	public void handleEvent(FreightTourEndEvent event) {
+		score--;
+		// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
+	}
+
+	@Override
 	public void handleEvent(FreightServiceEndEvent event) {
-		score = score + 0.1;
-		// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
+		score--;
+		// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
 	}
 }

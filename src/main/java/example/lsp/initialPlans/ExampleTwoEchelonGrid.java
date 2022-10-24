@@ -23,26 +23,18 @@ package example.lsp.initialPlans;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.TransshipmentHub;
 import lsp.usecase.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.CarrierStrategyManagerImpl;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -53,7 +45,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.VehicleType;
@@ -120,14 +111,11 @@ final class ExampleTwoEchelonGrid {
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				bind( CarrierScoringFunctionFactory.class ).toInstance( new MyCarrierScorer());
-//				bind (CarrierStrategyManager.class).toInstance(new CarrierStrategyManagerImpl());
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
 					CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
-
-
 				bind( LSPStrategyManager.class ).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
@@ -358,102 +346,34 @@ final class ExampleTwoEchelonGrid {
 	}
 
 
-	private static class MyCarrierScorer implements CarrierScoringFunctionFactory {
+	//		@Override public ScoringFunction createScoringFunction(Carrier carrier ){
+//
+//			return new ScoringFunction(){
+//
+//				private double score;
+//
+//				@Override public void handleActivity( Activity activity ){
+//					score--;
+//				}
+//				@Override public void handleLeg( Leg leg ){
+//					score = score - 10;
+//				}
+//				@Override public void agentStuck( double time ){
+//				}
+//				@Override public void addMoney( double amount ){
+//				}
+//				@Override public void addScore( double amount ){
+//				}
+//				@Override public void finish(){
+//				}
+//				@Override public double getScore(){
+//					return score;
+//				}
+//				@Override public void handleEvent( Event event ){
+//					score = score - 0.01;
+//				}
+//			};
+//		}
+//	}
 
-		@Override public ScoringFunction createScoringFunction(Carrier carrier ){
-
-			return new ScoringFunction(){
-
-				private double score;
-
-				@Override public void handleActivity( Activity activity ){
-					score--;
-				}
-				@Override public void handleLeg( Leg leg ){
-					score = score - 10;
-				}
-				@Override public void agentStuck( double time ){
-				}
-				@Override public void addMoney( double amount ){
-				}
-				@Override public void addScore( double amount ){
-				}
-				@Override public void finish(){
-				}
-				@Override public double getScore(){
-					return score;
-				}
-				@Override public void handleEvent( Event event ){
-					score = score - 0.01;
-				}
-			};
-		}
-	}
-
-	private static class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
-		private double score = 0;
-
-		private LSP lsp;
-
-		@Override
-		public void reset(int iteration) {
-			score = 0.;
-		}
-
-		@Override
-		public double getScoreForCurrentPlan() {
-			scoreLspCarriers();
-			scoreHub();
-			return score;
-		}
-
-		private void scoreLspCarriers() {
-			var lspPlan = lsp.getSelectedPlan();
-			for (LogisticsSolution solution : lspPlan.getSolutions()) {
-				for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
-					if (solutionElement.getResource() instanceof LSPCarrierResource carrierResource) {
-						var carriersScore = carrierResource.getCarrier().getSelectedPlan().getScore();
-						 if (carriersScore != null) {
-							 score = score + carriersScore;
-						 }
-					}
-				}
-			}
-		}
-
-		/**
-		 * If a hub resource is in the selected plan of the LSP, it will get scored.
-		 * <p>
-		 * This is somehow a quickfix, because the hubs do **not** have any own events yet.
-		 * This needs to be implemented later
-		 * KMT oct'22
-		 */
-		private void scoreHub() {
-			var lspPlan = lsp.getSelectedPlan();
-			for (LogisticsSolution solution : lspPlan.getSolutions()) {
-				for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
-					if (solutionElement.getResource() instanceof TransshipmentHub hub){
-						score = score - LSPUtils.getFixedCost(hub);
-					}
-				}
-			}
-		}
-
-		@Override
-		public void setEmbeddingContainer(LSP pointer) {
-			this.lsp = pointer;
-		}
-
-		@Override
-		public void handleEvent(FreightTourEndEvent event) {
-			score--;
-			// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
-		}
-
-		@Override
-		public void handleEvent(FreightServiceEndEvent event) {
-			score--;
-			// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
-		}
-	}
 }
