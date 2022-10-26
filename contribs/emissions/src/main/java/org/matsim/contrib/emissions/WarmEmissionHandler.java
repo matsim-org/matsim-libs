@@ -105,7 +105,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				nonCarWarn++; }
 		}
 		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-		if ( warnIfZeroLinkLength( link.getId(), link.getLength() ) ) { trafficLeaveCnt++; }
+		if ( linkLengthIsZero( link.getId(), link.getLength() ) ) { trafficLeaveCnt++; }
 
 		final double leaveTime = event.getTime();
 		final Id<Vehicle> vehicleId = event.getVehicleId();
@@ -124,11 +124,11 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			}
 		} else if ( this.vehicleEntersTrafficMap.containsKey( vehicleId ) ) {
 			logger.warn("At time " + event.getTime() + ", vehicle " + event.getVehicleId() + " enters and leaves traffic without" +
-					"having entered link " + event.getLinkId() + ". Thus, no emissions are calculated for (negligible) travel along this link.");
+					" having entered link " + event.getLinkId() + ". Thus, no emissions are calculated for travel along this link.");
 			sameLinkTrafficLeaveWarnCnt++;
 		} else {
 			logger.warn("At time " + event.getTime() + ", vehicle " + event.getVehicleId() + " left traffic without entering traffic " +
-					"or any link. Thus, no emissions are calculated for this (unusual) event.");
+					"or ANY link. Thus, no emissions are calculated for this unusual event.");
 			unusualTrafficLeaveWarnCnt++;
 		}
 }
@@ -161,7 +161,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		double linkLength = link.getLength();
 		double leaveTime = event.getTime();
 
-		if ( warnIfZeroLinkLength( linkId, linkLength ) ) { linkLeaveCnt++; }
+		if ( !linkLengthIsZero( linkId, linkLength ) ) { linkLeaveCnt++; }
 		// excluding links with zero lengths from leaveCnt. Amit July'17
 
 		if (this.linkEnterMap.containsKey( vehicleId )) {
@@ -188,15 +188,15 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, link.getId(), vehicleId, warmEmissions);
 	}
 
-	private boolean warnIfZeroLinkLength( Id<Link> linkId, double linkLength) {
+	private boolean linkLengthIsZero( Id<Link> linkId, double linkLength) {
 		if (linkLength == 0.) {
 			if (zeroLinkLengthWarnCnt == 0) {
 				logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure that this is intentional.");
 				logger.warn(Gbl.ONLYONCE);
 				zeroLinkLengthWarnCnt++;
 			}
-			return false;
-		} else { return true; }
+			return true;
+		} else { return false; }
 	}
 
 	private void handleNullVehicle(Id<Vehicle> vehicleId) {
