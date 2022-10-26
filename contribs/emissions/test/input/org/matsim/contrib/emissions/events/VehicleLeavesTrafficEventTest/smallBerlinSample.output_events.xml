@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<events version="1.0">
+	<event time="27147.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="home_56400.0"  />
+	<event time="27147.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="non_network_walk"  />
+	<event time="27561.0" type="travelled" person="A_onlyEntersAndLeftTrafficAtSameLink" distance="566.9662769046978"  />
+	<event time="27561.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="non_network_walk"  />
+	<event time="27561.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="car interaction"  />
+	<event time="27561.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="car interaction"  />
+	<event time="27561.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="car"  />
+	<event time="27561.0" type="PersonEntersVehicle" person="A_onlyEntersAndLeftTrafficAtSameLink" vehicle="A_onlyEntersAndLeftTrafficAtSameLink"  />
+	<event time="27562.0" type="vehicle enters traffic" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" vehicle="A_onlyEntersAndLeftTrafficAtSameLink" networkMode="car" relativePosition="1.0"  />
+	<event time="27562.0" type="vehicle leaves traffic" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" vehicle="A_onlyEntersAndLeftTrafficAtSameLink" networkMode="car" relativePosition="1.0"  />
+	<event time="27562.0" type="PersonLeavesVehicle" person="A_onlyEntersAndLeftTrafficAtSameLink" vehicle="A_onlyEntersAndLeftTrafficAtSameLink"  />
+	<event time="27562.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="car"  />
+	<event time="27562.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="car interaction"  />
+	<event time="27562.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="car interaction"  />
+	<event time="27562.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="non_network_walk"  />
+	<event time="28318.0" type="travelled" person="A_onlyEntersAndLeftTrafficAtSameLink" distance="1036.3842617104708"  />
+	<event time="28318.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="non_network_walk"  />
+	<event time="28318.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="work_3600.0"  />
+	<event time="31403.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="work_3600.0"  />
+	<event time="31403.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="bicycle"  />
+	<event time="32277.0" type="travelled" person="A_onlyEntersAndLeftTrafficAtSameLink" distance="2744.077377934469"  />
+	<event time="32277.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="83162" legMode="bicycle"  />
+	<event time="32277.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="83162" actType="leisure_600.0"  />
+	<event time="32277.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="83162" actType="leisure_600.0"  />
+	<event time="32277.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="83162" legMode="bicycle"  />
+	<event time="33553.0" type="travelled" person="A_onlyEntersAndLeftTrafficAtSameLink" distance="4007.820053799418"  />
+	<event time="33553.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="bicycle"  />
+	<event time="33553.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="work_31200.0"  />
+	<event time="64602.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="work_31200.0"  />
+	<event time="64602.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="non_network_walk"  />
+	<event time="65066.0" type="travelled" person="A_onlyEntersAndLeftTrafficAtSameLink" distance="636.3874474395539"  />
+	<event time="65066.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="non_network_walk"  />
+	<event time="65066.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="car interaction"  />
+	<event time="65066.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="car interaction"  />
+	<event time="65066.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="car"  />
+	<event time="65066.0" type="PersonEntersVehicle" person="A_onlyEntersAndLeftTrafficAtSameLink" vehicle="A_onlyEntersAndLeftTrafficAtSameLink"  />
+	<event time="65067.0" type="vehicle enters traffic" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" vehicle="A_onlyEntersAndLeftTrafficAtSameLink" networkMode="car" relativePosition="1.0"  />
+	<event time="65889.0" type="vehicle leaves traffic" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" vehicle="A_onlyEntersAndLeftTrafficAtSameLink" networkMode="car" relativePosition="1.0"  />
+	<event time="65889.0" type="PersonLeavesVehicle" person="A_onlyEntersAndLeftTrafficAtSameLink" vehicle="A_onlyEntersAndLeftTrafficAtSameLink"  />
+	<event time="65889.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" legMode="car"  />
+	<event time="65889.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" actType="car interaction"  />
+	<event time="65889.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" actType="car interaction"  />
+	<event time="65889.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" legMode="non_network_walk"  />
+	<event time="66289.0" type="travelled" person="A_onlyEntersAndLeftTrafficAtSameLink" distance="548.7888965445449"  />
+	<event time="66289.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" legMode="non_network_walk"  />
+	<event time="66289.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" actType="leisure_1200.0"  />
+	<event time="67249.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" actType="leisure_1200.0"  />
+	<event time="67249.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" legMode="non_network_walk"  />
+	<event time="67649.0" type="travelled" person="A_onlyEntersAndLeftTrafficAtSameLink" distance="548.7888965445449"  />
+	<event time="67649.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" legMode="non_network_walk"  />
+	<event time="67649.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" actType="car interaction"  />
+	<event time="67649.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" actType="car interaction"  />
+	<event time="67649.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" legMode="car"  />
+	<event time="67649.0" type="PersonEntersVehicle" person="A_onlyEntersAndLeftTrafficAtSameLink" vehicle="A_onlyEntersAndLeftTrafficAtSameLink"  />
+	<event time="67650.0" type="vehicle enters traffic" person="A_onlyEntersAndLeftTrafficAtSameLink" link="122224" vehicle="A_onlyEntersAndLeftTrafficAtSameLink" networkMode="car" relativePosition="1.0"  />
+	<event time="68484.0" type="vehicle leaves traffic" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" vehicle="A_onlyEntersAndLeftTrafficAtSameLink" networkMode="car" relativePosition="1.0"  />
+	<event time="68484.0" type="PersonLeavesVehicle" person="A_onlyEntersAndLeftTrafficAtSameLink" vehicle="A_onlyEntersAndLeftTrafficAtSameLink"  />
+	<event time="68484.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="car"  />
+	<event time="68484.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="car interaction"  />
+	<event time="68484.0" type="actend" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="car interaction"  />
+	<event time="68484.0" type="departure" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="non_network_walk"  />
+	<event time="68898.0" type="travelled" person="A_onlyEntersAndLeftTrafficAtSameLink" distance="566.9662769046978"  />
+	<event time="68898.0" type="arrival" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" legMode="non_network_walk"  />
+	<event time="68898.0" type="actstart" person="A_onlyEntersAndLeftTrafficAtSameLink" link="115016" actType="home_56400.0"  />
+	<event time="30960.0" type="actend" person="B_enteredLinkEarlier" link="96959" actType="home_53400.0"  />
+	<event time="30960.0" type="departure" person="B_enteredLinkEarlier" link="96959" legMode="non_network_walk"  />
+	<event time="31633.0" type="travelled" person="B_enteredLinkEarlier" distance="923.2224047831531"  />
+	<event time="31633.0" type="arrival" person="B_enteredLinkEarlier" link="96959" legMode="non_network_walk"  />
+	<event time="31633.0" type="actstart" person="B_enteredLinkEarlier" link="96959" actType="car interaction"  />
+	<event time="31633.0" type="actend" person="B_enteredLinkEarlier" link="96959" actType="car interaction"  />
+	<event time="31633.0" type="departure" person="B_enteredLinkEarlier" link="96959" legMode="car"  />
+	<event time="31633.0" type="PersonEntersVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="31634.0" type="vehicle enters traffic" person="B_enteredLinkEarlier" link="96959" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="31665.0" type="vehicle leaves traffic" person="B_enteredLinkEarlier" link="96963" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="31665.0" type="PersonLeavesVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="31665.0" type="arrival" person="B_enteredLinkEarlier" link="96963" legMode="car"  />
+	<event time="31665.0" type="actstart" person="B_enteredLinkEarlier" link="96963" actType="car interaction"  />
+	<event time="31665.0" type="actend" person="B_enteredLinkEarlier" link="96963" actType="car interaction"  />
+	<event time="31665.0" type="departure" person="B_enteredLinkEarlier" link="96963" legMode="non_network_walk"  />
+	<event time="33170.0" type="travelled" person="B_enteredLinkEarlier" distance="2064.6663681842515"  />
+	<event time="33170.0" type="arrival" person="B_enteredLinkEarlier" link="96963" legMode="non_network_walk"  />
+	<event time="33170.0" type="actstart" person="B_enteredLinkEarlier" link="96963" actType="work_7200.0"  />
+	<event time="38700.0" type="actend" person="B_enteredLinkEarlier" link="96963" actType="work_7200.0"  />
+	<event time="38700.0" type="departure" person="B_enteredLinkEarlier" link="96963" legMode="non_network_walk"  />
+	<event time="40205.0" type="travelled" person="B_enteredLinkEarlier" distance="2064.6663681842515"  />
+	<event time="40205.0" type="arrival" person="B_enteredLinkEarlier" link="96963" legMode="non_network_walk"  />
+	<event time="40205.0" type="actstart" person="B_enteredLinkEarlier" link="96963" actType="car interaction"  />
+	<event time="40205.0" type="actend" person="B_enteredLinkEarlier" link="96963" actType="car interaction"  />
+	<event time="40205.0" type="departure" person="B_enteredLinkEarlier" link="96963" legMode="car"  />
+	<event time="40205.0" type="PersonEntersVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="40206.0" type="vehicle enters traffic" person="B_enteredLinkEarlier" link="96963" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="40206.0" type="vehicle leaves traffic" person="B_enteredLinkEarlier" link="96963" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="40206.0" type="PersonLeavesVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="40206.0" type="arrival" person="B_enteredLinkEarlier" link="96963" legMode="car"  />
+	<event time="40206.0" type="actstart" person="B_enteredLinkEarlier" link="96963" actType="car interaction"  />
+	<event time="40206.0" type="actend" person="B_enteredLinkEarlier" link="96963" actType="car interaction"  />
+	<event time="40206.0" type="departure" person="B_enteredLinkEarlier" link="96963" legMode="non_network_walk"  />
+	<event time="40741.0" type="travelled" person="B_enteredLinkEarlier" distance="733.4642432560896"  />
+	<event time="40741.0" type="arrival" person="B_enteredLinkEarlier" link="96963" legMode="non_network_walk"  />
+	<event time="40741.0" type="actstart" person="B_enteredLinkEarlier" link="96963" actType="leisure_3000.0"  />
+	<event time="43621.0" type="actend" person="B_enteredLinkEarlier" link="96963" actType="leisure_3000.0"  />
+	<event time="43621.0" type="departure" person="B_enteredLinkEarlier" link="96963" legMode="non_network_walk"  />
+	<event time="44156.0" type="travelled" person="B_enteredLinkEarlier" distance="733.4642432560896"  />
+	<event time="44156.0" type="arrival" person="B_enteredLinkEarlier" link="96963" legMode="non_network_walk"  />
+	<event time="44156.0" type="actstart" person="B_enteredLinkEarlier" link="96963" actType="car interaction"  />
+	<event time="44156.0" type="actend" person="B_enteredLinkEarlier" link="96963" actType="car interaction"  />
+	<event time="44156.0" type="departure" person="B_enteredLinkEarlier" link="96963" legMode="car"  />
+	<event time="44156.0" type="PersonEntersVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="44157.0" type="vehicle enters traffic" person="B_enteredLinkEarlier" link="96963" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="44777.0" type="vehicle leaves traffic" person="B_enteredLinkEarlier" link="82614" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="44777.0" type="PersonLeavesVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="44777.0" type="arrival" person="B_enteredLinkEarlier" link="82614" legMode="car"  />
+	<event time="44777.0" type="actstart" person="B_enteredLinkEarlier" link="82614" actType="car interaction"  />
+	<event time="44777.0" type="actend" person="B_enteredLinkEarlier" link="82614" actType="car interaction"  />
+	<event time="44777.0" type="departure" person="B_enteredLinkEarlier" link="82614" legMode="non_network_walk"  />
+	<event time="45421.0" type="travelled" person="B_enteredLinkEarlier" distance="882.9400802595381"  />
+	<event time="45421.0" type="arrival" person="B_enteredLinkEarlier" link="82614" legMode="non_network_walk"  />
+	<event time="45421.0" type="actstart" person="B_enteredLinkEarlier" link="82614" actType="work_15000.0"  />
+	<event time="56640.0" type="actend" person="B_enteredLinkEarlier" link="82614" actType="work_15000.0"  />
+	<event time="56640.0" type="departure" person="B_enteredLinkEarlier" link="82614" legMode="non_network_walk"  />
+	<event time="57284.0" type="travelled" person="B_enteredLinkEarlier" distance="882.9400802595381"  />
+	<event time="57284.0" type="arrival" person="B_enteredLinkEarlier" link="82614" legMode="non_network_walk"  />
+	<event time="57284.0" type="actstart" person="B_enteredLinkEarlier" link="82614" actType="car interaction"  />
+	<event time="57284.0" type="actend" person="B_enteredLinkEarlier" link="82614" actType="car interaction"  />
+	<event time="57284.0" type="departure" person="B_enteredLinkEarlier" link="82614" legMode="car"  />
+	<event time="57284.0" type="PersonEntersVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="57285.0" type="vehicle enters traffic" person="B_enteredLinkEarlier" link="82614" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="58056.0" type="vehicle leaves traffic" person="B_enteredLinkEarlier" link="106426" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="58056.0" type="PersonLeavesVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="58056.0" type="arrival" person="B_enteredLinkEarlier" link="106426" legMode="car"  />
+	<event time="58056.0" type="actstart" person="B_enteredLinkEarlier" link="106426" actType="car interaction"  />
+	<event time="58056.0" type="actend" person="B_enteredLinkEarlier" link="106426" actType="car interaction"  />
+	<event time="58056.0" type="departure" person="B_enteredLinkEarlier" link="106426" legMode="non_network_walk"  />
+	<event time="58825.0" type="travelled" person="B_enteredLinkEarlier" distance="1054.8408665739826"  />
+	<event time="58825.0" type="arrival" person="B_enteredLinkEarlier" link="106426" legMode="non_network_walk"  />
+	<event time="58825.0" type="actstart" person="B_enteredLinkEarlier" link="106426" actType="leisure_4200.0"  />
+	<event time="62965.0" type="actend" person="B_enteredLinkEarlier" link="106426" actType="leisure_4200.0"  />
+	<event time="62965.0" type="departure" person="B_enteredLinkEarlier" link="106426" legMode="non_network_walk"  />
+	<event time="63734.0" type="travelled" person="B_enteredLinkEarlier" distance="1054.8408665739826"  />
+	<event time="63734.0" type="arrival" person="B_enteredLinkEarlier" link="106426" legMode="non_network_walk"  />
+	<event time="63734.0" type="actstart" person="B_enteredLinkEarlier" link="106426" actType="car interaction"  />
+	<event time="63734.0" type="actend" person="B_enteredLinkEarlier" link="106426" actType="car interaction"  />
+	<event time="63734.0" type="departure" person="B_enteredLinkEarlier" link="106426" legMode="car"  />
+	<event time="63734.0" type="PersonEntersVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="63735.0" type="vehicle enters traffic" person="B_enteredLinkEarlier" link="106426" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="64780.0" type="vehicle leaves traffic" person="B_enteredLinkEarlier" link="96959" vehicle="B_enteredLinkEarlier" networkMode="car" relativePosition="1.0"  />
+	<event time="64780.0" type="PersonLeavesVehicle" person="B_enteredLinkEarlier" vehicle="B_enteredLinkEarlier"  />
+	<event time="64780.0" type="arrival" person="B_enteredLinkEarlier" link="96959" legMode="car"  />
+	<event time="64780.0" type="actstart" person="B_enteredLinkEarlier" link="96959" actType="car interaction"  />
+	<event time="64780.0" type="actend" person="B_enteredLinkEarlier" link="96959" actType="car interaction"  />
+	<event time="64780.0" type="departure" person="B_enteredLinkEarlier" link="96959" legMode="non_network_walk"  />
+	<event time="65453.0" type="travelled" person="B_enteredLinkEarlier" distance="923.2224047831531"  />
+	<event time="65453.0" type="arrival" person="B_enteredLinkEarlier" link="96959" legMode="non_network_walk"  />
+	<event time="65453.0" type="actstart" person="B_enteredLinkEarlier" link="96959" actType="home_600.0"  />
+	<event time="66233.0" type="actend" person="B_enteredLinkEarlier" link="96959" actType="home_600.0"  />
+	<event time="66233.0" type="departure" person="B_enteredLinkEarlier" link="96959" legMode="transit_walk"  />
+	<event time="66355.0" type="travelled" person="B_enteredLinkEarlier" distance="99.79898021323237"  />
+	<event time="66355.0" type="arrival" person="B_enteredLinkEarlier" link="96959" legMode="transit_walk"  />
+	<event time="66355.0" type="actstart" person="B_enteredLinkEarlier" link="96959" actType="other_4200.0"  />
+	<event time="70375.0" type="actend" person="B_enteredLinkEarlier" link="96959" actType="other_4200.0"  />
+	<event time="70375.0" type="departure" person="B_enteredLinkEarlier" link="96959" legMode="walk"  />
+	<event time="71523.0" type="travelled" person="B_enteredLinkEarlier" distance="1212.6238884825862"  />
+	<event time="71523.0" type="arrival" person="B_enteredLinkEarlier" link="96963" legMode="walk"  />
+	<event time="71523.0" type="actstart" person="B_enteredLinkEarlier" link="96963" actType="leisure_3600.0"  />
+	<event time="75003.0" type="actend" person="B_enteredLinkEarlier" link="96963" actType="leisure_3600.0"  />
+	<event time="75003.0" type="departure" person="B_enteredLinkEarlier" link="96963" legMode="walk"  />
+	<event time="76069.0" type="travelled" person="B_enteredLinkEarlier" distance="1126.1474995194233"  />
+	<event time="76069.0" type="arrival" person="B_enteredLinkEarlier" link="96959" legMode="walk"  />
+	<event time="76069.0" type="actstart" person="B_enteredLinkEarlier" link="96959" actType="home_53400.0"  />
+	<event time="29370.0" type="actend" person="C_normal" link="16728" actType="home_44400.0"  />
+	<event time="29370.0" type="departure" person="C_normal" link="16728" legMode="non_network_walk"  />
+	<event time="29447.0" type="travelled" person="C_normal" distance="105.0617171124274"  />
+	<event time="29447.0" type="arrival" person="C_normal" link="16728" legMode="non_network_walk"  />
+	<event time="29447.0" type="actstart" person="C_normal" link="16728" actType="car interaction"  />
+	<event time="29447.0" type="actend" person="C_normal" link="16728" actType="car interaction"  />
+	<event time="29447.0" type="departure" person="C_normal" link="16728" legMode="car"  />
+	<event time="29447.0" type="PersonEntersVehicle" person="C_normal" vehicle="C_normal"  />
+	<event time="29448.0" type="vehicle enters traffic" person="C_normal" link="16728" vehicle="C_normal" networkMode="car" relativePosition="1.0"  />
+	<event time="30011.0" type="vehicle leaves traffic" person="C_normal" link="50580" vehicle="C_normal" networkMode="car" relativePosition="1.0"  />
+	<event time="30011.0" type="PersonLeavesVehicle" person="C_normal" vehicle="C_normal"  />
+	<event time="30011.0" type="arrival" person="C_normal" link="50580" legMode="car"  />
+	<event time="30011.0" type="actstart" person="C_normal" link="50580" actType="car interaction"  />
+	<event time="30011.0" type="actend" person="C_normal" link="50580" actType="car interaction"  />
+	<event time="30011.0" type="departure" person="C_normal" link="50580" legMode="non_network_walk"  />
+	<event time="30147.0" type="travelled" person="C_normal" distance="185.39468837227125"  />
+	<event time="30147.0" type="arrival" person="C_normal" link="50580" legMode="non_network_walk"  />
+	<event time="30147.0" type="actstart" person="C_normal" link="50580" actType="shopping_8400.0"  />
+	<event time="37858.0" type="actend" person="C_normal" link="50580" actType="shopping_8400.0"  />
+	<event time="37858.0" type="departure" person="C_normal" link="50580" legMode="non_network_walk"  />
+	<event time="37994.0" type="travelled" person="C_normal" distance="185.39468837227125"  />
+	<event time="37994.0" type="arrival" person="C_normal" link="50580" legMode="non_network_walk"  />
+	<event time="37994.0" type="actstart" person="C_normal" link="50580" actType="car interaction"  />
+	<event time="37994.0" type="actend" person="C_normal" link="50580" actType="car interaction"  />
+	<event time="37994.0" type="departure" person="C_normal" link="50580" legMode="car"  />
+	<event time="37994.0" type="PersonEntersVehicle" person="C_normal" vehicle="C_normal"  />
+	<event time="37995.0" type="vehicle enters traffic" person="C_normal" link="50580" vehicle="C_normal" networkMode="car" relativePosition="1.0"  />
+	<event time="41053.0" type="vehicle leaves traffic" person="C_normal" link="150017" vehicle="C_normal" networkMode="car" relativePosition="1.0"  />
+	<event time="41053.0" type="PersonLeavesVehicle" person="C_normal" vehicle="C_normal"  />
+	<event time="41053.0" type="arrival" person="C_normal" link="150017" legMode="car"  />
+	<event time="41053.0" type="actstart" person="C_normal" link="150017" actType="car interaction"  />
+	<event time="41053.0" type="actend" person="C_normal" link="150017" actType="car interaction"  />
+	<event time="41053.0" type="departure" person="C_normal" link="150017" legMode="non_network_walk"  />
+	<event time="41101.0" type="travelled" person="C_normal" distance="65.76626975999056"  />
+	<event time="41101.0" type="arrival" person="C_normal" link="150017" legMode="non_network_walk"  />
+	<event time="41101.0" type="actstart" person="C_normal" link="150017" actType="work_28200.0"  />
+	<event time="69761.0" type="actend" person="C_normal" link="150017" actType="work_28200.0"  />
+	<event time="69761.0" type="departure" person="C_normal" link="150017" legMode="non_network_walk"  />
+	<event time="69809.0" type="travelled" person="C_normal" distance="65.76626975999056"  />
+	<event time="69809.0" type="arrival" person="C_normal" link="150017" legMode="non_network_walk"  />
+	<event time="69809.0" type="actstart" person="C_normal" link="150017" actType="car interaction"  />
+	<event time="69809.0" type="actend" person="C_normal" link="150017" actType="car interaction"  />
+	<event time="69809.0" type="departure" person="C_normal" link="150017" legMode="car"  />
+	<event time="69809.0" type="PersonEntersVehicle" person="C_normal" vehicle="C_normal"  />
+	<event time="69810.0" type="vehicle enters traffic" person="C_normal" link="150017" vehicle="C_normal" networkMode="car" relativePosition="1.0"  />
+	<event time="70489.0" type="vehicle leaves traffic" person="C_normal" link="127404" vehicle="C_normal" networkMode="car" relativePosition="1.0"  />
+	<event time="70489.0" type="PersonLeavesVehicle" person="C_normal" vehicle="C_normal"  />
+	<event time="70489.0" type="arrival" person="C_normal" link="127404" legMode="car"  />
+	<event time="70489.0" type="actstart" person="C_normal" link="127404" actType="car interaction"  />
+	<event time="70489.0" type="actend" person="C_normal" link="127404" actType="car interaction"  />
+	<event time="70489.0" type="departure" person="C_normal" link="127404" legMode="non_network_walk"  />
+	<event time="70720.0" type="travelled" person="C_normal" distance="315.79652123622515"  />
+	<event time="70720.0" type="arrival" person="C_normal" link="127404" legMode="non_network_walk"  />
+	<event time="70720.0" type="actstart" person="C_normal" link="127404" actType="shopping_600.0"  />
+	<event time="70720.0" type="actend" person="C_normal" link="127404" actType="shopping_600.0"  />
+	<event time="70720.0" type="departure" person="C_normal" link="127404" legMode="non_network_walk"  />
+	<event time="70951.0" type="travelled" person="C_normal" distance="315.79652123622515"  />
+	<event time="70951.0" type="arrival" person="C_normal" link="127404" legMode="non_network_walk"  />
+	<event time="70951.0" type="actstart" person="C_normal" link="127404" actType="car interaction"  />
+	<event time="70951.0" type="actend" person="C_normal" link="127404" actType="car interaction"  />
+	<event time="70951.0" type="departure" person="C_normal" link="127404" legMode="car"  />
+	<event time="70951.0" type="PersonEntersVehicle" person="C_normal" vehicle="C_normal"  />
+	<event time="70952.0" type="vehicle enters traffic" person="C_normal" link="127404" vehicle="C_normal" networkMode="car" relativePosition="1.0"  />
+	<event time="73438.0" type="vehicle leaves traffic" person="C_normal" link="16728" vehicle="C_normal" networkMode="car" relativePosition="1.0"  />
+	<event time="73438.0" type="PersonLeavesVehicle" person="C_normal" vehicle="C_normal"  />
+	<event time="73438.0" type="arrival" person="C_normal" link="16728" legMode="car"  />
+	<event time="73438.0" type="actstart" person="C_normal" link="16728" actType="car interaction"  />
+	<event time="73438.0" type="actend" person="C_normal" link="16728" actType="car interaction"  />
+	<event time="73438.0" type="departure" person="C_normal" link="16728" legMode="non_network_walk"  />
+	<event time="73515.0" type="travelled" person="C_normal" distance="105.0617171124274"  />
+	<event time="73515.0" type="arrival" person="C_normal" link="16728" legMode="non_network_walk"  />
+	<event time="73515.0" type="actstart" person="C_normal" link="16728" actType="home_44400.0"  />
+</events>
