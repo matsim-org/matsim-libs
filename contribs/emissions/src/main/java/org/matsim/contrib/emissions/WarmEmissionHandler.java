@@ -101,28 +101,28 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		}
 
 		final double leaveTime = event.getTime();
-		final double enterTime;
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		if ( this.linkEnterMap.containsKey( vehicleId ) ) {
-			enterTime = this.linkEnterMap.get(vehicleId).getSecond();
+			double travelTime = leaveTime - this.linkEnterMap.get(vehicleId).getSecond() + 1.0;
+			// this extra second added to travelTime is needed because the vehicleLeavesTrafficEvent
+			// is thrown one second earlier (by design) ~kn,kmt,rjg 08.22
+			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
+			Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
+			if (vehicle != null) {
+				emissionsCalculation( vehicleId, vehicle, link, leaveTime, travelTime );
+				this.vehicleEntersTrafficMap.remove( vehicleId );
+				this.linkEnterMap.remove( vehicleId );
+				// clearing these maps "so that no second emission event is computed for travel from parking to link leave" (kn)
+			} else {
+				handleNullVehicle(vehicleId);
+			}
 		} else if ( this.vehicleEntersTrafficMap.containsKey( vehicleId ) ) {
-			enterTime = this.vehicleEntersTrafficMap.get( vehicleId ).getSecond();
+			logger.warn("Person with vehicleId " + event.getVehicleId() + " is entering and leaving traffic without" +
+					"having entered link " + event.getLinkId() + ". Thus, no emissions are calculated for (negligible) travel along this link.");
 		} else {
-			throw new RuntimeException("Cannot find a link/traffic enter time for vehicleId " + event.getVehicleId() +
-					". As a result emissions can't be calculated for this event. Aborting...");
-		}
-		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-
-		double travelTime = leaveTime - enterTime + 1.0;
-		// this extra second added to travel time is needed because the vehicleLeavesTrafficEvent is thrown one second earlier (by design) ~kn,kmt,rjg 08.22
-		Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-		if (vehicle != null) {
-			emissionsCalculation( vehicleId, vehicle, link, leaveTime, travelTime );
-			this.vehicleEntersTrafficMap.remove( vehicleId );
-			this.linkEnterMap.remove( vehicleId );
-			// clearing these maps "so that no second emission event is computed for travel from parking to link leave" (kn)
-		} else {
-			handleNullVehicle(vehicleId);
+			logger.warn("Person with vehicleId " + event.getVehicleId() + " has left traffic without entering traffic " +
+					"or any link. Thus, no emissions are calculated for this (unusual) event.");
+			// TODO should this rather just abort? ~rjg
 		}
 }
 
