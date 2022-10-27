@@ -27,7 +27,7 @@ import java.util.Set;
  * To check whether the remaining scoring params are subpopulation-specific, this class tests the person's marginalUtilityOfWaitingPt_s accordingly.
  *
  */
-public class PersonScoringParametersFromPersonAttributesTest {
+public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 
 	@Rule
 	public MatsimTestUtils utils;
@@ -40,7 +40,7 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		ScenarioConfigGroup scenarioConfigGroup = new ScenarioConfigGroup();
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
 
-		PlanCalcScoreConfigGroup.ScoringParameterSet personParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("person");
+		PlanCalcScoreConfigGroup.ScoringParameterSet personParams = planCalcScoreConfigGroup.getOrCreateScoringParameters(null);
 		personParams.setMarginalUtilityOfMoney(1);
 		personParams.setMarginalUtlOfWaitingPt_utils_hr(0.5 * 3600);
 
@@ -60,55 +60,33 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		modeParamsBike.setMonetaryDistanceRate(-0.002);
 		personParams.addModeParams(modeParamsBike);
 
-		PlanCalcScoreConfigGroup.ScoringParameterSet freightParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("freight");
-		freightParams.setMarginalUtilityOfMoney(444);
-		freightParams.setMarginalUtlOfWaitingPt_utils_hr(1d * 3600);
-
 		population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationFactory factory = population.getFactory();
 
 		{ //fill population
 			Person negativeIncome = factory.createPerson(Id.createPersonId("negativeIncome"));
-			PopulationUtils.putSubpopulation(negativeIncome, "person");
 			PersonUtils.setIncome(negativeIncome, -100d);
 			population.addPerson(negativeIncome);
 
 			Person zeroIncome = factory.createPerson(Id.createPersonId("zeroIncome"));
-			PopulationUtils.putSubpopulation(zeroIncome, "person");
 			PersonUtils.setIncome(zeroIncome, 0d) ;
 			population.addPerson(zeroIncome);
 
 			Person lowIncomeLowCarAsc = factory.createPerson(Id.createPersonId("lowIncomeLowCarAsc"));
-			PopulationUtils.putSubpopulation(lowIncomeLowCarAsc, "person");
 			PersonUtils.setIncome(lowIncomeLowCarAsc, 0.5d);
 			PersonUtils.setPersonalScoringModeConstant(lowIncomeLowCarAsc, TransportMode.car, -0.1d);
 			population.addPerson(lowIncomeLowCarAsc);
 
 			Person mediumIncomeHighCarAsc = factory.createPerson(Id.createPersonId("mediumIncomeHighCarAsc"));
-			PopulationUtils.putSubpopulation(mediumIncomeHighCarAsc, "person");
 			PersonUtils.setIncome(mediumIncomeHighCarAsc, 1d);
 			PersonUtils.setPersonalScoringModeConstant(mediumIncomeHighCarAsc, TransportMode.car, -2.1d);
 			population.addPerson(mediumIncomeHighCarAsc);
 
 			Person highIncomeLowCarAsc = factory.createPerson(Id.createPersonId("highIncomeLowCarAsc"));
-			PopulationUtils.putSubpopulation(highIncomeLowCarAsc, "person");
 			PersonUtils.setIncome(highIncomeLowCarAsc, 1.5d);
 			PersonUtils.setPersonalScoringModeConstant(highIncomeLowCarAsc, TransportMode.car, -0.1d);
 			population.addPerson(highIncomeLowCarAsc);
 
-			Person freight = factory.createPerson(Id.createPersonId("freight"));
-			PopulationUtils.putSubpopulation(freight, "freight");
-			population.addPerson(freight);
-
-			Person freightWithIncome1 = factory.createPerson(Id.createPersonId("freightWithIncome1"));
-			PopulationUtils.putSubpopulation(freightWithIncome1, "freight");
-			PersonUtils.setIncome(freightWithIncome1, 1.5d);
-			population.addPerson(freightWithIncome1);
-
-			Person freightWithIncome2 = factory.createPerson(Id.createPersonId("freightWithIncome2"));
-			PopulationUtils.putSubpopulation(freightWithIncome2, "freight");
-			PersonUtils.setIncome(freightWithIncome2, 0.5d);
-			population.addPerson(freightWithIncome2);
 		}
 		personScoringParams = new PersonScoringParametersFromPersonAttributes(population,
 				planCalcScoreConfigGroup,
@@ -157,24 +135,6 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1d, 0.5d);
 		Assert.assertEquals(-2.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
-	}
-
-	@Test
-	public void testPersonFreight(){
-		Id<Person> id = Id.createPersonId("freight");
-		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
-		//freight agent has no income attribute set, so it should use the marginal utility of money that is set in its subpopulation scoring parameters!
-		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1d/444d, 1d);
-	}
-
-	@Test
-	public void testFreightWithIncome(){
-		Id<Person> id = Id.createPersonId("freightWithIncome1");
-		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
-		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1.5/444d, 1d);
-		Id<Person> id2 = Id.createPersonId("freightWithIncome2");
-		ScoringParameters params2 = personScoringParams.getScoringParameters(population.getPersons().get(id2));
-		makeAssertMarginalUtilityOfMoneyAndPtWait(params2, 0.5/444d, 1d);
 	}
 
 	@Test
