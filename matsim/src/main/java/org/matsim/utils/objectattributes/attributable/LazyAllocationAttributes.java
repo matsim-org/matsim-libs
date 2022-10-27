@@ -23,6 +23,7 @@
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author cdobler
@@ -30,16 +31,21 @@ import java.util.function.Consumer;
 public final class LazyAllocationAttributes implements Attributes {
 
 	private final Consumer<Attributes> consumer;
+	private final Supplier<Attributes> supplier;
 	
-	public LazyAllocationAttributes(final Consumer<Attributes> consumer) {
+	public LazyAllocationAttributes(final Consumer<Attributes> consumer, final Supplier<Attributes> supplier) {
 		this.consumer = consumer;
+		this.supplier = supplier;
 	}
 	
 	@Override
 	public Object putAttribute(String attribute, Object value) {
-		final Attributes attributes = new AttributesImpl();
+		Attributes attributes = this.supplier.get();
+		if (Objects.isNull(attributes)) {
+			attributes = new AttributesImpl();
+			this.consumer.accept(attributes);
+		}
 		attributes.putAttribute(attribute, value);
-		this.consumer.accept(attributes);
 		return null;
 	}
 

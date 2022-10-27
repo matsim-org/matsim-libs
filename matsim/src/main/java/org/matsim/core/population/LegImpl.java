@@ -122,7 +122,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 		if (this.attributes != null) {
 			return this.attributes;
 		}
-		return new LazyAllocationAttributes(attributes -> this.attributes = attributes);
+		return new LazyAllocationAttributes(attributes -> this.attributes = attributes, () -> this.attributes);
 	}
 
 	//	private boolean locked;
