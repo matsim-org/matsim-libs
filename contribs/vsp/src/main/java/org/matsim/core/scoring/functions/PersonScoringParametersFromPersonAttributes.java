@@ -37,7 +37,6 @@ import java.util.OptionalDouble;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.matsim.core.population.PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME;
 import static org.matsim.core.population.PersonUtils.PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX;
 
 /**
@@ -46,16 +45,15 @@ import static org.matsim.core.population.PersonUtils.PERSONAL_SCORING_MODE_CONST
  * This class is an extension of {@link playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters}
  * which is an adoption of {@link org.matsim.core.scoring.functions.SubpopulationScoringParameters}.
  * This class additionaly allows for person-specific mode scoring parameters (for now ASC only) and marginalUtilityOfMoney.
- *
  * In order to use this, you need to provide the respective attributes (otherwise default values for the subpopulation
  * are used). For mode scoring parameters use .... TODO
- * For marginalUtilityOfMoney an attribute {@link org.matsim.core.population.PersonUtils#PERSONAL_INCOME_ATTRIBUTE_NAME} for persons that have a specific
- * income is used. Persons in the population, that have no attribute {@link org.matsim.core.population.PersonUtils#PERSONAL_INCOME_ATTRIBUTE_NAME} will use the
+ * For marginalUtilityOfMoney an attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} for persons that have a specific
+ * income is used. Persons in the population, that have no attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} will use the
  * default marginal utility set in their subpopulation's scoring parameters.
  * <p>
  * The person specific marginal utility is computed by subpopulationMgnUtilityOfMoney * AVERAGE_INCOME / PERSONAL_INCOME
  * where
- * AVERAGE_INCOME is computed as the average of all values of the attribute {@link org.matsim.core.population.PersonUtils#PERSONAL_INCOME_ATTRIBUTE_NAME} that are contained in the population.
+ * AVERAGE_INCOME is computed as the average of all values of the attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} that are contained in the population.
  * <p>
  * If you want to distinguish between 'rich' areas and 'poor' areas, make use of the subpopulation feature and set subpopulation-specific mgnUtilityOfMoney in
  * the #PlanCalcScoreConfigGroup
@@ -79,7 +77,7 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
     }
 
     private double computeAvgIncome(Population population) {
-        log.info("read income attribute '" + PERSONAL_INCOME_ATTRIBUTE_NAME + "' of all agents and compute global average.\n" +
+        log.info("reading income attribute using " + PersonUtils.class + " of all agents and compute global average.\n" +
                 "Make sure to set this attribute only to appropriate agents (i.e. true 'persons' and not freight agents) \n" +
                 "Income values <= 0 are ignored. Agents that have negative or 0 income will use the marginalUtilityOfMOney in their subpopulation's scoring params..");
         OptionalDouble averageIncome = population.getPersons().values().stream()

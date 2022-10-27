@@ -23,7 +23,7 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  * It checks whether the person specific income is read from the person attributes.
  * The marginalUtilityOfMoney should be calculated as averageIncome/personSpecificIncome and not taken from the subpopulation-specific scoring params.
- * To check whether the remaining scoring params are subpopulation-specific, this class tests the the person's marginalUtilityOfWaitingPt_s accordingly.
+ * To check whether the remaining scoring params are subpopulation-specific, this class tests the person's marginalUtilityOfWaitingPt_s accordingly.
  *
  */
 public class IncomeDependentUtilityOfMoneyPersonScoringParametersNoSubpopulationTest {
@@ -48,23 +48,23 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersNoSubpopulation
 
 		{ //fill population
 			Person negativeIncome = factory.createPerson(Id.createPersonId("negativeIncome"));
-			PopulationUtils.putPersonAttribute(negativeIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, -100d);
+			PersonUtils.setIncome(negativeIncome, -100d);
 			population.addPerson(negativeIncome);
 
 			Person zeroIncome = factory.createPerson(Id.createPersonId("zeroIncome"));
-			PopulationUtils.putPersonAttribute(zeroIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 0d);
+			PersonUtils.setIncome(zeroIncome, 0d);
 			population.addPerson(zeroIncome);
 
 			Person lowIncome = factory.createPerson(Id.createPersonId("lowIncome"));
-			PopulationUtils.putPersonAttribute(lowIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
+			PersonUtils.setIncome(lowIncome, 0.5d);
 			population.addPerson(lowIncome);
 
 			Person mediumIncome = factory.createPerson(Id.createPersonId("mediumIncome"));
-			PopulationUtils.putPersonAttribute(mediumIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 1d);
+			PersonUtils.setIncome(mediumIncome, 1d);
 			population.addPerson(mediumIncome);
 
 			Person highIncome = factory.createPerson(Id.createPersonId("highIncome"));
-			PopulationUtils.putPersonAttribute(highIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 1.5d);
+			PersonUtils.setIncome(highIncome, 1.5d);
 			population.addPerson(highIncome);
 
 		}
@@ -116,12 +116,12 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersNoSubpopulation
 		ScoringParameters paramsRich = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("highIncome")));
 		CharyparNagelMoneyScoring moneyScoringRich = new CharyparNagelMoneyScoring(paramsRich);
 		moneyScoringRich.addMoney(100);
-		Assert.assertEquals("for the rich person, 100 money units should be equal to a score of ", 20 * 1./1.5 * 100, moneyScoringRich.getScore(), utils.EPSILON);
+		Assert.assertEquals("for the rich person, 100 money units should be equal to a score of ", 20 * 1./1.5 * 100, moneyScoringRich.getScore(), MatsimTestUtils.EPSILON);
 
 		ScoringParameters paramsPoor = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("lowIncome")));
 		CharyparNagelMoneyScoring moneyScoringPoor = new CharyparNagelMoneyScoring(paramsPoor);
 		moneyScoringPoor.addMoney(100);
-		Assert.assertEquals("for the poor person, 100 money units should be equal to a score of ", 20 * 1./0.5 * 100, moneyScoringPoor.getScore(), utils.EPSILON);
+		Assert.assertEquals("for the poor person, 100 money units should be equal to a score of ", 20 * 1./0.5 * 100, moneyScoringPoor.getScore(), MatsimTestUtils.EPSILON);
 
 		Assert.assertTrue("100 money units should worth more for a poor person than for a rich person", moneyScoringPoor.getScore() > moneyScoringRich.getScore());
 	}

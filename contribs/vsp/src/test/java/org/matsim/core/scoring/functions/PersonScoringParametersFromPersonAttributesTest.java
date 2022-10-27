@@ -22,9 +22,9 @@ import java.util.Set;
 /**
  * this class tests {@link PersonScoringParametersFromPersonAttributes}
  *
- * It checks whether the person specific income is read from the person attributes.
+ * It checks whether the person specific income and mode constant (asc) is read from the person attributes.
  * The marginalUtilityOfMoney should be calculated as averageIncome/personSpecificIncome and not taken from the subpopulation-specific scoring params.
- * To check whether the remaining scoring params are subpopulation-specific, this class tests the the person's marginalUtilityOfWaitingPt_s accordingly.
+ * To check whether the remaining scoring params are subpopulation-specific, this class tests the person's marginalUtilityOfWaitingPt_s accordingly.
  *
  */
 public class PersonScoringParametersFromPersonAttributesTest {
@@ -70,29 +70,29 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		{ //fill population
 			Person negativeIncome = factory.createPerson(Id.createPersonId("negativeIncome"));
 			PopulationUtils.putSubpopulation(negativeIncome, "person");
-			PopulationUtils.putPersonAttribute(negativeIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, -100d);
+			PersonUtils.setIncome(negativeIncome, -100d);
 			population.addPerson(negativeIncome);
 
 			Person zeroIncome = factory.createPerson(Id.createPersonId("zeroIncome"));
 			PopulationUtils.putSubpopulation(zeroIncome, "person");
-			PopulationUtils.putPersonAttribute(zeroIncome, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 0d);
+			PersonUtils.setIncome(zeroIncome, 0d) ;
 			population.addPerson(zeroIncome);
 
 			Person lowIncomeLowCarAsc = factory.createPerson(Id.createPersonId("lowIncomeLowCarAsc"));
 			PopulationUtils.putSubpopulation(lowIncomeLowCarAsc, "person");
-			PopulationUtils.putPersonAttribute(lowIncomeLowCarAsc, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
-			PopulationUtils.putPersonAttribute(lowIncomeLowCarAsc, PersonUtils.PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX + TransportMode.car, -0.1d);
+			PersonUtils.setIncome(lowIncomeLowCarAsc, 0.5d);
+			PersonUtils.setPersonalScoringModeConstant(lowIncomeLowCarAsc, TransportMode.car, -0.1d);
 			population.addPerson(lowIncomeLowCarAsc);
 
 			Person mediumIncomeHighCarAsc = factory.createPerson(Id.createPersonId("mediumIncomeHighCarAsc"));
 			PopulationUtils.putSubpopulation(mediumIncomeHighCarAsc, "person");
-			PopulationUtils.putPersonAttribute(mediumIncomeHighCarAsc, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 1d);
+			PersonUtils.setIncome(mediumIncomeHighCarAsc, 1d);
 			PersonUtils.setPersonalScoringModeConstant(mediumIncomeHighCarAsc, TransportMode.car, -2.1d);
 			population.addPerson(mediumIncomeHighCarAsc);
 
 			Person highIncomeLowCarAsc = factory.createPerson(Id.createPersonId("highIncomeLowCarAsc"));
 			PopulationUtils.putSubpopulation(highIncomeLowCarAsc, "person");
-			PopulationUtils.putPersonAttribute(highIncomeLowCarAsc, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 1.5d);
+			PersonUtils.setIncome(highIncomeLowCarAsc, 1.5d);
 			PersonUtils.setPersonalScoringModeConstant(highIncomeLowCarAsc, TransportMode.car, -0.1d);
 			population.addPerson(highIncomeLowCarAsc);
 
@@ -102,12 +102,12 @@ public class PersonScoringParametersFromPersonAttributesTest {
 
 			Person freightWithIncome1 = factory.createPerson(Id.createPersonId("freightWithIncome1"));
 			PopulationUtils.putSubpopulation(freightWithIncome1, "freight");
-			PopulationUtils.putPersonAttribute(freightWithIncome1, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 1.5d);
+			PersonUtils.setIncome(freightWithIncome1, 1.5d);
 			population.addPerson(freightWithIncome1);
 
 			Person freightWithIncome2 = factory.createPerson(Id.createPersonId("freightWithIncome2"));
 			PopulationUtils.putSubpopulation(freightWithIncome2, "freight");
-			PopulationUtils.putPersonAttribute(freightWithIncome2, PersonUtils.PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
+			PersonUtils.setIncome(freightWithIncome2, 0.5d);
 			population.addPerson(freightWithIncome2);
 		}
 		personScoringParams = new PersonScoringParametersFromPersonAttributes(population,
@@ -163,7 +163,7 @@ public class PersonScoringParametersFromPersonAttributesTest {
 	public void testPersonFreight(){
 		Id<Person> id = Id.createPersonId("freight");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
-		//freight agent has no income attribute set, so it should use the marginal utility of money that is set in it's subpopulation scoring parameters!
+		//freight agent has no income attribute set, so it should use the marginal utility of money that is set in its subpopulation scoring parameters!
 		makeAssert(params, 1d/444d, 1d);
 	}
 
@@ -182,12 +182,12 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		ScoringParameters paramsRich = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("highIncomeLowCarAsc")));
 		CharyparNagelMoneyScoring moneyScoringRich = new CharyparNagelMoneyScoring(paramsRich);
 		moneyScoringRich.addMoney(100);
-		Assert.assertEquals("for the rich person, 100 money units should be equal to a score of 66.66", 1./1.5 * 100, moneyScoringRich.getScore(), utils.EPSILON);
+		Assert.assertEquals("for the rich person, 100 money units should be equal to a score of 66.66", 1./1.5 * 100, moneyScoringRich.getScore(), MatsimTestUtils.EPSILON);
 
 		ScoringParameters paramsPoor = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("lowIncomeLowCarAsc")));
 		CharyparNagelMoneyScoring moneyScoringPoor = new CharyparNagelMoneyScoring(paramsPoor);
 		moneyScoringPoor.addMoney(100);
-		Assert.assertEquals("for the poor person, 100 money units should be equal to a score of 200.00", 1./0.5 * 100, moneyScoringPoor.getScore(), utils.EPSILON);
+		Assert.assertEquals("for the poor person, 100 money units should be equal to a score of 200.00", 1./0.5 * 100, moneyScoringPoor.getScore(), MatsimTestUtils.EPSILON);
 
 		Assert.assertTrue("100 money units should worth more for a poor person than for a rich person", moneyScoringPoor.getScore() > moneyScoringRich.getScore());
 	}
@@ -205,13 +205,13 @@ public class PersonScoringParametersFromPersonAttributesTest {
 
 		legScoringRich.handleLeg(carLegZeroDistanceTenSeconds);
 		Assert.assertEquals("for the rich person with low car asc, a 0 meter and 10s trip should be equal to a score of ",
-				-0.1d -0.001d * 10 -7.5*1./1.5 -0.3, legScoringRich.getScore(), utils.EPSILON);
+				-0.1d -0.001d * 10 -7.5*1./1.5 -0.3, legScoringRich.getScore(), MatsimTestUtils.EPSILON);
 
 		ScoringParameters paramsMediumIncomeHighCarAsc = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("mediumIncomeHighCarAsc")));
 		CharyparNagelLegScoring legScoringMediumIncomeHighCarAsc = new CharyparNagelLegScoring(paramsMediumIncomeHighCarAsc, NetworkUtils.createNetwork(), Set.of(TransportMode.pt));
 		legScoringMediumIncomeHighCarAsc.handleLeg(carLegZeroDistanceTenSeconds);
 		Assert.assertEquals("for the medium person with high car asc, a 0 meter and 10s trip should be equal to a score of ",
-				-2.1d -0.001d * 10 -7.5*1./1.0 -0.3, legScoringMediumIncomeHighCarAsc.getScore(), utils.EPSILON);
+				-2.1d -0.001d * 10 -7.5*1./1.0 -0.3, legScoringMediumIncomeHighCarAsc.getScore(), MatsimTestUtils.EPSILON);
 	}
 
 	private void makeAssert(ScoringParameters params, double income, double marginalUtilityOfWaitingPt_s){
