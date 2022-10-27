@@ -1,4 +1,4 @@
-package playground.vsp.scoring;
+package org.matsim.core.scoring.functions;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,9 +14,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 

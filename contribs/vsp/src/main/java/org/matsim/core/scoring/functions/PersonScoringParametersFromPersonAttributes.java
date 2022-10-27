@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.scoring;
+package org.matsim.core.scoring.functions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,10 +28,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.ModeUtilityParameters;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
