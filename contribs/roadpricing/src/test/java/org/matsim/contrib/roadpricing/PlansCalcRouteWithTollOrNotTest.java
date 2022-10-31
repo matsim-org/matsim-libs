@@ -24,7 +24,8 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -61,7 +62,7 @@ import com.google.inject.Provider;
  */
 
 public class PlansCalcRouteWithTollOrNotTest {
-	private static final Logger log = Logger.getLogger( PlansCalcRouteWithTollOrNotTest.class );
+	private static final Logger log = LogManager.getLogger( PlansCalcRouteWithTollOrNotTest.class );
 
 	@Rule
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();

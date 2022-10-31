@@ -20,8 +20,9 @@
 
 package org.matsim.pt.counts;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -51,7 +52,7 @@ import java.util.TreeSet;
 public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 		VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler {
 
-	private static final Logger log = Logger.getLogger(OccupancyAnalyzer.class);
+	private static final Logger log = LogManager.getLogger(OccupancyAnalyzer.class);
 
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
@@ -68,8 +69,6 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
 
 	public OccupancyAnalyzer(final int timeBinSize, final double maxTime) {
-		log.setLevel( Level.INFO ) ;
-
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;

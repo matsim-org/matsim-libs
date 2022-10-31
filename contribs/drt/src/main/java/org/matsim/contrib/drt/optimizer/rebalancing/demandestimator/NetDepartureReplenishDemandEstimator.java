@@ -35,7 +35,7 @@ public class NetDepartureReplenishDemandEstimator implements PassengerRequestSch
 			FeedforwardRebalancingStrategyParams strategySpecificParams) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
-		timeBinSize = strategySpecificParams.getTimeBinSize();
+		timeBinSize = strategySpecificParams.timeBinSize;
 
 	}
 

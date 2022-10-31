@@ -19,7 +19,8 @@
 
 package org.matsim.integration;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -71,7 +72,7 @@ public class EquilTwoAgentsTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/*package*/ final static Logger log = Logger.getLogger(EquilTwoAgentsTest.class);
+	/*package*/ final static Logger log = LogManager.getLogger(EquilTwoAgentsTest.class);
 
 	/*package*/ final static Id<Person> personId1 = Id.create("1", Person.class);
 	/*package*/ final static Id<Person> personId2 = Id.create("2", Person.class);

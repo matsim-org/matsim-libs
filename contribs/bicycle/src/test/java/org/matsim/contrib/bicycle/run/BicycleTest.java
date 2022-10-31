@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,7 +67,7 @@ import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.
  */
 public class
 BicycleTest {
-	private static final Logger LOG = Logger.getLogger(BicycleTest.class);
+	private static final Logger LOG = LogManager.getLogger(BicycleTest.class);
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	

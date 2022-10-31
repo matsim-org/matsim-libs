@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -69,7 +70,7 @@ import org.xml.sax.Attributes;
  */
 public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
-	private final static Logger LOG = Logger.getLogger(SignalsAndLanesOsmNetworkReader.class);
+	private final static Logger LOG = LogManager.getLogger(SignalsAndLanesOsmNetworkReader.class);
 
 	private final static String TAG_RESTRICTION = "restriction";
 	private final static String TAG_TURNLANES = "turn:lanes";

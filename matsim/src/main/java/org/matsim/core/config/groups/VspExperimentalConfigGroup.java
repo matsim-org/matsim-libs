@@ -20,7 +20,8 @@ package org.matsim.core.config.groups;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -32,7 +33,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);
+	private final static Logger log = LogManager.getLogger(VspExperimentalConfigGroup.class);
 
 	public static final String GROUP_NAME = "vspExperimental";
 

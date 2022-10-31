@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -55,7 +56,7 @@ import playground.vsp.demandde.pendlermatrix.TripFlowSink;
 
 public class DemandMatrixReader {
 
-	private static final Logger log = Logger.getLogger(DemandMatrixReader.class);
+	private static final Logger log = LogManager.getLogger(DemandMatrixReader.class);
 
 	// PV Matrix enthält keine Richtungs-Info für den Pendlerverkehr --> Pendlerstatistik
 	//	private static final String PV_MATRIX = "../../shared-svn/studies/countries/de/prognose_2025/orig/pv-matrizen/2004_nuts_102r6x6.csv";

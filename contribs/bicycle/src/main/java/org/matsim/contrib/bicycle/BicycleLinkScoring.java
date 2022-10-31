@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -157,11 +158,11 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 			if ( Double.isNaN(dist) ) {
 				if ( ccc<10 ) {
 					ccc++ ;
-					Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: Simulation does not report " +
+					LogManager.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: Simulation does not report " +
 							"a distance for this trip. Possible reason for that: mode is teleported and router does not " +
 							"write distance into plan.  Needs to be fixed or these plans will die out.") ;
 					if ( ccc==10 ) {
-						Logger.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
+						LogManager.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
 					}
 				}
 			}

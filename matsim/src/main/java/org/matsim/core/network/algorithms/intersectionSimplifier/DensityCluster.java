@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
@@ -62,7 +63,7 @@ public class DensityCluster {
 	private Map<Id<Coord>, ClusterActivity> lostPoints = new TreeMap<Id<Coord>, ClusterActivity>();
 	private QuadTree<ClusterActivity> quadTree;
 	private List<Cluster> clusterList;
-	private final static Logger log = Logger.getLogger(DensityCluster.class);
+	private final static Logger log = LogManager.getLogger(DensityCluster.class);
 	private String delimiter = ",";
 	private final boolean silent;
 

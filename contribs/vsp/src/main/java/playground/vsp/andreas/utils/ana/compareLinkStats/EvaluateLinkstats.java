@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -19,7 +20,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  */
 public class EvaluateLinkstats implements TabularFileHandler {
 
-	private static final Logger log = Logger.getLogger(EvaluateLinkstats.class);
+	private static final Logger log = LogManager.getLogger(EvaluateLinkstats.class);
 	
 	private TabularFileParserConfig tabFileParserConfig;
 	private HashMap<String, ArrayList<Double>> linkMapWithCounts = new HashMap<String, ArrayList<Double>>();

@@ -87,7 +87,7 @@ public class MatsimTransformerTest {
 		assertEquals("myVehicle", matsimVehicle.getId().toString());
 		assertEquals(10.0, matsimVehicle.getEarliestStartTime(), 0.01);
 		assertEquals(20.0, matsimVehicle.getLatestEndTime(), 0.01);
-		assertEquals("loc", matsimVehicle.getLocation().toString());
+		assertEquals("loc", matsimVehicle.getLinkId().toString() );
 	}
 
 	@Test
@@ -229,8 +229,8 @@ public class MatsimTransformerTest {
 
 	private VehicleImpl createJspritVehicle(CarrierVehicle vehicle) {
 		return VehicleImpl.Builder.newInstance(vehicle.getId().toString())
-				.setEarliestStart(vehicle.getEarliestStartTime()).setLatestArrival(vehicle.getLatestEndTime())
-				.setStartLocation(Location.newInstance(vehicle.getLocation().toString())).build();
+					  .setEarliestStart(vehicle.getEarliestStartTime()).setLatestArrival(vehicle.getLatestEndTime())
+					  .setStartLocation(Location.newInstance(vehicle.getLinkId().toString() ) ).build();
 	}
 
 	@Test
@@ -325,13 +325,13 @@ public class MatsimTransformerTest {
 		CarrierVehicle matsimVehicle = getMatsimVehicle("matsimVehicle", "loc", getMatsimVehicleType());
 		double startTime = 15.0;
 		Tour.Builder sTourBuilder = Tour.Builder.newInstance();
-		sTourBuilder.scheduleStart(matsimVehicle.getLocation());
+		sTourBuilder.scheduleStart(matsimVehicle.getLinkId() );
 		sTourBuilder.addLeg(sTourBuilder.createLeg(null, 15.0, 0.0));
 		sTourBuilder.scheduleService(s1);
 		sTourBuilder.addLeg(sTourBuilder.createLeg(null, 15.0, 0.0));
 		sTourBuilder.scheduleService(s2);
 		sTourBuilder.addLeg(sTourBuilder.createLeg(null, 60.0, 0.0));
-		sTourBuilder.scheduleEnd(matsimVehicle.getLocation());
+		sTourBuilder.scheduleEnd(matsimVehicle.getLinkId() );
 		return ScheduledTour.newInstance(sTourBuilder.build(), matsimVehicle, startTime);
 	}
 
@@ -341,7 +341,7 @@ public class MatsimTransformerTest {
 		CarrierVehicle matsimVehicle = getMatsimVehicle(vehicleId, "loc", getMatsimVehicleType());
 		double startTime = 15.0;
 		Tour.Builder sTourBuilder = Tour.Builder.newInstance();
-		sTourBuilder.scheduleStart(matsimVehicle.getLocation());
+		sTourBuilder.scheduleStart(matsimVehicle.getLinkId() );
 		sTourBuilder.addLeg(sTourBuilder.createLeg(null, 15.0, 0.0));
 		sTourBuilder.schedulePickup(s1);
 		sTourBuilder.addLeg(sTourBuilder.createLeg(null, 15.0, 0.0));
@@ -351,7 +351,7 @@ public class MatsimTransformerTest {
 		sTourBuilder.addLeg(sTourBuilder.createLeg(null, 50.0, 0.0));
 		sTourBuilder.scheduleDelivery(s2);
 		sTourBuilder.addLeg(sTourBuilder.createLeg(null, 60.0, 0.0));
-		sTourBuilder.scheduleEnd(matsimVehicle.getLocation());
+		sTourBuilder.scheduleEnd(matsimVehicle.getLinkId() );
 		return ScheduledTour.newInstance(sTourBuilder.build(), matsimVehicle, startTime);
 	}
 

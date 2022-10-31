@@ -76,7 +76,7 @@ public class AuxDischargingHandler
 	@Inject
 	public AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg) {
 		this.vehicleProvider = vehicleProvider;
-		this.auxDischargeTimeStep = evCfg.getAuxDischargeTimeStep();
+		this.auxDischargeTimeStep = evCfg.auxDischargeTimeStep;
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class AuxDischargingHandler
 				ElectricVehicle ev = vehicleAndLink.vehicle;
 				double energy = ev.getAuxEnergyConsumption()
 						.calcEnergyConsumption(e.getSimulationTime(), auxDischargeTimeStep, vehicleAndLink.linkId);
-				ev.getBattery().changeSoc(-energy);
+				ev.getBattery().changeCharge(-energy);
 			}
 		}
 	}

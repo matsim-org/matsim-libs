@@ -42,7 +42,7 @@ class SelectiveInsertionProvider {
 			ForkJoinPool forkJoinPool, IncrementalStopDurationEstimator incrementalStopDurationEstimator) {
 		var insertionParams = (SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var restrictiveDetourTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
-				insertionParams.getRestrictiveBeelineSpeedFactor(), travelTimeMatrix, travelTime);
+				insertionParams.restrictiveBeelineSpeedFactor, travelTimeMatrix, travelTime);
 		return new SelectiveInsertionProvider(new BestInsertionFinder(insertionCostCalculator),
 				new InsertionGenerator(incrementalStopDurationEstimator, restrictiveDetourTimeEstimator), forkJoinPool);
 	}

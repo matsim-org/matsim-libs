@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,7 +38,7 @@ import org.matsim.core.gbl.Gbl;
  *
  */
 public class UserBenefitsCalculator {
-	private static final Logger logger = Logger.getLogger(UserBenefitsCalculator.class);
+	private static final Logger logger = LogManager.getLogger(UserBenefitsCalculator.class);
 
 	private final double betaLogit;
 	private final double marginalUtlOfMoney;

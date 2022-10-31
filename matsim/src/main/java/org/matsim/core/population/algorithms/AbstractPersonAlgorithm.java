@@ -20,7 +20,8 @@
 
 package org.matsim.core.population.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Counter;
@@ -28,7 +29,7 @@ import org.matsim.core.utils.misc.Counter;
 public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {
 	// this is ok as non-final since methods that contain code are final. kai, may'17
 
-	private final static Logger log = Logger.getLogger(AbstractPersonAlgorithm.class);
+	private final static Logger log = LogManager.getLogger(AbstractPersonAlgorithm.class);
 
 	public final void run(final Population plans) {
 		log.info("running " + this.getClass().getName() + " algorithm...");

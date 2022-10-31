@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ZoneParkingManager;
 import org.matsim.core.config.Config;
@@ -30,7 +31,7 @@ import com.google.inject.Inject;
 public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListener, MobsimAfterSimStepListener{
 	
 	private final ZoneParkingManager zoneManager;
-	private Logger log = Logger.getLogger(ZoneParkingOccupationListener.class);
+	private Logger log = LogManager.getLogger(ZoneParkingOccupationListener.class);
 	private HashMap<String,TreeSet<ParkingTuple>> zoneOccupationPerTime; 
 	private MatsimServices services;
 	int iteration;

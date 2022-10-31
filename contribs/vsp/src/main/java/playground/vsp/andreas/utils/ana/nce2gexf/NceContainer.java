@@ -1,6 +1,7 @@
 package playground.vsp.andreas.utils.ana.nce2gexf;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
@@ -12,7 +13,7 @@ import org.matsim.api.core.v01.Id;
 public class NceContainer {
 	
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(NceContainer.class);
+	private static final Logger log = LogManager.getLogger(NceContainer.class);
 	static final String toStringHeader = "# from node id; from node x; from node y; to node id; to node x; to node y; diffPerLink"; 
 
 	private Id fromNodeId;

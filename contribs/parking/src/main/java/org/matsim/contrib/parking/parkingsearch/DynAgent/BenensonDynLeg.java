@@ -1,6 +1,7 @@
 package org.matsim.contrib.parking.parkingsearch.DynAgent;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.parkingsearch.events.StartParkingSearchEvent;
@@ -32,7 +33,7 @@ enum ParkingMode {
 
 public class BenensonDynLeg extends ParkingDynLeg{
 
-	private static final Logger logger = Logger.getLogger(BenensonDynLeg.class);
+	private static final Logger logger = LogManager.getLogger(BenensonDynLeg.class);
 	private static final boolean logForDebug = false;
 
 	private double totalObservedParkingSpaces = 0.0;

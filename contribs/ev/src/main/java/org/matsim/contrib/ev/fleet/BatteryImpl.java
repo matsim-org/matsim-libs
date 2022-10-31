@@ -25,11 +25,11 @@ import com.google.common.base.Preconditions;
 
 public class BatteryImpl implements Battery {
 	private final double capacity;
-	private double soc;
+	private double charge;
 
-	public BatteryImpl(double capacity, double soc) {
+	public BatteryImpl(double capacity, double charge) {
 		this.capacity = capacity;
-		this.soc = soc;
+		this.charge = charge;
 	}
 
 	@Override
@@ -38,18 +38,18 @@ public class BatteryImpl implements Battery {
 	}
 
 	@Override
-	public double getSoc() {
-		return soc;
+	public double getCharge() {
+		return charge;
 	}
 
 	@Override
-	public void setSoc(double soc) {
-		Preconditions.checkArgument(soc >= 0 && soc <= capacity, "SoC outside allowed range: %s", soc);
-		this.soc = soc;
+	public void setCharge(double charge) {
+		Preconditions.checkArgument(charge >= 0 && charge <= capacity, "Charge outside allowed range: %s", charge);
+		this.charge = charge;
 	}
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(this).add("capacity", capacity).add("soc", soc).toString();
+		return MoreObjects.toStringHelper(this).add("capacity", capacity).add("charge", charge).toString();
 	}
 }

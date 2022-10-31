@@ -5,9 +5,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
+import org.matsim.core.router.RoutingModeMainModeIdentifier;
 import picocli.CommandLine;
 
 import java.nio.file.Files;
@@ -55,7 +55,7 @@ public class CleanPopulation implements MATSimAppCommand {
 
 		Population population = PopulationUtils.readPopulation(plans.toString());
 
-		if (!rmRoutes && !rmActivityLocations && !rmUnselected) {
+		if (!rmRoutes && !rmActivityLocations && !rmUnselected && !tripsToLegs) {
 			log.error("None of the 'remove' commands specified.");
 			return 2;
 		}
@@ -65,7 +65,7 @@ public class CleanPopulation implements MATSimAppCommand {
 
 		// Using the analysis main mode identifier instead of the routing mode based one on purpose
 		// to be able to process older population files without any routing modes!
-		TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new DefaultAnalysisMainModeIdentifier());
+		TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new RoutingModeMainModeIdentifier());
 
 		for (Person person : population.getPersons().values()) {
 

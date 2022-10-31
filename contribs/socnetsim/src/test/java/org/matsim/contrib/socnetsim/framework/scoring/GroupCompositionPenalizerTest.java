@@ -18,8 +18,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.scoring;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,15 +55,10 @@ import org.matsim.core.scoring.SumScoringFunction;
  * @author thibautd
  */
 public class GroupCompositionPenalizerTest {
-	private static final Logger log = Logger.getLogger( GroupCompositionPenalizerTest.class );
+	private static final Logger log = LogManager.getLogger( GroupCompositionPenalizerTest.class );
 	private final Id<Link> linkId = Id.createLinkId( 1 );
 	private final double utilOneCopart = 100;
 	private final double utilAlone = -1;
-
-	@Before
-	public void setTrace() {
-		Logger.getLogger( GroupCompositionPenalizer.class ).setLevel( Level.TRACE );
-	}
 
 	@Test
 	public void testFullOverlap() {

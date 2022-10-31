@@ -43,7 +43,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class RecursiveLocationMutator extends AbstractLocationMutator{
 
-	//	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
+	//	private static final Logger log = LogManager.getLogger(LocationMutatorwChoiceSet.class);
 	private int unsuccessfullLC = 0;
 	private double recursionTravelSpeedChange = 0.1;
 	private double recursionTravelSpeed = 30.0;

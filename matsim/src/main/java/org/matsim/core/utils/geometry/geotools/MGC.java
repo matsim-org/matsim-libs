@@ -23,7 +23,8 @@ package org.matsim.core.utils.geometry.geotools;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -41,7 +42,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class MGC {
 
-	private final static Logger log = Logger.getLogger(MGC.class);
+	private final static Logger log = LogManager.getLogger(MGC.class);
 
 	public static final GeometryFactory geoFac = new GeometryFactory();
 

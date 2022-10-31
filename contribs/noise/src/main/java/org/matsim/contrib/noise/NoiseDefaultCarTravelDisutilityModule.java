@@ -21,7 +21,8 @@ package org.matsim.contrib.noise;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -38,7 +39,7 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 * @author ikaddoura
 */
 public final class NoiseDefaultCarTravelDisutilityModule extends AbstractModule {
-	private static final Logger log = Logger.getLogger(NoiseDefaultCarTravelDisutilityModule.class);
+	private static final Logger log = LogManager.getLogger(NoiseDefaultCarTravelDisutilityModule.class);
 
 	@Override
 	public void install() {

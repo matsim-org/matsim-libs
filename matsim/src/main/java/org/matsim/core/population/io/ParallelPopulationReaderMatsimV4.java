@@ -20,7 +20,8 @@
 
 package org.matsim.core.population.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -57,7 +58,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 /* deliberately package */  class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	
-	static final Logger log = Logger.getLogger(ParallelPopulationReaderMatsimV4.class);
+	static final Logger log = LogManager.getLogger(ParallelPopulationReaderMatsimV4.class);
 
 	private final boolean isPopulationStreaming;
 	private final int numThreads;

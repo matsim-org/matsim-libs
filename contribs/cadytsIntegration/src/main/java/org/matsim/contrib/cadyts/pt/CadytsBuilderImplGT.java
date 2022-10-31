@@ -21,7 +21,8 @@ package org.matsim.contrib.cadyts.pt;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.cadyts.general.CadytsBuilderImpl;
 import org.matsim.contrib.cadyts.general.LookUpItemFromId;
@@ -42,7 +43,7 @@ public final class CadytsBuilderImplGT {
 
         // yy I also don't know where and when this is used to I am commenting it out to see if someone complains.  kai, feb'20
 
-//	private static Logger log = Logger.getLogger( CadytsBuilderImplGT.class ) ;
+//	private static Logger log = LogManager.getLogger( CadytsBuilderImplGT.class ) ;
 //
 //	private CadytsBuilderImplGT(){} // do not instantiate
 //

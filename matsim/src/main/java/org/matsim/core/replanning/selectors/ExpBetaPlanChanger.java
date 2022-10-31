@@ -20,7 +20,8 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.gbl.MatsimRandom;
@@ -31,7 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
  * @author kn based on mrieser
  */
 public final class ExpBetaPlanChanger<T extends BasicPlan, I> implements PlanSelector<T, I> {
-	private static final Logger log = Logger.getLogger(ExpBetaPlanChanger.class);
+	private static final Logger log = LogManager.getLogger(ExpBetaPlanChanger.class);
 
 	private final double beta;
 	static boolean betaWrnFlag = true ;

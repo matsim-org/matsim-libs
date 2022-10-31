@@ -58,7 +58,7 @@ public class ChargingInfrastructureModule extends AbstractModule {
 		bind(ChargingInfrastructureSpecification.class).toProvider(() -> {
 			ChargingInfrastructureSpecification chargingInfrastructureSpecification = new ChargingInfrastructureSpecificationImpl();
 			new ChargerReader(chargingInfrastructureSpecification).parse(
-					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getChargersFile()));
+					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.chargersFile));
 			return chargingInfrastructureSpecification;
 		}).asEagerSingleton();
 

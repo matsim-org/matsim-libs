@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats.operatorLogger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ import java.util.List;
 final class Log2Gexf {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(Log2Gexf.class);
+	private static final Logger log = LogManager.getLogger(Log2Gexf.class);
 	
 	private static void convertLog2Gexf(String inputFile, String outputFile) {
 		ArrayList<LogElement> logElements = LogReader.readFile(inputFile);

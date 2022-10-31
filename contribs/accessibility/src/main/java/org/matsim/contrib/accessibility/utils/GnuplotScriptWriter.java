@@ -21,7 +21,8 @@ package org.matsim.contrib.accessibility.utils;
 import java.io.BufferedWriter;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
@@ -32,7 +33,7 @@ import org.matsim.core.utils.misc.ExeRunner;
  *
  */
 public final class GnuplotScriptWriter {
-	private static final Logger log = Logger.getLogger( GnuplotScriptWriter.class ) ;
+	private static final Logger log = LogManager.getLogger( GnuplotScriptWriter.class ) ;
 	
 	private GnuplotScriptWriter() {} // do not instantiate
 

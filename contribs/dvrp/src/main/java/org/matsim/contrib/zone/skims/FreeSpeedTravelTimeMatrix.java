@@ -44,13 +44,13 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 
 	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads,
 			TravelTime travelTime) {
-		gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.getCellSize());
+		gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.cellSize);
 		var centralNodes = ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), gridSystem);
 		var travelDisutility = new TimeAsTravelDisutility(travelTime);
 		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(dvrpNetwork, centralNodes, 0,
 				travelTime, travelDisutility, numberOfThreads);
 		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(dvrpNetwork,
-				params.getMaxNeighborDistance(), 0, travelTime, travelDisutility, numberOfThreads);
+				params.maxNeighborDistance, 0, travelTime, travelDisutility, numberOfThreads);
 	}
 
 	@Override

@@ -28,7 +28,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -612,7 +613,7 @@ public class TransitQueueSimulationTest {
     }
 
     private static class SpyHandleStopData {
-        private static final Logger log = Logger.getLogger(TransitQueueSimulationTest.SpyHandleStopData.class);
+        private static final Logger log = LogManager.getLogger(TransitQueueSimulationTest.SpyHandleStopData.class);
 
         public final TransitStopFacility stopFacility;
         public final double time;

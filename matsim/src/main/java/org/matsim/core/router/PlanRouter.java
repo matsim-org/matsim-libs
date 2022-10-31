@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -47,7 +48,7 @@ import java.util.List;
  * @author thibautd
  */
 public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
-	private static final Logger log = Logger.getLogger( PlanRouter.class ) ;
+	private static final Logger log = LogManager.getLogger( PlanRouter.class ) ;
 	
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;

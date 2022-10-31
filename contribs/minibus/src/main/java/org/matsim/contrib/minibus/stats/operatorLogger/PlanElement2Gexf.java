@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats.operatorLogger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.genericUtils.gexf.*;
@@ -47,7 +48,7 @@ import java.util.List;
  */
 final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 	
-	private static final Logger log = Logger.getLogger(PlanElement2Gexf.class);
+	private static final Logger log = LogManager.getLogger(PlanElement2Gexf.class);
 	
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
 

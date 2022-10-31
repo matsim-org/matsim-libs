@@ -21,7 +21,7 @@
 			<parameterset type="RuleBasedETaxiOptimizer">
 				<parameterset type="RuleBasedTaxiOptimizer"/>
 
-				<param name="minRelativeSoc" value="0.7"/>
+				<param name="minSoc" value="0.7"/>
 				<param name="socCheckTimeStep" value="60"/>
 			</parameterset>
 		</parameterset>
@@ -33,9 +33,12 @@
 		<param name="auxDischargeTimeStep" value="60"/>
 
 		<param name="chargersFile" value="one_etaxi_chargers.xml"/>
-		<param name="vehiclesFile" value="one_etaxi_evehicles.xml"/>
 
 		<param name="timeProfiles" value="true"/>
+	</module>
+
+	<module name="vehicles">
+		<param name="vehiclesFile" value="one_etaxi_evehicles.xml"/>
 	</module>
 
 	<module name="network">

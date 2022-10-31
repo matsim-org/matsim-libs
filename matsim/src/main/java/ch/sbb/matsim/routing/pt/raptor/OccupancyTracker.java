@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator.RouteSegmentIterator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -51,7 +52,7 @@ import javax.inject.Inject;
  */
 public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private final static Logger LOG = Logger.getLogger(OccupancyTracker.class);
+	private final static Logger LOG = LogManager.getLogger(OccupancyTracker.class);
 
 	private final OccupancyData data;
 	private final Scenario scenario;

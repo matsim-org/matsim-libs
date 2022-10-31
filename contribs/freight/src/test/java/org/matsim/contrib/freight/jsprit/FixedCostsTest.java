@@ -41,7 +41,8 @@ import org.matsim.vehicles.*;
 
 import java.net.URL;
 import java.util.Collection;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -50,7 +51,7 @@ import org.apache.log4j.Logger;
  */
 public class FixedCostsTest extends MatsimTestCase {
 
-	private final static Logger log = Logger.getLogger(FixedCostsTest.class);
+	private final static Logger log = LogManager.getLogger(FixedCostsTest.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils() ;

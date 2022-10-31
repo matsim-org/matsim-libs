@@ -11,7 +11,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
@@ -38,7 +39,7 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
  * @author Chengqi Lu
  */
 public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
-	private static final Logger log = Logger.getLogger(FeedforwardRebalancingStrategy.class);
+	private static final Logger log = LogManager.getLogger(FeedforwardRebalancingStrategy.class);
 
 	private final DrtZonalSystem zonalSystem;
 	private final Fleet fleet;
@@ -67,19 +68,19 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		this.drtZoneTargetLinkSelector = drtZoneTargetLinkSelector;
 		this.fastHeuristicRelocationCalculator = fastHeuristicRelocationCalculator;
 		this.fleet = fleet;
-		timeBinSize = strategySpecificParams.getTimeBinSize();
+		timeBinSize = strategySpecificParams.timeBinSize;
 
-		rebalanceInterval = generalParams.getInterval();
+		rebalanceInterval = generalParams.interval;
 
-		scaling = strategySpecificParams.getFeedforwardSignalStrength() * rebalanceInterval / timeBinSize;
+		scaling = strategySpecificParams.feedforwardSignalStrength * rebalanceInterval / timeBinSize;
 		log.info("The feedforward signal strength is: "
-				+ Double.toString(strategySpecificParams.getFeedforwardSignalStrength()));
+				+ Double.toString(strategySpecificParams.feedforwardSignalStrength));
 
 		feedforwardSignal = feedforwardSignalHandler.getFeedforwardSignal();
-		feedforwardSignalLead = strategySpecificParams.getFeedforwardSignalLead();
+		feedforwardSignalLead = strategySpecificParams.feedforwardSignalLead;
 
-		feedbackSwitch = strategySpecificParams.getFeedbackSwitch();
-		minNumVehiclesPerZone = strategySpecificParams.getMinNumVehiclesPerZone();
+		feedbackSwitch = strategySpecificParams.feedbackSwitch;
+		minNumVehiclesPerZone = strategySpecificParams.minNumVehiclesPerZone;
 
 		log.info("Rebalance strategy constructed: Feedforward Rebalancing Strategy is used");
 		log.info("Feedback switch is set to " + Boolean.toString(feedbackSwitch));

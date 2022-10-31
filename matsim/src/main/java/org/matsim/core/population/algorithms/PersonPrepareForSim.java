@@ -20,7 +20,8 @@
 
 package org.matsim.core.population.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -61,7 +62,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	private final Network carOnlyNetwork;
 	private final ActivityFacilities activityFacilities;
 
-	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
+	private static final Logger log = LogManager.getLogger(PersonPrepareForSim.class);
 	private final Scenario scenario;
 	
 	/*

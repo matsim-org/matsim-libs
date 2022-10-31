@@ -22,7 +22,8 @@ package org.matsim.withinday.mobsim;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -35,7 +36,7 @@ import com.google.inject.Provider;
 
 public class WithinDayQSimFactory implements Provider<Mobsim> {
 
-	private static final Logger log = Logger.getLogger(WithinDayQSimFactory.class);
+	private static final Logger log = LogManager.getLogger(WithinDayQSimFactory.class);
 
 	private final Scenario scenario;
 	private final EventsManager eventsManager;

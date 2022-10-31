@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.households;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
@@ -44,7 +45,7 @@ import java.util.Map;
  *
  */
 public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlgorithm{
-	private static final Logger log = Logger.getLogger( HouseholdsWriterV10.class ) ;
+	private static final Logger log = LogManager.getLogger( HouseholdsWriterV10.class ) ;
 	
 	private List<Tuple<String, String>> atts = new ArrayList<>();
 	private Households households;

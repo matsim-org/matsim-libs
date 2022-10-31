@@ -3,11 +3,12 @@ package org.matsim.contrib.accessibility;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 public final class CSVWriter {
-	private static final Logger log = Logger.getLogger(CSVWriter.class);
+	private static final Logger log = LogManager.getLogger(CSVWriter.class);
 
 	public static final String FILE_NAME= "accessibilities.csv";
 	

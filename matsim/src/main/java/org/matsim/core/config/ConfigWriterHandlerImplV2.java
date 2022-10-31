@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.config;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -88,7 +89,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 			
 			// can't say what this is for:
 			if ( moduleName.equals("thisAintNoFlat") ) {
-				Logger.getLogger(this.getClass()).warn("here") ;
+				LogManager.getLogger(this.getClass()).warn("here") ;
 			}
 
 			// then process the parameter sets (which will recursively call the current method again):
@@ -144,7 +145,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 						}
 					}
 				}
-//					Logger.getLogger(this.getClass()).warn( "comparisonPSet=" + comparisonPSet ) ;
+//					LogManager.getLogger(this.getClass()).warn( "comparisonPSet=" + comparisonPSet ) ;
 				// TODO: write comments only for the first parameter set of a given type?
 				// I think that that is done now.  kai, jun'18
 				if ( !headerHasBeenWritten ) {

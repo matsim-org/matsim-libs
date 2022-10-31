@@ -20,7 +20,8 @@
 
 package org.matsim.core.population;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,7 +38,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class PersonImplTest extends MatsimTestCase {
 
-	private final static Logger log = Logger.getLogger(PersonImplTest.class);
+	private final static Logger log = LogManager.getLogger(PersonImplTest.class);
 
 	/**
 	 * @author mrieser

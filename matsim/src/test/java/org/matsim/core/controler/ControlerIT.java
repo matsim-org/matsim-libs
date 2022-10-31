@@ -31,7 +31,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,6 +54,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -76,7 +78,7 @@ import com.google.inject.Provider;
 @RunWith(Parameterized.class)
 public class ControlerIT {
 
-	private final static Logger log = Logger.getLogger(ControlerIT.class);
+	private final static Logger log = LogManager.getLogger(ControlerIT.class);
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final boolean isUsingFastCapacityUpdate;
@@ -99,6 +101,7 @@ public class ControlerIT {
 
 		// need to run the controler to get Scenario initilized
 		controler.getConfig().controler().setLastIteration( 0 );
+		controler.getConfig().controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 		controler.run();
 
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
@@ -500,6 +503,7 @@ public class ControlerIT {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setCompressionType( CompressionType.zst );
+		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
 
 		final Controler controler = new Controler(config);
 

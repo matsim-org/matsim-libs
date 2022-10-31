@@ -21,7 +21,8 @@ package org.matsim.run;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils.ExitTrappedException;
  */
 public class CreateFullConfigTest {
 
-	private final static Logger log = Logger.getLogger(CreateFullConfigTest.class);
+	private final static Logger log = LogManager.getLogger(CreateFullConfigTest.class);
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 

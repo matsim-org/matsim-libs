@@ -34,7 +34,8 @@ import java.util.stream.Collectors;
 
 import jakarta.validation.constraints.NotNull;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
@@ -51,7 +52,7 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
  */
 public final class EqualVehiclesToPopulationRatioTargetCalculator implements RebalancingTargetCalculator {
 
-	private static final Logger log = Logger.getLogger(EqualVehiclesToPopulationRatioTargetCalculator.class);
+	private static final Logger log = LogManager.getLogger(EqualVehiclesToPopulationRatioTargetCalculator.class);
 
 	private final int fleetSize;
 	private final Map<DrtZone, Integer> activitiesPerZone;

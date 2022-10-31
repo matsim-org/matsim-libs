@@ -26,7 +26,8 @@ import java.io.IOException;
 import java.util.*;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
@@ -46,10 +47,11 @@ import org.matsim.vehicles.VehicleType;
  * 
  * @author sschroeder
  *
+ * @deprecated Use {@link CarrierPlanWriter} instead which writes the newest format
  */
 public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
-	private static final  Logger logger = Logger.getLogger(CarrierPlanXmlWriterV2.class);
+	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV2.class);
 
 	private final Collection<Carrier> carriers;
 
@@ -141,7 +143,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 			if(vehicleTypeId == null) vehicleTypeId = v.getType() == null ? null : v.getType().getId();
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
 			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getId()
-					+ "\" depotLinkId=\"" + v.getLocation()  
+					+ "\" depotLinkId=\"" + v.getLinkId()
 					+ "\" typeId=\"" + vehicleTypeId.toString()
 					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
 					+ "\" latestEnd=\"" + getTime(v.getLatestEndTime())

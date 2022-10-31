@@ -75,28 +75,28 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 
 		Battery battery = ((EvDvrpVehicle)vehicle).getElectricVehicle().getBattery();
 		int nextTaskIdx;
-		double socBeforeNextTask;
+		double chargeBeforeNextTask;
 		if (schedule.getStatus() == ScheduleStatus.PLANNED) {
 			nextTaskIdx = 0;
-			socBeforeNextTask = battery.getSoc();
+			chargeBeforeNextTask = battery.getCharge();
 		} else { // STARTED
 			Task currentTask = schedule.getCurrentTask();
 			ETaskTracker eTracker = (ETaskTracker)currentTask.getTaskTracker();
-			socBeforeNextTask = eTracker.predictSocAtEnd();
+			chargeBeforeNextTask = eTracker.predictChargeAtEnd();
 			nextTaskIdx = currentTask.getTaskIdx() + 1;
 		}
 
 		List<? extends Task> tasks = schedule.getTasks();
 		for (int i = nextTaskIdx; i < tasks.size() - 1; i++) {
-			socBeforeNextTask -= ((ETask)tasks.get(i)).getTotalEnergy();
+			chargeBeforeNextTask -= ((ETask)tasks.get(i)).getTotalEnergy();
 		}
 
-		if (socBeforeNextTask < minimumRelativeSoc * battery.getCapacity()) {
+		if (chargeBeforeNextTask < minimumRelativeSoc * battery.getCapacity()) {
 			return null;// skip undercharged vehicles
 		}
 
 		VehicleEntry entry = entryFactory.create(vehicle, currentTime);
-		return entry == null ? null : new EVehicleEntry(entry, socBeforeNextTask);
+		return entry == null ? null : new EVehicleEntry(entry, chargeBeforeNextTask);
 	}
 
 	public static class EDrtVehicleDataEntryFactoryProvider implements Provider<VehicleEntry.EntryFactory> {

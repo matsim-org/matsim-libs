@@ -24,7 +24,8 @@ package org.matsim.contrib.freight.controler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -83,7 +84,7 @@ class TimeAndSpaceTourRouter {
 	
 	
 	@SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(TimeAndSpaceTourRouter.class);
+	private static final Logger logger = LogManager.getLogger(TimeAndSpaceTourRouter.class);
 	
 	private LeastCostPathCalculator router;
 	

@@ -20,7 +20,8 @@
 
 package org.matsim.core.utils.gis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -50,7 +51,7 @@ import java.util.List;
  * @author mrieser // switch to GeoTools 2.7.3
  */
 public class ShapeFileReader implements MatsimSomeReader {
-    	private static final Logger log = Logger.getLogger(ShapeFileReader.class);
+    	private static final Logger log = LogManager.getLogger(ShapeFileReader.class);
 
 	private SimpleFeatureSource featureSource = null;
 

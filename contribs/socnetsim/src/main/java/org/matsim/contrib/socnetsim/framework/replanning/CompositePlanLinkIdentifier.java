@@ -22,7 +22,8 @@ package org.matsim.contrib.socnetsim.framework.replanning;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
@@ -39,7 +40,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentif
  * @author thibautd
  */
 public final class CompositePlanLinkIdentifier implements PlanLinkIdentifier {
-	private static final Logger log = Logger.getLogger( CompositePlanLinkIdentifier.class );
+	private static final Logger log = LogManager.getLogger( CompositePlanLinkIdentifier.class );
 
 	private final Collection<PlanLinkIdentifier> orDelegates = new ArrayList<PlanLinkIdentifier>();
 	private final Collection<PlanLinkIdentifier> andDelegates = new ArrayList<PlanLinkIdentifier>();

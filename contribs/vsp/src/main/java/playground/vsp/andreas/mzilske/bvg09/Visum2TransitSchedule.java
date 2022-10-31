@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -35,7 +36,7 @@ import org.matsim.visum.VisumNetwork.VehicleUnit;
 
 public class Visum2TransitSchedule {
 
-	private static final Logger log = Logger.getLogger(Visum2TransitSchedule.class);
+	private static final Logger log = LogManager.getLogger(Visum2TransitSchedule.class);
 
 	private final VisumNetwork visum;
 	private final TransitSchedule schedule;

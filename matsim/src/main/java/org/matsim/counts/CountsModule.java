@@ -23,7 +23,8 @@
 package org.matsim.counts;
 
 import com.google.inject.Provides;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.CountsConfigGroup;
@@ -35,7 +36,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 public class CountsModule extends AbstractModule {
-    private static final Logger log = Logger.getLogger( CountsModule.class );
+    private static final Logger log = LogManager.getLogger( CountsModule.class );
 
     @Override
     public void install() {

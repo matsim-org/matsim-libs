@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -61,7 +62,7 @@ class Realm {
     private final EventsManager eventsManager;
     // Current timestamp
     private int secs;
-    Logger log = Logger.getLogger(Realm.class);
+    Logger log = LogManager.getLogger(Realm.class);
 
     public Realm(ScenarioImporter scenario, EventsManager eventsManager) throws Exception {
     	this.si = scenario;

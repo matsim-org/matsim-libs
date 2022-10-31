@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,7 +34,7 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 public class PlusOneRebalancingStrategy
 		implements RebalancingStrategy, PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler,
 		PassengerRequestRejectedEventHandler, MobsimScopeEventHandler {
-	private static final Logger log = Logger.getLogger(PlusOneRebalancingStrategy.class);
+	private static final Logger log = LogManager.getLogger(PlusOneRebalancingStrategy.class);
 
 	private final String mode;
 	private final Network network;

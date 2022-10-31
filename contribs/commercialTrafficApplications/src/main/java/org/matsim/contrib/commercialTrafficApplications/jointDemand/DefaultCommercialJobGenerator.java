@@ -219,7 +219,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		// Create start activity
 
 		Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START,
-				scheduledTour.getVehicle().getLocation());
+				scheduledTour.getVehicle().getLinkId() );
 		plan.addActivity(startActivity);
 
 		for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
@@ -274,7 +274,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 		// Create end activity
 		Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END,
-				scheduledTour.getVehicle().getLocation());
+				scheduledTour.getVehicle().getLinkId() );
 		plan.addActivity(endActivity);
 
 		return plan;

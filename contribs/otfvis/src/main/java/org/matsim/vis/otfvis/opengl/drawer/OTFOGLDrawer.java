@@ -29,7 +29,8 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.matsim.api.core.v01.Coord;
@@ -66,7 +67,7 @@ import java.util.List;
 
 public class OTFOGLDrawer implements GLEventListener {
 
-	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
+	private final static Logger log = LogManager.getLogger(OTFOGLDrawer.class);
 
 	private double[] modelview = new double[16];
 

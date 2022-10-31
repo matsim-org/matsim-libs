@@ -27,7 +27,8 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,7 +40,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -83,7 +84,7 @@ import com.google.inject.Inject;
 */
 
 public class RunExamplePtDisturbances {
-	private static final Logger log = Logger.getLogger( RunExamplePtDisturbances.class ) ;
+	private static final Logger log = LogManager.getLogger( RunExamplePtDisturbances.class ) ;
 	private static final URL configURL = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("ptdisturbances"),"config.xml");
 
 	public static void main(String[] args) {

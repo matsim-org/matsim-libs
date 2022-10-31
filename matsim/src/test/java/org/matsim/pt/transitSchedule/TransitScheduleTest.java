@@ -23,7 +23,8 @@ package org.matsim.pt.transitSchedule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -38,7 +39,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitScheduleTest {
 
-	private static final Logger log = Logger.getLogger(TransitScheduleTest.class);
+	private static final Logger log = LogManager.getLogger(TransitScheduleTest.class);
 
 	@Test
 	public void testInitialization() {

@@ -20,7 +20,8 @@ package org.matsim.contrib.bicycle;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
@@ -34,7 +35,7 @@ import org.matsim.vehicles.VehicleType;
 final class BicycleModule extends AbstractModule {
 	// needs to be public since otherwise nobody can overwrite parts of Bicycles.addAsOverridingModules(...).  kai, sep'19
 
-	private static final Logger LOG = Logger.getLogger(BicycleModule.class);
+	private static final Logger LOG = LogManager.getLogger(BicycleModule.class);
 
 	@Inject
 	private BicycleConfigGroup bicycleConfigGroup;

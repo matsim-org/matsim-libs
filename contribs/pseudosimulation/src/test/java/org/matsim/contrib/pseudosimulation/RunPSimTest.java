@@ -5,7 +5,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -37,7 +38,7 @@ public class RunPSimTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private Logger logger = Logger.getLogger(RunPSimTest.class );
+	private Logger logger = LogManager.getLogger(RunPSimTest.class );
 
 	private final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial" ),"0.config.xml" ) );
 

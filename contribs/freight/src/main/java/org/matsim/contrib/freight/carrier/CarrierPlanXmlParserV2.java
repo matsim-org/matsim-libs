@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder;
@@ -47,7 +48,7 @@ import org.xml.sax.Attributes;
 
 class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
-	public static final  Logger logger = Logger.getLogger(CarrierPlanXmlParserV2.class);
+	public static final  Logger logger = LogManager.getLogger(CarrierPlanXmlParserV2.class);
 
 	public static final String CARRIERS = "carriers";
 	public static final String CARRIER = "carrier";
@@ -284,8 +285,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 						if (actEndTime == null)
 							throw new IllegalStateException("endTime of activity \"" + type + "\" missing.");
 						currentStartTime = parseTimeToDouble(actEndTime);
-						previousActLoc = currentVehicle.getLocation();
-						currentTourBuilder.scheduleStart(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+						previousActLoc = currentVehicle.getLinkId();
+						currentTourBuilder.scheduleStart(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 
 						break;
 					case "pickup": {
@@ -317,8 +318,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 						break;
 					}
 					case "end":
-						finishLeg(currentVehicle.getLocation());
-						currentTourBuilder.scheduleEnd(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+						finishLeg(currentVehicle.getLinkId() );
+						currentTourBuilder.scheduleEnd(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 						break;
 				}
 				break;

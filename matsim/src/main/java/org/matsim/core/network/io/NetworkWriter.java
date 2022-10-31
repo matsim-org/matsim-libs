@@ -20,7 +20,8 @@
 
 package org.matsim.core.network.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -39,7 +40,7 @@ import java.util.Map;
 
 public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	
-	private static final Logger log = Logger.getLogger(NetworkWriter.class);
+	private static final Logger log = LogManager.getLogger(NetworkWriter.class);
 	
 	private final Network network;
 	private final CoordinateTransformation transformation;

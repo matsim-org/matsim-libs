@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats.operatorLogger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ import java.util.List;
  */
 public class LogElement2PlanElement {
 	
-	private static final Logger log = Logger.getLogger(LogElement2PlanElement.class);
+	private static final Logger log = LogManager.getLogger(LogElement2PlanElement.class);
 	
 	/**
 	 * Aggregate atomic data of {@linkplain LogElement} into time series data of {@link PlanElement}.

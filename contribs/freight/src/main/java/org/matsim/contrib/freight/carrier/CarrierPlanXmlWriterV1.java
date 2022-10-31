@@ -29,7 +29,8 @@ import java.util.Map;
 
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
@@ -49,7 +50,7 @@ import org.matsim.core.utils.misc.Time;
 @Deprecated
 public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 
-	private static final  Logger logger = Logger.getLogger(CarrierPlanXmlWriterV1.class);
+	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV1.class);
 	private final Collection<Carrier> carriers;
 	private int idCounter = 0;
 	private final Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<>();
@@ -106,7 +107,7 @@ public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 		writer.write("\t\t\t<vehicles>\n");
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			writer.write("\t\t\t\t<vehicle id=\"" + v.getId()
-					+ "\" linkId=\"" + v.getLocation() + "\"" + "\" typeId=\""
+					+ "\" linkId=\"" + v.getLinkId() + "\"" + "\" typeId=\""
 					+ v.getVehicleTypeId().toString()
 					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
 					+ "\" latestEnd=\"" + getTime(v.getLatestEndTime())

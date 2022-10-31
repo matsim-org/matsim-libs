@@ -1,6 +1,7 @@
 package playground.vsp.openberlinscenario.cemdap.output;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
@@ -14,7 +15,7 @@ import java.util.Map;
 
 public class CemdapOutputAnalyzer {
 
-    public static final Logger LOG = Logger.getLogger(CemdapOutputAnalyzer.class);
+    public static final Logger LOG = LogManager.getLogger(CemdapOutputAnalyzer.class);
 
 
     // Cemdap activity file columns

@@ -11,7 +11,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +60,7 @@ Some test cases for the OSM-Lane and Signal-Reader
 
 @RunWith(Parameterized.class)
 public class SignalsAndLanesOsmNetworkReaderTest {
-    private static final Logger log = Logger.getLogger(SignalsAndLanesOsmNetworkReaderTest.class);
+    private static final Logger log = LogManager.getLogger(SignalsAndLanesOsmNetworkReaderTest.class);
 
 
     @Rule

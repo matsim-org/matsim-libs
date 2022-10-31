@@ -19,7 +19,8 @@
 package org.matsim.core.controler;
 
 import com.google.inject.Provider;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
@@ -34,7 +35,7 @@ import java.util.Set;
 class NewControler extends AbstractController implements ControlerI {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(NewControler.class);
+	private static final Logger log = LogManager.getLogger(NewControler.class);
 
 	private final Config config;
 	private final PrepareForSim prepareForSim;

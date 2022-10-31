@@ -21,7 +21,8 @@
 package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.Injector;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
@@ -96,7 +97,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
-	final private static Logger log = Logger.getLogger(QSim.class);
+	final private static Logger log = LogManager.getLogger(QSim.class);
 
 	/**
 	 * time since last "info"

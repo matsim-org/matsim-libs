@@ -43,16 +43,16 @@ public class EvStatsModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				if (evCfg.getTimeProfiles()) {
+				if (evCfg.timeProfiles) {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
 							SocHistogramTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							IndividualSocTimeProfileCollectorProvider.class);
+							IndividualChargeTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
 							ChargerOccupancyTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerOccupancyXYDataProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
+							VehicleTypeAggregatedChargeTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
 
 					bind(ChargerPowerCollector.class).asEagerSingleton();
