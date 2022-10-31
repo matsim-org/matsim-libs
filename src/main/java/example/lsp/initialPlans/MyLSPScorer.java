@@ -2,10 +2,6 @@ package example.lsp.initialPlans;
 
 import lsp.*;
 import lsp.usecase.TransshipmentHub;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 
 /**
  * A scorer for the LSP.
@@ -15,7 +11,7 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler
  *
  * @author Kai Martins-Turner (kturner)
  */
-/*package-private*/ class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
+/*package-private*/ class MyLSPScorer implements LSPScorer {
 	private double score = 0;
 
 	private LSP lsp;
@@ -69,15 +65,4 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler
 		this.lsp = pointer;
 	}
 
-	@Override
-	public void handleEvent(FreightTourEndEvent event) {
-		score--;
-		// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
-	}
-
-	@Override
-	public void handleEvent(FreightServiceEndEvent event) {
-		score--;
-		// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
-	}
 }
