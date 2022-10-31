@@ -32,16 +32,20 @@ public class QSimComponentsTest{
 
 	@Test(expected = RuntimeException.class)
 	public void testRemoveNetsimEngine() {
+		// test removing a default qsim module by name
+
+		// running MATSim should fail after removing the netsim engine, since some of the routes do not have a travel time, and in consequence cannot
+		// be teleported if netsim engine is missing.  Thus, the RuntimeException confirms that removing the module worked.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setLastIteration( 0 );
 
+		// remove the module:  (There is also syntax at some intermediate level for this, but I prefer the syntax at config level.  kai, oct'22)
 		QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
 		List<String> components = componentsConfig.getActiveComponents();
 		components.remove( QNetsimEngineModule.COMPONENT_NAME );
 		componentsConfig.setActiveComponents( components );
-
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
@@ -50,8 +54,37 @@ public class QSimComponentsTest{
 		controler.run();
 	}
 
-	@Test(expected= ProvisionException.class)
-	public void testInstallQSimModule() {
+	@Test
+			(expected= ProvisionException.class)
+	public void testReplaceQNetworkFactory() {
+		// here we try to replace the QNetworkFactory.  Cannot do this since we cannot override bindings.
+
+		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
+		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controler().setLastIteration( 0 );
+
+		Scenario scenario = ScenarioUtils.loadScenario( config );
+
+		Controler controler = new Controler( scenario );
+
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				this.installQSimModule( new AbstractQSimModule(){
+					@Override protected void configureQSim(){
+						bind( QNetworkFactory.class ).to( BrokenNetworkFactory.class );
+					}
+				} );
+			}
+		} );
+
+		controler.run();
+	}
+
+	@Test
+			(expected= ProvisionException.class)
+	public void testReplaceQNetworkFactoryByReplacingNetsimEngine() {
+		// trying to replace the QNetworkFactory in the "clean" way.  That is, replace the original netsim engine by my own, and with this
+		// replace the QNetworkFactory.  Does not work since the QNetworkFactory binding is not affected.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
@@ -73,7 +106,7 @@ public class QSimComponentsTest{
 				this.installQSimModule( new AbstractQSimModule(){
 					@Override protected void configureQSim(){
 						bind( QNetsimEngineI.class ).to( QNetsimEngineWithThreadpool.class ).asEagerSingleton();
-
+//
 						bind( VehicularDepartureHandler.class ).toProvider( QNetsimEngineDepartureHandlerProvider.class ).asEagerSingleton();
 
 						bind( QNetworkFactory.class ).to( BrokenNetworkFactory.class );
@@ -90,6 +123,8 @@ public class QSimComponentsTest{
 
 	@Test(expected = RuntimeException.class)
 	public void testOverridingQSimModule() {
+		// use the newly implemented install _overriding_ qsim module.  With this, replacing the QNetworkFactory now works; the
+		// RuntimeException is consequence of the fact that the broken network factory is used.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
