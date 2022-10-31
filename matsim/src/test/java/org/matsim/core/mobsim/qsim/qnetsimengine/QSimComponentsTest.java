@@ -1,5 +1,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import com.google.inject.Inject;
 import com.google.inject.ProvisionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +9,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -57,7 +59,7 @@ public class QSimComponentsTest{
 	@Test
 			(expected= ProvisionException.class)
 	public void testReplaceQNetworkFactory() {
-		// here we try to replace the QNetworkFactory.  Cannot do this since we cannot override bindings.
+		// here we try to replace the QNetworkFactory.  Complains that QNetworkFactory is bound multiple times.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
@@ -71,7 +73,7 @@ public class QSimComponentsTest{
 			@Override public void install(){
 				this.installQSimModule( new AbstractQSimModule(){
 					@Override protected void configureQSim(){
-						bind( QNetworkFactory.class ).to( BrokenNetworkFactory.class );
+						bind( QNetworkFactory.class ).to( MyNetworkFactory.class );
 					}
 				} );
 			}
@@ -81,50 +83,29 @@ public class QSimComponentsTest{
 	}
 
 	@Test
-			(expected= ProvisionException.class)
-	public void testReplaceQNetworkFactoryByReplacingNetsimEngine() {
-		// trying to replace the QNetworkFactory in the "clean" way.  That is, replace the original netsim engine by my own, and with this
-		// replace the QNetworkFactory.  Does not work since the QNetworkFactory binding is not affected.
+	public void testReplaceQNetworkFactory2() {
+		// here we try to replace the QNetworkFactory at AbstractQSimModule.  This works.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setLastIteration( 0 );
 
-		QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
-		List<String> components = componentsConfig.getActiveComponents();
-		components.remove( QNetsimEngineModule.COMPONENT_NAME );
-		components.add( MY_NETSIM_ENGINE );
-		componentsConfig.setActiveComponents( components );
-
-
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		Controler controler = new Controler( scenario );
 
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				this.installQSimModule( new AbstractQSimModule(){
-					@Override protected void configureQSim(){
-						bind( QNetsimEngineI.class ).to( QNetsimEngineWithThreadpool.class ).asEagerSingleton();
-//
-						bind( VehicularDepartureHandler.class ).toProvider( QNetsimEngineDepartureHandlerProvider.class ).asEagerSingleton();
-
-						bind( QNetworkFactory.class ).to( BrokenNetworkFactory.class );
-
-						addQSimComponentBinding( MY_NETSIM_ENGINE ).to( VehicularDepartureHandler.class );
-						addQSimComponentBinding( MY_NETSIM_ENGINE ).to( QNetsimEngineI.class );
-					}
-				} );
+		controler.addOverridingQSimModule( new AbstractQSimModule(){
+			@Override public void configureQSim(){
+				bind( QNetworkFactory.class ).to( MyNetworkFactory.class );
 			}
 		} );
 
 		controler.run();
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void testOverridingQSimModule() {
-		// use the newly implemented install _overriding_ qsim module.  With this, replacing the QNetworkFactory now works; the
-		// RuntimeException is consequence of the fact that the broken network factory is used.
+		// use the newly implemented install _overriding_ qsim module.  With this, replacing the QNetworkFactory now works as part of AbstractModule.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
@@ -138,7 +119,7 @@ public class QSimComponentsTest{
 			@Override public void install(){
 				this.installOverridingQSimModule( new AbstractQSimModule(){
 					@Override protected void configureQSim(){
-						bind( QNetworkFactory.class ).to( BrokenNetworkFactory.class );
+						bind( QNetworkFactory.class ).to( MyNetworkFactory.class );
 					}
 				} );
 			}
@@ -148,15 +129,19 @@ public class QSimComponentsTest{
 	}
 
 
-	private static class BrokenNetworkFactory implements QNetworkFactory {
+	private static class MyNetworkFactory implements QNetworkFactory {
+		ConfigurableQNetworkFactory delegate ;
+		@Inject MyNetworkFactory( EventsManager events, Scenario scenario ) {
+			delegate = new ConfigurableQNetworkFactory( events, scenario );
+		}
 		@Override public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngineI.NetsimInternalInterface simEngine1 ){
-			throw new RuntimeException( "not implemented" );
+			delegate.initializeFactory( agentCounter, mobsimTimer, simEngine1 );
 		}
 		@Override public QNodeI createNetsimNode( Node node ){
-			throw new RuntimeException( "not implemented" );
+			return delegate.createNetsimNode( node );
 		}
 		@Override public QLinkI createNetsimLink( Link link, QNodeI queueNode ){
-			throw new RuntimeException( "not implemented" );
+			return delegate.createNetsimLink( link, queueNode);
 		}
 	}
 }
