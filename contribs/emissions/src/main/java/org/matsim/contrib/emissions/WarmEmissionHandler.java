@@ -124,11 +124,11 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			}
 		} else if ( this.vehicleEntersTrafficMap.containsKey( vehicleId ) ) {
 			logger.warn("At time " + event.getTime() + ", vehicle " + event.getVehicleId() + " enters and leaves traffic without" +
-					"having entered link " + event.getLinkId() + ". Thus, no emissions are calculated for (negligible) travel along this link.");
+					" having entered link " + event.getLinkId() + ". Thus, no emissions are calculated for travel along this link.");
 			sameLinkTrafficLeaveWarnCnt++;
 		} else {
 			logger.warn("At time " + event.getTime() + ", vehicle " + event.getVehicleId() + " left traffic without entering traffic " +
-					"or any link. Thus, no emissions are calculated for this (unusual) event.");
+					"or ANY link. Thus, no emissions are calculated for this unusual event.");
 			unusualTrafficLeaveWarnCnt++;
 		}
 }
