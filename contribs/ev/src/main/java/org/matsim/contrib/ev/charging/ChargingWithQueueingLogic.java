@@ -59,12 +59,12 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			ElectricVehicle ev = evIter.next();
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
-			ev.getBattery().changeSoc(ev.getChargingPower().calcChargingPower(charger) * chargePeriod);
+			ev.getBattery().changeCharge(ev.getChargingPower().calcChargingPower(charger) * chargePeriod);
 
 			if (chargingStrategy.isChargingCompleted(ev)) {
 				evIter.remove();
 				eventsManager.processEvent(
-						new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
+						new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getCharge()));
 				listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 			}
 		}
@@ -95,7 +95,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	public void removeVehicle(ElectricVehicle ev, double now) {
 		if (pluggedVehicles.remove(ev.getId()) != null) {// successfully removed
 			eventsManager.processEvent(
-					new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
+					new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getCharge()));
 			listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 
 			if (!queuedVehicles.isEmpty()) {
@@ -120,7 +120,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			throw new IllegalArgumentException();
 		}
 		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), charger.getChargerType(),
-				ev.getBattery().getSoc()));
+				ev.getBattery().getCharge()));
 		listeners.get(ev.getId()).notifyChargingStarted(ev, now);
 	}
 

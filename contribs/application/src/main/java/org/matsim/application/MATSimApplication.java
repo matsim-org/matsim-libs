@@ -177,7 +177,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		}
 
 		if (iterations > -1)
-			config.controler().setLastIteration(iterations - 1);
+			config.controler().setLastIteration(iterations);
 
 		if (output != null)
 			config.controler().setOutputDirectory(output.toString());

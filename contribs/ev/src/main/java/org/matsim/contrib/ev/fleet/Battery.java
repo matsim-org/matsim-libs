@@ -27,21 +27,21 @@ public interface Battery {
 	double getCapacity();
 
 	/**
-	 * @return Vehicle State of Charge [J]
+	 * @return charge [J]
 	 */
-	double getSoc();
+	double getCharge();
 
 	/**
-	 * @param soc Vehicle State of Charge [J]
+	 * @param charge charge [J]
 	 */
-	void setSoc(double soc);
+	void setCharge(double charge);
 
 	/**
-	 * Changes SOC, making sure the charge level does not increase above the battery capacity or decrease below 0.
+	 * Changes charge, making sure the charge level does not increase above the battery capacity or decrease below 0.
 	 *
 	 * @param energy change in energy [J], can be negative or positive
 	 */
-	default void changeSoc(double energy) {
-		setSoc(Math.max(0, Math.min(getSoc() + energy, getCapacity())));
+	default void changeCharge(double energy) {
+		setCharge(Math.max(0, Math.min(getCharge() + energy, getCapacity())));
 	}
 }
