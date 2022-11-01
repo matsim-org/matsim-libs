@@ -37,7 +37,7 @@ public class VehicleLeavesTrafficEventsTest {
     private static final String networkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
     private static final String outputDirectory = "test/output/org/matsim/contrib/emissions/events/VehicleLeavesTrafficEventTest/";
     private static final String inputDirectory = "test/input/org/matsim/contrib/emissions/events/VehicleLeavesTrafficEventTest/";
-    /* package, for test */ static final String emissionEventsFileName = "smallBerlinSample.emissions.events.offline.xml.gz";
+    private static final String emissionEventsFileName = "smallBerlinSample.emissions.events.offline.xml.gz";
 
     // =======================================================================================================
 
