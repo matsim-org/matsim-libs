@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<carriers>
+		<carrier id="carrier1">
+            <attributes>
+                <attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+            </attributes>
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="carrier_19_lightVehicle" depotLinkId="j(0,1)R" typeId="light" earliestStart="06:00:00" latestEnd="16:00:00"/>
+				</vehicles>
+
+			</capabilities>
+
+			<shipments>
+				<shipment id="1" from="j(0,1)R" to="j(9,7)" size="1" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+				<shipment id="11" from="j(0,1)R" to="j(6,1)R" size="3" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+				<shipment id="12" from="j(0,1)R" to="i(5,6)" size="5" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+				<shipment id="13" from="j(0,1)R" to="j(4,2)R" size="7" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+				<shipment id="14" from="j(0,1)R" to="j(9,2)" size="10" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+            </shipments>
+
+			<services>
+			</services>
+
+		</carrier>
+
+	</carriers>

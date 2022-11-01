@@ -74,7 +74,7 @@ public class SocHistogramTimeProfileCollectorProvider implements Provider<Mobsim
 		return TimeProfiles.createProfileCalculator(header, () -> {
 			UniformHistogram histogram = new UniformHistogram(0.1, header.size());
 			for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
-				histogram.addValue(ev.getBattery().getSoc() / ev.getBattery().getCapacity());
+				histogram.addValue(ev.getBattery().getCharge() / ev.getBattery().getCapacity());
 			}
 
 			ImmutableMap.Builder<String, Double> builder = ImmutableMap.builder();

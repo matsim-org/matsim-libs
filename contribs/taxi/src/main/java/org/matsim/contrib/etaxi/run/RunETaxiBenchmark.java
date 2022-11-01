@@ -68,7 +68,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunETaxiBenchmark {
 	private static final double CHARGING_SPEED_FACTOR = 1.5; // > 1 in this example
-	private static final double MAX_RELATIVE_SOC = 0.8; // charge up to 80% SOC
+	private static final double MAX_SOC = 0.8; // charge up to 80% SOC
 	private static final double TEMPERATURE = 20; // oC
 
 	public static void run(URL configUrl, int runs) {
@@ -114,7 +114,7 @@ public class RunETaxiBenchmark {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
+						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_SOC)));
 				//TODO switch to VariableSpeedCharging for Nissan
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);

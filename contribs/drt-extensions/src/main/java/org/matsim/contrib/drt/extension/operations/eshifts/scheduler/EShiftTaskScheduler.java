@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
@@ -180,7 +179,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
 			final double waitTime = ChargingEstimations
 					.estimateMaxWaitTimeForNextVehicle(chargerImpl);
 
-			if (ev.getBattery().getSoc() / ev.getBattery().getCapacity() < shiftsParams.chargeDuringBreakThreshold ||
+			if (ev.getBattery().getCharge() / ev.getBattery().getCapacity() < shiftsParams.chargeDuringBreakThreshold ||
 			waitTime > 0) {
                 dropoffStopTask = taskFactory.createShiftBreakTask(vehicle, startTime,
                         endTime, link, shiftBreak, breakFacility);
@@ -329,7 +328,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
 			final double waitTime = ChargingEstimations
 					.estimateMaxWaitTimeForNextVehicle(chargingImpl);
 
-			if (ev.getBattery().getSoc() / ev.getBattery().getCapacity() < shiftsParams.chargeDuringBreakThreshold
+			if (ev.getBattery().getCharge() / ev.getBattery().getCapacity() < shiftsParams.chargeDuringBreakThreshold
                     || ((ChargingWithAssignmentLogic) chargingImpl.getLogic()).getAssignedVehicles().contains(ev)
 			|| waitTime >0) {
                 dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, startTime,
