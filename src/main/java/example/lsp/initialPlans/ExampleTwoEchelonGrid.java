@@ -89,6 +89,7 @@ final class ExampleTwoEchelonGrid {
 			.setCostPerDistanceUnit(0.0005)
 			.setCostPerTimeUnit(0.005)
 			.build();
+	public static final double HUBCOSTS_FIX = 120.;
 
 	private ExampleTwoEchelonGrid() {
 	} // so it cannot be instantiated
@@ -236,7 +237,7 @@ final class ExampleTwoEchelonGrid {
 			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
 					.setTransshipmentHubScheduler(hubScheduler)
 					.build();
-			LSPUtils.setFixedCost(hubResource, 120.); //Set fixed costs (per day) for the availability of the hub.
+			LSPUtils.setFixedCost(hubResource, HUBCOSTS_FIX); //Set fixed costs (per day) for the availability of the hub.
 
 			LogisticsSolutionElement hubLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("HubLSE", LogisticsSolutionElement.class))
 					.setResource(hubResource)
