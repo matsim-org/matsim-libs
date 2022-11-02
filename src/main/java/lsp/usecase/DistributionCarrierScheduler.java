@@ -20,11 +20,6 @@
 
 package lsp.usecase;
 
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.util.Solutions;
 import lsp.*;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -34,9 +29,6 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -69,7 +61,6 @@ import java.util.*;
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();
 			this.carrier.getPlans().clear();
-			this.carrier.setSelectedPlan(null);
 		}
 	}
 
@@ -79,7 +70,8 @@ import java.util.*;
 		double availiabilityTimeOfLastShipment = 0;
 		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
 		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
-		List<ScheduledTour> scheduledTours = new LinkedList<>();
+//		List<ScheduledTour> scheduledTours = new LinkedList<>();
+		List<CarrierPlan> scheduledPlans = new LinkedList<>();
 
 		for (ShipmentWithTime tuple : copyOfAssignedShipments) {
 			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber weas ist, wenn es mehrer gibt???
@@ -93,9 +85,9 @@ import java.util.*;
 				availiabilityTimeOfLastShipment = tuple.getTime();
 			} else {
 				load = 0;
-				Carrier auxiliaryCarrier = createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime);
-				routeCarrier(auxiliaryCarrier);
-				scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
+				Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime) , resource.getNetwork());
+//				scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
+				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 				cumulatedLoadingTime = 0;
 				shipmentsInCurrentTour.clear();
 				shipmentsInCurrentTour.add(tuple);
@@ -106,16 +98,16 @@ import java.util.*;
 		}
 
 		if (!shipmentsInCurrentTour.isEmpty()) {
-			Carrier auxiliaryCarrier = createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime);
-			routeCarrier(auxiliaryCarrier);
-			scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
+			Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime), resource.getNetwork());
+//			scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
+			scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 			shipmentsInCurrentTour.clear();
 		}
 
-		CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledTours));
+		CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledPlans));
+		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
 		carrier.setSelectedPlan(plan);
 	}
-
 
 
 	/**
@@ -131,18 +123,21 @@ import java.util.*;
 	 * and use only on DistributionCarrier with only one VRP and only one jsprit-Run. This would avoid this workaround and
 	 * also improve the solution, because than the DistributionCarrier can decide on it one which shipments will go into which tours
 	 *
-	 * @param scheduledTours Collection of scheduledTours
+	 * @param carrierPlans Collection of CarrierPlans
 	 * @return Collection<ScheduledTour> the scheduledTours with unified tour Ids.
 	 */
-	private Collection<ScheduledTour> unifyTourIds(Collection<ScheduledTour> scheduledTours) {
+//	private Collection<ScheduledTour> unifyTourIds(Collection<ScheduledTour> scheduledTours) {
+	private Collection<ScheduledTour> unifyTourIds(Collection<CarrierPlan> carrierPlans) {
 		int tourIdindex = 1;
 		List<ScheduledTour> scheduledToursUnified = new LinkedList<>();
 
-		for (ScheduledTour scheduledTour : scheduledTours) {
-			var newTour = scheduledTour.getTour().duplicateWithNewId(Id.create("dist_"+tourIdindex, Tour.class));
-			tourIdindex++;
-			var newScheduledTour = ScheduledTour.newInstance(newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture() );
-			scheduledToursUnified.add(newScheduledTour);
+		for (CarrierPlan carrierPlan : carrierPlans) {
+			for (ScheduledTour scheduledTour : carrierPlan.getScheduledTours()) {
+				var newTour = scheduledTour.getTour().duplicateWithNewId(Id.create("dist_" + tourIdindex, Tour.class));
+				tourIdindex++;
+				var newScheduledTour = ScheduledTour.newInstance(newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture());
+				scheduledToursUnified.add(newScheduledTour);
+			}
 		}
 
 		return scheduledToursUnified;
@@ -157,24 +152,6 @@ import java.util.*;
 		CarrierService service = builder.build();
 		pairs.add(new LSPCarrierPair(tuple, service));
 		return service;
-	}
-
-	private void routeCarrier(Carrier carrier) {
-		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, resource.getNetwork());
-		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(resource.getNetwork(), UsecaseUtils.getVehicleTypeCollection(carrier));
-		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
-		vrpBuilder.setRoutingCost(netbasedTransportcosts);
-		VehicleRoutingProblem vrp = vrpBuilder.build();
-
-		VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(vrp);
-		algorithm.setMaxIterations(1);
-		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-
-		VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
-
-		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
-		NetworkRouter.routePlan(plan, netbasedTransportcosts);
-		carrier.setSelectedPlan(plan);
 	}
 
 	@Override

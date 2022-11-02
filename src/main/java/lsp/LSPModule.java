@@ -33,10 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierAgentTracker;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.controler.CarrierStrategyManager;
-import org.matsim.contrib.freight.controler.FreightAgentSource;
+import org.matsim.contrib.freight.controler.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -62,6 +59,9 @@ public class LSPModule extends AbstractModule {
 
 		bind(LSPControlerListener.class).in(Singleton.class);
 		addControlerListenerBinding().to(LSPControlerListener.class);
+
+		bind(CarrierControlerListener.class).in( Singleton.class );
+		addControlerListenerBinding().to(CarrierControlerListener.class);
 
 		bind( CarrierAgentTracker.class ).in( Singleton.class );
 		addEventHandlerBinding().to( CarrierAgentTracker.class );
@@ -103,6 +103,7 @@ public class LSPModule extends AbstractModule {
 
 		// the scorers are necessary to run a zeroth iteration to the end:
 		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFactoryDummyImpl.class );
+//		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFunctionFactoryImpl.class );
 		bind( LSPScorerFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
 
 		// for iterations, one needs to replace the following with something meaningful.  If nothing else, there are "empty implementations" that do nothing.  kai, jul'22

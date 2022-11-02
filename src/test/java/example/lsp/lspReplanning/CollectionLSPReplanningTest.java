@@ -20,7 +20,6 @@
 
 package example.lsp.lspReplanning;
 
-import com.google.inject.Provider;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
@@ -34,6 +33,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
+import org.matsim.contrib.freight.controler.CarrierStrategyManagerImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -41,6 +42,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -181,19 +184,23 @@ public class CollectionLSPReplanningTest {
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPStrategyManager.class ).toProvider( new Provider<LSPStrategyManager>(){
-					@Override public LSPStrategyManager get(){
-						LSPStrategyManager manager = new LSPStrategyManagerImpl();
-						{
-							ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-							maybeTodayAssigner.setLSP( collectionLSP );
-							final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy();
-							// (a factory makes sense if it is passed around; in this case it feels like overkill.  kai, jul'22)
-							manager.addStrategy( strategy, null, 1 );
-						}
-						return manager;
+				bind( LSPStrategyManager.class ).toProvider(() -> {
+					LSPStrategyManager manager = new LSPStrategyManagerImpl();
+					{
+						ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+						maybeTodayAssigner.setLSP( collectionLSP );
+						final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy();
+						// (a factory makes sense if it is passed around; in this case it feels like overkill.  kai, jul'22)
+						manager.addStrategy( strategy, null, 1 );
 					}
-				} );
+					return manager;
+				});
+
+				bind( CarrierStrategyManager.class ).toProvider(() -> {
+					CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
+					return strategyManager;
+				});
 			}
 		} );
 
@@ -203,6 +210,8 @@ public class CollectionLSPReplanningTest {
 //		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
 	}
+
+
 
 	@Test
 	public void testCollectionLSPReplanning() {

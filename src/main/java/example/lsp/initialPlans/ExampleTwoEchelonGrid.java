@@ -20,11 +20,9 @@
 
 package example.lsp.initialPlans;
 
-import com.google.inject.Provider;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.TransshipmentHub;
 import lsp.usecase.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,10 +32,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
+import org.matsim.contrib.freight.controler.CarrierStrategyManagerImpl;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -73,7 +70,6 @@ import java.util.*;
  */
 final class ExampleTwoEchelonGrid {
 
-
 	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGrid.class);
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
 	private static final Id<Link> HUB_LINK_ID = Id.createLinkId("j(5,3)");
@@ -93,6 +89,7 @@ final class ExampleTwoEchelonGrid {
 			.setCostPerDistanceUnit(0.0005)
 			.setCostPerTimeUnit(0.005)
 			.build();
+	public static final double HUBCOSTS_FIX = 120.;
 
 	private ExampleTwoEchelonGrid() {
 	} // so it cannot be instantiated
@@ -114,16 +111,18 @@ final class ExampleTwoEchelonGrid {
 		});
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPStrategyManager.class ).toProvider( new Provider<LSPStrategyManager>(){
-					@Override public LSPStrategyManager get(){
-						LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-						strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
-//						strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
-						return strategyManager;
-					}
-				} );
+				bind( CarrierScoringFunctionFactory.class ).toInstance( new MyCarrierScorer());
+				bind( CarrierStrategyManager.class ).toProvider(() -> {
+					CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+					return strategyManager;
+				});
+				bind( LSPStrategyManager.class ).toProvider(() -> {
+					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+					return strategyManager;
+				});
 				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new MyLSPScorer() );
-
 			}
 		} );
 
@@ -203,10 +202,10 @@ final class ExampleTwoEchelonGrid {
 					.addSolutionElement(directCarrierElement)
 					.build();
 
-			final ShipmentAssigner singlesolutionShipmentAssigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
+			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
 			lspPlan_direct = LSPUtils.createLSPPlan()
 					.addSolution(solution_direct)
-					.setAssigner(singlesolutionShipmentAssigner);
+					.setAssigner(singleSolutionShipmentAssigner);
 		}
 
 		LSPPlan lspPlan_withHub;
@@ -238,7 +237,7 @@ final class ExampleTwoEchelonGrid {
 			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
 					.setTransshipmentHubScheduler(hubScheduler)
 					.build();
-			LSPUtils.setFixedCost(hubResource, 120.); //Set fixed costs (per day) for the availability of the hub.
+			LSPUtils.setFixedCost(hubResource, HUBCOSTS_FIX); //Set fixed costs (per day) for the availability of the hub.
 
 			LogisticsSolutionElement hubLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("HubLSE", LogisticsSolutionElement.class))
 					.setResource(hubResource)
@@ -268,11 +267,9 @@ final class ExampleTwoEchelonGrid {
 					.addSolutionElement(distributionCarrierElement)
 					.build();
 
-
 			lspPlan_withHub = LSPUtils.createLSPPlan()
 					.addSolution(solution_withHub)
 					.setAssigner(UsecaseUtils.createSingleSolutionShipmentAssigner());
-
 		}
 
 		//Todo: Auch das ist wirr: Muss hier alle sommeln, damit man die dann im LSPBuilder dem SolutionScheduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu ... urgs KMT'Jul22
@@ -280,26 +277,11 @@ final class ExampleTwoEchelonGrid {
 		lspPlans.add(lspPlan_withHub);
 		lspPlans.add(lspPlan_direct);
 
-		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
+		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
 				.setInitialPlan(lspPlan_direct)
-//				.setInitialPlan(lspPlan_withHub)
-//				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
-				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans))) //Hier müssen irgendwie die Ressourcen beider Pläne rein, oder? - Habe ich jetzt gemacht. kmt ' jul22
-				;
-
-
-		LSP lsp = lspBuilder.build();
-		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
-//		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
-
-		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
-//		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
-//		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
-//		strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
-//		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
-//		replanner.setEmbeddingContainer(lsp);
-
-//		lsp.setReplanner(replanner);
+				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans)))
+				.build();
+		lsp.addPlan(lspPlan_withHub); //add the second plan to the lsp
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
@@ -338,7 +320,6 @@ final class ExampleTwoEchelonGrid {
 	}
 
 	//TODO: This is maybe something that can go into a utils class ... KMT jul22
-
 	private static List<LSPResource> createResourcesListFromLSPPlans(List<LSPPlan> lspPlans) {
 		log.info("Collecting all LSPResources from the LSPPlans");
 		List<LSPResource> resourcesList = new ArrayList<>();            //TODO: Mache daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
@@ -366,55 +347,34 @@ final class ExampleTwoEchelonGrid {
 	}
 
 
-	private static class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
-		private double score = 0;
+	//		@Override public ScoringFunction createScoringFunction(Carrier carrier ){
+//
+//			return new ScoringFunction(){
+//
+//				private double score;
+//
+//				@Override public void handleActivity( Activity activity ){
+//					score--;
+//				}
+//				@Override public void handleLeg( Leg leg ){
+//					score = score - 10;
+//				}
+//				@Override public void agentStuck( double time ){
+//				}
+//				@Override public void addMoney( double amount ){
+//				}
+//				@Override public void addScore( double amount ){
+//				}
+//				@Override public void finish(){
+//				}
+//				@Override public double getScore(){
+//					return score;
+//				}
+//				@Override public void handleEvent( Event event ){
+//					score = score - 0.01;
+//				}
+//			};
+//		}
+//	}
 
-		private LSP lsp;
-
-		@Override
-		public void reset(int iteration) {
-			score = 0.;
-		}
-
-		@Override
-		public double getScoreForCurrentPlan() {
-			scoreHub();
-			return score;
-		}
-
-		/**
-		 * If a hub resource is in the selected plan of the LSP, it will get scored.
-		 * <p>
-		 * This is somehow a quickfix, because the hubs do **not** have any own events yet.
-		 * This needs to be implemented later
-		 * KMT oct'22
-		 */
-		private void scoreHub() {
-			var lspPlan = lsp.getSelectedPlan();
-			for (LogisticsSolution solution : lspPlan.getSolutions()) {
-				for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
-					if (solutionElement.getResource() instanceof TransshipmentHub hub){
-						score = score - LSPUtils.getFixedCost(hub);
-					}
-				}
-			}
-		}
-
-		@Override
-		public void setEmbeddingContainer(LSP pointer) {
-			this.lsp = pointer;
-		}
-
-		@Override
-		public void handleEvent(FreightTourEndEvent event) {
-			score--;
-			// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
-		}
-
-		@Override
-		public void handleEvent(FreightServiceEndEvent event) {
-			score--;
-			// use event handlers to compute score.  In this case, score is decreased by one every time a service and a tour ends.
-		}
-	}
 }

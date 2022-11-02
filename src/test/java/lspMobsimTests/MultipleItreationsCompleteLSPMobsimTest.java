@@ -34,6 +34,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
+import org.matsim.contrib.freight.controler.CarrierStrategyManagerImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -41,6 +43,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -303,6 +307,11 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
+				bind( CarrierStrategyManager.class ).toProvider(() -> {
+					CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
+					return strategyManager;
+				});
 			}
 		} );
 		config.controler().setFirstIteration(0);
@@ -335,5 +344,8 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 			}
 		}
 	}
+
 }
+
+
 
