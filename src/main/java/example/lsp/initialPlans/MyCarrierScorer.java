@@ -5,7 +5,6 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 
@@ -24,11 +23,11 @@ class MyCarrierScorer implements CarrierScoringFunctionFactory {
 		VehicleEmploymentScoring vehicleEmploymentScoring = new VehicleEmploymentScoring(carrier);
 //		DriversLegScoring driverLegScoring = new DriversLegScoring(carrier, this.network);
 //		DriversActivityScoring actScoring = new DriversActivityScoring();
-		DriversTripScoring driversTripScoring = new DriversTripScoring( carrier, this.network);
+		TakeJspritScore takeJspritScore = new TakeJspritScore( carrier);
 //		sf.addScoringFunction(driverLegScoring);
 		sf.addScoringFunction(vehicleEmploymentScoring);
 //		sf.addScoringFunction(actScoring);
-		sf.addScoringFunction(driversTripScoring);
+		sf.addScoringFunction(takeJspritScore);
 		return sf;
 	}
 
@@ -58,6 +57,24 @@ class MyCarrierScorer implements CarrierScoringFunctionFactory {
 				}
 			}
 			return score;
+		}
+	}
+
+	private class TakeJspritScore implements SumScoringFunction.BasicScoring {
+
+		private final Carrier carrier;
+		public TakeJspritScore(Carrier carrier) {
+			super();
+			this.carrier = carrier;
+		}
+
+		@Override public void finish() {}
+
+		@Override public double getScore() {
+			if (carrier.getSelectedPlan().getScore() != null){
+				return carrier.getSelectedPlan().getScore();
+			}
+			return Double.NEGATIVE_INFINITY;
 		}
 	}
 
@@ -129,8 +146,8 @@ class MyCarrierScorer implements CarrierScoringFunctionFactory {
 //		@Override public void handleActivity(Activity activity) {
 //			if (activity instanceof FreightActivity freightActivity) {
 //				double actStartTime = freightActivity.getStartTime().seconds();
-//				// Scoring for missed TimeWindows -- Commented out, because it is unclear, which value to set here
-//				// and I do not have a replanning strategy, that forces e.g. a time-shift
+////				// Scoring for missed TimeWindows -- Commented out, because it is unclear, which value to set here
+////				// and I do not have a replanning strategy, that forces e.g. a time-shift
 ////				TimeWindow tw = freightActivity.getTimeWindow();
 ////				if(actStartTime > tw.getEnd()){
 ////					double penalty_score = (-1)*(actStartTime - tw.getEnd()) * missedTimeWindowPenalty;
@@ -141,7 +158,7 @@ class MyCarrierScorer implements CarrierScoringFunctionFactory {
 //				//TODO: Unclear how to get the right timeParameter out of the vehicleType - missing link between activity and driver/agent, that could be used.
 //				double actTimeCosts = (freightActivity.getEndTime().seconds() - actStartTime) * timeParameter;
 //				if (!(actTimeCosts >= 0.0)) throw new AssertionError("actTimeCosts must be positive");
-//				score += actTimeCosts*(-1);
+//				score += actTimeCosts * (-1);
 //			}
 //		}
 //
@@ -150,28 +167,5 @@ class MyCarrierScorer implements CarrierScoringFunctionFactory {
 //		}
 //	}
 
-	private static class DriversTripScoring implements SumScoringFunction.TripScoring {
-
-		private double score = 0.0;
-		private final Network network;
-		private final Carrier carrier;
-
-		public DriversTripScoring(Carrier carrier, Network network) {
-			super();
-			this.network = network;
-			this.carrier = carrier;
-		}
-
-		@Override public void finish() {}
-
-		@Override public double getScore() {
-			return score;
-		}
-
-		@Override public void handleTrip(TripStructureUtils.Trip trip) {
-			var myTrip  = trip;
-			score = score -1;
-		}
-	}
 
 }
