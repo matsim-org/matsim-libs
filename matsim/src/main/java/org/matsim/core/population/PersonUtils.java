@@ -22,6 +22,7 @@
 package org.matsim.core.population;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,9 +41,9 @@ public final class PersonUtils {
     private static final String AGE = "age";
     private static final String TRAVEL_CARDS = "travelcards";
     /** {@code @Deprecated:} Use {@link #getIncome(Person)} {@link #setIncome(Person, double)} and make private */
-    public static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
-    public static final String PERSONAL_SCORING_PREFIX = "scoring_";
-    public static final String PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX = PERSONAL_SCORING_PREFIX + "constant_";
+    private static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
+    private static final String PERSONAL_SCORING_PREFIX = "scoring_";
+    private static final String PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME = PERSONAL_SCORING_PREFIX + "constant";
     private final static Logger log = LogManager.getLogger(Person.class);
 
     @Deprecated // use methods of interface Person
@@ -95,8 +96,8 @@ public final class PersonUtils {
     /**
      * convenience method for often used demographic attribute
      */
-    public static Double getPersonalScoringModeConstant(Person person, String mode) {
-        return (Double) person.getAttributes().getAttribute(PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX + mode);
+    public static Map<String, Double> getPersonalScoringModeConstants(Person person) {
+        return (Map<String, Double>) person.getAttributes().getAttribute(PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME);
     }
 
     /**
@@ -188,8 +189,8 @@ public final class PersonUtils {
         person.getAttributes().putAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME, income);
     }
 
-    public static void setPersonalScoringModeConstant(Person person, final String mode, final double constant) {
-        person.getAttributes().putAttribute(PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX + mode, constant);
+    public static void setPersonalScoringModeConstants(Person person, Map<String, Double> mode2scoringConstant) {
+        person.getAttributes().putAttribute(PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME, mode2scoringConstant);
     }
 
     @Deprecated // yyyy is there a way to use person.getAttributes instead??  kai, nov'16

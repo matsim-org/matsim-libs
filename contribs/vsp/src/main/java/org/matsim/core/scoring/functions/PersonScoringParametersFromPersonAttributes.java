@@ -37,8 +37,6 @@ import java.util.OptionalDouble;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.matsim.core.population.PersonUtils.PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX;
-
 /**
  * @author tschlenther
  * <p>
@@ -158,31 +156,22 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
                 }
             }
 
-            // We do not know which modes have a person-specific constant set in their attributes, so iterate over all attributes to find them
-            for (Map.Entry<String, Object> entry: person.getAttributes().getAsMap().entrySet()) {
-                if (entry.getKey().startsWith(PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX)) {
-                    try {
-                        String mode = entry.getKey().split(PERSONAL_SCORING_MODE_CONSTANT_ATTRIBUTE_PREFIX)[1];
-                        double constant = (Double) entry.getValue();
-                        ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
-                        modeUtilityParamsBuilder.setConstant(constant);
+            Map<String, Double> personalScoringModeConstants = PersonUtils.getPersonalScoringModeConstants(person);
+            if (personalScoringModeConstants != null) {
+                for (Map.Entry<String, Double> entry: personalScoringModeConstants.entrySet()) {
+                    ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
+                    modeUtilityParamsBuilder.setConstant(entry.getValue());
 
-                        // copy other params from subpopulation config
-                        PlanCalcScoreConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(mode);
-                        modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling());
-                        modeUtilityParamsBuilder.setMarginalUtilityOfDistance_m(subpopulationModeParams.getMarginalUtilityOfDistance());
-                        modeUtilityParamsBuilder.setMonetaryDistanceRate(subpopulationModeParams.getMonetaryDistanceRate());
-                        modeUtilityParamsBuilder.setDailyMoneyConstant(subpopulationModeParams.getDailyMonetaryConstant());
-                        modeUtilityParamsBuilder.setDailyUtilityConstant(subpopulationModeParams.getDailyUtilityConstant());
+                    // copy other params from subpopulation config
+                    PlanCalcScoreConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(entry.getKey());
+                    modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling());
+                    modeUtilityParamsBuilder.setMarginalUtilityOfDistance_m(subpopulationModeParams.getMarginalUtilityOfDistance());
+                    modeUtilityParamsBuilder.setMonetaryDistanceRate(subpopulationModeParams.getMonetaryDistanceRate());
+                    modeUtilityParamsBuilder.setDailyMoneyConstant(subpopulationModeParams.getDailyMonetaryConstant());
+                    modeUtilityParamsBuilder.setDailyUtilityConstant(subpopulationModeParams.getDailyUtilityConstant());
 
-                        ModeUtilityParameters modeUtilityParameters = modeUtilityParamsBuilder.build();
-                        builder.setModeParameters(mode, modeUtilityParameters);
-                    } catch (Exception e) {
-                        log.error("Found a person with attribute " + entry.getKey() +
-                                " which implies a person specific scoring mode constant, but the value could not be assigned successfully to the person's scoring parameters. See detailed error message:\n " +
-                                e.getMessage());
-                        throw new RuntimeException("Unreadable person specific scoring mode constant.");
-                    }
+                    ModeUtilityParameters modeUtilityParameters = modeUtilityParamsBuilder.build();
+                    builder.setModeParameters(entry.getKey(), modeUtilityParameters);
                 }
             }
 
