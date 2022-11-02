@@ -70,7 +70,8 @@ import java.util.*;
 		double availiabilityTimeOfLastShipment = 0;
 		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
 		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
-		List<ScheduledTour> scheduledTours = new LinkedList<>();
+//		List<ScheduledTour> scheduledTours = new LinkedList<>();
+		List<CarrierPlan> scheduledPlans = new LinkedList<>();
 
 		for (ShipmentWithTime tuple : copyOfAssignedShipments) {
 			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber weas ist, wenn es mehrer gibt???
@@ -85,7 +86,8 @@ import java.util.*;
 			} else {
 				load = 0;
 				Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime) , resource.getNetwork());
-				scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
+//				scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
+				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 				cumulatedLoadingTime = 0;
 				shipmentsInCurrentTour.clear();
 				shipmentsInCurrentTour.add(tuple);
@@ -97,14 +99,15 @@ import java.util.*;
 
 		if (!shipmentsInCurrentTour.isEmpty()) {
 			Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime), resource.getNetwork());
-			scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
+//			scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
+			scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 			shipmentsInCurrentTour.clear();
 		}
 
-		CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledTours));
+		CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledPlans));
+		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
 		carrier.setSelectedPlan(plan);
 	}
-
 
 
 	/**
@@ -120,18 +123,21 @@ import java.util.*;
 	 * and use only on DistributionCarrier with only one VRP and only one jsprit-Run. This would avoid this workaround and
 	 * also improve the solution, because than the DistributionCarrier can decide on it one which shipments will go into which tours
 	 *
-	 * @param scheduledTours Collection of scheduledTours
+	 * @param carrierPlans Collection of CarrierPlans
 	 * @return Collection<ScheduledTour> the scheduledTours with unified tour Ids.
 	 */
-	private Collection<ScheduledTour> unifyTourIds(Collection<ScheduledTour> scheduledTours) {
+//	private Collection<ScheduledTour> unifyTourIds(Collection<ScheduledTour> scheduledTours) {
+	private Collection<ScheduledTour> unifyTourIds(Collection<CarrierPlan> carrierPlans) {
 		int tourIdindex = 1;
 		List<ScheduledTour> scheduledToursUnified = new LinkedList<>();
 
-		for (ScheduledTour scheduledTour : scheduledTours) {
-			var newTour = scheduledTour.getTour().duplicateWithNewId(Id.create("dist_"+tourIdindex, Tour.class));
-			tourIdindex++;
-			var newScheduledTour = ScheduledTour.newInstance(newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture() );
-			scheduledToursUnified.add(newScheduledTour);
+		for (CarrierPlan carrierPlan : carrierPlans) {
+			for (ScheduledTour scheduledTour : carrierPlan.getScheduledTours()) {
+				var newTour = scheduledTour.getTour().duplicateWithNewId(Id.create("dist_" + tourIdindex, Tour.class));
+				tourIdindex++;
+				var newScheduledTour = ScheduledTour.newInstance(newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture());
+				scheduledToursUnified.add(newScheduledTour);
+			}
 		}
 
 		return scheduledToursUnified;

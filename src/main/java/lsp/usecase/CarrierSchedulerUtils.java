@@ -13,6 +13,7 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This class contains some code fragments, that are used in the different *CarrierScheduler classes.
@@ -38,5 +39,15 @@ import java.util.Collection;
 		NetworkRouter.routePlan(plan, netbasedTransportcosts);
 		carrier.setSelectedPlan(plan);
 		return carrier;
+	}
+
+	static Double sumUpScore(List<CarrierPlan> scheduledPlans) {
+		double score = 0;
+		for (CarrierPlan scheduledPlan : scheduledPlans) {
+			if (scheduledPlan.getScore() != null) {
+				score = score + scheduledPlan.getScore();
+			}
+		}
+		return score;
 	}
 }

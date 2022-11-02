@@ -32,10 +32,7 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * In the case of the MainRunResource, the incoming LSPShipments are bundled
@@ -76,8 +73,9 @@ import java.util.List;
 		List<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
 		copyOfAssignedShipments.sort(Comparator.comparingDouble(ShipmentWithTime::getTime));
 		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
-		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
-
+//		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
+		List<CarrierPlan> scheduledPlans = new LinkedList<>();
+		
 		for (ShipmentWithTime tuple : copyOfAssignedShipments) {
 			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if ((load + tuple.getShipment().getSize()) <= vehicleType.getCapacity().getOther().intValue()) {
@@ -86,7 +84,8 @@ import java.util.List;
 			} else {
 				load = 0;
 				CarrierPlan plan = createPlan(carrier, shipmentsInCurrentTour);
-				scheduledTours.addAll(plan.getScheduledTours());
+//				scheduledTours.addAll(plan.getScheduledTours());
+				scheduledPlans.add(plan);
 				shipmentsInCurrentTour.clear();
 				shipmentsInCurrentTour.add(tuple);
 				load = load + tuple.getShipment().getSize();
@@ -95,10 +94,17 @@ import java.util.List;
 		}
 		if (!shipmentsInCurrentTour.isEmpty()) {
 			CarrierPlan plan = createPlan(carrier, shipmentsInCurrentTour);
-			scheduledTours.addAll(plan.getScheduledTours());
+//			scheduledTours.addAll(plan.getScheduledTours());
+			scheduledPlans.add(plan);
 			shipmentsInCurrentTour.clear();
 		}
+
+		List<ScheduledTour> scheduledTours = new LinkedList<>();
+		for (CarrierPlan scheduledPlan : scheduledPlans) {
+			scheduledTours.addAll(scheduledPlan.getScheduledTours());
+		}
 		CarrierPlan plan = new CarrierPlan(carrier, scheduledTours);
+		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
 		carrier.setSelectedPlan(plan);
 	}
 
