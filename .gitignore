@@ -9,6 +9,8 @@ matsimExamples
 **/target
 /log_projects.log
 *.orig
+matsim/docs/doxygen/html
+matsim/src/main/java/Doxyfile
 
 # ignore output directories:
 output/
