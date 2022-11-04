@@ -84,6 +84,8 @@ public class RunETaxiScenarioIT {
 			String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml").toString();
 			String [] args = {configPath,
 					"--config:controler.outputDirectory", utils.getOutputDirectory()
+					,"--config:multiModeTaxi.taxi[mode=taxi].numberOfThreads","1"
+					,"--config:global.numberOfThreads","1"
 //				,"--config:controler.lastIteration", "1"
 			} ;
 			RunETaxiScenario.run(args, false);
@@ -114,12 +116,14 @@ public class RunETaxiScenarioIT {
 	}
 
 	@Test
-	@Ignore // temporarily ignore this test due to problems on the build server
+//	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment() {
 		try {
 			String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml").toString();
 			String [] args = {configPath,
 					"--config:controler.outputDirectory", utils.getOutputDirectory()
+					,"--config:multiModeTaxi.taxi[mode=taxi].numberOfThreads","1"
+					,"--config:global.numberOfThreads","1"
 //				,"--config:controler.lastIteration", "1"
 			} ;
 			RunETaxiScenario.run(args, false);
