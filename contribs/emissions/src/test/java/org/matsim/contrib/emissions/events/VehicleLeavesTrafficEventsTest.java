@@ -1,6 +1,7 @@
 package org.matsim.contrib.emissions.events;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -17,6 +18,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 /**
@@ -30,23 +32,24 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  * @author Ruan J. Gräbe
  */
 public class VehicleLeavesTrafficEventsTest {
+
+    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
     private static final String hbefaColdFile = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario" ), "sample_41_EFA_ColdStart_vehcat_2020average.csv" ).toString();
     private static final String hbefaWarmFile = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario" ), "sample_41_EFA_HOT_vehcat_2020average.csv" ).toString();
-    private static final String eventsFile =  "test/input/org/matsim/contrib/emissions/events/VehicleLeavesTrafficEventTest/smallBerlinSample.output_events.xml.gz";
-    private static final String vehiclesFile = "test/input/org/matsim/contrib/emissions/events/VehicleLeavesTrafficEventTest/smallBerlinSample_emissionVehicles.xml";
+    private final String eventsFile = utils.getInputDirectory() + "smallBerlinSample.output_events.xml.gz";
+    private final String vehiclesFile = utils.getInputDirectory() + "smallBerlinSample_emissionVehicles.xml";
     private static final String networkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
-    private static final String outputDirectory = "test/output/org/matsim/contrib/emissions/events/VehicleLeavesTrafficEventTest/";
-    private static final String inputDirectory = "test/input/org/matsim/contrib/emissions/events/VehicleLeavesTrafficEventTest/";
+    private final String outputDirectory = utils.getOutputDirectory() + "VehicleLeavesTrafficEventTest/";
+    private final String inputDirectory = utils.getOutputDirectory() + "VehicleLeavesTrafficEventTest/";
     private static final String emissionEventsFileName = "smallBerlinSample.emissions.events.offline.xml.gz";
 
     // =======================================================================================================
 
     @Test
     public final void testRareEventsFromBerlinScenario (){
-        Config config = ConfigUtils.createConfig();
-        config.setContext(IOUtils.getFileUrl("./"));
 
-        config.controler().setOutputDirectory( outputDirectory );
+        Config config = utils.createConfigWithTestInputFilePathAsContext();
+
         config.vehicles().setVehiclesFile( vehiclesFile );
         config.network().setInputFile( networkFile );
 
@@ -86,9 +89,7 @@ public class VehicleLeavesTrafficEventsTest {
                     " on the link" );
         }
         // If the try-block executes, this ensures emission events occur as expected:
-        String expected = inputDirectory + emissionEventsFileName;
-        String actual = outputDirectory + emissionEventsFileName;
-        EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
+        EventsFileComparator.Result result = EventsUtils.compareEventsFiles( inputDirectory + emissionEventsFileName, outputDirectory + emissionEventsFileName );
         Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
     }
 
