@@ -12,15 +12,15 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
-public class RunEvExamplewithLTHConsumptionModelTest{
+public class RunEvExampleWithLTHConsumptionModelTest{
 
-	private static final Logger log = LogManager.getLogger( RunEvExamplewithLTHConsumptionModelTest.class );
+	private static final Logger log = LogManager.getLogger( RunEvExampleWithLTHConsumptionModelTest.class );
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test public void runTest(){
 		try {
-			String [] args = { RunEvExamplewithLTHConsumptionModel.DEFAULT_CONFIG_FILE
+			String [] args = { RunEvExampleWithLTHConsumptionModel.DEFAULT_CONFIG_FILE
 					,"--config:controler.outputDirectory", utils.getOutputDirectory()
 			};
 

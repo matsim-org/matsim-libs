@@ -53,9 +53,9 @@ import org.matsim.vehicles.VehicleType;
  * Link slopes may be added using a double array on the network.
  * The consumption maps are based on Domingues, Gabriel. / Modeling, Optimization and Analysis of Electromobility Systems. Lund : Department of Biomedical Engineering, Lund university, 2018. 169 p., PhD thesis
  */
-public class RunEvExamplewithLTHConsumptionModel {
+public class RunEvExampleWithLTHConsumptionModel{
 	static final String DEFAULT_CONFIG_FILE = "test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
-	private static final Logger log = LogManager.getLogger(RunEvExamplewithLTHConsumptionModel.class);
+	private static final Logger log = LogManager.getLogger( RunEvExampleWithLTHConsumptionModel.class );
 
 	public static void main(String[] args) throws IOException {
 		final URL configUrl;
@@ -74,7 +74,7 @@ public class RunEvExamplewithLTHConsumptionModel {
 						+ DEFAULT_CONFIG_FILE);
 			}
 		}
-		new RunEvExamplewithLTHConsumptionModel().run(configUrl);
+		new RunEvExampleWithLTHConsumptionModel().run(configUrl );
 	}
 
 	public void run(URL configUrl) {
