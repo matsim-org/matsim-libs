@@ -91,14 +91,15 @@ public class ElectricFleetModule extends AbstractModule {
 						public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 							for (var oldSpec : electricFleetSpecification.getVehicleSpecifications().values()) {
 								var matsimVehicle = oldSpec.getMatsimVehicle();
-								double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles()
+								double chargeAtEndOfCurrentIteration = electricFleet.getElectricVehicles()
 										.get(oldSpec.getId())
 										.getBattery()
-										.getSoc();
+										.getCharge();
 
-								// INITIAL_ENERGY_kWh attribute is in kWh, the SoC is in J
+								// INITIAL_ENERGY_kWh attribute is in kWh, the charge is in J
 								matsimVehicle.getAttributes()
-										.putAttribute(INITIAL_ENERGY_kWh, EvUnits.J_to_kWh(socAtEndOfCurrentIteration));
+										.putAttribute(INITIAL_ENERGY_kWh,
+												EvUnits.J_to_kWh(chargeAtEndOfCurrentIteration));
 							}
 						}
 					});

@@ -17,7 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev.example;/*
+package org.matsim.contrib.ev.example;
+/*
  * created by jbischoff, 19.03.2019
  */
 
@@ -85,8 +86,9 @@ public class RunEvExampleWithLTHConsumptionModel{
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
-		driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory("defaultVehicleType",
-				new LTHConsumptionModelReader(Id.create("defaultVehicleType", VehicleType.class)).readURL(
+		var vehicleType = Id.create("EV_60.0kWh", VehicleType.class);
+		driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory(vehicleType,
+				new LTHConsumptionModelReader(vehicleType).readURL(
 						ConfigGroup.getInputFileURL(config.getContext(), "MidCarMap.csv")));
 
 		Controler controler = new Controler(scenario);
