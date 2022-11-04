@@ -24,6 +24,8 @@ import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithD
 
 import java.net.URL;
 import java.util.List;
+import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -88,8 +90,10 @@ public class RunETaxiScenario {
 			}
 		});
 
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
-				multiModeTaxiConfig.modes().collect(toList())));
+		String [] modes = multiModeTaxiConfig.modes().toArray( String[]::new );  // wtf
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes( modes ) );
+//		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), multiModeTaxiConfig.modes().collect(toList())));
+		// activation of EV_COMPONENT now in EvModule.  kai, nov'22
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
