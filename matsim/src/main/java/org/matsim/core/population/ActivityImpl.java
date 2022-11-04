@@ -47,14 +47,14 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 	// Case (X): facilityId inconsistent with linkId, coord.  Idea: mobsim takes the facilityId and (a) checks the other
 	// attribs or (b) ignores them.
 
-	private OptionalTime endTime = OptionalTime.undefined();
+	private double endTime = OptionalTime.undefined().getRawSeconds();
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
-	private OptionalTime startTime = OptionalTime.undefined();
+	private double startTime = OptionalTime.undefined().getRawSeconds();
 
-	private OptionalTime dur = OptionalTime.undefined();
+	private double dur = OptionalTime.undefined().getRawSeconds();
 
 	private String type;
 	private Coord coord = null;
@@ -69,16 +69,17 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public final OptionalTime getEndTime() {
-		return this.endTime;
+		return OptionalTime.of(this.endTime);
 	}
 
 	@Override
 	public final void setEndTime(final double endTime) {
-		this.endTime = OptionalTime.defined(endTime);
+		this.endTime = endTime;
 	}
 
+	@Override
 	public final void setEndTimeUndefined() {
-		this.endTime = OptionalTime.undefined();
+		this.endTime = OptionalTime.undefined().getRawSeconds();
 	}
 
 	/**
@@ -86,7 +87,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 	 */
 	@Override
 	public final OptionalTime getStartTime() {
-		return this.startTime;
+		return OptionalTime.of(this.startTime);
 	}
 
 	/**
@@ -94,11 +95,11 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 	 */
 	@Override
 	public final void setStartTime(final double startTime) {
-		this.startTime = OptionalTime.defined(startTime);
+		this.startTime = startTime;
 	}
 
 	public final void setStartTimeUndefined() {
-		this.startTime = OptionalTime.undefined();
+		this.startTime = OptionalTime.undefined().getRawSeconds();
 	}
 
 	@Override
@@ -170,17 +171,17 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public OptionalTime getMaximumDuration() {
-		return this.dur;
+		return OptionalTime.of(this.dur);
 	}
 
 	@Override
 	public void setMaximumDuration(final double dur) {
-		this.dur = OptionalTime.defined(dur);
+		this.dur = dur;
 	}
 
 	@Override
 	public void setMaximumDurationUndefined() {
-		this.dur = OptionalTime.undefined();
+		this.dur = OptionalTime.undefined().getRawSeconds();
 	}
 
 	@Override
