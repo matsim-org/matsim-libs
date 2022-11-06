@@ -20,12 +20,12 @@ class MyCarrierScorer implements CarrierScoringFunctionFactory {
 
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		SumScoringFunction sf = new SumScoringFunction();
-		VehicleEmploymentScoring vehicleEmploymentScoring = new VehicleEmploymentScoring(carrier);
+//		VehicleEmploymentScoring vehicleEmploymentScoring = new VehicleEmploymentScoring(carrier);
 //		DriversLegScoring driverLegScoring = new DriversLegScoring(carrier, this.network);
 //		DriversActivityScoring actScoring = new DriversActivityScoring();
 		TakeJspritScore takeJspritScore = new TakeJspritScore( carrier);
 //		sf.addScoringFunction(driverLegScoring);
-		sf.addScoringFunction(vehicleEmploymentScoring);
+//		sf.addScoringFunction(vehicleEmploymentScoring);
 //		sf.addScoringFunction(actScoring);
 		sf.addScoringFunction(takeJspritScore);
 		return sf;
