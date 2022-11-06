@@ -30,6 +30,7 @@ import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -138,9 +139,37 @@ import java.util.*;
 		CarrierVehicle vehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		double tourStartTime = latestTupleTime + totalLoadingTime;
 		ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, vehicle, tourStartTime);
+
 		tours.add(sTour);
 		CarrierPlan plan = new CarrierPlan(carrier, tours);
 		NetworkRouter.routePlan(plan, netbasedTransportcosts);
+		{
+			//score plan
+			double score = 0.;
+			for (ScheduledTour scheduledTour : plan.getScheduledTours()) {
+				//vehicle fixed costs
+				score = score + scheduledTour.getVehicle().getType().getCostInformation().getFixedCosts();
+
+				//distance
+				double distance =  0.0;
+				for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
+					if (tourElement instanceof Leg leg){
+//						distance = distance + leg.getRoute().getDistance();
+						var route= (NetworkRoute) leg.getRoute();
+						for (Id<Link> linkId : route.getLinkIds()) {
+							distance = distance + resource.getNetwork().getLinks().get(linkId).getLength();
+						}
+						distance = distance + resource.getNetwork().getLinks().get(route.getEndLinkId()).getLength();
+					}
+				}
+				score = score + scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter() * distance;
+
+				//time
+				double time = scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
+				score = score + scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond() * time;
+			}
+			plan.setScore(-score);
+		}
 		return plan;
 	}
 
