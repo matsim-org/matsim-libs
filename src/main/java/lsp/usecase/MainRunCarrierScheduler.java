@@ -112,6 +112,7 @@ import java.util.*;
 	private int tourIdindex = 1; //Have unique TourIds for the MainRun.
 	private CarrierPlan createPlan(Carrier carrier, List<ShipmentWithTime> tuples) {
 
+		//TODO: Allgemein: Hier ist alles manuell zusammen gesetzt; es findet KEINE Tourenplanung statt!
 		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(resource.getNetwork(), UsecaseUtils.getVehicleTypeCollection(resource.getCarrier()));
 		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
 		Collection<ScheduledTour> tours = new ArrayList<>();
@@ -135,6 +136,10 @@ import java.util.*;
 
 		tourBuilder.addLeg(new Leg());
 		tourBuilder.scheduleEnd(Id.create(resource.getEndLinkId(), Link.class));
+		//TODO: Option einfügen, dass es auch noch eine Fahrt zurück zum Depot gibt?
+		// Würde das optional machen, weil es ja nach Kontext Sinn ergeben kann (urban) aber nicht muss (langstrecke)
+		// Bei der Langstrecke kann man annehmen, dass das Fahrzeug ab dem Ziel einen neuen Auftrag nach irgendwo erhalten kann.
+		// Urban wird es eher ans Depot zurück kehren.
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
 		CarrierVehicle vehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		double tourStartTime = latestTupleTime + totalLoadingTime;
@@ -144,7 +149,7 @@ import java.util.*;
 		CarrierPlan plan = new CarrierPlan(carrier, tours);
 		NetworkRouter.routePlan(plan, netbasedTransportcosts);
 		{
-			//score plan
+			//score plan //TODO: ISt noch nicht perfekt identisch, weil Handling-Zeiten (Act.) noch fehlen.. Aber Startpunkt.
 			double score = 0.;
 			for (ScheduledTour scheduledTour : plan.getScheduledTours()) {
 				//vehicle fixed costs
