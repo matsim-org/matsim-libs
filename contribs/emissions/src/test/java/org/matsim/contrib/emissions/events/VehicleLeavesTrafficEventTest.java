@@ -21,42 +21,36 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
+import java.net.URL;
+
 /**
  *
  * Calculate offline emissions to test rare cases of vehicle
  * enter and leave traffic events occurring on the same links.
- *
+ * <p>
  * This class tests the (proper) handling of these cases as a result of
  * the VehicleLeavesTrafficEvent method in the WarmEmissionHandler.
  *
  * @author Ruan J. Gräbe
  */
-public class VehicleLeavesTrafficEventsTest {
+public class VehicleLeavesTrafficEventTest {
 
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
-    private static final String hbefaColdFile = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario" ), "sample_41_EFA_ColdStart_vehcat_2020average.csv" ).toString();
-    private static final String hbefaWarmFile = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario" ), "sample_41_EFA_HOT_vehcat_2020average.csv" ).toString();
-    private final String eventsFile = utils.getInputDirectory() + "smallBerlinSample.output_events.xml.gz";
-    private final String vehiclesFile = utils.getInputDirectory() + "smallBerlinSample_emissionVehicles.xml";
-    private static final String networkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
-    private final String outputDirectory = utils.getOutputDirectory() + "VehicleLeavesTrafficEventTest/";
-    private final String inputDirectory = utils.getOutputDirectory() + "VehicleLeavesTrafficEventTest/";
-    private static final String emissionEventsFileName = "smallBerlinSample.emissions.events.offline.xml.gz";
-
-    // =======================================================================================================
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public final void testRareEventsFromBerlinScenario (){
 
+		final String emissionEventsFileName = "smallBerlinSample.emissions.events.offline.xml.gz";
+		final String resultingEvents = utils.getOutputDirectory() + "../" + emissionEventsFileName;
+
         Config config = utils.createConfigWithTestInputFilePathAsContext();
+        config.vehicles().setVehiclesFile("smallBerlinSample_emissionVehicles.xml");
+        config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
 
-        config.vehicles().setVehiclesFile( vehiclesFile );
-        config.network().setInputFile( networkFile );
-
+		final URL testScenarioURL = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario");
         EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-
-        emissionsConfig.setAverageColdEmissionFactorsFile( hbefaColdFile );
-        emissionsConfig.setAverageWarmEmissionFactorsFile( hbefaWarmFile );
+        emissionsConfig.setAverageColdEmissionFactorsFile(IOUtils.extendUrl( testScenarioURL, "sample_41_EFA_ColdStart_vehcat_2020average.csv" ).toString());
+        emissionsConfig.setAverageWarmEmissionFactorsFile(IOUtils.extendUrl( testScenarioURL, "sample_41_EFA_HOT_vehcat_2020average.csv" ).toString());
         emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable );
         emissionsConfig.setNonScenarioVehicles( EmissionsConfigGroup.NonScenarioVehicles.ignore );
 
@@ -78,18 +72,20 @@ public class VehicleLeavesTrafficEventsTest {
         injector.getInstance(EmissionModule.class);
 
         try {
-            final EventWriterXML eventWriterXML = new EventWriterXML( config.controler().getOutputDirectory() + emissionEventsFileName );
+            final EventWriterXML eventWriterXML = new EventWriterXML( resultingEvents );
             eventsManager.addHandler( eventWriterXML );
-            new MatsimEventsReader(eventsManager).readFile( eventsFile );
+            new MatsimEventsReader(eventsManager).readFile(utils.getClassInputDirectory() + "smallBerlinSample.output_events.xml.gz");
             eventWriterXML.closeFile();
         } catch ( Exception e ) {
-            throw new RuntimeException( "Failing because there is no proper handling for the case where" +
-                    " a vehicle leaves traffic WITHOUT entering the link (no link enter time). A zero" +
-                    " emissions event should occur for these instances because there is no significant travel" +
-                    " on the link" );
+			throw new RuntimeException(e) ; // I (kmt) would like to see the original message :)
+//            throw new RuntimeException( "Failing because there is no proper handling for the case where" +
+//                    " a vehicle leaves traffic WITHOUT entering the link (no link enter time). A zero" +
+//                    " emissions event should occur for these instances because there is no significant travel" +
+//                    " on the link");
         }
         // If the try-block executes, this ensures emission events occur as expected:
-        EventsFileComparator.Result result = EventsUtils.compareEventsFiles( inputDirectory + emissionEventsFileName, outputDirectory + emissionEventsFileName );
+		final String expected = utils.getClassInputDirectory() + emissionEventsFileName;
+		EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, resultingEvents);
         Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
     }
 
