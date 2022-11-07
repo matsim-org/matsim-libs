@@ -25,11 +25,12 @@ import java.net.URL;
 
 /**
  *
- * Calculate offline emissions to test rare cases of vehicle
- * enter and leave traffic events occurring on the same links.
+ * Calculate offline emissions to test rare cases of "vehicle
+ * enters traffic" and "vehicle leaves traffic" events occurring
+ * on the same links.
  * <p>
- * This class tests the (proper) handling of these cases as a result of
- * the VehicleLeavesTrafficEvent method in the WarmEmissionHandler.
+ * This class tests the (proper) handling of these cases in
+ * the VehicleLeavesTrafficEvent method from the WarmEmissionHandler.
  *
  * @author Ruan J. Gräbe
  */
@@ -41,7 +42,7 @@ public class VehicleLeavesTrafficEventTest {
     public final void testRareEventsFromBerlinScenario (){
 
 		final String emissionEventsFileName = "smallBerlinSample.emissions.events.offline.xml.gz";
-		final String resultingEvents = utils.getOutputDirectory() + "../" + emissionEventsFileName;
+		final String resultingEvents = utils.getOutputDirectory() + emissionEventsFileName;
 
         Config config = utils.createConfigWithTestInputFilePathAsContext();
         config.vehicles().setVehiclesFile("smallBerlinSample_emissionVehicles.xml");
@@ -77,13 +78,8 @@ public class VehicleLeavesTrafficEventTest {
             new MatsimEventsReader(eventsManager).readFile(utils.getClassInputDirectory() + "smallBerlinSample.output_events.xml.gz");
             eventWriterXML.closeFile();
         } catch ( Exception e ) {
-			throw new RuntimeException(e) ; // I (kmt) would like to see the original message :)
-//            throw new RuntimeException( "Failing because there is no proper handling for the case where" +
-//                    " a vehicle leaves traffic WITHOUT entering the link (no link enter time). A zero" +
-//                    " emissions event should occur for these instances because there is no significant travel" +
-//                    " on the link");
+			throw new RuntimeException(e) ;
         }
-        // If the try-block executes, this ensures emission events occur as expected:
 		final String expected = utils.getClassInputDirectory() + emissionEventsFileName;
 		EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, resultingEvents);
         Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result);
