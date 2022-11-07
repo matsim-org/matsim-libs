@@ -148,34 +148,55 @@ import java.util.*;
 		tours.add(sTour);
 		CarrierPlan plan = new CarrierPlan(carrier, tours);
 		NetworkRouter.routePlan(plan, netbasedTransportcosts);
-		{
-			//score plan //TODO: ISt noch nicht perfekt identisch, weil Handling-Zeiten (Act.) noch fehlen.. Aber Startpunkt.
-			double score = 0.;
-			for (ScheduledTour scheduledTour : plan.getScheduledTours()) {
-				//vehicle fixed costs
-				score = score + scheduledTour.getVehicle().getType().getCostInformation().getFixedCosts();
+		plan.setScore(scorePlanManually(plan));
+		return plan;
+	}
 
-				//distance
-				double distance =  0.0;
-				for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
-					if (tourElement instanceof Leg leg){
-//						distance = distance + leg.getRoute().getDistance();
-						var route= (NetworkRoute) leg.getRoute();
-						for (Id<Link> linkId : route.getLinkIds()) {
-							distance = distance + resource.getNetwork().getLinks().get(linkId).getLength();
-						}
+	/**
+	 * For the main run, there is currently (nov'22) no jsprit planning.
+	 * The plan is instead constructed manually. As a consequence, there is no score (from jsprit) for this plan available.
+	 * To avoid issues in later scoring of the LSP, we would like to hava also a score for the MainRunCarrier.
+	 * This is calculated here manually
+	 * <p>
+	 *  It bases on the
+	 *  - vehicle's fixed costs
+	 *  - distance dependent costs
+	 *  - (expected) travel time dependent costs
+	 *  NOT included is the calculation of activity times,... But this is currently also missing e.g. in the distributionCarrier, where the VRP setup
+	 *  does not include this :(
+	 *
+	 * @param plan The carrierPlan, that should get scored.
+	 * @return the calculated score
+	 */
+	private double scorePlanManually(CarrierPlan plan) {
+		//score plan // Note: Activities are not scored, but they are also NOT scored for the Distribution carrier (as the VRP is currently set up) kmt nov'22
+		double score = 0.;
+		for (ScheduledTour scheduledTour : plan.getScheduledTours()) {
+			//vehicle fixed costs
+			score = score + scheduledTour.getVehicle().getType().getCostInformation().getFixedCosts();
+
+			//distance
+			double distance =  0.0;
+			double time = 0.0;
+			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
+				if (tourElement instanceof Leg leg){
+					//distance
+					NetworkRoute route = (NetworkRoute) leg.getRoute();
+					for (Id<Link> linkId : route.getLinkIds()) {
+						distance = distance + resource.getNetwork().getLinks().get(linkId).getLength();
+					}
+					if (route.getEndLinkId() != route.getStartLinkId()) { //Do not calculate any distance, if start and endpoint are identical
 						distance = distance + resource.getNetwork().getLinks().get(route.getEndLinkId()).getLength();
 					}
-				}
-				score = score + scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter() * distance;
 
-				//time
-				double time = scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
-				score = score + scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond() * time;
+					//travel time (exp.)
+					time = time + leg.getExpectedTransportTime();
+				}
 			}
-			plan.setScore(-score);
+			score = score + scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter() * distance;
+			score = score + scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond() * time;
 		}
-		return plan;
+		return (-score); //negative, because we are looking at "costs" instead of "utility"
 	}
 
 	private CarrierService convertToCarrierService(ShipmentWithTime tuple) {
