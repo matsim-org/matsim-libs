@@ -30,6 +30,7 @@ import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -111,6 +112,7 @@ import java.util.*;
 	private int tourIdindex = 1; //Have unique TourIds for the MainRun.
 	private CarrierPlan createPlan(Carrier carrier, List<ShipmentWithTime> tuples) {
 
+		//TODO: Allgemein: Hier ist alles manuell zusammen gesetzt; es findet KEINE Tourenplanung statt!
 		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(resource.getNetwork(), UsecaseUtils.getVehicleTypeCollection(resource.getCarrier()));
 		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
 		Collection<ScheduledTour> tours = new ArrayList<>();
@@ -134,14 +136,67 @@ import java.util.*;
 
 		tourBuilder.addLeg(new Leg());
 		tourBuilder.scheduleEnd(Id.create(resource.getEndLinkId(), Link.class));
+		//TODO: Option einfügen, dass es auch noch eine Fahrt zurück zum Depot gibt?
+		// Würde das optional machen, weil es ja nach Kontext Sinn ergeben kann (urban) aber nicht muss (langstrecke)
+		// Bei der Langstrecke kann man annehmen, dass das Fahrzeug ab dem Ziel einen neuen Auftrag nach irgendwo erhalten kann.
+		// Urban wird es eher ans Depot zurück kehren.
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
 		CarrierVehicle vehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		double tourStartTime = latestTupleTime + totalLoadingTime;
 		ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, vehicle, tourStartTime);
+
 		tours.add(sTour);
 		CarrierPlan plan = new CarrierPlan(carrier, tours);
 		NetworkRouter.routePlan(plan, netbasedTransportcosts);
+		plan.setScore(scorePlanManually(plan));
 		return plan;
+	}
+
+	/**
+	 * For the main run, there is currently (nov'22) no jsprit planning.
+	 * The plan is instead constructed manually. As a consequence, there is no score (from jsprit) for this plan available.
+	 * To avoid issues in later scoring of the LSP, we would like to hava also a score for the MainRunCarrier.
+	 * This is calculated here manually
+	 * <p>
+	 *  It bases on the
+	 *  - vehicle's fixed costs
+	 *  - distance dependent costs
+	 *  - (expected) travel time dependent costs
+	 *  NOT included is the calculation of activity times,... But this is currently also missing e.g. in the distributionCarrier, where the VRP setup
+	 *  does not include this :(
+	 *
+	 * @param plan The carrierPlan, that should get scored.
+	 * @return the calculated score
+	 */
+	private double scorePlanManually(CarrierPlan plan) {
+		//score plan // Note: Activities are not scored, but they are also NOT scored for the Distribution carrier (as the VRP is currently set up) kmt nov'22
+		double score = 0.;
+		for (ScheduledTour scheduledTour : plan.getScheduledTours()) {
+			//vehicle fixed costs
+			score = score + scheduledTour.getVehicle().getType().getCostInformation().getFixedCosts();
+
+			//distance
+			double distance =  0.0;
+			double time = 0.0;
+			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
+				if (tourElement instanceof Leg leg){
+					//distance
+					NetworkRoute route = (NetworkRoute) leg.getRoute();
+					for (Id<Link> linkId : route.getLinkIds()) {
+						distance = distance + resource.getNetwork().getLinks().get(linkId).getLength();
+					}
+					if (route.getEndLinkId() != route.getStartLinkId()) { //Do not calculate any distance, if start and endpoint are identical
+						distance = distance + resource.getNetwork().getLinks().get(route.getEndLinkId()).getLength();
+					}
+
+					//travel time (exp.)
+					time = time + leg.getExpectedTransportTime();
+				}
+			}
+			score = score + scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter() * distance;
+			score = score + scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond() * time;
+		}
+		return (-score); //negative, because we are looking at "costs" instead of "utility"
 	}
 
 	private CarrierService convertToCarrierService(ShipmentWithTime tuple) {
