@@ -42,6 +42,7 @@ public class QSimComponentsTest{
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setLastIteration( 0 );
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		// remove the module:  (There is also syntax at some intermediate level for this, but I prefer the syntax at config level.  kai, oct'22)
 		QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
@@ -56,14 +57,14 @@ public class QSimComponentsTest{
 		controler.run();
 	}
 
-	@Test
-			(expected= ProvisionException.class)
+	@Test(expected= ProvisionException.class)
 	public void testReplaceQNetworkFactory() {
 		// here we try to replace the QNetworkFactory.  Complains that QNetworkFactory is bound multiple times.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setLastIteration( 0 );
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
@@ -89,6 +90,7 @@ public class QSimComponentsTest{
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setLastIteration( 0 );
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
@@ -110,6 +112,7 @@ public class QSimComponentsTest{
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setLastIteration( 0 );
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
