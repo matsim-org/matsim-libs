@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -37,12 +38,13 @@ import org.matsim.vehicles.Vehicle;
 import com.google.common.base.Preconditions;
 
 public class ChargingWithQueueingLogic implements ChargingLogic {
-	private final ChargerSpecification charger;
+	protected final ChargerSpecification charger;
 	private final ChargingStrategy chargingStrategy;
 	private final EventsManager eventsManager;
 
 	private final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
+	private final Queue<ElectricVehicle> arrivingVehicles = new LinkedBlockingQueue<>();
 	private final Map<Id<Vehicle>, ChargingListener> listeners = new LinkedHashMap<>();
 
 	public ChargingWithQueueingLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy,
@@ -69,6 +71,17 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			}
 		}
 
+		var arrivingVehiclesIter = arrivingVehicles.iterator();
+		while (arrivingVehiclesIter.hasNext()) {
+			var ev = arrivingVehiclesIter.next();
+			if (pluggedVehicles.size() < charger.getPlugCount()) {
+				plugVehicle(ev, now);
+			} else {
+				queueVehicle(ev, now);
+			}
+			arrivingVehiclesIter.remove();
+		}
+
 		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugCount() - pluggedVehicles.size());
 		for (int i = 0; i < queuedToPluggedCount; i++) {
 			plugVehicle(queuedVehicles.poll(), now);
@@ -83,12 +96,8 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 	@Override
 	public void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now) {
+		arrivingVehicles.add(ev);
 		listeners.put(ev.getId(), chargingListener);
-		if (pluggedVehicles.size() < charger.getPlugCount()) {
-			plugVehicle(ev, now);
-		} else {
-			queueVehicle(ev, now);
-		}
 	}
 
 	@Override
