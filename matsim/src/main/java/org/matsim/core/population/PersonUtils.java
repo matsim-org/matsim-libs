@@ -95,9 +95,21 @@ public final class PersonUtils {
 
     /**
      * convenience method for often used demographic attribute
+     * There is apparently no way to register a Map(String, Double) at ObjectAttributesConverter since all Maps default
+     * to StringStringMapConverter and there is no way to register a StringDoubleMapConverter. Therefore, the personal
+     * scoring mode constants uses a Map(String, String). If this attribute is read often an alternative similar to
+     * PersonVehicles can be considered.
      */
-    public static Map<String, Double> getPersonalScoringModeConstants(Person person) {
-        return (Map<String, Double>) person.getAttributes().getAttribute(PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME);
+    public static Map<String, String> getPersonalScoringModeConstants(Person person) {
+        Object attributeValue = person.getAttributes().getAttribute(PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME);
+        try {
+            return attributeValue == null ? null : (Map<String, String>) attributeValue;
+        } catch (Exception e) {
+            log.error("Error retrieving personalScoringModeConstants from attribute " +
+                    PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME + ". Should be a Map<String,String>.");
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     /**
@@ -189,7 +201,7 @@ public final class PersonUtils {
         person.getAttributes().putAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME, income);
     }
 
-    public static void setPersonalScoringModeConstants(Person person, Map<String, Double> mode2scoringConstant) {
+    public static void setPersonalScoringModeConstants(Person person, Map<String, String> mode2scoringConstant) {
         person.getAttributes().putAttribute(PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME, mode2scoringConstant);
     }
 

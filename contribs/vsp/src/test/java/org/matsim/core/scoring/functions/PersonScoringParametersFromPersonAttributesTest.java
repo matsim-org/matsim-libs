@@ -83,26 +83,26 @@ public class PersonScoringParametersFromPersonAttributesTest {
 			Person lowIncomeLowCarAsc = factory.createPerson(Id.createPersonId("lowIncomeLowCarAsc"));
 			PopulationUtils.putSubpopulation(lowIncomeLowCarAsc, "person");
 			PersonUtils.setIncome(lowIncomeLowCarAsc, 0.5d);
-			Map<String, Double> lowIncomeLowCarAscModeConstants = new HashMap<>();
-			lowIncomeLowCarAscModeConstants.put(TransportMode.car, -0.1d);
-			lowIncomeLowCarAscModeConstants.put(TransportMode.bike, -100.0d);
+			Map<String, String> lowIncomeLowCarAscModeConstants = new HashMap<>();
+			lowIncomeLowCarAscModeConstants.put(TransportMode.car, "-0.1");
+			lowIncomeLowCarAscModeConstants.put(TransportMode.bike, "-100.0");
 			PersonUtils.setPersonalScoringModeConstants(lowIncomeLowCarAsc, lowIncomeLowCarAscModeConstants);
 			population.addPerson(lowIncomeLowCarAsc);
 
 			Person mediumIncomeHighCarAsc = factory.createPerson(Id.createPersonId("mediumIncomeHighCarAsc"));
 			PopulationUtils.putSubpopulation(mediumIncomeHighCarAsc, "person");
 			PersonUtils.setIncome(mediumIncomeHighCarAsc, 1d);
-			Map<String, Double> mediumIncomeHighCarAscModeConstants = new HashMap<>();
-			mediumIncomeHighCarAscModeConstants.put(TransportMode.car, -2.1d);
-			mediumIncomeHighCarAscModeConstants.put(TransportMode.bike, -50.0d);
+			Map<String, String> mediumIncomeHighCarAscModeConstants = new HashMap<>();
+			mediumIncomeHighCarAscModeConstants.put(TransportMode.car, "-2.1");
+			mediumIncomeHighCarAscModeConstants.put(TransportMode.bike, "-50.0");
 			PersonUtils.setPersonalScoringModeConstants(mediumIncomeHighCarAsc, mediumIncomeHighCarAscModeConstants);
 			population.addPerson(mediumIncomeHighCarAsc);
 
 			Person highIncomeLowCarAsc = factory.createPerson(Id.createPersonId("highIncomeLowCarAsc"));
 			PopulationUtils.putSubpopulation(highIncomeLowCarAsc, "person");
 			PersonUtils.setIncome(highIncomeLowCarAsc, 1.5d);
-			Map<String, Double> highIncomeLowCarAscModeConstants = new HashMap<>();
-			highIncomeLowCarAscModeConstants.put(TransportMode.car, -0.1d);
+			Map<String, String> highIncomeLowCarAscModeConstants = new HashMap<>();
+			highIncomeLowCarAscModeConstants.put(TransportMode.car, "-0.1");
 			PersonUtils.setPersonalScoringModeConstants(highIncomeLowCarAsc, highIncomeLowCarAscModeConstants);
 			population.addPerson(highIncomeLowCarAsc);
 

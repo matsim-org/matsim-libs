@@ -156,11 +156,17 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
                 }
             }
 
-            Map<String, Double> personalScoringModeConstants = PersonUtils.getPersonalScoringModeConstants(person);
+            Map<String, String> personalScoringModeConstants = PersonUtils.getPersonalScoringModeConstants(person);
             if (personalScoringModeConstants != null) {
-                for (Map.Entry<String, Double> entry: personalScoringModeConstants.entrySet()) {
+                for (Map.Entry<String, String> entry: personalScoringModeConstants.entrySet()) {
                     ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
-                    modeUtilityParamsBuilder.setConstant(entry.getValue());
+                    try {
+                        modeUtilityParamsBuilder.setConstant(Double.parseDouble(entry.getValue()));
+                    } catch (NumberFormatException e) {
+                        log.error("PersonalScoringModeConstants from person attribute could not be parsed for person " +
+                                person.getId().toString() + ".");
+                        throw new RuntimeException(e);
+                    }
 
                     // copy other params from subpopulation config
                     PlanCalcScoreConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(entry.getKey());
