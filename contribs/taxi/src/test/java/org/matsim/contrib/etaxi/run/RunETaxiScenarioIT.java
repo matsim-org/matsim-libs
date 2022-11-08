@@ -20,7 +20,6 @@ package org.matsim.contrib.etaxi.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
@@ -29,11 +28,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.run.RunMatsim;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-
-import java.net.URL;
 
 /**
  * @author michalm
@@ -84,8 +80,6 @@ public class RunETaxiScenarioIT {
 			String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml").toString();
 			String [] args = {configPath,
 					"--config:controler.outputDirectory", utils.getOutputDirectory()
-					,"--config:multiModeTaxi.taxi[mode=taxi].numberOfThreads","1"
-					,"--config:global.numberOfThreads","1"
 //				,"--config:controler.lastIteration", "1"
 			} ;
 			RunETaxiScenario.run(args, false);
@@ -122,8 +116,6 @@ public class RunETaxiScenarioIT {
 			String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml").toString();
 			String [] args = {configPath,
 					"--config:controler.outputDirectory", utils.getOutputDirectory()
-					,"--config:multiModeTaxi.taxi[mode=taxi].numberOfThreads","1"
-					,"--config:global.numberOfThreads","1"
 //				,"--config:controler.lastIteration", "1"
 			} ;
 			RunETaxiScenario.run(args, false);
