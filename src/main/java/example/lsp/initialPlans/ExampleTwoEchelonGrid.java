@@ -77,8 +77,8 @@ final class ExampleTwoEchelonGrid {
 	private static final VehicleType VEH_TYPE_LARGE_10 = CarrierVehicleType.Builder.newInstance(Id.create("large10", VehicleType.class))
 			.setCapacity(10)
 			.setMaxVelocity(10)
-			.setFixCost(130)
-			.setCostPerDistanceUnit(0.001)
+			.setFixCost(150)
+			.setCostPerDistanceUnit(0.01)
 			.setCostPerTimeUnit(0.01)
 			.build();
 
@@ -86,10 +86,10 @@ final class ExampleTwoEchelonGrid {
 			.setCapacity(2)
 			.setMaxVelocity(10)
 			.setFixCost(25)
-			.setCostPerDistanceUnit(0.0005)
+			.setCostPerDistanceUnit(0.001)
 			.setCostPerTimeUnit(0.005)
 			.build();
-	public static final double HUBCOSTS_FIX = 120.;
+	public static final double HUBCOSTS_FIX = 100.;
 
 	private ExampleTwoEchelonGrid() {
 	} // so it cannot be instantiated
