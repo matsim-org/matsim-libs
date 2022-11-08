@@ -101,9 +101,8 @@ public final class PersonUtils {
      * PersonVehicles can be considered.
      */
     public static Map<String, String> getPersonalScoringModeConstants(Person person) {
-        Object attributeValue = person.getAttributes().getAttribute(PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME);
         try {
-            return attributeValue == null ? null : (Map<String, String>) attributeValue;
+            return (Map<String, String>) person.getAttributes().getAttribute(PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME);
         } catch (Exception e) {
             log.error("Error retrieving personalScoringModeConstants from attribute " +
                     PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME + ". Should be a Map<String,String>.");
