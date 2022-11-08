@@ -69,7 +69,7 @@ class Realm {
         // The plus one is necessary because we peek into the next slot on each tick.
         this.delayedLinksByWakeupTime = new ArrayList<>();
         this.delayedAgentsByWakeupTime = new ArrayList<>();
-        this.agent_stops = scenario.agent_stops;
+        this.agent_stops = scenario.agentStops;
         this.route_stops_by_route_no = scenario.routeStopsByRouteNo;
         this.line_of_route = scenario.lineOfRoute;
         this.sortedEvents = new EventArray();

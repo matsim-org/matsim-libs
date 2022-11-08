@@ -81,7 +81,7 @@ class ScenarioImporter {
 	private final boolean deterministicPt;
 	// Agents waiting in pt stations. Should be used as follows:
 	// agent_stops.get(curr station id).get(line id) -> queue of agents
-	protected IdMap<TransitStopFacility, IntArrayMap<ArrayDeque<Agent>>> agent_stops;
+	protected IdMap<TransitStopFacility, IntArrayMap<ArrayDeque<Agent>>> agentStops;
 
 	private float[] flowCapacityPCEs;
 	private float[] storageCapacityPCEs;
@@ -179,7 +179,7 @@ class ScenarioImporter {
 					}
 				}
 				// reset agent_stops
-				for (IntArrayMap<ArrayDeque<Agent>> station_id : agent_stops) {
+				for (IntArrayMap<ArrayDeque<Agent>> station_id : agentStops) {
 					for (ArrayDeque<Agent> agents_per_line : station_id.values()) {
 						agents_per_line.clear();
 					}
@@ -254,7 +254,7 @@ class ScenarioImporter {
 		initRoutesStations();
 
 		// Initialize agent_stops.
-		this.agent_stops = new IdMap<>(TransitStopFacility.class);
+		this.agentStops = new IdMap<>(TransitStopFacility.class);
 
 		TransitSchedule ts = this.scenario.getTransitSchedule();
 		for (TransitLine line : ts.getTransitLines().values()) {
@@ -264,7 +264,7 @@ class ScenarioImporter {
 					TransitRouteStop routeStop = stops.get(i);
 					TransitStopFacility stopFacility = routeStop.getStopFacility();
 
-					IntArrayMap<ArrayDeque<Agent>> linesMap = this.agent_stops.computeIfAbsent(stopFacility.getId(), k -> new IntArrayMap<>());
+					IntArrayMap<ArrayDeque<Agent>> linesMap = this.agentStops.computeIfAbsent(stopFacility.getId(), k -> new IntArrayMap<>());
 					linesMap.computeIfAbsent(line.getId().index(), k -> new ArrayDeque<>());
 				}
 			}
@@ -403,7 +403,7 @@ class ScenarioImporter {
 	}
 
 	private void populateStops(int srcStopId, int lineId) {
-		IntArrayMap<ArrayDeque<Agent>> agents = this.agent_stops.get(srcStopId);
+		IntArrayMap<ArrayDeque<Agent>> agents = this.agentStops.get(srcStopId);
 		agents.computeIfAbsent(lineId, k -> new ArrayDeque<>());
 	}
 
