@@ -40,7 +40,6 @@ public final class PersonUtils {
     private static final String EMPLOYED = "employed";
     private static final String AGE = "age";
     private static final String TRAVEL_CARDS = "travelcards";
-    /** {@code @Deprecated:} Use {@link #getIncome(Person)} {@link #setIncome(Person, double)} and make private */
     private static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
     private static final String PERSONAL_SCORING_PREFIX = "scoring_";
     private static final String PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME = PERSONAL_SCORING_PREFIX + "constant";
