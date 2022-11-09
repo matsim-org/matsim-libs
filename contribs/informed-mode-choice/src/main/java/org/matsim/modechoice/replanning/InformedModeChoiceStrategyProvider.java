@@ -15,6 +15,7 @@ import javax.inject.Inject;
 /**
  * Provider for {@link InformedModeChoicePlanStrategy}.
  */
+@Deprecated
 public class InformedModeChoiceStrategyProvider implements Provider<PlanStrategy> {
 
 	@Inject

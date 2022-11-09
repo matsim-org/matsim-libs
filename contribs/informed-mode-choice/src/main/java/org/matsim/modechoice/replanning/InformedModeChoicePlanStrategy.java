@@ -38,8 +38,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- * The main strategy for informed mode choice.
+ * Not in use currently.
  */
+@Deprecated
 public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 	private static final Logger log = LogManager.getLogger(InformedModeChoicePlanStrategy.class);
