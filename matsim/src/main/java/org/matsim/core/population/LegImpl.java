@@ -32,8 +32,8 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	private Route route = null;
 
-	private double depTime = OptionalTime.undefined().getRawSeconds();
-	private double travTime = OptionalTime.undefined().getRawSeconds();
+	private double depTime = OptionalTime.toSeconds(OptionalTime.undefined());
+	private double travTime = OptionalTime.toSeconds(OptionalTime.undefined());
 	private String mode;
 	private String routingMode;
 
@@ -68,7 +68,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public final OptionalTime getDepartureTime() {
-		return OptionalTime.of(this.depTime);
+		return OptionalTime.fromSeconds(this.depTime);
 	}
 
 	@Override
@@ -78,12 +78,12 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public void setDepartureTimeUndefined() {
-		this.depTime = OptionalTime.undefined().getRawSeconds();
+		this.depTime = OptionalTime.toSeconds(OptionalTime.undefined());
 	}
 
 	@Override
 	public final OptionalTime getTravelTime() {
-		return OptionalTime.of(this.travTime);
+		return OptionalTime.fromSeconds(this.travTime);
 	}
 
 	@Override
@@ -93,7 +93,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public void setTravelTimeUndefined() {
-		this.travTime = OptionalTime.undefined().getRawSeconds();
+		this.travTime = OptionalTime.toSeconds(OptionalTime.undefined());
 	}
 
 	@Override

@@ -39,7 +39,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	private double dist = Double.NaN;
 
-	private double travTime = OptionalTime.undefined().getRawSeconds();
+	private double travTime = OptionalTime.toSeconds(OptionalTime.undefined());
 
 	private Id<Link> startLinkId = null;
 	private Id<Link> endLinkId = null;
@@ -61,7 +61,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	@Override
 	public final OptionalTime getTravelTime() {
-		return OptionalTime.of(this.travTime);
+		return OptionalTime.fromSeconds(this.travTime);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	@Override
 	public void setTravelTimeUndefined() {
-		this.travTime = OptionalTime.undefined().getRawSeconds();
+		this.travTime = OptionalTime.toSeconds(OptionalTime.undefined());
 	}
 
 	@Override

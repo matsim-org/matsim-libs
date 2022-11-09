@@ -58,22 +58,22 @@ public final class OptionalTime {
 		return UNDEFINED;
 	}
 
-	public static OptionalTime of(double seconds) {
+	public static OptionalTime fromSeconds(double seconds) {
 		if (seconds == Time.UNDEFINED_TIME) return UNDEFINED;
 		else if (seconds == 0) return TIME_0;
 		else return new OptionalTime(seconds);
 	}
-	
+
+	public static double toSeconds(OptionalTime optionalTime) {
+		return optionalTime.seconds;
+	}
+
 	private final double seconds;
 
 	private OptionalTime(double seconds) {
 		this.seconds = seconds;
 	}
 
-	public double getRawSeconds() {
-		return seconds;
-	}
-	
 	public double seconds() {
 		if (seconds == Time.UNDEFINED_TIME) {
 			throw new NoSuchElementException("Undefined time");
