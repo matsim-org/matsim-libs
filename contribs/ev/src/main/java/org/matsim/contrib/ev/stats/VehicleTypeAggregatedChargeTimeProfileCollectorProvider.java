@@ -77,7 +77,7 @@ public class VehicleTypeAggregatedChargeTimeProfileCollectorProvider implements 
 					.stream()
 					.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getCharge()))
 					.average()
-					.getAsDouble();
+					.orElse(Double.NaN);// when no vehicle in the fleet, return NaN
 			averageSocByType.put(ALL_VEHICLES_ID, averageSoc);
 			return ImmutableMap.copyOf(averageSocByType);
 		});
