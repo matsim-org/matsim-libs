@@ -140,7 +140,7 @@ import java.util.List;
 		if (this.scorer != null) {
 			this.selectedPlan.setScore(scorer.getScoreForCurrentPlan() );
 		} else {
-			log.fatal("trying to score the current LSP plan, but scorer is not set.");
+			throw new RuntimeException("trying to score the current LSP plan, but scorer is not set.");
 		}
 	}
 
