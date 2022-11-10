@@ -24,6 +24,8 @@ import lsp.LSPCarrierResource;
 import lsp.LSPDataObject;
 import lsp.LSPResource;
 import lsp.LogisticsSolutionElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,12 +35,17 @@ import java.util.Collection;
 
 /*package-private*/ class MainRunCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 
+	private static final Logger log = LogManager.getLogger(MainRunCarrierResource.class);
+
 	private final Carrier carrier;
 	private final Id<Link> fromLinkId;
 	private final Id<Link> toLinkId;
 	private final Collection<LogisticsSolutionElement> clientElements;
 	private final MainRunCarrierScheduler mainRunScheduler;
+
+	private final UsecaseUtils.VehicleReturn vehicleReturn;
 	private final Network network;
+
 
 	MainRunCarrierResource(UsecaseUtils.MainRunCarrierResourceBuilder builder) {
 		super(builder.getId());
@@ -47,6 +54,12 @@ import java.util.Collection;
 		this.toLinkId = builder.getToLinkId();
 		this.clientElements = builder.getClientElements();
 		this.mainRunScheduler = builder.getMainRunScheduler();
+		if (builder.getVehicleReturn() != null){
+			this.vehicleReturn = builder.getVehicleReturn();
+		} else {
+			log.warn("Return behaviour was not specified. Using the following setting as default: " + UsecaseUtils.VehicleReturn.endAtToLink);
+			this.vehicleReturn = UsecaseUtils.VehicleReturn.endAtToLink;
+		}
 		this.network = builder.getNetwork();
 	}
 
@@ -78,4 +91,7 @@ import java.util.Collection;
 		return network;
 	}
 
+	public UsecaseUtils.VehicleReturn getVehicleReturn() {
+		return vehicleReturn;
+	}
 }

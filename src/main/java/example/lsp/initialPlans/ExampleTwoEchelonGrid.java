@@ -221,6 +221,7 @@ final class ExampleTwoEchelonGrid {
 					.setFromLinkId(DEPOT_LINK_ID)
 					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 					.setToLinkId(HUB_LINK_ID)
+					.setVehicleReturn(UsecaseUtils.VehicleReturn.returnToFromLink)
 					.build();
 
 			LogisticsSolutionElement mainCarrierLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("mainCarrierLSE", LogisticsSolutionElement.class))

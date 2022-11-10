@@ -135,11 +135,17 @@ import java.util.*;
 		}
 
 		tourBuilder.addLeg(new Leg());
-		tourBuilder.scheduleEnd(Id.create(resource.getEndLinkId(), Link.class));
-		//TODO: Option einfügen, dass es auch noch eine Fahrt zurück zum Depot gibt?
-		// Würde das optional machen, weil es ja nach Kontext Sinn ergeben kann (urban) aber nicht muss (langstrecke)
-		// Bei der Langstrecke kann man annehmen, dass das Fahrzeug ab dem Ziel einen neuen Auftrag nach irgendwo erhalten kann.
-		// Urban wird es eher ans Depot zurück kehren.
+		switch (resource.getVehicleReturn()) {
+			case returnToFromLink -> {
+				//The more "urban" behaviour: The vehicle returns to its origin (startLink).
+				tourBuilder.scheduleEnd(Id.create(resource.getStartLinkId(), Link.class));
+			}
+			case endAtToLink -> {
+				//The more "long-distance" behaviour: The vehicle ends at its destination (toLink).
+				tourBuilder.scheduleEnd(Id.create(resource.getEndLinkId(), Link.class));
+			}
+			default -> throw new IllegalStateException("Unexpected value: " + resource.getVehicleReturn());
+		}
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
 		CarrierVehicle vehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		double tourStartTime = latestTupleTime + totalLoadingTime;
