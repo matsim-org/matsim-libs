@@ -89,7 +89,7 @@ final class ExampleTwoEchelonGrid {
 			.setCostPerDistanceUnit(0.001)
 			.setCostPerTimeUnit(0.005)
 			.build();
-	public static final double HUBCOSTS_FIX = 100.;
+	public static final double HUBCOSTS_FIX = -100.;
 
 	private ExampleTwoEchelonGrid() {
 	} // so it cannot be instantiated
@@ -111,7 +111,8 @@ final class ExampleTwoEchelonGrid {
 		});
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( CarrierScoringFunctionFactory.class ).toInstance( new MyCarrierScorer());
+//				bind( CarrierScoringFunctionFactory.class ).toInstance( new MyCarrierScorer());
+				bind( CarrierScoringFunctionFactory.class ).toInstance( new MyEventBasedCarrierScorer());
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
 					CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
