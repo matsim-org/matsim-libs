@@ -22,7 +22,7 @@ For this to work, vehicles that represent an EV need to be attached to a vehicle
 
 ## A few notes to the current state of this package (and it's issues and TODOs)
 
-- The code generally was tested only with the Open Berlin Scenario v5.5.x ]
+- The code generally was tested only with the Open Berlin Scenario v5.5.x 
 - The official EV specification is the one coming from the matsim-vehicle, similar to the `ev` contrib. (MATSim-PR2218, Oct '22) 
 - (needs review - obsolete, but code requires some checks) The initial SoC (as well as other important attributes) is read/written from/to the vehicle _type_ instead of the (single) vehicle. This is, because the corresponding code was written before MATSim-PR1605. So, the code could use adoption to PR1605. Now, if you want to have individual initial SoCs, you need to have one vehicle type for each person/value.
 
