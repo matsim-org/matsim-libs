@@ -40,10 +40,13 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.Vehicle;
 
@@ -237,7 +240,12 @@ import org.matsim.vehicles.Vehicle;
 
 		out.write(">\n");
 
-		this.attributesWriter.writeAttributes( "\t\t\t\t" , out , leg.getAttributes() );
+		if (leg.getRoutingMode() != null) {
+			Attributes attributes = new Attributes();
+			AttributesUtils.copyTo(leg.getAttributes(), attributes);
+			attributes.putAttribute(TripStructureUtils.routingMode, leg.getRoutingMode());
+			this.attributesWriter.writeAttributes( "\t\t\t\t" , out , attributes );
+		} else this.attributesWriter.writeAttributes( "\t\t\t\t" , out , leg.getAttributes() );
 	}
 
 	private static void endLeg(final BufferedWriter out) throws IOException {

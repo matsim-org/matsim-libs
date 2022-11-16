@@ -21,6 +21,7 @@ package org.matsim.core.population.io;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 
 import org.apache.logging.log4j.LogManager;
@@ -41,6 +42,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -50,6 +52,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
@@ -168,7 +171,7 @@ import com.google.inject.Inject;
 						currAttributes = curract.getAttributes();
 						break;
 					case LEG:
-						currAttributes = currleg.getAttributes();
+						currAttributes = new org.matsim.utils.objectattributes.attributable.Attributes();
 						break;
 					default:
 						throw new RuntimeException( context.peek() );
@@ -205,19 +208,29 @@ import com.google.inject.Inject;
 				this.attributesReader.endTag( name , content , context );
 				break;
 			case ATTRIBUTES:
-				if (context.peek().equals(POPULATION)) {
-					String inputCRS = ProjectionUtils.getCRS(scenario.getPopulation());
+				switch( context.peek() ) {
+					case POPULATION:
+						String inputCRS = ProjectionUtils.getCRS(scenario.getPopulation());
 
-					if (inputCRS != null && targetCRS != null) {
-						if (externalInputCRS != null) {
-							// warn or crash?
-							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+						if (inputCRS != null && targetCRS != null) {
+							if (externalInputCRS != null) {
+								// warn or crash?
+								log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+							}
+							coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
+							ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
 						}
-						coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
-						ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
-					}
+						break;
+					case LEG:
+						Object routingMode = currAttributes.getAttribute(TripStructureUtils.routingMode);
+						if (Objects.nonNull(routingMode) && routingMode instanceof String) {
+							currAttributes.removeAttribute(TripStructureUtils.routingMode);
+							currleg.setRoutingMode((String) routingMode);
+						}
+						AttributesUtils.copyTo(currAttributes, currleg.getAttributes());
+						break;
 				}
-			    break;
+				break;
 			case PLAN:
 				if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
 					((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();

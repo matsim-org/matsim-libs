@@ -175,6 +175,7 @@ public final class PopulationUtils {
 		public UnmodifiableLeg( Leg leg ) {
 			this.delegate = leg ;
 		}
+
 		@Override
 		public String getMode() {
 			return this.delegate.getMode() ;
@@ -185,6 +186,16 @@ public final class PopulationUtils {
 			throw new UnsupportedOperationException() ;
 		}
 
+		@Override
+		public String getRoutingMode() {
+			return this.delegate.getRoutingMode() ;
+		}
+
+		@Override
+		public void setRoutingMode(String routingMode) {
+			throw new UnsupportedOperationException() ;
+		}
+		
 		@Override
 		public Route getRoute() {
 			// route should be unmodifiable. kai
