@@ -70,6 +70,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	/*package*/ OptionalTime[] arrTimes;
 	/*package*/ OptionalTime[] travTimes;
 	/*package*/ String[] modes;
+	/*package*/ String[] routingModes;
 	
 	private final Attributes attributes = new AttributesImpl();
 	@Override

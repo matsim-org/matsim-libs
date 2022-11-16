@@ -28,17 +28,18 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
-/* deliberately package */  final class LegImpl  implements Leg {
+/* deliberately package */ final class LegImpl implements Leg {
 
 	private Route route = null;
 
 	private OptionalTime depTime = OptionalTime.undefined();
 	private OptionalTime travTime = OptionalTime.undefined();
 	private String mode;
+	private String routingMode;
 
 	private Attributes attributes = null;
 
-	/* deliberately package */  LegImpl(final String transportMode) {
+	/* deliberately package */ LegImpl(final String transportMode) {
 		this.mode = transportMode;
 	}
 
@@ -49,12 +50,22 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public final void setMode(String transportMode) {
-		this.mode = transportMode;
+		this.mode = transportMode == null ? null : transportMode.intern();
 		TripStructureUtils.setRoutingMode( this, null );
 //		TripStructureUtils.setRoutingMode( this, null ); // setting routingMode to null leads to exceptions in AttributesXmlWriterDelegate.writeAttributes() : Class<?> clazz = objAttribute.getValue().getClass();
 		// (yyyy or maybe "transportMode" instead of "null"?? kai, oct'19)
 	}
 
+	@Override
+	public final String getRoutingMode() {
+		return this.routingMode;
+	}
+	
+	@Override
+	public final void setRoutingMode(String routingMode) {
+		this.routingMode = routingMode == null ? null : routingMode.intern();
+	}
+	
 	@Override
 	public final OptionalTime getDepartureTime() {
 		return this.depTime;
