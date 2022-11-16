@@ -16,7 +16,7 @@ import org.matsim.modechoice.estimators.LegEstimator;
  * Estimates drt trips based only daily averages. No spatial or temporal differentiation is taken into account for the estimate.
  * This estimator is suited for small scenarios with few vehicles and trips and consequently few data points.
  */
-public class BasicDRTTripEstimator implements LegEstimator<ModeAvailability> {
+public class BasicDRTLegEstimator implements LegEstimator<ModeAvailability> {
 
 	// TODO: these might be bound separately (per mode)
 
