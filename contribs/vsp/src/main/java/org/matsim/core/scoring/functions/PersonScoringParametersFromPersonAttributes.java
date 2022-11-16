@@ -156,7 +156,7 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
                 }
             }
 
-            Map<String, String> personalScoringModeConstants = PersonUtils.getPersonalScoringModeConstants(person);
+            Map<String, String> personalScoringModeConstants = PersonUtils.getModeConstants(person);
             if (personalScoringModeConstants != null) {
                 for (Map.Entry<String, String> entry: personalScoringModeConstants.entrySet()) {
                     ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
