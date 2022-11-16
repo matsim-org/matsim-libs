@@ -104,6 +104,12 @@ public final class EmissionModule {
 	public void writeEmissionInformation() {
 		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
 				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
+		int noVehicleLeavesTrafficEmissions = warmEmissionHandler.getSameLinkTrafficLeaveWarnCnt() + warmEmissionHandler.getUnusualTrafficLeaveWarnCnt();
+		logger.info("Warm emissions were not calculated for " + noVehicleLeavesTrafficEmissions + " of " + warmEmissionHandler.getTrafficLeaveCnt() +
+				" vehicle leaves traffic events (no corresponding link enter event).");
+		if ( warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() > 0 ) {
+			logger.info(warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() + " events occurred where the vehicle left traffic without entering ANY link " +
+					"(no warm emissions calculated). These events might need to be investigated."); }
 
 		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
 
