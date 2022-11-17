@@ -34,6 +34,8 @@ public class BasicDRTLegEstimator implements LegEstimator<ModeAvailability> {
 
 	@Override
 	public double estimate(EstimatorContext context, String mode, Leg leg, ModeAvailability option) {
+
+
 		return 0;
 	}
 }
