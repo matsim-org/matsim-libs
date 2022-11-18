@@ -19,6 +19,7 @@ import org.matsim.modechoice.estimators.TripEstimator;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A service for working with {@link PlanModel} and creating estimates.
@@ -117,6 +118,16 @@ public final class PlanModelService implements StartupListener {
 
 			planModel.putEstimate(mode, c);
 		}
+	}
+
+	/**
+	 * Return the modes an estimator was registered for.
+	 */
+	public List<String> modesForEstimator(LegEstimator<?> est) {
+		return legEstimators.entrySet().stream().filter(e -> e.getValue().equals(est))
+				.map(Map.Entry::getKey)
+				.distinct()
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -225,6 +236,7 @@ public final class PlanModelService implements StartupListener {
 
 	/**
 	 * Check whether all registered constraints are met.
+	 * @param modes array of used modes for each trip of the day
 	 */
 	public boolean isValidOption(PlanModel model, String[] modes) {
 
