@@ -20,7 +20,7 @@ public class ShowGUI implements Callable<Integer> {
     public Integer call() throws Exception {
 
         String name = "MATSim GUI";
-        if (spec.parent() != null) {
+        if (spec.parent() != null && spec.parent().usageMessage().header().length > 0) {
             // Use header of parent and cutoff formatting
             name = spec.parent().usageMessage().header()[0];
             name = name.substring(MATSimApplication.COLOR.length(), name.length() - 4);
