@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.scoring.functions;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +39,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author tschlenther
+ * @author tschlenther / vsp-gleich
  * <p>
  * This class is an extension of {@link playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters}
  * which is an adoption of {@link org.matsim.core.scoring.functions.SubpopulationScoringParameters}.
