@@ -28,6 +28,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecifications;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -53,7 +57,7 @@ public class TransferFinalSocToNextIterTest {
 		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 
 		var vehicle1 = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		EVUtils.setInitialEnergy_kWh(vehicle1, INITIAL_ENERGY_kWh);
+		ElectricVehicleSpecifications.setInitialEnergy_kWh(vehicle1, INITIAL_ENERGY_kWh);
 
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
@@ -61,13 +65,14 @@ public class TransferFinalSocToNextIterTest {
 		controler.run();
 
 		// testInitialEnergyInIter0
-		Assert.assertEquals(INITIAL_ENERGY_kWh, handler.iterationInitialSOC.get(0), 0.0);
+		Assert.assertEquals(INITIAL_ENERGY_kWh * EvUnits.J_PER_kWh, handler.iterationInitialSOC.get(0), 0.0);
 
 		// testSOCIsDumpedIntoVehicleType
 		//agent has driven the car so SOC should have changed and should be dumped into the vehicle type
 		var vehicle = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		Assert.assertNotEquals(EVUtils.getInitialEnergy_kWh(vehicle), INITIAL_ENERGY_kWh);
-		Assert.assertEquals(10, EVUtils.getInitialEnergy_kWh(vehicle), MatsimTestUtils.EPSILON); //should be fully charged
+		var evSpec = new ElectricVehicleSpecificationImpl(vehicle);
+		Assert.assertNotEquals(evSpec.getInitialCharge(), INITIAL_ENERGY_kWh * EvUnits.J_PER_kWh);
+		Assert.assertEquals(10 * EvUnits.J_PER_kWh, evSpec.getInitialCharge(), MatsimTestUtils.EPSILON); //should be fully charged
 
 		// testSOCisTransferredToNextIteration
 		for (int i = 0; i < LAST_ITERATION; i++) {
@@ -78,20 +83,21 @@ public class TransferFinalSocToNextIterTest {
 	private static class SOCHandler implements BeforeMobsimListener, AfterMobsimListener {
 		private final Map<Integer, Double> iterationInitialSOC = new HashMap<>();
 		private final Map<Integer, Double> iterationEndSOC = new HashMap<>();
-		private final Vehicle car;
+		private final ElectricVehicleSpecification evSpec;
 
 		SOCHandler(Scenario scenario) {
-			this.car = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
+			var car = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
+			evSpec = new ElectricVehicleSpecificationImpl(car);
 		}
 
 		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
-			this.iterationEndSOC.put(event.getIteration(), EVUtils.getInitialEnergy_kWh(car));
+			this.iterationEndSOC.put(event.getIteration(), evSpec.getInitialCharge());
 		}
 
 		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-			this.iterationInitialSOC.put(event.getIteration(), EVUtils.getInitialEnergy_kWh(car));
+			this.iterationInitialSOC.put(event.getIteration(), evSpec.getInitialCharge());
 		}
 	}
 }
