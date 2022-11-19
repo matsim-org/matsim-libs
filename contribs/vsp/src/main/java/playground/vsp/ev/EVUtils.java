@@ -33,7 +33,7 @@ public class EVUtils {
 	 * @param vehicle
 	 * @return the initial energy in kWh
 	 */
-	static Double getInitialEnergy(Vehicle vehicle) {
+	static Double getInitialEnergy_kWh(Vehicle vehicle) {
 		return (Double)vehicle.getAttributes()
 				.getAttribute(ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh);
 	}
@@ -42,7 +42,7 @@ public class EVUtils {
 	 * @param vehicle
 	 * @param initialEnergyInKWh initial energy [kWh]
 	 */
-	public static void setInitialEnergy(Vehicle vehicle, double initialEnergyInKWh) {
+	public static void setInitialEnergy_kWh(Vehicle vehicle, double initialEnergyInKWh) {
 		vehicle.getAttributes()
 				.putAttribute(ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh, initialEnergyInKWh);
 	}

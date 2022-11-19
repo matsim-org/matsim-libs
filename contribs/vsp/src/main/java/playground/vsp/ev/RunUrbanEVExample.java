@@ -72,8 +72,7 @@ import org.matsim.vehicles.VehiclesFactory;
  */
 public class RunUrbanEVExample {
 
-	static final double CAR_INITIAL_ENERGY = 4.;
-	static final double BIKE_INITIAL_ENERGY = 4.;
+	static final double CAR_INITIAL_ENERGY_kWh = 4.;
 
 	public static void main(String[] args) {
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
@@ -134,7 +133,7 @@ public class RunUrbanEVExample {
 			scenario.getVehicles().addVehicleType(carVehicleType);
 			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
 					carVehicleType);
-			EVUtils.setInitialEnergy(carVehicle, CAR_INITIAL_ENERGY);
+			EVUtils.setInitialEnergy_kWh(carVehicle, CAR_INITIAL_ENERGY_kWh);
 			scenario.getVehicles().addVehicle(carVehicle);
 
 			VehicleType bikeVehicleType = vehicleFactory.createVehicleType(

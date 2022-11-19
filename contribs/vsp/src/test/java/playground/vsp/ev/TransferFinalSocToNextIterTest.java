@@ -41,7 +41,7 @@ public class TransferFinalSocToNextIterTest {
 	private final Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
 	private final SOCHandler handler = new SOCHandler(scenario);
 	private static final Integer LAST_ITERATION = 1;
-	private static final double INITIAL_ENERGY = 9.5;
+	private static final double INITIAL_ENERGY_kWh = 9.5;
 
 	@Rule
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
@@ -53,7 +53,7 @@ public class TransferFinalSocToNextIterTest {
 		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 
 		var vehicle1 = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		EVUtils.setInitialEnergy(vehicle1, INITIAL_ENERGY);
+		EVUtils.setInitialEnergy_kWh(vehicle1, INITIAL_ENERGY_kWh);
 
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
@@ -61,13 +61,13 @@ public class TransferFinalSocToNextIterTest {
 		controler.run();
 
 		// testInitialEnergyInIter0
-		Assert.assertEquals(INITIAL_ENERGY, handler.iterationInitialSOC.get(0), 0.0);
+		Assert.assertEquals(INITIAL_ENERGY_kWh, handler.iterationInitialSOC.get(0), 0.0);
 
 		// testSOCIsDumpedIntoVehicleType
 		//agent has driven the car so SOC should have changed and should be dumped into the vehicle type
 		var vehicle = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		Assert.assertNotEquals(EVUtils.getInitialEnergy(vehicle), INITIAL_ENERGY);
-		Assert.assertEquals(10, EVUtils.getInitialEnergy(vehicle), MatsimTestUtils.EPSILON); //should be fully charged
+		Assert.assertNotEquals(EVUtils.getInitialEnergy_kWh(vehicle), INITIAL_ENERGY_kWh);
+		Assert.assertEquals(10, EVUtils.getInitialEnergy_kWh(vehicle), MatsimTestUtils.EPSILON); //should be fully charged
 
 		// testSOCisTransferredToNextIteration
 		for (int i = 0; i < LAST_ITERATION; i++) {
@@ -86,12 +86,12 @@ public class TransferFinalSocToNextIterTest {
 
 		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
-			this.iterationEndSOC.put(event.getIteration(), EVUtils.getInitialEnergy(car));
+			this.iterationEndSOC.put(event.getIteration(), EVUtils.getInitialEnergy_kWh(car));
 		}
 
 		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-			this.iterationInitialSOC.put(event.getIteration(), EVUtils.getInitialEnergy(car));
+			this.iterationInitialSOC.put(event.getIteration(), EVUtils.getInitialEnergy_kWh(car));
 		}
 	}
 }
