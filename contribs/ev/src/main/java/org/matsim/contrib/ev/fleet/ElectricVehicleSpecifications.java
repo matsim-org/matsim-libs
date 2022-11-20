@@ -26,12 +26,8 @@ import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
 
 public class ElectricVehicleSpecifications {
-	/**
-	 * @param vehicle
-	 * @param initialEnergyInKWh initial energy [kWh]
-	 */
-	public static void setInitialEnergy_kWh(Vehicle vehicle, double initialEnergyInKWh) {
-		vehicle.getAttributes().putAttribute(ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh, initialEnergyInKWh);
+	public static void setInitialSoc(Vehicle vehicle, double initialSoc) {
+		vehicle.getAttributes().putAttribute(ElectricVehicleSpecificationImpl.INITIAL_SOC, initialSoc);
 	}
 
 	public static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes) {

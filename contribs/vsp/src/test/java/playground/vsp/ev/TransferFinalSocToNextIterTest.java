@@ -28,7 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecifications;
@@ -45,7 +44,7 @@ public class TransferFinalSocToNextIterTest {
 	private final Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
 	private final SOCHandler handler = new SOCHandler(scenario);
 	private static final Integer LAST_ITERATION = 1;
-	private static final double INITIAL_ENERGY_kWh = 9.5;
+	private static final double INITIAL_SOC = 0.95;
 
 	@Rule
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
@@ -57,7 +56,7 @@ public class TransferFinalSocToNextIterTest {
 		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 
 		var vehicle1 = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		ElectricVehicleSpecifications.setInitialEnergy_kWh(vehicle1, INITIAL_ENERGY_kWh);
+		ElectricVehicleSpecifications.setInitialSoc(vehicle1, INITIAL_SOC);
 
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
@@ -65,14 +64,14 @@ public class TransferFinalSocToNextIterTest {
 		controler.run();
 
 		// testInitialEnergyInIter0
-		Assert.assertEquals(INITIAL_ENERGY_kWh * EvUnits.J_PER_kWh, handler.iterationInitialSOC.get(0), 0.0);
+		Assert.assertEquals(INITIAL_SOC, handler.iterationInitialSOC.get(0), 0.0);
 
 		// testSOCIsDumpedIntoVehicleType
 		//agent has driven the car so SOC should have changed and should be dumped into the vehicle type
 		var vehicle = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
 		var evSpec = new ElectricVehicleSpecificationImpl(vehicle);
-		Assert.assertNotEquals(evSpec.getInitialCharge(), INITIAL_ENERGY_kWh * EvUnits.J_PER_kWh);
-		Assert.assertEquals(10 * EvUnits.J_PER_kWh, evSpec.getInitialCharge(), MatsimTestUtils.EPSILON); //should be fully charged
+		Assert.assertNotEquals(evSpec.getInitialSoc(), INITIAL_SOC);
+		Assert.assertEquals(1, evSpec.getInitialSoc(), MatsimTestUtils.EPSILON); //should be fully charged
 
 		// testSOCisTransferredToNextIteration
 		for (int i = 0; i < LAST_ITERATION; i++) {
@@ -92,12 +91,12 @@ public class TransferFinalSocToNextIterTest {
 
 		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
-			this.iterationEndSOC.put(event.getIteration(), evSpec.getInitialCharge());
+			this.iterationEndSOC.put(event.getIteration(), evSpec.getInitialSoc());
 		}
 
 		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-			this.iterationInitialSOC.put(event.getIteration(), evSpec.getInitialCharge());
+			this.iterationInitialSOC.put(event.getIteration(), evSpec.getInitialSoc());
 		}
 	}
 }

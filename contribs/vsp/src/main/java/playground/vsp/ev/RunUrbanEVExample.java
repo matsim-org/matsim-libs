@@ -73,7 +73,8 @@ import org.matsim.vehicles.VehiclesFactory;
  */
 public class RunUrbanEVExample {
 
-	static final double CAR_INITIAL_ENERGY_kWh = 4.;
+	static final double CAR_BATTERY_CAPACITY_kWh = 10.;
+	static final double CAR_INITIAL_SOC = 0.4;
 
 	public static void main(String[] args) {
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
@@ -129,12 +130,12 @@ public class RunUrbanEVExample {
 			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString(),
 					VehicleType.class)); //TODO should at least have a suffix "_car"
 			VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
-			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
+			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), CAR_BATTERY_CAPACITY_kWh);
 			ElectricVehicleSpecifications.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 			scenario.getVehicles().addVehicleType(carVehicleType);
 			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
 					carVehicleType);
-			ElectricVehicleSpecifications.setInitialEnergy_kWh(carVehicle, CAR_INITIAL_ENERGY_kWh);
+			ElectricVehicleSpecifications.setInitialSoc(carVehicle, CAR_INITIAL_SOC);
 			scenario.getVehicles().addVehicle(carVehicle);
 
 			VehicleType bikeVehicleType = vehicleFactory.createVehicleType(
