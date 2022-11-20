@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,24 +20,17 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import org.matsim.api.core.v01.Identifiable;
+import java.util.Collection;
+
+import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.collect.ImmutableList;
-
-/**
- * @author Michal Maciejewski (michalm)
- */
-public interface ElectricVehicleSpecification extends Identifiable<Vehicle> {
-	Vehicle getMatsimVehicle();
-
-	ImmutableList<String> getChargerTypes();
-
-	double getInitialSoc(); //in [0, 1]
-
-	default double getInitialCharge() {
-		return getInitialSoc() * getBatteryCapacity();
+public class ElectricVehicleSpecifications {
+	public static void setInitialSoc(Vehicle vehicle, double initialSoc) {
+		vehicle.getAttributes().putAttribute(ElectricVehicleSpecificationImpl.INITIAL_SOC, initialSoc);
 	}
 
-	double getBatteryCapacity();//[J]
+	public static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes) {
+		engineInformation.getAttributes().putAttribute(ElectricVehicleSpecificationImpl.CHARGER_TYPES, chargerTypes);
+	}
 }

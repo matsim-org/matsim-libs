@@ -11,9 +11,9 @@
 		<width meter="1.0"/>
 		<engineInformation>
 			<attributes>
-				<attribute name="chargerTypes" class="java.util.ImmutableCollections$List12">["default"]</attribute>
-				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">60.0</attribute>
 				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="chargerTypes" class="java.util.Collections$UnmodifiableCollection">["default"]</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">60.0</attribute>
 			</attributes>
 		</engineInformation>
 		<costInformation>
@@ -26,77 +26,77 @@
 
 	<vehicle id="0" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="1" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="10" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="11" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="12" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="13" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="14" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="2" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="3" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="4" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="5" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="6" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="7" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="8" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 	<vehicle id="9" type="EV_60.0kWh">
 		<attributes>
-			<attribute name="initialEnergyInKWh" class="java.lang.Double">60.0</attribute>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
 		</attributes>
 	</vehicle>
 
