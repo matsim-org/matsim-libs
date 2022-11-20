@@ -311,7 +311,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	/**
 	 * Modules that are configurable via command line arguments.
 	 */
-	private List<ConfigGroup> getConfigurableModules() {
+	protected List<ConfigGroup> getConfigurableModules() {
 		return Lists.newArrayList(
 				new ControlerConfigGroup(),
 				new GlobalConfigGroup(),

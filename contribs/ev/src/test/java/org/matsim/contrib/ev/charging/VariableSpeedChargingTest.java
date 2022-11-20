@@ -83,10 +83,10 @@ public class VariableSpeedChargingTest {
 		// this record is a bit hacky implementation of ElectricVehicleSpecification just meant for tests
 		record TestEvSpecification(Id<Vehicle> getId, Vehicle getMatsimVehicle, String getVehicleType,
 								   ImmutableList<String> getChargerTypes, double getBatteryCapacity,
-								   double getInitialCharge) implements ElectricVehicleSpecification {
+								   double getInitialSoc) implements ElectricVehicleSpecification {
 		}
 		var specification = new TestEvSpecification(Id.create("ev_id", Vehicle.class), null, "vt",
-				ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), EvUnits.kWh_to_J(charge_kWh));
+				ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), charge_kWh / capacity_kWh);
 
 		var charger = ImmutableChargerSpecification.newBuilder()
 				.id(Id.create("charger_id", Charger.class))
