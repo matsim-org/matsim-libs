@@ -35,7 +35,6 @@ import com.google.common.collect.ImmutableList;
 public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecification {
 	public static final String EV_ENGINE_HBEFA_TECHNOLOGY = "electricity";
 
-	public static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
 	public static final String INITIAL_SOC = "initialSoc";// in [0, 1]
 	public static final String CHARGER_TYPES = "chargerTypes";
 
