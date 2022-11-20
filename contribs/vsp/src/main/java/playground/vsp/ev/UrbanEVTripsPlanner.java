@@ -261,7 +261,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				do {
 					double newCharge = evSpec.getInitialCharge();
 					pseudoVehicle.getBattery().setCharge(newCharge);
-					double capacityThreshold = pseudoVehicle.getBattery().getCapacity() * (configGroup.getCriticalSOC());
 					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);
 
 					if (legWithCriticalSOC != null) {
@@ -303,7 +302,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							break;
 
 						} else if (evLegs.get(evLegs.size() - 1).equals(legWithCriticalSOC)
-								&& pseudoVehicle.getBattery().getCharge() > capacityThreshold) {
+								&& pseudoVehicle.getBattery().getSoc() > configGroup.getCriticalSOC()) {
 							//critical leg is the last of the day but energy is above the threshold
 							//TODO: plan for the next day! that means, check at least if the first leg can be done!
 							cnt = 0;
@@ -348,9 +347,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	private Leg getCriticalOrLastEvLeg(Plan modifiablePlan, ElectricVehicle pseudoVehicle, Id<Vehicle> originalVehicleId) {
 		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup)config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
 
-		double capacityThreshold = pseudoVehicle.getBattery().getCapacity()
-				* (configGroup.getCriticalSOC()); //TODO randomize? Might also depend on the battery size!
-
 		Double chargingBegin = null;
 
 		Set<String> modesWithVehicles = new HashSet<>(scenario.getConfig().qsim().getMainModes());
@@ -366,7 +362,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 						.equals(originalVehicleId)) {
 					lastLegWithVehicle = leg;
 					emulateVehicleDischarging(pseudoVehicle, leg);
-					if (pseudoVehicle.getBattery().getCharge() <= capacityThreshold) {
+					if (pseudoVehicle.getBattery().getSoc() <= configGroup.getCriticalSOC()) { // TODO randomize?
 						return leg;
 					}
 				}
