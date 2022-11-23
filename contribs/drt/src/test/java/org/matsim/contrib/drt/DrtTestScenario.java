@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.MATSimApplication;
-import org.matsim.contrib.drt.estimator.BasicDRTLegEstimator;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -23,10 +22,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
-import org.matsim.modechoice.InformedModeChoiceModule;
-import org.matsim.modechoice.ModeOptions;
-import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
-import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -36,21 +31,34 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * A test scenario based on kelheim example.
  */
 public class DrtTestScenario extends MATSimApplication {
 
+
+	private final Consumer<Controler> prepareControler;
+	private final Consumer<Config> prepareConfig;
+
 	public static void main(String[] args) {
 		MATSimApplication.run(DrtTestScenario.class, args);
 	}
 
 	public DrtTestScenario() {
+		this(controler -> {}, config -> {});
+	}
+
+	public DrtTestScenario(Consumer<Controler> prepareControler, Consumer<Config> prepareConfig) {
+		this.prepareControler = prepareControler;
+		this.prepareConfig = prepareConfig;
 	}
 
 	public DrtTestScenario(@Nullable Config config) {
 		super(config);
+		this.prepareControler = controler -> {};
+		this.prepareConfig = c -> {};
 	}
 
 	public static Config loadConfig(MatsimTestUtils utils) {
@@ -110,6 +118,8 @@ public class DrtTestScenario extends MATSimApplication {
 
 		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 
+		prepareConfig.accept(config);
+
 		return config;
 	}
 
@@ -138,13 +148,7 @@ public class DrtTestScenario extends MATSimApplication {
 	@Override
 	protected void prepareControler(Controler controler) {
 
-		InformedModeChoiceModule.Builder builder = InformedModeChoiceModule.newBuilder()
-				.withFixedCosts(FixedCostsEstimator.DailyConstant.class, "car")
-				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.AlwaysAvailable.class, "bike", "walk", "pt")
-				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.ConsiderYesAndNo.class, "car")
-				.withLegEstimator(BasicDRTLegEstimator.class, ModeOptions.AlwaysAvailable.class, "drt", "av");
-
-		controler.addOverridingModule(builder.build());
+		prepareControler.accept(controler);
 
 		// DRT specific
 
