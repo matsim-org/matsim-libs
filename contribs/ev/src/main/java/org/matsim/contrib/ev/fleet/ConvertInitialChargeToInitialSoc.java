@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh;
 import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl.INITIAL_SOC;
 
 import org.matsim.vehicles.MatsimVehicleReader;
@@ -31,6 +30,8 @@ import org.matsim.vehicles.VehicleUtils;
  * @author Michal Maciejewski (michalm)
  */
 public class ConvertInitialChargeToInitialSoc {
+	private static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
+
 	public static void run(String file) {
 		var vehicles = VehicleUtils.createVehiclesContainer();
 		var reader = new MatsimVehicleReader(vehicles);

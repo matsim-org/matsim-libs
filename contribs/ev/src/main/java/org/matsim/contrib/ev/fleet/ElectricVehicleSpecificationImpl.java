@@ -27,6 +27,7 @@ import org.matsim.contrib.ev.EvUnits;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -35,7 +36,6 @@ import com.google.common.collect.ImmutableList;
 public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecification {
 	public static final String EV_ENGINE_HBEFA_TECHNOLOGY = "electricity";
 
-	public static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
 	public static final String INITIAL_SOC = "initialSoc";// in [0, 1]
 	public static final String CHARGER_TYPES = "chargerTypes";
 
@@ -52,9 +52,7 @@ public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecific
 	public ElectricVehicleSpecificationImpl(Vehicle matsimVehicle) {
 		this.matsimVehicle = matsimVehicle;
 		//provided per vehicle type (in engine info)
-		if (getInitialCharge() < 0 || getInitialCharge() > getBatteryCapacity()) {
-			throw new IllegalArgumentException("Invalid initialCharge or batteryCapacity of vehicle: " + getId());
-		}
+		Preconditions.checkArgument(getInitialSoc() >= 0 && getInitialSoc() <= 1, "Invalid initialCharge or batteryCapacity of vehicle: %s", getId());
 	}
 
 	@Override
