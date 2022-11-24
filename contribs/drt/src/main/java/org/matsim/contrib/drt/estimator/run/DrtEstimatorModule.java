@@ -1,22 +1,15 @@
 package org.matsim.contrib.drt.estimator.run;
 
 import com.google.inject.Singleton;
-
-import org.matsim.contrib.drt.estimator.DrtAccessEgressEstimator;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
-import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.DvrpMode;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.modal.AbstractModalModule;
 import org.matsim.core.modal.ModalInjector;
 import org.matsim.core.modal.ModalProviders;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.Function;
 
 /**
  * Main module that needs to be installed if any estimator is to be used.
@@ -52,7 +45,7 @@ public class DrtEstimatorModule extends AbstractModule {
 							Constructor<? extends DrtEstimator> constructor = group.estimator.getDeclaredConstructor(ModalInjector.class);
 							return constructor.newInstance(ModalProviders.createInjector(getter));
 						} catch (NoSuchMethodException e) {
-							throw new RuntimeException("Could not find constructor for DRT estimator. You need to have a constructor with one parameter accepting ModalInjector", e);
+							throw new RuntimeException("Could not find constructor for DRT estimator. You need to have a public constructor with one parameter accepting ModalInjector", e);
 						} catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
 							throw new RuntimeException("Could not instantiate DRT estimator", e);
 						}
@@ -60,8 +53,6 @@ public class DrtEstimatorModule extends AbstractModule {
 			)).in(Singleton.class);
 
 			addControlerListenerBinding().to(modalKey(DrtEstimator.class));
-
-			bindModal(DrtAccessEgressEstimator.class).toProvider(modalProvider(getter -> new DrtAccessEgressEstimator(ModalProviders.createInjector(getter)))).in(Singleton.class);
 
 			bindModal(DrtEstimatorConfigGroup.class).toInstance(group);
 		}

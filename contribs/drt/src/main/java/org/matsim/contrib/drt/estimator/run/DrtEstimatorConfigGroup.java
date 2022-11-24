@@ -41,6 +41,7 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 
 	// window
 	// decay factor
+	// randomisation
 
 	@Override
 	public String getMode() {
