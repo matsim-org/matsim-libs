@@ -2,10 +2,16 @@ package example.lsp.initialPlans;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndEvent;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryStartEvent;
+import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 
@@ -33,6 +39,8 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	 */
 	private static class EventbasedScoring implements SumScoringFunction.ArbitraryEventScoring{
 
+		@Inject private Scenario scenario;
+
 		Logger log = LogManager.getLogger(EventbasedScoring.class);
 		private final Carrier carrier;
 		private double score;
@@ -50,7 +58,39 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 
 		@Override public void handleEvent(Event event) {
 			log.warn(event.toString());
+			if (event instanceof FreightTourStartEvent freightTourStartEvent) {
+				handleEvent(freightTourStartEvent);
+			} else if (event instanceof LinkEnterEvent linkEnterEvent) {
+				handleEvent(linkEnterEvent);
+			} else if (event instanceof LinkLeaveEvent linkLeaveEvent) {
+				handleEvent(linkLeaveEvent);
+			} else if (event instanceof FreightShipmentDeliveryStartEvent freightShipmentDeliveryStartEvent) {
+				handleEvent(freightShipmentDeliveryStartEvent);
+			} else if (event instanceof FreightShipmentDeliveryEndEvent freightShipmentsDeliveryEndEvent) {
+				handleEvent(freightShipmentsDeliveryEndEvent);
+			}
 			score = score - 10;
+		}
+
+
+		private void handleEvent(FreightTourStartEvent event){
+			var vehId = event.getVehicleId();
+		}
+
+		private void handleEvent(LinkEnterEvent event){
+
+		}
+
+		private void handleEvent(LinkLeaveEvent event){
+
+		}
+
+		private void handleEvent(FreightShipmentDeliveryStartEvent event){
+
+		}
+
+		private void handleEvent(FreightShipmentDeliveryEndEvent event){
+
 		}
 
 
