@@ -169,6 +169,7 @@ final class ExampleTwoEchelonGrid {
 		//Change speed on all links to 30 km/h (8.33333 m/s) for easier computation --> Freeflow TT per link is 2min
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			link.setFreespeed(30 / 3.6);
+			link.setCapacity(1000);
 		}
 
 		log.info("Add LSP to the scenario");
