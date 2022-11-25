@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,7 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.scoring;
+
+package org.matsim.core.scoring.functions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,21 +29,23 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author tschlenther
+ * @author tschlenther / vsp-gleich
  * <p>
- * This class is an adoption of {@link org.matsim.core.scoring.functions.SubpopulationScoringParameters}.
- * It additionaly allows for person-specific marginalUtilityOfMoney.
+ * This class is an extension of {@link playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters}
+ * which is an adoption of {@link org.matsim.core.scoring.functions.SubpopulationScoringParameters}.
+ * This class additionaly allows for person-specific mode scoring parameters (for now ASC only) and marginalUtilityOfMoney.
+ * In order to use this, you need to provide the respective attributes (otherwise default values for the subpopulation
+ * are used). For mode scoring parameters use .... TODO
  * For marginalUtilityOfMoney an attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} for persons that have a specific
  * income is used. Persons in the population, that have no attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} will use the
  * default marginal utility set in their subpopulation's scoring parameters.
@@ -54,8 +57,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * If you want to distinguish between 'rich' areas and 'poor' areas, make use of the subpopulation feature and set subpopulation-specific mgnUtilityOfMoney in
  * the #PlanCalcScoreConfigGroup
  */
-public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements ScoringParametersForPerson {
-    Logger log = LogManager.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
+public class PersonScoringParametersFromPersonAttributes implements ScoringParametersForPerson {
+    Logger log = LogManager.getLogger(PersonScoringParametersFromPersonAttributes.class);
+
     private final PlanCalcScoreConfigGroup config;
     private final ScenarioConfigGroup scConfig;
     private final TransitConfigGroup transitConfigGroup;
@@ -64,7 +68,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
     private final Map<String, Map<String, ActivityUtilityParameters>> activityParamsPerSubpopulation = new ConcurrentHashMap<>();
 
     @Inject
-    IncomeDependentUtilityOfMoneyPersonScoringParameters(Population population, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, TransitConfigGroup transitConfigGroup) {
+    PersonScoringParametersFromPersonAttributes(Population population, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, TransitConfigGroup transitConfigGroup) {
         this.config = planCalcScoreConfigGroup;
         this.scConfig = scenarioConfigGroup;
         this.transitConfigGroup = transitConfigGroup;
@@ -150,6 +154,31 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
                     // (not sure what this means.  "null" would have been an option, but is made impossible, see above.  An income of 0 may be possible, but with the 1/y that we often use it should be avoided.)
                     log.warn("you have set income to " + personalIncome + " for person " + person + ". This is invalid and gets ignored." +
                             "Instead, the marginalUtilityOfMoney is derived from the subpopulation's scoring parameters.");
+                }
+            }
+
+            Map<String, String> personalScoringModeConstants = PersonUtils.getModeConstants(person);
+            if (personalScoringModeConstants != null) {
+                for (Map.Entry<String, String> entry: personalScoringModeConstants.entrySet()) {
+                    ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
+                    try {
+                        modeUtilityParamsBuilder.setConstant(Double.parseDouble(entry.getValue()));
+                    } catch (NumberFormatException e) {
+                        log.error("PersonalScoringModeConstants from person attribute could not be parsed for person " +
+                                person.getId().toString() + ".");
+                        throw new RuntimeException(e);
+                    }
+
+                    // copy other params from subpopulation config
+                    PlanCalcScoreConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(entry.getKey());
+                    modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling());
+                    modeUtilityParamsBuilder.setMarginalUtilityOfDistance_m(subpopulationModeParams.getMarginalUtilityOfDistance());
+                    modeUtilityParamsBuilder.setMonetaryDistanceRate(subpopulationModeParams.getMonetaryDistanceRate());
+                    modeUtilityParamsBuilder.setDailyMoneyConstant(subpopulationModeParams.getDailyMonetaryConstant());
+                    modeUtilityParamsBuilder.setDailyUtilityConstant(subpopulationModeParams.getDailyUtilityConstant());
+
+                    ModeUtilityParameters modeUtilityParameters = modeUtilityParamsBuilder.build();
+                    builder.setModeParameters(entry.getKey(), modeUtilityParameters);
                 }
             }
 

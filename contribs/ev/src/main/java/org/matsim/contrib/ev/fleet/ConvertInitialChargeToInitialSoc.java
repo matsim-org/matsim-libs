@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,24 +20,32 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.vehicles.Vehicle;
+import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl.INITIAL_SOC;
 
-import com.google.common.collect.ImmutableList;
+import org.matsim.vehicles.MatsimVehicleReader;
+import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface ElectricVehicleSpecification extends Identifiable<Vehicle> {
-	Vehicle getMatsimVehicle();
+public class ConvertInitialChargeToInitialSoc {
+	private static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
 
-	ImmutableList<String> getChargerTypes();
+	public static void run(String file) {
+		var vehicles = VehicleUtils.createVehiclesContainer();
+		var reader = new MatsimVehicleReader(vehicles);
+		reader.readFile(file);
 
-	double getInitialSoc(); //in [0, 1]
+		for (var v : vehicles.getVehicles().values()) {
+			double battery_kWh = VehicleUtils.getEnergyCapacity(v.getType().getEngineInformation());
+			double initial_kWh = (double)v.getAttributes().getAttribute(INITIAL_ENERGY_kWh);
+			double initial_soc = initial_kWh / battery_kWh;
+			v.getAttributes().removeAttribute(INITIAL_ENERGY_kWh);
+			v.getAttributes().putAttribute(INITIAL_SOC, initial_soc);
+		}
 
-	default double getInitialCharge() {
-		return getInitialSoc() * getBatteryCapacity();
+		var writer = new MatsimVehicleWriter(vehicles);
+		writer.writeFile(file);
 	}
-
-	double getBatteryCapacity();//[J]
 }

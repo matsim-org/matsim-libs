@@ -1,9 +1,9 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,29 +15,30 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.drt.extension.companions;
 
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.vehicles.Vehicle;
+import java.util.List;
 
-import com.google.common.collect.ImmutableList;
+import org.matsim.contrib.util.random.RandomUtils;
+import org.matsim.contrib.util.random.UniformRandom;
+import org.matsim.contrib.util.random.WeightedRandomSelection;
 
 /**
- * @author Michal Maciejewski (michalm)
+ *
+ * @author Steffen Axer
+ *
  */
-public interface ElectricVehicleSpecification extends Identifiable<Vehicle> {
-	Vehicle getMatsimVehicle();
+public class DrtCompanionUtils {
 
-	ImmutableList<String> getChargerTypes();
-
-	double getInitialSoc(); //in [0, 1]
-
-	default double getInitialCharge() {
-		return getInitialSoc() * getBatteryCapacity();
+	public static WeightedRandomSelection<Integer> createIntegerSampler(final List<Double> distribution) {
+		WeightedRandomSelection<Integer> wrs = new WeightedRandomSelection<>(
+				new UniformRandom(RandomUtils.getLocalGenerator()));
+		for (int i = 0; i < distribution.size(); ++i) {
+			wrs.add(i, distribution.get(i));
+		}
+		return wrs;
 	}
 
-	double getBatteryCapacity();//[J]
 }

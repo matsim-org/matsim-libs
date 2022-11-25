@@ -36,6 +36,10 @@ public interface Battery {
 	 */
 	void setCharge(double charge);
 
+	default double getSoc() {
+		return getCharge() / getCapacity();
+	}
+
 	/**
 	 * Changes charge, making sure the charge level does not increase above the battery capacity or decrease below 0.
 	 *
