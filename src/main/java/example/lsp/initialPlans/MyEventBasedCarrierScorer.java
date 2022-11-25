@@ -18,8 +18,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -35,6 +34,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		SumScoringFunction sf = new SumScoringFunction();
 		sf.addScoringFunction(new EventBasedScoring(carrier));
+		sf.addScoringFunction(new LinkBasedTollScoring(carrier));
 		return sf;
 	}
 
@@ -101,6 +101,53 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 			final double costPerMeter = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType().getCostInformation().getCostsPerMeter();
 			score = score - (distance * costPerMeter);
 		}
+
+	}
+
+	/**
+	 * Calculate the carrier's score based on Events.
+	 * Currently, it includes:
+	 * - fixed costs (using FreightTourEndEvent)
+	 * - time-dependent costs (using FreightTourStart- and -EndEvent)
+	 * - distance-dependent costs (using LinkEnterEvent)
+	 */
+	private class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
+
+		Logger log = LogManager.getLogger(EventBasedScoring.class);
+		private final Carrier carrier;
+		private double score;
+
+		public LinkBasedTollScoring(Carrier carrier) {
+			super();
+			this.carrier = carrier;
+		}
+
+		@Override public void finish() {}
+
+		@Override public double getScore() {
+			return score;
+		}
+
+		@Override public void handleEvent(Event event) {
+			if (event instanceof LinkEnterEvent linkEnterEvent) {
+				handleEvent(linkEnterEvent);
+			}
+		}
+		private void handleEvent(LinkEnterEvent event) {
+			List<String> tolledLinkList = Arrays.asList("i(5,5)R");
+
+			final Id<VehicleType> vehicleId = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType().getId();
+
+			if (vehicleId.toString().equals("large10")) { //toll the large vehicles
+				if (tolledLinkList.contains(event.getLinkId().toString())){
+					log.warn("tolling");
+					score = score - 1000;
+				}
+			}
+		}
+
+
+
 
 	}
 }
