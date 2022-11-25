@@ -396,11 +396,11 @@ public class UsecaseUtils {
 
 	}
 
-	enum CARRIER_TYPE {collectionCarrier, mainRunCarrier, distributionCarrier, undefined}
+	public enum CARRIER_TYPE {collectionCarrier, mainRunCarrier, distributionCarrier, undefined}
 
 	private static final String CARRIER_TYPE_ATTR = "carrierType" ;
 
-	/*package-private*/ static CARRIER_TYPE getCarrierType(Carrier carrier ) {
+	public static CARRIER_TYPE getCarrierType(Carrier carrier ) {
 		CARRIER_TYPE result = (CARRIER_TYPE) carrier.getAttributes().getAttribute(CARRIER_TYPE_ATTR);
 		if (result == null){
 			log.error("Requested attribute " + CARRIER_TYPE_ATTR + " does not exists. Will return " + CARRIER_TYPE.undefined );
