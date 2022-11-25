@@ -1,21 +1,25 @@
 package example.lsp.initialPlans;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndEvent;
-import org.matsim.contrib.freight.events.FreightShipmentDeliveryStartEvent;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
-import javax.inject.Inject;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -25,32 +29,38 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	@Inject
 	private Network network;
 
+	@Inject
+	private Scenario scenario;
+
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		SumScoringFunction sf = new SumScoringFunction();
-		EventbasedScoring vehicleEmploymentScoring = new EventbasedScoring(carrier);
-		sf.addScoringFunction(vehicleEmploymentScoring);
+		sf.addScoringFunction(new EventBasedScoring(carrier));
 		return sf;
 	}
 
 
 	/**
-	 * Score the (daily) fixed costs of each vehicle that is used.
-	 * Summing up for all tours. The values are taken from the vehicleCostInformation in the vehicleType.
+	 * Calculate the carrier's score based on Events.
+	 * Currently, it includes:
+	 * - fixed costs (using FreightTourEndEvent)
+	 * - time-dependent costs (using FreightTourStart- and -EndEvent)
+	 * - distance-dependent costs (using LinkEnterEvent)
 	 */
-	private static class EventbasedScoring implements SumScoringFunction.ArbitraryEventScoring{
+	private class EventBasedScoring implements SumScoringFunction.ArbitraryEventScoring {
 
-		@Inject private Scenario scenario;
-
-		Logger log = LogManager.getLogger(EventbasedScoring.class);
+		Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Carrier carrier;
 		private double score;
 
-		public EventbasedScoring(Carrier carrier) {
+		private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
+
+		public EventBasedScoring(Carrier carrier) {
 			super();
 			this.carrier = carrier;
 		}
 
-		@Override public void finish() {}
+		@Override public void finish() {
+		}
 
 		@Override public double getScore() {
 			return score;
@@ -60,157 +70,37 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 			log.warn(event.toString());
 			if (event instanceof FreightTourStartEvent freightTourStartEvent) {
 				handleEvent(freightTourStartEvent);
+			} else if (event instanceof FreightTourEndEvent freightTourEndEvent) {
+				handleEvent(freightTourEndEvent);
 			} else if (event instanceof LinkEnterEvent linkEnterEvent) {
 				handleEvent(linkEnterEvent);
-			} else if (event instanceof LinkLeaveEvent linkLeaveEvent) {
-				handleEvent(linkLeaveEvent);
-			} else if (event instanceof FreightShipmentDeliveryStartEvent freightShipmentDeliveryStartEvent) {
-				handleEvent(freightShipmentDeliveryStartEvent);
-			} else if (event instanceof FreightShipmentDeliveryEndEvent freightShipmentsDeliveryEndEvent) {
-				handleEvent(freightShipmentsDeliveryEndEvent);
 			}
-			score = score - 10;
 		}
 
-
-		private void handleEvent(FreightTourStartEvent event){
-			var vehId = event.getVehicleId();
+		private void handleEvent(FreightTourStartEvent event) {
+			// Save time of freight tour start
+			tourStartTime.put(event.getTourId(), event.getTime());
 		}
 
-		private void handleEvent(LinkEnterEvent event){
+		//Fix costs for vehicle usage
+		private void handleEvent(FreightTourEndEvent event) {
+			//Fix costs for vehicle usage
+			//FIXME: Bei den FreightServiceEvents sind die MATSim vehicleIds drinnen. --> Gut
+			final VehicleType vehicleType = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
+//			final VehicleType vehicleType = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType();
+			score = score - vehicleType.getCostInformation().getFixedCosts();
 
+			// variable costs per Time
+			double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
+			score = score - (tourDuration * vehicleType.getCostInformation().getCostsPerSecond());
 		}
 
-		private void handleEvent(LinkLeaveEvent event){
-
+		private void handleEvent(LinkEnterEvent event) {
+			final double distance = network.getLinks().get(event.getLinkId()).getLength();
+			//FIXME: Bei den LinkEnterEvents sind die "Dummy" vehicle"Ids" des carriers drinnen.
+			final double costPerMeter = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType().getCostInformation().getCostsPerMeter();
+			score = score - (distance * costPerMeter);
 		}
-
-		private void handleEvent(FreightShipmentDeliveryStartEvent event){
-
-		}
-
-		private void handleEvent(FreightShipmentDeliveryEndEvent event){
-
-		}
-
 
 	}
-
-//				double score = 0.;
-//			CarrierPlan selectedPlan = carrier.getSelectedPlan();
-//			if(selectedPlan == null) return 0.;
-//			for(ScheduledTour tour : selectedPlan.getScheduledTours()){
-//				if(!tour.getTour().getTourElements().isEmpty()){
-//					score += (-1)*tour.getVehicle().getType().getCostInformation().getFixedCosts();
-//				}
-//			}
-
-//	private class TakeJspritScore implements SumScoringFunction.BasicScoring {
-//
-//		private final Carrier carrier;
-//		public TakeJspritScore(Carrier carrier) {
-//			super();
-//			this.carrier = carrier;
-//		}
-//
-//		@Override public void finish() {}
-//
-//		@Override public double getScore() {
-//			if (carrier.getSelectedPlan().getScore() != null){
-//				return carrier.getSelectedPlan().getScore();
-//			}
-//			return Double.NEGATIVE_INFINITY;
-//		}
-//	}
-
-//	private static class DriversLegScoring implements SumScoringFunction.LegScoring {
-//
-//		private double score = 0.0;
-//		private final Network network;
-//		private final Carrier carrier;
-//
-//
-//		public DriversLegScoring(Carrier carrier, Network network) {
-//			super();
-//			this.network = network;
-//			this.carrier = carrier;
-//		}
-//
-//		@Override public void finish() {}
-//
-//		@Override public double getScore() {
-//			return score;
-//		}
-//
-//		@Override public void handleLeg(Leg leg) {
-//			if(leg.getRoute() instanceof NetworkRoute nRoute){
-//				CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, nRoute.getVehicleId());
-//				Gbl.assertNotNull(vehicle);
-//
-//				//Distance based costs / score
-//				{
-//					double distance = 0.0;
-//					//TODO KMT: Warum sind Start und EndLink hier enthalten? Ist das dann nicht ggf. doppelt gezählt - bei mehreren Legs in Folge?
-//					distance += network.getLinks().get(nRoute.getStartLinkId()).getLength();
-//					for (Id<Link> linkId : nRoute.getLinkIds()) {
-//						distance += network.getLinks().get(linkId).getLength();
-//					}
-//					distance += network.getLinks().get(nRoute.getEndLinkId()).getLength();
-//
-//
-//					double distanceCosts = distance * vehicle.getType().getCostInformation().getCostsPerMeter();
-//					if (!(distanceCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
-//					score += (-1) * distanceCosts;
-//				}
-//
-//				//Time-based (driving) costs /score
-//				{
-//					double timeCosts = leg.getTravelTime().seconds() * vehicle.getType().getCostInformation().getCostsPerSecond();
-//					if (!(timeCosts >= 0.0)) throw new AssertionError("timeCosts of leg must be positive");
-//					score += (-1) * timeCosts;
-//				}
-//			}
-//		}
-//	}
-
-//	private static class DriversActivityScoring implements SumScoringFunction.ActivityScoring{
-//
-//		private double score;
-//
-//		@Override public void finish() {
-//		}
-//
-//		@Override public double getScore() {
-//			return score;
-//		}
-//
-//		@Override public void handleFirstActivity(Activity activity) {
-//			handleActivity(activity); // no other handling then normal - in between - activity
-//		}
-//
-//		@Override public void handleActivity(Activity activity) {
-//			if (activity instanceof FreightActivity freightActivity) {
-//				double actStartTime = freightActivity.getStartTime().seconds();
-////				// Scoring for missed TimeWindows -- Commented out, because it is unclear, which value to set here
-////				// and I do not have a replanning strategy, that forces e.g. a time-shift
-////				TimeWindow tw = freightActivity.getTimeWindow();
-////				if(actStartTime > tw.getEnd()){
-////					double penalty_score = (-1)*(actStartTime - tw.getEnd()) * missedTimeWindowPenalty;
-////					if (!(penalty_score <= 0.0)) throw new AssertionError("penalty score must be negative");
-////					score += penalty_score;
-////				}
-//
-//				//TODO: Unclear how to get the right timeParameter out of the vehicleType - missing link between activity and driver/agent, that could be used.
-//				double actTimeCosts = (freightActivity.getEndTime().seconds() - actStartTime) * timeParameter;
-//				if (!(actTimeCosts >= 0.0)) throw new AssertionError("actTimeCosts must be positive");
-//				score += actTimeCosts * (-1);
-//			}
-//		}
-//
-//		@Override public void handleLastActivity(Activity activity) {
-//			handleActivity(activity); // no other handling then normal - in between - activity
-//		}
-//	}
-
-
 }
