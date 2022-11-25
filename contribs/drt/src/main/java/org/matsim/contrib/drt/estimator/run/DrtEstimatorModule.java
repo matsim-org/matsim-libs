@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.estimator.run;
 
 import com.google.inject.Singleton;
+import org.matsim.contrib.drt.estimator.DrtEstimateAnalyzer;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.config.ConfigUtils;
@@ -38,7 +39,6 @@ public class DrtEstimatorModule extends AbstractModule {
 		@Override
 		public void install() {
 
-
 			bindModal(DrtEstimator.class).toProvider(modalProvider(
 					getter -> {
 						try {
@@ -55,6 +55,11 @@ public class DrtEstimatorModule extends AbstractModule {
 			addControlerListenerBinding().to(modalKey(DrtEstimator.class));
 
 			bindModal(DrtEstimatorConfigGroup.class).toInstance(group);
+
+			// Needs to run before estimators
+			bindModal(DrtEstimateAnalyzer.class).toProvider(modalProvider(getter -> new DrtEstimateAnalyzer(ModalProviders.createInjector(getter)))).in(Singleton.class);
+			addControlerListenerBinding().to(modalKey(DrtEstimateAnalyzer.class));
+
 		}
 
 	}

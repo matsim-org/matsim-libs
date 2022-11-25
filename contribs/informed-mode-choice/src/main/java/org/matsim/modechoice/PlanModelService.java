@@ -213,6 +213,7 @@ public final class PlanModelService implements StartupListener {
 						if (legEst == null)
 							throw new IllegalStateException("No leg estimator defined for mode: " + legMode);
 
+						// TODO: add delay estimate? (e.g waiting time for drt, currently not respected)
 						estimate += legEst.estimate(context, legMode, leg, c.getOption());
 					}
 

@@ -24,10 +24,10 @@ public interface DrtEstimator extends ControlerListener {
 	 *
 	 * @param distance    travel distance in meter
 	 * @param travelTime  travel time in seconds
-	 * @param waitingTIme waiting time in seconds
+	 * @param waitingTime waiting time in seconds
 	 * @param fare        money, which is negative if the customer needs to pay it
 	 */
-	record Estimate(double distance, double travelTime, double waitingTIme, double fare) {
+	record Estimate(double distance, double travelTime, double waitingTime, double fare) {
 
 	}
 

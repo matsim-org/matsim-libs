@@ -2,6 +2,8 @@ package org.matsim.contrib.drt.estimator.run;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,12 +38,26 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 	@NotNull
 	public Class<? extends DrtEstimator> estimator = BasicDrtEstimator.class;
 
-	// default wait time
-	// default detour
+	@Parameter
+	@Comment("Decay of the exponential moving average.")
+	@Positive
+	public double decayFactor = 0.5;
 
-	// window
-	// decay factor
-	// randomisation
+	@Parameter
+	@Comment("Randomize estimates with standard deviation")
+	@PositiveOrZero
+	public double randomization = 0.1;
+
+	@Parameter
+	@Comment("Default wait time in seconds, when no estimates are present.")
+	@PositiveOrZero
+	public double defaultWaitTime = 300;
+
+	@Parameter
+	@Comment("Default detour factor, when no estimates are present.")
+	@PositiveOrZero
+	public double defaultDetourFactor = 1.05;
+
 
 	@Override
 	public String getMode() {

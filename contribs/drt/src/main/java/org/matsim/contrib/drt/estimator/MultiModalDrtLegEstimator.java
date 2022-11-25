@@ -50,11 +50,11 @@ public class MultiModalDrtLegEstimator implements LegEstimator<ModeAvailability>
 		DrtEstimator.Estimate est = estimator.estimate(route, departureTime);
 		ModeUtilityParameters params = context.scoring.modeParams.get(mode);
 
-		// TODO: How is waiting time scored ?
+		// By default, waiting time is scored as travel time
 		return params.constant +
 				params.marginalUtilityOfDistance_m * est.distance() +
 				params.marginalUtilityOfTraveling_s * est.travelTime() +
-			//	context.scoring.marginalUtilityOfWaitingPt_s * est.waitingTIme() +
+				params.marginalUtilityOfTraveling_s * est.waitingTime() +
 				context.scoring.marginalUtilityOfMoney * params.monetaryDistanceCostRate * est.distance() +
 				context.scoring.marginalUtilityOfMoney * est.fare();
 
