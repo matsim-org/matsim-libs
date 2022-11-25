@@ -89,7 +89,7 @@ final class ExampleTwoEchelonGrid {
 			.setCostPerDistanceUnit(0.001)
 			.setCostPerTimeUnit(0.005)
 			.build();
-	public static final double HUBCOSTS_FIX = -100.;
+	public static final double HUBCOSTS_FIX = 100.;
 
 	private ExampleTwoEchelonGrid() {
 	} // so it cannot be instantiated
