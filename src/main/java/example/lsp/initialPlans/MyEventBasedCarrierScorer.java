@@ -136,7 +136,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		private void handleEvent(LinkEnterEvent event) {
 //			List<String> tolledLinkList = Arrays.asList("i(5,5)R");
 			List<String> tolledLinkList = Arrays.asList("i(3,4)", "i(3,6)", "i(7,5)R", "i(7,7)R", "j(4,8)R", "j(6,8)R", "j(3,4)", "j(5,4)");
-			List<String> vehicleTypesToBeTolled = Arrays.asList("large10"); //toll the large vehicles
+			List<String> vehicleTypesToBeTolled = Arrays.asList("large50"); //toll the large vehicles
 
 			//TODO: Leider ist hier nicht die (MATSim/mobsim) vehicleId verfügbar, sodass ein ausschluss von doppel-tolling nicht möglich ist.
 			//Somit bleibt argumentativ nur, dass es echte Cordon-Maut ist, die bei JEDER Einfahrt bezahlt werden muss.
