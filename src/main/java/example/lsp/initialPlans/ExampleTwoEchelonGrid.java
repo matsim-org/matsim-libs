@@ -167,7 +167,7 @@ final class ExampleTwoEchelonGrid {
 
 			CommandLine cmd = ConfigUtils.getCommandLine(args);
 		} else {
-			config.controler().setOutputDirectory("output/2echelon/"+demandSetting +  "_"  + costSetting  + "_"  + HUBCOSTS_FIX+ "_"  + TOLL_VALUE);
+			config.controler().setOutputDirectory("output/2echelon_"+demandSetting +  "_"  + costSetting  + "_"  + HUBCOSTS_FIX+ "_"  + TOLL_VALUE);
 			config.controler().setLastIteration(2);
 		}
 
