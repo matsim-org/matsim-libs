@@ -18,7 +18,10 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -31,13 +34,18 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	@Inject
 	private Scenario scenario;
 
+	private double toll;
+
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		SumScoringFunction sf = new SumScoringFunction();
 		sf.addScoringFunction(new EventBasedScoring(carrier));
-		sf.addScoringFunction(new LinkBasedTollScoring(carrier));
+		sf.addScoringFunction(new LinkBasedTollScoring(carrier, toll));
 		return sf;
 	}
 
+	void setToll (double toll) {
+		this.toll = toll;
+	}
 
 	/**
 	 * Calculate the carrier's score based on Events.
@@ -105,21 +113,20 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	}
 
 	/**
-	 * Calculate the carrier's score based on Events.
-	 * Currently, it includes:
-	 * - fixed costs (using FreightTourEndEvent)
-	 * - time-dependent costs (using FreightTourStart- and -EndEvent)
-	 * - distance-dependent costs (using LinkEnterEvent)
+	 * Calculate some toll for drinving on a link
+	 * This a lazy implementation of a cordon toll.
 	 */
-	private class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
+	class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
 
 		Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Carrier carrier;
+		private final double toll;
 		private double score;
 
-		public LinkBasedTollScoring(Carrier carrier) {
+		public LinkBasedTollScoring(Carrier carrier, double toll) {
 			super();
 			this.carrier = carrier;
+			this.toll = toll;
 		}
 
 		@Override public void finish() {}
@@ -133,6 +140,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 				handleEvent(linkEnterEvent);
 			}
 		}
+
 		private void handleEvent(LinkEnterEvent event) {
 //			List<String> tolledLinkList = Arrays.asList("i(5,5)R");
 			List<String> tolledLinkList = Arrays.asList("i(3,4)", "i(3,6)", "i(7,5)R", "i(7,7)R", "j(4,8)R", "j(6,8)R", "j(3,4)", "j(5,4)");
@@ -143,15 +151,11 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 			final Id<VehicleType> vehicleTypeId = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType().getId();
 
 			if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) { //Toll only once a day
-				if (tolledLinkList.contains(event.getLinkId().toString())){
+				if (tolledLinkList.contains(event.getLinkId().toString())) {
 					log.info("Tolling caused by event: " + event.toString());
-					score = score - 1000;
+					score = score - toll;
 				}
 			}
 		}
-
-
-
-
 	}
 }

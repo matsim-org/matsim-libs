@@ -71,9 +71,11 @@ import java.util.*;
 final class ExampleTwoEchelonGrid {
 
 	//Run Settings
-	public static final double HUBCOSTS_FIX = 100;
-	private static final DemandSetting demandSetting = DemandSetting.tenCustomers;
+	static final double HUBCOSTS_FIX = 100;
+	private static final DemandSetting demandSetting = DemandSetting.oneCustomer;
 	private static final CarrierCostSetting costSetting = CarrierCostSetting.lowerCost4LastMile;
+	private static final double TOLL_VALUE = 1000;
+
 
 	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGrid.class);
 
@@ -119,10 +121,14 @@ final class ExampleTwoEchelonGrid {
 				install(new LSPModule());
 			}
 		});
+
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 //				bind( CarrierScoringFunctionFactory.class ).toInstance( new MyCarrierScorer());
-				bind( CarrierScoringFunctionFactory.class ).toInstance( new MyEventBasedCarrierScorer());
+				final MyEventBasedCarrierScorer carrierScorer = new MyEventBasedCarrierScorer();
+				carrierScorer.setToll(TOLL_VALUE);
+
+				bind( CarrierScoringFunctionFactory.class ).toInstance(carrierScorer);
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
 					CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
@@ -141,7 +147,7 @@ final class ExampleTwoEchelonGrid {
 		controler.run();
 
 		log.info("Some results ....");
-		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX);
+		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
 
 		printScores(LSPUtils.getLSPs(controler.getScenario()).getLSPs().values());
 		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
@@ -161,7 +167,7 @@ final class ExampleTwoEchelonGrid {
 
 			CommandLine cmd = ConfigUtils.getCommandLine(args);
 		} else {
-			config.controler().setOutputDirectory("output/2echelon/"+demandSetting +  "_"  + costSetting  + "_"  + HUBCOSTS_FIX);
+			config.controler().setOutputDirectory("output/2echelon/"+demandSetting +  "_"  + costSetting  + "_"  + HUBCOSTS_FIX+ "_"  + TOLL_VALUE);
 			config.controler().setLastIteration(2);
 		}
 
