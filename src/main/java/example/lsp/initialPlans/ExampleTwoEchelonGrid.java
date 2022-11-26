@@ -72,8 +72,8 @@ final class ExampleTwoEchelonGrid {
 
 	//Run Settings
 	public static final double HUBCOSTS_FIX = 100;
-	private static final DemandSetting demandSetting = DemandSetting.oneCustomer;
-	private static final CarrierCostSetting costSetting = CarrierCostSetting.sameCost;
+	private static final DemandSetting demandSetting = DemandSetting.tenCustomers;
+	private static final CarrierCostSetting costSetting = CarrierCostSetting.lowerCost4LastMile;
 
 	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGrid.class);
 
@@ -161,7 +161,7 @@ final class ExampleTwoEchelonGrid {
 
 			CommandLine cmd = ConfigUtils.getCommandLine(args);
 		} else {
-			config.controler().setOutputDirectory("output/2echelon/");
+			config.controler().setOutputDirectory("output/2echelon/"+demandSetting +  "_"  + costSetting  + "_"  + HUBCOSTS_FIX);
 			config.controler().setLastIteration(2);
 		}
 
