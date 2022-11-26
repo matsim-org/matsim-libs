@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
@@ -18,7 +19,10 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -31,13 +35,18 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	@Inject
 	private Scenario scenario;
 
+	private double toll;
+
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		SumScoringFunction sf = new SumScoringFunction();
 		sf.addScoringFunction(new EventBasedScoring(carrier));
-		sf.addScoringFunction(new LinkBasedTollScoring(carrier));
+		sf.addScoringFunction(new LinkBasedTollScoring(carrier, toll));
 		return sf;
 	}
 
+	void setToll (double toll) {
+		this.toll = toll;
+	}
 
 	/**
 	 * Calculate the carrier's score based on Events.
@@ -105,21 +114,33 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	}
 
 	/**
-	 * Calculate the carrier's score based on Events.
-	 * Currently, it includes:
-	 * - fixed costs (using FreightTourEndEvent)
-	 * - time-dependent costs (using FreightTourStart- and -EndEvent)
-	 * - distance-dependent costs (using LinkEnterEvent)
+	 * Calculate some toll for drinving on a link
+	 * This a lazy implementation of a cordon toll.
 	 */
-	private class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
+	class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
 
 		Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Carrier carrier;
+		private final double toll;
 		private double score;
 
-		public LinkBasedTollScoring(Carrier carrier) {
+		private double tollingCounter;
+		private double maxNumberOfTollings; //Begrenze Anzahl der Bemautungen
+		private final List<String> vehicleTypesToBeTolled = Arrays.asList("large50");
+
+		public LinkBasedTollScoring(Carrier carrier, double toll) {
 			super();
 			this.carrier = carrier;
+			this.toll = toll;
+			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				//Das ist noch nicht Perfekt, weil es besser wäre, dass nur jedes Fahrzeuig wirklich einmal bemautet wird.
+				//Aber es begrenzt immerhin auf die Anzahl der Fahrzeuge des Types, die unterwegs sind.
+				//Siehe auch untern bei der Bemautung selbst
+				//kmt nov '22
+				if (vehicleTypesToBeTolled.contains(scheduledTour.getVehicle().getType().getId().toString())) {
+					this.maxNumberOfTollings++;
+				}
+			}
 		}
 
 		@Override public void finish() {}
@@ -133,21 +154,24 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 				handleEvent(linkEnterEvent);
 			}
 		}
+
 		private void handleEvent(LinkEnterEvent event) {
-			List<String> tolledLinkList = Arrays.asList("i(5,5)R");
+//			List<String> tolledLinkList = Arrays.asList("i(5,5)R");
+			List<String> tolledLinkList = Arrays.asList("i(3,4)", "i(3,6)", "i(7,5)R", "i(7,7)R", "j(4,8)R", "j(6,8)R", "j(3,4)", "j(5,4)");
 
-			final Id<VehicleType> vehicleId = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType().getId();
+			//TODO: Leider ist hier nicht die (MATSim/mobsim) vehicleId verfügbar, sodass ein echter Ausschluss von Doppel-Bemautung nicht möglich ist.
+			//Somit bleibt argumentativ nur, dass es echte Cordon-Maut ist, die bei JEDER Einfahrt bezahlt werden muss.
+			final Id<VehicleType> vehicleTypeId = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType().getId();
 
-			if (vehicleId.toString().equals("large10")) { //toll the large vehicles
-				if (tolledLinkList.contains(event.getLinkId().toString())){
-					log.warn("tolling");
-					score = score - 1000;
+			if (tollingCounter < maxNumberOfTollings) {
+				if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
+					if (tolledLinkList.contains(event.getLinkId().toString())) {
+						log.info("Tolling caused by event: " + event.toString());
+						tollingCounter++;
+						score = score - toll;
+					}
 				}
 			}
 		}
-
-
-
-
 	}
 }
