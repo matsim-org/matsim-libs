@@ -134,13 +134,17 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 			}
 		}
 		private void handleEvent(LinkEnterEvent event) {
-			List<String> tolledLinkList = Arrays.asList("i(5,5)R");
+//			List<String> tolledLinkList = Arrays.asList("i(5,5)R");
+			List<String> tolledLinkList = Arrays.asList("i(3,4)", "i(3,6)", "i(7,5)R", "i(7,7)R", "j(4,8)R", "j(6,8)R", "j(3,4)", "j(5,4)");
+			List<String> vehicleTypesToBeTolled = Arrays.asList("large10"); //toll the large vehicles
 
-			final Id<VehicleType> vehicleId = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType().getId();
+			//TODO: Leider ist hier nicht die (MATSim/mobsim) vehicleId verfügbar, sodass ein ausschluss von doppel-tolling nicht möglich ist.
+			//Somit bleibt argumentativ nur, dass es echte Cordon-Maut ist, die bei JEDER Einfahrt bezahlt werden muss.
+			final Id<VehicleType> vehicleTypeId = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType().getId();
 
-			if (vehicleId.toString().equals("large10")) { //toll the large vehicles
+			if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) { //Toll only once a day
 				if (tolledLinkList.contains(event.getLinkId().toString())){
-					log.warn("tolling");
+					log.info("Tolling caused by event: " + event.toString());
 					score = score - 1000;
 				}
 			}
