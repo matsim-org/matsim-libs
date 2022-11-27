@@ -20,10 +20,7 @@
 
 package lsp.usecase;
 
-import lsp.LSP;
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
-import lsp.LogisticsSolutionElement;
+import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -84,6 +81,21 @@ public class UsecaseUtils {
 		return vehicleTypeCollection;
 	}
 
+	public static void printShipmentsOfLSP(String outputDir, LSP lsp) {
+		System.out.println("Writing out shipments of LSP");
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_shipments.tsv")) {
+			final String str0 = "LSP: " + lsp.getId();
+			System.out.println(str0);
+			writer.write(str0 + "\n");
+			for (LSPShipment shipment : lsp.getShipments()) {
+				final String str1 = "Shipment: " + shipment ;
+				System.out.println(str1);
+				writer.write(str1 + "\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public static void printResults_shipmentPlan(String outputDir, LSP lsp) {
 		System.out.println("Writing out shipmentPlan for LSP");
@@ -94,7 +106,7 @@ public class UsecaseUtils {
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-				final String str1 = "Shipment: " + shipment.getId();
+				final String str1 = "Shipment: " + shipment ;
 				System.out.println(str1);
 				writer.write(str1 + "\n");
 				for (ShipmentPlanElement element : elementList) {
@@ -120,13 +132,13 @@ public class UsecaseUtils {
 	public static void printResults_shipmentLog(String outputDir, LSP lsp) {
 		System.out.println("Writing out shipmentLog for LSP");
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_shipmentLogs.tsv")) {
-			final String str0 = "LSP: " + lsp.getId();
+			final String str0 = "LSP: " + lsp.getId() ;
 			System.out.println(str0);
 			writer.write(str0 + "\n");
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getLog().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-				final String str1 = "Shipment: " + shipment.getId();
+				final String str1 = "Shipment: " + shipment.toString();
 				System.out.println(str1);
 				writer.write(str1 + "\n");
 				for (ShipmentPlanElement element : elementList) {
@@ -137,6 +149,31 @@ public class UsecaseUtils {
 				System.out.println();
 				writer.write("\n");
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void printScores(String outputDir, LSP lsp) {
+		System.out.println("Writing out scores for LSP");
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_scores.tsv")) {
+			final String str0 = "LSP: " + lsp.getId() ;
+			System.out.println(str0);
+			writer.write(str0 + "\n");
+			final String str1 = "The LSP `` " + lsp.getId() + " ´´ has the following number of plans: " + lsp.getPlans().size()  + "\n The scores are: ";
+			System.out.println(str1);
+			writer.write(str1 + "\n");
+			for (LSPPlan plan : lsp.getPlans()) {
+				final String str2 = "Score: " + plan.getScore().toString() ;
+				System.out.println(str2);
+				writer.write(str2 + "\n");
+			}
+			final String str3 = "The selected plan has the score: " + lsp.getSelectedPlan().getScore() ;
+			System.out.println(str3);
+			writer.write(str3 + "\n");
+			System.out.println("###");
+			writer.write("### \n");
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

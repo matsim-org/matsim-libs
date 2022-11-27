@@ -72,7 +72,7 @@ final class ExampleTwoEchelonGrid {
 
 	//Run Settings
 	static final double HUBCOSTS_FIX = 100;
-	private static final DemandSetting demandSetting = DemandSetting.oneCustomer;
+	private static final DemandSetting demandSetting = DemandSetting.tenCustomers;
 	private static final CarrierCostSetting costSetting = CarrierCostSetting.lowerCost4LastMile;
 	private static final double TOLL_VALUE = 1000;
 
@@ -144,13 +144,14 @@ final class ExampleTwoEchelonGrid {
 		} );
 
 		log.info("Run MATSim");
+		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
 		controler.run();
 
 		log.info("Some results ....");
-		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
 
-		printScores(LSPUtils.getLSPs(controler.getScenario()).getLSPs().values());
 		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
+			UsecaseUtils.printScores(controler.getControlerIO().getOutputPath(), lsp);
+			UsecaseUtils.printShipmentsOfLSP(controler.getControlerIO().getOutputPath(), lsp);
 			UsecaseUtils.printResults_shipmentPlan(controler.getControlerIO().getOutputPath(), lsp);
 			UsecaseUtils.printResults_shipmentLog(controler.getControlerIO().getOutputPath(), lsp);
 		}
@@ -362,8 +363,8 @@ final class ExampleTwoEchelonGrid {
 					Id<LSPShipment> id = Id.create("Shipment_" + i, LSPShipment.class);
 					ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 
-					int capacityDemand = rand1.nextInt(5);
-					builder.setCapacityDemand(capacityDemand);
+					int capacityDemand = rand1.nextInt(4);
+					builder.setCapacityDemand(1+capacityDemand);
 
 					builder.setFromLinkId(DEPOT_LINK_ID);
 					final Id<Link> toLinkId = Id.createLinkId(zoneLinkList.get(rand2.nextInt(zoneLinkList.size()-1)));
@@ -393,19 +394,6 @@ final class ExampleTwoEchelonGrid {
 			}
 		}
 		return resourcesList;
-	}
-
-
-	private static void printScores(Collection<LSP> lsps) {
-		for (LSP lsp : lsps) {
-			log.info("The LSP `` " + lsp.getId() + " ´´ has the following number of plans: " + lsp.getPlans().size());
-			log.info("The scores are");
-			for (LSPPlan plan : lsp.getPlans()) {
-				log.info(plan.getScore());
-			}
-			log.info("The selected plan has the score: " + lsp.getSelectedPlan().getScore());
-			log.info("###");
-		}
 	}
 
 
