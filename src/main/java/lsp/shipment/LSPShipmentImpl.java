@@ -114,4 +114,21 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 		return pickupServiceTime;
 	}
 
+	@Override public String toString() {
+		return "LSPShipmentImpl{" +
+				"Id=" + getId() +
+				"\t fromLinkId=" + fromLinkId +
+				"\t toLinkId=" + toLinkId +
+				"\t capacityDemand=" + capacityDemand +
+				"\t startTimeWindow=" + startTimeWindow +
+				"\t endTimeWindow=" + endTimeWindow +
+				"\t capacityDemand=" + capacityDemand +
+				"\t deliveryServiceTime=" + deliveryServiceTime +
+				"\t pickupServiceTime=" + pickupServiceTime +
+//				"\t schedule=" + schedule +
+//				"\t log=" + log +
+//				"\t requirements=" + requirements +
+				"\t solutionId=" + solutionId +
+				'}';
+	}
 }
