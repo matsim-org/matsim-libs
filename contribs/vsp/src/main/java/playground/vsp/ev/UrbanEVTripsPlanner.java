@@ -386,8 +386,9 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							.findAny()
 							.orElseThrow();
 
-					pseudoVehicle.getBattery()
-							.changeCharge(pseudoVehicle.getChargingPower().calcChargingPower(chargerSpecification) * chargingDuration);
+					double energy = pseudoVehicle.getChargingPower().calcChargingPower(chargerSpecification) * chargingDuration;
+					double newCharge = Math.min(pseudoVehicle.getBattery().getCharge() + energy, pseudoVehicle.getBattery().getCapacity());
+					pseudoVehicle.getBattery().setCharge(newCharge);
 				}
 			} else
 				throw new IllegalArgumentException();

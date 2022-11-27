@@ -86,7 +86,7 @@ public class RunEvExampleWithLTHConsumptionModel {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
-		var vehicleType = Id.create("EV_60.0kWh", VehicleType.class);
+		var vehicleType = Id.create("EV_65.0kWh", VehicleType.class);
 		driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory(vehicleType,
 				new LTHConsumptionModelReader(vehicleType).readURL(
 						ConfigGroup.getInputFileURL(config.getContext(), "MidCarMap.csv")));

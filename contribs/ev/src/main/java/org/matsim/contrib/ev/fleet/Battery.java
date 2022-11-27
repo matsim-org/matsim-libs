@@ -46,6 +46,6 @@ public interface Battery {
 	 * @param energy change in energy [J], can be negative or positive
 	 */
 	default void changeCharge(double energy) {
-		setCharge(Math.max(0, Math.min(getCharge() + energy, getCapacity())));
+		setCharge(getCharge() + energy);
 	}
 }
