@@ -73,8 +73,8 @@ import org.matsim.vehicles.VehiclesFactory;
  */
 public class RunUrbanEVExample {
 
-	static final double CAR_BATTERY_CAPACITY_kWh = 10.;
-	static final double CAR_INITIAL_SOC = 0.4;
+	static final double CAR_BATTERY_CAPACITY_kWh = 20.;
+	static final double CAR_INITIAL_SOC = 0.5;
 
 	public static void main(String[] args) {
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
@@ -108,6 +108,7 @@ public class RunUrbanEVExample {
 	public static void prepareConfig(Config config) {
 		UrbanEVConfigGroup evReplanningCfg = new UrbanEVConfigGroup();
 		config.addModule(evReplanningCfg);
+		evReplanningCfg.setCriticalSOC(0.4);
 
 		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
 		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);

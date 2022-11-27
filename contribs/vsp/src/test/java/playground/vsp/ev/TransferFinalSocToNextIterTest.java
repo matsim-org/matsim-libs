@@ -71,7 +71,7 @@ public class TransferFinalSocToNextIterTest {
 		var vehicle = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
 		var evSpec = new ElectricVehicleSpecificationImpl(vehicle);
 		Assert.assertNotEquals(evSpec.getInitialSoc(), INITIAL_SOC);
-		Assert.assertEquals(1, evSpec.getInitialSoc(), MatsimTestUtils.EPSILON); //should be fully charged
+		Assert.assertEquals(0.7273605127621898, evSpec.getInitialSoc(), MatsimTestUtils.EPSILON); //should not be fully charged
 
 		// testSOCisTransferredToNextIteration
 		for (int i = 0; i < LAST_ITERATION; i++) {
