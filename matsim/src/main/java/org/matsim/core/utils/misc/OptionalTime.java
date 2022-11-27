@@ -57,6 +57,10 @@ public final class OptionalTime {
 	public static OptionalTime undefined() {
 		return UNDEFINED;
 	}
+	
+	public static OptionalTime zeroSeconds() {
+		return TIME_0;
+	}
 
 	private final double seconds;
 
