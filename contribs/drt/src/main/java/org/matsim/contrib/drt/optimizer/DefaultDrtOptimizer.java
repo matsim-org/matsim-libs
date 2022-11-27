@@ -64,9 +64,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final RequestQueue<DrtRequest> unplannedRequests;
 
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
-			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
-			ScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
-			UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
+			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry, ScheduleTimingUpdater scheduleTimingUpdater,
+			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -86,28 +85,31 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		unplannedRequests.updateQueuesOnNextTimeSteps(e.getSimulationTime());
 
-		if (!unplannedRequests.getSchedulableRequests().isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(
-				e.getSimulationTime())) {
+		boolean scheduleTimingUpdated = false;
+		if (!unplannedRequests.getSchedulableRequests().isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(e.getSimulationTime())) {
 			for (DvrpVehicle v : fleet.getVehicles().values()) {
 				scheduleTimingUpdater.updateTimings(v);
 			}
+			scheduleTimingUpdated = true;
 
 			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
 		}
 
 		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
+			if (!scheduleTimingUpdated) {
+				for (DvrpVehicle v : fleet.getVehicles().values()) {
+					scheduleTimingUpdater.updateTimings(v);
+				}
+			}
+
 			rebalanceFleet();
 		}
 	}
 
 	private void rebalanceFleet() {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
-		Stream<? extends DvrpVehicle> rebalancableVehicles = fleet.getVehicles()
-				.values()
-				.stream()
-				.filter(scheduleInquiry::isIdle);
-		List<Relocation> relocations = rebalancingStrategy.calcRelocations(rebalancableVehicles,
-				mobsimTimer.getTimeOfDay());
+		Stream<? extends DvrpVehicle> rebalancableVehicles = fleet.getVehicles().values().stream().filter(scheduleInquiry::isIdle);
+		List<Relocation> relocations = rebalancingStrategy.calcRelocations(rebalancableVehicles, mobsimTimer.getTimeOfDay());
 
 		if (!relocations.isEmpty()) {
 			log.debug("Fleet rebalancing: #relocations=" + relocations.size());
