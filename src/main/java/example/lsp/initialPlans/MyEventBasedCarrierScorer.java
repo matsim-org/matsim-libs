@@ -61,6 +61,10 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		private final Carrier carrier;
 		private double score;
 
+		private double MAX_SHIFT_DURATION = 8 * 3600;
+		private Map<VehicleType, Double>  vehicleType2TourDuration = new LinkedHashMap<>();
+		private Map<VehicleType, Integer>  vehicleType2ScoredFixCosts = new LinkedHashMap<>();
+
 		private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
 
 		public EventBasedScoring(Carrier carrier) {
@@ -96,11 +100,37 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 			//Fix costs for vehicle usage
 			//FIXME: Bei den FreightServiceEvents sind die MATSim vehicleIds drinnen. --> Gut
 			final VehicleType vehicleType = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
-//			final VehicleType vehicleType = carrier.getCarrierCapabilities().getCarrierVehicles().get(event.getVehicleId()).getType();
-			score = score - vehicleType.getCostInformation().getFixedCosts();
+			// score = score - vehicleType.getCostInformation().getFixedCosts(); //score all vehicles with fixed costs
+
+			double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
+			{ //limit fixexd costs scoring
+				if (tourDuration > MAX_SHIFT_DURATION) {
+					throw new RuntimeException("Duration of tour is longer than max shift defined in scoring fct, caused by event:"
+							+ event + " tourDuration: " + tourDuration + " max shift duration:  " + MAX_SHIFT_DURATION);
+				}
+
+				//sum up tour durations
+				if (vehicleType2TourDuration.containsKey(vehicleType)) {
+					vehicleType2TourDuration.put(vehicleType, vehicleType2TourDuration.get(vehicleType) + tourDuration);
+				} else {
+					vehicleType2TourDuration.put(vehicleType, tourDuration);
+				}
+
+				//scoring needed?
+				final double currentNuOfVehiclesNeeded = Math.ceil(vehicleType2TourDuration.get(vehicleType) / MAX_SHIFT_DURATION);
+				final Integer nuAlreadyScored = vehicleType2ScoredFixCosts.get(vehicleType);
+				if (nuAlreadyScored == null ) {
+					log.info("Score fixed costs for vehicle type: " + vehicleType.getId().toString());
+					score = score - vehicleType.getCostInformation().getFixedCosts();
+					vehicleType2ScoredFixCosts.put(vehicleType, 1);
+				} else if (currentNuOfVehiclesNeeded > nuAlreadyScored) {
+					log.info("Score fixed costs for vehicle type: " + vehicleType.getId().toString());
+					score = score - vehicleType.getCostInformation().getFixedCosts();
+					vehicleType2ScoredFixCosts.put(vehicleType, vehicleType2ScoredFixCosts.get(vehicleType) + 1);
+				}
+			}
 
 			// variable costs per Time
-			double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
 			score = score - (tourDuration * vehicleType.getCostInformation().getCostsPerSecond());
 		}
 
