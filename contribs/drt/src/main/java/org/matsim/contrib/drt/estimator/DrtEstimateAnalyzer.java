@@ -2,7 +2,7 @@ package org.matsim.contrib.drt.estimator;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -53,7 +53,11 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 
 		try {
 			csv = new CSVPrinter(Files.newBufferedWriter(Path.of(filename), StandardCharsets.UTF_8), CSVFormat.DEFAULT);
-			csv.printRecord("iteration", "wait_time_mae", "travel_time_mae", "fare_mae");
+			csv.printRecord("iteration",
+					"wait_time_mae", "wait_time_err_q5", "wait_time_err_q50", "wait_time_err_q95",
+					"travel_time_mae", "travel_time_err_q5", "travel_time_err_q50", "travel_time_err_q95",
+					"fare_mae", "fare_err_q5", "fare_err_q50", "fare_err_q95"
+			);
 
 		} catch (IOException e) {
 			throw new UncheckedIOException("Could not open output file for estimates.", e);
@@ -87,9 +91,9 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 	 */
 	private Iterable<Number> calcMetrics(int iteration) {
 
-		SummaryStatistics waitTime = new SummaryStatistics();
-		SummaryStatistics travelTime = new SummaryStatistics();
-		SummaryStatistics fare = new SummaryStatistics();
+		DescriptiveStatistics waitTime = new DescriptiveStatistics();
+		DescriptiveStatistics travelTime = new DescriptiveStatistics();
+		DescriptiveStatistics fare = new DescriptiveStatistics();
 
 		for (DrtEventSequenceCollector.EventSequence seq : collector.getPerformedRequestSequences().values()) {
 			if (seq.getPickedUp().isPresent() && seq.getDroppedOff().isPresent()) {
@@ -111,7 +115,12 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 			}
 		}
 
-		return List.of(iteration, waitTime.getMean(), travelTime.getMean(), fare.getMean());
+		return List.of(
+				iteration,
+				waitTime.getMean(), waitTime.getPercentile(5), waitTime.getPercentile(50), waitTime.getPercentile(95),
+				travelTime.getMean(), travelTime.getPercentile(5), travelTime.getPercentile(50), travelTime.getPercentile(95),
+				fare.getMean(), fare.getPercentile(5), fare.getPercentile(50), fare.getPercentile(95)
+		);
 	}
 
 }
