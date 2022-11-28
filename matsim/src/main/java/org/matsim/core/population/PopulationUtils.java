@@ -59,12 +59,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.population.routes.heavycompressed.HeavyCompressedNetworkRouteFactory;
+import org.matsim.core.population.routes.mediumcompressed.MediumCompressedNetworkRouteFactory;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
@@ -131,8 +132,12 @@ public final class PopulationUtils {
 		RouteFactory factory;
 		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
 			factory = new LinkNetworkRouteFactory();
+		} else if (PlansConfigGroup.NetworkRouteType.MediumCompressedNetworkRoute.equals(networkRouteType) && network != null) {
+			factory = new MediumCompressedNetworkRouteFactory();
+		} else if (PlansConfigGroup.NetworkRouteType.HeavyCompressedNetworkRoute.equals(networkRouteType) && network != null) {
+			factory = new HeavyCompressedNetworkRouteFactory(network, TransportMode.car);
 		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
-			factory = new CompressedNetworkRouteFactory(network);
+			factory = new HeavyCompressedNetworkRouteFactory(network, TransportMode.car);
 		} else {
 			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
 		}

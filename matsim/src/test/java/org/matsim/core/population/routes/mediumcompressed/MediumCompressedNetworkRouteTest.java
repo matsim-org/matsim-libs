@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,42 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population.routes;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+package org.matsim.core.population.routes.mediumcompressed;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.core.population.routes.AbstractNetworkRouteTest;
+import org.matsim.core.population.routes.NetworkRoute;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author mrieser
  */
-public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
+public class MediumCompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
 	public NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final Network network) {
-		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
-		return new CompressedNetworkRouteImpl(fromLinkId, toLinkId, network, subsequent.getSubsequentLinks());
+		MediumCompressedNetworkRouteFactory factory = new MediumCompressedNetworkRouteFactory();
+		return factory.createRoute(fromLinkId, toLinkId);
 	}
 
 	/**
@@ -94,13 +85,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 		List<Id<Link>> linkIds = List.of(link1.getId(), link2.getId(), link3.getId());
 
-		Map<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<>();
-		subsequentLinks.put(link0.getId(), link1.getId());
-		subsequentLinks.put(link1.getId(), link2.getId());
-		subsequentLinks.put(link2.getId(), link3.getId());
-		subsequentLinks.put(link3.getId(), link4.getId());
-
-		NetworkRoute route = new CompressedNetworkRouteImpl(link0.getId(), link4.getId(), network, subsequentLinks);
+		NetworkRoute route = new MediumCompressedNetworkRoute(link0.getId(), link4.getId());
 		route.setLinkIds(link0.getId(), linkIds, link4.getId());
 
 		List<Id<Link>> linksId2 = route.getLinkIds();
@@ -111,25 +96,16 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	/**
-	 * Tests that {@link CompressedNetworkRouteImpl#getLinkIds()} doesn't crash or
+	 * Tests that {@link MediumCompressedNetworkRoute#getLinkIds()} doesn't crash or
 	 * hang when a route object is not correctly initialized.
 	 */
 	@Test
 	public void testGetLinkIds_incompleteInitialization() {
 		Network network = createTestNetwork();
 		Link link0 = network.getLinks().get(Id.create("0", Link.class));
-		Link link1 = network.getLinks().get(Id.create("1", Link.class));
-		Link link2 = network.getLinks().get(Id.create("2", Link.class));
-		Link link3 = network.getLinks().get(Id.create("3", Link.class));
 		Link link4 = network.getLinks().get(Id.create("4", Link.class));
 
-		Map<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<>();
-		subsequentLinks.put(link0.getId(), link1.getId());
-		subsequentLinks.put(link1.getId(), link2.getId());
-		subsequentLinks.put(link2.getId(), link3.getId());
-		subsequentLinks.put(link3.getId(), link4.getId());
-
-		NetworkRoute route = new CompressedNetworkRouteImpl(link0.getId(), link4.getId(), network, subsequentLinks);
+		NetworkRoute route = new MediumCompressedNetworkRoute(link0.getId(), link4.getId());
 		// NO route.setLinks() here!
 
 		Assert.assertEquals("expected 0 links.", 0, route.getLinkIds().size());
@@ -167,19 +143,13 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		network.addLink(link5);
 		network.addLink(endLink);
 
-		Map<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<>();
-		subsequentLinks.put(startLink.getId(), link3.getId());
-		subsequentLinks.put(link3.getId(), link4.getId());
-		subsequentLinks.put(link4.getId(), link5.getId());
-		subsequentLinks.put(link5.getId(), endLink.getId());
-
-		CompressedNetworkRouteImpl route1 = new CompressedNetworkRouteImpl(startLink.getId(), endLink.getId(), network, subsequentLinks);
+		MediumCompressedNetworkRoute route1 = new MediumCompressedNetworkRoute(startLink.getId(), endLink.getId());
 		ArrayList<Id<Link>> srcRoute = new ArrayList<>(5);
 		Collections.addAll(srcRoute, link3.getId(), link4.getId());
 		route1.setLinkIds(startLink.getId(), srcRoute, link5.getId());
 		Assert.assertEquals(2, route1.getLinkIds().size());
 
-		CompressedNetworkRouteImpl route2 = route1.clone();
+		MediumCompressedNetworkRoute route2 = route1.clone();
 
 		srcRoute.add(link5.getId());
 		route2.setLinkIds(startLink.getId(), srcRoute, endLink.getId());

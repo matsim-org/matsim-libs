@@ -22,11 +22,9 @@ package org.matsim.core.network.algorithms;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkIdComparator;
 
 import java.util.*;
 
@@ -41,23 +39,27 @@ import java.util.*;
  *
  * @author ychen
  * @author mrieser
+ * @author nrieser
  */
 public final class SubsequentLinksAnalyzer {
 
 	private final Network network;
+	private final String preferredMode;
 
-	/** Stores the logical subsequent link (value) for a given link (key). */
-	private final Map<Id<Link>, Id<Link>> subsequentLinks = new IdMap<>(Link.class);
+	/** Stores the logical subsequent link (value) for a given link (by link-id-index). */
+	private final Link[] subsequentLinks;
 
-	public SubsequentLinksAnalyzer(final Network network) {
+	public SubsequentLinksAnalyzer(final Network network, final String preferredMode) {
 		this.network = network;
+		this.preferredMode = preferredMode;
+		this.subsequentLinks = new Link[Id.getNumberOfIds(Link.class)];
 		compute();
 	}
 
 	/**
-	 * @return a map, giving for each link (key in map) the computed subsequent link (value in map).
+	 * @return an array, giving for each link (link-id-index as array index) the computed subsequent link (value in map).
 	 */
-	public Map<Id<Link>, Id<Link>> getSubsequentLinks() {
+	public Link[] getSubsequentLinks() {
 		return this.subsequentLinks;
 	}
 
@@ -79,6 +81,7 @@ public final class SubsequentLinksAnalyzer {
 		};
 		LinkData[] linkData = new LinkData[10];
 		for (Link l : this.network.getLinks().values()) {
+			Set<String> modes = l.getAllowedModes();
 			Node from = l.getFromNode();
 			Node to = l.getToNode();
 			Coord cFrom = from.getCoord();
@@ -87,7 +90,18 @@ public final class SubsequentLinksAnalyzer {
 			double yTo = cTo.getY();
 			double thetaL = Math.atan2(yTo - cFrom.getY(), xTo - cFrom.getX());
 			Collection<? extends Link> outLinks = to.getOutLinks().values();
-			if (outLinks.size() > 1) {
+
+			String requiredMode = modes.size() == 1
+					? modes.iterator().next()
+					: (modes.contains(this.preferredMode) ? this.preferredMode : (modes.isEmpty() ? this.preferredMode : modes.iterator().next()));
+
+			Collection<? extends Link> potentialLinks = outLinks.stream().filter(link -> link.getAllowedModes().contains(requiredMode)).toList();
+
+			if (potentialLinks.isEmpty()) {
+				potentialLinks = outLinks;
+			}
+
+			if (potentialLinks.size() > 1) {
 				int linkCount = 0;
 
 				for (Link out : outLinks) {
@@ -116,9 +130,9 @@ public final class SubsequentLinksAnalyzer {
 
 				// find the best subsequent link: the one with the smallest theta, if multiple have this than the one with the biggest capacity
 				Arrays.sort(linkData, 0, linkCount, linkDataComparator);
-				this.subsequentLinks.put(l.getId(), linkData[0].link.getId());
+				this.subsequentLinks[l.getId().index()] = linkData[0].link;
 			} else if (outLinks.size() == 1) {
-				this.subsequentLinks.put(l.getId(), outLinks.iterator().next().getId());
+				this.subsequentLinks[l.getId().index()] = outLinks.iterator().next();
 			}
 		}
 	}
