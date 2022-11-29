@@ -81,6 +81,7 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 
 		try {
 			csv.printRecord(calcMetrics(event.getIteration()));
+			csv.flush();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
