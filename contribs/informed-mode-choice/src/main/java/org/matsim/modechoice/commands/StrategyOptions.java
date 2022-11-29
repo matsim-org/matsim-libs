@@ -95,6 +95,8 @@ public final class StrategyOptions {
 		if (group.forceInnovation != 10)
 			log.accept(config, "f-inv", group.forceInnovation);
 
+		if (group.weight != 0.1)
+			log.accept(config, "weight", group.weight);
 
 		// Depends on number of pre generated plans
 		if (getModeChoice() == ModeChoice.none)
