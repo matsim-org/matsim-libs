@@ -171,7 +171,7 @@ import com.google.inject.Inject;
 						currAttributes = curract.getAttributes();
 						break;
 					case LEG:
-						currAttributes = new org.matsim.utils.objectattributes.attributable.Attributes();
+						currAttributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 						break;
 					default:
 						throw new RuntimeException( context.peek() );

@@ -46,6 +46,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.Vehicle;
@@ -241,7 +242,7 @@ import org.matsim.vehicles.Vehicle;
 		out.write(">\n");
 
 		if (leg.getRoutingMode() != null) {
-			Attributes attributes = new Attributes();
+			Attributes attributes = new AttributesImpl();
 			AttributesUtils.copyTo(leg.getAttributes(), attributes);
 			attributes.putAttribute(TripStructureUtils.routingMode, leg.getRoutingMode());
 			this.attributesWriter.writeAttributes( "\t\t\t\t" , out , attributes );
