@@ -73,7 +73,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 	@Override
 	public OptionalTime getBoardingTime() {
-		return OptionalTime.fromSeconds(routeDescription.boardingTime);
+		return asOptionalTime(routeDescription.boardingTime);
 	}
 
 	public void setBoardingTime(double boardingTime) {
@@ -115,7 +115,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	}
 
 	public static class RouteDescription {
-		public double boardingTime = OptionalTime.toSeconds(OptionalTime.undefined());
+		public double boardingTime = UNDEFINED_TIME;
 
 		public int transitLineIndex;
 		public int transitRouteIndex;
@@ -150,7 +150,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 		@JsonProperty("boardingTime")
 		public void setBoardingTime(String boardingTime) {
-			this.boardingTime = OptionalTime.toSeconds(Time.parseOptionalTime(boardingTime));
+			this.boardingTime = Time.parseOptionalTime(boardingTime).orElse(UNDEFINED_TIME);
 		}
 
 		@JsonProperty("transitLineId")

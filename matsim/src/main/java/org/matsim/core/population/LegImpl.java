@@ -30,10 +30,12 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 /* deliberately package */ final class LegImpl implements Leg {
 
+	private static final double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
+
 	private Route route = null;
 
-	private double depTime = OptionalTime.toSeconds(OptionalTime.undefined());
-	private double travTime = OptionalTime.toSeconds(OptionalTime.undefined());
+	private double depTime = UNDEFINED_TIME;
+	private double travTime = UNDEFINED_TIME;
 	private String mode;
 	private String routingMode;
 
@@ -43,8 +45,13 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 		this.mode = transportMode;
 	}
 
+
+	private static OptionalTime asOptionalTime(double seconds) {
+		return Double.isInfinite(seconds) ? OptionalTime.undefined() : OptionalTime.defined(seconds);
+	}
+
 	@Override
-	public final String getMode() {
+	public String getMode() {
 		return this.mode;
 	}
 
@@ -67,33 +74,33 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 	}
 
 	@Override
-	public final OptionalTime getDepartureTime() {
-		return OptionalTime.fromSeconds(this.depTime);
+	public OptionalTime getDepartureTime() {
+		return asOptionalTime(this.depTime);
 	}
 
 	@Override
-	public final void setDepartureTime(final double depTime) {
+	public void setDepartureTime(final double depTime) {
 		this.depTime = depTime;
 	}
 
 	@Override
 	public void setDepartureTimeUndefined() {
-		this.depTime = OptionalTime.toSeconds(OptionalTime.undefined());
+		this.depTime = UNDEFINED_TIME;
 	}
 
 	@Override
-	public final OptionalTime getTravelTime() {
-		return OptionalTime.fromSeconds(this.travTime);
+	public OptionalTime getTravelTime() {
+		return asOptionalTime(this.travTime);
 	}
 
 	@Override
-	public final void setTravelTime(final double travTime) {
+	public void setTravelTime(final double travTime) {
 		this.travTime = travTime;
 	}
 
 	@Override
 	public void setTravelTimeUndefined() {
-		this.travTime = OptionalTime.toSeconds(OptionalTime.undefined());
+		this.travTime = UNDEFINED_TIME;
 	}
 
 	@Override
@@ -102,12 +109,12 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 	}
 
 	@Override
-	public final void setRoute(Route route) {
+	public void setRoute(Route route) {
 		this.route = route;
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return "leg [mode="
 				+ this.getMode()
 				+ "]"

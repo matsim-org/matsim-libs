@@ -35,8 +35,8 @@ public final class OptionalTime {
 	//TODO we could store an array of all "reasonable" times, e.g. 0 to 100_000 ???
 
 	//cached values:
-	private static OptionalTime UNDEFINED = new OptionalTime(Time.UNDEFINED_TIME);
-	private static OptionalTime TIME_0 = new OptionalTime(0);
+	private static final OptionalTime UNDEFINED = new OptionalTime(Time.UNDEFINED_TIME);
+	private static final OptionalTime TIME_0 = new OptionalTime(0);
 	
 	/**
 	 * Creates OptionalTime that wraps only a defined time
@@ -56,16 +56,6 @@ public final class OptionalTime {
 
 	public static OptionalTime undefined() {
 		return UNDEFINED;
-	}
-
-	public static OptionalTime fromSeconds(double seconds) {
-		if (seconds == Time.UNDEFINED_TIME) return UNDEFINED;
-		else if (seconds == 0) return TIME_0;
-		else return new OptionalTime(seconds);
-	}
-
-	public static double toSeconds(OptionalTime optionalTime) {
-		return optionalTime.seconds;
 	}
 
 	private final double seconds;
