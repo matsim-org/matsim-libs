@@ -18,10 +18,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DefaultTransitPassengerRoute extends AbstractRoute implements TransitPassengerRoute {
 	protected final static int NULL_ID = -1;
+	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	
 	final public static String ROUTE_TYPE = "default_pt";
 
-	private RouteDescription routeDescription = null;
+	public double boardingTime = UNDEFINED_TIME;
+
+	public int transitLineIndex;
+	public int transitRouteIndex;
+
+	public int accessFacilityIndex;
+	public int egressFacilityIndex;
 
 	DefaultTransitPassengerRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		this(startLinkId, endLinkId, null, null, null, null);
@@ -41,11 +48,10 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 			Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
 		super(accessLinkId, egressLinkId);
 
-		this.routeDescription = new RouteDescription();
-		routeDescription.transitLineIndex = Objects.isNull(transitLineId) ? NULL_ID : transitLineId.index();
-		routeDescription.transitRouteIndex = Objects.isNull(transitRouteId) ? NULL_ID : transitRouteId.index();
-		routeDescription.accessFacilityIndex = Objects.isNull(accessFacilityId) ? NULL_ID : accessFacilityId.index();
-		routeDescription.egressFacilityIndex = Objects.isNull(egressFacilityId) ? NULL_ID : egressFacilityId.index();
+		this.transitLineIndex = Objects.isNull(transitLineId) ? NULL_ID : transitLineId.index();
+		this.transitRouteIndex = Objects.isNull(transitRouteId) ? NULL_ID : transitRouteId.index();
+		this.accessFacilityIndex = Objects.isNull(accessFacilityId) ? NULL_ID : accessFacilityId.index();
+		this.egressFacilityIndex = Objects.isNull(egressFacilityId) ? NULL_ID : egressFacilityId.index();
 	}
 
 	@Override
@@ -55,8 +61,15 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 	@Override
 	public String getRouteDescription() {
+
 		try {
-			return new ObjectMapper().writeValueAsString(routeDescription);
+			RouteDescription routeDescription = new RouteDescription();
+			routeDescription.boardingTime = this.boardingTime;
+			routeDescription.accessFacilityId = this.accessFacilityIndex == NULL_ID ? null : Id.get(this.accessFacilityIndex, TransitStopFacility.class);
+			routeDescription.egressFacilityId = this.egressFacilityIndex == NULL_ID ? null : Id.get(this.egressFacilityIndex, TransitStopFacility.class);
+			routeDescription.transitLineId = this.transitLineIndex == NULL_ID ? null : Id.get(this.transitLineIndex, TransitLine.class);
+			routeDescription.transitRouteId = this.transitRouteIndex == NULL_ID ? null : Id.get(this.transitRouteIndex, TransitRoute.class);
+			return OBJECT_MAPPER.writeValueAsString(routeDescription);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
@@ -65,7 +78,12 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	@Override
 	public void setRouteDescription(String routeDescription) {
 		try {
-			this.routeDescription = new ObjectMapper().readValue(routeDescription, RouteDescription.class);
+			RouteDescription parsed = OBJECT_MAPPER.readValue(routeDescription, RouteDescription.class);
+			this.boardingTime = parsed.boardingTime;
+			this.accessFacilityIndex = parsed.accessFacilityId == null ? NULL_ID : parsed.accessFacilityId.index();
+			this.egressFacilityIndex = parsed.egressFacilityId == null ? NULL_ID : parsed.egressFacilityId.index();
+			this.transitLineIndex = parsed.transitLineId == null ? NULL_ID : parsed.transitLineId.index();
+			this.transitRouteIndex = parsed.transitRouteId == null ? NULL_ID : parsed.transitRouteId.index();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -73,31 +91,31 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 	@Override
 	public OptionalTime getBoardingTime() {
-		return asOptionalTime(routeDescription.boardingTime);
+		return asOptionalTime(this.boardingTime);
 	}
 
 	public void setBoardingTime(double boardingTime) {
-		routeDescription.boardingTime = boardingTime;
+		this.boardingTime = boardingTime;
 	}
 
 	@Override
 	public Id<TransitLine> getLineId() {
-		return routeDescription.transitLineIndex >= 0 ? Id.get(routeDescription.transitLineIndex, TransitLine.class) : null;
+		return this.transitLineIndex >= 0 ? Id.get(this.transitLineIndex, TransitLine.class) : null;
 	}
 
 	@Override
 	public Id<TransitRoute> getRouteId() {
-		return routeDescription.transitRouteIndex >= 0 ? Id.get(routeDescription.transitRouteIndex, TransitRoute.class) : null;
+		return this.transitRouteIndex >= 0 ? Id.get(this.transitRouteIndex, TransitRoute.class) : null;
 	}
 
 	@Override
 	public Id<TransitStopFacility> getAccessStopId() {
-		return routeDescription.accessFacilityIndex >= 0 ? Id.get(routeDescription.accessFacilityIndex, TransitStopFacility.class) : null;
+		return this.accessFacilityIndex >= 0 ? Id.get(this.accessFacilityIndex, TransitStopFacility.class) : null;
 	}
 
 	@Override
 	public Id<TransitStopFacility> getEgressStopId() {
-		return routeDescription.egressFacilityIndex >= 0 ? Id.get(routeDescription.egressFacilityIndex, TransitStopFacility.class) : null;
+		return this.egressFacilityIndex >= 0 ? Id.get(this.egressFacilityIndex, TransitStopFacility.class) : null;
 	}
 
 	@Override
@@ -117,11 +135,11 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	public static class RouteDescription {
 		public double boardingTime = UNDEFINED_TIME;
 
-		public int transitLineIndex;
-		public int transitRouteIndex;
+		public Id<TransitLine> transitLineId;
+		public Id<TransitRoute> transitRouteId;
 
-		public int accessFacilityIndex;
-		public int egressFacilityIndex;
+		public Id<TransitStopFacility> accessFacilityId;
+		public Id<TransitStopFacility> egressFacilityId;
 
 		@JsonProperty("boardingTime")
 		public String getBoardingTime() {
@@ -130,22 +148,22 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 		@JsonProperty("accessFacilityId")
 		public String getAccessFacilityId() {
-			return accessFacilityIndex == NULL_ID ? null : Id.get(accessFacilityIndex, TransitStopFacility.class).toString();
+			return this.accessFacilityId == null ? null : this.accessFacilityId.toString();
 		}
 
 		@JsonProperty("egressFacilityId")
 		public String getEgressFacilityId() {
-			return egressFacilityIndex == NULL_ID ? null : Id.get(egressFacilityIndex, TransitStopFacility.class).toString();
+			return this.egressFacilityId == null ? null : this.egressFacilityId.toString();
 		}
 
 		@JsonProperty("transitLineId")
 		public String getTransitLineId() {
-			return transitLineIndex == NULL_ID ? null : Id.get(transitLineIndex, TransitLine.class).toString();
+			return this.transitLineId == null ? null : this.transitLineId.toString();
 		}
 
 		@JsonProperty("transitRouteId")
 		public String getRouteLineId() {
-			return transitRouteIndex == NULL_ID ? null : Id.get(transitRouteIndex, TransitRoute.class).toString();
+			return this.transitRouteId == null ? null : this.transitRouteId.toString();
 		}
 
 		@JsonProperty("boardingTime")
@@ -155,22 +173,22 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 		@JsonProperty("transitLineId")
 		public void setTransitLineId(String transitLineId) {
-			this.transitLineIndex = transitLineId == null ? NULL_ID : Id.create(transitLineId, TransitLine.class).index();
+			this.transitLineId = transitLineId == null ? null : Id.create(transitLineId, TransitLine.class);
 		}
 
 		@JsonProperty("transitRouteId")
 		public void setRouteLineId(String transitRouteId) {
-			this.transitRouteIndex = transitRouteId == null ? NULL_ID : Id.create(transitRouteId, TransitRoute.class).index();
+			this.transitRouteId = transitRouteId == null ? null : Id.create(transitRouteId, TransitRoute.class);
 		}
 
 		@JsonProperty("accessFacilityId")
 		public void setAccessFacilityId(String accessFacilityId) {
-			this.accessFacilityIndex = accessFacilityId == null ? NULL_ID : Id.create(accessFacilityId, TransitStopFacility.class).index();
+			this.accessFacilityId = accessFacilityId == null ? null : Id.create(accessFacilityId, TransitStopFacility.class);
 		}
 
 		@JsonProperty("egressFacilityId")
 		public void setEgressFacilityId(String egressFacilityId) {
-			this.egressFacilityIndex = egressFacilityId == null ? NULL_ID : Id.create(egressFacilityId, TransitStopFacility.class).index();
+			this.egressFacilityId = egressFacilityId == null ? null : Id.create(egressFacilityId, TransitStopFacility.class);
 		}
 
 	}
