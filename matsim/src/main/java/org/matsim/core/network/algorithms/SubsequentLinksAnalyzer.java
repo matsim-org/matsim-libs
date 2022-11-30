@@ -131,7 +131,7 @@ public final class SubsequentLinksAnalyzer {
 				// find the best subsequent link: the one with the smallest theta, if multiple have this than the one with the biggest capacity
 				Arrays.sort(linkData, 0, linkCount, linkDataComparator);
 				this.subsequentLinks[l.getId().index()] = linkData[0].link;
-			} else if (outLinks.size() == 1) {
+			} else if (potentialLinks.size() == 1) {
 				this.subsequentLinks[l.getId().index()] = outLinks.iterator().next();
 			}
 		}
