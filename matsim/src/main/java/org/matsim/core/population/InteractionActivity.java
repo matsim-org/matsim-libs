@@ -35,6 +35,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 /*package*/ final class InteractionActivity implements Activity {
 
+	/*
+	 * TODO:
+	 * Replace this with an implementation that throws an exception in case attributes are added.
+	 * This is possible once the lazy-attributes branch is merged.
+	 */
+	private static Attributes emptyAttributes = new Attributes();
+	
 	private String type;
 	private Coord coord = null;
 	private Id<Link> linkId = null;
@@ -81,14 +88,15 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public void setMaximumDuration(final double dur) {
-		throw new UnsupportedOperationException("Setting duration is not supported for InteractionActivity.");
+		// For compatibility reasons: allow setting duration to 0 which is the default value anyway.
+		if (dur != OptionalTime.zeroSeconds().seconds()) throw new UnsupportedOperationException("Setting duration is not supported for InteractionActivity.");
 	}
 
 	@Override
 	public void setMaximumDurationUndefined() {
-		// It is already undefined, i.e. do nothing.
+		throw new UnsupportedOperationException("Setting duration to undefined is not supported for InteractionActivity.");
 	}
-	
+
 	@Override
 	public final String getType() {
 		return this.type;
@@ -103,10 +111,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	public final Coord getCoord() {
 		return this.coord;
 	}
+
 	@Override
 	public void setCoord(final Coord coord) {
 		this.coord = coord;
 	}
+
 	@Override
 	public final Id<Link> getLinkId() {
 		return this.linkId;
@@ -129,9 +139,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public Attributes getAttributes() {
-		throw new UnsupportedOperationException("Using attributes is not supported for InteractionActivity.");
-	}
-	
+//		throw new UnsupportedOperationException("Using attributes is not supported for InteractionActivity.");
+		return emptyAttributes;
+}
+
 	@Override
 	public final String toString() {
 		return "act [type="

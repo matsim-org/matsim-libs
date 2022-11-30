@@ -85,7 +85,7 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 
 				Activity activityE = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null,
 						parkingLocation.getId(), mainMode);
-				activityE.setMaximumDuration(0);
+//				activityE.setMaximumDuration(0); // obsolete since this is hard-coded in InteractionActivity
 
 				trip.add(activityE);
 
@@ -100,7 +100,7 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 
 			Activity activityS = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null,
 					vehicleLinkLocation.getId(), mainMode);
-			activityS.setMaximumDuration(0);
+//			activityS.setMaximumDuration(0); // obsolete since this is hard-coded in InteractionActivity
 
 			trip.add(activityS);
 			// === car leg: ===
@@ -112,7 +112,7 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 						time));
 				Activity activityE = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null,
 						parkingLocation.getId(), mainMode);
-				activityE.setMaximumDuration(0);
+//				activityE.setMaximumDuration(0); // obsolete since this is hard-coded in InteractionActivity
 
 				trip.add(activityE);
 

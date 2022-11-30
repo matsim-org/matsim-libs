@@ -313,7 +313,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	private static Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink, final String mode) {
 		Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
-		act.setMaximumDuration(0.0);
+//		act.setMaximumDuration(0.0); // obsolete since this is hard-coded in InteractionActivity
 		return act;
 	}
 
