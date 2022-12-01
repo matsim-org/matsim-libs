@@ -305,7 +305,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				double efStopGo_gpkm = 0.;
 				if (fractionStopGo > 0) {
 					// compute emissions from stop-go fraction:
-					efkey.setTrafficSituation(STOPANDGO);
+					efkey.setTrafficSituation(STOPANDGO_HEAVY);
 					efStopGo_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
 					logger.debug("pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm);
 
