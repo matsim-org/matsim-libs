@@ -52,6 +52,7 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 		this.trafficSituation = trafficSituation;
 	}
 
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

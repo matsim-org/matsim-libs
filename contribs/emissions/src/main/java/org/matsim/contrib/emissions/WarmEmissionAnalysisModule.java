@@ -104,7 +104,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// The following tests if the detailed table is consistent, i.e. if there exist all combinations of entries.  There used to be some test
 					// cases where this was deliberately not the case, implying that this was assumed as plausible also for studies.  This is now forbidding it.
 					// If this causes too many problems, we could insert a switch (or attach it to the fallback behavior switch).  kai, feb'20
-					// Eventually vehicle category and vehicle attribute should be alligned in order to make the allCombinations setting useful
+					// Eventually vehicle category and vehicle attribute should be aligned in order to make the allCombinations setting useful
 					// see discussion in  https://github.com/matsim-org/matsim-libs/issues/1226 kturner, nov'20
 					Set<String> roadCategories = new HashSet<>();
 					Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
@@ -143,7 +143,23 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						}
 					}
 					break;
-
+				case perVehCat:
+					if (detailedHbefaWarmTable != null) {
+						List<HbefaWarmEmissionFactorKey> keylist = new ArrayList<>();
+						Set<HbefaVehicleCategory> vehicleCategories = EnumSet.allOf(HbefaVehicleCategory.class);
+						for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
+							keylist.addAll(vehicleCategory.getWarmEmissionEntries(detailedHbefaWarmTable));
+						}
+						for (HbefaWarmEmissionFactorKey hbefaWarmEmissionFactorKey : keylist) {
+							HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(hbefaWarmEmissionFactorKey);
+							if (result == null) {
+								throw new RuntimeException("emissions factor for key=" + hbefaWarmEmissionFactorKey + " is missing." +
+										" There used to be some fallback, but it was " +
+										"inconsistent and confusing, so we are now just aborting.");
+							}
+						}
+					}
+					break;
 				case consistent:
 					// yy The above consistency check might actually be too restrictive.  The code only needs that both freeflow and stopgo traffic
 					// conditions exist for a certain lookup.  So we could still have some road categories, vehicle categories or vehicle attributes
@@ -264,7 +280,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
 			efkey.setVehicleAttributes(hbefaVehicleAttributes);
 		}
-
 
 		double averageSpeed_kmh = (linkLength_m / 1000) / (travelTime_sec / 3600);
 
@@ -544,9 +559,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					throw new IllegalStateException( "Unexpected value: " + ecg.getDetailedVsAverageLookupBehavior() );
 		}
 
-		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in " +
-                                                           "the config OR " +
-				"you should use another fallback setting when using detailed calculation OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
+		throw new RuntimeException("Was not able to lookup emissions factor. " +
+				"Maybe you wanted to look up detailed values and did not specify this in the config OR " +
+				"you should use another fallback setting when using detailed calculation " +
+				"OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
 	}
 
 
