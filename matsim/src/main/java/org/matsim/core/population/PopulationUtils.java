@@ -855,16 +855,24 @@ public final class PopulationUtils {
 	 * @param out
 	 **/
 	public static void copyFromTo(final Plan in, final Plan out) {
-		copyFromTo(in, out, false); // by default 'false' to be backwards compatible
+		/*
+		 * By default 'false' to be backwards compatible. As a result, InteractionActivities will be converted to ActivityImpl.
+		 */
+		copyFromTo(in, out, false); 
 	}
 
-	public static void copyFromTo(final Plan in, final Plan out, final boolean convertInteractionActivities) {
+	public static void copyFromTo(final Plan in, final Plan out, final boolean withInteractionActivities) {
 		out.getPlanElements().clear();
 		out.setScore(in.getScore());
 		out.setType(in.getType());
 		for (PlanElement pe : in.getPlanElements()) {
 			if (pe instanceof Activity) {
-				if (convertInteractionActivities && StageActivityTypeIdentifier.isStageActivity(((Activity) pe).getType()))
+				/*
+				 * So far, we do not use the check for StageActivityTypeIdentifier.isStageActivity(...). It Would convert ActivityImpl to InteractionActivities.
+				 * However, there are pieces of code in use, e.g. in the share mobility contrib, where "interaction activities" need to be modeled as ActivityImpl
+				 * since their duration is != or they have a defined start time.
+				 */
+				if (withInteractionActivities && (pe instanceof InteractionActivity /* || StageActivityTypeIdentifier.isStageActivity(((Activity) pe).getType())*/))
 					out.getPlanElements().add(createInteractionActivity((Activity) pe));
 				else out.getPlanElements().add(createActivity((Activity) pe));
 			} else if (pe instanceof Leg) {

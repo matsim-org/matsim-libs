@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * EditTrips.java
@@ -27,6 +26,7 @@ package org.matsim.withinday.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,7 +53,6 @@ import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -528,7 +527,16 @@ public final class EditTrips {
 					departureTime = departureTimeAccordingToPlannedActivityEnd;
 				}
 			}
-			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, plan.getPerson(), trip.getTripAttributes() );
+			// Replace InteractionActivity with ActivityImpl since they need to be editable.
+			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, plan.getPerson(), trip.getTripAttributes() )
+					.stream()
+					.map(p -> {
+						if (p instanceof Activity && StageActivityTypeIdentifier.isStageActivity(((Activity) p).getType())) {
+							return PopulationUtils.createActivity((Activity) p);
+						} else return p;
+					})
+					.collect(Collectors.toList());
+
 			TripRouter.insertTrip(plan, nextAct, newTrip, trip.getDestinationActivity() ) ;
 		} else {
 			/*
@@ -546,8 +554,16 @@ public final class EditTrips {
 
 		Facility toFacility =  FacilitiesUtils.toFacility( newAct, scenario.getActivityFacilities() );
 
-		return tripRouter.calcRoute(mainMode, currentLocationFacility, toFacility, now, person, routingAttributes );
+		return tripRouter.calcRoute(mainMode, currentLocationFacility, toFacility, now, person, routingAttributes )
+				.stream()
+				.map(p -> {
+					if (p instanceof Activity && StageActivityTypeIdentifier.isStageActivity(((Activity) p).getType())) {
+						return PopulationUtils.createActivity((Activity) p);
+					} else return p;
+				})
+				.collect(Collectors.toList());
 	}
+
 	// replan from stage activity:
 	private void replanCurrentTripFromStageActivity(Trip trip, int tripElementsIndex,
 			String mainMode, double now, MobsimAgent agent) {
@@ -710,7 +726,14 @@ public final class EditTrips {
 		Facility fromFacility = FacilitiesUtils.toFacility(trip.getOriginActivity(), scenario.getActivityFacilities());
 		Facility toFacility = FacilitiesUtils.toFacility(trip.getDestinationActivity(), scenario.getActivityFacilities());
 
-		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, person, trip.getTripAttributes());
+		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, person, trip.getTripAttributes())
+				.stream()
+				.map(p -> {
+					if (p instanceof Activity && StageActivityTypeIdentifier.isStageActivity(((Activity) p).getType())) {
+						return PopulationUtils.createActivity((Activity) p);
+					} else return p;
+				})
+				.collect(Collectors.toList());;
 
 		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
 
