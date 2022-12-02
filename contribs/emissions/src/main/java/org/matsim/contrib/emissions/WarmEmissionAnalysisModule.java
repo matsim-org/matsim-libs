@@ -351,7 +351,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 										Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple,
 										HbefaWarmEmissionFactorKey efkey) {
 
-		efkey.setTrafficSituation(STOPANDGO);
+		efkey.setTrafficSituation(STOPANDGO_HEAVY);
 		double stopGoSpeedFromTable_kmh = getEf(vehicleInformationTuple, efkey).getSpeed();
 
 		double fractionStopGo;
