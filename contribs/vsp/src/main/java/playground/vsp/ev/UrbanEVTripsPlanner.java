@@ -470,6 +470,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		//add plugout act
 		Activity plugOutAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(),
 				chargingLink.getId(), routingMode + UrbanVehicleChargingHandler.PLUGOUT_IDENTIFIER);
+		plugOutAct = PopulationUtils.createActivity(plugOutAct); // createStageActivity... creates a InteractionActivity where duration cannot be set.
 		trip.add(plugOutAct);
 		now = timeInterpretation.decideOnElementEndTime(accessLeg, now).seconds();
 
@@ -521,11 +522,12 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		trip.addAll(routedSegment);
 
 		//add plugin act
-		Activity pluginAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(),
+		Activity plugInAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(),
 				chargingLink.getId(), routingMode + UrbanVehicleChargingHandler.PLUGIN_IDENTIFIER);
-		trip.add(pluginAct);
+		plugInAct = PopulationUtils.createActivity(plugInAct); // createStageActivity... creates a InteractionActivity where duration cannot be set.
+		trip.add(plugInAct);
 
-		now = timeInterpretation.decideOnActivityEndTime(pluginAct, now).seconds();
+		now = timeInterpretation.decideOnActivityEndTime(plugInAct, now).seconds();
 
 		//add walk leg to destination
 		routedSegment = tripRouter.calcRoute(TransportMode.walk, chargerFacility, toFacility, now, plan.getPerson(), new AttributesImpl());
