@@ -299,6 +299,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			double ef_gpkm;
 			if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
 
+				logger.warn( "YOU ARE NOW DEPENDING ON A LOCAL VERSION OF MATSIM: emissions_StopAndGo2-local" );
+
 				// compute faction.  This cannot be done earlier since efkey.component is needed.
 				fractionStopGo = getFractionStopAndGo(freeVelocity_ms * 3.6, averageSpeed_kmh, vehicleInformationTuple, efkey);
 
