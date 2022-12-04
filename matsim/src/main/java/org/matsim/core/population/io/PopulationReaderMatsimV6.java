@@ -42,6 +42,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -49,6 +50,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.AttributeConverter;
@@ -284,9 +286,13 @@ import com.google.inject.Inject;
 	}
 
 	private void startAct(final Attributes atts) {
+		final String actType = atts.getValue(ATTR_ACT_TYPE);
+		final boolean isStageActivity = StageActivityTypeIdentifier.isStageActivity(actType);
 		if (atts.getValue(ATTR_ACT_FACILITY) != null) {
 			final Id<ActivityFacility> facilityId = Id.create(atts.getValue(ATTR_ACT_FACILITY), ActivityFacility.class);
-			this.curract = PopulationUtils.createAndAddActivityFromFacilityId(this.currplan, atts.getValue(ATTR_ACT_TYPE), facilityId);
+			if (isStageActivity) this.curract = PopulationUtils.createInteractionActivityFromFacilityId(actType, facilityId);
+			else this.curract = PopulationUtils.createActivityFromFacilityId(actType, facilityId);
+//			this.curract = PopulationUtils.createAndAddActivityFromFacilityId(this.currplan, actType, facilityId);
 			if (atts.getValue(ATTR_ACT_LINK) != null) {
 				final Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 				this.curract.setLinkId(linkId);
@@ -298,24 +304,42 @@ import com.google.inject.Inject;
 		} else if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			final Id<Link> linkId1 = linkId;
-			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
+			if (isStageActivity) this.curract = PopulationUtils.createInteractionActivityFromLinkId(actType, linkId1);
+			else this.curract = PopulationUtils.createActivityFromLinkId(actType, linkId1);
+//			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				final Coord coord = parseCoord( atts );
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 			final Coord coord = parseCoord( atts );
-			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
+			if (isStageActivity) this.curract = PopulationUtils.createInteractionActivityFromCoord(actType, coord);
+			else this.curract = PopulationUtils.createActivityFromCoord(actType, coord);
+//			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the facility, the link or the coords be specified for an Act.");
 		}
 
-		Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
-				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
-		Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR))
-				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
-		Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
-				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
+		final OptionalTime startTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME));
+		final OptionalTime endTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR));
+		final OptionalTime duration = Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME));
+
+		// Check whether we need to check whether the given times match the assumptions made in InteractionActivity. Otherwise convert it to a regular Activity.
+		if (isStageActivity && (startTime.isDefined() || endTime.isDefined() || duration.isUndefined() || duration.seconds() > 0.0)) {
+			this.curract = PopulationUtils.createActivity(this.curract);
+		} else {
+			startTime.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
+			endTime.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
+			duration.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
+		}
+		this.currplan.addActivity(this.curract);
+
+//		Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
+//				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
+//		Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR))
+//				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
+//		Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
+//				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
 		if (this.routeDescription != null) {
 			finishLastRoute();
 		}

@@ -781,10 +781,26 @@ public final class PopulationUtils {
 		return getFactory().createActivityFromLinkId(type, linkId) ;
 	}
 
+	public static Activity createInteractionActivityFromLinkId(String type, Id<Link> linkId) {
+		return getFactory().createInteractionActivityFromLinkId(type, linkId) ;
+	}
+
+	public static Activity createActivityFromFacilityId(String type, Id<ActivityFacility> facilityId) {
+		return getFactory().createActivityFromActivityFacilityId(type, facilityId);
+	}
+
+	public static Activity createInteractionActivityFromFacilityId(String type, Id<ActivityFacility> facilityId) {
+		return getFactory().createInteractionActivityFromActivityFacilityId(type, facilityId);
+	}
+	
 	public static Activity createActivityFromCoord(String type, Coord coord) {
 		return getFactory().createActivityFromCoord(type, coord) ;
 	}
 
+	public static Activity createInteractionActivityFromCoord(String type, Coord coord) {
+		return getFactory().createInteractionActivityFromCoord(type, coord) ;
+	}
+	
 	public static Activity createActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
 		Activity act = getFactory().createActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
