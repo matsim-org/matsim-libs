@@ -16,15 +16,20 @@ class RunMATSimAppCommandExample implements MATSimAppCommand {
 	private String input2;
 
 	@CommandLine.Mixin
-	private ShpOptions shp = new ShpOptions();
+	private final ShpOptions shp = new ShpOptions();
 
-	@Override public Integer call() throws Exception{
-		System.out.println( input.toString() );
-		System.out.println( input2.toString() );
+	@Override public Integer call() {
+		System.out.println( input );
+		System.out.println( input2 );
+		System.out.println( shp.getShapeFile() );
 		return null;
 	}
 
 	public static void main( String[] args ){
+//		args = new String [] {
+//				"--input=blabla"
+//				, "--shp=shpPath"
+//		};
 		new RunMATSimAppCommandExample().execute( args );
 	}
 

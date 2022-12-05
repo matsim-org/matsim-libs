@@ -24,10 +24,8 @@ import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import picocli.CommandLine;
 
-@CommandLine.Command( header = ":: MyScenario ::", version = "1.0")
-@MATSimApplication.Prepare( {RunMATSimAppCommandExample.class})
+@MATSimApplication.Prepare( {PreparationExample.class, RunMATSimAppCommandExample.class })
 
 /**
  * @author nagel
@@ -36,12 +34,29 @@ import picocli.CommandLine;
 public class RunMatsimApplicationExample extends MATSimApplication {
 
 	public static void main(String[] args) {
-//		MATSimApplication.run( RunMatsimApplicationExample.class, args );
 
-//		MATSimApplication.run( RunMatsimApplicationExample.class, "help");
+		MATSimApplication.run( RunMatsimApplicationExample.class, args ); // default help message
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "help"); // default help message
+
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "help", "prepare"); // list of prepare subcommands
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "prepare", "help"); // list of prepare subcommands
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "help", "prepare", "example"); // ist of prepare subcommands; "example" is ignored
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "prepare", "help", "example"); // options for example subcommand
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "prepare", "example", "help"); // error ("help" not allowed here)
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "prepare", "example", "--help"); // error ("--help" not allowed here)
+
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "run", "help"); // usage info
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "help", "run"); // usage info
+
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "gui", "help"); // runs the gui
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "help", "gui"); // usage info
+
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "prepare", "help", "example" );
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "example", "help");
 //		MATSimApplication.run( RunMatsimApplicationExample.class, "gui");
-//		MATSimApplication.run( RunMatsimApplicationExample.class, "prepare");
-		MATSimApplication.run( RunMatsimApplicationExample.class, "prepare", "example", "--input=\"abc\"");
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "prepare", "example", "--input=\"abc\"");
+//		MATSimApplication.run( RunMatsimApplicationExample.class, "generate-completion");
+
 	}
 
 	public RunMatsimApplicationExample( ) {
@@ -64,5 +79,5 @@ public class RunMatsimApplicationExample extends MATSimApplication {
 		controler.addOverridingModule( new OTFVisFileWriterModule() );
 	}
 
-	
+
 }
