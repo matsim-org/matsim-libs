@@ -74,13 +74,13 @@ public final class RunAverageEmissionToolOfflineExample{
 			// config_average has the emissions config group commented out.  So all that there is to configure (for average emissions)
 			// follows here. kai, dec'22
 
+			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.directlyTryAverageTable );
+
 //		emissionsConfig.setAverageColdEmissionFactorsFile( "../sample_EFA_ColdStart_vehcat_2005average.csv" );
 //		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_EFA_HOT_vehcat_2005average.csv" );
 
 			emissionsConfig.setAverageColdEmissionFactorsFile( "../sample_EFA_ColdStart_vehcat_2020_average_withHGVetc.csv" );
 			emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
-
-			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.directlyTryAverageTable );
 
 			emissionsConfig.setNonScenarioVehicles( NonScenarioVehicles.abort );
 
@@ -116,7 +116,7 @@ public final class RunAverageEmissionToolOfflineExample{
 			@Override
 			public void install(){
 				bind( Scenario.class ).toInstance( scenario );
-				bind( EventsManager.class ).toInstance( eventsManager );
+				bind( EventsManager.class ).toInstance( eventsManager ) ;
 				bind( EmissionModule.class ) ;
 			}
 		};
@@ -133,7 +133,6 @@ public final class RunAverageEmissionToolOfflineExample{
 		eventsManager.addHandler( eventWriterXML );
 
 		// read events file into the events reader.  EmissionsModule and events writer have been added as handlers, and will act accordingly.
-//		new MatsimEventsReader(eventsManager).readFile(eventsFile );
 		EventsUtils.readEvents( eventsManager, eventsFile );
 
 		// events writer needs to be explicitly closed, otherwise it does not work:
@@ -143,7 +142,7 @@ public final class RunAverageEmissionToolOfflineExample{
 		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( config.controler().getOutputDirectory() + "/output_vehicles.xml.gz" );
 		NetworkUtils.writeNetwork( scenario.getNetwork(), config.controler().getOutputDirectory() + "/output_network.xml.gz" );
 		ConfigUtils.writeConfig( config, config.controler().getOutputDirectory() + "/output_config.xml" );
-		ConfigUtils.writeMinimalConfig( config, config.controler().getOutputDirectory() + "/output_reduced_config.xml" );
+		ConfigUtils.writeMinimalConfig( config, config.controler().getOutputDirectory() + "/output_config_reduced.xml" );
 
 	}
 
