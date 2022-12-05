@@ -239,7 +239,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 //		Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setDetailedVsAverageLookupBehavior(lookupBehavior);
-		emissionsConfig.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes);							//Somehow needed even if deprecated, since a null pointer exception ids thrown when not set :( . kmt mar'20
+//		emissionsConfig.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes);							//Somehow needed even if deprecated, since a null pointer exception ids thrown when not set :( . kmt mar'20
 		emissionsConfig.setAverageColdEmissionFactorsFile("sample_41_EFA_ColdStart_vehcat_2020average.csv");
 		emissionsConfig.setDetailedColdEmissionFactorsFile("sample_41_EFA_ColdStart_SubSegm_2020detailed.csv");
 		emissionsConfig.setAverageWarmEmissionFactorsFile( "sample_41_EFA_HOT_vehcat_2020average.csv" );
