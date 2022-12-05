@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.extensions.emissions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.CreateEmissionConfig;
@@ -28,12 +30,17 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.vehicles.VehicleUtils;
+
+import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.*;
 
 
 /**
@@ -45,7 +52,7 @@ import org.matsim.vehicles.MatsimVehicleWriter;
  * @author benjamin, julia
  */
 public final class RunAverageEmissionToolOfflineExample{
-
+	private static final Logger log = LogManager.getLogger(RunAverageEmissionToolOfflineExample.class );
 	private static final String eventsFile =  "./scenarios/sampleScenario/5.events.xml.gz";
 
 	/* package, for test */ static final String emissionEventOutputFileName = "5.emission.events.offline.xml.gz";
@@ -60,21 +67,24 @@ public final class RunAverageEmissionToolOfflineExample{
 		} else {
 			config = ConfigUtils.loadConfig( args );
 		}
-
-		config.controler().setOutputDirectory( config.controler().getOutputDirectory() );
+		config.plansCalcRoute().clearTeleportedModeParams();
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
+		{
+			// config_average has the emissions config group commented out.  So all that there is to configure (for average emissions)
+			// follows here. kai, dec'22
 
 //		emissionsConfig.setAverageColdEmissionFactorsFile( "../sample_EFA_ColdStart_vehcat_2005average.csv" );
 //		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_EFA_HOT_vehcat_2005average.csv" );
 
-		emissionsConfig.setAverageColdEmissionFactorsFile( "../sample_EFA_ColdStart_vehcat_2020_average_withHGVetc.csv" );
-		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
+			emissionsConfig.setAverageColdEmissionFactorsFile( "../sample_EFA_ColdStart_vehcat_2020_average_withHGVetc.csv" );
+			emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
 
-		emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable );
+			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.directlyTryAverageTable );
 
-		emissionsConfig.setNonScenarioVehicles( EmissionsConfigGroup.NonScenarioVehicles.abort );
+			emissionsConfig.setNonScenarioVehicles( NonScenarioVehicles.abort );
 
+		}
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
@@ -119,18 +129,21 @@ public final class RunAverageEmissionToolOfflineExample{
 		// ---
 
 		// add events writer into emissions event handler
-		final EventWriterXML eventWriterXML = new EventWriterXML( config.controler().getOutputDirectory() + emissionEventOutputFileName );
+		final EventWriterXML eventWriterXML = new EventWriterXML( config.controler().getOutputDirectory() + '/' + emissionEventOutputFileName );
 		eventsManager.addHandler( eventWriterXML );
 
 		// read events file into the events reader.  EmissionsModule and events writer have been added as handlers, and will act accordingly.
-		new MatsimEventsReader(eventsManager).readFile(eventsFile );
+//		new MatsimEventsReader(eventsManager).readFile(eventsFile );
+		EventsUtils.readEvents( eventsManager, eventsFile );
 
 		// events writer needs to be explicitly closed, otherwise it does not work:
 		eventWriterXML.closeFile();
 
-		// also write vehicles and network as a service so we have all out files in one directory:
-		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( config.controler().getOutputDirectory() + "vehicles.xml.gz" );
-		NetworkUtils.writeNetwork( scenario.getNetwork(), config.controler().getOutputDirectory() + "network.xml.gz" );
+		// also write vehicles and network and config as a service so we have all out files in one directory:
+		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( config.controler().getOutputDirectory() + "/output_vehicles.xml.gz" );
+		NetworkUtils.writeNetwork( scenario.getNetwork(), config.controler().getOutputDirectory() + "/output_network.xml.gz" );
+		ConfigUtils.writeConfig( config, config.controler().getOutputDirectory() + "/output_config.xml" );
+		ConfigUtils.writeMinimalConfig( config, config.controler().getOutputDirectory() + "/output_reduced_config.xml" );
 
 	}
 
