@@ -321,25 +321,19 @@ import com.google.inject.Inject;
 		}
 
 		final OptionalTime startTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME));
-		final OptionalTime endTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR));
-		final OptionalTime duration = Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME));
+		final OptionalTime duration = Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR));
+		final OptionalTime endTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME));
 
 		// Check whether we need to check whether the given times match the assumptions made in InteractionActivity. Otherwise convert it to a regular Activity.
 		if (isStageActivity && (startTime.isDefined() || endTime.isDefined() || duration.isUndefined() || duration.seconds() > 0.0)) {
 			this.curract = PopulationUtils.createActivity(this.curract);
 		} else {
 			startTime.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
-			endTime.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
-			duration.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
+			duration.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
+			endTime.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
 		}
 		this.currplan.addActivity(this.curract);
 
-//		Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
-//				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
-//		Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR))
-//				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
-//		Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
-//				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
 		if (this.routeDescription != null) {
 			finishLastRoute();
 		}
