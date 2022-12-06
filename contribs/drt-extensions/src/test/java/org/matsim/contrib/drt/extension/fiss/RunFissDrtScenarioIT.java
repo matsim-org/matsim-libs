@@ -147,8 +147,6 @@ public class RunFissDrtScenarioIT {
 
 		//FISS part
 		{
-
-
 			FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
 			fissConfigGroup.sampleFactor = 0.1;
 			fissConfigGroup.sampledModes = Set.of(TransportMode.car);
@@ -159,7 +157,6 @@ public class RunFissDrtScenarioIT {
 
 			run.configureQSimComponents(qSimComponentsConfigurator);
 		}
-
 
 		run.run();
 	}

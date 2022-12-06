@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * @author nkuehnel / MOIA
+ * @author nkuehnel / MOIA, hrewald
  */
 public class FISSConfigGroup extends ReflectiveConfigGroup {
 

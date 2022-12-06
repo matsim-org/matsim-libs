@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author nkuehnel / MOIA
+ * @author nkuehnel / MOIA, hrewald
  */
 public class FISSConfigurator {
 

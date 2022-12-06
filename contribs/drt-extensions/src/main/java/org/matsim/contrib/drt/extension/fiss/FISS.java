@@ -51,7 +51,7 @@ import java.util.Random;
  * Also implements MobsimEngine to delegate required teleportation steps (such as arrivals).
  *
  *
- * @author nkuehnel / MOIA, hrewald / VW
+ * @author nkuehnel / MOIA, hrewald
  *
  */
 public class FISS implements DepartureHandler, MobsimEngine {

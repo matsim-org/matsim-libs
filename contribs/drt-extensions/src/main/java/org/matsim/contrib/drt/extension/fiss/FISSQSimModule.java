@@ -22,7 +22,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.router.util.TravelTime;
 
 /**
- * @author nkuehnel / MOIA
+ * @author nkuehnel / MOIA, hrewald
  */
 public class FISSQSimModule extends AbstractQSimModule {
 
