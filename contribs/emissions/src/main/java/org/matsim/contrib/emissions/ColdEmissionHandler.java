@@ -119,6 +119,7 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
                     this.vehicleId2accumulatedDistance.put( vehicleId, distance );
                 }
                 // yyyy I have absolutely no clue what the distance stuff is doing here.  kai, jan'20
+                // I now think that this has to do with the fact that the cold emissions are smeared out over the initial distance.  Don't know the details, though.  kai, dec'22
             }
         }
     }
