@@ -18,6 +18,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
@@ -97,10 +98,10 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		// Assigns link ids in the station objects
 		matchBAStWithNetwork(network, stations, counts);
 
+		clean(stations);
+
 		readHourlyTrafficVolume(primaryData, stations);
 		readHourlyTrafficVolume(motorwayData, stations);
-
-		clean(stations);
 
 		log.info("+++++++ Map aggregated traffic volumes to count stations +++++++");
 		Counts<Link> miv = new Counts<>();
@@ -205,6 +206,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 		Path input = pathToDisaggregatedData;
 		FileSystem fs = null;
+		BufferedReader reader;
 
 		// Try to use file inside zip file
 		if (input.getFileName().toString().endsWith(".zip")) {
@@ -214,15 +216,24 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 					Optional<Path> opt = stream.filter(p -> !p.toString().equals("/")).findFirst();
 					if (opt.isPresent())
 						input = opt.get();
+
+					reader = Files.newBufferedReader(input, StandardCharsets.ISO_8859_1);
 				}
 			} catch (IOException e) {
 				log.warn("Error processing zip file", e);
+				return;
+			}
+		} else {
+
+			try {
+				reader = IOUtils.getBufferedReader(input.toUri().toURL(), StandardCharsets.ISO_8859_1);
+			} catch (IOException e) {
+				log.error("Error creating buffered reader by IOUtils", e);
+				return;
 			}
 		}
 
-		try (//BufferedReader reader = Files.newBufferedReader(input, StandardCharsets.ISO_8859_1);
-			 var reader = IOUtils.getBufferedReader(input.toUri().toURL(), StandardCharsets.ISO_8859_1);
-			 FileSystem f = fs) {
+		try{
 			CSVParser records = CSVFormat
 					.newFormat(';')
 					.withAllowMissingColumnNames()
@@ -245,76 +256,76 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 						return day > 1 && day < 5;
 					})
 					.collect(Collectors.toList());
+
+			if (preFilteredRecords == null || preFilteredRecords.isEmpty()) {
+				log.warn("Records read from {} don't contain the stations ... ", pathToDisaggregatedData);
+				return;
+			}
+
+			log.info("+++++++ Start aggregation of traffic volume data +++++++");
+
+			Set<String> stationIds = preFilteredRecords.stream()
+					.map(record -> record.get("Zst"))
+					.collect(Collectors.toSet());
+
+			for (String number : stationIds) {
+				BAStCountStation station = stations.get(number);
+				String direction1 = station.getMatchedDir();
+				String direction2 = station.getOppDir();
+
+				String mivCol1 = "KFZ_" + direction1;
+				String mivCol2 = "KFZ_" + direction2;
+				String freightCol1 = "Lkw_" + direction1;
+				String freightCol2 = "Lkw_" + direction2;
+
+				log.info("Process data for count station {}", station.getName());
+
+				List<CSVRecord> allEntriesOfStation = preFilteredRecords.stream()
+						.filter(record -> record.get("Zst").equals(number)).toList();
+
+				for (String hour : hours) {
+					var hourlyTrafficVolumes = allEntriesOfStation.stream()
+							.filter(record -> record.get("Stunde").replace("\"", "")
+									.equals(hour)).toList();
+
+					if (hourlyTrafficVolumes.isEmpty()) {
+						log.warn("No volume for station {} at hour {}", station.getName(), hour);
+						continue;
+					}
+
+					double divisor = hourlyTrafficVolumes.size();
+					double sumMiv1 = hourlyTrafficVolumes.stream()
+							.mapToDouble(record -> Double.parseDouble(record.get(mivCol1)))
+							.sum();
+
+					double sumMiv2 = hourlyTrafficVolumes.stream()
+							.mapToDouble(record -> Double.parseDouble(record.get(mivCol2)))
+							.sum();
+
+					double meanMiv1 = sumMiv1 / divisor;
+					double meanMiv2 = sumMiv2 / divisor;
+
+					station.getMivTrafficVolume1().put(hour, meanMiv1);
+					station.getMivTrafficVolume2().put(hour, meanMiv2);
+
+					//Same procedure for freight
+					double sumFreight1 = hourlyTrafficVolumes.stream()
+							.mapToDouble(record -> Double.parseDouble(record.get(freightCol1)))
+							.sum();
+
+					double sumFreight2 = hourlyTrafficVolumes.stream()
+							.mapToDouble(record -> Double.parseDouble(record.get(freightCol2)))
+							.sum();
+
+					double meanFreight1 = sumFreight1 / divisor;
+					double meanFreight2 = sumFreight2 / divisor;
+
+					station.getFreightTrafficVolume1().put(hour, meanFreight1);
+					station.getFreightTrafficVolume2().put(hour, meanFreight2);
+				}
+			}
 		} catch (IOException e) {
 			log.error("Error reading hourly volumes", e);
-		}
-
-		if (preFilteredRecords == null || preFilteredRecords.isEmpty()) {
-			log.warn("Records read from {} don't contain the stations ... ", pathToDisaggregatedData);
-			return;
-		}
-
-		log.info("+++++++ Start aggregation of traffic volume data +++++++");
-
-		Set<String> stationIds = preFilteredRecords.stream()
-				.map(record -> record.get("Zst"))
-				.collect(Collectors.toSet());
-
-		for (String number : stationIds) {
-			BAStCountStation station = stations.get(number);
-			String direction1 = station.getMatchedDir();
-			String direction2 = station.getOppDir();
-
-			String mivCol1 = "KFZ_" + direction1;
-			String mivCol2 = "KFZ_" + direction2;
-			String freightCol1 = "Lkw_" + direction1;
-			String freightCol2 = "Lkw_" + direction2;
-
-			log.info("Process data for count station {}", station.getName());
-
-			List<CSVRecord> allEntriesOfStation = preFilteredRecords.stream()
-					.filter(record -> record.get("Zst").equals(number)).toList();
-
-			for (String hour : hours) {
-				var hourlyTrafficVolumes = allEntriesOfStation.stream()
-						.filter(record -> record.get("Stunde").replace("\"", "")
-								.equals(hour)).toList();
-
-				if (hourlyTrafficVolumes.isEmpty()) {
-					log.warn("No volume for station {} at hour {}", station.getName(), hour);
-					continue;
-				}
-
-				double divisor = hourlyTrafficVolumes.size();
-				double sumMiv1 = hourlyTrafficVolumes.stream()
-						.mapToDouble(record -> Double.parseDouble(record.get(mivCol1)))
-						.sum();
-
-				double sumMiv2 = hourlyTrafficVolumes.stream()
-						.mapToDouble(record -> Double.parseDouble(record.get(mivCol2)))
-						.sum();
-
-				double meanMiv1 = sumMiv1 / divisor;
-				double meanMiv2 = sumMiv2 / divisor;
-
-				station.getMivTrafficVolume1().put(hour, meanMiv1);
-				station.getMivTrafficVolume2().put(hour, meanMiv2);
-
-				//Same procedure for freight
-				double sumFreight1 = hourlyTrafficVolumes.stream()
-						.mapToDouble(record -> Double.parseDouble(record.get(freightCol1)))
-						.sum();
-
-				double sumFreight2 = hourlyTrafficVolumes.stream()
-						.mapToDouble(record -> Double.parseDouble(record.get(freightCol2)))
-						.sum();
-
-				double meanFreight1 = sumFreight1 / divisor;
-				double meanFreight2 = sumFreight2 / divisor;
-
-				station.getFreightTrafficVolume1().put(hour, meanFreight1);
-				station.getFreightTrafficVolume2().put(hour, meanFreight2);
-			}
 		}
 	}
 
@@ -362,15 +373,19 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		index.remove(opp);
 	}
 
-	private List<Predicate<String>> createRoadTypeFilter(List<String> types) {
+	private List<Predicate<Link>> createRoadTypeFilter(List<String> types) {
 
-		List<Predicate<String>> filter = new ArrayList<>();
+		List<Predicate<Link>> filter = new ArrayList<>();
 
 		for (String type : types) {
 
-			Predicate<String> p = string -> {
+			Predicate<Link> p = link -> {
+				var attr = link.getAttributes().getAttribute("type");
+				if(attr == null)
+					return true;
+
 				Pattern pattern = Pattern.compile(type, Pattern.CASE_INSENSITIVE);
-				return pattern.matcher(string).find();
+				return pattern.matcher(attr.toString()).find();
 			};
 
 			filter.add(p);
@@ -382,13 +397,13 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 		Network filteredNetwork;
 
-		List<Predicate<String>> roadTypeFilter = createRoadTypeFilter(roadTypes);
+		List<Predicate<Link>> roadTypeFilter = createRoadTypeFilter(roadTypes);
 
 		{
 			Network network = NetworkUtils.readNetwork(pathToNetwork);
 			NetworkFilterManager filter = new NetworkFilterManager(network, new NetworkConfigGroup());
 			filter.addLinkFilter(link -> link.getAllowedModes().contains(TransportMode.car));
-			filter.addLinkFilter(link -> roadTypeFilter.stream().anyMatch(predicate -> predicate.test(link.getAttributes().getAttribute("type").toString())));
+			filter.addLinkFilter(link -> roadTypeFilter.stream().anyMatch(predicate -> predicate.test(link)));
 
 			filteredNetwork = filter.applyFilters();
 		}
@@ -440,11 +455,16 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		Set<String> ignored = counts.getIgnored();
 		final Predicate<BAStCountStation> optFilter = station -> !ignored.contains(station.getId());
 
+		/*
+		* TODO
+		*  fix shape filter with different crs
+		* */
 		final Predicate<BAStCountStation> shpFilter;
 		if (shp.getShapeFile() != null) {
 			// default input is set to lat lon
 			ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "_");
-			shpFilter = station -> index.contains(station.getCoord());
+			CoordinateTransformation transform = crs.getTransformation();
+			shpFilter = station -> index.contains(transform.transform(station.getCoord()));
 		} else
 			shpFilter = (station) -> true;
 

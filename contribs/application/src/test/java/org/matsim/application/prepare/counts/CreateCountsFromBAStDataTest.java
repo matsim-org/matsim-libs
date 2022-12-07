@@ -28,12 +28,9 @@ public class CreateCountsFromBAStDataTest {
 
 		String[] args = new String[]{
 				"--station-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/Jawe2021_test_data.csv",
-				"--network=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/009.output_network.xml.gz",
-				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.txt.zip",
+				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
+				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.zip",
 				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
-				"--shp=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Shape/ruhrgebiet_boundary.shp",
-				"--shp-crs=EPSG:25832",
-				"--input-crs=EPSG:25832",
 				"--year=2021",
 				"--car-output=" + car,
 				"--freight-output=" + freight
