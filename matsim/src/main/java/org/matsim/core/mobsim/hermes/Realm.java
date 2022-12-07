@@ -119,13 +119,13 @@ class Realm {
 
     protected boolean processAgentLink(Agent agent, long planentry, int currLinkId) {
         int linkid = Agent.getLinkPlanEntry(planentry);
-        int velocity = Agent.getVelocityPlanEntry(planentry);
+        double velocity = Agent.getVelocityPlanEntry(planentry);
         HLink next = links[linkid];
         int prev_finishtime = agent.linkFinishTime;
         // this ensures that if no velocity is provided for the vehicle, we use the link
         velocity = velocity == 0 ? next.velocity() : velocity;
         // the max(1, ...) ensures that a link hop takes at least on step.
-        int traveltime = HermesConfigGroup.LINK_ADVANCE_DELAY + Math.max(1, next.length() / Math.min(velocity, next.velocity()));
+        int traveltime = (HermesConfigGroup.LINK_ADVANCE_DELAY + (int) Math.round(Math.max(1, next.length() / Math.min(velocity, next.velocity()))));
         agent.linkFinishTime = secs + traveltime;
         float storageCapacityPCU = agent.getStorageCapacityPCUE();
         if (next.push(agent,secs,storageCapacityPCU)) {
