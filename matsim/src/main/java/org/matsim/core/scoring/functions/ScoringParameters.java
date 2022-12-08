@@ -27,15 +27,17 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.collections.ArrayMap;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class ScoringParameters implements MatsimParameters {
 
-	public final Map<String, ActivityUtilityParameters> utilParams;
+	public final Map<String, ActivityUtilityParameters> activityParams;
 	public final Map<String, ModeUtilityParameters> modeParams;
 	public final double marginalUtilityOfWaiting_s;
 	public final double marginalUtilityOfLateArrival_s;
@@ -52,7 +54,7 @@ public class ScoringParameters implements MatsimParameters {
 	public final double simulationPeriodInDays;
 
 	private ScoringParameters(
-			final Map<String, ActivityUtilityParameters> utilParams,
+			final Map<String, ActivityUtilityParameters> activityParams,
 			final Map<String, ModeUtilityParameters> modeParams,
 			final double marginalUtilityOfWaiting_s,
 			final double marginalUtilityOfLateArrival_s,
@@ -65,7 +67,7 @@ public class ScoringParameters implements MatsimParameters {
 			final boolean scoreActs,
 			final boolean usingOldScoringBelowZeroUtilityDuration,
 			final double simulationPeriodInDays) {
-		this.utilParams = utilParams;
+		this.activityParams = activityParams;
 		this.modeParams = modeParams;
 		this.marginalUtilityOfWaiting_s = marginalUtilityOfWaiting_s;
 		this.marginalUtilityOfLateArrival_s = marginalUtilityOfLateArrival_s;
@@ -80,8 +82,30 @@ public class ScoringParameters implements MatsimParameters {
 		this.simulationPeriodInDays = simulationPeriodInDays;
 	}
 
+	private static final class CachedActivityParamsBySubpop {
+		private static final Map<String, Map<String, ActivityUtilityParameters>> cachedActivityParamsBySubpop = new LinkedHashMap<>();
+		void put( String subpop, Map<String,ActivityUtilityParameters> map ) {
+
+			Gbl.assertIf( cachedActivityParamsBySubpop.get(subpop) == null );
+			// (should not be able to over-write this)
+
+			cachedActivityParamsBySubpop.put( subpop, map );
+		}
+		Map<String, ActivityUtilityParameters> get( String subpop ) {
+			final Map<String, ActivityUtilityParameters> map = cachedActivityParamsBySubpop.get( subpop );
+			if ( map==null ) {
+				return null;
+			} else{
+				return Collections.unmodifiableMap( map );
+			}
+			// (cannot apply unmodifiableMap to null!)
+		}
+
+	}
 	public static final class Builder {
-		private final Map<String, ActivityUtilityParameters> utilParams;
+		private static final CachedActivityParamsBySubpop cachedActivityParamsBySubpop = new CachedActivityParamsBySubpop();
+
+		private final Map<String, ActivityUtilityParameters> activityParams;
 		private final Map<String, ModeUtilityParameters> modeParams;
 
 		private double marginalUtilityOfWaiting_s;
@@ -128,6 +152,7 @@ public class ScoringParameters implements MatsimParameters {
 				final PlanCalcScoreConfigGroup configGroup,
 				final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
 				final ScenarioConfigGroup scenarioConfig) {
+			Map<String, ActivityUtilityParameters> activityParamsTmp;
 			this.simulationPeriodInDays = scenarioConfig.getSimulationPeriodInDays();
 			
 			this.usingOldScoringBelowZeroUtilityDuration = configGroup.isUsingOldScoringBelowZeroUtilityDuration() ;
@@ -142,11 +167,18 @@ public class ScoringParameters implements MatsimParameters {
 			scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
 					marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
 
-			utilParams = new TreeMap<>() ;
-			for (ActivityParams params : scoringParameterSet.getActivityParams()) {
-				ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
-				utilParams.put(params.getActivityType(), factory.build() ) ;
+			// yyyy this is attempting to cache the activity params so that we do not created #actTypes x #persons entries.  Not yet tested/debugged ... kai, jun'22
+			final var subpop = scoringParameterSet.getSubpopulation();
+			activityParamsTmp = cachedActivityParamsBySubpop.get( subpop );
+			if ( activityParamsTmp ==null ){
+				activityParamsTmp = new TreeMap<>();
+				for( ActivityParams params : scoringParameterSet.getActivityParams() ){
+					ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder( params );
+					activityParamsTmp.put( params.getActivityType(), factory.build() );
+				}
+				cachedActivityParamsBySubpop.put( subpop, activityParamsTmp);
 			}
+			this.activityParams = activityParamsTmp;
 
 			modeParams = new TreeMap<>() ;
 			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
@@ -197,7 +229,7 @@ public class ScoringParameters implements MatsimParameters {
 			scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
 					marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
 
-			utilParams = activityParams;
+			this.activityParams = activityParams;
 
 			modeParams = new TreeMap<>() ;
 			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
@@ -220,12 +252,12 @@ public class ScoringParameters implements MatsimParameters {
 		}
 
 		public Builder setActivityParameters(String activityType, ActivityUtilityParameters params) {
-			this.utilParams.put( activityType , params );
+			this.activityParams.put( activityType , params );
 			return this;
 		}
 
 		public ActivityUtilityParameters getActivityParameters(String activityType) {
-			return this.utilParams.get( activityType );
+			return this.activityParams.get( activityType );
 		}
 
 		public Builder setModeParameters(String mode, ModeUtilityParameters params) {
@@ -289,7 +321,7 @@ public class ScoringParameters implements MatsimParameters {
 
 		public ScoringParameters build() {
 			return new ScoringParameters(
-					utilParams,
+					activityParams,
 					modeParams,
 					marginalUtilityOfWaiting_s,
 					marginalUtilityOfLateArrival_s,

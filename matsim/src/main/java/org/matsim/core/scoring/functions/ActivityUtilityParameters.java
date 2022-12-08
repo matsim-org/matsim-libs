@@ -200,7 +200,7 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 	private OptionalTime earliestEndTime = OptionalTime.undefined();
 	private boolean scoreAtAll=true;
 
-	private ActivityUtilityParameters(final String type) {
+	private ActivityUtilityParameters( final String type ) {
 		this.type = type;
 	}
 
