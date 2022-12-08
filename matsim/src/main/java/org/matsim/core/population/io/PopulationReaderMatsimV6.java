@@ -290,9 +290,11 @@ import com.google.inject.Inject;
 		final boolean isStageActivity = StageActivityTypeIdentifier.isStageActivity(actType);
 		if (atts.getValue(ATTR_ACT_FACILITY) != null) {
 			final Id<ActivityFacility> facilityId = Id.create(atts.getValue(ATTR_ACT_FACILITY), ActivityFacility.class);
-			if (isStageActivity) this.curract = PopulationUtils.createInteractionActivityFromFacilityId(actType, facilityId);
-			else this.curract = PopulationUtils.createActivityFromFacilityId(actType, facilityId);
-//			this.curract = PopulationUtils.createAndAddActivityFromFacilityId(this.currplan, actType, facilityId);
+			if (isStageActivity) {
+				this.curract = PopulationUtils.createInteractionActivityFromFacilityId(actType, facilityId);
+			} else {
+				this.curract = PopulationUtils.createActivityFromFacilityId(actType, facilityId);
+			}
 			if (atts.getValue(ATTR_ACT_LINK) != null) {
 				final Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 				this.curract.setLinkId(linkId);
@@ -303,34 +305,37 @@ import com.google.inject.Inject;
 			}
 		} else if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			final Id<Link> linkId1 = linkId;
-			if (isStageActivity) this.curract = PopulationUtils.createInteractionActivityFromLinkId(actType, linkId1);
-			else this.curract = PopulationUtils.createActivityFromLinkId(actType, linkId1);
-//			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
+			if (isStageActivity) {
+				this.curract = PopulationUtils.createInteractionActivityFromLinkId(actType, linkId);
+			} else {
+				this.curract = PopulationUtils.createActivityFromLinkId(actType, linkId);
+			}
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-				final Coord coord = parseCoord( atts );
+				final Coord coord = parseCoord(atts);
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-			final Coord coord = parseCoord( atts );
-			if (isStageActivity) this.curract = PopulationUtils.createInteractionActivityFromCoord(actType, coord);
-			else this.curract = PopulationUtils.createActivityFromCoord(actType, coord);
-//			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
+			final Coord coord = parseCoord(atts);
+			if (isStageActivity) {
+				this.curract = PopulationUtils.createInteractionActivityFromCoord(actType, coord);
+			} else {
+				this.curract = PopulationUtils.createActivityFromCoord(actType, coord);
+			}
 		} else {
-			throw new IllegalArgumentException("In this version of MATSim either the facility, the link or the coords be specified for an Act.");
+			throw new IllegalArgumentException("In this version of MATSim either the facility, the link or the coords must be specified for an Act.");
 		}
 
 		final OptionalTime startTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME));
 		final OptionalTime duration = Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR));
 		final OptionalTime endTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME));
 
-		// Check whether we need to check whether the given times match the assumptions made in InteractionActivity. Otherwise convert it to a regular Activity.
+		// Check whether the given times match the assumptions made in InteractionActivity. Otherwise, convert it to a regular Activity.
 		if (isStageActivity && (startTime.isDefined() || endTime.isDefined() || duration.isUndefined() || duration.seconds() > 0.0)) {
 			this.curract = PopulationUtils.createActivity(this.curract);
 		} else {
-			startTime.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
-			duration.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
-			endTime.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
+			startTime.ifDefinedOrElse(this.curract::setStartTime, this.curract::setStartTimeUndefined);
+			duration.ifDefinedOrElse(this.curract::setMaximumDuration, this.curract::setMaximumDurationUndefined);
+			endTime.ifDefinedOrElse(this.curract::setEndTime, this.curract::setEndTimeUndefined);
 		}
 		this.currplan.addActivity(this.curract);
 

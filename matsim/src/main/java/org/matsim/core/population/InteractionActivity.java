@@ -28,6 +28,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 /**
  * An optimized implementation for interaction activities where start- and endtime is undefined and duration is 0.
@@ -35,12 +36,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 /*package*/ final class InteractionActivity implements Activity {
 
-	/*
-	 * TODO:
-	 * Replace this with an implementation that throws an exception in case attributes are added.
-	 * This is possible once the lazy-attributes branch is merged.
-	 */
-	private static Attributes emptyAttributes = new Attributes();
+	private static final Attributes EMPTY_ATTRIBUTES = new LazyAllocationAttributes(attributes -> {
+		throw new RuntimeException("interaction activities cannot have attributes.");
+	}, () -> null);
 	
 	private String type;
 	private Coord coord = null;
@@ -52,32 +50,32 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final OptionalTime getEndTime() {
+	public OptionalTime getEndTime() {
 		return OptionalTime.undefined();
 	}
 
 	@Override
-	public final void setEndTime(final double endTime) {
+	public void setEndTime(final double endTime) {
 		throw new UnsupportedOperationException("Setting duration is not supported for InteractionActivity.");
 	}
 
 	@Override
-	public final void setEndTimeUndefined() {
+	public void setEndTimeUndefined() {
 		// It is already undefined, i.e. do nothing.
 	}
 
 	@Override
-	public final OptionalTime getStartTime() {
+	public OptionalTime getStartTime() {
 		return OptionalTime.undefined();
 	}
 
 	@Override
-	public final void setStartTime(final double startTime) {
+	public void setStartTime(final double startTime) {
 		throw new UnsupportedOperationException("Setting start time is not supported for InteractionActivity.");
 	}
 
 	@Override
-	public final void setStartTimeUndefined() {
+	public void setStartTimeUndefined() {
 		// It is already undefined, i.e. do nothing.
 	}
 
@@ -98,17 +96,17 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final String getType() {
+	public String getType() {
 		return this.type;
 	}
 
 	@Override
-	public final void setType(final String type) {
+	public void setType(final String type) {
 		this.type = type.intern();
 	}
 
 	@Override
-	public final Coord getCoord() {
+	public Coord getCoord() {
 		return this.coord;
 	}
 
@@ -118,33 +116,32 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final Id<Link> getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
 	@Override
-	public final Id<ActivityFacility> getFacilityId() {
+	public Id<ActivityFacility> getFacilityId() {
 		return this.facilityId;
 	}
 
 	@Override
-	public final void setFacilityId(final Id<ActivityFacility> facilityId) {
+	public void setFacilityId(final Id<ActivityFacility> facilityId) {
 		this.facilityId = facilityId;
 	}
 
 	@Override
-	public final void setLinkId(final Id<Link> linkId) {
+	public void setLinkId(final Id<Link> linkId) {
 		this.linkId = linkId;
 	}
 
 	@Override
 	public Attributes getAttributes() {
-//		throw new UnsupportedOperationException("Using attributes is not supported for InteractionActivity.");
-		return emptyAttributes;
+		return EMPTY_ATTRIBUTES;
 }
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return "act [type="
 				+ this.getType()
 				+ "]"
