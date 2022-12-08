@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 
@@ -52,6 +53,8 @@ public interface QNetworkFactory extends MatsimFactory {
 	 * <p></p>
 	 * This could be solved using custom scopes.  They do, however, for the time being only exist in the guice inject framework, not
 	 * in javax.inject, and thus we do not want to use them (yet?).
+	 * <p></p>
+	 * (yy I think that the above has been changed with the separate QSimComponents, and thus one could attempt to fix it.  kai, jul'22)
 	 */
 	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1 ) ;
 

@@ -64,7 +64,7 @@ public class DriveDischargingHandler
 	}
 
 	private final Network network;
-	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
+	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
 	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
@@ -100,8 +100,8 @@ public class DriveDischargingHandler
 		}
 	}
 
-	//XXX The current implementation is thread-safe because no other EventHandler modifies battery SOC
-	// (for instance, AUX discharging and battery charging modifies SOC outside event handling
+	//XXX The current implementation is thread-safe because no other EventHandler modifies battery charge
+	// (for instance, AUX discharging and battery charging modifies charge outside event handling
 	// (as MobsimAfterSimStepListeners)
 	//TODO In the long term, it will be safer to move the discharging procedure to a MobsimAfterSimStepListener
 	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime) {
@@ -113,7 +113,7 @@ public class DriveDischargingHandler
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt)
 					+ ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
 			//Energy consumption might be negative on links with negative slope
-			ev.getBattery().changeSoc(-energy);
+			ev.getBattery().changeCharge(-energy);
 
 			//FIXME emit a DriveOnLinkEnergyConsumptionEvent instead of calculating it here...
 			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);

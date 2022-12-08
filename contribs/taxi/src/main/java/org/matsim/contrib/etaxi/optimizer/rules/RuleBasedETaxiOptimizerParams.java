@@ -38,7 +38,7 @@ public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerPa
 	// (for approx. 20 km => 3kWh) with 3 kW-heating on
 	@Positive
 	@DecimalMax("1.0")
-	public double minRelativeSoc = 0.3;
+	public double minSoc = 0.3;
 
 	@Parameter
 	@Comment("Specifies how often idle vehicles are checked if they have become"

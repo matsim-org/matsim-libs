@@ -26,12 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -44,8 +39,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
@@ -146,17 +140,14 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		double l_d = DrtLegsAnalyser.getTotalDistance(drtVehicleStats.getVehicleStates()) / (legs.size()
 				* directDistanceMean);
 
-		var stayTaskProfile = vehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles()
-				.getOrDefault(new DrtTaskType(DrtTaskBaseType.STAY), new double[0]);
-		var minStayTaskVehicleCountOverDay = Arrays.stream(stayTaskProfile).min();
-
+		MinCountAndShareIdleVehiclesOverDay minCountAndShareIdleVehiclesOverDay = getMinCountAndShareIdleVehiclesOverDay();
 		String vehStats = DrtLegsAnalyser.summarizeVehicles(drtVehicleStats.getVehicleStates(), delimiter)
 				+ delimiter
 				+ format.format(l_d)
 				+ delimiter
-				+ (minStayTaskVehicleCountOverDay.isPresent() ?
-				format.format(minStayTaskVehicleCountOverDay.getAsDouble()) :
-				notAvailableString);
+				+ format.format(minCountAndShareIdleVehiclesOverDay.minShareIdleVehiclesOverDay)
+				+ delimiter
+				+ format.format(minCountAndShareIdleVehiclesOverDay.minCountIdleVehiclesOverDay);
 		String occStats = DrtLegsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter,
 				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
@@ -214,6 +205,30 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				filename(event, "drt_boardings", ".csv"), filename(event, "drt_alightments", ".csv"), network);
 	}
 
+	private record MinCountAndShareIdleVehiclesOverDay(double minCountIdleVehiclesOverDay,
+													   double minShareIdleVehiclesOverDay) {
+	}
+
+	private MinCountAndShareIdleVehiclesOverDay getMinCountAndShareIdleVehiclesOverDay() {
+		double minCountIdleVehiclesOverDay = Double.MAX_VALUE;
+		double minShareIdleVehiclesOverDay = Double.MAX_VALUE;
+		double[] stayTaskProfile = vehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles().get(DrtStayTask.TYPE);
+		double[] numberOfVehiclesInServiceProfile = vehicleOccupancyProfileCalculator.getNumberOfVehiclesInServiceProfile();
+		if (stayTaskProfile != null) {
+			for (int i = 0; i < numberOfVehiclesInServiceProfile.length; i++) {
+				if (numberOfVehiclesInServiceProfile[i] > 0) {
+					// only consider time intervals in which vehicles were in operation. Otherwise, any time period without a vehicle in operation will make for count 0.
+					minCountIdleVehiclesOverDay = Math.min(minCountIdleVehiclesOverDay, stayTaskProfile[i]);
+					minShareIdleVehiclesOverDay = Math.min(minShareIdleVehiclesOverDay, stayTaskProfile[i] / numberOfVehiclesInServiceProfile[i]);
+				}
+			}
+		}
+
+		return new MinCountAndShareIdleVehiclesOverDay(
+				minCountIdleVehiclesOverDay < Double.MAX_VALUE ? minCountIdleVehiclesOverDay : Double.NaN,
+				minShareIdleVehiclesOverDay < Double.MAX_VALUE ? minShareIdleVehiclesOverDay : Double.NaN);
+	}
+
 	private String filename(IterationEndsEvent event, String prefix) {
 		return filename(event, prefix, "");
 	}
@@ -261,7 +276,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			if (!vheaderWritten) {
 				bw.write(line("runId", "iteration", "vehicles", "totalDistance", "totalEmptyDistance", "emptyRatio",
 						"totalPassengerDistanceTraveled", "averageDrivenDistance", "averageEmptyDistance",
-						"averagePassengerDistanceTraveled", "d_p/d_t", "l_det", "minShareIdleVehicles"));
+						"averagePassengerDistanceTraveled", "d_p/d_t", "l_det", "minShareIdleVehicles", "minCountIdleVehicles"));
 			}
 			bw.write(line(runId, it, summarizeVehicles));
 		} catch (IOException e) {

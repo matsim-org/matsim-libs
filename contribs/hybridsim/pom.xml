@@ -10,8 +10,8 @@
   <name>hybridsim</name>
 
   <properties>
-    <protobuf.version>3.21.7</protobuf.version>
-    <grpc.version>1.49.1</grpc.version>
+    <protobuf.version>3.21.10</protobuf.version>
+    <grpc.version>1.51.0</grpc.version>
   </properties>
 
   <dependencies>
@@ -42,7 +42,7 @@
       <extension>
         <groupId>kr.motd.maven</groupId>
         <artifactId>os-maven-plugin</artifactId>
-        <version>1.7.0</version>
+        <version>1.7.1</version>
       </extension>
     </extensions>
 

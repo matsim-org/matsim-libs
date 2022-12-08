@@ -27,22 +27,25 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Preconditions;
 
 public class ChargingWithQueueingLogic implements ChargingLogic {
-	private final ChargerSpecification charger;
+	protected final ChargerSpecification charger;
 	private final ChargingStrategy chargingStrategy;
 	private final EventsManager eventsManager;
 
-	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
-	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new LinkedHashMap<>();
+	private final Queue<ElectricVehicle> arrivingVehicles = new LinkedBlockingQueue<>();
+	private final Map<Id<Vehicle>, ChargingListener> listeners = new LinkedHashMap<>();
 
 	public ChargingWithQueueingLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy,
 			EventsManager eventsManager) {
@@ -58,14 +61,27 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			ElectricVehicle ev = evIter.next();
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
-			ev.getBattery().changeSoc(ev.getChargingPower().calcChargingPower(charger) * chargePeriod);
+			double energy = ev.getChargingPower().calcChargingPower(charger) * chargePeriod;
+			double newCharge = Math.min(ev.getBattery().getCharge() + energy, ev.getBattery().getCapacity());
+			ev.getBattery().setCharge(newCharge);
 
 			if (chargingStrategy.isChargingCompleted(ev)) {
 				evIter.remove();
 				eventsManager.processEvent(
-						new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
+						new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getCharge()));
 				listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 			}
+		}
+
+		var arrivingVehiclesIter = arrivingVehicles.iterator();
+		while (arrivingVehiclesIter.hasNext()) {
+			var ev = arrivingVehiclesIter.next();
+			if (pluggedVehicles.size() < charger.getPlugCount()) {
+				plugVehicle(ev, now);
+			} else {
+				queueVehicle(ev, now);
+			}
+			arrivingVehiclesIter.remove();
 		}
 
 		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugCount() - pluggedVehicles.size());
@@ -76,24 +92,21 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 	@Override
 	public void addVehicle(ElectricVehicle ev, double now) {
-		addVehicle(ev, new ChargingListener() {}, now);
+		addVehicle(ev, new ChargingListener() {
+		}, now);
 	}
 
 	@Override
 	public void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now) {
+		arrivingVehicles.add(ev);
 		listeners.put(ev.getId(), chargingListener);
-		if (pluggedVehicles.size() < charger.getPlugCount()) {
-			plugVehicle(ev, now);
-		} else {
-			queueVehicle(ev, now);
-		}
 	}
 
 	@Override
 	public void removeVehicle(ElectricVehicle ev, double now) {
 		if (pluggedVehicles.remove(ev.getId()) != null) {// successfully removed
 			eventsManager.processEvent(
-					new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
+					new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getCharge()));
 			listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 
 			if (!queuedVehicles.isEmpty()) {
@@ -118,7 +131,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			throw new IllegalArgumentException();
 		}
 		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), charger.getChargerType(),
-				ev.getBattery().getSoc()));
+				ev.getBattery().getCharge()));
 		listeners.get(ev.getId()).notifyChargingStarted(ev, now);
 	}
 

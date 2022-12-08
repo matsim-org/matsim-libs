@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -97,6 +98,7 @@ public abstract class AbstractModule implements Module {
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
 	private Config config;
+	private Multibinder<AbstractQSimModule> qsimOverridingModulesMultibinder;
 
 	public AbstractModule() {
 		// config will be injected later
@@ -125,6 +127,7 @@ public abstract class AbstractModule implements Module {
 						new TypeLiteral<Class<?>>(){},
 						new TypeLiteral<AttributeConverter<?>>() {} );
 		this.qsimModulesMultibinder = Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
+		this.qsimOverridingModulesMultibinder = Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) );
 		this.install();
 	}
 
@@ -142,11 +145,14 @@ public abstract class AbstractModule implements Module {
 	protected final LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
 		return eventHandlerMultibinder.addBinding();
 	}
-	
+
 	protected final void installQSimModule(AbstractQSimModule qsimModule) {
 		qsimModulesMultibinder.addBinding().toInstance(qsimModule);
 	}
-	
+	protected final void installOverridingQSimModule(AbstractQSimModule qsimModule) {
+		qsimOverridingModulesMultibinder.addBinding().toInstance(qsimModule);
+	}
+
 	/**
 	 * @see ControlerListener
 	 */

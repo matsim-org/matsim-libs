@@ -8,13 +8,12 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
-
-import static playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters.*;
 
 /**
  * this class tests {@link IncomeDependentUtilityOfMoneyPersonScoringParameters}
@@ -51,27 +50,27 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 		{ //fill population
 			Person negativeIncome = factory.createPerson(Id.createPersonId("negativeIncome"));
 			PopulationUtils.putSubpopulation(negativeIncome, "person");
-			PopulationUtils.putPersonAttribute(negativeIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, -100d);
+			PersonUtils.setIncome(negativeIncome, -100d);
 			population.addPerson(negativeIncome);
 
 			Person zeroIncome = factory.createPerson(Id.createPersonId("zeroIncome"));
 			PopulationUtils.putSubpopulation(zeroIncome, "person");
-			PopulationUtils.putPersonAttribute(zeroIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 0d);
+			PersonUtils.setIncome(zeroIncome, 0d);
 			population.addPerson(zeroIncome);
 
 			Person lowIncome = factory.createPerson(Id.createPersonId("lowIncome"));
 			PopulationUtils.putSubpopulation(lowIncome, "person");
-			PopulationUtils.putPersonAttribute(lowIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
+			PersonUtils.setIncome(lowIncome, 0.5d);
 			population.addPerson(lowIncome);
 
 			Person mediumIncome = factory.createPerson(Id.createPersonId("mediumIncome"));
 			PopulationUtils.putSubpopulation(mediumIncome, "person");
-			PopulationUtils.putPersonAttribute(mediumIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 1d);
+			PersonUtils.setIncome(mediumIncome, 1d);
 			population.addPerson(mediumIncome);
 
 			Person highIncome = factory.createPerson(Id.createPersonId("highIncome"));
 			PopulationUtils.putSubpopulation(highIncome, "person");
-			PopulationUtils.putPersonAttribute(highIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 1.5d);
+			PersonUtils.setIncome(highIncome, 1.5d);
 			population.addPerson(highIncome);
 
 			Person freight = factory.createPerson(Id.createPersonId("freight"));
@@ -80,12 +79,12 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 
 			Person freightWithIncome1 = factory.createPerson(Id.createPersonId("freightWithIncome1"));
 			PopulationUtils.putSubpopulation(freightWithIncome1, "freight");
-			PopulationUtils.putPersonAttribute(freightWithIncome1, PERSONAL_INCOME_ATTRIBUTE_NAME, 1.5d);
+			PersonUtils.setIncome(freightWithIncome1, 1.5d);
 			population.addPerson(freightWithIncome1);
 
 			Person freightWithIncome2 = factory.createPerson(Id.createPersonId("freightWithIncome2"));
 			PopulationUtils.putSubpopulation(freightWithIncome2, "freight");
-			PopulationUtils.putPersonAttribute(freightWithIncome2, PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
+			PersonUtils.setIncome(freightWithIncome2, 0.5d);
 			population.addPerson(freightWithIncome2);
 		}
 		personScoringParams = new IncomeDependentUtilityOfMoneyPersonScoringParameters(population,
@@ -154,12 +153,12 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 		ScoringParameters paramsRich = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("highIncome")));
 		CharyparNagelMoneyScoring moneyScoringRich = new CharyparNagelMoneyScoring(paramsRich);
 		moneyScoringRich.addMoney(100);
-		Assert.assertEquals("for the rich person, 100 money units should be equal to a score of 66.66", 1./1.5 * 100, moneyScoringRich.getScore(), utils.EPSILON);
+		Assert.assertEquals("for the rich person, 100 money units should be equal to a score of 66.66", 1./1.5 * 100, moneyScoringRich.getScore(), MatsimTestUtils.EPSILON);
 
 		ScoringParameters paramsPoor = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("lowIncome")));
 		CharyparNagelMoneyScoring moneyScoringPoor = new CharyparNagelMoneyScoring(paramsPoor);
 		moneyScoringPoor.addMoney(100);
-		Assert.assertEquals("for the poor person, 100 money units should be equal to a score of 200.00", 1./0.5 * 100, moneyScoringPoor.getScore(), utils.EPSILON);
+		Assert.assertEquals("for the poor person, 100 money units should be equal to a score of 200.00", 1./0.5 * 100, moneyScoringPoor.getScore(), MatsimTestUtils.EPSILON);
 
 		Assert.assertTrue("100 money units should worth more for a poor person than for a rich person", moneyScoringPoor.getScore() > moneyScoringRich.getScore());
 	}

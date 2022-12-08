@@ -62,7 +62,7 @@ class UrbanVehicleChargingHandler
 	public static final String PLUGOUT_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
 			PLUGOUT_IDENTIFIER);
 	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
-	private final Map<Id<ElectricVehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
 
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final ElectricFleet electricFleet;
@@ -87,7 +87,7 @@ class UrbanVehicleChargingHandler
 		if (event.getActType().endsWith(PLUGIN_INTERACTION)) {
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
-				Id<ElectricVehicle> evId = Id.create(vehicleId, ElectricVehicle.class);
+				Id<Vehicle> evId = Id.create(vehicleId, Vehicle.class);
 				if (electricFleet.getElectricVehicles().containsKey(evId)) {
 					ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
 					List<Charger> chargers = chargersAtLinks.get(event.getLinkId());
@@ -120,7 +120,7 @@ class UrbanVehicleChargingHandler
 		if (event.getActType().endsWith(PLUGOUT_INTERACTION)) {
 			Tuple<Id<Vehicle>, Id<Charger>> tuple = chargingProcedures.get(event.getLinkId()).remove(event.getPersonId());
 			if (tuple != null) {
-				Id<ElectricVehicle> evId = Id.create(tuple.getFirst(), ElectricVehicle.class);
+				Id<Vehicle> evId = Id.create(tuple.getFirst(), Vehicle.class);
 				if(vehiclesAtChargers.remove(evId) != null){ //if null, vehicle is fully charged and de-plugged already (see handleEvent(ChargingEndedEvent) )
 					Id<Charger> chargerId = tuple.getSecond();
 					Charger c = chargingInfrastructure.getChargers().get(chargerId);

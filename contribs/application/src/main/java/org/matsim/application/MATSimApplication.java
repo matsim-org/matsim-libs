@@ -86,7 +86,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			" |_|  |_/_/ \\_\\_| |___/_|_|_|_|\n|@";
 
 	@CommandLine.Option(names = "--config", description = "Path to config file used for the run.", order = 0)
-	protected File scenario;
+	protected File configPath;
 
 	@CommandLine.Option(names = "--yaml", description = "Path to yaml file with config params to overwrite.", required = false)
 	protected Path specs;
@@ -136,10 +136,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	/**
 	 * Constructor
 	 *
-	 * @param defaultScenario path to the default scenario config
+	 * @param defaultConfigPath path to the default scenario config
 	 */
-	public MATSimApplication(@Nullable String defaultScenario) {
-		this.defaultScenario = defaultScenario;
+	public MATSimApplication(@Nullable String defaultConfigPath) {
+		this.defaultScenario = defaultConfigPath;
 	}
 
 	/**
@@ -160,7 +160,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		// load config if not present yet.
 		if (config == null) {
-			config = loadConfig(Objects.requireNonNull(scenario, "No default scenario location given").getAbsoluteFile().toString());
+			config = loadConfig(Objects.requireNonNull( configPath, "No default scenario location given" ).getAbsoluteFile().toString() );
 		} else {
 			Config tmp = prepareConfig(config);
 			config = tmp != null ? tmp : config;
@@ -177,7 +177,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		}
 
 		if (iterations > -1)
-			config.controler().setLastIteration(iterations - 1);
+			config.controler().setLastIteration(iterations);
 
 		if (output != null)
 			config.controler().setOutputDirectory(output.toString());
@@ -311,7 +311,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	/**
 	 * Modules that are configurable via command line arguments.
 	 */
-	private List<ConfigGroup> getConfigurableModules() {
+	protected List<ConfigGroup> getConfigurableModules() {
 		return Lists.newArrayList(
 				new ControlerConfigGroup(),
 				new GlobalConfigGroup(),
@@ -679,7 +679,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		}
 	}
 
-	@CommandLine.Command(name = "prepare", description = "Contains all commands for preparing the scenario. (See help prepare)",
+	@CommandLine.Command(name = "prepare", description = "Contains all commands for preparing the scenario. (See prepare help; \n" +
+									     "  needs to be ... \"prepare\", \"help\" ) if run from Java.)",
+			// (This used to be "help prepare", which works as well.  However, "prepare help <subcommand>" then also works while "help
+			// prepare <subcommand>" does not.  So I think that "prepare help" saves some time in understanding help options.  kai, nov'22)
 			subcommands = CommandLine.HelpCommand.class)
 	public static class PrepareCommand implements Callable<Integer> {
 

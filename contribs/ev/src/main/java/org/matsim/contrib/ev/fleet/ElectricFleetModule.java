@@ -20,13 +20,8 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle.INITIAL_ENERGY_kWh;
-
-import java.util.Optional;
-
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -34,7 +29,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import com.google.inject.Inject;
@@ -55,8 +49,10 @@ public class ElectricFleetModule extends AbstractModule {
 
 			@Override
 			public ElectricFleetSpecification get() {
-				return ElectricVehicleSpecificationWithMatsimVehicle.createFleetSpecificationFromMatsimVehicles(
-						vehicles);
+				ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
+				ElectricVehicleSpecificationImpl.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification,
+						vehicles.getVehicles().values());
+				return fleetSpecification;
 			}
 		}).asEagerSingleton();
 
@@ -75,8 +71,8 @@ public class ElectricFleetModule extends AbstractModule {
 
 					@Override
 					public ElectricFleet get() {
-						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory,
-								auxConsumptionFactory, chargingPowerFactory);
+						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory, auxConsumptionFactory,
+								chargingPowerFactory);
 					}
 				}).asEagerSingleton();
 
@@ -91,26 +87,9 @@ public class ElectricFleetModule extends AbstractModule {
 						@Override
 						public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 							for (var oldSpec : electricFleetSpecification.getVehicleSpecifications().values()) {
-								Optional<Vehicle> matsimVehicle = oldSpec.getMatsimVehicle();
-								double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles()
-										.get(oldSpec.getId())
-										.getBattery()
-										.getSoc();
-
-								if (matsimVehicle.isPresent()) {
-									//should (and need to) overwrite the matsimVehicle attribute. careful: this attribute is in kWh, the SoC is in J
-									matsimVehicle.get()
-											.getAttributes()
-											.putAttribute(INITIAL_ENERGY_kWh,
-													EvUnits.J_to_kWh(socAtEndOfCurrentIteration));
-									electricFleetSpecification.replaceVehicleSpecification(
-											new ElectricVehicleSpecificationWithMatsimVehicle(matsimVehicle.get()));
-								} else {
-									electricFleetSpecification.replaceVehicleSpecification(
-											ImmutableElectricVehicleSpecification.newBuilder(oldSpec)
-													.initialSoc(socAtEndOfCurrentIteration)
-													.build());
-								}
+								var matsimVehicle = oldSpec.getMatsimVehicle();
+								double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles().get(oldSpec.getId()).getBattery().getSoc();
+								ElectricVehicleSpecifications.setInitialSoc(matsimVehicle, socAtEndOfCurrentIteration);
 							}
 						}
 					});
