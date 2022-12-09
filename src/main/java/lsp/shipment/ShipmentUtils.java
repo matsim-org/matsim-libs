@@ -423,9 +423,6 @@ public final class ShipmentUtils {
 			this.resourceId = resourceId;
 		}
 
-		public void setLinkId(Id<Link> linkId) {
-		}
-
 		public ScheduledShipmentHandle build() {
 			return new ScheduledShipmentHandle(this);
 		}

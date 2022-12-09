@@ -78,7 +78,6 @@ import java.util.ArrayList;
 				builder.setLogisticsChainElement(element);
 			}
 		}
-		builder.setLinkId(transshipmentHub.getStartLinkId());
 		ShipmentPlanElement handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
