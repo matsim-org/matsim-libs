@@ -24,6 +24,8 @@ import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierService;
 
 final class LoggedShipmentTransport implements ShipmentLeg {
 
@@ -32,12 +34,14 @@ final class LoggedShipmentTransport implements ShipmentLeg {
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> fromLinkId;
 	private double endTime;
+	private Id<Link> toLinkId;
 
 	LoggedShipmentTransport(ShipmentUtils.LoggedShipmentTransportBuilder builder) {
 		this.startTime = builder.getStartTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
 		this.fromLinkId = builder.getFromLinkId();
+		this.toLinkId = builder.getToLinkId();
 	}
 
 
@@ -74,5 +78,25 @@ final class LoggedShipmentTransport implements ShipmentLeg {
 	public Id<Link> getFromLinkId() {
 		return fromLinkId;
 	}
+
+	@Override
+	public CarrierService getCarrierService() {
+		throw new RuntimeException("not implemented");
+	}
+
+
+	public Id<Link> getToLinkId() {
+		return toLinkId;
+	}
+
+	public void setToLinkId(Id<Link> toLinkId) {
+		this.toLinkId = toLinkId;
+	}
+
+	@Override
+	public Id<Carrier> getCarrierId() {
+		throw new RuntimeException("not implemented");
+	}
+
 
 }
