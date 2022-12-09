@@ -71,7 +71,7 @@ import java.util.*;
 	private ExampleSchedulingOfTransportChainHubsVsDirect() {
 	} // so it cannot be instantiated
 
-	public static void main(String[] args) throws CommandLine.ConfigurationException {
+	public static void main(String[] args) {
 
 		final SolutionType solutionType;
 
