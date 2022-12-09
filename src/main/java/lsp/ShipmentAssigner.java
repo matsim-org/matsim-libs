@@ -25,7 +25,7 @@ import lsp.shipment.LSPShipment;
 /**
  * Takes an {@link LSPShipment} and normally assigns it to something that belongs to an {@link LSP}.
  * <br/><br/>
- * If there are several {@link LogisticsSolution}s, the {@link LSP} has to assign each {@link LSPShipment} to
+ * If there are several {@link LogisticChain}s, the {@link LSP} has to assign each {@link LSPShipment} to
  * the suitable one. For this purpose, each LSPPlan contains a pluggable strategy that
  * is contained in classes implementing the interface {@link ShipmentAssigner}.
  * <br/><br/>
@@ -36,6 +36,6 @@ import lsp.shipment.LSPShipment;
  */
 public interface ShipmentAssigner extends KnowsLSP {
 
-	void assignToSolution(LSPShipment shipment);
+	void assignToLogisticChain(LSPShipment shipment);
 
 }

@@ -21,7 +21,7 @@
 package lsp.shipment;
 
 import lsp.LSPResource;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 
 	private final double startTime;
 	private final double endTime;
-	private final LogisticsSolutionElement element;
+	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
 
@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.network.Link;
 	}
 
 	@Override
-	public LogisticsSolutionElement getSolutionElement() {
+	public LogisticChainElement getLogisticChainElement() {
 		return element;
 	}
 

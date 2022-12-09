@@ -214,18 +214,18 @@ final class ExampleTwoEchelonGrid {
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
-			LogisticsSolutionElement directCarrierElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("directCarrierLSE", LogisticsSolutionElement.class))
+			LogisticChainElement directCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierLSE", LogisticChainElement.class))
 					.setResource(directCarrierRessource)
 					.build();
 
 
-			LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("directSolution", LogisticsSolution.class))
-					.addSolutionElement(directCarrierElement)
+			LogisticChain solution_direct = LSPUtils.LogisticChainBuilder.newInstance(Id.create("directSolution", LogisticChain.class))
+					.addLogisticChainElement(directCarrierElement)
 					.build();
 
-			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
+			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 			lspPlan_direct = LSPUtils.createLSPPlan()
-					.addSolution(solution_direct)
+					.addLogisticChain(solution_direct)
 					.setAssigner(singleSolutionShipmentAssigner);
 		}
 
@@ -245,7 +245,7 @@ final class ExampleTwoEchelonGrid {
 					.setVehicleReturn(UsecaseUtils.VehicleReturn.returnToFromLink)
 					.build();
 
-			LogisticsSolutionElement mainCarrierLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("mainCarrierLSE", LogisticsSolutionElement.class))
+			LogisticChainElement mainCarrierLSE = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("mainCarrierLSE", LogisticChainElement.class))
 					.setResource(mainCarrierRessource)
 					.build();
 
@@ -261,7 +261,7 @@ final class ExampleTwoEchelonGrid {
 					.build();
 			LSPUtils.setFixedCost(hubResource, HUBCOSTS_FIX); //Set fixed costs (per day) for the availability of the hub.
 
-			LogisticsSolutionElement hubLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("HubLSE", LogisticsSolutionElement.class))
+			LogisticChainElement hubLSE = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("HubLSE", LogisticChainElement.class))
 					.setResource(hubResource)
 					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
 
@@ -280,7 +280,7 @@ final class ExampleTwoEchelonGrid {
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
-			LogisticsSolutionElement distributionCarrierElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("distributionCarrierLSE", LogisticsSolutionElement.class))
+			LogisticChainElement distributionCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("distributionCarrierLSE", LogisticChainElement.class))
 					.setResource(distributionCarrierRessource)
 					.build();
 
@@ -289,15 +289,15 @@ final class ExampleTwoEchelonGrid {
 			mainCarrierLSE.connectWithNextElement(hubLSE);
 			hubLSE.connectWithNextElement(distributionCarrierElement);
 
-			LogisticsSolution solution_withHub = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("hubSolution", LogisticsSolution.class))
-					.addSolutionElement(mainCarrierLSE)
-					.addSolutionElement(hubLSE)
-					.addSolutionElement(distributionCarrierElement)
+			LogisticChain solution_withHub = LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubSolution", LogisticChain.class))
+					.addLogisticChainElement(mainCarrierLSE)
+					.addLogisticChainElement(hubLSE)
+					.addLogisticChainElement(distributionCarrierElement)
 					.build();
 
 			lspPlan_withHub = LSPUtils.createLSPPlan()
-					.addSolution(solution_withHub)
-					.setAssigner(UsecaseUtils.createSingleSolutionShipmentAssigner());
+					.addLogisticChain(solution_withHub)
+					.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner());
 		}
 
 		//Todo: Auch das ist wirr: Muss hier alle sommeln, damit man die dann im LSPBuilder dem SolutionScheduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu ... urgs KMT'Jul22
@@ -307,7 +307,7 @@ final class ExampleTwoEchelonGrid {
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
 				.setInitialPlan(lspPlan_direct)
-				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans)))
+				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
 		lsp.addPlan(lspPlan_withHub); //add the second plan to the lsp
 
@@ -318,7 +318,7 @@ final class ExampleTwoEchelonGrid {
 		}
 
 		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
-		lsp.scheduleSolutions();
+		lsp.scheduleLogisticChains();
 
 		return lsp;
 	}
@@ -387,8 +387,8 @@ final class ExampleTwoEchelonGrid {
 		log.info("Collecting all LSPResources from the LSPPlans");
 		List<LSPResource> resourcesList = new ArrayList<>();            //TODO: Mache daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
 		for (LSPPlan lspPlan : lspPlans) {
-			for (LogisticsSolution solution : lspPlan.getSolutions()) {
-				for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+			for (LogisticChain solution : lspPlan.getLogisticChain()) {
+				for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
 					resourcesList.add(solutionElement.getResource());
 				}
 			}

@@ -22,7 +22,7 @@ package lsp.usecase;
 
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentLeg;
 import lsp.shipment.ShipmentPlanElement;
@@ -85,12 +85,12 @@ import java.util.Map;
 		// This is maybe not ideal, but works; kmt oct'22
 	}
 
-	public void addShipment(LSPShipment shipment, LogisticsSolutionElement solutionElement) {
+	public void addShipment(LSPShipment shipment, LogisticChainElement solutionElement) {
 		TransshipmentHubEventHandlerPair pair = new TransshipmentHubEventHandlerPair(shipment, solutionElement);
 
 		for (ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values()) {
 			if (planElement instanceof ShipmentLeg transport) {
-				if (transport.getSolutionElement().getNextElement() == solutionElement) {
+				if (transport.getLogisticChainElement().getNextElement() == solutionElement) {
 					servicesWaitedFor.put(transport.getCarrierService(), pair);
 				}
 			}
@@ -146,9 +146,9 @@ import java.util.Map;
 		builder.setStartTime(startTime);
 		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);
-		builder.setLogisticsSolutionElement(servicesWaitedFor.get(carrierService).element);
+		builder.setLogisticsChainElement(servicesWaitedFor.get(carrierService).element);
 		ShipmentPlanElement handle = builder.build();
-		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
+		String idString = handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
 			lspShipment.getLog().addPlanElement(loadId, handle);
@@ -195,9 +195,9 @@ import java.util.Map;
 
 	static class TransshipmentHubEventHandlerPair {
 		public final LSPShipment shipment;
-		public final LogisticsSolutionElement element;
+		public final LogisticChainElement element;
 
-		public TransshipmentHubEventHandlerPair(LSPShipment shipment, LogisticsSolutionElement element) {
+		public TransshipmentHubEventHandlerPair(LSPShipment shipment, LogisticChainElement element) {
 			this.shipment = shipment;
 			this.element = element;
 		}

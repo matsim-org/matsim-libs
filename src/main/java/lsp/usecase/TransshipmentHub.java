@@ -22,7 +22,7 @@ package lsp.usecase;
 
 import lsp.LSPDataObject;
 import lsp.LSPResource;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -50,7 +50,7 @@ public class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPR
 
 	private final Id<Link> locationLinkId;
 	private final TransshipmentHubScheduler transshipmentHubScheduler;
-	private final List<LogisticsSolutionElement> clientElements;
+	private final List<LogisticChainElement> clientElements;
 
 	private TransshipmentHub() { // Do not instantiate. (removable once this class is package-private again) KMT oct'22
 		super(null);
@@ -82,7 +82,7 @@ public class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPR
 	}
 
 	@Override
-	public Collection<LogisticsSolutionElement> getClientElements() {
+	public Collection<LogisticChainElement> getClientElements() {
 		return clientElements;
 	}
 

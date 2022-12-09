@@ -78,15 +78,15 @@ public class CollectionLSPScoringTest {
 		LSPResource collectionResource = CollectionCarrierResourceBuilder.newInstance(Id.create("CollectionCarrierResource", LSPResource.class), network)
 				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setCarrier(carrier).setLocationLinkId(collectionLink.getId()).build();
 
-		LogisticsSolutionElement collectionElement = LSPUtils.LogisticsSolutionElementBuilder
-				.newInstance(Id.create("CollectionElement", LogisticsSolutionElement.class)).setResource(collectionResource).build();
+		LogisticChainElement collectionElement = LSPUtils.LogisticChainElementBuilder
+				.newInstance(Id.create("CollectionElement", LogisticChainElement.class)).setResource(collectionResource).build();
 
-		LogisticsSolution collectionSolution = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("CollectionSolution", LogisticsSolution.class))
-				.addSolutionElement(collectionElement).build();
+		LogisticChain collectionSolution = LSPUtils.LogisticChainBuilder.newInstance(Id.create("CollectionSolution", LogisticChain.class))
+				.addLogisticChainElement(collectionElement).build();
 
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
-				.setInitialPlan(LSPUtils.createLSPPlan().setAssigner(createSingleSolutionShipmentAssigner()).addSolution(collectionSolution))
-				.setSolutionScheduler(createDefaultSimpleForwardSolutionScheduler(Collections.singletonList(collectionResource)))
+				.setInitialPlan(LSPUtils.createLSPPlan().setAssigner(createSingleLogisticChainShipmentAssigner()).addLogisticChain(collectionSolution))
+				.setLogisticChainScheduler(createDefaultSimpleForwardLogisticChainScheduler(Collections.singletonList(collectionResource)))
 //				.setSolutionScorer(new ExampleLSPScoring.TipScorer())
 				.build();
 
@@ -132,7 +132,7 @@ public class CollectionLSPScoringTest {
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
 
-		collectionLSP.scheduleSolutions();
+		collectionLSP.scheduleLogisticChains();
 
 		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(collectionLSP);
@@ -160,7 +160,7 @@ public class CollectionLSPScoringTest {
 	public void testCollectionLSPScoring() {
 		System.out.println(collectionLSP.getSelectedPlan().getScore());
 		assertEquals(numberOfShipments, collectionLSP.getShipments().size());
-		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments()
+		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getLogisticChain().iterator().next().getShipments()
 				.size());
 		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <= (numberOfShipments * 5));

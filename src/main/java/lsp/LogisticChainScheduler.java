@@ -18,43 +18,17 @@
  *  * ***********************************************************************
  */
 
-package lsp.usecase;
+package lsp;
 
-import lsp.LSP;
-import lsp.LogisticsSolution;
-import lsp.ShipmentAssigner;
-import lsp.shipment.LSPShipment;
-import org.matsim.core.gbl.Gbl;
 
 /**
- * Ganz einfacher {@link ShipmentAssigner}:
- * Voraussetzung: Der {@link lsp.LSPPlan} hat genau 1 {@link LogisticsSolution}.
- * <p>
- * Dann wird das {@link  LSPShipment} diesem zugeordnet.
- * <p>
- * (Falls die Voraussetzung "exakt 1 Solution pro Plan" nicht erfüllt ist, kommt eine RuntimeException)
+ * Serve the purpose of routing a set of {@link lsp.shipment.LSPShipment}s through a set of
+ * {@link LogisticChain}s, which, in turn, consist of several {@link LogisticChainElement}s
+ * and the corresponding {@link LSPResource}s.
  */
-class SingleSolutionShipmentAssigner implements ShipmentAssigner {
+public interface LogisticChainScheduler extends HasBackpointer<LSP> {
 
-	private LSP lsp;
+	void scheduleLogisticChain();
 
-	SingleSolutionShipmentAssigner() {
-	}
-
-	@Override
-	public LSP getLSP() {
-		throw new RuntimeException("not implemented");
-	}
-
-	public void setLSP(LSP lsp) {
-		this.lsp = lsp;
-	}
-
-	@Override
-	public void assignToSolution(LSPShipment shipment) {
-		Gbl.assertIf(lsp.getSelectedPlan().getSolutions().size() == 1);
-		LogisticsSolution singleSolution = lsp.getSelectedPlan().getSolutions().iterator().next();
-		singleSolution.assignShipment(shipment);
-	}
-
+	void setBufferTime(int bufferTime);
 }

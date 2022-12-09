@@ -36,7 +36,7 @@ public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTra
 
 	Id<Link> getEndLinkId();
 
-	Collection<LogisticsSolutionElement> getClientElements();
+	Collection<LogisticChainElement> getClientElements();
 
 	void schedule(int bufferTime);
 

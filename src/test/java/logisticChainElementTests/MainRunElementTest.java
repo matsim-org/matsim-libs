@@ -18,12 +18,11 @@
  *  * ***********************************************************************
  */
 
-package solutionElementTests;
+package logisticChainElementTests;
 
-import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 import lsp.LSPUtils;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,11 +40,10 @@ import org.matsim.vehicles.VehicleType;
 
 import static org.junit.Assert.*;
 
-public class DistributionElementTest {
+public class MainRunElementTest {
 
-	private LSPCarrierResource adapter;
-	private LogisticsSolutionElement distributionElement;
-
+	private LSPResource mainRunResource;
+	private LogisticChainElement mainRunElement;
 
 	@Before
 	public void initialize() {
@@ -55,22 +53,25 @@ public class DistributionElementTest {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
-		Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
-		Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
-		vehicleTypeBuilder.setCapacity(10);
-		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		VehicleType distributionType = vehicleTypeBuilder.build();
 
-		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
+		Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
+		Id<VehicleType> vehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
+		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
+		vehicleTypeBuilder.setCapacity(30);
+		vehicleTypeBuilder.setCostPerDistanceUnit(0.0002);
+		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
+		vehicleTypeBuilder.setFixCost(120);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
+		org.matsim.vehicles.VehicleType mainRunType = vehicleTypeBuilder.build();
+
+
+		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("MainRunVehicle");
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, fromLinkId, mainRunType);
+
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(distributionType);
+		capabilitiesBuilder.addType(mainRunType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
@@ -78,34 +79,37 @@ public class DistributionElementTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("DistributionCarrierResource", LSPResource.class);
-		UsecaseUtils.DistributionCarrierResourceBuilder builder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(adapterId, network);
-		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		builder.setCarrier(carrier);
-		builder.setLocationLinkId(distributionLinkId);
-		adapter = builder.build();
+		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
+		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
+		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
+		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
+		mainRunResourceBuilder.setCarrier(carrier);
+		mainRunResource = mainRunResourceBuilder.build();
 
-		Id<LogisticsSolutionElement> elementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
-		distributionBuilder.setResource(adapter);
-		distributionElement = distributionBuilder.build();
+		Id<LogisticChainElement> elementId = Id.create("MainRunElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
+		mainRunBuilder.setResource(mainRunResource);
+		mainRunElement = mainRunBuilder.build();
 
 	}
 
 	@Test
 	public void testDistributionElement() {
-		assertNotNull(distributionElement.getIncomingShipments());
-		assertNotNull(distributionElement.getIncomingShipments().getShipments());
-		assertTrue(distributionElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertNotNull(distributionElement.getAttributes());
-		assertTrue(distributionElement.getAttributes().isEmpty());
-//		assertNull(distributionElement.getEmbeddingContainer() );
-		assertNull(distributionElement.getNextElement());
-		assertNotNull(distributionElement.getOutgoingShipments());
-		assertNotNull(distributionElement.getOutgoingShipments().getShipments());
-		assertTrue(distributionElement.getOutgoingShipments().getSortedShipments().isEmpty());
-		assertNull(distributionElement.getPreviousElement());
-		assertSame(distributionElement.getResource(), adapter);
-		assertSame(distributionElement.getResource().getClientElements().iterator().next(), distributionElement);
+		assertNotNull(mainRunElement.getIncomingShipments());
+		assertNotNull(mainRunElement.getIncomingShipments().getShipments());
+		assertTrue(mainRunElement.getIncomingShipments().getSortedShipments().isEmpty());
+		assertNotNull(mainRunElement.getAttributes());
+		assertTrue(mainRunElement.getAttributes().isEmpty());
+//		assertNull(mainRunElement.getEmbeddingContainer() );
+		assertNull(mainRunElement.getNextElement());
+		assertNotNull(mainRunElement.getOutgoingShipments());
+		assertNotNull(mainRunElement.getOutgoingShipments().getShipments());
+		assertTrue(mainRunElement.getOutgoingShipments().getSortedShipments().isEmpty());
+		assertNull(mainRunElement.getPreviousElement());
+		assertSame(mainRunElement.getResource(), mainRunResource);
+		assertSame(mainRunElement.getResource().getClientElements().iterator().next(), mainRunElement);
 	}
+
+
 }

@@ -124,7 +124,7 @@ import java.util.*;
 		}
 
 		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
-		lsp.scheduleSolutions();
+		lsp.scheduleLogisticChains();
 
 		log.info("Set up simulation controler and LSPModule");
 		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(lsp)));
@@ -180,7 +180,7 @@ import java.util.*;
 		final Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)"); //TODO: Hochziehen aber non-static.
 		final Id<Link> hubLinkId = Id.createLinkId("(14 2) (14 3)");
 
-		LogisticsSolutionElement depotElement;
+		LogisticChainElement depotElement;
 		{
 			//The SolutionElement for the first reloading point is created
 
@@ -198,14 +198,14 @@ import java.util.*;
 					.setTransshipmentHubScheduler(depotScheduler)
 					.build();
 
-			depotElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("DepotElement", LogisticsSolutionElement.class))
+			depotElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("DepotElement", LogisticChainElement.class))
 					.setResource(depotResource)
 					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
 			//Maybe TODO: Depot als LogisticSolutionElement raus nehmen.(?)
 		}
 
 		//The LogisticsSolutionElement for the main run Resource is created
-		LogisticsSolutionElement mainRunElement;
+		LogisticChainElement mainRunElement;
 		{
 
 			log.info("");
@@ -237,13 +237,13 @@ import java.util.*;
 					.setCarrier(mainRunCarrier)
 					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 					.build();
-			mainRunElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("MainRunElement", LogisticsSolutionElement.class))
+			mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
 					.setResource(mainRunResource)
 					.build();
 		}
 
 
-		LogisticsSolutionElement hubElement;
+		LogisticChainElement hubElement;
 		{
 			log.info("");
 			log.info("The second reloading adapter (hub) i.e. the Resource is created");
@@ -261,13 +261,13 @@ import java.util.*;
 					.build();
 
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-			hubElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("SecondHubElement", LogisticsSolutionElement.class))
+			hubElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("SecondHubElement", LogisticChainElement.class))
 					.setResource(hubResource)
 					.build();
 		}
 
 
-		LogisticsSolutionElement distributionElement;
+		LogisticChainElement distributionElement;
 		{
 			//The Carrier for distribution from reloading Point is created
 			VehicleType distributionVehicleType = createCarrierVehicleType("DistributionCarrierVehicleType");
@@ -292,15 +292,15 @@ import java.util.*;
 
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 
-			distributionElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(
-							Id.create("DistributionElement", LogisticsSolutionElement.class))
+			distributionElement = LSPUtils.LogisticChainElementBuilder.newInstance(
+							Id.create("DistributionElement", LogisticChainElement.class))
 					.setResource(distributionResource)
 					.build();
 		}
 
 
 		//### New (KMT): Carrier for direct distribution from Depot (without 2nd reloading Point)
-		LogisticsSolutionElement directDistributionElement;
+		LogisticChainElement directDistributionElement;
 		{
 			//The Carrier for distribution from reloading Point is created
 			VehicleType directDistributionVehicleType = createCarrierVehicleType("DirectDistributionCarrierVehicleType");
@@ -326,8 +326,8 @@ import java.util.*;
 			// (The scheduler is where jsprit comes into play.)
 
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-			directDistributionElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(
-							Id.create("DirectDistributionElement", LogisticsSolutionElement.class))
+			directDistributionElement = LSPUtils.LogisticChainElementBuilder.newInstance(
+							Id.create("DirectDistributionElement", LogisticChainElement.class))
 					.setResource(directDistributionResource)
 					.build();
 		}
@@ -349,7 +349,7 @@ import java.util.*;
 				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
 
 				return lspBuilder.setInitialPlan(lspPlan_Reloading)
-						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_Reloading)))
+						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_Reloading)))
 						.build();
 
 			}
@@ -361,7 +361,7 @@ import java.util.*;
 
 				return lspBuilder
 						.setInitialPlan(lspPlan_direct)
-						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
+						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
 						.build();
 			}
 			case twoPlans_directAndHub -> {
@@ -382,7 +382,7 @@ import java.util.*;
 
 				final LSP lsp = lspBuilder
 						.setInitialPlan(lspPlan_direct)
-						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList))
+						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList))
 						.build();
 
 				lsp.addPlan(lspPlan_Reloading); //adding the second plan
@@ -397,15 +397,15 @@ import java.util.*;
 	private static List<LSPResource> createResourcesListFromLSPPlan(LSPPlan lspPlanWithReloading) {
 		log.info("Collecting all LSPResources from the LSPPlan");
 		List<LSPResource> resourcesList = new ArrayList<>();            //TODO: Mahe daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
-		for (LogisticsSolution solution : lspPlanWithReloading.getSolutions()) {
-			for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+		for (LogisticChain solution : lspPlanWithReloading.getLogisticChain()) {
+			for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
 				resourcesList.add(solutionElement.getResource());
 			}
 		}
 		return resourcesList;
 	}
 
-	private static LSPPlan createLSPPlan_direct(LogisticsSolutionElement depotElement, LogisticsSolutionElement directDistributionElement) {
+	private static LSPPlan createLSPPlan_direct(LogisticChainElement depotElement, LogisticChainElement directDistributionElement) {
 		log.info("");
 		log.info("The order of the logisticsSolutionElements is now specified");
 		depotElement.connectWithNextElement(directDistributionElement);
@@ -419,20 +419,20 @@ import java.util.*;
 		log.info("");
 		log.info("set up logistic Solution - direct distribution from the depot is created");
 
-		LogisticsSolution completeSolutionDirect = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("SolutionDirectId", LogisticsSolution.class))
-				.addSolutionElement(depotElement)
-				.addSolutionElement(directDistributionElement)
+		LogisticChain completeSolutionDirect = LSPUtils.LogisticChainBuilder.newInstance(Id.create("SolutionDirectId", LogisticChain.class))
+				.addLogisticChainElement(depotElement)
+				.addLogisticChainElement(directDistributionElement)
 				.build();
 
 		log.info("");
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
 		return LSPUtils.createLSPPlan()
-				.setAssigner(UsecaseUtils.createSingleSolutionShipmentAssigner())
-				.addSolution(completeSolutionDirect);
+				.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner())
+				.addLogisticChain(completeSolutionDirect);
 	}
 
-	private static LSPPlan createLSPPlan_reloading(LogisticsSolutionElement depotElement, LogisticsSolutionElement mainRunElement, LogisticsSolutionElement hubElement, LogisticsSolutionElement distributionElement) {
+	private static LSPPlan createLSPPlan_reloading(LogisticChainElement depotElement, LogisticChainElement mainRunElement, LogisticChainElement hubElement, LogisticChainElement distributionElement) {
 		log.info("");
 		log.info("set up logistic Solution - original with hub usage solution is created");
 
@@ -441,12 +441,12 @@ import java.util.*;
 		mainRunElement.connectWithNextElement(hubElement);
 		hubElement.connectWithNextElement(distributionElement);
 
-		LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
-						Id.create("SolutionWithTransshipmentHubId", LogisticsSolution.class))
-				.addSolutionElement(depotElement)
-				.addSolutionElement(mainRunElement)
-				.addSolutionElement(hubElement)
-				.addSolutionElement(distributionElement)
+		LogisticChain completeSolutionWithReloading = LSPUtils.LogisticChainBuilder.newInstance(
+						Id.create("SolutionWithTransshipmentHubId", LogisticChain.class))
+				.addLogisticChainElement(depotElement)
+				.addLogisticChainElement(mainRunElement)
+				.addLogisticChainElement(hubElement)
+				.addLogisticChainElement(distributionElement)
 				.build();
 
 
@@ -454,8 +454,8 @@ import java.util.*;
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
 		return LSPUtils.createLSPPlan()
-				.setAssigner(UsecaseUtils.createSingleSolutionShipmentAssigner())
-				.addSolution(completeSolutionWithReloading);
+				.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner())
+				.addLogisticChain(completeSolutionWithReloading);
 	}
 
 	private static VehicleType createCarrierVehicleType(String vehicleTypeId) {

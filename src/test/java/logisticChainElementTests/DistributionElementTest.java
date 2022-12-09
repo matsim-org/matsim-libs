@@ -18,12 +18,12 @@
  *  * ***********************************************************************
  */
 
-package solutionElementTests;
+package logisticChainElementTests;
 
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 import lsp.LSPUtils;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,39 +36,41 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import static org.junit.Assert.*;
 
-public class CollectionElementTest {
+public class DistributionElementTest {
 
-	private LogisticsSolutionElement collectionElement;
-	private LSPCarrierResource carrierResource;
+	private LSPCarrierResource adapter;
+	private LogisticChainElement distributionElement;
+
 
 	@Before
 	public void initialize() {
-
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
-		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
-		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
+		Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
+		Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
 		vehicleTypeBuilder.setCapacity(10);
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
 		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		VehicleType collectionType = vehicleTypeBuilder.build();
+		VehicleType distributionType = vehicleTypeBuilder.build();
 
-		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLinkId, collectionType);
+		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(collectionType);
+		capabilitiesBuilder.addType(distributionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
@@ -76,34 +78,34 @@ public class CollectionElementTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder builder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
-		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+		Id<LSPResource> adapterId = Id.create("DistributionCarrierResource", LSPResource.class);
+		UsecaseUtils.DistributionCarrierResourceBuilder builder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(adapterId, network);
+		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		builder.setCarrier(carrier);
-		builder.setLocationLinkId(collectionLinkId);
-		carrierResource = builder.build();
+		builder.setLocationLinkId(distributionLinkId);
+		adapter = builder.build();
 
-		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
-		collectionBuilder.setResource(carrierResource);
-		collectionElement = collectionBuilder.build();
+		Id<LogisticChainElement> elementId = Id.create("DistributionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder distributionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
+		distributionBuilder.setResource(adapter);
+		distributionElement = distributionBuilder.build();
+
 	}
 
 	@Test
-	public void testCollectionElement() {
-		assertNotNull(collectionElement.getIncomingShipments());
-		assertNotNull(collectionElement.getIncomingShipments().getShipments());
-		assertTrue(collectionElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertNotNull(collectionElement.getAttributes());
-		assertTrue(collectionElement.getAttributes().isEmpty());
-//		assertNull(collectionElement.getEmbeddingContainer() );
-		assertNull(collectionElement.getNextElement());
-		assertNotNull(collectionElement.getOutgoingShipments());
-		assertNotNull(collectionElement.getOutgoingShipments().getShipments());
-		assertTrue(collectionElement.getOutgoingShipments().getSortedShipments().isEmpty());
-		assertNull(collectionElement.getPreviousElement());
-		assertSame(collectionElement.getResource(), carrierResource);
-		assertSame(collectionElement.getResource().getClientElements().iterator().next(), collectionElement);
+	public void testDistributionElement() {
+		assertNotNull(distributionElement.getIncomingShipments());
+		assertNotNull(distributionElement.getIncomingShipments().getShipments());
+		assertTrue(distributionElement.getIncomingShipments().getSortedShipments().isEmpty());
+		assertNotNull(distributionElement.getAttributes());
+		assertTrue(distributionElement.getAttributes().isEmpty());
+//		assertNull(distributionElement.getEmbeddingContainer() );
+		assertNull(distributionElement.getNextElement());
+		assertNotNull(distributionElement.getOutgoingShipments());
+		assertNotNull(distributionElement.getOutgoingShipments().getShipments());
+		assertTrue(distributionElement.getOutgoingShipments().getSortedShipments().isEmpty());
+		assertNull(distributionElement.getPreviousElement());
+		assertSame(distributionElement.getResource(), adapter);
+		assertSame(distributionElement.getResource().getClientElements().iterator().next(), distributionElement);
 	}
-
 }

@@ -113,26 +113,26 @@ public class CollectionLSPMobsimTest {
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionResource = adapterBuilder.build();
 
-		final LogisticsSolutionElement collectionElement;
+		final LogisticChainElement collectionElement;
 		{
-			Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-			LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
+			Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
+			LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
 			collectionElementBuilder.setResource(collectionResource);
 			collectionElement = collectionElementBuilder.build();
 		}
-		final LogisticsSolution collectionSolution;
+		final LogisticChain collectionSolution;
 		{
-			Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-			LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId);
-			collectionSolutionBuilder.addSolutionElement(collectionElement);
+			Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
+			LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
+			collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 			collectionSolution = collectionSolutionBuilder.build();
 		}
 		final LSPPlan collectionPlan;
 		{
-			ShipmentAssigner assigner = createSingleSolutionShipmentAssigner();
+			ShipmentAssigner assigner = createSingleLogisticChainShipmentAssigner();
 			collectionPlan = LSPUtils.createLSPPlan();
 			collectionPlan.setAssigner(assigner);
-			collectionPlan.addSolution(collectionSolution);
+			collectionPlan.addLogisticChain(collectionSolution);
 		}
 		{
 			final LSPUtils.LSPBuilder collectionLSPBuilder;
@@ -140,9 +140,9 @@ public class CollectionLSPMobsimTest {
 			collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 			collectionLSPBuilder.setInitialPlan(collectionPlan);
 			resourcesList.add(collectionResource);
-			SolutionScheduler simpleScheduler = createDefaultSimpleForwardSolutionScheduler(resourcesList);
+			LogisticChainScheduler simpleScheduler = createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 			simpleScheduler.setBufferTime(300);
-			collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
+			collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 			collectionLSP = collectionLSPBuilder.build();
 		}
 		{
@@ -174,7 +174,7 @@ public class CollectionLSPMobsimTest {
 				LSPShipment shipment = builder.build();
 				collectionLSP.assignShipmentToLSP(shipment);
 			}
-			collectionLSP.scheduleSolutions();
+			collectionLSP.scheduleLogisticChains();
 		}
 		final LSPs lsps;
 		{
@@ -234,7 +234,7 @@ public class CollectionLSPMobsimTest {
 				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
 				assertEquals(scheduleElement.getElementType(), logElement.getElementType());
 				assertSame(scheduleElement.getResourceId(), logElement.getResourceId());
-				assertSame(scheduleElement.getSolutionElement(), logElement.getSolutionElement());
+				assertSame(scheduleElement.getLogisticChainElement(), logElement.getLogisticChainElement());
 				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
 			}
 		}

@@ -23,7 +23,7 @@ package lsp.shipment;
 //import demand.UtilityFunction;
 
 import lsp.LSPResource;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -45,7 +45,7 @@ public final class ShipmentUtils {
 	public static final class LoggedShipmentHandleBuilder {
 		private double startTime;
 		private double endTime;
-		private LogisticsSolutionElement element;
+		private LogisticChainElement element;
 		private Id<LSPResource> resourceId;
 		private Id<Link> linkId;
 
@@ -64,7 +64,7 @@ public final class ShipmentUtils {
 			this.endTime = endTime;
 		}
 
-		public void setLogisticsSolutionElement(LogisticsSolutionElement element){
+		public void setLogisticsChainElement(LogisticChainElement element){
 			this.element = element;
 		}
 
@@ -90,7 +90,7 @@ public final class ShipmentUtils {
 			return endTime;
 		}
 
-		public LogisticsSolutionElement getElement() {
+		public LogisticChainElement getElement() {
 			return element;
 		}
 
@@ -106,7 +106,7 @@ public final class ShipmentUtils {
 	public static final class LoggedShipmentLoadBuilder {
 		private double startTime;
 		private double endTime;
-		private LogisticsSolutionElement element;
+		private LogisticChainElement element;
 		private Id<LSPResource> resourceId;
 		private Id<Carrier> carrierId;
 		private Id<Link> linkId;
@@ -126,7 +126,7 @@ public final class ShipmentUtils {
 			this.endTime = endTime;
 		}
 
-		public void setLogisticsSolutionElement(LogisticsSolutionElement element){
+		public void setLogisticsChainElement(LogisticChainElement element){
 			this.element = element;
 		}
 
@@ -156,7 +156,7 @@ public final class ShipmentUtils {
 			return endTime;
 		}
 
-		public LogisticsSolutionElement getElement() {
+		public LogisticChainElement getElement() {
 			return element;
 		}
 
@@ -175,7 +175,7 @@ public final class ShipmentUtils {
 
 	public static final class LoggedShipmentTransportBuilder {
 		private double startTime;
-		private LogisticsSolutionElement element;
+		private LogisticChainElement element;
 		private Id<LSPResource> resourceId;
 		private Id<Link> fromLinkId;
 		private Id<Link> toLinkId;
@@ -192,7 +192,7 @@ public final class ShipmentUtils {
 			this.startTime = startTime;
 		}
 
-		public void setLogisticsSolutionElement(LogisticsSolutionElement element){
+		public void setLogisticChainElement(LogisticChainElement element){
 			this.element = element;
 		}
 
@@ -221,7 +221,7 @@ public final class ShipmentUtils {
 			return startTime;
 		}
 
-		public LogisticsSolutionElement getElement() {
+		public LogisticChainElement getElement() {
 			return element;
 		}
 
@@ -245,7 +245,7 @@ public final class ShipmentUtils {
 	public static final class ScheduledShipmentUnloadBuilder {
 		double startTime;
 		double endTime;
-		LogisticsSolutionElement element;
+		LogisticChainElement element;
 		Id<LSPResource> resourceId;
 		Id<Carrier> carrierId;
 		Id<Link> linkId;
@@ -266,7 +266,7 @@ public final class ShipmentUtils {
 			this.endTime = endTime;
 		}
 
-		public void setLogisticsSolutionElement(LogisticsSolutionElement element) {
+		public void setLogisticsChainElement(LogisticChainElement element) {
 			this.element = element;
 		}
 
@@ -294,7 +294,7 @@ public final class ShipmentUtils {
 	public static final class ScheduledShipmentTransportBuilder {
 		double startTime;
 		double endTime;
-		LogisticsSolutionElement element;
+		LogisticChainElement element;
 		Id<LSPResource> resourceId;
 		Id<Carrier> carrierId;
 		Id<Link> fromLinkId;
@@ -316,7 +316,7 @@ public final class ShipmentUtils {
 			this.endTime = endTime;
 		}
 
-		public void setLogisticsSolutionElement(LogisticsSolutionElement element) {
+		public void setLogisticChainElement(LogisticChainElement element) {
 			this.element = element;
 		}
 
@@ -348,7 +348,7 @@ public final class ShipmentUtils {
 	public static final class ScheduledShipmentLoadBuilder {
 		double startTime;
 		double endTime;
-		LogisticsSolutionElement element;
+		LogisticChainElement element;
 		Id<LSPResource> resourceId;
 		Id<Carrier> carrierId;
 		Id<Link> linkId;
@@ -369,7 +369,7 @@ public final class ShipmentUtils {
 			this.endTime = endTime;
 		}
 
-		public void setLogisticsSolutionElement(LogisticsSolutionElement element) {
+		public void setLogisticChainElement(LogisticChainElement element) {
 			this.element = element;
 		}
 
@@ -397,7 +397,7 @@ public final class ShipmentUtils {
 	public static final class ScheduledShipmentHandleBuilder {
 		double startTime;
 		double endTime;
-		LogisticsSolutionElement element;
+		LogisticChainElement element;
 		Id<LSPResource> resourceId;
 
 		private ScheduledShipmentHandleBuilder() {
@@ -415,7 +415,7 @@ public final class ShipmentUtils {
 			this.endTime = endTime;
 		}
 
-		public void setLogisticsSolutionElement(LogisticsSolutionElement element) {
+		public void setLogisticsChainElement(LogisticChainElement element) {
 			this.element = element;
 		}
 
@@ -434,7 +434,7 @@ public final class ShipmentUtils {
 	public static final class LoggedShipmentUnloadBuilder {
 		double startTime;
 		double endTime;
-		LogisticsSolutionElement element;
+		LogisticChainElement element;
 		Id<LSPResource> resourceId;
 		Id<Carrier> carrierId;
 		Id<Link> linkId;
@@ -454,7 +454,7 @@ public final class ShipmentUtils {
 			this.endTime = endTime;
 		}
 
-		public void setLogisticsSolutionElement(LogisticsSolutionElement element) {
+		public void setLogisticChainElement(LogisticChainElement element) {
 			this.element = element;
 		}
 

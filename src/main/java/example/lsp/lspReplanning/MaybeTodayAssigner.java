@@ -37,11 +37,11 @@ import java.util.Random;
 	}
 
 	@Override
-	public void assignToSolution(LSPShipment shipment) {
+	public void assignToLogisticChain(LSPShipment shipment) {
 		boolean assignToday = random.nextBoolean();
 		if (assignToday) {
-			Gbl.assertIf(lsp.getSelectedPlan().getSolutions().size() == 1);
-			lsp.getSelectedPlan().getSolutions().iterator().next().assignShipment(shipment);
+			Gbl.assertIf(lsp.getSelectedPlan().getLogisticChain().size() == 1);
+			lsp.getSelectedPlan().getLogisticChain().iterator().next().assignShipment(shipment);
 		}
 	}
 

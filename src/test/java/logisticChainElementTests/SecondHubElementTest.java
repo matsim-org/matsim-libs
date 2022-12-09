@@ -18,11 +18,11 @@
  *  * ***********************************************************************
  */
 
-package solutionElementTests;
+package logisticChainElementTests;
 
 import lsp.LSPResource;
 import lsp.LSPUtils;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 public class SecondHubElementTest {
 
 	private LSPResource point;
-	private LogisticsSolutionElement hubElement;
+	private LogisticChainElement hubElement;
 
 	@Before
 	public void initialize() {
@@ -47,8 +47,8 @@ public class SecondHubElementTest {
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
 				.build();
 
-		hubElement = LSPUtils.LogisticsSolutionElementBuilder
-				.newInstance(Id.create("SecondHubElement", LogisticsSolutionElement.class))
+		hubElement = LSPUtils.LogisticChainElementBuilder
+				.newInstance(Id.create("SecondHubElement", LogisticChainElement.class))
 				.setResource(point)
 				.build();
 	}

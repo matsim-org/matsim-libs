@@ -99,22 +99,22 @@ public class MainRunOnlyLSPMobsimTest {
 		mainRunResourceBuilder.setCarrier(mainRunCarrier);
 		LSPResource mainRunResource = mainRunResourceBuilder.build();
 
-		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId);
+		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
 		mainRunBuilder.setResource(mainRunResource);
-		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
+		LogisticChainElement mainRunElement = mainRunBuilder.build();
 
 
-		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId);
+		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
 
-		completeSolutionBuilder.addSolutionElement(mainRunElement);
-		LogisticsSolution completeSolution = completeSolutionBuilder.build();
+		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
+		LogisticChain completeSolution = completeSolutionBuilder.build();
 
-		ShipmentAssigner assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
-		completePlan.addSolution(completeSolution);
+		completePlan.addLogisticChain(completeSolution);
 
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
@@ -122,9 +122,9 @@ public class MainRunOnlyLSPMobsimTest {
 
 		resourcesList.add(mainRunResource);
 
-		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
-		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
+		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
@@ -171,7 +171,7 @@ public class MainRunOnlyLSPMobsimTest {
 			LSPShipment shipment = builder.build();
 			lsp.assignShipmentToLSP(shipment);
 		}
-		lsp.scheduleSolutions();
+		lsp.scheduleLogisticChains();
 
 		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(lsp);
@@ -208,7 +208,7 @@ public class MainRunOnlyLSPMobsimTest {
 				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
 				assertEquals(scheduleElement.getElementType(), logElement.getElementType());
 				assertSame(scheduleElement.getResourceId(), logElement.getResourceId());
-				assertSame(scheduleElement.getSolutionElement(), logElement.getSolutionElement());
+				assertSame(scheduleElement.getLogisticChainElement(), logElement.getLogisticChainElement());
 				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
 			}
 		}

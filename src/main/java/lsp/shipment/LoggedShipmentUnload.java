@@ -21,7 +21,7 @@
 package lsp.shipment;
 
 import lsp.LSPResource;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -29,7 +29,7 @@ class LoggedShipmentUnload implements ShipmentActivity {
 
 	private final double startTime;
 	private final double endTime;
-	private final LogisticsSolutionElement element;
+	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
 
 	LoggedShipmentUnload(ShipmentUtils.LoggedShipmentUnloadBuilder builder) {
@@ -41,7 +41,7 @@ class LoggedShipmentUnload implements ShipmentActivity {
 
 
 	@Override
-	public LogisticsSolutionElement getSolutionElement() {
+	public LogisticChainElement getLogisticChainElement() {
 		return element;
 	}
 

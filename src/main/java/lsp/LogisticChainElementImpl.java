@@ -21,17 +21,17 @@
 package lsp;
 
 
-/* package-private */ class LogisticsSolutionElementImpl extends LSPDataObject<LogisticsSolutionElement> implements LogisticsSolutionElement {
+/* package-private */ class LogisticChainElementImpl extends LSPDataObject<LogisticChainElement> implements LogisticChainElement {
 
 	private final LSPResource resource;
 	private final WaitingShipments incomingShipments;
 	private final WaitingShipments outgoingShipments;
 	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
-	private LogisticsSolutionElement previousElement;
-	private LogisticsSolutionElement nextElement;
-	private LogisticsSolution solution;
+	private LogisticChainElement previousElement;
+	private LogisticChainElement nextElement;
+	private LogisticChain logisticChain;
 
-	LogisticsSolutionElementImpl(LSPUtils.LogisticsSolutionElementBuilder builder) {
+	LogisticChainElementImpl(LSPUtils.LogisticChainElementBuilder builder) {
 		super(builder.id);
 		this.resource = builder.resource;
 		this.incomingShipments = builder.incomingShipments;
@@ -40,9 +40,9 @@ package lsp;
 	}
 
 	@Override
-	public void connectWithNextElement(LogisticsSolutionElement element) {
+	public void connectWithNextElement(LogisticChainElement element) {
 		this.nextElement = element;
-		((LogisticsSolutionElementImpl) element).previousElement = this;
+		((LogisticChainElementImpl) element).previousElement = this;
 	}
 
 	@Override
@@ -62,17 +62,17 @@ package lsp;
 
 
 	@Override
-	public void setEmbeddingContainer(LogisticsSolution solution) {
-		this.solution = solution;
+	public void setEmbeddingContainer(LogisticChain solution) {
+		this.logisticChain = solution;
 	}
 
 	@Override
-	public LogisticsSolutionElement getPreviousElement() {
+	public LogisticChainElement getPreviousElement() {
 		return previousElement;
 	}
 
 	@Override
-	public LogisticsSolutionElement getNextElement() {
+	public LogisticChainElement getNextElement() {
 		return nextElement;
 	}
 

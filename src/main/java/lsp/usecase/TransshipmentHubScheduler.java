@@ -22,7 +22,7 @@ package lsp.usecase;
 
 import lsp.LSPResource;
 import lsp.LSPResourceScheduler;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import lsp.ShipmentWithTime;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -73,20 +73,20 @@ import java.util.ArrayList;
 		builder.setStartTime(tuple.getTime());
 		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getSize());
 		builder.setResourceId(transshipmentHub.getId());
-		for (LogisticsSolutionElement element : transshipmentHub.getClientElements()) {
+		for (LogisticChainElement element : transshipmentHub.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				builder.setLogisticsSolutionElement(element);
+				builder.setLogisticsChainElement(element);
 			}
 		}
 		builder.setLinkId(transshipmentHub.getStartLinkId());
 		ShipmentPlanElement handle = builder.build();
-		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
+		String idString = handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getShipmentPlan().addPlanElement(id, handle);
 	}
 
 	private void addShipmentToEventHandler(ShipmentWithTime tuple) {
-		for (LogisticsSolutionElement element : transshipmentHub.getClientElements()) {
+		for (LogisticChainElement element : transshipmentHub.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				eventHandler.addShipment(tuple.getShipment(), element);
 				break;

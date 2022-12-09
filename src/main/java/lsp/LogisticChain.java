@@ -20,36 +20,27 @@
 
 package lsp;
 
+import lsp.shipment.LSPShipment;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
+import java.util.Collection;
 
-public interface LogisticsSolutionElement extends Identifiable<LogisticsSolutionElement>, HasBackpointer<LogisticsSolution>, HasSimulationTrackers<LogisticsSolutionElement>, Attributable {
 
-	void connectWithNextElement(LogisticsSolutionElement element);
+/**
+ * A LogisticsSolution can be seen as a representative of a
+ * transport chain. It consists of several chain links that implement the interface
+ * {@link LogisticChainElement}. The latter is more a logical than a physical entity.
+ * Physical entities, in turn, are housed inside classes that implement the interface
+ * {@link LSPResource}. This introduction of an intermediate layer allows physical Resources
+ * to be used by several {@link LogisticChain}s and thus transport chains.
+ */
+public interface LogisticChain extends Identifiable<LogisticChain>, KnowsLSP, HasSimulationTrackers<LogisticChain>, Attributable {
 
-	/**
-	 * The logistics solution element wraps around a resource.  Don't know why we need this wrapping.
-	 *
-	 * @return the resource
-	 */
-	LSPResource getResource();
+	Collection<LogisticChainElement> getLogisticChainElements();
 
-	LogisticsSolutionElement getPreviousElement();
+	Collection<LSPShipment> getShipments();
 
-	LogisticsSolutionElement getNextElement();
-
-	/**
-	 * This collection stores LSPShipments that are waiting for their treatment in this element or more precisely the Resource that is in
-	 * charge of the actual physical handling.
-	 *
-	 * @return WaitingShipments
-	 */
-	WaitingShipments getIncomingShipments();
-
-	/**
-	 * Shipments that have already been treated.
-	 */
-	WaitingShipments getOutgoingShipments();
+	void assignShipment(LSPShipment shipment);
 
 }

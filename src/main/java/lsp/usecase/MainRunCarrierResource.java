@@ -23,7 +23,7 @@ package lsp.usecase;
 import lsp.LSPCarrierResource;
 import lsp.LSPDataObject;
 import lsp.LSPResource;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,7 +40,7 @@ import java.util.Collection;
 	private final Carrier carrier;
 	private final Id<Link> fromLinkId;
 	private final Id<Link> toLinkId;
-	private final Collection<LogisticsSolutionElement> clientElements;
+	private final Collection<LogisticChainElement> clientElements;
 	private final MainRunCarrierScheduler mainRunScheduler;
 
 	private final UsecaseUtils.VehicleReturn vehicleReturn;
@@ -74,7 +74,7 @@ import java.util.Collection;
 	}
 
 	@Override
-	public Collection<LogisticsSolutionElement> getClientElements() {
+	public Collection<LogisticChainElement> getClientElements() {
 		return clientElements;
 	}
 

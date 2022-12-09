@@ -22,7 +22,7 @@ package lsp.usecase;
 
 import lsp.LSPResource;
 import lsp.LSPUtils;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 public class FirstHubElementTest {
 
 	private TransshipmentHub point;
-	private LogisticsSolutionElement reloadingElement;
+	private LogisticChainElement reloadingElement;
 
 	@Before
 	public void initialize() {
@@ -46,8 +46,8 @@ public class FirstHubElementTest {
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
 				.build();
 
-		reloadingElement = LSPUtils.LogisticsSolutionElementBuilder
-				.newInstance(Id.create("FirstHubElement", LogisticsSolutionElement.class))
+		reloadingElement = LSPUtils.LogisticChainElementBuilder
+				.newInstance(Id.create("FirstHubElement", LogisticChainElement.class))
 				.setResource(point)
 				.build();
 	}

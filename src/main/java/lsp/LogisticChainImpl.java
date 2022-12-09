@@ -27,17 +27,17 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/* package-private */ class LogisticsSolutionImpl extends LSPDataObject<LogisticsSolution> implements LogisticsSolution {
-	private static final Logger log = LogManager.getLogger(LogisticsSolutionImpl.class);
+/* package-private */ class LogisticChainImpl extends LSPDataObject<LogisticChain> implements LogisticChain {
+	private static final Logger log = LogManager.getLogger(LogisticChainImpl.class);
 
-	private final Collection<LogisticsSolutionElement> solutionElements;
+	private final Collection<LogisticChainElement> logisticChainElements;
 	private final Collection<LSPShipment> shipments;
 	private LSP lsp;
 
-	LogisticsSolutionImpl(LSPUtils.LogisticsSolutionBuilder builder) {
+	LogisticChainImpl(LSPUtils.LogisticChainBuilder builder) {
 		super(builder.id);
-		this.solutionElements = builder.elements;
-		for (LogisticsSolutionElement element : this.solutionElements) {
+		this.logisticChainElements = builder.elements;
+		for (LogisticChainElement element : this.logisticChainElements) {
 			element.setEmbeddingContainer(this);
 		}
 		this.shipments = new ArrayList<>();
@@ -54,8 +54,8 @@ import java.util.Collection;
 	}
 
 	@Override
-	public Collection<LogisticsSolutionElement> getSolutionElements() {
-		return solutionElements;
+	public Collection<LogisticChainElement> getLogisticChainElements() {
+		return logisticChainElements;
 	}
 
 	@Override
@@ -71,10 +71,10 @@ import java.util.Collection;
 	@Override public String toString() {
 		StringBuilder strb = new StringBuilder();
 		strb.append("LogisticsSolutionImpl{")
-				.append("[No of SolutionsElements=").append(solutionElements.size()).append("] \n");
-		if (!solutionElements.isEmpty()){
+				.append("[No of SolutionsElements=").append(logisticChainElements.size()).append("] \n");
+		if (!logisticChainElements.isEmpty()){
 			strb.append("{SolutionElements=");
-			for  (LogisticsSolutionElement solutionElement : solutionElements) {
+			for  (LogisticChainElement solutionElement : logisticChainElements) {
 				strb.append("\n [" + solutionElement.toString() + "]");
 			}
 			strb.append("}");

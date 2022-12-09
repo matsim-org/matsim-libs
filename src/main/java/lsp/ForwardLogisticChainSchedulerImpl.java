@@ -27,14 +27,14 @@ import java.util.ArrayList;
 /**
  * ....
  * Macht 3 Schritte:
- * 1.) the LSPShipments are handed over to the first {@link LogisticsSolutionElement} of their {@link LogisticsSolution}
+ * 1.) the LSPShipments are handed over to the first {@link LogisticChainElement} of their {@link LogisticChain}
  * 2.) the neighbors, i.e. the predecessors and successors of all {@link LSPResource}s are determined
  * 3.) the Resources are brought into the right sequence according to the algorithm.
  * <p>
  * When traversing this list of {@link LSPResource}s, the operations in
  * each {@link LSPResource} are scheduled individually by calling their {@link LSPResourceScheduler}.
  */
-/* package-private */ class ForwardSolutionSchedulerImpl implements SolutionScheduler {
+/* package-private */ class ForwardLogisticChainSchedulerImpl implements LogisticChainScheduler {
 
 	/**
 	 * The Resources are brought into the right sequence according to the algorithm.
@@ -50,13 +50,13 @@ import java.util.ArrayList;
 	private LSP lsp;
 	private int bufferTime;
 
-	ForwardSolutionSchedulerImpl() {
+	ForwardLogisticChainSchedulerImpl() {
 		this.sortedResourceList = new ArrayList<>();
 		this.neighbourList = new ArrayList<>();
 	}
 
 	@Override
-	public void scheduleSolutions() {
+	public void scheduleLogisticChain() {
 		insertShipmentsAtBeginning();
 		setResourceNeighbours();
 		sortResources();
@@ -75,11 +75,11 @@ import java.util.ArrayList;
 		neighbourList.clear();
 		for (LSPResource resource : lsp.getResources()) {
 			ResourceNeighbours neighbours = new ResourceNeighbours(resource);
-			for (LogisticsSolutionElement element : resource.getClientElements()) {
-				LogisticsSolutionElement predecessor = element.getPreviousElement();
+			for (LogisticChainElement element : resource.getClientElements()) {
+				LogisticChainElement predecessor = element.getPreviousElement();
 				LSPResource previousResource = predecessor.getResource();
 				neighbours.addPredecessor(previousResource);
-				LogisticsSolutionElement successor = element.getNextElement();
+				LogisticChainElement successor = element.getNextElement();
 				LSPResource nextResource = successor.getResource();
 				neighbours.addSuccessor(nextResource);
 			}
@@ -126,16 +126,16 @@ import java.util.ArrayList;
 	}
 
 	private void insertShipmentsAtBeginning() {
-		for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-			LogisticsSolutionElement firstElement = getFirstElement(solution);
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+			LogisticChainElement firstElement = getFirstElement(solution);
 			for (LSPShipment shipment : solution.getShipments()) {
 				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment);
 			}
 		}
 	}
 
-	private LogisticsSolutionElement getFirstElement(LogisticsSolution solution) {
-		for (LogisticsSolutionElement element : solution.getSolutionElements()) {
+	private LogisticChainElement getFirstElement(LogisticChain solution) {
+		for (LogisticChainElement element : solution.getLogisticChainElements()) {
 			if (element.getPreviousElement() == null) {
 				return element;
 			}
@@ -151,7 +151,7 @@ import java.util.ArrayList;
 	/**
 	 * The relationship between different {@link LSPResource}s allows to handle various supply
 	 * structures that the {@link LSP} might decide to maintain. Thus, a {@link LSPResource} can have several
-	 * successors or predecessors or can be used by several different {@link LogisticsSolution}s.
+	 * successors or predecessors or can be used by several different {@link LogisticChain}s.
 	 * The neighborhood structure among the {@link LSPResource}s is stored in instances of the class
 	 * {@link ResourceNeighbours} which contain references on the considered {@link LSPResource}  and on the set
 	 * of immediate successors respective predecessors. As the result of this step, a collection of

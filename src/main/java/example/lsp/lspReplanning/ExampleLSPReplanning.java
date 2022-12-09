@@ -82,22 +82,22 @@ import java.util.*;
 		LSPResource collectionResource = adapterBuilder.build();
 
 		//The adapter is now inserted into the only LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
+		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionResource);
-		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
+		LogisticChainElement collectionElement = collectionElementBuilder.build();
 
 		//The LogisticsSolutionElement is now inserted into the only LogisticsSolution of the LSP
-		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addSolutionElement(collectionElement);
-		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
+		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
+		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
+		LogisticChain collectionSolution = collectionSolutionBuilder.build();
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-		ShipmentAssigner assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		collectionPlan.setAssigner(assigner);
-		collectionPlan.addSolution(collectionSolution);
+		collectionPlan.addLogisticChain(collectionSolution);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
@@ -105,8 +105,8 @@ import java.util.*;
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionResource);
-		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
-		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
+		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 
 		LSP lsp = collectionLSPBuilder.build();
 
@@ -225,11 +225,11 @@ import java.util.*;
 		controler.run();
 
 		System.out.println("Shipments delivered today:");
-		for (LSPShipment shipment : lsp.getSelectedPlan().getSolutions().iterator().next().getShipments()) {
+		for (LSPShipment shipment : lsp.getSelectedPlan().getLogisticChain().iterator().next().getShipments()) {
 			System.out.println(shipment.getId());
 		}
 
-		lsp.getShipments().removeAll(lsp.getSelectedPlan().getSolutions().iterator().next().getShipments());
+		lsp.getShipments().removeAll(lsp.getSelectedPlan().getLogisticChain().iterator().next().getShipments());
 
 		System.out.println("Shipments delivered tomorrow:");
 		for (LSPShipment shipment : lsp.getShipments()) {

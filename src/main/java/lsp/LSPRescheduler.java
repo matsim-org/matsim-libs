@@ -62,9 +62,9 @@ final class LSPRescheduler {
 	static void notifyReplanning(LSPs lsps, ReplanningEvent event) {
 		if (event.getIteration() != 0) {
 			for (LSP lsp : lsps.getLSPs().values()) {
-				for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+				for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
 					solution.getShipments().clear();
-					for (LogisticsSolutionElement element : solution.getSolutionElements()) {
+					for (LogisticChainElement element : solution.getLogisticChainElements()) {
 						element.getIncomingShipments().clear();
 						element.getOutgoingShipments().clear();
 					}
@@ -73,9 +73,9 @@ final class LSPRescheduler {
 				for (LSPShipment shipment : lsp.getShipments()) {
 					shipment.getShipmentPlan().clear();
 					shipment.getLog().clear();
-					lsp.getSelectedPlan().getAssigner().assignToSolution(shipment);
+					lsp.getSelectedPlan().getAssigner().assignToLogisticChain(shipment);
 				}
-				lsp.scheduleSolutions();
+				lsp.scheduleLogisticChains();
 			}
 		}
 	}

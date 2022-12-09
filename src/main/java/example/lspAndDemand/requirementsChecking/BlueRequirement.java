@@ -20,7 +20,7 @@
 
 package example.lspAndDemand.requirementsChecking;
 
-import lsp.LogisticsSolution;
+import lsp.LogisticChain;
 import lsp.shipment.Requirement;
 
 import static example.lspAndDemand.requirementsChecking.ExampleCheckRequirementsOfAssigner.ATTRIBUTE_COLOR;
@@ -30,7 +30,7 @@ import static example.lspAndDemand.requirementsChecking.ExampleCheckRequirements
 	static final String BLUE = "blue";
 
 	@Override
-	public boolean checkRequirement(LogisticsSolution solution) {
+	public boolean checkRequirement(LogisticChain solution) {
 		return solution.getAttributes().getAttribute(ATTRIBUTE_COLOR).equals(BLUE);
 	}
 

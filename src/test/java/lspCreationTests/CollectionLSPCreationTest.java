@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
 
 public class CollectionLSPCreationTest {
 
-	private LogisticsSolution collectionSolution;
+	private LogisticChain logisticChain;
 	private ShipmentAssigner assigner;
 	private LSPPlan collectionPlan;
 	private LSP collectionLSP;
@@ -85,28 +85,28 @@ public class CollectionLSPCreationTest {
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
 
-		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
+		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionResource);
-		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
+		LogisticChainElement collectionElement = collectionElementBuilder.build();
 
-		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addSolutionElement(collectionElement);
-		collectionSolution = collectionSolutionBuilder.build();
+		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
+		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
+		logisticChain = collectionSolutionBuilder.build();
 
-		assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
+		assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
-		collectionPlan.addSolution(collectionSolution);
+		collectionPlan.addLogisticChain(logisticChain);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionResource);
 
-		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
-		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
+		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	}
 
@@ -119,8 +119,8 @@ public class CollectionLSPCreationTest {
 		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
 		assertSame(selectedPlan.getLSP(), collectionLSP);
 		assertSame(selectedPlan.getAssigner(), assigner);
-		assertSame(selectedPlan.getSolutions().iterator().next(), collectionSolution);
-		assertSame(selectedPlan.getSolutions().iterator().next().getLSP(), collectionLSP);
+		assertSame(selectedPlan.getLogisticChain().iterator().next(), logisticChain);
+		assertSame(selectedPlan.getLogisticChain().iterator().next().getLSP(), collectionLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== collectionLSP);
 		assertSame(selectedPlan.getLSP(), collectionLSP);
 	}

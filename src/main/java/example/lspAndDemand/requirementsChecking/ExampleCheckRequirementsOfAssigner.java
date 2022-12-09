@@ -77,15 +77,15 @@ class ExampleCheckRequirementsOfAssigner {
 		redResourceBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource redResource = redResourceBuilder.build();
 
-		Id<LogisticsSolutionElement> redElementId = Id.create("RedElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder redElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(redElementId);
+		Id<LogisticChainElement> redElementId = Id.create("RedElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder redElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(redElementId);
 		redElementBuilder.setResource(redResource);
-		LogisticsSolutionElement redElement = redElementBuilder.build();
+		LogisticChainElement redElement = redElementBuilder.build();
 
-		Id<LogisticsSolution> redSolutionId = Id.create("RedSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder redSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(redSolutionId);
-		redSolutionBuilder.addSolutionElement(redElement);
-		LogisticsSolution redSolution = redSolutionBuilder.build();
+		Id<LogisticChain> redSolutionId = Id.create("RedSolution", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder redSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(redSolutionId);
+		redSolutionBuilder.addLogisticChainElement(redElement);
+		LogisticChain redSolution = redSolutionBuilder.build();
 
 		//Add info that shows the world the color of the solution
 //		redSolution.getAttributes().add(new RedInfo() );
@@ -112,15 +112,15 @@ class ExampleCheckRequirementsOfAssigner {
 		blueResourceBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource blueResource = blueResourceBuilder.build();
 
-		Id<LogisticsSolutionElement> blueElementId = Id.create("BlueCElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder blueElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(blueElementId);
+		Id<LogisticChainElement> blueElementId = Id.create("BlueCElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder blueElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(blueElementId);
 		blueElementBuilder.setResource(blueResource);
-		LogisticsSolutionElement blueElement = blueElementBuilder.build();
+		LogisticChainElement blueElement = blueElementBuilder.build();
 
-		Id<LogisticsSolution> blueSolutionId = Id.create("BlueSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder blueSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(blueSolutionId);
-		blueSolutionBuilder.addSolutionElement(blueElement);
-		LogisticsSolution blueSolution = blueSolutionBuilder.build();
+		Id<LogisticChain> blueSolutionId = Id.create("BlueSolution", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder blueSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(blueSolutionId);
+		blueSolutionBuilder.addLogisticChainElement(blueElement);
+		LogisticChain blueSolution = blueSolutionBuilder.build();
 
 		//Add info that shows the world the color of the solution
 //		blueSolution.getAttributes().add(new BlueInfo() );
@@ -131,8 +131,8 @@ class ExampleCheckRequirementsOfAssigner {
 		LSPPlan plan = LSPUtils.createLSPPlan();
 		ShipmentAssigner assigner = new RequirementsAssigner();
 		plan.setAssigner(assigner);
-		plan.addSolution(redSolution);
-		plan.addSolution(blueSolution);
+		plan.addLogisticChain(redSolution);
+		plan.addLogisticChain(blueSolution);
 
 		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		lspBuilder.setInitialPlan(plan);
@@ -140,8 +140,8 @@ class ExampleCheckRequirementsOfAssigner {
 		resourcesList.add(redResource);
 		resourcesList.add(blueResource);
 
-		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
-		lspBuilder.setSolutionScheduler(simpleScheduler);
+		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		lspBuilder.setLogisticChainScheduler(simpleScheduler);
 		return lspBuilder.build();
 	}
 
@@ -207,7 +207,7 @@ class ExampleCheckRequirementsOfAssigner {
 			lsp.assignShipmentToLSP(shipment);
 		}
 
-		for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
 			if (solution.getId().toString().equals("RedSolution")) {
 				for (LSPShipment shipment : solution.getShipments()) {
 					if (!(shipment.getRequirements().iterator().next() instanceof RedRequirement)) {
