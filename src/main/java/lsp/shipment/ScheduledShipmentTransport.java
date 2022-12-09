@@ -52,8 +52,7 @@ final class ScheduledShipmentTransport implements ShipmentLeg {
 
 	@Override
 	public String getElementType() {
-		String type = "TRANSPORT";
-		return type;
+		return "TRANSPORT";
 	}
 
 	@Override

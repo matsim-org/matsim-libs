@@ -42,8 +42,7 @@ class ScheduledShipmentHandle implements ShipmentActivity {
 
 	@Override
 	public String getElementType() {
-		String type = "HANDLE";
-		return type;
+		return "HANDLE";
 	}
 
 	@Override

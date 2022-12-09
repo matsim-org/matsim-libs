@@ -91,13 +91,12 @@ import java.util.*;
 		LSPPlan lspPlan = LSPUtils.createLSPPlan().setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner()).addLogisticChain(logisticChain);
 
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
-		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
+
+		return LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 				.setInitialPlan(lspPlan)
 				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.singletonList(lspResource)))
 //				.setSolutionScorer(new TipScorer())
 				.build();
-
-		return lsp;
 	}
 
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network) {

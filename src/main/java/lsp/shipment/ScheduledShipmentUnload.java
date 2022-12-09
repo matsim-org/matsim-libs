@@ -50,8 +50,7 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 
 	@Override
 	public String getElementType() {
-		String type = "UNLOAD";
-		return type;
+		return "UNLOAD";
 	}
 
 	@Override

@@ -51,8 +51,7 @@ class ScheduledShipmentLoad implements ShipmentActivity {
 
 	@Override
 	public String getElementType() {
-		String type = "LOAD";
-		return type;
+		return "LOAD";
 	}
 
 	@Override

@@ -54,8 +54,7 @@ import org.matsim.api.core.v01.network.Link;
 
 	@Override
 	public String getElementType() {
-		String type = "HANDLE";
-		return type;
+		return "HANDLE";
 	}
 
 	@Override
