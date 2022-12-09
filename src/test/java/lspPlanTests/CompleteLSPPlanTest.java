@@ -105,8 +105,6 @@ public class CompleteLSPPlanTest {
 		firstHubElementBuilder.setResource(firstTransshipmentHubBuilder.build());
 		LogisticChainElement firstHubElement = firstHubElementBuilder.build();
 
-		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
-		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder mainRunVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(collectionVehicleTypeId);
 		mainRunVehicleTypeBuilder.setCapacity(30);
 		mainRunVehicleTypeBuilder.setCostPerDistanceUnit(0.0002);

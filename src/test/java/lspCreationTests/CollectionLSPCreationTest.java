@@ -44,7 +44,6 @@ public class CollectionLSPCreationTest {
 
 	private LogisticChain logisticChain;
 	private ShipmentAssigner assigner;
-	private LSPPlan collectionPlan;
 	private LSP collectionLSP;
 
 	@Before
