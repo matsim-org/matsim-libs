@@ -57,13 +57,13 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	 */
 	private class EventBasedScoring implements SumScoringFunction.ArbitraryEventScoring {
 
-		Logger log = LogManager.getLogger(EventBasedScoring.class);
+		final Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Carrier carrier;
 		private double score;
 
 		private final double MAX_SHIFT_DURATION = 8 * 3600;
-		private Map<VehicleType, Double>  vehicleType2TourDuration = new LinkedHashMap<>();
-		private Map<VehicleType, Integer>  vehicleType2ScoredFixCosts = new LinkedHashMap<>();
+		private final Map<VehicleType, Double>  vehicleType2TourDuration = new LinkedHashMap<>();
+		private final Map<VehicleType, Integer>  vehicleType2ScoredFixCosts = new LinkedHashMap<>();
 
 		private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
 
@@ -149,7 +149,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	 */
 	class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
 
-		Logger log = LogManager.getLogger(EventBasedScoring.class);
+		final Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Carrier carrier;
 		private final double toll;
 		private double score;
