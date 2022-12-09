@@ -55,12 +55,12 @@ public class UsecaseUtils {
 		return new MainRunCarrierScheduler();
 	}
 
-	public static SimpleForwardSolutionScheduler createDefaultSimpleForwardSolutionScheduler(List<LSPResource> resources) {
-		return new SimpleForwardSolutionScheduler(resources);
+	public static SimpleForwardLogisticChainScheduler createDefaultSimpleForwardLogisticChainScheduler(List<LSPResource> resources) {
+		return new SimpleForwardLogisticChainScheduler(resources);
 	}
 
-	public static SingleSolutionShipmentAssigner createSingleSolutionShipmentAssigner() {
-		return new SingleSolutionShipmentAssigner();
+	public static SingleLogisticChainShipmentAssigner createSingleLogisticChainShipmentAssigner() {
+		return new SingleLogisticChainShipmentAssigner();
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class UsecaseUtils {
 				System.out.println(str1);
 				writer.write(str1 + "\n");
 				for (ShipmentPlanElement element : elementList) {
-					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+					final String str2 = element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
 					System.out.println(str2);
 					writer.write(str2 + "\n");
 				}
@@ -138,11 +138,11 @@ public class UsecaseUtils {
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getLog().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-				final String str1 = "Shipment: " + shipment.toString();
+				final String str1 = "Shipment: " + shipment;
 				System.out.println(str1);
 				writer.write(str1 + "\n");
 				for (ShipmentPlanElement element : elementList) {
-					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+					final String str2 = element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
 					System.out.println(str2);
 					writer.write(str2 + "\n");
 				}
@@ -184,7 +184,7 @@ public class UsecaseUtils {
 	public static class CollectionCarrierResourceBuilder {
 
 		final Id<LSPResource> id;
-		final ArrayList<LogisticsSolutionElement> clientElements;
+		final ArrayList<LogisticChainElement> clientElements;
 		final Network network;
 		Carrier carrier;
 		Id<Link> locationLinkId;
@@ -227,7 +227,7 @@ public class UsecaseUtils {
 	public static class DistributionCarrierResourceBuilder {
 
 		final Id<LSPResource> id;
-		final ArrayList<LogisticsSolutionElement> clientElements;
+		final ArrayList<LogisticChainElement> clientElements;
 		final Network network;
 		Carrier carrier;
 		Id<Link> locationLinkId;
@@ -269,7 +269,7 @@ public class UsecaseUtils {
 	public static class MainRunCarrierResourceBuilder {
 
 		private final Id<LSPResource> id;
-		private final ArrayList<LogisticsSolutionElement> clientElements;
+		private final ArrayList<LogisticChainElement> clientElements;
 		private final Network network;
 		private Carrier carrier;
 		private Id<Link> fromLinkId;
@@ -334,7 +334,7 @@ public class UsecaseUtils {
 			return toLinkId;
 		}
 
-		ArrayList<LogisticsSolutionElement> getClientElements() {
+		ArrayList<LogisticChainElement> getClientElements() {
 			return clientElements;
 		}
 
@@ -390,7 +390,7 @@ public class UsecaseUtils {
 
 		private final Id<LSPResource> id;
 		private final Id<Link> locationLinkId;
-		private final ArrayList<LogisticsSolutionElement> clientElements;
+		private final ArrayList<LogisticChainElement> clientElements;
 		private TransshipmentHubScheduler transshipmentHubScheduler;
 		private final Scenario scenario;
 
@@ -427,7 +427,7 @@ public class UsecaseUtils {
 			return transshipmentHubScheduler;
 		}
 
-		ArrayList<LogisticsSolutionElement> getClientElements() {
+		ArrayList<LogisticChainElement> getClientElements() {
 			return clientElements;
 		}
 

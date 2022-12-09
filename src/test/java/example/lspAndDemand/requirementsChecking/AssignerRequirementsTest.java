@@ -46,8 +46,8 @@ import static org.junit.Assert.assertTrue;
 
 public class AssignerRequirementsTest {
 
-	private LogisticsSolution blueSolution;
-	private LogisticsSolution redSolution;
+	private LogisticChain blueChain;
+	private LogisticChain redChain;
 
 	@Before
 	public void initialize() {
@@ -87,22 +87,22 @@ public class AssignerRequirementsTest {
 		redResourceBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource redCollectionResource = redResourceBuilder.build();
 
-		Id<LogisticsSolutionElement> redElementId = Id.create("RedCollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder redCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(redElementId);
+		Id<LogisticChainElement> redElementId = Id.create("RedCollectionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder redCollectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(redElementId);
 		redCollectionElementBuilder.setResource(redCollectionResource);
-		LogisticsSolutionElement redCollectionElement = redCollectionElementBuilder.build();
+		LogisticChainElement redCollectionElement = redCollectionElementBuilder.build();
 
-		Id<LogisticsSolution> redCollectionSolutionId = Id.create("RedCollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder redCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(redCollectionSolutionId);
-		redCollectionSolutionBuilder.addSolutionElement(redCollectionElement);
-		redSolution = redCollectionSolutionBuilder.build();
+		Id<LogisticChain> redCollectionSolutionId = Id.create("RedCollectionSolution", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder redCollectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(redCollectionSolutionId);
+		redCollectionSolutionBuilder.addLogisticChainElement(redCollectionElement);
+		redChain = redCollectionSolutionBuilder.build();
 //		redSolution.getAttributes().add(new RedInfo() );
-		redSolution.getAttributes().putAttribute("color", "red");
+		redChain.getAttributes().putAttribute("color", "red");
 
 		ShipmentAssigner assigner = new RequirementsAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
-		collectionPlan.addSolution(redSolution);
+		collectionPlan.addLogisticChain(redChain);
 
 		Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
 		Id<Vehicle> blueVehicleId = Id.createVehicleId("BlueVehicle");
@@ -123,18 +123,18 @@ public class AssignerRequirementsTest {
 		blueResourceBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource blueCollectionResource = blueResourceBuilder.build();
 
-		Id<LogisticsSolutionElement> blueElementId = Id.create("BlueCollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder blueCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(blueElementId);
+		Id<LogisticChainElement> blueElementId = Id.create("BlueCollectionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder blueCollectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(blueElementId);
 		blueCollectionElementBuilder.setResource(blueCollectionResource);
-		LogisticsSolutionElement blueCollectionElement = blueCollectionElementBuilder.build();
+		LogisticChainElement blueCollectionElement = blueCollectionElementBuilder.build();
 
-		Id<LogisticsSolution> blueCollectionSolutionId = Id.create("BlueCollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder blueCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(blueCollectionSolutionId);
-		blueCollectionSolutionBuilder.addSolutionElement(blueCollectionElement);
-		blueSolution = blueCollectionSolutionBuilder.build();
+		Id<LogisticChain> blueCollectionSolutionId = Id.create("BlueCollectionSolution", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder blueCollectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(blueCollectionSolutionId);
+		blueCollectionSolutionBuilder.addLogisticChainElement(blueCollectionElement);
+		blueChain = blueCollectionSolutionBuilder.build();
 //		blueSolution.getAttributes().add(new BlueInfo() );
-		blueSolution.getAttributes().putAttribute("color", "blue");
-		collectionPlan.addSolution(blueSolution);
+		blueChain.getAttributes().putAttribute("color", "blue");
+		collectionPlan.addLogisticChain(blueChain);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
@@ -142,8 +142,8 @@ public class AssignerRequirementsTest {
 		resourcesList.add(redCollectionResource);
 		resourcesList.add(blueCollectionResource);
 
-		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
-		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
+		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		LSP collectionLSP = collectionLSPBuilder.build();
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
@@ -188,10 +188,10 @@ public class AssignerRequirementsTest {
 
 	@Test
 	public void testAssignerRequirements() {
-		for (LSPShipment shipment : blueSolution.getShipments()) {
+		for (LSPShipment shipment : blueChain.getShipments()) {
 			assertTrue(shipment.getRequirements().iterator().next() instanceof BlueRequirement);
 		}
-		for (LSPShipment shipment : redSolution.getShipments()) {
+		for (LSPShipment shipment : redChain.getShipments()) {
 			assertTrue(shipment.getRequirements().iterator().next() instanceof RedRequirement);
 		}
 	}

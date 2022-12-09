@@ -43,7 +43,7 @@ public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<
 	/**
 	 * ok (behavioral method)
 	 */
-	void scheduleSolutions();
+	void scheduleLogisticChains();
 
 
 	/**

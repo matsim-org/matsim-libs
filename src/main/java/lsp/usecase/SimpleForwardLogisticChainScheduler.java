@@ -29,34 +29,34 @@ import java.util.List;
  * In the class SimpleForwardSolutionScheduler two tasks are performed:
  * <p>
  * 1.) the {@link LSPShipment}s that were assigned to the suitable
- * {@link LogisticsSolution} by the {@link lsp.ShipmentAssigner} in a previous step are handed over to the first
- * {@link LogisticsSolutionElement}.
+ * {@link LogisticChain} by the {@link lsp.ShipmentAssigner} in a previous step are handed over to the first
+ * {@link LogisticChainElement}.
  * <p>
  * 2.) all {@link LSPResource}s that were handed over to the SimpleForwardSolutionScheduler
  * exogenously, are now scheduled sequentially in an order that was also specified exogenously.
- * This order ensures that each {@link LogisticsSolution} is traversed from the
- * first to the last {@link LogisticsSolutionElement}. During this procedure, the concerned
+ * This order ensures that each {@link LogisticChain} is traversed from the
+ * first to the last {@link LogisticChainElement}. During this procedure, the concerned
  * {@link LSPShipment}s  are taken from the collection of incoming shipments, handled by the
  * {@link LSPResource} in charge and then added to the collection of outgoing shipments of the client
- * {@link LogisticsSolutionElement}.
+ * {@link LogisticChainElement}.
  * <p>
  * The SimpleForwardSolutionScheduler needs the sequence in which the Resources are scheduled as exogenous input.
  * <p>
  * The expression "`forward"' refers to the fact that in both cases the scheduling process starts at the first element
- * of each {@link LogisticsSolution} and from the earliest possible point of time.
+ * of each {@link LogisticChain} and from the earliest possible point of time.
  */
-/*package-private*/ class SimpleForwardSolutionScheduler implements SolutionScheduler {
+/*package-private*/ class SimpleForwardLogisticChainScheduler implements LogisticChainScheduler {
 
 	private final List<LSPResource> resources;
 	private LSP lsp;
 	private int bufferTime;
 
-	SimpleForwardSolutionScheduler(List<LSPResource> resources) {
+	SimpleForwardLogisticChainScheduler(List<LSPResource> resources) {
 		this.resources = resources;
 	}
 
 	@Override
-	public void scheduleSolutions() {
+	public void scheduleLogisticChain() {
 		insertShipmentsAtBeginning();
 		for (LSPResource resource : resources) {
 			for (LSPResource lspResource : lsp.getResources()) {
@@ -74,8 +74,8 @@ import java.util.List;
 
 
 	private void insertShipmentsAtBeginning() {
-		for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-			LogisticsSolutionElement firstElement = getFirstElement(solution);
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+			LogisticChainElement firstElement = getFirstElement(solution);
 			for (LSPShipment shipment : solution.getShipments()) {
 				assert firstElement != null;
 				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment);
@@ -83,8 +83,8 @@ import java.util.List;
 		}
 	}
 
-	private LogisticsSolutionElement getFirstElement(LogisticsSolution solution) {
-		for (LogisticsSolutionElement element : solution.getSolutionElements()) {
+	private LogisticChainElement getFirstElement(LogisticChain solution) {
+		for (LogisticChainElement element : solution.getLogisticChainElements()) {
 			if (element.getPreviousElement() == null) {
 				return element;
 			}

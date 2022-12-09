@@ -18,12 +18,12 @@
  *  * ***********************************************************************
  */
 
-package solutionTests;
+package logisticChainTests;
 
 import lsp.LSPResource;
 import lsp.LSPUtils;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChain;
+import lsp.LogisticChainElement;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,14 +43,14 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class CompleteSolutionTest {
+public class CompleteLogisticChainTest {
 
-	private LogisticsSolutionElement collectionElement;
-	private LogisticsSolutionElement firstHubElement;
-	private LogisticsSolutionElement mainRunElement;
-	private LogisticsSolutionElement secondHubElement;
-	private LogisticsSolutionElement distributionElement;
-	private LogisticsSolution solution;
+	private LogisticChainElement collectionElement;
+	private LogisticChainElement firstHubElement;
+	private LogisticChainElement mainRunElement;
+	private LogisticChainElement secondHubElement;
+	private LogisticChainElement distributionElement;
+	private LogisticChain logisticChain;
 
 	@Before
 	public void initialize() {
@@ -91,9 +91,9 @@ public class CompleteSolutionTest {
 		collectionResourceBuilder.setCarrier(collectionCarrier);
 		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 
-		Id<LogisticsSolutionElement> collectionElementId = Id.create("CollectionElement",
-				LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder
+		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement",
+				LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(collectionElementId);
 		collectionBuilder.setResource(collectionResourceBuilder.build());
 		collectionElement = collectionBuilder.build();
@@ -109,15 +109,13 @@ public class CompleteSolutionTest {
 				firstTransshipmentHub_LinkId, scenario);
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 
-		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FiretHubElement",
-				LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
+		Id<LogisticChainElement> firstHubElementId = Id.create("FiretHubElement",
+				LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder firstHubElementBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(firstHubElementId);
 		firstHubElementBuilder.setResource(firstTransshipmentHubBuilder.build());
 		firstHubElement = firstHubElementBuilder.build();
 
-		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
-		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder mainRunVehicleTypeBuilder = CarrierVehicleType.Builder
 				.newInstance(collectionVehicleTypeId);
 		mainRunVehicleTypeBuilder.setCapacity(30);
@@ -147,8 +145,8 @@ public class CompleteSolutionTest {
 		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
 		mainRunResourceBuilder.setCarrier(collectionCarrier);
 
-		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder
+		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(mainRunElementId);
 		mainRunBuilder.setResource(mainRunResourceBuilder.build());
 		mainRunElement = mainRunBuilder.build();
@@ -164,9 +162,9 @@ public class CompleteSolutionTest {
 				secondTransshipmentHub_LinkId, scenario);
 		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
 
-		Id<LogisticsSolutionElement> secondHubElementId = Id.create("SecondHubElement",
-				LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder secondHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
+		Id<LogisticChainElement> secondHubElementId = Id.create("SecondHubElement",
+				LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder secondHubElementBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(secondHubElementId);
 		secondHubElementBuilder.setResource(secondTransshipmentHubBuilder.build());
 		secondHubElement = secondHubElementBuilder.build();
@@ -201,9 +199,9 @@ public class CompleteSolutionTest {
 		distributionResourceBuilder.setCarrier(carrier);
 		distributionResourceBuilder.setLocationLinkId(distributionLinkId);
 
-		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement",
-				LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder
+		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement",
+				LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder distributionBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(distributionElementId);
 		distributionBuilder.setResource(distributionResourceBuilder.build());
 		distributionElement = distributionBuilder.build();
@@ -213,29 +211,29 @@ public class CompleteSolutionTest {
 		mainRunElement.connectWithNextElement(secondHubElement);
 		secondHubElement.connectWithNextElement(distributionElement);
 
-		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId);
-		completeSolutionBuilder.addSolutionElement(collectionElement);
-		completeSolutionBuilder.addSolutionElement(firstHubElement);
-		completeSolutionBuilder.addSolutionElement(mainRunElement);
-		completeSolutionBuilder.addSolutionElement(secondHubElement);
-		completeSolutionBuilder.addSolutionElement(distributionElement);
-		solution = completeSolutionBuilder.build();
+		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
+		completeSolutionBuilder.addLogisticChainElement(collectionElement);
+		completeSolutionBuilder.addLogisticChainElement(firstHubElement);
+		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
+		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
+		completeSolutionBuilder.addLogisticChainElement(distributionElement);
+		logisticChain = completeSolutionBuilder.build();
 
 	}
 
 	@Test
-	public void testCompleteSolution() {
-		assertNotNull(solution.getSimulationTrackers());
-		assertTrue(solution.getSimulationTrackers().isEmpty());
-		assertNotNull(solution.getAttributes());
-		assertTrue(solution.getAttributes().isEmpty());
-		assertNull(solution.getLSP());
-		assertNotNull(solution.getShipments());
-		assertTrue(solution.getShipments().isEmpty());
-		assertEquals(5, solution.getSolutionElements().size());
-		ArrayList<LogisticsSolutionElement> elements = new ArrayList<>(solution.getSolutionElements());
-		for (LogisticsSolutionElement element : elements) {
+	public void testCompleteLogisticChain() {
+		assertNotNull(logisticChain.getSimulationTrackers());
+		assertTrue(logisticChain.getSimulationTrackers().isEmpty());
+		assertNotNull(logisticChain.getAttributes());
+		assertTrue(logisticChain.getAttributes().isEmpty());
+		assertNull(logisticChain.getLSP());
+		assertNotNull(logisticChain.getShipments());
+		assertTrue(logisticChain.getShipments().isEmpty());
+		assertEquals(5, logisticChain.getLogisticChainElements().size());
+		ArrayList<LogisticChainElement> elements = new ArrayList<>(logisticChain.getLogisticChainElements());
+		for (LogisticChainElement element : elements) {
 			if (elements.indexOf(element) == 0) {
 				assertNull(element.getPreviousElement());
 			}

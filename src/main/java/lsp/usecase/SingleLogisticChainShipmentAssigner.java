@@ -18,24 +18,43 @@
  *  * ***********************************************************************
  */
 
-package lsp.shipment;
+package lsp.usecase;
 
-import lsp.LSPResource;
-import lsp.LogisticChainElement;
-import org.matsim.api.core.v01.Id;
+import lsp.LSP;
+import lsp.LogisticChain;
+import lsp.ShipmentAssigner;
+import lsp.shipment.LSPShipment;
+import org.matsim.core.gbl.Gbl;
 
-public interface ShipmentPlanElement {
+/**
+ * Ganz einfacher {@link ShipmentAssigner}:
+ * Voraussetzung: Der {@link lsp.LSPPlan} hat genau 1 {@link LogisticChain}.
+ * <p>
+ * Dann wird das {@link  LSPShipment} diesem zugeordnet.
+ * <p>
+ * (Falls die Voraussetzung "exakt 1 LogisticChain pro Plan" nicht erfüllt ist, kommt eine RuntimeException)
+ */
+class SingleLogisticChainShipmentAssigner implements ShipmentAssigner {
 
-	LogisticChainElement getLogisticChainElement();
+	private LSP lsp;
 
-	Id<LSPResource> getResourceId();
+	SingleLogisticChainShipmentAssigner() {
+	}
 
-	// yyyy "type" feels like this makes it a tagged class.  These should be avoided (Effective Java 2018, Item 23).  It is, however, probably not
-	// used as a type, but rather as a description.  Rename?
-	String getElementType();
+	@Override
+	public LSP getLSP() {
+		throw new RuntimeException("not implemented");
+	}
 
-	double getStartTime();
+	public void setLSP(LSP lsp) {
+		this.lsp = lsp;
+	}
 
-	double getEndTime();
+	@Override
+	public void assignToLogisticChain(LSPShipment shipment) {
+		Gbl.assertIf(lsp.getSelectedPlan().getLogisticChain().size() == 1);
+		LogisticChain singleSolution = lsp.getSelectedPlan().getLogisticChain().iterator().next();
+		singleSolution.assignShipment(shipment);
+	}
 
 }

@@ -21,7 +21,7 @@
 package example.lspAndDemand.requirementsChecking;
 
 import lsp.LSP;
-import lsp.LogisticsSolution;
+import lsp.LogisticChain;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.Requirement;
@@ -31,28 +31,28 @@ import java.util.Collection;
 
 class RequirementsAssigner implements ShipmentAssigner {
 
-	private final Collection<LogisticsSolution> feasibleSolutions;
+	private final Collection<LogisticChain> feasibleLogisticChains;
 	private LSP lsp;
 
 	public RequirementsAssigner() {
-		this.feasibleSolutions = new ArrayList<>();
+		this.feasibleLogisticChains = new ArrayList<>();
 	}
 
 	@Override
-	public void assignToSolution(LSPShipment shipment) {
-		feasibleSolutions.clear();
+	public void assignToLogisticChain(LSPShipment shipment) {
+		feasibleLogisticChains.clear();
 
 		label:
-		for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
 			for (Requirement requirement : shipment.getRequirements()) {
 				if (!requirement.checkRequirement(solution)) {
 
 					continue label;
 				}
 			}
-			feasibleSolutions.add(solution);
+			feasibleLogisticChains.add(solution);
 		}
-		LogisticsSolution chosenSolution = feasibleSolutions.iterator().next();
+		LogisticChain chosenSolution = feasibleLogisticChains.iterator().next();
 		chosenSolution.assignShipment(shipment);
 	}
 

@@ -26,25 +26,25 @@ import java.util.Collection;
 
 /* package-private */ class LSPPlanImpl implements LSPPlan {
 
-	private final Collection<LogisticsSolution> solutions;
+	private final Collection<LogisticChain> logisticChains;
 	private LSP lsp;
 	private double score;
 	private ShipmentAssigner assigner;
 
 	LSPPlanImpl() {
-		this.solutions = new ArrayList<>();
+		this.logisticChains = new ArrayList<>();
 	}
 
 	@Override
-	public LSPPlan addSolution(LogisticsSolution solution) {
-		this.solutions.add(solution);
+	public LSPPlan addLogisticChain(LogisticChain solution) {
+		this.logisticChains.add(solution);
 		solution.setLSP(this.lsp);
 		return this;
 	}
 
 	@Override
-	public Collection<LogisticsSolution> getSolutions() {
-		return solutions;
+	public Collection<LogisticChain> getLogisticChain() {
+		return logisticChains;
 	}
 
 	@Override
@@ -79,22 +79,22 @@ import java.util.Collection;
 		this.lsp = lsp;
 		if (assigner != null) {
 			this.assigner.setLSP(lsp);
-			// yy vom Design her wäre es vllt einfacher und logischer, wenn der assigner einen backpointer auf den LSPPlan hätte.  Dann
-			// müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen.  kai, may'22
+			// yy vom Design her wäre es vlt. einfacher und logischer, wenn der assigner einen backpointer auf den LSPPlan hätte. Dann
+			// müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen. kai, may'22
 		}
-		for (LogisticsSolution solution : solutions) {
+		for (LogisticChain solution : logisticChains) {
 			solution.setLSP(lsp);
 		}
 	}
 
 	@Override public String toString() {
 		StringBuilder strb = new StringBuilder();
-			strb.append("[score=" + this.score + "]");
-			for (LogisticsSolution solution : this.solutions) {
-				strb.append(", [solutionId=").append(solution.getId()  + "], [No of SolutionElements=" + solution.getSolutionElements().size()+ "] \n" );
-				if (!solution.getSolutionElements().isEmpty()){
-					for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
-						strb.append("\t \t" + solutionElement.toString()).append("\n");
+			strb.append("[score=").append(this.score).append("]");
+			for (LogisticChain solution : this.logisticChains) {
+				strb.append(", [solutionId=").append(solution.getId()).append("], [No of SolutionElements=").append(solution.getLogisticChainElements().size()).append("] \n");
+				if (!solution.getLogisticChainElements().isEmpty()){
+					for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
+						strb.append("\t \t").append(solutionElement.toString()).append("\n");
 					}
 				}
 			}

@@ -23,7 +23,7 @@ package lsp.usecase;
 import lsp.LSPCarrierResource;
 import lsp.LSPDataObject;
 import lsp.LSPResource;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -35,7 +35,7 @@ import java.util.Collection;
 /*package-private*/ class DistributionCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 
 	private final Carrier carrier;
-	private final Collection<LogisticsSolutionElement> clientElements;
+	private final Collection<LogisticChainElement> clientElements;
 	private final DistributionCarrierScheduler distributionHandler;
 	private final Network network;
 
@@ -72,7 +72,7 @@ import java.util.Collection;
 	}
 
 	@Override
-	public Collection<LogisticsSolutionElement> getClientElements() {
+	public Collection<LogisticChainElement> getClientElements() {
 		return clientElements;
 	}
 

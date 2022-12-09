@@ -86,10 +86,10 @@ import java.util.Random;
 		LSPResource collectionResource = adapterBuilder.build();
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
+		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionResource);
-		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
+		LogisticChainElement collectionElement = collectionElementBuilder.build();
 
 
 		//The first reloading adapter i.e. the Resource is created
@@ -107,10 +107,10 @@ import java.util.Random;
 		LSPResource firstTranshipmentHubResource = firstTransshipmentHubBuilder.build();
 
 		//The SolutionElement for the first reloading point is created
-		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FirstHubElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstHubElementId);
+		Id<LogisticChainElement> firstHubElementId = Id.create("FirstHubElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder firstHubElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(firstHubElementId);
 		firstHubElementBuilder.setResource(firstTranshipmentHubResource);
-		LogisticsSolutionElement firstHubElement = firstHubElementBuilder.build();
+		LogisticChainElement firstHubElement = firstHubElementBuilder.build();
 
 
 		//The Carrier for the main run Resource is created
@@ -149,10 +149,10 @@ import java.util.Random;
 		LSPResource mainRunResource = mainRunResourceBuilder.build();
 
 		//The LogisticsSolutionElement for the main run Resource is created
-		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId);
+		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
 		mainRunBuilder.setResource(mainRunResource);
-		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
+		LogisticChainElement mainRunElement = mainRunBuilder.build();
 
 
 		//The second reloading adapter i.e. the Resource is created       
@@ -170,10 +170,10 @@ import java.util.Random;
 		LSPResource secondTranshipmentHubResource = secondTransshipmentHubBuilder.build();
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		Id<LogisticsSolutionElement> secondHubElementId = Id.create("SecondHubElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder secondHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(secondHubElementId);
+		Id<LogisticChainElement> secondHubElementId = Id.create("SecondHubElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder secondHubElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(secondHubElementId);
 		secondHubElementBuilder.setResource(secondTranshipmentHubResource);
-		LogisticsSolutionElement secondHubElement = secondHubElementBuilder.build();
+		LogisticChainElement secondHubElement = secondHubElementBuilder.build();
 
 
 		//The Carrier for distribution is created
@@ -210,10 +210,10 @@ import java.util.Random;
 		LSPResource distributionResource = distributionResourceBuilder.build();
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(distributionElementId);
+		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder distributionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(distributionElementId);
 		distributionBuilder.setResource(distributionResource);
-		LogisticsSolutionElement distributionElement = distributionBuilder.build();
+		LogisticChainElement distributionElement = distributionBuilder.build();
 
 		//The Order of the logisticsSolutionElements is now specified
 		collectionElement.connectWithNextElement(firstHubElement);
@@ -223,21 +223,21 @@ import java.util.Random;
 
 
 		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
-		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId);
-		completeSolutionBuilder.addSolutionElement(collectionElement);
-		completeSolutionBuilder.addSolutionElement(firstHubElement);
-		completeSolutionBuilder.addSolutionElement(mainRunElement);
-		completeSolutionBuilder.addSolutionElement(secondHubElement);
-		completeSolutionBuilder.addSolutionElement(distributionElement);
-		LogisticsSolution completeSolution = completeSolutionBuilder.build();
+		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
+		completeSolutionBuilder.addLogisticChainElement(collectionElement);
+		completeSolutionBuilder.addLogisticChainElement(firstHubElement);
+		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
+		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
+		completeSolutionBuilder.addLogisticChainElement(distributionElement);
+		LogisticChain completeSolution = completeSolutionBuilder.build();
 
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
-		ShipmentAssigner assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		completePlan.setAssigner(assigner);
-		completePlan.addSolution(completeSolution);
+		completePlan.addLogisticChain(completeSolution);
 
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
@@ -249,8 +249,8 @@ import java.util.Random;
 		resourcesList.add(mainRunResource);
 		resourcesList.add(secondTranshipmentHubResource);
 		resourcesList.add(distributionResource);
-		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
-		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
+		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 
 		return completeLSPBuilder.build();
 
@@ -323,7 +323,7 @@ import java.util.Random;
 		}
 
 		//schedule the LSP with the shipments and according to the scheduler of the Resource
-		lsp.scheduleSolutions();
+		lsp.scheduleLogisticChains();
 
 		//set up simulation controler and LSPModule
 		ArrayList<LSP> lspList = new ArrayList<>();
@@ -352,11 +352,11 @@ import java.util.Random;
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
 			for (int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
-				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
+				System.out.println("Scheduled: " + scheduleElements.get(i).getLogisticChainElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
 			}
 			System.out.println();
 			for (int i = 0; i < shipment.getLog().getPlanElements().size(); i++) {
-				System.out.println("Logged: " + logElements.get(i).getSolutionElement().getId() + "  " + logElements.get(i).getResourceId() + "  " + logElements.get(i).getElementType() + " Start: " + logElements.get(i).getStartTime() + " End: " + logElements.get(i).getEndTime());
+				System.out.println("Logged: " + logElements.get(i).getLogisticChainElement().getId() + "  " + logElements.get(i).getResourceId() + "  " + logElements.get(i).getElementType() + " Start: " + logElements.get(i).getStartTime() + " End: " + logElements.get(i).getEndTime());
 			}
 			System.out.println();
 		}

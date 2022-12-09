@@ -22,7 +22,7 @@ package lsp.usecase;
 
 import lsp.LSPCarrierResource;
 import lsp.LSPSimulationTracker;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -37,13 +37,13 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandl
 /*package-private*/  class DistributionTourStartEventHandler implements FreightTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
-	private final LogisticsSolutionElement element;
+	private final LogisticChainElement element;
 	private final LSPCarrierResource resource;
 	private LSPShipment lspShipment;
 
 	private final Tour tour;
 
-	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource, Tour tour) {
+	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticChainElement element, LSPCarrierResource resource, Tour tour) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.element = element;
@@ -75,12 +75,12 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandl
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getLinkId());
-		builder.setLogisticsSolutionElement(element);
+		builder.setLogisticsChainElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setEndTime(event.getTime());
 		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(tour));
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
-		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
+		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
@@ -90,11 +90,11 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandl
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getLinkId());
 		builder.setToLinkId(tour.getEndLinkId());
-		builder.setLogisticsSolutionElement(element);
+		builder.setLogisticChainElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setStartTime(event.getTime());
 		ShipmentPlanElement transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
+		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(transportId, transport);
 	}
@@ -122,7 +122,7 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandl
 	}
 
 
-	public LogisticsSolutionElement getElement() {
+	public LogisticChainElement getElement() {
 		return element;
 	}
 

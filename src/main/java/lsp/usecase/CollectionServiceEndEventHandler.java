@@ -23,7 +23,7 @@ package lsp.usecase;
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentLeg;
 import lsp.shipment.ShipmentPlanElement;
@@ -42,15 +42,15 @@ import java.util.Collection;
 class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
-	private final LogisticsSolutionElement solutionElement;
+	private final LogisticChainElement logisticChainElement;
 	private final LSPCarrierResource resource;
 	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
 	private LSPShipment lspShipment;
 
-	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
+	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticChainElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
-		this.solutionElement = element;
+		this.logisticChainElement = element;
 		this.resource = resource;
 	}
 
@@ -73,12 +73,12 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightSe
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setStartTime(event.getTime() - event.getServiceDuration());
 		builder.setEndTime(event.getTime());
-		builder.setLogisticsSolutionElement(solutionElement);
+		builder.setLogisticsChainElement(logisticChainElement);
 		builder.setResourceId(resource.getId());
 		builder.setLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
-		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
+		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
@@ -86,12 +86,12 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightSe
 	private void logTransport(FreightServiceEndEvent event) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setStartTime(event.getTime());
-		builder.setLogisticsSolutionElement(solutionElement);
+		builder.setLogisticChainElement(logisticChainElement);
 		builder.setResourceId(resource.getId());
 		builder.setFromLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		ShipmentLeg transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
+		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(transportId, transport);
 	}
@@ -107,8 +107,8 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightSe
 	}
 
 
-	public LogisticsSolutionElement getElement() {
-		return solutionElement;
+	public LogisticChainElement getElement() {
+		return logisticChainElement;
 	}
 
 

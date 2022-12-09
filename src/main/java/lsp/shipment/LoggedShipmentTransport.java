@@ -21,7 +21,7 @@
 package lsp.shipment;
 
 import lsp.LSPResource;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -30,7 +30,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 final class LoggedShipmentTransport implements ShipmentLeg {
 
 	private final double startTime;
-	private final LogisticsSolutionElement element;
+	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> fromLinkId;
 	private double endTime;
@@ -46,7 +46,7 @@ final class LoggedShipmentTransport implements ShipmentLeg {
 
 
 	@Override
-	public LogisticsSolutionElement getSolutionElement() {
+	public LogisticChainElement getLogisticChainElement() {
 		return element;
 	}
 

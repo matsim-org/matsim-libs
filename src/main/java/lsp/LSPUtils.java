@@ -39,8 +39,8 @@ public final class LSPUtils {
 		return new LSPPlanImpl();
 	}
 
-	public static SolutionScheduler createForwardSolutionScheduler() {
-		return new ForwardSolutionSchedulerImpl();
+	public static LogisticChainScheduler createForwardLogisiticChainScheduler() {
+		return new ForwardLogisticChainSchedulerImpl();
 	}
 
 	public static WaitingShipments createWaitingShipments() {
@@ -100,7 +100,7 @@ public final class LSPUtils {
 	public static final class LSPBuilder {
 		final Collection<LSPResource> resources;
 		Id<LSP> id;
-		SolutionScheduler solutionScheduler;
+		LogisticChainScheduler logisticChainScheduler;
 		LSPPlan initialPlan;
 
 		private LSPBuilder(Id<LSP> id) {
@@ -112,8 +112,8 @@ public final class LSPUtils {
 			return new LSPBuilder(id);
 		}
 
-		public LSPBuilder setSolutionScheduler(SolutionScheduler solutionScheduler) {
-			this.solutionScheduler = solutionScheduler;
+		public LSPBuilder setLogisticChainScheduler(LogisticChainScheduler logisticChainScheduler) {
+			this.logisticChainScheduler = logisticChainScheduler;
 			return this;
 		}
 
@@ -142,8 +142,8 @@ public final class LSPUtils {
 
 		public LSPBuilder setInitialPlan(LSPPlan plan) {
 			this.initialPlan = plan;
-			for (LogisticsSolution solution : plan.getSolutions()) {
-				for (LogisticsSolutionElement element : solution.getSolutionElements()) {
+			for (LogisticChain solution : plan.getLogisticChain()) {
+				for (LogisticChainElement element : solution.getLogisticChainElements()) {
 					if (!resources.contains(element.getResource())) {
 						resources.add(element.getResource());
 					}
@@ -158,60 +158,60 @@ public final class LSPUtils {
 		}
 	}
 
-	public static final class LogisticsSolutionBuilder {
-		final Id<LogisticsSolution> id;
-		final Collection<LogisticsSolutionElement> elements;
+	public static final class LogisticChainBuilder {
+		final Id<LogisticChain> id;
+		final Collection<LogisticChainElement> elements;
 		//		final Collection<EventHandler> eventHandlers;
-		final Collection<LSPSimulationTracker<LogisticsSolution>> trackers;
+		final Collection<LSPSimulationTracker<LogisticChain>> trackers;
 
-		private LogisticsSolutionBuilder(Id<LogisticsSolution> id) {
+		private LogisticChainBuilder(Id<LogisticChain> id) {
 			this.elements = new ArrayList<>();
-			this.trackers = new ArrayList<LSPSimulationTracker<LogisticsSolution>>();
+			this.trackers = new ArrayList<LSPSimulationTracker<LogisticChain>>();
 			this.id = id;
 		}
 
-		public static LogisticsSolutionBuilder newInstance(Id<LogisticsSolution> id) {
-			return new LogisticsSolutionBuilder(id);
+		public static LogisticChainBuilder newInstance(Id<LogisticChain> id) {
+			return new LogisticChainBuilder(id);
 		}
 
-		public LogisticsSolutionBuilder addSolutionElement(LogisticsSolutionElement element) {
+		public LogisticChainBuilder addLogisticChainElement(LogisticChainElement element) {
 			elements.add(element);
 			return this;
 		}
 
-		public LogisticsSolutionBuilder addTracker(LSPSimulationTracker<LogisticsSolution> tracker) {
+		public LogisticChainBuilder addTracker(LSPSimulationTracker<LogisticChain> tracker) {
 			trackers.add(tracker);
 			return this;
 		}
 
-		public LogisticsSolution build() {
-			return new LogisticsSolutionImpl(this);
+		public LogisticChain build() {
+			return new LogisticChainImpl(this);
 		}
 	}
 
-	public static final class LogisticsSolutionElementBuilder {
-		final Id<LogisticsSolutionElement> id;
+	public static final class LogisticChainElementBuilder {
+		final Id<LogisticChainElement> id;
 		final WaitingShipments incomingShipments;
 		final WaitingShipments outgoingShipments;
 		LSPResource resource;
 
-		private LogisticsSolutionElementBuilder(Id<LogisticsSolutionElement> id) {
+		private LogisticChainElementBuilder(Id<LogisticChainElement> id) {
 			this.id = id;
 			this.incomingShipments = createWaitingShipments();
 			this.outgoingShipments = createWaitingShipments();
 		}
 
-		public static LogisticsSolutionElementBuilder newInstance(Id<LogisticsSolutionElement> id) {
-			return new LogisticsSolutionElementBuilder(id);
+		public static LogisticChainElementBuilder newInstance(Id<LogisticChainElement> id) {
+			return new LogisticChainElementBuilder(id);
 		}
 
-		public LogisticsSolutionElementBuilder setResource(LSPResource resource) {
+		public LogisticChainElementBuilder setResource(LSPResource resource) {
 			this.resource = resource;
 			return this;
 		}
 
-		public LogisticsSolutionElement build() {
-			return new LogisticsSolutionElementImpl(this);
+		public LogisticChainElement build() {
+			return new LogisticChainElementImpl(this);
 		}
 	}
 

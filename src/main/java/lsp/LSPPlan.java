@@ -28,14 +28,14 @@ import java.util.Collection;
 /**
  * This interface has the following properties:<ul>
  * <li> As a {@link BasicPlan} it has a score, so it can be used for evolutionary learning.  kai, may'22 </li>
- * <li> An {@link LSPShipment} is added via lspPlan#getAssigner().assignToSolution(shipment).  The {@link ShipmentAssigner} assigns it deterministically to a {@link LogisticsSolution}. </li>
+ * <li> An {@link LSPShipment} is added via lspPlan#getAssigner().assignToSolution(shipment).  The {@link ShipmentAssigner} assigns it deterministically to a {@link LogisticChain}. </li>
  * </ul>
  */
 public interface LSPPlan extends BasicPlan, KnowsLSP {
 
-	LSPPlan addSolution(LogisticsSolution solution);
+	LSPPlan addLogisticChain(LogisticChain solution);
 
-	Collection<LogisticsSolution> getSolutions();
+	Collection<LogisticChain> getLogisticChain();
 
 	/**
 	 * yy My intuition would be to replace lspPlan#getAssigner().assignToSolution( shipment ) by lspPlan.addShipment( shipment ).  kai, may'22

@@ -22,7 +22,7 @@ package example.lsp.simulationTrackers;
 
 import lsp.LSPSimulationTracker;
 import lsp.LSPUtils;
-import lsp.LogisticsSolution;
+import lsp.LogisticChain;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -42,7 +42,7 @@ import org.matsim.core.events.handler.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticsSolution>,
+/*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticChain>,
 		LinkEnterEventHandler,
 		VehicleLeavesTrafficEventHandler,
 		FreightTourStartEventHandler,
@@ -61,7 +61,7 @@ import java.util.Collection;
 	private int totalWeightOfShipments;
 	private double fixedUnitCosts;
 	private double linearUnitCosts;
-	private LogisticsSolution logisticsSolution;
+	private LogisticChain logisticChain;
 
 	public LinearCostTracker(double shareOfFixedCosts) {
 		this.shareOfFixedCosts = shareOfFixedCosts;
@@ -112,8 +112,8 @@ import java.util.Collection;
 //		}
 //		info.setFixedCost( fixedUnitCosts );
 //		info.setVariableCost( linearUnitCosts );
-		LSPUtils.setFixedCost(this.logisticsSolution, fixedUnitCosts);
-		LSPUtils.setVariableCost(this.logisticsSolution, linearUnitCosts);
+		LSPUtils.setFixedCost(this.logisticChain, fixedUnitCosts);
+		LSPUtils.setVariableCost(this.logisticChain, linearUnitCosts);
 
 
 	}
@@ -136,8 +136,8 @@ import java.util.Collection;
 //	@Override public Attributes getAttributes(){
 //		return attributes;
 //	}
-	@Override public void setEmbeddingContainer( LogisticsSolution pointer ){
-		this.logisticsSolution = pointer;
+	@Override public void setEmbeddingContainer( LogisticChain pointer ){
+		this.logisticChain = pointer;
 	}
 	@Override public void handleEvent( LinkEnterEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){

@@ -80,20 +80,20 @@ import java.util.*;
 				.setCarrier(carrier).setLocationLinkId(collectionLinkId).build();
 
 		//The adapter is now inserted into the only LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		LogisticsSolutionElement logisticsSolutionElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(
-				Id.create("CollectionElement", LogisticsSolutionElement.class)).setResource(lspResource).build();
+		LogisticChainElement logisticChainElement = LSPUtils.LogisticChainElementBuilder.newInstance(
+				Id.create("CollectionElement", LogisticChainElement.class)).setResource(lspResource).build();
 
 		//The LogisticsSolutionElement is now inserted into the only LogisticsSolution of the LSP
-		LogisticsSolution logisticsSolution = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("CollectionSolution", LogisticsSolution.class))
-				.addSolutionElement(logisticsSolutionElement).build();
+		LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("CollectionSolution", LogisticChain.class))
+				.addLogisticChainElement(logisticChainElement).build();
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
-		LSPPlan lspPlan = LSPUtils.createLSPPlan().setAssigner(UsecaseUtils.createSingleSolutionShipmentAssigner()).addSolution(logisticsSolution);
+		LSPPlan lspPlan = LSPUtils.createLSPPlan().setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner()).addLogisticChain(logisticChain);
 
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 				.setInitialPlan(lspPlan)
-				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(Collections.singletonList(lspResource)))
+				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.singletonList(lspResource)))
 //				.setSolutionScorer(new TipScorer())
 				.build();
 
@@ -178,7 +178,7 @@ import java.util.*;
 		}
 
 		//schedule the LSP with the shipments and according to the scheduler of the Resource
-		lsp.scheduleSolutions();
+		lsp.scheduleLogisticChains();
 
 		//Prepare LSPModule and add the LSP
 		LSPs lsps = new LSPs(Collections.singletonList(lsp));

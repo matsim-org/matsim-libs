@@ -22,7 +22,7 @@ package lsp.usecase;
 
 import lsp.LSPCarrierResource;
 import lsp.LSPSimulationTracker;
-import lsp.LogisticsSolutionElement;
+import lsp.LogisticChainElement;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentLeg;
 import lsp.shipment.ShipmentPlanElement;
@@ -37,14 +37,14 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 /*package-private*/  class DistributionServiceStartEventHandler implements AfterMobsimListener, FreightServiceStartEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
-	private final LogisticsSolutionElement solutionElement;
+	private final LogisticChainElement logisticChainElement;
 	private final LSPCarrierResource resource;
 	private LSPShipment lspShipment;
 
-	DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
+	DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticChainElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
-		this.solutionElement = element;
+		this.logisticChainElement = element;
 		this.resource = resource;
 	}
 
@@ -63,7 +63,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 	}
 
 	private void logTransport(FreightServiceStartEvent event) {
-		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
+		String idString = resource.getId() + "" + logisticChainElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
 		if (abstractPlanElement instanceof ShipmentLeg transport) {
@@ -75,12 +75,12 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getLinkId());
-		builder.setLogisticsSolutionElement(solutionElement);
+		builder.setLogisticChainElement(logisticChainElement);
 		builder.setResourceId(resource.getId());
 		builder.setStartTime(event.getTime());
 		builder.setEndTime(event.getTime() + event.getServiceDuration());
 		ShipmentPlanElement unload = builder.build();
-		String idString = unload.getResourceId() + "" + unload.getSolutionElement().getId() + "" + unload.getElementType();
+		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(unloadId, unload);
 	}
@@ -93,8 +93,8 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		return lspShipment;
 	}
 
-	public LogisticsSolutionElement getSolutionElement() {
-		return solutionElement;
+	public LogisticChainElement getLogisticChainElement() {
+		return logisticChainElement;
 	}
 
 	public LSPCarrierResource getResource() {

@@ -66,7 +66,7 @@ public class CollectionTrackerTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 	private Network network;
 	private Carrier carrier;
-	private LogisticsSolution collectionSolution;
+	private LogisticChain logisticChain;
 	private double shareOfFixedCosts;
 
 	@Before
@@ -114,15 +114,15 @@ public class CollectionTrackerTest {
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
 
-		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
+		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionResource);
-		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
+		LogisticChainElement collectionElement = collectionElementBuilder.build();
 
-		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addSolutionElement(collectionElement);
-		collectionSolution = collectionSolutionBuilder.build();
+		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
+		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
+		logisticChain = collectionSolutionBuilder.build();
 
 		{
 			shareOfFixedCosts = 0.2;
@@ -132,21 +132,21 @@ public class CollectionTrackerTest {
 			tracker.getEventHandlers().add(new DistanceAndTimeHandler(scenario));
 			// I think that it would be better to use delegation inside LinearCostTracker, i.e. to not expose getEventHandlers(). kai, jun'22
 
-			collectionSolution.addSimulationTracker(tracker);
+			logisticChain.addSimulationTracker(tracker);
 		}
 
-		ShipmentAssigner assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
-		collectionPlan.addSolution(collectionSolution);
+		collectionPlan.addLogisticChain(logisticChain);
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionResource);
 
-		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
-		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
+		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		LSP collectionLSP = collectionLSPBuilder.build();
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
@@ -180,7 +180,7 @@ public class CollectionTrackerTest {
 			LSPShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
-		collectionLSP.scheduleSolutions();
+		collectionLSP.scheduleLogisticChains();
 
 
 		ArrayList<LSP> lspList = new ArrayList<>();
@@ -208,8 +208,8 @@ public class CollectionTrackerTest {
 	@Test
 	public void testCollectionTracker() {
 
-		assertEquals(1, collectionSolution.getSimulationTrackers().size());
-		LSPSimulationTracker<LogisticsSolution> tracker = collectionSolution.getSimulationTrackers().iterator().next();
+		assertEquals(1, logisticChain.getSimulationTrackers().size());
+		LSPSimulationTracker<LogisticChain> tracker = logisticChain.getSimulationTrackers().iterator().next();
 		assertTrue(tracker instanceof LinearCostTracker);
 		LinearCostTracker linearTracker = (LinearCostTracker) tracker;
 		double totalScheduledCosts = 0;
@@ -311,10 +311,10 @@ public class CollectionTrackerTest {
 
 		// I cannot say how the above was supposed to work, since costInfo.getVariableCost() was the same in both cases.  kai, may'22
 
-		assertEquals(2, collectionSolution.getAttributes().size());
-		assertEquals(LSPUtils.getVariableCost(collectionSolution), linearTrackedCostsPerShipment, Math.max(linearTrackedCostsPerShipment, LSPUtils.getVariableCost(collectionSolution)) * 0.01);
-		assertEquals(LSPUtils.getVariableCost(collectionSolution), linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment, LSPUtils.getVariableCost(collectionSolution)) * 0.01);
-		assertEquals(LSPUtils.getFixedCost(collectionSolution), fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, LSPUtils.getFixedCost(collectionSolution)) * 0.01);
-		assertEquals(LSPUtils.getFixedCost(collectionSolution), fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment, LSPUtils.getFixedCost(collectionSolution)) * 0.01);
+		assertEquals(2, logisticChain.getAttributes().size());
+		assertEquals(LSPUtils.getVariableCost(logisticChain), linearTrackedCostsPerShipment, Math.max(linearTrackedCostsPerShipment, LSPUtils.getVariableCost(logisticChain)) * 0.01);
+		assertEquals(LSPUtils.getVariableCost(logisticChain), linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment, LSPUtils.getVariableCost(logisticChain)) * 0.01);
+		assertEquals(LSPUtils.getFixedCost(logisticChain), fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, LSPUtils.getFixedCost(logisticChain)) * 0.01);
+		assertEquals(LSPUtils.getFixedCost(logisticChain), fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment, LSPUtils.getFixedCost(logisticChain)) * 0.01);
 	}
 }

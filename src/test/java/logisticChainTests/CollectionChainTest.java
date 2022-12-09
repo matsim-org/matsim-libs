@@ -18,7 +18,7 @@
  *  * ***********************************************************************
  */
 
-package solutionTests;
+package logisticChainTests;
 
 import lsp.*;
 import lsp.usecase.UsecaseUtils;
@@ -39,9 +39,9 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class CollectionSolutionTest {
+public class CollectionChainTest {
 
-	private LogisticsSolution collectionSolution;
+	private LogisticChain logisticChain;
 
 	@Before
 	public void initialize() {
@@ -80,32 +80,32 @@ public class CollectionSolutionTest {
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPCarrierResource carrierResource = adapterBuilder.build();
 
-		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
+		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(elementId);
 		collectionElementBuilder.setResource(carrierResource);
-		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
+		LogisticChainElement collectionElement = collectionElementBuilder.build();
 
-		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder
+		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder
 				.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addSolutionElement(collectionElement);
-		collectionSolution = collectionSolutionBuilder.build();
+		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
+		logisticChain = collectionSolutionBuilder.build();
 
 	}
 
 	@Test
-	public void testCollectionSolution() {
-		assertNotNull(collectionSolution.getSimulationTrackers());
-		assertTrue(collectionSolution.getSimulationTrackers().isEmpty());
-		assertNotNull(collectionSolution.getAttributes());
-		assertTrue(collectionSolution.getAttributes().isEmpty());
-		assertNull(collectionSolution.getLSP());
-		assertNotNull(collectionSolution.getShipments());
-		assertTrue(collectionSolution.getShipments().isEmpty());
-		assertEquals(1, collectionSolution.getSolutionElements().size());
-		ArrayList<LogisticsSolutionElement> elements = new ArrayList<>(collectionSolution.getSolutionElements());
-		for (LogisticsSolutionElement element : elements) {
+	public void testCollectionChain() {
+		assertNotNull(logisticChain.getSimulationTrackers());
+		assertTrue(logisticChain.getSimulationTrackers().isEmpty());
+		assertNotNull(logisticChain.getAttributes());
+		assertTrue(logisticChain.getAttributes().isEmpty());
+		assertNull(logisticChain.getLSP());
+		assertNotNull(logisticChain.getShipments());
+		assertTrue(logisticChain.getShipments().isEmpty());
+		assertEquals(1, logisticChain.getLogisticChainElements().size());
+		ArrayList<LogisticChainElement> elements = new ArrayList<>(logisticChain.getLogisticChainElements());
+		for (LogisticChainElement element : elements) {
 			if (elements.indexOf(element) == 0) {
 				assertNull(element.getPreviousElement());
 			}

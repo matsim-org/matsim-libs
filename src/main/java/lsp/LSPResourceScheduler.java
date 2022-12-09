@@ -83,7 +83,7 @@ public abstract class LSPResourceScheduler {
 
 	public final void presortIncomingShipments() {
 		this.shipments = new ArrayList<>();
-		for (LogisticsSolutionElement element : resource.getClientElements()) {
+		for (LogisticChainElement element : resource.getClientElements()) {
 			shipments.addAll(element.getIncomingShipments().getShipments());
 		}
 		shipments.sort(Comparator.comparingDouble(ShipmentWithTime::getTime));
@@ -94,7 +94,7 @@ public abstract class LSPResourceScheduler {
 		for (ShipmentWithTime shipment : shipments) {
 			double endOfTransportTime = shipment.getShipment().getShipmentPlan().getMostRecentEntry().getEndTime() + bufferTime;
 			ShipmentWithTime outgoingTuple = new ShipmentWithTime(endOfTransportTime, shipment.getShipment());
-			for (LogisticsSolutionElement element : resource.getClientElements()) {
+			for (LogisticChainElement element : resource.getClientElements()) {
 				if (element.getIncomingShipments().getShipments().contains(shipment)) {
 					element.getOutgoingShipments().getShipments().add(outgoingTuple);
 					element.getIncomingShipments().getShipments().remove(shipment);

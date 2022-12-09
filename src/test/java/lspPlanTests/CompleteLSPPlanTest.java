@@ -42,7 +42,7 @@ public class CompleteLSPPlanTest {
 
 	private ShipmentAssigner assigner;
 	private LSPPlan completePlan;
-	private LogisticsSolution completeSolution;
+	private LogisticChain logisticChain;
 
 	@Before
 	public void initialize() {
@@ -83,10 +83,10 @@ public class CompleteLSPPlanTest {
 		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 
 
-		Id<LogisticsSolutionElement> collectionElementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(collectionElementId);
+		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(collectionElementId);
 		collectionBuilder.setResource(collectionResourceBuilder.build());
-		LogisticsSolutionElement collectionElement = collectionBuilder.build();
+		LogisticChainElement collectionElement = collectionBuilder.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
@@ -100,13 +100,11 @@ public class CompleteLSPPlanTest {
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 
 
-		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FiretHubElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstHubElementId);
+		Id<LogisticChainElement> firstHubElementId = Id.create("FiretHubElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder firstHubElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(firstHubElementId);
 		firstHubElementBuilder.setResource(firstTransshipmentHubBuilder.build());
-		LogisticsSolutionElement firstHubElement = firstHubElementBuilder.build();
+		LogisticChainElement firstHubElement = firstHubElementBuilder.build();
 
-		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
-		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder mainRunVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(collectionVehicleTypeId);
 		mainRunVehicleTypeBuilder.setCapacity(30);
 		mainRunVehicleTypeBuilder.setCostPerDistanceUnit(0.0002);
@@ -138,10 +136,10 @@ public class CompleteLSPPlanTest {
 		mainRunResourceBuilder.setCarrier(collectionCarrier);
 
 
-		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId);
+		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
 		mainRunBuilder.setResource(mainRunResourceBuilder.build());
-		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
+		LogisticChainElement mainRunElement = mainRunBuilder.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
@@ -155,10 +153,10 @@ public class CompleteLSPPlanTest {
 		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
 
 
-		Id<LogisticsSolutionElement> secondHubElementId = Id.create("SecondHubElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder secondHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(secondHubElementId);
+		Id<LogisticChainElement> secondHubElementId = Id.create("SecondHubElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder secondHubElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(secondHubElementId);
 		secondHubElementBuilder.setResource(secondTransshipmentHubBuilder.build());
-		LogisticsSolutionElement secondHubElement = secondHubElementBuilder.build();
+		LogisticChainElement secondHubElement = secondHubElementBuilder.build();
 
 		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
@@ -190,29 +188,29 @@ public class CompleteLSPPlanTest {
 		distributionResourceBuilder.setLocationLinkId(distributionLinkId);
 
 
-		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(distributionElementId);
+		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder distributionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(distributionElementId);
 		distributionBuilder.setResource(distributionResourceBuilder.build());
-		LogisticsSolutionElement distributionElement = distributionBuilder.build();
+		LogisticChainElement distributionElement = distributionBuilder.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);
 		firstHubElement.connectWithNextElement(mainRunElement);
 		mainRunElement.connectWithNextElement(secondHubElement);
 		secondHubElement.connectWithNextElement(distributionElement);
 
-		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId);
-		completeSolutionBuilder.addSolutionElement(collectionElement);
-		completeSolutionBuilder.addSolutionElement(firstHubElement);
-		completeSolutionBuilder.addSolutionElement(mainRunElement);
-		completeSolutionBuilder.addSolutionElement(secondHubElement);
-		completeSolutionBuilder.addSolutionElement(distributionElement);
-		completeSolution = completeSolutionBuilder.build();
+		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
+		completeSolutionBuilder.addLogisticChainElement(collectionElement);
+		completeSolutionBuilder.addLogisticChainElement(firstHubElement);
+		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
+		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
+		completeSolutionBuilder.addLogisticChainElement(distributionElement);
+		logisticChain = completeSolutionBuilder.build();
 
-		assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
+		assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
-		completePlan.addSolution(completeSolution);
+		completePlan.addLogisticChain(logisticChain);
 	}
 
 	@Test
@@ -220,8 +218,8 @@ public class CompleteLSPPlanTest {
 		assertSame(completePlan.getAssigner(), assigner);
 		assertNull(completePlan.getLSP());
 		assertEquals(0, (double) completePlan.getScore(), 0.0);
-		assertEquals(1, completePlan.getSolutions().size());
-		assertSame(completePlan.getSolutions().iterator().next(), completeSolution);
+		assertEquals(1, completePlan.getLogisticChain().size());
+		assertSame(completePlan.getLogisticChain().iterator().next(), logisticChain);
 	}
 
 }

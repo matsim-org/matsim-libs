@@ -20,10 +20,10 @@
 
 package lsp.shipment;
 
-import lsp.LogisticsSolution;
+import lsp.LogisticChain;
 
 public interface Requirement {
 
-	boolean checkRequirement(LogisticsSolution solution);
+	boolean checkRequirement(LogisticChain solution);
 
 }

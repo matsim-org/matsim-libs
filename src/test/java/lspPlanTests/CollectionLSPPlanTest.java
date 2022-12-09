@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 
 public class CollectionLSPPlanTest {
 
-	private LogisticsSolution collectionSolution;
+	private LogisticChain logisticChain;
 	private ShipmentAssigner assigner;
 	private LSPPlan collectionPlan;
 
@@ -81,20 +81,20 @@ public class CollectionLSPPlanTest {
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 
 
-		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
+		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
+		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
 		collectionElementBuilder.setResource(adapterBuilder.build());
-		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
+		LogisticChainElement collectionElement = collectionElementBuilder.build();
 
-		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addSolutionElement(collectionElement);
-		collectionSolution = collectionSolutionBuilder.build();
+		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
+		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
+		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
+		logisticChain = collectionSolutionBuilder.build();
 
-		assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
+		assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
-		collectionPlan.addSolution(collectionSolution);
+		collectionPlan.addLogisticChain(logisticChain);
 	}
 
 	@Test
@@ -102,8 +102,8 @@ public class CollectionLSPPlanTest {
 		assertSame(collectionPlan.getAssigner(), assigner);
 		assertEquals(0, (double) collectionPlan.getScore(), 0.0);
 		assertNull(collectionPlan.getLSP());
-		assertEquals(1, collectionPlan.getSolutions().size());
-		assertSame(collectionPlan.getSolutions().iterator().next(), collectionSolution);
+		assertEquals(1, collectionPlan.getLogisticChain().size());
+		assertSame(collectionPlan.getLogisticChain().iterator().next(), logisticChain);
 	}
 
 }
