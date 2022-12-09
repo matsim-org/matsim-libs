@@ -69,7 +69,7 @@ public class DriveDischargingHandler
 	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
 	@Inject
-	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg) {
+	/* public */ DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg) {
 		this.network = network;
 		eVehicles = data.getElectricVehicles();
 		evDrives = new HashMap<>(eVehicles.size() / 10);
