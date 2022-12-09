@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.*;
 
@@ -88,7 +89,7 @@ import java.util.*;
 	private int nextMsg2=1;
 
 	private boolean locked = false ;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	NetworkImpl(LinkFactory linkFactory) {
 		this.factory = new NetworkFactoryImpl(this, linkFactory);

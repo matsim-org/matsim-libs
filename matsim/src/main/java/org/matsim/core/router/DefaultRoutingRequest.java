@@ -3,6 +3,7 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class DefaultRoutingRequest implements RoutingRequest {
 	private final Attributes attributes;
@@ -53,6 +54,6 @@ public class DefaultRoutingRequest implements RoutingRequest {
 
 	static public RoutingRequest withoutAttributes(Facility fromFacility, Facility toFacility, double departureTime,
 			Person person) {
-		return new DefaultRoutingRequest(fromFacility, toFacility, departureTime, person, new Attributes());
+		return new DefaultRoutingRequest(fromFacility, toFacility, departureTime, person, new AttributesImpl());
 	}
 }

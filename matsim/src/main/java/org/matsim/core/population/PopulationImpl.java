@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * @author nagel
@@ -37,7 +38,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /* deliberately package */ class PopulationImpl implements Population, Lockable {
 	private static final Logger log = LogManager.getLogger(PopulationImpl.class);
 
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	private String name;
 	private Map<Id<Person>, Person> persons = new LinkedHashMap<>();
 	private final PopulationFactory populationFactory;

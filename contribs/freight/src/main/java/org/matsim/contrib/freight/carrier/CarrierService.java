@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 
 public final class CarrierService implements Attributable {
@@ -103,7 +104,7 @@ public final class CarrierService implements Attributable {
 
 	private final int demand;
 
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	private CarrierService(Builder builder){
 		id = builder.id;

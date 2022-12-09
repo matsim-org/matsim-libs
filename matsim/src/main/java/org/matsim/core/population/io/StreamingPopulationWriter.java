@@ -34,6 +34,7 @@ import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -146,7 +147,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			@Override
 			public Attributes getAttributes() {
 				//A stream written Population cannot contain Population Attributes, only Person Attributes.
-				return new Attributes();
+				return new AttributesImpl();
 			}
 
 		} ;

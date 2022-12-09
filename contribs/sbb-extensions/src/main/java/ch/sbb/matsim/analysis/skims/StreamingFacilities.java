@@ -7,6 +7,7 @@ import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -63,6 +64,6 @@ public class StreamingFacilities implements ActivityFacilities {
 
     @Override
     public Attributes getAttributes() {
-        return new Attributes();
+        return new AttributesImpl();
     }
 }
