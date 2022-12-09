@@ -23,23 +23,20 @@ package lsp.shipment;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 
-/*package*/ class LoggedShipmentHandle implements ShipmentActivity {
+/*package*/ class LoggedShipmentHandle implements ShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;
 	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
-	private final Id<Link> linkId;
 
 	LoggedShipmentHandle(ShipmentUtils.LoggedShipmentHandleBuilder builder) {
 		this.startTime = builder.getStartTime();
 		this.endTime = builder.getEndTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
-		this.linkId = builder.getLinkId();
 	}
 
 	@Override
@@ -54,8 +51,7 @@ import org.matsim.api.core.v01.network.Link;
 
 	@Override
 	public String getElementType() {
-		String type = "HANDLE";
-		return type;
+		return "HANDLE";
 	}
 
 	@Override
@@ -68,9 +64,5 @@ import org.matsim.api.core.v01.network.Link;
 		return endTime;
 	}
 
-	@Override
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
 
 }

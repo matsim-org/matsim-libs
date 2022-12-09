@@ -44,7 +44,6 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightSe
 	private final CarrierService carrierService;
 	private final LogisticChainElement logisticChainElement;
 	private final LSPCarrierResource resource;
-	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
 	private LSPShipment lspShipment;
 
 	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticChainElement element, LSPCarrierResource resource) {

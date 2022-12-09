@@ -136,7 +136,7 @@ import java.util.List;
 		return resources;
 	}
 
-	public void scoreSelectedPlan(ScoringEvent scoringEvent) {
+	public void scoreSelectedPlan() {
 		if (this.scorer != null) {
 			this.selectedPlan.setScore(scorer.getScoreForCurrentPlan() );
 		} else {

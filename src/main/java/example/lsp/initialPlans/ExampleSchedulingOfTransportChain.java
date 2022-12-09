@@ -304,7 +304,6 @@ import java.util.Random;
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
-			LSPShipment shipment = builder.build();
 			shipmentList.add(builder.build());
 		}
 		return shipmentList;

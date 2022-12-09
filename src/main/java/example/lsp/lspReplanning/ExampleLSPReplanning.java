@@ -108,8 +108,6 @@ import java.util.*;
 		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 
-		LSP lsp = collectionLSPBuilder.build();
-
 		//Create StrategyManager, insert it in Replanner and add it to the lsp;
 //				TomorrowShipmentAssignerStrategyManagerFactoryImpl factory = new TomorrowShipmentAssignerStrategyManagerFactoryImpl();
 		// yyyy this feels quite odd.  The matsim GenericStrategyManager is heavyweight infrastructure, which exists
@@ -130,7 +128,7 @@ import java.util.*;
 //		collectionLSPBuilder.setReplanner( replanner ) ;
 		// yyyy set replanner in builder. kai, sep'18
 
-		return lsp;
+		return collectionLSPBuilder.build();
 	}
 
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network) {

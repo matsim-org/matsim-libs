@@ -23,9 +23,8 @@ package lsp.shipment;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
-class LoggedShipmentUnload implements ShipmentActivity {
+class LoggedShipmentUnload implements ShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;
@@ -52,8 +51,7 @@ class LoggedShipmentUnload implements ShipmentActivity {
 
 	@Override
 	public String getElementType() {
-		String type = "UNLOAD";
-		return type;
+		return "UNLOAD";
 	}
 
 	@Override
@@ -66,8 +64,4 @@ class LoggedShipmentUnload implements ShipmentActivity {
 		return endTime;
 	}
 
-	@Override
-	public Id<Link> getLinkId() {
-		throw new RuntimeException("not implemented");
-	}
 }

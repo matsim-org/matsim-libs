@@ -71,7 +71,7 @@ import java.util.*;
 	private ExampleSchedulingOfTransportChainHubsVsDirect() {
 	} // so it cannot be instantiated
 
-	public static void main(String[] args) throws CommandLine.ConfigurationException {
+	public static void main(String[] args) {
 
 		final SolutionType solutionType;
 
@@ -136,7 +136,7 @@ import java.util.*;
 		controler.addOverridingModule(new LSPModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new MyLSPScorer() );
+				bind( LSPScorerFactory.class ).toInstance( () -> new MyLSPScorer() );
 
 //				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
 				// The above means there will be no replanning.  The below needs at least one strategy to be happy.  kai, jul'22

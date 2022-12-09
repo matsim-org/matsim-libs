@@ -101,7 +101,7 @@ import java.util.ArrayList;
 							addShipmentTransportElement(tuple, tour, serviceActivity);
 							addShipmentUnloadElement(tuple, tour, serviceActivity);
 							addCollectionTourEndEventHandler(pair.service, tuple, resource, tour);
-							addCollectionServiceEventHandler(pair.service, tuple, resource, tour);
+							addCollectionServiceEventHandler(pair.service, tuple, resource);
 							//				break outerLoop;
 						}
 					}
@@ -132,7 +132,7 @@ import java.util.ArrayList;
 		tuple.getShipment().getShipmentPlan().addPlanElement(id, load);
 	}
 
-	private void addCollectionServiceEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
+	private void addCollectionServiceEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, tuple.getShipment(), element, resource);

@@ -42,7 +42,6 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 	private final ShipmentPlan schedule;
 	private final ShipmentPlan log;
 	private final List<Requirement> requirements;
-	private Id<LogisticChain> logisticChainId;
 
 	LSPShipmentImpl(ShipmentUtils.LSPShipmentBuilder builder) {
 		super(builder.id);
@@ -105,11 +104,6 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 	}
 
 	@Override
-	public Id<LogisticChain> getLogisticChainId() {
-		return logisticChainId;
-	}
-
-	@Override
 	public double getPickupServiceTime() {
 		return pickupServiceTime;
 	}
@@ -128,7 +122,6 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 //				"\t schedule=" + schedule +
 //				"\t log=" + log +
 //				"\t requirements=" + requirements +
-				"\t solutionId=" + logisticChainId +
 				'}';
 	}
 }

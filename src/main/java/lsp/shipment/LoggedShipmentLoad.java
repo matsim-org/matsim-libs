@@ -23,9 +23,8 @@ package lsp.shipment;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
-/*package-private*/ class LoggedShipmentLoad implements ShipmentActivity {
+/*package-private*/ class LoggedShipmentLoad implements ShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;
@@ -42,8 +41,7 @@ import org.matsim.api.core.v01.network.Link;
 
 	@Override
 	public String getElementType() {
-		String type = "LOAD";
-		return type;
+		return "LOAD";
 	}
 
 	@Override
@@ -66,8 +64,4 @@ import org.matsim.api.core.v01.network.Link;
 		return resourceId;
 	}
 
-	@Override
-	public Id<Link> getLinkId() {
-		throw new RuntimeException("not implemented");
-	}
 }

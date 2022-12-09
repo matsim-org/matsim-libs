@@ -284,27 +284,29 @@ import java.util.*;
 		return auxiliaryCarrier;
 	}
 
-	private double getLoadStartTime(ShipmentWithTime tuple, Tour tour) {
-		double loadStartTime = 0;
-		ListIterator<TourElement> iterator = tour.getTourElements().listIterator(tour.getTourElements().size() - 1);
-
-		outerLoop:
-		while (iterator.hasPrevious()) {
-			TourElement element = iterator.previous();
-			if (element instanceof ServiceActivity serviceActivity) {
-				LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
-				for (LSPCarrierPair pair : pairs) {
-					if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
-						break outerLoop;
-					} else {
-						loadStartTime = loadStartTime + serviceActivity.getDuration();
-					}
-				}
-			}
-		}
-
-		return loadStartTime;
-	}
+// --Commented out by Inspection START (09.12.22, 21:59):
+//	private double getLoadStartTime(ShipmentWithTime tuple, Tour tour) {
+//		double loadStartTime = 0;
+//		ListIterator<TourElement> iterator = tour.getTourElements().listIterator(tour.getTourElements().size() - 1);
+//
+//		outerLoop:
+//		while (iterator.hasPrevious()) {
+//			TourElement element = iterator.previous();
+//			if (element instanceof ServiceActivity serviceActivity) {
+//				LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
+//				for (LSPCarrierPair pair : pairs) {
+//					if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
+//						break outerLoop;
+//					} else {
+//						loadStartTime = loadStartTime + serviceActivity.getDuration();
+//					}
+//				}
+//			}
+//		}
+//
+//		return loadStartTime;
+//	}
+// --Commented out by Inspection STOP (09.12.22, 21:59)
 
 	private void addDistributionServiceEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {

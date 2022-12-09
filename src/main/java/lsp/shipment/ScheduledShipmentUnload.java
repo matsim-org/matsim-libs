@@ -23,18 +23,16 @@ package lsp.shipment;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
-class ScheduledShipmentUnload implements ShipmentActivity {
+class ScheduledShipmentUnload implements ShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;
 	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
 	private final Id<Carrier> carrierId;
-	private final Id<Link> linkId;
 	private final CarrierService carrierService;
 
 	ScheduledShipmentUnload(ShipmentUtils.ScheduledShipmentUnloadBuilder builder) {
@@ -43,15 +41,13 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 		this.element = builder.element;
 		this.resourceId = builder.resourceId;
 		this.carrierId = builder.carrierId;
-		this.linkId = builder.linkId;
 		this.carrierService = builder.carrierService;
 	}
 
 
 	@Override
 	public String getElementType() {
-		String type = "UNLOAD";
-		return type;
+		return "UNLOAD";
 	}
 
 	@Override
@@ -77,10 +73,6 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 
 	public Id<Carrier> getCarrierId() {
 		return carrierId;
-	}
-
-	public Id<Link> getLinkId() {
-		return linkId;
 	}
 
 	public CarrierService getCarrierService() {

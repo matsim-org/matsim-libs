@@ -99,7 +99,7 @@ public final class LSPUtils {
 
 	public static final class LSPBuilder {
 		final Collection<LSPResource> resources;
-		Id<LSP> id;
+		final Id<LSP> id;
 		LogisticChainScheduler logisticChainScheduler;
 		LSPPlan initialPlan;
 

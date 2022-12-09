@@ -136,14 +136,10 @@ import java.util.*;
 
 		tourBuilder.addLeg(new Leg());
 		switch (resource.getVehicleReturn()) {
-			case returnToFromLink -> {
-				//The more "urban" behaviour: The vehicle returns to its origin (startLink).
-				tourBuilder.scheduleEnd(Id.create(resource.getStartLinkId(), Link.class));
-			}
-			case endAtToLink -> {
-				//The more "long-distance" behaviour: The vehicle ends at its destination (toLink).
-				tourBuilder.scheduleEnd(Id.create(resource.getEndLinkId(), Link.class));
-			}
+			case returnToFromLink -> //The more "urban" behaviour: The vehicle returns to its origin (startLink).
+					tourBuilder.scheduleEnd(Id.create(resource.getStartLinkId(), Link.class));
+			case endAtToLink -> //The more "long-distance" behaviour: The vehicle ends at its destination (toLink).
+					tourBuilder.scheduleEnd(Id.create(resource.getEndLinkId(), Link.class));
 			default -> throw new IllegalStateException("Unexpected value: " + resource.getVehicleReturn());
 		}
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();

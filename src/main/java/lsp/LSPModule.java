@@ -73,9 +73,9 @@ public class LSPModule extends AbstractModule {
 		switch (freightConfig.getTimeWindowHandling()) {
 			case ignore:
 				break;
-//			case enforceBeginnings:
+			case enforceBeginnings:
 ////				abc.add( WithinDayActivityReScheduling.COMPONENT_NAME );
-//				log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
+				log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
 //				break;
 			default:
 				throw new IllegalStateException("Unexpected value: " + freightConfig.getTimeWindowHandling());
@@ -91,9 +91,9 @@ public class LSPModule extends AbstractModule {
 				switch (freightConfig.getTimeWindowHandling()) {
 					case ignore:
 						break;
-//					case enforceBeginnings:
+					case enforceBeginnings:
 ////						this.addQSimComponentBinding(WithinDayActivityReScheduling.COMPONENT_NAME).to( WithinDayActivityReScheduling.class );
-//						log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
+						log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
 //						break;
 					default:
 						throw new IllegalStateException("Unexpected value: " + freightConfig.getTimeWindowHandling());
@@ -118,7 +118,7 @@ public class LSPModule extends AbstractModule {
 	}
 
 	private static class LSPScoringFunctionFactoryDummyImpl implements LSPScorerFactory{
-		@Override public LSPScorer createScoringFunction( LSP lsp ){
+		@Override public LSPScorer createScoringFunction( ){
 			return new LSPScorer(){
 				@Override public double getScoreForCurrentPlan(){
 					return Double.NEGATIVE_INFINITY;

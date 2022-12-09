@@ -1,5 +1,5 @@
 LSP: LSPwithReloading
-Shipment: LSPShipmentImpl{Id=1	 fromLinkId=(4 2) (4 3)	 toLinkId=(17 2) (17 3)	 capacityDemand=5	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=5	 deliveryServiceTime=300.0	 pickupServiceTime=0.0	 solutionId=null}
+Shipment: LSPShipmentImpl{Id=1	 fromLinkId=(4 2) (4 3)	 toLinkId=(17 2) (17 3)	 capacityDemand=5	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=5	 deliveryServiceTime=300.0	 pickupServiceTime=0.0}
 DepotElement		Depot		HANDLE		0.0		15.0
 MainRunElement		MainRunResource		LOAD		19.0		1699.0
 MainRunElement		MainRunResource		TRANSPORT		1699.0		3299.0
@@ -9,7 +9,7 @@ DistributionElement		DistributionCarrierResource		LOAD		4994.0		5414.0
 DistributionElement		DistributionCarrierResource		TRANSPORT		5414.0		6733.999999999997
 DistributionElement		DistributionCarrierResource		UNLOAD		6733.999999999997		7033.999999999997
 
-Shipment: LSPShipmentImpl{Id=2	 fromLinkId=(4 2) (4 3)	 toLinkId=(17 0) (17 1)	 capacityDemand=5	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=5	 deliveryServiceTime=300.0	 pickupServiceTime=0.0	 solutionId=null}
+Shipment: LSPShipmentImpl{Id=2	 fromLinkId=(4 2) (4 3)	 toLinkId=(17 0) (17 1)	 capacityDemand=5	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=5	 deliveryServiceTime=300.0	 pickupServiceTime=0.0}
 DepotElement		Depot		HANDLE		0.0		15.0
 MainRunElement		MainRunResource		LOAD		19.0		1699.0
 MainRunElement		MainRunResource		TRANSPORT		1699.0		3299.0
@@ -19,7 +19,7 @@ DistributionElement		DistributionCarrierResource		LOAD		4994.0		5294.0
 DistributionElement		DistributionCarrierResource		TRANSPORT		5294.0		6227.333333333331
 DistributionElement		DistributionCarrierResource		UNLOAD		6227.333333333331		6527.333333333331
 
-Shipment: LSPShipmentImpl{Id=3	 fromLinkId=(4 2) (4 3)	 toLinkId=(16 0) (15 0)	 capacityDemand=9	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=9	 deliveryServiceTime=540.0	 pickupServiceTime=0.0	 solutionId=null}
+Shipment: LSPShipmentImpl{Id=3	 fromLinkId=(4 2) (4 3)	 toLinkId=(16 0) (15 0)	 capacityDemand=9	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=9	 deliveryServiceTime=540.0	 pickupServiceTime=0.0}
 DepotElement		Depot		HANDLE		0.0		19.0
 MainRunElement		MainRunResource		LOAD		19.0		1699.0
 MainRunElement		MainRunResource		TRANSPORT		1699.0		3299.0
@@ -29,7 +29,7 @@ DistributionElement		DistributionCarrierResource		LOAD		4998.0		5538.0
 DistributionElement		DistributionCarrierResource		TRANSPORT		5538.0		6337.999999999998
 DistributionElement		DistributionCarrierResource		UNLOAD		6337.999999999998		6877.999999999998
 
-Shipment: LSPShipmentImpl{Id=4	 fromLinkId=(4 2) (4 3)	 toLinkId=(16 0) (17 0)	 capacityDemand=2	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=2	 deliveryServiceTime=120.0	 pickupServiceTime=0.0	 solutionId=null}
+Shipment: LSPShipmentImpl{Id=4	 fromLinkId=(4 2) (4 3)	 toLinkId=(16 0) (17 0)	 capacityDemand=2	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=2	 deliveryServiceTime=120.0	 pickupServiceTime=0.0}
 DepotElement		Depot		HANDLE		0.0		12.0
 MainRunElement		MainRunResource		LOAD		19.0		1699.0
 MainRunElement		MainRunResource		TRANSPORT		1699.0		3299.0
@@ -39,7 +39,7 @@ DistributionElement		DistributionCarrierResource		LOAD		4994.0		5414.0
 DistributionElement		DistributionCarrierResource		TRANSPORT		5414.0		6213.999999999998
 DistributionElement		DistributionCarrierResource		UNLOAD		6213.999999999998		6333.999999999998
 
-Shipment: LSPShipmentImpl{Id=5	 fromLinkId=(4 2) (4 3)	 toLinkId=(17 1) (18 1)	 capacityDemand=7	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=7	 deliveryServiceTime=420.0	 pickupServiceTime=0.0	 solutionId=null}
+Shipment: LSPShipmentImpl{Id=5	 fromLinkId=(4 2) (4 3)	 toLinkId=(17 1) (18 1)	 capacityDemand=7	 startTimeWindow=[start=00:00:00, end=24:00:00]	 endTimeWindow=[start=00:00:00, end=24:00:00]	 capacityDemand=7	 deliveryServiceTime=420.0	 pickupServiceTime=0.0}
 DepotElement		Depot		HANDLE		0.0		17.0
 MainRunElement		MainRunResource		LOAD		19.0		1699.0
 MainRunElement		MainRunResource		TRANSPORT		1699.0		3299.0

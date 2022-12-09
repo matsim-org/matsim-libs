@@ -29,7 +29,6 @@ package lsp;
 	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
 	private LogisticChainElement previousElement;
 	private LogisticChainElement nextElement;
-	private LogisticChain logisticChain;
 
 	LogisticChainElementImpl(LSPUtils.LogisticChainElementBuilder builder) {
 		super(builder.id);
@@ -62,8 +61,8 @@ package lsp;
 
 
 	@Override
-	public void setEmbeddingContainer(LogisticChain solution) {
-		this.logisticChain = solution;
+	public void setEmbeddingContainer(LogisticChain logisticChain) {
+		/* not */
 	}
 
 	@Override
