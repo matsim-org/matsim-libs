@@ -65,8 +65,4 @@ class LoggedShipmentUnload implements ShipmentActivity {
 		return endTime;
 	}
 
-	@Override
-	public Id<Link> getLinkId() {
-		throw new RuntimeException("not implemented");
-	}
 }

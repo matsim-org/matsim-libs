@@ -32,14 +32,12 @@ import org.matsim.api.core.v01.network.Link;
 	private final double endTime;
 	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
-	private final Id<Link> linkId;
 
 	LoggedShipmentHandle(ShipmentUtils.LoggedShipmentHandleBuilder builder) {
 		this.startTime = builder.getStartTime();
 		this.endTime = builder.getEndTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
-		this.linkId = builder.getLinkId();
 	}
 
 	@Override
@@ -67,9 +65,5 @@ import org.matsim.api.core.v01.network.Link;
 		return endTime;
 	}
 
-	@Override
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
 
 }

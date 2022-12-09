@@ -31,7 +31,6 @@ class ScheduledShipmentHandle implements ShipmentActivity {
 	private final double endTime;
 	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
-	private Id<Link> linkId;
 
 	ScheduledShipmentHandle(ShipmentUtils.ScheduledShipmentHandleBuilder builder) {
 		this.startTime = builder.startTime;
@@ -63,10 +62,6 @@ class ScheduledShipmentHandle implements ShipmentActivity {
 	@Override
 	public Id<LSPResource> getResourceId() {
 		return resourceId;
-	}
-
-	public Id<Link> getLinkId() {
-		return linkId;
 	}
 
 }

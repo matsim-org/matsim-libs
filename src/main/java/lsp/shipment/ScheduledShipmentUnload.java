@@ -34,7 +34,6 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
 	private final Id<Carrier> carrierId;
-	private final Id<Link> linkId;
 	private final CarrierService carrierService;
 
 	ScheduledShipmentUnload(ShipmentUtils.ScheduledShipmentUnloadBuilder builder) {
@@ -43,7 +42,6 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 		this.element = builder.element;
 		this.resourceId = builder.resourceId;
 		this.carrierId = builder.carrierId;
-		this.linkId = builder.linkId;
 		this.carrierService = builder.carrierService;
 	}
 
@@ -76,10 +74,6 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 
 	public Id<Carrier> getCarrierId() {
 		return carrierId;
-	}
-
-	public Id<Link> getLinkId() {
-		return linkId;
 	}
 
 	public CarrierService getCarrierService() {

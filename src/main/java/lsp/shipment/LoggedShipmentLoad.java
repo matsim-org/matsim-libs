@@ -65,8 +65,4 @@ import org.matsim.api.core.v01.network.Link;
 		return resourceId;
 	}
 
-	@Override
-	public Id<Link> getLinkId() {
-		throw new RuntimeException("not implemented");
-	}
 }

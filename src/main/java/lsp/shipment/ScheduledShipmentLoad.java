@@ -35,7 +35,6 @@ class ScheduledShipmentLoad implements ShipmentActivity {
 	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
 	private final Id<Carrier> carrierId;
-	private final Id<Link> linkId;
 	private final CarrierService carrierService;
 
 	ScheduledShipmentLoad(ShipmentUtils.ScheduledShipmentLoadBuilder builder) {
@@ -43,7 +42,6 @@ class ScheduledShipmentLoad implements ShipmentActivity {
 		this.endTime = builder.endTime;
 		this.element = builder.element;
 		this.resourceId = builder.resourceId;
-		this.linkId = builder.linkId;
 		this.carrierId = builder.carrierId;
 		this.carrierService = builder.carrierService;
 	}
@@ -72,10 +70,6 @@ class ScheduledShipmentLoad implements ShipmentActivity {
 	@Override
 	public Id<LSPResource> getResourceId() {
 		return resourceId;
-	}
-
-	public Id<Link> getLinkId() {
-		return linkId;
 	}
 
 	public Id<Carrier> getCarrierId() {
