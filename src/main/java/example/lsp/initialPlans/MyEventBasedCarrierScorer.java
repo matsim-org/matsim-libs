@@ -61,7 +61,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		private final Carrier carrier;
 		private double score;
 
-		private double MAX_SHIFT_DURATION = 8 * 3600;
+		private final double MAX_SHIFT_DURATION = 8 * 3600;
 		private Map<VehicleType, Double>  vehicleType2TourDuration = new LinkedHashMap<>();
 		private Map<VehicleType, Integer>  vehicleType2ScoredFixCosts = new LinkedHashMap<>();
 
@@ -196,7 +196,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 			if (tollingCounter < maxNumberOfTollings) {
 				if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
 					if (tolledLinkList.contains(event.getLinkId().toString())) {
-						log.info("Tolling caused by event: " + event.toString());
+						log.info("Tolling caused by event: " + event);
 						tollingCounter++;
 						score = score - toll;
 					}
