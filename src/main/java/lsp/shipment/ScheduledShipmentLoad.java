@@ -23,12 +23,11 @@ package lsp.shipment;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
 
-class ScheduledShipmentLoad implements ShipmentActivity {
+class ScheduledShipmentLoad implements ShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;

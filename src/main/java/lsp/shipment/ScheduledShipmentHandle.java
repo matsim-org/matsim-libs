@@ -23,9 +23,8 @@ package lsp.shipment;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
-class ScheduledShipmentHandle implements ShipmentActivity {
+class ScheduledShipmentHandle implements ShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;
