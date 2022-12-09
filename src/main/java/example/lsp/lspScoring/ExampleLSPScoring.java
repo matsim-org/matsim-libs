@@ -158,7 +158,7 @@ import java.util.*;
 		controler.addOverridingModule(new LSPModule());
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new TipScorer() );
+				bind( LSPScorerFactory.class ).toInstance( () -> new TipScorer() );
 			}
 		} );
 		return controler;

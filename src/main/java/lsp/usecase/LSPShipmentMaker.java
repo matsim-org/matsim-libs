@@ -32,8 +32,13 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
+
+/**
+ * This class seems to be only used by TM.
+ * Looks like it will create some random Shipment.
+ * As input a network is need.
+ */
 class LSPShipmentMaker {
 
 	public static void main(String[] args) {
@@ -41,7 +46,6 @@ class LSPShipmentMaker {
 		Network network = NetworkUtils.createNetwork();
 		MatsimNetworkReader reader = new MatsimNetworkReader(network);
 		reader.readFile("D:/Working_Copies_Dissertation/Code_Dissertation/logistics/scenarios/2regions/2regions-network.xml");
-		Random random = new Random(1);
 		ArrayList<LSPShipment> shipments = new ArrayList<>();
 
 		for (int i = 0; i < 8; i++) {

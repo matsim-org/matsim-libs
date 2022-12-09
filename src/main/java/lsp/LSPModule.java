@@ -118,7 +118,7 @@ public class LSPModule extends AbstractModule {
 	}
 
 	private static class LSPScoringFunctionFactoryDummyImpl implements LSPScorerFactory{
-		@Override public LSPScorer createScoringFunction( LSP lsp ){
+		@Override public LSPScorer createScoringFunction( ){
 			return new LSPScorer(){
 				@Override public double getScoreForCurrentPlan(){
 					return Double.NEGATIVE_INFINITY;

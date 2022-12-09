@@ -68,7 +68,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		// Doing so results in a lot of "not adding eventsHandler since already added" warnings.
 		// @KN: Would it be possible to do it in (simulation) startup and therefor only oce?
 		for (LSP lsp : lsps.getLSPs().values()) {
-			((LSPImpl) lsp).setScorer( lspScoringFunctionFactory.createScoringFunction( lsp ) );
+			((LSPImpl) lsp).setScorer( lspScoringFunctionFactory.createScoringFunction() );
 
 			// simulation trackers of lsp:
 			registerSimulationTrackers(lsp );
@@ -138,7 +138,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	@Override
 	public void notifyScoring(ScoringEvent scoringEvent) {
 		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
-			lsp.scoreSelectedPlan(scoringEvent);
+			lsp.scoreSelectedPlan();
 		}
 		// yyyyyy might make more sense to register the lsps directly as scoring controler listener (??)
 	}

@@ -59,6 +59,4 @@ public interface LSPShipment extends Identifiable<LSPShipment>, Attributable, Ha
 
 	Collection<Requirement> getRequirements();
 
-	Id<LogisticChain> getLogisticChainId();
-
 }

@@ -30,10 +30,6 @@ public class LSPDataObject<T> implements HasSimulationTrackers<T>, Attributable,
 		return Collections.unmodifiableCollection( this.trackers );
 	}
 
-	@Override public final void clearSimulationTrackers() {
-		trackers.clear();
-	}
-
 	@Override  public final Attributes getAttributes() {
 		return attributes;
 	}

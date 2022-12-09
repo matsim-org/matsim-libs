@@ -139,7 +139,7 @@ final class ExampleTwoEchelonGrid {
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
-				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new MyLSPScorer() );
+				bind( LSPScorerFactory.class ).toInstance( () -> new MyLSPScorer() );
 			}
 		} );
 
