@@ -79,8 +79,8 @@ import java.util.Collection;
 		this.lsp = lsp;
 		if (assigner != null) {
 			this.assigner.setLSP(lsp);
-			// yy vom Design her wäre es vllt einfacher und logischer, wenn der assigner einen backpointer auf den LSPPlan hätte.  Dann
-			// müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen.  kai, may'22
+			// yy vom Design her wäre es vlt. einfacher und logischer, wenn der assigner einen backpointer auf den LSPPlan hätte. Dann
+			// müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen. kai, may'22
 		}
 		for (LogisticChain solution : logisticChains) {
 			solution.setLSP(lsp);
@@ -89,12 +89,12 @@ import java.util.Collection;
 
 	@Override public String toString() {
 		StringBuilder strb = new StringBuilder();
-			strb.append("[score=" + this.score + "]");
+			strb.append("[score=").append(this.score).append("]");
 			for (LogisticChain solution : this.logisticChains) {
-				strb.append(", [solutionId=").append(solution.getId()  + "], [No of SolutionElements=" + solution.getLogisticChainElements().size()+ "] \n" );
+				strb.append(", [solutionId=").append(solution.getId()).append("], [No of SolutionElements=").append(solution.getLogisticChainElements().size()).append("] \n");
 				if (!solution.getLogisticChainElements().isEmpty()){
 					for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
-						strb.append("\t \t" + solutionElement.toString()).append("\n");
+						strb.append("\t \t").append(solutionElement.toString()).append("\n");
 					}
 				}
 			}

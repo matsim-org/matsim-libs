@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 public class FirstReloadResourceTest {
 
 	private static final Id<Link> hubLinkId = Id.createLinkId("(4 2) (4 3)");
-	;
 	private TransshipmentHub transshipmentHub;
 
 	@Before

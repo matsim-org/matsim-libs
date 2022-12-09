@@ -268,6 +268,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			for (LogisticChainElement clientElement : reloadEventHandler.getTranshipmentHub().getClientElements()) {
 				if (clientElement == element) {
 					handledByTranshipmentHub = true;
+					break;
 				}
 			}
 			assertTrue(handledByTranshipmentHub);

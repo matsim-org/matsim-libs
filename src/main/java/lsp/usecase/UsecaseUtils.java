@@ -138,7 +138,7 @@ public class UsecaseUtils {
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getLog().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-				final String str1 = "Shipment: " + shipment.toString();
+				final String str1 = "Shipment: " + shipment;
 				System.out.println(str1);
 				writer.write(str1 + "\n");
 				for (ShipmentPlanElement element : elementList) {
