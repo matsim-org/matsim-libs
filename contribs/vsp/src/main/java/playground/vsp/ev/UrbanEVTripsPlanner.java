@@ -658,7 +658,9 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			//			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
 			//					+ auxEnergyConsumption.calcEnergyConsumption(leg.getDepartureTime().seconds(), travelT, l.getId());
 			double consumption = driveConsumption + auxConsumption;
-			ev.getBattery().changeCharge(-consumption);
+			ev.getBattery().dischargeEnergy(consumption, missingEnergy -> {
+				throw new RuntimeException("Energy consumed greater than the current charge. Missing energy: " + missingEnergy);
+			});
 			linkEnterTime += travelT;
 		}
 	}
