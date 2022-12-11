@@ -28,7 +28,9 @@ public class ActivityEngineModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind( ActivityEngineDefaultImpl.class ).in( Singleton.class );
-		addQSimComponentBinding( COMPONENT_NAME ).to( ActivityEngineDefaultImpl.class );
+//		bind( ActivityEngineDefaultImpl.class ).in( Singleton.class );
+//		addQSimComponentBinding( COMPONENT_NAME ).to( ActivityEngineDefaultImpl.class );
+		bind( ParallelActivityEngine.class ).in( Singleton.class );
+		addQSimComponentBinding( COMPONENT_NAME ).to( ParallelActivityEngine.class );
 	}
 }

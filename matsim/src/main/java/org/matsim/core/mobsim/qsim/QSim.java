@@ -65,6 +65,7 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -126,7 +127,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 	private final org.matsim.core.mobsim.qsim.AgentCounter agentCounter;
-	private final Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
+	private final Map<Id<Person>, MobsimAgent> agents = new ConcurrentHashMap<>(); //new LinkedHashMap<>();
 	private final IdMap<Vehicle, MobsimVehicle> vehicles = new IdMap<>(Vehicle.class);
 	private final List<AgentSource> agentSources = new ArrayList<>();
 
@@ -158,15 +159,17 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 			return QSim.this;
 		}
 
+		// Call goes to a ConcurrentHashMap<> - I don't think this needs to be synchronized...
 		@Override
-		public synchronized void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
+		public /*synchronized*/ void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 			if (QSim.this.netEngine != null) {
 				QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
 			}
 		}
 
+		// Call goes to a ConcurrentHashMap<> - I don't think this needs to be synchronized...
 		@Override
-		public synchronized MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
+		public /*synchronized*/ MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
 			if (QSim.this.netEngine != null) {
 				return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
 			}
@@ -458,10 +461,10 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private void arrangeNextAgentAction(final MobsimAgent agent) {
 		switch( agent.getState() ) {
 		case ACTIVITY:
-			arrangeAgentActivity(agent);
+			arrangeAgentActivity(agent); // calls ActivityEngine - we need to make this thread-safe
 			break ;
 		case LEG:
-			this.arrangeAgentDeparture(agent);
+			this.arrangeAgentDeparture(agent); // looks thread-safe
 			break ;
 		case ABORT:
 			this.events.processEvent( new PersonStuckEvent(this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode()));
@@ -469,7 +472,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 			// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
 			// register abort handlers.  If someone ever comes to this place here and needs this.  kai, nov'17
 			
-			this.agents.remove(agent.getId()) ;
+			this.agents.remove(agent.getId()) ; // -> Switched to concurrentHashMap
 			this.agentCounter.decLiving();
 			this.agentCounter.incLost();
 			break ;

@@ -24,8 +24,11 @@
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.inject.Inject;
 
@@ -53,7 +56,7 @@ import org.matsim.vis.snapshotwriters.TeleportationVisData;
 public final class DefaultTeleportationEngine implements TeleportationEngine {
 	private static final Logger log = LogManager.getLogger( DefaultTeleportationEngine.class ) ;
 	
-	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<>(
+	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityBlockingQueue<>/*PriorityQueue<>*/(
 			30, new Comparator<Tuple<Double, MobsimAgent>>() {
 
 		@Override
@@ -68,7 +71,8 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 			return ret;
 		}
 	});
-	private final LinkedHashMap<Id<Person>, TeleportationVisData> teleportationData = new LinkedHashMap<>();
+//	private final LinkedHashMap<Id<Person>, TeleportationVisData> teleportationData = new LinkedHashMap<>();
+	private final Map<Id<Person>, TeleportationVisData> teleportationData = new ConcurrentHashMap<>();
 	private InternalInterface internalInterface;
 	private Scenario scenario;
 	private EventsManager eventsManager;
@@ -87,7 +91,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	}
 
 	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+	public /*synchronized*/ boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if (agent.getExpectedTravelTime().isUndefined()) {
 			LogManager.getLogger(this.getClass()).info("mode: " + agent.getMode());
 			throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
@@ -101,7 +105,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 			Facility arfac = agent.getDestinationFacility() ;
 			travelTime = DefaultTeleportationEngine.travelTimeCheck(travelTime, speed, dpfac, arfac);
 		}
-    	
+
 		double arrivalTime = now + travelTime ;
 		this.teleportationList.add(new Tuple<>(arrivalTime, agent));
 		
