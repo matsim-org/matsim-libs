@@ -19,14 +19,14 @@ public class SpeedTest {
     @Test
     public void encodingFastDecimalPointSpeedRoundsDownToNearestInteger() {
         int encoded = Agent.prepareVelocityForLinkEntry(15.3);
-	    Assert.assertEquals(15 + 90, encoded);
+        Assert.assertEquals(15 + 90, encoded);
 
     }
 
     @Test
     public void encodingFastDecimalPointSpeedRoundsUpToNearestInteger() {
         int encoded = Agent.prepareVelocityForLinkEntry(15.6);
-	    Assert.assertEquals(16 + 90, encoded);
+        Assert.assertEquals(16 + 90, encoded);
     }
 
     @Test
@@ -44,13 +44,13 @@ public class SpeedTest {
     @Test
     public void encodingSlowDecimalPointSpeedRoundsDown() {
         int encoded = Agent.prepareVelocityForLinkEntry(5.33);
-	    Assert.assertEquals((int) (5.3 * 10), encoded);
+        Assert.assertEquals((int) (5.3 * 10), encoded);
     }
 
     @Test
     public void encodingSlowDecimalPointSpeedRoundsUp() {
         int encoded = Agent.prepareVelocityForLinkEntry(5.66);
-	    Assert.assertEquals((int) (5.7 * 10), encoded);
+        Assert.assertEquals((int) (5.7 * 10), encoded);
     }
 
     @Test
