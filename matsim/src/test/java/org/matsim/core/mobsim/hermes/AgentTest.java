@@ -101,8 +101,8 @@ public class AgentTest {
 		int eventId = 0;
 		int linkId = 0;
 		double velocity = 15.2;
-		int PCECategory = 0;
-		long flatPlanEntry = Agent.prepareLinkEntry(eventId, linkId, velocity, PCECategory);
+		int PceCategory = 0;
+		long flatPlanEntry = Agent.prepareLinkEntry(eventId, linkId, velocity, PceCategory);
 		double testedVelocity = Agent.getVelocityPlanEntry(flatPlanEntry);
 		assertEquals(15.0, testedVelocity, 0.0);
 	}
@@ -112,8 +112,8 @@ public class AgentTest {
 		int eventId = 0;
 		int linkId = 0;
 		double velocity = 3.43;
-		int PCECategory = 0;
-		long flatPlanEntry = Agent.prepareLinkEntry(eventId, linkId, velocity, PCECategory);
+		int PceCategory = 0;
+		long flatPlanEntry = Agent.prepareLinkEntry(eventId, linkId, velocity, PceCategory);
 		double testedVelocity = Agent.getVelocityPlanEntry(flatPlanEntry);
 		assertEquals(3.4, testedVelocity, 0.0);
 	}
