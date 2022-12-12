@@ -78,8 +78,9 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * 
 	 * @param inclPop
 	 */
-	public void setInclPop(boolean inclPop) {
+	public LegHistogram setInclPop(boolean inclPop) {
 		this.inclPopulation = inclPop;
+		return this;
 	}
 	
 	

@@ -86,17 +86,16 @@ public final class RunChessboard {
             public void install() {
                 bind( CarrierStrategyManager.class ).toProvider( new MyCarrierPlanStrategyManagerFactory( types ) );
                 bind(CarrierScoringFunctionFactory.class).toInstance( new MyCarrierScoringFunctionFactory() );
-                final CarrierScoreStats scores = new CarrierScoreStats(carriers, config.controler().getOutputDirectory() +"/carrier_scores", true);
-                final int statInterval = 1;
-                final LegHistogram freightOnly = new LegHistogram(900);
-                freightOnly.setInclPop(false);
-                binder().requestInjection(freightOnly);
-                final LegHistogram withoutFreight = new LegHistogram(900);
-                binder().requestInjection(withoutFreight);
 
-                addEventHandlerBinding().toInstance(withoutFreight);
+                final LegHistogram freightOnly = new LegHistogram(900).setInclPop( false );
+//                binder().requestInjection(freightOnly);
                 addEventHandlerBinding().toInstance(freightOnly);
-                addControlerListenerBinding().toInstance(scores);
+
+                final LegHistogram withoutFreight = new LegHistogram(900);
+//                binder().requestInjection(withoutFreight);
+                addEventHandlerBinding().toInstance(withoutFreight);
+
+                addControlerListenerBinding().toInstance( new CarrierScoreStats(carriers, config.controler().getOutputDirectory() +"/carrier_scores", true) );
                 addControlerListenerBinding().toInstance(new IterationEndsListener() {
 
                     @Inject
@@ -104,9 +103,9 @@ public final class RunChessboard {
 
                     @Override
                     public void notifyIterationEnds(IterationEndsEvent event) {
-                        if (event.getIteration() % statInterval != 0) return;
-                        //write plans
                         String dir = controlerIO.getIterationPath(event.getIteration());
+
+                        //write plans
                         new CarrierPlanWriter(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 
                         //write stats
@@ -151,15 +150,14 @@ public final class RunChessboard {
     }
 
     public final Config prepareConfig(){
-        final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-        final URL configURL = IOUtils.extendUrl(url, "config.xml");
-        config = ConfigUtils.loadConfig(configURL  );
+        config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9" ), "config.xml" ) );
+        config.controler().setLastIteration( 1 );
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setCarriersFile("carrierPlans.xml");
         freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
-        config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-        config.global().setRandomSeed(4177);
-        config.controler().setOutputDirectory("./output/");
+        config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+//        config.global().setRandomSeed(4177);
+//        config.controler().setOutputDirectory("./output/");
         return config;
     }
 

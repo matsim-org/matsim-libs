@@ -128,7 +128,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		kinematicWaves /*kinematicWaves and withHoles produce same snapshots Amit Mar'17*/
 	}
 
-	private SnapshotStyle snapshotStyle = SnapshotStyle.equiDist;
+	private SnapshotStyle snapshotStyle = SnapshotStyle.queue;
 
 	// ---
 	private static final String MAIN_MODE = "mainMode";

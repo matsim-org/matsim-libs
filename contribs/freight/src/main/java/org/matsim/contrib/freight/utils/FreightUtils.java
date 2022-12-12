@@ -527,4 +527,8 @@ public class FreightUtils {
 	public static void putVehicle( Plan plan, Vehicle vehicle ){
 		plan.getAttributes().putAttribute( CARRIER_VEHICLE, vehicle );
 	}
+
+	public static void writeCarriers( Carriers carriers, String filename ) {
+		new CarrierPlanWriter( carriers ).write( filename );
+	}
 }
