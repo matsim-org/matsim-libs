@@ -32,25 +32,25 @@ public class SpeedTest {
     @Test
     public void slowSpeedIsEncodedByMultiplyingBy10() {
         int encoded = Agent.prepareVelocityForLinkEntry(4.6);
-        Assert.assertEquals((int) (4.6 * 10), encoded);
+        Assert.assertEquals(46, encoded);
     }
 
     @Test
     public void slowSpeedIsDecodedByDividingBy10() {
-        double decoded = Agent.decodeVelocityFromLinkEntry((int) (4.6 * 10));
+        double decoded = Agent.decodeVelocityFromLinkEntry(46);
         Assert.assertEquals(4.6, decoded, 0.0);
     }
 
     @Test
     public void encodingSlowDecimalPointSpeedRoundsDown() {
         int encoded = Agent.prepareVelocityForLinkEntry(5.33);
-        Assert.assertEquals((int) (5.3 * 10), encoded);
+        Assert.assertEquals(53, encoded);
     }
 
     @Test
     public void encodingSlowDecimalPointSpeedRoundsUp() {
         int encoded = Agent.prepareVelocityForLinkEntry(5.66);
-        Assert.assertEquals((int) (5.7 * 10), encoded);
+        Assert.assertEquals(57, encoded);
     }
 
     @Test
