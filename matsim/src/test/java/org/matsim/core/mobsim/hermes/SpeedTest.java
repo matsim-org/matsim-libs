@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public class SpeedTest {
     @Test
-    public void encodingFastIntegerSpeedLeadsToNoLossOfInformation() {
+    public void fastIntegerSpeedIsEncodedCorrectly() {
         int encoded = Agent.prepareVelocityForLinkEntry(15);
         Assert.assertEquals(105, encoded);
 
@@ -14,25 +14,21 @@ public class SpeedTest {
     }
 
     @Test
-    public void encodingFastDecimalPointSpeedRoundsDown() {
+    public void encodingFastDecimalPointSpeedRoundsDownToNearestInteger() {
         int encoded = Agent.prepareVelocityForLinkEntry(15.3);
-        Assert.assertEquals(105, encoded);
-
         double decoded = Agent.decodeVelocityFromLinkEntry(encoded);
         Assert.assertEquals(15.0, decoded, 0.0);
     }
 
     @Test
-    public void encodingFastDecimalPointSpeedRoundsUp() {
+    public void encodingFastDecimalPointSpeedRoundsUpToNearestInteger() {
         int encoded = Agent.prepareVelocityForLinkEntry(15.6);
-        Assert.assertEquals(106, encoded);
-
         double decoded = Agent.decodeVelocityFromLinkEntry(encoded);
         Assert.assertEquals(16.0, decoded, 0.0);
     }
 
     @Test
-    public void encodingSlowIntegerSpeedLeadsToNoLossOfInformation() {
+    public void slowIntegerSpeedIsEncodedCorrectly() {
         int encoded = Agent.prepareVelocityForLinkEntry(4);
         Assert.assertEquals(40, encoded);
 
@@ -43,8 +39,6 @@ public class SpeedTest {
     @Test
     public void encodingSlowDecimalPointSpeedRoundsDown() {
         int encoded = Agent.prepareVelocityForLinkEntry(5.33);
-        Assert.assertEquals(53, encoded);
-
         double decoded = Agent.decodeVelocityFromLinkEntry(encoded);
         Assert.assertEquals(5.3, decoded, 0.0);
     }
@@ -52,8 +46,6 @@ public class SpeedTest {
     @Test
     public void encodingSlowDecimalPointSpeedRoundsUp() {
         int encoded = Agent.prepareVelocityForLinkEntry(5.66);
-        Assert.assertEquals(57, encoded);
-
         double decoded = Agent.decodeVelocityFromLinkEntry(encoded);
         Assert.assertEquals(5.7, decoded, 0.0);
     }
