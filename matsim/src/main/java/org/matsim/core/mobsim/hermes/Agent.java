@@ -287,7 +287,7 @@ class Agent {
         return (pcecategory << 56) | (linkid << 8) | encodedVelocity;
     }
 
-	private static int prepareVelocityForLinkEntry(double velocity) {
+	public static int prepareVelocityForLinkEntry(double velocity) {
 		// Checking for velocities that are too high.
 		velocity = Math.min(velocity, HermesConfigGroup.MAX_VEHICLE_VELOCITY);
 		// Checking for velocities that are too low.
@@ -303,7 +303,7 @@ class Agent {
 		return (int) Math.round(velocity);
 	}
 
-	private static double decodeVelocityFromLinkEntry(int encodedVelocity) {
+	public static double decodeVelocityFromLinkEntry(int encodedVelocity) {
 		double velocity;
 		if (encodedVelocity < 100) {
 			// 0 - 99 -> 0.0 - 9.9 m/s
