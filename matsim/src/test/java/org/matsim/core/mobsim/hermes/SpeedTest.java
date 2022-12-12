@@ -5,11 +5,14 @@ import org.junit.Test;
 
 public class SpeedTest {
     @Test
-    public void fastIntegerSpeedIsEncodedCorrectly() {
-        int encoded = Agent.prepareVelocityForLinkEntry(15);
-        Assert.assertEquals(105, encoded);
+    public void fastSpeedIsEncodedByAdding90() {
+	    int encoded = Agent.prepareVelocityForLinkEntry(15);
+	    Assert.assertEquals(15 + 90, encoded);
+    }
 
-        double decoded = Agent.decodeVelocityFromLinkEntry(encoded);
+    @Test
+    public void fastSpeedIsDecodedBySubtracting90() {
+        double decoded = Agent.decodeVelocityFromLinkEntry(15 + 90);
         Assert.assertEquals(15.0, decoded, 0.0);
     }
 
@@ -26,6 +29,18 @@ public class SpeedTest {
         double decoded = Agent.decodeVelocityFromLinkEntry(encoded);
         Assert.assertEquals(16.0, decoded, 0.0);
     }
+
+	@Test
+	public void slowSpeedIsEncodedByMultiplyingBy10() {
+		int encoded = Agent.prepareVelocityForLinkEntry(4.6);
+		Assert.assertEquals((int) 4.6 * 10, encoded);
+	}
+
+	@Test
+	public void slowSpeedIsDecodedByDividingBy10() {
+		double decoded = Agent.decodeVelocityFromLinkEntry((int) 4.6 * 10);
+		Assert.assertEquals(4.6, decoded, 0.0);
+	}
 
     @Test
     public void slowIntegerSpeedIsEncodedCorrectly() {
