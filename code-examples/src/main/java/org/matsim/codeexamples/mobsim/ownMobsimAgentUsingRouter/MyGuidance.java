@@ -51,7 +51,7 @@ class MyGuidance {
         String mainMode = TransportMode.car;
         Facility fromFacility = new LinkWrapperFacility(this.scenario.getNetwork().getLinks().get(linkId));
         Facility toFacility = new LinkWrapperFacility(this.scenario.getNetwork().getLinks().get(destinationLinkId));
-        List<? extends PlanElement> trip = router.calcRoute(mainMode, fromFacility, toFacility, now, person, new Attributes());
+        List<? extends PlanElement> trip = router.calcRoute(mainMode, fromFacility, toFacility, now, person, null );
 
         Leg leg = (Leg) trip.get(0);  // test: either plan element 0 or 1 will be a car leg
 

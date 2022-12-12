@@ -20,15 +20,19 @@ package org.matsim.codeexamples.extensions.freight;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.util.concurrent.ExecutionException;
 
@@ -66,14 +70,14 @@ public class RunFreightExample {
 //		FreightUtils.getCarrierVehicleTypes( scenario ).getVehicleTypes().get( Id.create("light", VehicleType.class ) ).getCapacity().setOther( 1 );
 
 		// output before jsprit run (not necessary)
-		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
+		new CarrierPlanWriter(FreightUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		// Solving the VRP (generate carrier's tour plans)
 		FreightUtils.runJsprit( scenario );
 
 		// Output after jsprit run (not necessary)
-		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
+		new CarrierPlanWriter(FreightUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		// ## MATSim configuration:  ##
@@ -82,12 +86,7 @@ public class RunFreightExample {
 
 
 		// otfvis (if you want to use):
-//		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
-//		otfVisConfigGroup.setLinkWidth( 10 );
-//		otfVisConfigGroup.setDrawNonMovingItems( false );
-//		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.kinematicWaves );
-//		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.kinematicWaves );
-//		controler.addOverridingModule( new OTFVisLiveModule() );
+		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		// ## Start of the MATSim-Run: ##
 		controler.run();
