@@ -282,38 +282,38 @@ class Agent {
         if (linkid > HermesConfigGroup.MAX_LINK_ID) {
             throw new RuntimeException("exceeded maximum number of links");
         }
-		int encodedVelocity = prepareVelocityForLinkEntry(velocity);
+        int encodedVelocity = prepareVelocityForLinkEntry(velocity);
 
         return (pcecategory << 56) | (linkid << 8) | encodedVelocity;
     }
 
-	public static int prepareVelocityForLinkEntry(double velocity) {
-		// Checking for velocities that are too high.
-		velocity = Math.min(velocity, HermesConfigGroup.MAX_VEHICLE_VELOCITY);
-		// Checking for velocities that are too low.
-		velocity = velocity < 0 ? HermesConfigGroup.MAX_VEHICLE_VELOCITY : velocity;
-		// Encode velocity to 8-bit
-		if (velocity < 10) {
-			// Speeds 0.0 - 9.9 -> 0 - 99
-			velocity = velocity * 10;
-		} else {
-			// Speeds 10 - 165 -> 100 - 255
-			velocity = velocity + 90;
-		}
-		return (int) Math.round(velocity);
-	}
+    public static int prepareVelocityForLinkEntry(double velocity) {
+        // Checking for velocities that are too high.
+        velocity = Math.min(velocity, HermesConfigGroup.MAX_VEHICLE_VELOCITY);
+        // Checking for velocities that are too low.
+        velocity = velocity < 0 ? HermesConfigGroup.MAX_VEHICLE_VELOCITY : velocity;
+        // Encode velocity to 8-bit unsigned integer
+        if (velocity < 10) {
+            // Speeds 0.0 - 9.9 -> 0 - 99
+            velocity = velocity * 10;
+        } else {
+            // Speeds 10 - 165 -> 100 - 255
+            velocity = velocity + 90;
+        }
+        return (int) Math.round(velocity);
+    }
 
-	public static double decodeVelocityFromLinkEntry(int encodedVelocity) {
-		double velocity;
-		if (encodedVelocity < 100) {
-			// 0 - 99 -> 0.0 - 9.9 m/s
-			velocity = ((double) encodedVelocity) / 10.0;
-		} else {
-			// 100 - 255 -> 10 - 165 m/s
-			velocity = ((double) encodedVelocity) - 90;
-		}
-		return velocity;
-	}
+    public static double decodeVelocityFromLinkEntry(int encodedVelocity) {
+        double velocity;
+        if (encodedVelocity < 100) {
+            // 0 - 99 -> 0.0 - 9.9 m/s
+            velocity = ((double) encodedVelocity) / 10.0;
+        } else {
+            // 100 - 255 -> 10 - 165 m/s
+            velocity = ((double) encodedVelocity) - 90;
+        }
+        return velocity;
+    }
 
 
 	public static long prepareStopDelay(long type, long departure, long element) {

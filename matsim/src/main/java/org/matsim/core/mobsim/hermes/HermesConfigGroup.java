@@ -39,7 +39,7 @@ public final class HermesConfigGroup extends ReflectiveConfigGroup {
     // Maximum number of stops (limited to 20bits in the plan)
     public static final int MAX_STOP_ROUTE_ID = 65536;
     // Maximum vehicle velocity (limited to 8 bits in the plan: integers 0-99 reserved for speeds 0.0 - 9.9
-	// and 100-255 reserved for speeds 10 - 165)
+    // and 100-255 reserved for speeds 10 - 165)
     public static final int MAX_VEHICLE_VELOCITY = 165;
     // Maximum vehicle PCE types (limited to 4 bits)
     public static final int MAX_VEHICLE_PCETYPES = 15;
