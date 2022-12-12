@@ -64,7 +64,6 @@ public class AgentTest {
 	public void encodingFastDecimalPointSpeedRoundsDownToNearestInteger() {
 		int encoded = Agent.prepareVelocityForLinkEntry(15.3);
 		assertEquals(15 + 90, encoded);
-
 	}
 
 	@Test
@@ -99,23 +98,23 @@ public class AgentTest {
 
 	@Test
 	public void fastSpeedIsIntegerWithFlatPlan() {
-		int eventid = 0;
-		int linkid = 0;
+		int eventId = 0;
+		int linkId = 0;
 		double velocity = 15.2;
-		int pcecategory = 0;
-		long flatplanentry = Agent.prepareLinkEntry(eventid, linkid, velocity, pcecategory);
-		double testedVelocity = Agent.getVelocityPlanEntry(flatplanentry);
+		int PCECategory = 0;
+		long flatPlanEntry = Agent.prepareLinkEntry(eventId, linkId, velocity, PCECategory);
+		double testedVelocity = Agent.getVelocityPlanEntry(flatPlanEntry);
 		assertEquals(15.0, testedVelocity, 0.0);
 	}
 
 	@Test
 	public void smallSpeedHasOneDecimalPointAccuracyWithFlatPlan() {
-		int eventid = 0;
-		int linkid = 0;
+		int eventId = 0;
+		int linkId = 0;
 		double velocity = 3.43;
-		int pcecategory = 0;
-		long flatplanentry = Agent.prepareLinkEntry(eventid, linkid, velocity, pcecategory);
-		double testedVelocity = Agent.getVelocityPlanEntry(flatplanentry);
+		int PCECategory = 0;
+		long flatPlanEntry = Agent.prepareLinkEntry(eventId, linkId, velocity, PCECategory);
+		double testedVelocity = Agent.getVelocityPlanEntry(flatPlanEntry);
 		assertEquals(3.4, testedVelocity, 0.0);
 	}
 }
