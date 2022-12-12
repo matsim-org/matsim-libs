@@ -35,17 +35,17 @@ public class SpeedTest {
 		Assert.assertEquals(5.5, decoded, 0.0);
 	}
 	@Test
-	public void integerSpeedWithFlatPlan() {
+	public void largerSpeedIsIntegerWithFlatPlan() {
 		int eventid = 0;
 		int linkid = 0;
-		double velocity = 15.0;
+		double velocity = 15.2;
 		int pcecategory = 0;
 		long flatplanentry = Agent.prepareLinkEntry(eventid, linkid, velocity, pcecategory);
 		double testedVelocity = Agent.getVelocityPlanEntry(flatplanentry);
-		Assert.assertEquals(velocity, testedVelocity, 0.0);
+		Assert.assertEquals(15.0, testedVelocity, 0.0);
 	}
 	@Test
-	public void smallSpeedWithFlatPlan() {
+	public void smallSpeedHasOneDecimalPointAccuracyWithFlatPlan() {
 		int eventid = 0;
 		int linkid = 0;
 		double velocity = 3.43;
