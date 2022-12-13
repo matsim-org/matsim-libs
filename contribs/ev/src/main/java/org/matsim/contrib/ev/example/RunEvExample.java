@@ -32,12 +32,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
+import org.matsim.contrib.ev.stats.DryEvHandler;
 import org.matsim.contrib.ev.routing.EvNetworkRoutingProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -81,6 +83,8 @@ public class RunEvExample {
 					protected void configureQSim() {
 						bind(VehicleChargingHandler.class).asEagerSingleton();
 						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
+						bind( DryEvHandler.class ).asEagerSingleton();
+						addMobsimScopeEventHandlerBinding().to( DryEvHandler.class );
 					}
 				});
 			}
