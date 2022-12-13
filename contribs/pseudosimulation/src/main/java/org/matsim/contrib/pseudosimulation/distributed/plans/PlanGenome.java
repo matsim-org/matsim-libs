@@ -21,6 +21,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * Created by fouriep on 1/28/15.
@@ -40,7 +41,7 @@ public class PlanGenome implements Plan {
     private String type = null;
     private Customizable customizableDelegate;
     
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	@Override
 	public final Attributes getAttributes() {
 		return this.attributes;

@@ -51,6 +51,16 @@ class LCLeg implements Leg, LCPlanElement {
 	}
 
 	@Override
+	public final String getRoutingMode() {
+		return this.plan.routingModes[this.arrayIndex];
+	}
+
+	@Override
+	public final void setRoutingMode(String routingMode) {
+		this.plan.routingModes[this.arrayIndex] = routingMode;
+	}
+
+	@Override
 	public final Route getRoute() {
 		return this.plan.routes[this.arrayIndex];
 	}

@@ -159,6 +159,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
 							selectedChargerLink.getId(), stageActivityModePrefix);
+					chargeAct = PopulationUtils.createActivity(chargeAct); // createStageActivity... creates a InteractionActivity where duration cannot be set.
 					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
 					chargeAct.setMaximumDuration(Math.max(evConfigGroup.minimumChargeTime, estimatedChargingTime));
@@ -192,12 +193,8 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 
 			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
 					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime().seconds(), travelT, l.getId());
-			pseudoVehicle.getBattery().changeCharge(-consumption);
-			double currentCharge = pseudoVehicle.getBattery().getCharge();
 			// to accomodate for ERS, where energy charge is directly implemented in the consumption model
-			double consumptionDiff = (lastCharge - currentCharge);
-			lastCharge = currentCharge;
-			consumptions.put(l, consumptionDiff);
+			consumptions.put(l, consumption);
 			linkEnterTime += travelT;
 		}
 		return consumptions;

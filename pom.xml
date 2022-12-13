@@ -31,10 +31,10 @@
         <argLine></argLine>
 
         <log4j.version>2.19.0</log4j.version>
-        <geotools.version>27.2</geotools.version>
+        <geotools.version>28.0</geotools.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>5.1.0</guice.version>
-        <jackson.version>2.14.0</jackson.version>
+        <jackson.version>2.14.1</jackson.version>
     </properties>
 
     <scm>
@@ -216,7 +216,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.3</version>
+                <version>2.0.5</version>
             </dependency>
 
             <dependency>
@@ -264,7 +264,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.27.0</version>
+                <version>3.28.0</version>
             </dependency>
 
             <dependency>
@@ -376,7 +376,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

@@ -30,6 +30,7 @@ import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopArea;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * A facility (infrastructure) describing a public transport stop.
@@ -45,7 +46,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	private final boolean isBlockingLane;
 	private String name = null;
 	private Customizable customizableDelegate;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	protected TransitStopFacilityImpl(final Id<TransitStopFacility> id, final Coord coord, final boolean isBlockingLane) {
 		this.id = id;

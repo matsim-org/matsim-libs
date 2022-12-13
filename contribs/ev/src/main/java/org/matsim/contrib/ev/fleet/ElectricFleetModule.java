@@ -20,11 +20,8 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl.INITIAL_ENERGY_kWh;
-
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -74,8 +71,8 @@ public class ElectricFleetModule extends AbstractModule {
 
 					@Override
 					public ElectricFleet get() {
-						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory,
-								auxConsumptionFactory, chargingPowerFactory);
+						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory, auxConsumptionFactory,
+								chargingPowerFactory);
 					}
 				}).asEagerSingleton();
 
@@ -91,15 +88,8 @@ public class ElectricFleetModule extends AbstractModule {
 						public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 							for (var oldSpec : electricFleetSpecification.getVehicleSpecifications().values()) {
 								var matsimVehicle = oldSpec.getMatsimVehicle();
-								double chargeAtEndOfCurrentIteration = electricFleet.getElectricVehicles()
-										.get(oldSpec.getId())
-										.getBattery()
-										.getCharge();
-
-								// INITIAL_ENERGY_kWh attribute is in kWh, the charge is in J
-								matsimVehicle.getAttributes()
-										.putAttribute(INITIAL_ENERGY_kWh,
-												EvUnits.J_to_kWh(chargeAtEndOfCurrentIteration));
+								double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles().get(oldSpec.getId()).getBattery().getSoc();
+								ElectricVehicleSpecifications.setInitialSoc(matsimVehicle, socAtEndOfCurrentIteration);
 							}
 						}
 					});

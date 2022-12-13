@@ -274,7 +274,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
 		}
 		if ((averageSpeed_kmh - freeVelocity_ms * 3.6) > 1.0){
-			if (ecg.handlesHighAverageSpeeds()) {
+			if (ecg.getHandleHighAverageSpeeds()) {
 				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeVelocity_ms * 3.6 );
 				averageSpeed_kmh = freeVelocity_ms * 3.6;
 			} else {

@@ -59,12 +59,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.population.routes.heavycompressed.HeavyCompressedNetworkRouteFactory;
+import org.matsim.core.population.routes.mediumcompressed.MediumCompressedNetworkRouteFactory;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
@@ -82,9 +83,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesUtils;
  */
 public final class PopulationUtils {
 	private static final Logger log = LogManager.getLogger( PopulationUtils.class );
-//	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
 	private static final PopulationFactory populationFactory = createPopulation( new PlansConfigGroup(), null  ).getFactory() ;
-	// try to avoid misleading comment about config context.  kai, dec'18
 
 	/**
 	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
@@ -131,30 +130,18 @@ public final class PopulationUtils {
 		RouteFactory factory;
 		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
 			factory = new LinkNetworkRouteFactory();
+		} else if (PlansConfigGroup.NetworkRouteType.MediumCompressedNetworkRoute.equals(networkRouteType) && network != null) {
+			factory = new MediumCompressedNetworkRouteFactory();
+		} else if (PlansConfigGroup.NetworkRouteType.HeavyCompressedNetworkRoute.equals(networkRouteType) && network != null) {
+			factory = new HeavyCompressedNetworkRouteFactory(network, TransportMode.car);
 		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
-			factory = new CompressedNetworkRouteFactory(network);
+			factory = new HeavyCompressedNetworkRouteFactory(network, TransportMode.car);
 		} else {
 			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
 		}
 		routeFactory.setRouteFactory(NetworkRoute.class, factory);
 		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
 	}
-
-	//	public static Population createStreamingPopulation(PlansConfigGroup plansConfigGroup, Network network) {
-	//		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
-	//		RouteFactories routeFactory = new RouteFactories();
-	//		String networkRouteType = plansConfigGroup.getNetworkRouteType();
-	//		RouteFactory factory;
-	//		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
-	//			factory = new LinkNetworkRouteFactory();
-	//		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
-	//			factory = new CompressedNetworkRouteFactory(network);
-	//		} else {
-	//			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
-	//		}
-	//		routeFactory.setRouteFactory(NetworkRoute.class, factory);
-	//		return new Population(new PopulationFactoryImpl(routeFactory));
-	//	}
 
 	public static Leg unmodifiableLeg( Leg leg ) {
 		return new UnmodifiableLeg( leg ) ;
@@ -175,6 +162,7 @@ public final class PopulationUtils {
 		public UnmodifiableLeg( Leg leg ) {
 			this.delegate = leg ;
 		}
+
 		@Override
 		public String getMode() {
 			return this.delegate.getMode() ;
@@ -185,6 +173,16 @@ public final class PopulationUtils {
 			throw new UnsupportedOperationException() ;
 		}
 
+		@Override
+		public String getRoutingMode() {
+			return this.delegate.getRoutingMode() ;
+		}
+
+		@Override
+		public void setRoutingMode(String routingMode) {
+			throw new UnsupportedOperationException() ;
+		}
+		
 		@Override
 		public Route getRoute() {
 			// route should be unmodifiable. kai
@@ -680,9 +678,7 @@ public final class PopulationUtils {
 		List<PlanElement> planElements = plan.getPlanElements();
 		int indexOfLastCarLegOfDay=-1;
 		for (int i=planElements.size()-1;i>=0;i--){
-			if (planElements.get(i) instanceof Leg){
-				Leg leg = (Leg) planElements.get(i);
-
+			if (planElements.get(i) instanceof Leg leg){
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
 					indexOfLastCarLegOfDay=i;
 					break;
@@ -692,8 +688,8 @@ public final class PopulationUtils {
 		}
 
 		for (int i=indexOfLastCarLegOfDay+1;i<planElements.size();i++){
-			if (planElements.get(i) instanceof Activity){
-				return (Activity) planElements.get(i);
+			if (planElements.get(i) instanceof Activity act){
+				return act;
 			}
 		}
 		return null;
@@ -703,9 +699,7 @@ public final class PopulationUtils {
 		List<PlanElement> planElements = plan.getPlanElements();
 		int indexOfFirstCarLegOfDay=-1;
 		for (int i=0;i<planElements.size();i++){
-			if (planElements.get(i) instanceof Leg){
-				Leg leg= (Leg) planElements.get(i);
-
+			if (planElements.get(i) instanceof Leg leg){
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
 					indexOfFirstCarLegOfDay=i;
 					break;
@@ -714,8 +708,8 @@ public final class PopulationUtils {
 			}
 		}
 		for (int i=indexOfFirstCarLegOfDay-1;i>=0;i--){
-			if (planElements.get(i) instanceof Activity){
-				return (Activity) planElements.get(i);
+			if (planElements.get(i) instanceof Activity act){
+				return act;
 			}
 		}
 		return null;
@@ -724,10 +718,8 @@ public final class PopulationUtils {
 	public static boolean hasCarLeg(Plan plan){
 		List<PlanElement> planElements = plan.getPlanElements();
 		for (int i=0;i<planElements.size();i++){
-			if (planElements.get(i) instanceof Leg){
-				Leg Leg= (Leg) planElements.get(i);
-
-				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
+			if (planElements.get(i) instanceof Leg leg){
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
 					return true;
 				}
 
@@ -764,12 +756,34 @@ public final class PopulationUtils {
 		return getFactory().createActivityFromLinkId(type, linkId) ;
 	}
 
+	public static Activity createInteractionActivityFromLinkId(String type, Id<Link> linkId) {
+		return getFactory().createInteractionActivityFromLinkId(type, linkId) ;
+	}
+
+	public static Activity createActivityFromFacilityId(String type, Id<ActivityFacility> facilityId) {
+		return getFactory().createActivityFromActivityFacilityId(type, facilityId);
+	}
+
+	public static Activity createInteractionActivityFromFacilityId(String type, Id<ActivityFacility> facilityId) {
+		return getFactory().createInteractionActivityFromActivityFacilityId(type, facilityId);
+	}
+	
 	public static Activity createActivityFromCoord(String type, Coord coord) {
 		return getFactory().createActivityFromCoord(type, coord) ;
 	}
 
+	public static Activity createInteractionActivityFromCoord(String type, Coord coord) {
+		return getFactory().createInteractionActivityFromCoord(type, coord) ;
+	}
+	
 	public static Activity createActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
 		Activity act = getFactory().createActivityFromCoord(type, coord) ;
+		act.setLinkId(linkId);
+		return act ;
+	}
+
+	public static Activity createInteractionActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
+		Activity act = getFactory().createInteractionActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
 		return act ;
 	}
@@ -818,8 +832,8 @@ public final class PopulationUtils {
 	}
 
 	public static Activity createStageActivityFromCoordLinkIdAndModePrefix(final Coord interactionCoord, final Id<Link> interactionLink, String modePrefix ) {
-		Activity act = createActivityFromCoordAndLinkId(PlanCalcScoreConfigGroup.createStageActivityType(modePrefix), interactionCoord, interactionLink);
-		act.setMaximumDuration(0.0);
+		Activity act = createInteractionActivityFromCoordAndLinkId(PlanCalcScoreConfigGroup.createStageActivityType(modePrefix), interactionCoord, interactionLink);
+//		act.setMaximumDuration(0.0); // obsolete since this is hard-coded in InteractionActivity
 		return act;
 	}
 
@@ -831,13 +845,29 @@ public final class PopulationUtils {
 	 * @param in a plan who's data will be loaded into this plan
 	 * @param out
 	 **/
-	public static void copyFromTo(final Plan in, Plan out) {
+	public static void copyFromTo(final Plan in, final Plan out) {
+		/*
+		 * By default 'false' to be backwards compatible. As a result, InteractionActivities will be converted to ActivityImpl.
+		 */
+		copyFromTo(in, out, false); 
+	}
+
+	public static void copyFromTo(final Plan in, final Plan out, final boolean withInteractionActivities) {
 		out.getPlanElements().clear();
 		out.setScore(in.getScore());
 		out.setType(in.getType());
 		for (PlanElement pe : in.getPlanElements()) {
 			if (pe instanceof Activity) {
-				out.getPlanElements().add(createActivity((Activity) pe));
+				/*
+				 * So far, we do not use the check for StageActivityTypeIdentifier.isStageActivity(...). It Would convert ActivityImpl to InteractionActivities.
+				 * However, there are pieces of code in use, e.g. in the share mobility contrib, where "interaction activities" need to be modeled as ActivityImpl
+				 * since their duration is != 0 or they have a defined start time.
+				 */
+				if (withInteractionActivities && (pe instanceof InteractionActivity /* || StageActivityTypeIdentifier.isStageActivity(((Activity) pe).getType())*/)) {
+					out.getPlanElements().add(createInteractionActivity((Activity) pe));
+				} else {
+					out.getPlanElements().add(createActivity((Activity) pe));
+				}
 			} else if (pe instanceof Leg) {
 				out.getPlanElements().add( createLeg( (Leg) pe ) ) ;
 			} else {
@@ -883,6 +913,14 @@ public final class PopulationUtils {
 		return newAct ;
 	}
 
+	public static Activity createInteractionActivity(Activity act) {
+		Activity newAct = getFactory().createInteractionActivityFromLinkId(act.getType(), act.getLinkId()) ;
+
+		copyFromTo(act, newAct);
+		// (this ends up setting type and linkId again)
+
+		return newAct ;
+	}
 
 	/**
 	 * Makes a deep copy of this leg, however only when the Leg has a route which is
@@ -1050,7 +1088,7 @@ public final class PopulationUtils {
 
 	public static Id<Link> decideOnLinkIdForActivity( Activity act, Scenario sc ) {
 		if ( act.getFacilityId() !=null ) {
-			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );;
+			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );
 			if ( facility==null ) {
 				throw new RuntimeException("facility ID given but not in facilities container") ;
 			}
@@ -1070,7 +1108,7 @@ public final class PopulationUtils {
 		// some people prefer throwing exceptions over using null
 
 		if ( facilityId !=null ) {
-			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( facilityId );;
+			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( facilityId );
 			Gbl.assertNotNull( facility  );
 			Gbl.assertNotNull( facility.getCoord() ) ;
 			return facility.getCoord() ;
@@ -1090,7 +1128,7 @@ public final class PopulationUtils {
 	}
 
 	public static void sampleDown( Population pop, double sample ) {
-		final Random rnd = MatsimRandom.getLocalInstance();;
+		final Random rnd = MatsimRandom.getLocalInstance();
 		log.info( "population size before downsampling=" + pop.getPersons().size() ) ;
 		pop.getPersons().values().removeIf( person ->  rnd.nextDouble() >= sample ) ;
 		log.info( "population size after downsampling=" + pop.getPersons().size() ) ;
@@ -1168,7 +1206,6 @@ public final class PopulationUtils {
 		return map;
 	}
 	private static int tryStdCnt = 5;
-	private static int tryTrnCnt = 5;
 	public static Person findPerson( Id<Person> personId, Scenario scenario ) {
 		Person person = getOrCreateAllpersons( scenario ).getPersons().get( personId );
 		if ( person==null ) {

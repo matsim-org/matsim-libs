@@ -19,13 +19,10 @@
 
 package org.matsim.contrib.ev;
 
-import javax.annotation.Nullable;
-
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "ev";
@@ -60,6 +57,11 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("If true, charge/SoC time profile plots will be created")
 	public boolean timeProfiles = false;
+
+	@Parameter
+	@Comment("Number of individual time profiles to be created")
+	@Positive
+	public int numberOfIndividualTimeProfiles = 50;
 
 	@Parameter
 	@Comment("determines whether the resulting SoC at the end of the iteration X is set to be the initial SoC"

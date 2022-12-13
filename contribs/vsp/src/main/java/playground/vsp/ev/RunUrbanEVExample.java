@@ -51,6 +51,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecifications;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -72,8 +73,8 @@ import org.matsim.vehicles.VehiclesFactory;
  */
 public class RunUrbanEVExample {
 
-	static final double CAR_INITIAL_ENERGY = 4.;
-	static final double BIKE_INITIAL_ENERGY = 4.;
+	static final double CAR_BATTERY_CAPACITY_kWh = 20.;
+	static final double CAR_INITIAL_SOC = 0.5;
 
 	public static void main(String[] args) {
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
@@ -107,6 +108,7 @@ public class RunUrbanEVExample {
 	public static void prepareConfig(Config config) {
 		UrbanEVConfigGroup evReplanningCfg = new UrbanEVConfigGroup();
 		config.addModule(evReplanningCfg);
+		evReplanningCfg.setCriticalSOC(0.4);
 
 		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
 		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
@@ -129,12 +131,12 @@ public class RunUrbanEVExample {
 			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString(),
 					VehicleType.class)); //TODO should at least have a suffix "_car"
 			VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
-			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
-			EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
+			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), CAR_BATTERY_CAPACITY_kWh);
+			ElectricVehicleSpecifications.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 			scenario.getVehicles().addVehicleType(carVehicleType);
 			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
 					carVehicleType);
-			EVUtils.setInitialEnergy(carVehicle, CAR_INITIAL_ENERGY);
+			ElectricVehicleSpecifications.setInitialSoc(carVehicle, CAR_INITIAL_SOC);
 			scenario.getVehicles().addVehicle(carVehicle);
 
 			VehicleType bikeVehicleType = vehicleFactory.createVehicleType(
