@@ -89,7 +89,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		for (int i = 0; i < this.threadContexts.length; i++) {
 			GeneratorContext context = generator.get();
 			this.threadContexts[i] = context;
-			this.singleTrip[i] = SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, context.pruner, nonChainBasedModes);
+			this.singleTrip[i] = SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, context.pruner, nonChainBasedModes, this.config.isRequireDifferentModes());
 		}
 
 		history = new IdMap<>(Person.class, scenario.getPopulation().getPersons().size());

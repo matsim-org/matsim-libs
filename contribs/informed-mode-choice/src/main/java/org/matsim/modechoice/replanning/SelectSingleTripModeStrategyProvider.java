@@ -47,7 +47,7 @@ public class SelectSingleTripModeStrategyProvider implements Provider<PlanStrate
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SelectSingleTripModeStrategy(globalConfigGroup,  config.getModes(), generator, selector, pruner));
+		builder.addStrategyModule(new SelectSingleTripModeStrategy(globalConfigGroup,  config.getModes(), generator, selector, pruner, config.isRequireDifferentModes()));
 
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 

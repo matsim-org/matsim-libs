@@ -34,26 +34,29 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 	private final List<String> modes;
 	private final Provider<CandidatePruner> pruner;
 
+	private final boolean requireDifferentModes;
+
 	public SelectSingleTripModeStrategy(GlobalConfigGroup globalConfigGroup,
 	                                    List<String> modes,
 	                                    Provider<SingleTripChoicesGenerator> generator,
 	                                    Provider<PlanSelector> selector,
-	                                    Provider<CandidatePruner> pruner) {
+	                                    Provider<CandidatePruner> pruner, boolean requireDifferentModes) {
 		super(globalConfigGroup);
 		this.generator = generator;
 		this.selector = selector;
 		this.modes = modes;
 		this.pruner = pruner;
+		this.requireDifferentModes = requireDifferentModes;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new Algorithm(generator.get(), selector.get(), pruner.get(), modes);
+		return new Algorithm(generator.get(), selector.get(), pruner.get(), modes, requireDifferentModes);
 	}
 
 
-	public static Algorithm newAlgorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes) {
-		return new Algorithm(generator, selector, pruner, modes);
+	public static Algorithm newAlgorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
+		return new Algorithm(generator, selector, pruner, modes, requireDifferentModes);
 	}
 
 	public static final class Algorithm implements PlanAlgorithm {
@@ -63,12 +66,14 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		private final CandidatePruner pruner;
 		private final Set<String> modes;
 		private final Random rnd;
+		private final boolean requireDifferentModes;
 
-		public Algorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes) {
+		public Algorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
 			this.generator = generator;
 			this.selector = selector;
 			this.pruner = pruner;
 			this.modes = new HashSet<>(modes);
+			this.requireDifferentModes = requireDifferentModes;
 			this.rnd = MatsimRandom.getLocalInstance();
 		}
 
@@ -151,7 +156,8 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			}
 
 			// Remove options that are the same as the current mode
-			candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
+			if (requireDifferentModes)
+				candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
 
 			// Remove avoided combinations
 			if (avoidList != null) {

@@ -59,7 +59,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 
 		GeneratorContext context = generator.get();
-		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, context.pruner, nonChainBasedModes));
+		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, context.pruner, nonChainBasedModes, config.isRequireDifferentModes()));
 	}
 
 	/**
@@ -165,7 +165,8 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				// execute best k modes
 				candidates.addAll(ctx.generator.generate(model, nonChainBasedModes, mask));
 
-				candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModesMutable()));
+				if (config.isRequireDifferentModes())
+					candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModesMutable()));
 
 				// Pruning is applied based on current plan estimate
 				// best k generator applied pruning already, but the single trip options need to be checked again

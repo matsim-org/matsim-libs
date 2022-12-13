@@ -91,7 +91,9 @@ public class RandomSubtourModeStrategy extends AbstractMultithreadedModule {
 					String[] current = model.getCurrentModes();
 
 					List<String> candidates = new ArrayList<>(nonChainBasedModes);
-					candidates.remove(current[idx]);
+
+					if (config.isRequireDifferentModes())
+						candidates.remove(current[idx]);
 
 					if (!candidates.isEmpty()) {
 
@@ -131,7 +133,7 @@ public class RandomSubtourModeStrategy extends AbstractMultithreadedModule {
 					}
 
 					// Current option is not added twice
-					if (!Arrays.equals(model.getCurrentModesMutable(), option))
+					if (!config.isRequireDifferentModes() || !Arrays.equals(model.getCurrentModesMutable(), option))
 						if (planModelService.isValidOption(model, option))
 							candidates.add(new PlanCandidate(option, -1));
 

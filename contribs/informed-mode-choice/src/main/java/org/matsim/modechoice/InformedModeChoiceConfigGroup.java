@@ -45,6 +45,10 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private Schedule anneal = Schedule.quadratic;
 
 	@Parameter
+	@Comment("Require that new plan modes are always different from the current one.")
+	private boolean requireDifferentModes = true;
+
+	@Parameter
 	@Comment("Defines how constraint violations are handled.")
 	private ConstraintCheck constraintCheck = ConstraintCheck.abort;
 
@@ -132,6 +136,14 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public List<String> getModes() {
 		return modes;
+	}
+
+	public void setRequireDifferentModes(boolean requireDifferentModes) {
+		this.requireDifferentModes = requireDifferentModes;
+	}
+
+	public boolean isRequireDifferentModes() {
+		return requireDifferentModes;
 	}
 
 	@Override

@@ -60,6 +60,7 @@ public final class StrategyOptions {
 		imc.setInvBeta(group.invBeta);
 		imc.setAnneal(group.anneal);
 		imc.setPruning(group.prune);
+		imc.setRequireDifferentModes(group.innovateModes);
 
 		log.accept(config, "mc", getModeChoice());
 
@@ -85,6 +86,9 @@ public final class StrategyOptions {
 
 		if (!group.timeMutation)
 			log.accept(config, "no-tm", "");
+
+		if (!group.innovateModes)
+			log.accept(config, "no-inv-modes", "");
 
 		if (group.anneal != InformedModeChoiceConfigGroup.Schedule.quadratic)
 			log.accept(config, "anneal", group.anneal);
@@ -225,6 +229,9 @@ public final class StrategyOptions {
 
 		@CommandLine.Option(names = "--prune", description = "Name of pruner to enable")
 		private String prune;
+
+		@CommandLine.Option(names = "--no-innovate-modes", defaultValue = "true", description = "Require that new plan modes are always different from the current one.", negatable = true)
+		private boolean innovateModes;
 
 		@CommandLine.Option(names = "--anneal", defaultValue = "quadratic", description = "Parameter annealing: ${COMPLETION-CANDIDATES}")
 		private InformedModeChoiceConfigGroup.Schedule anneal = InformedModeChoiceConfigGroup.Schedule.quadratic;
