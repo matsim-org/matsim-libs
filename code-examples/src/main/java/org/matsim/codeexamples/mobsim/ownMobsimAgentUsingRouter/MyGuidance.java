@@ -29,7 +29,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.List;
 
@@ -51,7 +51,7 @@ class MyGuidance {
         String mainMode = TransportMode.car;
         Facility fromFacility = new LinkWrapperFacility(this.scenario.getNetwork().getLinks().get(linkId));
         Facility toFacility = new LinkWrapperFacility(this.scenario.getNetwork().getLinks().get(destinationLinkId));
-        List<? extends PlanElement> trip = router.calcRoute(mainMode, fromFacility, toFacility, now, person, new Attributes());
+        List<? extends PlanElement> trip = router.calcRoute(mainMode, fromFacility, toFacility, now, person, new AttributesImpl());
 
         Leg leg = (Leg) trip.get(0);  // test: either plan element 0 or 1 will be a car leg
 
