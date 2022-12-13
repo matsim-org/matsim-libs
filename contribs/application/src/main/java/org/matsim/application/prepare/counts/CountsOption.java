@@ -113,8 +113,22 @@ public final class CountsOption {
 	 *
 	 * @return null if not matched
 	 */
-	public Id<Link> isManuallyMatched(String stationId) {
+	public Map<String, Id<Link>> isManuallyMatched(String stationId) {
 		readManualMatched();
-		return manualMatchedCounts.get(stationId);
+		List<String> matchedStations = manualMatchedCounts.keySet().stream().
+				filter(key -> key.contains(stationId)).
+				collect(Collectors.toList());
+
+		if(matchedStations.isEmpty()){
+			return null;
+		} else{
+			Map<String, Id<Link>> result = new HashMap<>();
+
+			for(String m: matchedStations)
+				result.put(m, manualMatchedCounts.get(m));
+
+			return result;
+		}
+
 	}
 }

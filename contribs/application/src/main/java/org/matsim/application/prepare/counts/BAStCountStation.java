@@ -48,6 +48,14 @@ class BAStCountStation {
 		return id;
 	}
 
+	public String getDir1() {
+		return dir1;
+	}
+
+	public String getDir2() {
+		return dir2;
+	}
+
 	public Map<String, Double> getMivTrafficVolume1() {
 		return mivTrafficVolume1;
 	}

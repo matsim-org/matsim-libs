@@ -13,13 +13,13 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -80,9 +80,6 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 	private final ShpOptions shp = new ShpOptions();
 
 	@CommandLine.Mixin
-	private final CrsOptions crs = new CrsOptions();
-
-	@CommandLine.Mixin
 	private final CountsOption counts = new CountsOption();
 
 	private static final Logger log = LogManager.getLogger(CreateCountsFromBAStData.class);
@@ -93,7 +90,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 	@Override
 	public Integer call() {
-		Map<String, BAStCountStation> stations = readBAStCountStations(stationData, shp, crs, counts);
+		Map<String, BAStCountStation> stations = readBAStCountStations(stationData, shp, counts);
 
 		// Assigns link ids in the station objects
 		matchBAStWithNetwork(network, stations, counts);
@@ -205,7 +202,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		List<CSVRecord> preFilteredRecords = null;
 
 		Path input = pathToDisaggregatedData;
-		FileSystem fs = null;
+		FileSystem fs;
 		BufferedReader reader;
 
 		// Try to use file inside zip file
@@ -329,19 +326,65 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		}
 	}
 
+	private boolean checkManualMatching(BAStCountStation station, Network network, Map<String, Id<Link>> manualMatched){
+		if(manualMatched.size() > 2){
+			log.warn("Too many manual matched links for station {}", station.getName());
+			return false;
+		}
+		// Check direction matching
+		String dir1 = station.getDir1();
+		String dir2 = station.getDir2();
+
+		List<String> bastDirections = List.of(dir1, dir2);
+
+		List<String> manualDir = manualMatched.keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toList());
+
+		if(!manualDir.containsAll(bastDirections)){
+			log.warn("Wrong direction matching for station {}", station.getName());
+			return false;
+		}
+
+		//Check if link is in the network
+		for(Id<Link> id: manualMatched.values()){
+
+			if (!network.getLinks().containsKey(id)) {
+				log.warn("Manual matched station link {} is not in the network!", id);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private void match(Network network, Index index, BAStCountStation station, CountsOption counts) {
 
-		Id<Link> matchedId = counts.isManuallyMatched(station.getId());
+		Map<String, Id<Link>> manuallyMatched = counts.isManuallyMatched(station.getId());
 		Link matched;
-		if(matchedId != null) {
+		if(manuallyMatched != null) {
 
-			if (!network.getLinks().containsKey(matchedId)) {
-				log.warn("Manual matched station link {} is not in the network!", matchedId);
+			if(!checkManualMatching(station, network, manuallyMatched)){
 				station.setHasNoMatchedLink();
 				station.setHasNoOppLink();
 				return;
 			}
+
+			String dir1 = station.getDir1();
+			String key1 = dir1 + "_" + station.getName();
+
+			String dir2 = station.getDir2();
+			String key2 = dir2 + "_" + station.getName();
+
+			Id<Link> matchedId = manuallyMatched.get(key1);
 			matched = network.getLinks().get(matchedId);
+
+			Id<Link> oppId = manuallyMatched.get(key2);
+			Link opp = network.getLinks().get(oppId);
+
+			station.setMatchedLink(matched);
+			station.setOppLink(opp);
+
+			index.remove(matched);
+			index.remove(opp);
 		} else {
 
 			matched = NetworkUtils.getNearestLink(network, station.getCoord());
@@ -355,22 +398,24 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 					return;
 				}
 			}
-		}
-		station.setMatchedLink(matched);
-		index.remove(matched);
 
-		Link opp = NetworkUtils.findLinkInOppositeDirection(matched);
+			station.setMatchedLink(matched);
 
-		if (opp == null) {
-			opp = index.query(station);
+			Link opp = NetworkUtils.findLinkInOppositeDirection(matched);
+
 			if (opp == null) {
-				log.warn("Could not match station {} to an opposite link", station.getName());
-				station.setHasNoOppLink();
-				return;
+				opp = index.query(station);
+				if (opp == null) {
+					log.warn("Could not match station {} to an opposite link", station.getName());
+					station.setHasNoOppLink();
+					return;
+				}
 			}
+			station.setOppLink(opp);
+
+			index.remove(matched);
+			index.remove(opp);
 		}
-		station.setOppLink(opp);
-		index.remove(opp);
 	}
 
 	private List<Predicate<Link>> createRoadTypeFilter(List<String> types) {
@@ -415,7 +460,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			match(filteredNetwork, index, station, countsOption);
 	}
 
-	private Map<String, BAStCountStation> readBAStCountStations(Path pathToAggregatedData, ShpOptions shp, CrsOptions crs, CountsOption counts) {
+	private Map<String, BAStCountStation> readBAStCountStations(Path pathToAggregatedData, ShpOptions shp, CountsOption counts) {
 
 		List<BAStCountStation> stations = new ArrayList<>();
 
@@ -455,16 +500,12 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		Set<String> ignored = counts.getIgnored();
 		final Predicate<BAStCountStation> optFilter = station -> !ignored.contains(station.getId());
 
-		/*
-		* TODO
-		*  fix shape filter with different crs
-		* */
 		final Predicate<BAStCountStation> shpFilter;
 		if (shp.getShapeFile() != null) {
 			// default input is set to lat lon
-			ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "_");
-			CoordinateTransformation transform = crs.getTransformation();
-			shpFilter = station -> index.contains(transform.transform(station.getCoord()));
+			ShpOptions.Index index = shp.createIndex(shp.getShapeCrs(), "_");
+			CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("EPSG:25832", shp.getShapeCrs());
+			shpFilter = station -> index.contains(transformation.transform(station.getCoord()));
 		} else
 			shpFilter = (station) -> true;
 

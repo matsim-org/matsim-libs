@@ -31,6 +31,7 @@ public class CreateCountsFromBAStDataTest {
 				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
 				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.zip",
 				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
+				"--shp=C:\\Users\\ACER\\Desktop\\Uni\\SoSe_21\\MATSim\\Bezirke_-_Berlin-shp\\Berlin_Bezirke.shp",
 				"--year=2021",
 				"--car-output=" + car,
 				"--freight-output=" + freight
