@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
@@ -45,8 +46,7 @@ import com.google.inject.Inject;
  * ActivityStartEvent.
  */
 public class AuxDischargingHandler
-		implements MobsimAfterSimStepListener, ActivityStartEventHandler, ActivityEndEventHandler,
-		MobsimScopeEventHandler {
+		implements MobsimAfterSimStepListener, ActivityStartEventHandler, ActivityEndEventHandler, MobsimScopeEventHandler {
 	public interface VehicleProvider {
 		/**
 		 * During activities such as stopping at a bus stop or taxi rank, picking up/dropping off passengers etc.
@@ -70,13 +70,15 @@ public class AuxDischargingHandler
 
 	private final VehicleProvider vehicleProvider;
 	private final int auxDischargeTimeStep;
+	private EventsManager eventsManager;
 
 	private final ConcurrentMap<Id<Person>, VehicleAndLink> vehicles = new ConcurrentHashMap<>();
 
 	@Inject
-	public AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg) {
+	public AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg, EventsManager eventsManager) {
 		this.vehicleProvider = vehicleProvider;
 		this.auxDischargeTimeStep = evCfg.auxDischargeTimeStep;
+		this.eventsManager = eventsManager;
 	}
 
 	@Override
@@ -86,7 +88,9 @@ public class AuxDischargingHandler
 				ElectricVehicle ev = vehicleAndLink.vehicle;
 				double energy = ev.getAuxEnergyConsumption()
 						.calcEnergyConsumption(e.getSimulationTime(), auxDischargeTimeStep, vehicleAndLink.linkId);
-				ev.getBattery().changeCharge(-energy);
+				ev.getBattery()
+						.dischargeEnergy(energy, missingEnergy -> eventsManager.processEvent(
+								new MissingEnergyEvent(e.getSimulationTime(), ev.getId(), vehicleAndLink.linkId, missingEnergy)));
 			}
 		}
 	}

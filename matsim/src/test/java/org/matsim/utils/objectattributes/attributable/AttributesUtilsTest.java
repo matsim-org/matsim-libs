@@ -11,8 +11,8 @@ public class AttributesUtilsTest {
 
 		var data = 1L;
 		var attributeKey = "data-key";
-		var from = new Attributes();
-		var to = new Attributes();
+		var from = new AttributesImpl();
+		var to = new AttributesImpl();
 		from.putAttribute(attributeKey, data);
 
 		AttributesUtils.copyTo(from, to);

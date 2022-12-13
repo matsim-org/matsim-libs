@@ -21,6 +21,7 @@ package org.matsim.core.population.io;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 
 import org.apache.logging.log4j.LogManager;
@@ -41,15 +42,19 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
@@ -168,7 +173,7 @@ import com.google.inject.Inject;
 						currAttributes = curract.getAttributes();
 						break;
 					case LEG:
-						currAttributes = currleg.getAttributes();
+						currAttributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 						break;
 					default:
 						throw new RuntimeException( context.peek() );
@@ -205,19 +210,29 @@ import com.google.inject.Inject;
 				this.attributesReader.endTag( name , content , context );
 				break;
 			case ATTRIBUTES:
-				if (context.peek().equals(POPULATION)) {
-					String inputCRS = ProjectionUtils.getCRS(scenario.getPopulation());
+				switch( context.peek() ) {
+					case POPULATION:
+						String inputCRS = ProjectionUtils.getCRS(scenario.getPopulation());
 
-					if (inputCRS != null && targetCRS != null) {
-						if (externalInputCRS != null) {
-							// warn or crash?
-							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+						if (inputCRS != null && targetCRS != null) {
+							if (externalInputCRS != null) {
+								// warn or crash?
+								log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+							}
+							coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
+							ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
 						}
-						coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
-						ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
-					}
+						break;
+					case LEG:
+						Object routingMode = currAttributes.getAttribute(TripStructureUtils.routingMode);
+						if (Objects.nonNull(routingMode) && routingMode instanceof String) {
+							currAttributes.removeAttribute(TripStructureUtils.routingMode);
+							currleg.setRoutingMode((String) routingMode);
+						}
+						AttributesUtils.copyTo(currAttributes, currleg.getAttributes());
+						break;
 				}
-			    break;
+				break;
 			case PLAN:
 				if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
 					((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
@@ -271,9 +286,15 @@ import com.google.inject.Inject;
 	}
 
 	private void startAct(final Attributes atts) {
+		final String actType = atts.getValue(ATTR_ACT_TYPE);
+		final boolean isStageActivity = StageActivityTypeIdentifier.isStageActivity(actType);
 		if (atts.getValue(ATTR_ACT_FACILITY) != null) {
 			final Id<ActivityFacility> facilityId = Id.create(atts.getValue(ATTR_ACT_FACILITY), ActivityFacility.class);
-			this.curract = PopulationUtils.createAndAddActivityFromFacilityId(this.currplan, atts.getValue(ATTR_ACT_TYPE), facilityId);
+			if (isStageActivity) {
+				this.curract = PopulationUtils.createInteractionActivityFromFacilityId(actType, facilityId);
+			} else {
+				this.curract = PopulationUtils.createActivityFromFacilityId(actType, facilityId);
+			}
 			if (atts.getValue(ATTR_ACT_LINK) != null) {
 				final Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 				this.curract.setLinkId(linkId);
@@ -284,25 +305,40 @@ import com.google.inject.Inject;
 			}
 		} else if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			final Id<Link> linkId1 = linkId;
-			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
+			if (isStageActivity) {
+				this.curract = PopulationUtils.createInteractionActivityFromLinkId(actType, linkId);
+			} else {
+				this.curract = PopulationUtils.createActivityFromLinkId(actType, linkId);
+			}
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-				final Coord coord = parseCoord( atts );
+				final Coord coord = parseCoord(atts);
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-			final Coord coord = parseCoord( atts );
-			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
+			final Coord coord = parseCoord(atts);
+			if (isStageActivity) {
+				this.curract = PopulationUtils.createInteractionActivityFromCoord(actType, coord);
+			} else {
+				this.curract = PopulationUtils.createActivityFromCoord(actType, coord);
+			}
 		} else {
-			throw new IllegalArgumentException("In this version of MATSim either the facility, the link or the coords be specified for an Act.");
+			throw new IllegalArgumentException("In this version of MATSim either the facility, the link or the coords must be specified for an Act.");
 		}
 
-		Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
-				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
-		Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR))
-				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
-		Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
-				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
+		final OptionalTime startTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME));
+		final OptionalTime duration = Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR));
+		final OptionalTime endTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME));
+
+		// Check whether the given times match the assumptions made in InteractionActivity. Otherwise, convert it to a regular Activity.
+		if (isStageActivity && (startTime.isDefined() || endTime.isDefined() || duration.isUndefined() || duration.seconds() > 0.0)) {
+			this.curract = PopulationUtils.createActivity(this.curract);
+		} else {
+			startTime.ifDefinedOrElse(this.curract::setStartTime, this.curract::setStartTimeUndefined);
+			duration.ifDefinedOrElse(this.curract::setMaximumDuration, this.curract::setMaximumDurationUndefined);
+			endTime.ifDefinedOrElse(this.curract::setEndTime, this.curract::setEndTimeUndefined);
+		}
+		this.currplan.addActivity(this.curract);
+
 		if (this.routeDescription != null) {
 			finishLastRoute();
 		}

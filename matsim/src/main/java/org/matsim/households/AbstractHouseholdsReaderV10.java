@@ -60,7 +60,7 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
-			new org.matsim.utils.objectattributes.attributable.Attributes();
+			new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 
 	public AbstractHouseholdsReaderV10(Households households) {
 		if (households == null) {

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -40,7 +41,7 @@ public class DrtStopFacilityImpl implements DrtStopFacility {
 	}
 
 	public static DrtStopFacility createFromLink(Link link) {
-		return new DrtStopFacilityImpl(Id.create(link.getId(), DrtStopFacility.class), link.getId(), link.getToNode().getCoord(), new Attributes());
+		return new DrtStopFacilityImpl(Id.create(link.getId(), DrtStopFacility.class), link.getId(), link.getToNode().getCoord(), new AttributesImpl());
 	}
 
 	private final Id<DrtStopFacility> id;

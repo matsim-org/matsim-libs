@@ -21,6 +21,7 @@ package org.matsim.vehicles;
 
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * @author dgrether
@@ -28,7 +29,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 public final class EngineInformation implements Attributable {
 	// yyyy maybe these subtypes should be immutable?
 
-	private Attributes attributes = new Attributes() ;
+	private Attributes attributes = new AttributesImpl() ;
 
 	/* package-private */ EngineInformation() { }
 	@Deprecated

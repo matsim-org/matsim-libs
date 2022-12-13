@@ -159,6 +159,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
 							selectedChargerLink.getId(), stageActivityModePrefix);
+					chargeAct = PopulationUtils.createActivity(chargeAct); // createStageActivity... creates a InteractionActivity where duration cannot be set.
 					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
 					chargeAct.setMaximumDuration(Math.max(evConfigGroup.minimumChargeTime, estimatedChargingTime));

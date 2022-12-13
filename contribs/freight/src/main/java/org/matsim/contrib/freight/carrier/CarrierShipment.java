@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * A shipment from one location to another, with certain size and other constraints such as time-windows and service-times.
@@ -140,7 +141,7 @@ public final class CarrierShipment implements Attributable {
 	private final TimeWindow deliveryTimeWindow;
 	private double pickupServiceTime;
 	private double deliveryServiceTime;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 
 	private CarrierShipment(Builder builder) {

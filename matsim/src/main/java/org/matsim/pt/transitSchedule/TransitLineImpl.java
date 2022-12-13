@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 
 /**
@@ -40,7 +41,7 @@ public class TransitLineImpl implements TransitLine {
 	private final Id<TransitLine> lineId;
 	private String name = null;
 	private final Map<Id<TransitRoute>, TransitRoute> transitRoutes = new LinkedHashMap<>(5);
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	protected TransitLineImpl(final Id<TransitLine> id) {
 		this.lineId = id;

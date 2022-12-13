@@ -57,8 +57,8 @@ public class RunETaxiScenario {
 	private static final double MAX_SOC = 0.8; // charge up to 80% SOC
 	private static final double TEMPERATURE = 20; // oC
 
-	public static void run(URL configUrl, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configUrl,
+	public static void run(String [] args, boolean otfvis) {
+		Config config = ConfigUtils.loadConfig(args,
 				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup());
 
