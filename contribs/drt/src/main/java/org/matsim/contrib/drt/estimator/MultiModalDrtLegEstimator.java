@@ -3,6 +3,8 @@ package org.matsim.contrib.drt.estimator;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.estimator.run.DrtEstimatorConfigGroup;
 import org.matsim.contrib.drt.estimator.run.MultiModeDrtEstimatorConfigGroup;
@@ -24,6 +26,8 @@ import java.util.Objects;
  */
 public class MultiModalDrtLegEstimator implements LegEstimator<ModeAvailability> {
 
+	private static final Logger log = LogManager.getLogger(MultiModalDrtLegEstimator.class);
+
 	private final Map<String, DrtEstimator> estimators = new HashMap<>();
 
 	@Inject
@@ -33,7 +37,15 @@ public class MultiModalDrtLegEstimator implements LegEstimator<ModeAvailability>
 
 		// Collect all mode specific bindings
 		for (DrtEstimatorConfigGroup el : config.getModalElements()) {
-			estimators.put(el.mode, injector.getInstance(Key.get(DrtEstimator.class, DvrpModes.mode(el.mode))));
+
+			DrtEstimator instance = null;
+			try {
+				instance = injector.getInstance(Key.get(DrtEstimator.class, DvrpModes.mode(el.mode)));
+			} catch (Exception e) {
+				log.warn("Could not retrieve drt estimator for {}: {}", el.mode, e.getMessage());
+			}
+
+			estimators.put(el.mode, instance);
 		}
 	}
 
@@ -45,7 +57,7 @@ public class MultiModalDrtLegEstimator implements LegEstimator<ModeAvailability>
 
 		OptionalTime departureTime = leg.getDepartureTime();
 
-		DrtEstimator estimator = Objects.requireNonNull(estimators.get(mode), "No drt estimator found for mode :" + mode);
+		DrtEstimator estimator = Objects.requireNonNull(estimators.get(mode), String.format("No drt estimator found for mode %s. Check warnings above for errors.", mode));
 
 		DrtEstimator.Estimate est = estimator.estimate(route, departureTime);
 		ModeUtilityParameters params = context.scoring.modeParams.get(mode);

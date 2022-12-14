@@ -18,8 +18,11 @@ import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MultiModalDrtLegEstimatorTest {
 
@@ -74,9 +77,14 @@ public class MultiModalDrtLegEstimatorTest {
 	@Test
 	public void run() {
 
-		// TODO
+		String out = utils.getOutputDirectory();
 
 		controler.run();
+
+		assertThat(new File(out, "kelheim-mini-drt.drt_estimates_drt.csv"))
+				.exists()
+				.isNotEmpty();
+
 
 	}
 }
