@@ -110,7 +110,6 @@ public class RunETaxiScenarioIT {
 	}
 
 	@Test
-//	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment() {
 		try {
 			String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml").toString();
@@ -133,8 +132,7 @@ public class RunETaxiScenarioIT {
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
 				EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
-//				Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
-				// this test is non-deterministic at least on the amount of charges.  Multi-threading issue?  kai, nov'22
+				Assert.assertEquals( EventsFileComparator.Result.FILES_ARE_EQUAL, result );
 			}
 
 		} catch ( Exception ee ) {
