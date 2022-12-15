@@ -8,8 +8,7 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
-public class BicycleQSimModule extends AbstractQSimModule {
-	// needs to be public since otherwise one cannot overwrite only parts of Bicycles.addAsOverridingModules(...).  kai, sep'19
+class BicycleQSimModule extends AbstractQSimModule {
 
     @Override
     protected void configureQSim() {

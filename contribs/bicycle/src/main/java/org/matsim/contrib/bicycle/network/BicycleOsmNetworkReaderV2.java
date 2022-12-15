@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.bicycle.BicycleUtils;
+import org.matsim.contrib.osm.networkReader.OsmBicycleReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -43,7 +44,7 @@ import java.util.Set;
 
 /**
  * @author dziemke
- * @deprecated This class is replaced by OsmBicycleReader in the osm-contrib. Use org.matsim.contribs.osm.networkReader.OsmBicycleReader instead
+ * @deprecated This class is replaced by OsmBicycleReader in the osm-contrib. Use {@link OsmBicycleReader} instead
  */
 @Deprecated
 public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {

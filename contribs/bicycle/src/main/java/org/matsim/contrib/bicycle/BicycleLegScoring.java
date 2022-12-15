@@ -38,6 +38,8 @@ import java.util.Set;
 
 /**
  * @author dziemke
+ * @deprecated -- no longer used.  The material is now in {@link BicycleScoreEventsCreator}, and using the additive {@link
+ * org.matsim.api.core.v01.events.PersonScoreEvent}.  kai, dec'22
  */
 class BicycleLegScoring implements SumScoringFunction.LegScoring, SumScoringFunction.ArbitraryEventScoring{
 	private static final Logger log = LogManager.getLogger( BicycleLegScoring.class ) ;
