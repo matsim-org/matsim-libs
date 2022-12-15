@@ -51,7 +51,7 @@ import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * @author nagel, dziemke
@@ -137,7 +137,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 			ActivityFacility destinationFacility = activityFacilitiesFactory.createActivityFacility(null, destination.getNearestBasicLocation().getCoord());
 
 			Gbl.assertNotNull(tripRouter);
-			List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, null, new Attributes());
+			List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, null, new AttributesImpl());
 
 			double utility = 0.;
 			List<Leg> legs = TripStructureUtils.getLegs(plan);

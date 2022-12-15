@@ -32,6 +32,7 @@ import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * maintainer: mrieser / Senozon AG
@@ -61,7 +62,7 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 
 	private boolean locked = false ;
 
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	/**
 	 * Deliberately protected, see {@link MatsimDataClassImplMarkerInterface}

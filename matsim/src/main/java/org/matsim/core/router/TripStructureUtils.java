@@ -52,8 +52,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author thibautd
  */
 public final class TripStructureUtils {
+
 	private static final Logger log = LogManager.getLogger(TripStructureUtils.class);
 
+	public static final String routingMode = "routingMode";
+	
 	public enum StageActivityHandling {StagesAsNormalActivities, ExcludeStageActivities}
 
 	private TripStructureUtils() {}
@@ -593,15 +596,11 @@ public final class TripStructureUtils {
 	}
 
 	public static String getRoutingMode(Leg leg) {
-		return (String) leg.getAttributes().getAttribute("routingMode");
+		return leg.getRoutingMode();
 	}
 
 	public static void setRoutingMode(Leg leg, String mode) {
-		if ( mode != null ){
-			leg.getAttributes().putAttribute( "routingMode", mode );
-		} else {
-			leg.getAttributes().removeAttribute(  "routingMode" ) ;
-		}
+		leg.setRoutingMode(mode);
 	}
 
 	// if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method

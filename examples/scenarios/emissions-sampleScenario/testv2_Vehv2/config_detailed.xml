@@ -28,26 +28,18 @@
 
 	<module name="emissions" >
 
-		<!-- REQUIRED: file with HBEFA 3.1 fleet average cold emission factors -->
 		<param name="averageFleetColdEmissionFactorsFile" value="../sample_EFA_ColdStart_vehcat_2005average.csv" />
 
-		<!-- REQUIRED: file with HBEFA 3.1 fleet average warm emission factors -->
 		<param name="averageFleetWarmEmissionFactorsFile" value="../sample_EFA_HOT_vehcat_2005average.csv" />
 
-		<!-- OPTIONAL: file with HBEFA 3.1 detailed cold emission factors -->
 		<param name="detailedColdEmissionFactorsFile" value="../sample_EFA_ColdStart_SubSegm_2005detailed.csv" />
 
-		<!-- OPTIONAL: file with HBEFA 3.1 detailed warm emission factors -->
 		<param name="detailedWarmEmissionFactorsFile" value="../sample_EFA_HOT_SubSegm_2005detailed.csv" />
-
-		<!--"fromLinkAttributes" will eventually become default:-->
-		<param name="hbefaRoadTypeSource" value="fromLinkAttributes" />
 
 		<!-- Each vehicle in matsim points to a VehicleType.  For the emissions package to work, each VehicleType needs to contain corresponding information.  This switch determines _where_ in VehicleType that information is contained.  default: asEngineInformationAttributes -->
 		<param name="hbefaVehicleDescriptionSource" value="asEngineInformationAttributes" />
 
 		<!-- if true then detailed emission factor files must be provided! -->
-<!--		<param name="usingDetailedEmissionCalculation" value="true" />-->
 		<param name="detailedVsAverageLookupBehavior" value="tryDetailedThenTechnologyAverageThenAverageTable" />
 
 	</module>

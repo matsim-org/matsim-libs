@@ -33,7 +33,11 @@ public interface ElectricVehicleSpecification extends Identifiable<Vehicle> {
 
 	ImmutableList<String> getChargerTypes();
 
-	double getInitialCharge();//[J]
+	double getInitialSoc(); //in [0, 1]
+
+	default double getInitialCharge() {
+		return getInitialSoc() * getBatteryCapacity();
+	}
 
 	double getBatteryCapacity();//[J]
 }

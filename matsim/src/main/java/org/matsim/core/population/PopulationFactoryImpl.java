@@ -64,6 +64,13 @@ import org.matsim.facilities.ActivityFacility;
 	}
 
 	@Override
+	public Activity createInteractionActivityFromCoord(final String actType, final Coord coord) {
+        Activity act = new InteractionActivity(actType) ;
+        act.setCoord(coord); 
+        return act ;
+	}
+
+	@Override
 	public Activity createActivityFromLinkId(final String actType, final Id<Link> linkId) {
 	        Activity act = new ActivityImpl(actType) ;
 	        act.setLinkId(linkId);
@@ -71,8 +78,22 @@ import org.matsim.facilities.ActivityFacility;
 	}
 
 	@Override
+	public Activity createInteractionActivityFromLinkId(final String actType, final Id<Link> linkId) {
+	        Activity act = new InteractionActivity(actType) ;
+	        act.setLinkId(linkId);
+	        return act ;
+	}
+
+	@Override
 	public Activity createActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ){
 		Activity act = new ActivityImpl( actType ) ;
+		act.setFacilityId( activityFacilityId );
+		return act ;
+	}
+
+	@Override
+	public Activity createInteractionActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ){
+		Activity act = new InteractionActivity( actType ) ;
 		act.setFacilityId( activityFacilityId );
 		return act ;
 	}

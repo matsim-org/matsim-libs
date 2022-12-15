@@ -188,9 +188,12 @@ final class CarrierDriverAgent{
 			// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
 			// filled from just listening to events.  kai, jul'22
 			for( FreightEventCreator freightEventCreator : freightEventCreators) {
-				Event customEvent = freightEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter, vehicleId );
-				if(customEvent != null) {
-					this.events.processEvent(customEvent );
+				Event freightEvent = freightEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter, vehicleId );
+				if(freightEvent != null) {
+					this.events.processEvent( freightEvent );
+					if( scoringFunction != null ){
+						scoringFunction.handleEvent( freightEvent );
+					}
 				}
 			}
 //		}
