@@ -13,6 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.modechoice.constraints.RelaxedMassConservationConstraint;
 import org.matsim.modechoice.estimators.ComplexTripEstimator;
@@ -25,6 +26,7 @@ import picocli.CommandLine;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,7 +67,8 @@ public class TestScenario extends MATSimApplication {
 
 		File f;
 		try {
-			f = new File(ExamplesUtils.getTestScenarioURL("kelheim/config.xml").toURI());
+			URL context = ExamplesUtils.getTestScenarioURL("kelheim");
+			f = new File(IOUtils.extendUrl(context, "config.xml").toURI());
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
