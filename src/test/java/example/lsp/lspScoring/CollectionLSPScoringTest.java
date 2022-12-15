@@ -23,8 +23,8 @@ package example.lsp.lspScoring;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -179,6 +179,7 @@ public class CollectionLSPScoringTest {
 
 	@Test
 	public void compareEvents(){
-		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+		// 0 = "Files are equal".
+		Assert.assertEquals(0, MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" ));
 	}
 }

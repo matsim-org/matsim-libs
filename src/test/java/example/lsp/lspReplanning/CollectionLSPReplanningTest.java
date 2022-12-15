@@ -24,6 +24,7 @@ import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -226,7 +227,8 @@ public class CollectionLSPReplanningTest {
 
 	@Test
 	public void compareEvents(){
-		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+		// 0 = "Files are equal".
+		Assert.assertEquals(0, MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" ));
 	}
 
 }
