@@ -25,6 +25,7 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,6 +46,7 @@ import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
@@ -54,8 +56,11 @@ import java.util.Random;
 import static org.junit.Assert.assertTrue;
 
 public class CollectionLSPReplanningTest {
-	private LSP collectionLSP;
 
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+
+	private LSP collectionLSP;
 
 	@Before
 	public void initialize() {
@@ -206,8 +211,8 @@ public class CollectionLSPReplanningTest {
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-//		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		controler.run();
 	}
 
@@ -217,6 +222,11 @@ public class CollectionLSPReplanningTest {
 	public void testCollectionLSPReplanning() {
 		System.out.println(collectionLSP.getSelectedPlan().getLogisticChain().iterator().next().getShipments().size());
 		assertTrue(collectionLSP.getSelectedPlan().getLogisticChain().iterator().next().getShipments().size() < 20);
+	}
+
+	@Test
+	public void compareEvents(){
+		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 	}
 
 }

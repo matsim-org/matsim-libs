@@ -61,9 +61,9 @@ import static org.junit.Assert.assertTrue;
 
 
 public class CollectionTrackerTest {
-	private static final Logger log = LogManager.getLogger(CollectionTrackerTest.class);
 	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+	private static final Logger log = LogManager.getLogger(CollectionTrackerTest.class);
 	private Network network;
 	private Carrier carrier;
 	private LogisticChain logisticChain;
@@ -199,7 +199,7 @@ public class CollectionTrackerTest {
 		});
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 //		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		controler.run();
@@ -316,5 +316,10 @@ public class CollectionTrackerTest {
 		assertEquals(LSPUtils.getVariableCost(logisticChain), linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment, LSPUtils.getVariableCost(logisticChain)) * 0.01);
 		assertEquals(LSPUtils.getFixedCost(logisticChain), fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, LSPUtils.getFixedCost(logisticChain)) * 0.01);
 		assertEquals(LSPUtils.getFixedCost(logisticChain), fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment, LSPUtils.getFixedCost(logisticChain)) * 0.01);
+	}
+
+	@Test
+	public void compareEvents(){
+		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 	}
 }

@@ -54,10 +54,10 @@ import static lsp.usecase.UsecaseUtils.*;
 import static org.junit.Assert.*;
 
 public class CollectionLSPMobsimTest {
-	private static final Logger log = LogManager.getLogger(CollectionLSPMobsimTest.class);
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
+	private static final Logger log = LogManager.getLogger(CollectionLSPMobsimTest.class);
 
 	private LSP collectionLSP;
 	private Carrier carrier;
@@ -238,5 +238,10 @@ public class CollectionLSPMobsimTest {
 				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
 			}
 		}
+	}
+
+	@Test
+	public void compareEvents(){
+		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 	}
 }

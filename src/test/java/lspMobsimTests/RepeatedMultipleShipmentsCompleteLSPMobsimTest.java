@@ -25,6 +25,8 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,6 +43,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -50,9 +53,12 @@ import java.util.Collections;
 import static org.junit.Assert.*;
 
 public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
+
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 	private LSP completeLSP;
 
-
+	@Before
 	public void initialize() {
 		Config config = new Config();
 		config.addCoreModules();
@@ -305,8 +311,8 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		});
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-//		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		controler.run();
 	}
 
@@ -344,6 +350,11 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 				}
 			}
 		}
+	}
+
+	@Test
+	public void compareEvents(){
+		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 	}
 }
 
