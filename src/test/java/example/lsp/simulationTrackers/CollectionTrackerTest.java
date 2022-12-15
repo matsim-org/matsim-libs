@@ -199,7 +199,7 @@ public class CollectionTrackerTest {
 		});
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 //		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		controler.run();

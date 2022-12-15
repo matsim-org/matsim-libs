@@ -311,7 +311,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		});
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		controler.run();
 	}

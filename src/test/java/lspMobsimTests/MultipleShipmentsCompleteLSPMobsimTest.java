@@ -323,7 +323,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		} );
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		controler.run();
 
