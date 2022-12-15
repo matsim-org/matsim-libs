@@ -26,6 +26,7 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,6 +47,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -55,6 +57,9 @@ import java.util.Collections;
 import static org.junit.Assert.*;
 
 public class MultipleItreationsCompleteLSPMobsimTest {
+
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 	private LSP completeLSP;
 
 	@Before
@@ -317,7 +322,7 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-//		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		controler.run();
 
 		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
@@ -343,6 +348,11 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
 			}
 		}
+	}
+
+	@Test
+	public void compareEvents(){
+		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 	}
 
 }

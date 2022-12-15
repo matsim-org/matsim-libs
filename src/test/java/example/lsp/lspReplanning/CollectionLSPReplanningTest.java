@@ -58,7 +58,7 @@ import static org.junit.Assert.assertTrue;
 public class CollectionLSPReplanningTest {
 
 	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private LSP collectionLSP;
 

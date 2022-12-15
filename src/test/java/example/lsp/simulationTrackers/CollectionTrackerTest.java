@@ -61,9 +61,9 @@ import static org.junit.Assert.assertTrue;
 
 
 public class CollectionTrackerTest {
-	private static final Logger log = LogManager.getLogger(CollectionTrackerTest.class);
 	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+	private static final Logger log = LogManager.getLogger(CollectionTrackerTest.class);
 	private Network network;
 	private Carrier carrier;
 	private LogisticChain logisticChain;

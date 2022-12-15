@@ -15,7 +15,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class ExampleLSPScoringTest {
 	private static final Logger log = LogManager.getLogger(ExampleLSPScoringTest.class);
 	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testMain() {

@@ -59,7 +59,7 @@ import static org.junit.Assert.assertTrue;
 public class MultipleIterationsCollectionLSPScoringTest {
 
 	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final int numberOfShipments = 25;
 	private LSP collectionLSP;
