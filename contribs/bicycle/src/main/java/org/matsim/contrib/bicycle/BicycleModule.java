@@ -22,14 +22,19 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.common.returnsreceiver.qual.This;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultTurnAcceptanceLogic;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.withinday.mobsim.WithinDayQSimModule;
 
 /**
  * @author smetzler, dziemke
@@ -58,8 +63,6 @@ public final class BicycleModule extends AbstractModule {
 				// yyyyyy remember that the 10it test needs to be un-ignored.  kai, dec'22
 
 				this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
-//				bindScoringFunctionFactory().to( BicycleScoringFunctionFactory.class ).in( Singleton.class );
-//				bindScoringFunctionFactory().to( CharyparNagelScoringFunctionFactory.class ).in( Singleton.class );
 			}
 			case linkBased -> {
 				bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
@@ -74,7 +77,18 @@ public final class BicycleModule extends AbstractModule {
 		}
 		addControlerListenerBinding().to(ConsistencyCheck.class);
 
-		this.installOverridingQSimModule( new BicycleQSimModule() );
+		this.installOverridingQSimModule( new AbstractQSimModule(){
+			@Inject EventsManager events;
+			@Inject Scenario scenario;
+			@Inject BicycleLinkSpeedCalculator bicycleLinkSpeedCalculator;
+			@Override protected void configureQSim(){
+				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+				factory.setLinkSpeedCalculator( bicycleLinkSpeedCalculator );
+				bind( QNetworkFactory.class ).toInstance(factory );
+				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring
+				// it in every iteration via the initializeFactory(...) method. kai, mar'16
+			}
+		} );
 	}
 
 	static class ConsistencyCheck implements StartupListener {
