@@ -24,6 +24,8 @@ import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,6 +40,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
@@ -50,6 +53,8 @@ import static org.junit.Assert.assertTrue;
 
 public class CollectionLSPScoringTest {
 
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 	private final int numberOfShipments = 25;
 	private LSP collectionLSP;
 
@@ -152,7 +157,7 @@ public class CollectionLSPScoringTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-//		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		controler.run();
 	}
 
@@ -172,4 +177,8 @@ public class CollectionLSPScoringTest {
 		 */
 	}
 
+	@Test
+	public void compareEvents(){
+		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+	}
 }

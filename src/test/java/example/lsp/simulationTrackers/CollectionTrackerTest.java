@@ -317,4 +317,9 @@ public class CollectionTrackerTest {
 		assertEquals(LSPUtils.getFixedCost(logisticChain), fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, LSPUtils.getFixedCost(logisticChain)) * 0.01);
 		assertEquals(LSPUtils.getFixedCost(logisticChain), fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment, LSPUtils.getFixedCost(logisticChain)) * 0.01);
 	}
+
+	@Test
+	public void compareEvents(){
+		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+	}
 }
