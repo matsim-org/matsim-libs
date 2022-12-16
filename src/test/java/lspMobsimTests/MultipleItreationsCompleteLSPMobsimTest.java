@@ -25,6 +25,7 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,6 +54,8 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -253,7 +256,7 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
 
-		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
+		List<Link> linkList = new LinkedList<>(network.getLinks().values());
 		//Random rand = new Random(1);
 		int numberOfShipments = MatsimRandom.getRandom().nextInt(50);
 
@@ -264,7 +267,7 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 			builder.setCapacityDemand(capacityDemand);
 
 			while (true) {
-				Collections.shuffle(linkList);
+				Collections.shuffle(linkList, MatsimRandom.getRandom());
 				Link pendingToLink = linkList.get(0);
 				if ((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
 						pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -279,7 +282,7 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 			}
 
 			while (true) {
-				Collections.shuffle(linkList);
+				Collections.shuffle(linkList, MatsimRandom.getRandom());
 				Link pendingFromLink = linkList.get(0);
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -352,7 +355,8 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 
 	@Test
 	public void compareEvents(){
-		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+		// 0 = "Files are equal".
+		Assert.assertEquals(0, MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" ));
 	}
 
 }

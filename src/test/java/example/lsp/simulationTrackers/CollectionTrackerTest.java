@@ -26,6 +26,7 @@ import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,9 +53,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -149,7 +148,7 @@ public class CollectionTrackerTest {
 		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		LSP collectionLSP = collectionLSPBuilder.build();
 
-		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
+		List<Link> linkList = new LinkedList<>(network.getLinks().values());
 
 
 		for (int i = 1; i < 2; i++) {
@@ -320,6 +319,7 @@ public class CollectionTrackerTest {
 
 	@Test
 	public void compareEvents(){
-		MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+		// 0 = "Files are equal".
+		Assert.assertEquals(0, MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" ));
 	}
 }
