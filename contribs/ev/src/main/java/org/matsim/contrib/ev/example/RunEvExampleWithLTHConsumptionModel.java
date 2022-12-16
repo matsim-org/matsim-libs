@@ -25,6 +25,7 @@ package org.matsim.contrib.ev.example;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,27 +63,25 @@ public class RunEvExampleWithLTHConsumptionModel {
 		final URL configUrl;
 		if (args.length > 0) {
 			log.info("Starting simulation run with the following arguments:");
-			configUrl = new URL(args[0]);
-			log.info("config URL: " + configUrl);
+			log.info("args=" + Arrays.toString( args ) );
 		} else {
 			File localConfigFile = new File(DEFAULT_CONFIG_FILE);
 			if (localConfigFile.exists()) {
 				log.info("Starting simulation run with the local example config file");
-				configUrl = localConfigFile.toURI().toURL();
+				args = new String[]{ DEFAULT_CONFIG_FILE };
 			} else {
 				log.info("Starting simulation run with the example config file from GitHub repository");
-				configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/"
-						+ DEFAULT_CONFIG_FILE);
+				args = new String[]{"https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/"
+						+ DEFAULT_CONFIG_FILE };
 			}
 		}
-		new RunEvExampleWithLTHConsumptionModel().run(configUrl);
+		new RunEvExampleWithLTHConsumptionModel().run(args);
 	}
 
-	public void run(URL configUrl) {
-		Config config = ConfigUtils.loadConfig(configUrl, new EvConfigGroup());
+	public void run( String[] args ) {
+		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
 		config.controler()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory("output/evExampleLTH");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
