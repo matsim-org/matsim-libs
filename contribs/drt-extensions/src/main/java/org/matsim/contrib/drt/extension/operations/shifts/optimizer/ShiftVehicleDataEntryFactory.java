@@ -1,16 +1,13 @@
 package org.matsim.contrib.drt.extension.operations.shifts.optimizer;
 
-import com.google.inject.Provider;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalStop;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
+import org.matsim.contrib.drt.optimizer.SlackTimeCalculator;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.core.config.Config;
-
-import javax.inject.Inject;
 
 /**
  * @author nkuehnel / MOIA
@@ -20,8 +17,8 @@ public class ShiftVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 	private final VehicleDataEntryFactoryImpl entryFactory;
 
 
-	public ShiftVehicleDataEntryFactory(DrtConfigGroup drtCfg) {
-		entryFactory = new VehicleDataEntryFactoryImpl(drtCfg);
+	public ShiftVehicleDataEntryFactory(DrtConfigGroup drtCfg, SlackTimeCalculator slackTimeCalculator) {
+		entryFactory = new VehicleDataEntryFactoryImpl(drtCfg, slackTimeCalculator);
 	}
 
 	@Override
@@ -43,19 +40,5 @@ public class ShiftVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 			return false;
 		}
 		return !(dvrpVehicle.getSchedule().getCurrentTask() instanceof OperationalStop);
-	}
-
-	public static class ShiftVehicleDataEntryFactoryProvider implements Provider<ShiftVehicleDataEntryFactory> {
-
-		@Inject
-		private Config config;
-
-		public ShiftVehicleDataEntryFactoryProvider() {
-		}
-
-		@Override
-		public ShiftVehicleDataEntryFactory get() {
-			return new ShiftVehicleDataEntryFactory(DrtConfigGroup.getSingleModeDrtConfig(config));
-		}
 	}
 }

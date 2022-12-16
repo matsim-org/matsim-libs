@@ -9,6 +9,7 @@ import org.matsim.contrib.drt.extension.operations.EDrtOperationsControlerCreato
 import org.matsim.contrib.drt.extension.operations.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.optimizer.DefaultSlackTimeCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -169,7 +170,7 @@ public class RunEShiftDrtScenarioIT {
 				@Override
 				public void install() {
 					bind(ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider(drtCfg, MIN_RELATIVE_SOC));
+							new ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider(drtCfg, MIN_RELATIVE_SOC, new DefaultSlackTimeCalculator()));
 				}
 			});
 		}

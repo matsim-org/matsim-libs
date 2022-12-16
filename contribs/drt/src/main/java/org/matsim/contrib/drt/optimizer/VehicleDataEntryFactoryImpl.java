@@ -30,7 +30,6 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -45,7 +44,10 @@ import com.google.common.collect.ImmutableList;
 public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	private final double lookAhead;
 
-	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
+	private final SlackTimeCalculator slackTimeCalculator;
+
+	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg, SlackTimeCalculator slackTimeCalculator) {
+		this.slackTimeCalculator = slackTimeCalculator;
 		if (drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated) {
 			lookAhead = drtCfg.maxWaitTime - drtCfg.stopDuration;
 			Preconditions.checkArgument(lookAhead >= 0,
@@ -101,7 +103,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			outgoingOccupancy -= s.getOccupancyChange();
 		}
 
-		var slackTimes = computeSlackTimes(vehicle, currentTime, stops);
+		var slackTimes = slackTimeCalculator.computeSlackTimes(vehicle, currentTime, stops);
 
 		return new VehicleEntry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
 				ImmutableList.copyOf(stops), slackTimes);
@@ -109,30 +111,5 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 	public boolean isNotEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
 		return currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime();
-	}
-
-	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops) {
-		double[] slackTimes = new double[stops.length + 1];
-
-		//vehicle
-		double slackTime = calcVehicleSlackTime(vehicle, now);
-		slackTimes[stops.length] = slackTime;
-
-		//stops
-		for (int i = stops.length - 1; i >= 0; i--) {
-			var stop = stops[i];
-			slackTime = Math.min(stop.latestArrivalTime - stop.task.getBeginTime(), slackTime);
-			slackTime = Math.min(stop.latestDepartureTime - stop.task.getEndTime(), slackTime);
-			slackTimes[i] = slackTime;
-		}
-		return slackTimes;
-	}
-
-	static double calcVehicleSlackTime(DvrpVehicle vehicle, double now) {
-		var lastTask = Schedules.getLastTask(vehicle.getSchedule());
-		//if the last task is started, take 'now', otherwise take the planned begin time
-		double availableFromTime = Math.max(lastTask.getBeginTime(), now);
-		//for an already delayed vehicle, assume slack is 0 (instead of a negative number)
-		return Math.max(0, vehicle.getServiceEndTime() - availableFromTime);
 	}
 }

@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.extension.edrt.run;
 
 import java.net.URL;
 
+import org.matsim.contrib.drt.optimizer.DefaultSlackTimeCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -61,7 +62,7 @@ public class RunEDrtScenario {
 				@Override
 				public void install() {
 					bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new EDrtVehicleDataEntryFactoryProvider(drtCfg, MIN_RELATIVE_SOC));
+							new EDrtVehicleDataEntryFactoryProvider(drtCfg, MIN_RELATIVE_SOC, new DefaultSlackTimeCalculator()));
 				}
 			});
 		}

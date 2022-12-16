@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.operations.eshifts.optimizer;
 
 import com.google.inject.Provider;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftStayTask;
+import org.matsim.contrib.drt.optimizer.SlackTimeCalculator;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -16,8 +17,8 @@ public class ShiftEDrtVehicleDataEntryFactory implements VehicleEntry.EntryFacto
 
     private final EDrtVehicleDataEntryFactory entryFactory;
 
-    public ShiftEDrtVehicleDataEntryFactory(DrtConfigGroup drtCfg, double minSoc) {
-        entryFactory = new EDrtVehicleDataEntryFactory(drtCfg, minSoc);
+    public ShiftEDrtVehicleDataEntryFactory(DrtConfigGroup drtCfg, double minSoc, SlackTimeCalculator slackTimeCalculator) {
+        entryFactory = new EDrtVehicleDataEntryFactory(drtCfg, minSoc, slackTimeCalculator);
     }
 
     @Override
@@ -40,15 +41,18 @@ public class ShiftEDrtVehicleDataEntryFactory implements VehicleEntry.EntryFacto
 		private final DrtConfigGroup drtCfg;
 		private final double minimumRelativeSoc;
 
+		private final SlackTimeCalculator slackTimeCalculator;
 
-        public ShiftEDrtVehicleDataEntryFactoryProvider(DrtConfigGroup drtCfg, double minimumRelativeSoc) {
+
+		public ShiftEDrtVehicleDataEntryFactoryProvider(DrtConfigGroup drtCfg, double minimumRelativeSoc, SlackTimeCalculator slackTimeCalculator) {
 			this.drtCfg = drtCfg;
             this.minimumRelativeSoc = minimumRelativeSoc;
-        }
+			this.slackTimeCalculator = slackTimeCalculator;
+		}
 
         @Override
         public ShiftEDrtVehicleDataEntryFactory get() {
-            return new ShiftEDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc);
+            return new ShiftEDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc, slackTimeCalculator);
         }
     }
 }

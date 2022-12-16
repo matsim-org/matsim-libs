@@ -21,7 +21,6 @@
 package org.matsim.contrib.drt.optimizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl.computeSlackTimes;
 import static org.matsim.contrib.drt.optimizer.Waypoint.Stop;
 
 import org.junit.Test;
@@ -46,37 +45,39 @@ public class VehicleDataEntryFactoryImplTest {
 	//time slack: 30 (departure is the constraint)
 	private final Stop stop1 = stop(300, 340, 400, 430);
 
+	private final SlackTimeCalculator slackTimeCalculator = new DefaultSlackTimeCalculator();
+
 	@Test
 	public void computeSlackTimes_withStops() {
 		//final stay task not started - vehicle slack time is 50
-		assertThat(computeSlackTimes(vehicle(500, 450), 100, new Stop[] { stop0, stop1 })).containsExactly(20, 30, 50);
+		assertThat(slackTimeCalculator.computeSlackTimes(vehicle(500, 450), 100, new Stop[] { stop0, stop1 })).containsExactly(20, 30, 50);
 
 		//final stay task not started - vehicle slack time is 25 and limits the slack times at stop1
-		assertThat(computeSlackTimes(vehicle(500, 475), 100, new Stop[] { stop0, stop1 })).containsExactly(20, 25, 25);
+		assertThat(slackTimeCalculator.computeSlackTimes(vehicle(500, 475), 100, new Stop[] { stop0, stop1 })).containsExactly(20, 25, 25);
 
 		//final stay task not started - vehicle slack time is 10 and limits the slack times at all stops
-		assertThat(computeSlackTimes(vehicle(500, 490), 100, new Stop[] { stop0, stop1 })).containsExactly(10, 10, 10);
+		assertThat(slackTimeCalculator.computeSlackTimes(vehicle(500, 490), 100, new Stop[] { stop0, stop1 })).containsExactly(10, 10, 10);
 	}
 
 	@Test
 	public void computeSlackTimes_withoutStops() {
 		//final stay task not started yet - vehicle slack time is 10
-		assertThat(computeSlackTimes(vehicle(500, 490), 485, new Stop[] {})).containsExactly(10);
+		assertThat(slackTimeCalculator.computeSlackTimes(vehicle(500, 490), 485, new Stop[] {})).containsExactly(10);
 
 		//final stay task just started - vehicle slack time is 10
-		assertThat(computeSlackTimes(vehicle(500, 490), 490, new Stop[] {})).containsExactly(10);
+		assertThat(slackTimeCalculator.computeSlackTimes(vehicle(500, 490), 490, new Stop[] {})).containsExactly(10);
 
 		//final stay task half completed - vehicle slack time is 5
-		assertThat(computeSlackTimes(vehicle(500, 490), 495, new Stop[] {})).containsExactly(5);
+		assertThat(slackTimeCalculator.computeSlackTimes(vehicle(500, 490), 495, new Stop[] {})).containsExactly(5);
 
 		//final stay task just completed - vehicle slack time is 0
-		assertThat(computeSlackTimes(vehicle(500, 490), 500, new Stop[] {})).containsExactly(0);
+		assertThat(slackTimeCalculator.computeSlackTimes(vehicle(500, 490), 500, new Stop[] {})).containsExactly(0);
 
 		//final stay task started, but delayed - vehicle slack time is 0
-		assertThat(computeSlackTimes(vehicle(500, 510), 510, new Stop[] {})).containsExactly(0);
+		assertThat(slackTimeCalculator.computeSlackTimes(vehicle(500, 510), 510, new Stop[] {})).containsExactly(0);
 
 		//final stay task planned after vehicle end time - vehicle slack time is 0s
-		assertThat(computeSlackTimes(vehicle(500, 510), 300, new Stop[] {})).containsExactly(0);
+		assertThat(slackTimeCalculator.computeSlackTimes(vehicle(500, 510), 300, new Stop[] {})).containsExactly(0);
 	}
 
 	private Stop stop(double beginTime, double latestArrivalTime, double endTime, double latestDepartureTime) {

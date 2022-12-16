@@ -20,6 +20,7 @@ package org.matsim.contrib.drt.extension.edrt.optimizer;
 
 import java.util.List;
 
+import org.matsim.contrib.drt.optimizer.SlackTimeCalculator;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -52,9 +53,9 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 	private final double minimumRelativeSoc;
 	private final VehicleDataEntryFactoryImpl entryFactory;
 
-	public EDrtVehicleDataEntryFactory(DrtConfigGroup drtCfg, double minimumRelativeSoc) {
+	public EDrtVehicleDataEntryFactory(DrtConfigGroup drtCfg, double minimumRelativeSoc, SlackTimeCalculator slackTimeCalculator) {
 		this.minimumRelativeSoc = minimumRelativeSoc;
-		entryFactory = new VehicleDataEntryFactoryImpl(drtCfg);
+		entryFactory = new VehicleDataEntryFactoryImpl(drtCfg, slackTimeCalculator);
 	}
 
 	@Override
@@ -103,14 +104,17 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 		private final DrtConfigGroup drtCfg;
 		private final double minimumRelativeSoc;
 
-		public EDrtVehicleDataEntryFactoryProvider(DrtConfigGroup drtCfg, double minimumRelativeSoc) {
+		private SlackTimeCalculator slackTimeCalculator;
+
+		public EDrtVehicleDataEntryFactoryProvider(DrtConfigGroup drtCfg, double minimumRelativeSoc, SlackTimeCalculator slackTimeCalculator) {
 			this.drtCfg = drtCfg;
 			this.minimumRelativeSoc = minimumRelativeSoc;
+			this.slackTimeCalculator = slackTimeCalculator;
 		}
 
 		@Override
 		public EDrtVehicleDataEntryFactory get() {
-			return new EDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc);
+			return new EDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc, slackTimeCalculator);
 		}
 	}
 }

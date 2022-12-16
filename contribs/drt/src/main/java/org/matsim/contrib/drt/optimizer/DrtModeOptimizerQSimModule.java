@@ -104,7 +104,11 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		install(getInsertionSearchQSimModule(drtCfg));
 
-		bindModal(VehicleEntry.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
+		bindModal(SlackTimeCalculator.class).toInstance(new DefaultSlackTimeCalculator());
+
+		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
+				new VehicleDataEntryFactoryImpl(drtCfg, getter.getModal(SlackTimeCalculator.class)))).asEagerSingleton();
+
 
 		bindModal(CostCalculationStrategy.class).to(drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated ?
 				CostCalculationStrategy.RejectSoftConstraintViolations.class :
