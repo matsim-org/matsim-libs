@@ -50,6 +50,8 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import static lsp.usecase.UsecaseUtils.*;
 import static org.junit.Assert.*;
@@ -147,7 +149,7 @@ public class CollectionLSPMobsimTest {
 			collectionLSP = collectionLSPBuilder.build();
 		}
 		{
-			ArrayList<Link> linkList = new ArrayList<>(scenario.getNetwork().getLinks().values());
+			List<Link> linkList = new LinkedList<>(scenario.getNetwork().getLinks().values());
 			for (int i = 1; i < 2; i++) {
 				Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 				ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
@@ -155,7 +157,7 @@ public class CollectionLSPMobsimTest {
 				builder.setCapacityDemand(capacityDemand);
 
 				while (true) {
-					Collections.shuffle(linkList);
+					Collections.shuffle(linkList, MatsimRandom.getRandom());
 					Link pendingFromLink = linkList.get(0);
 					if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 							pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -246,4 +248,5 @@ public class CollectionLSPMobsimTest {
 		// 0 = "Files are equal".
 		Assert.assertEquals(0, MatsimTestUtils.compareEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" ));
 	}
+
 }

@@ -47,9 +47,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -247,7 +245,7 @@ public class CompleteLSPMobsimTest {
 		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
 
-		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
+		List<Link> linkList = new LinkedList<>(network.getLinks().values());
 		Random rand = new Random(1);
 		for (int i = 1; i < 2; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);

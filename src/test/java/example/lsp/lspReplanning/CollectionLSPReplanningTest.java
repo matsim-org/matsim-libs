@@ -50,9 +50,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertTrue;
 
@@ -135,7 +133,7 @@ public class CollectionLSPReplanningTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 
-		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
+		List<Link> linkList = new LinkedList<>(network.getLinks().values());
 
 
 		for (int i = 1; i < 21; i++) {

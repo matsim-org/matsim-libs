@@ -54,6 +54,8 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -217,7 +219,7 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 
-		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
+		List<Link> linkList = new LinkedList<>(network.getLinks().values());
 		int numberOfShipments = 1 + MatsimRandom.getRandom().nextInt(50);
 		for (int i = 1; i < 1 + numberOfShipments; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -226,7 +228,7 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 			builder.setCapacityDemand(capacityDemand);
 
 			while (true) {
-				Collections.shuffle(linkList);
+				Collections.shuffle(linkList, MatsimRandom.getRandom());
 				Link pendingToLink = linkList.get(0);
 				if ((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
 						pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -241,7 +243,7 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 			}
 
 			while (true) {
-				Collections.shuffle(linkList);
+				Collections.shuffle(linkList, MatsimRandom.getRandom());
 				Link pendingFromLink = linkList.get(0);
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&

@@ -43,9 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import static lsp.usecase.UsecaseUtils.*;
 import static org.junit.Assert.assertEquals;
@@ -106,7 +104,7 @@ public class CollectionLSPScoringTest {
 //		collectionLSP.addSimulationTracker( tipScorer );
 //		collectionLSP.setScorer(tipScorer);
 
-		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
+		List<Link> linkList = new LinkedList<>(network.getLinks().values());
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
