@@ -50,7 +50,7 @@ public abstract class AbstractLogisticEvent extends Event implements HasLinkId, 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LspShipmentId, lspShipmentId.toString());
+		attr.put(ATTRIBUTE_LSP_SHIPMENT_ID, lspShipmentId.toString());
 		return attr;
 	}
 }

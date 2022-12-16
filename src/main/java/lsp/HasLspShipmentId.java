@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
  */
 public interface HasLspShipmentId {
 
-	String ATTRIBUTE_LspShipmentId = "lspShipment";
+	String ATTRIBUTE_LSP_SHIPMENT_ID = "lspShipmentId";
 	Id<LSPShipment> getLspShipmentId();
 
 }
