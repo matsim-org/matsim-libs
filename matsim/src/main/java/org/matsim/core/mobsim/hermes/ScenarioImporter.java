@@ -286,9 +286,9 @@ class ScenarioImporter {
 			switch (type) {
 				case Agent.LinkType:
 					int linkid = Agent.getLinkPlanEntry(planentry);
-					int velocity = Agent.getVelocityPlanEntry(planentry);
+					double velocity = Agent.getVelocityPlanEntry(planentry);
 					HLink link = hermesLinks[linkid];
-					agent.linkFinishTime = link.length() / Math.min(velocity, link.velocity());
+					agent.linkFinishTime = (int) Math.round(link.length() / Math.min(velocity, link.velocity()));
 					link.push(agent, 0, getStorageCapacityPCE(Agent.getLinkPCEEntry(planentry)));
 					break;
 				case Agent.SleepForType:
@@ -372,8 +372,8 @@ class ScenarioImporter {
 		Id<VehicleType> vtypeid = v == null ? VehicleUtils.getDefaultVehicleType().getId() : v.getType().getId();
 		int pcuCategory = this.vehicleTypeMapping.get(vtypeid);
 		Id<Vehicle> vid = v == null ? Id.createVehicleId("v" + person.getId()) : v.getId();
-		int velocity = v == null ?
-				HermesConfigGroup.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
+		double velocity = v == null ?
+				HermesConfigGroup.MAX_VEHICLE_VELOCITY : v.getType().getMaximumVelocity();
 		int egressId = endLId.index();
 
 		//initial capacity setting
