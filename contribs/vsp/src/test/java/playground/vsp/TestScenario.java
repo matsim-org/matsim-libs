@@ -45,15 +45,8 @@ public class TestScenario extends MATSimApplication {
 
 	public static Config loadConfig(MatsimTestUtils utils) {
 
-		File f;
-		try {
-			URL context = ExamplesUtils.getTestScenarioURL("kelheim");
-			f = new File(IOUtils.extendUrl(context, "config.xml").toURI());
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
-
-		Config config = ConfigUtils.loadConfig(f.toString());
+		URL context = ExamplesUtils.getTestScenarioURL("kelheim");
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(context, "config.xml"));
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		return config;
