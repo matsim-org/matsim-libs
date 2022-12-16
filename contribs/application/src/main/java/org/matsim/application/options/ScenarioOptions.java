@@ -13,8 +13,8 @@ import java.nio.file.Path;
  */
 public class ScenarioOptions {
 
-	@CommandLine.Option(names = "--config", description = "Path to scenario config", required = true)
-	private Path configPath;
+	@CommandLine.Option(names = "--config", description = "Path (or URI) to scenario config", required = true)
+	private String configPath;
 
 	@CommandLine.Option(names = "--scenario", description = "Full qualified classname of the MATSim application scenario class. The IMC modules must be specified there.", required = true)
 	private Class<? extends MATSimApplication> scenario;
@@ -32,7 +32,7 @@ public class ScenarioOptions {
 	 */
 	public Config getConfig() {
 		if (config == null) {
-			config = ConfigUtils.loadConfig(configPath.toString());
+			config = ConfigUtils.loadConfig(configPath);
 
 			if (populationPath != null)
 				config.plans().setInputFile(populationPath.toString());

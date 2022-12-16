@@ -2,6 +2,7 @@ package org.matsim.modechoice.commands;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.modechoice.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
@@ -22,7 +23,7 @@ public class GenerateChoiceSetTest {
 
 		new GenerateChoiceSet().execute(
 				"--scenario", TestScenario.class.getCanonicalName(),
-				"--config", new File(ExamplesUtils.getTestScenarioURL("kelheim/config.xml").toURI()).toString(),
+				"--config", IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("kelheim"),"config.xml").toString(),
 				"--output", out.resolve("plans.xml").toString()
 		);
 
