@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Holds data for one bast counting station.
@@ -130,6 +131,9 @@ class BAStCountStation {
 	}
 
 	public void overwriteDirections(String newMatchedDir, String newOppDir){
+
+		if(Objects.equals(newMatchedDir, newOppDir))
+			throw new RuntimeException("Can't match the same direction for both links!");
 
 		if(newMatchedDir != null)
 			this.matchedDir = newMatchedDir.contains(this.dir1) ? "R1": "R2";
