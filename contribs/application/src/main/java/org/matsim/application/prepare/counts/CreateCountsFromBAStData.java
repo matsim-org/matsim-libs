@@ -52,6 +52,9 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 	@CommandLine.Option(names = "--network", description = "path to MATSim network", required = true)
 	private String network;
 
+	@CommandLine.Option(names = "--network-crs", description = "crs of MATSim network", defaultValue = "EPSG:25832")
+	private String networkCrs;
+
 	@CommandLine.Option(names = "--road-types", description = "Define on which roads counts are created")
 	private final List<String> roadTypes = List.of("motorway", "primary", "trunk");
 
@@ -93,7 +96,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		Map<String, BAStCountStation> stations = readBAStCountStations(stationData, shp, counts);
 
 		// Assigns link ids in the station objects
-		matchBAStWithNetwork(network, stations, counts);
+		matchBAStWithNetwork(network, stations, counts, networkCrs);
 
 		clean(stations);
 
@@ -119,6 +122,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 		log.info("+++++++ Check stations for duplicates and missing link ids +++++++");
 
+		//Set<Id<Link>>
 		Set<Id<Link>> uniqueIds = stations.values().stream()
 				.filter(BAStCountStation::hasMatchedLink)
 				.filter(BAStCountStation::hasOppLink)
@@ -356,7 +360,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		return true;
 	}
 
-	private void match(Network network, Index index, BAStCountStation station, CountsOption counts) {
+	private void match(Network network, Index index, BAStCountStation station, CountsOption counts, CoordinateTransformation transformation) {
 
 		Map<String, Id<Link>> manuallyMatched = counts.isManuallyMatched(station.getId());
 		Link matched;
@@ -369,10 +373,10 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			}
 
 			String dir1 = station.getDir1();
-			String key1 = dir1 + "_" + station.getName();
+			String key1 = dir1 + "_" + station.getId();
 
 			String dir2 = station.getDir2();
-			String key2 = dir2 + "_" + station.getName();
+			String key2 = dir2 + "_" + station.getId();
 
 			Id<Link> matchedId = manuallyMatched.get(key1);
 			matched = network.getLinks().get(matchedId);
@@ -383,11 +387,13 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			station.setMatchedLink(matched);
 			station.setOppLink(opp);
 
+			station.overwriteDirections(dir1, dir2);
+
 			index.remove(matched);
 			index.remove(opp);
 		} else {
 
-			matched = NetworkUtils.getNearestLink(network, station.getCoord());
+			matched = NetworkUtils.getNearestLink(network, transformation.transform(station.getCoord()));
 
 			if (matched == null) {
 				log.debug("Query is used for matching!");
@@ -438,7 +444,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		return filter;
 	}
 
-	private void matchBAStWithNetwork(String pathToNetwork, Map<String, BAStCountStation> stations, CountsOption countsOption) {
+	private void matchBAStWithNetwork(String pathToNetwork, Map<String, BAStCountStation> stations, CountsOption countsOption, String networkCrs) {
 
 		Network filteredNetwork;
 
@@ -454,10 +460,11 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		}
 
 		Index index = new Index(filteredNetwork, searchRange);
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:25832", networkCrs);
 
 		log.info("+++++++ Match BASt stations with network +++++++");
 		for (var station : stations.values())
-			match(filteredNetwork, index, station, countsOption);
+			match(filteredNetwork, index, station, countsOption, coordinateTransformation);
 	}
 
 	private Map<String, BAStCountStation> readBAStCountStations(Path pathToAggregatedData, ShpOptions shp, CountsOption counts) {

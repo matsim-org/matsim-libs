@@ -3,6 +3,7 @@ package org.matsim.application.prepare.counts;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,8 +112,6 @@ class BAStCountStation {
 
 	public void setOppLink(Link oppLink) {
 		this.oppLink = oppLink;
-
-		matchDirection(oppLink, this.dir2);
 	}
 
 	public void setHasNoMatchedLink(){
@@ -128,6 +127,15 @@ class BAStCountStation {
 
 		this.matchedDir = direction.contains(bastDirection) ? "R1": "R2";
 		this.oppDir = matchedDir.equals("R1") ? "R2": "R1";
+	}
+
+	public void overwriteDirections(String newMatchedDir, String newOppDir){
+
+		if(newMatchedDir != null)
+			this.matchedDir = newMatchedDir.contains(this.dir1) ? "R1": "R2";
+
+		if(newOppDir != null)
+			this.oppDir = newOppDir.contains(this.dir1) ? "R1": "R2";
 	}
 
 	public String getLinkDirection(Link link) {

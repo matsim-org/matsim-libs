@@ -5,9 +5,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.Map;
 
 public class CreateCountsFromBAStDataTest {
 
@@ -29,6 +33,7 @@ public class CreateCountsFromBAStDataTest {
 		String[] args = new String[]{
 				"--station-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/Jawe2021_test_data.csv",
 				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
+				"--network-crs=EPSG:31468",
 				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.zip",
 				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
 				"--shp=C:\\Users\\ACER\\Desktop\\Uni\\SoSe_21\\MATSim\\Bezirke_-_Berlin-shp\\Berlin_Bezirke.shp",
@@ -56,12 +61,11 @@ public class CreateCountsFromBAStDataTest {
 
 		String[] args1 = new String[]{
 				"--station-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/Jawe2021_test_data.csv",
-				"--network=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/009.output_network.xml.gz",
+				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
+				"--network-crs=EPSG:31468",
 				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.txt",
 				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
-				"--shp=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Shape/ruhrgebiet_boundary.shp",
-				"--shp-crs=EPSG:25832",
-				"--input-crs=EPSG:25832",
+				"--shp=C:\\Users\\ACER\\Desktop\\Uni\\SoSe_21\\MATSim\\Bezirke_-_Berlin-shp\\Berlin_Bezirke.shp",
 				"--year=2021",
 				"--car-output=" + car1,
 				"--freight-output=" + freight1
@@ -74,12 +78,11 @@ public class CreateCountsFromBAStDataTest {
 
 		String[] args2 = new String[]{
 				"--station-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/Jawe2021_test_data.csv",
-				"--network=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/009.output_network.xml.gz",
+				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
+				"--network-crs=EPSG:31468",
 				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.txt",
 				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
-				"--shp=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Shape/ruhrgebiet_boundary.shp",
-				"--shp-crs=EPSG:25832",
-				"--input-crs=EPSG:25832",
+				"--shp=C:\\Users\\ACER\\Desktop\\Uni\\SoSe_21\\MATSim\\Bezirke_-_Berlin-shp\\Berlin_Bezirke.shp",
 				"--year=2021",
 				"--car-output=" + car2,
 				"--freight-output=" + freight2,
@@ -100,31 +103,42 @@ public class CreateCountsFromBAStDataTest {
 	@Test
 	public void testManualMatchedCounts(){
 
-		String car2 = utils.getOutputDirectory() + "manual-matched-" + carOutput;
-		String freight2 = utils.getOutputDirectory() + "manual-matched-" + freightOutput;
+		String car = utils.getOutputDirectory() + "manual-matched-" + carOutput;
+		String freight = utils.getOutputDirectory() + "manual-matched-" + freightOutput;
 
-		String[] args2 = new String[]{
+		//Map contains supposed matching from manual.csv
+		Map<Id<Link>, String> manual = Map.of(Id.createLinkId("4205"), "Neukölln", Id.createLinkId("4219"), "Neukölln");
+
+		String[] args = new String[]{
 				"--station-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/Jawe2021_test_data.csv",
-				"--network=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/009.output_network.xml.gz",
+				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
+				"--network-crs=EPSG:31468",
 				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.txt",
 				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
-				"--shp=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Shape/ruhrgebiet_boundary.shp",
-				"--shp-crs=EPSG:25832",
-				"--input-crs=EPSG:25832",
+				"--shp=C:\\Users\\ACER\\Desktop\\Uni\\SoSe_21\\MATSim\\Bezirke_-_Berlin-shp\\Berlin_Bezirke.shp",
 				"--year=2021",
-				"--car-output=" + car2,
-				"--freight-output=" + freight2,
+				"--car-output=" + car,
+				"--freight-output=" + freight,
 				"--manual-matched-counts=" + manualMatchedCounts,
 		};
 
-		new CreateCountsFromBAStData().execute(args2);
+		new CreateCountsFromBAStData().execute(args);
 
 		Counts<Link> countsWithManualMatched = new Counts<>();
 
-		new MatsimCountsReader(countsWithManualMatched).readFile(car2);
+		new CountsReaderMatsimV1(countsWithManualMatched).readFile(car);
 
-		Id<Link> target = Id.createLinkId("3506230770006f"); //Link is matched to station Bochum regular
+		var map = countsWithManualMatched.getCounts();
 
-		Assert.assertFalse(countsWithManualMatched.getCounts().containsKey(target));
+		for(var entry: manual.entrySet()){
+
+			Id<Link> supposed = entry.getKey();
+			String station = entry.getValue();
+
+			Count<Link> actual = map.get(supposed);
+			String actualStation = actual.getCsLabel();
+
+			Assert.assertEquals(station, actualStation);
+		}
 	}
 }
