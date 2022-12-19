@@ -108,6 +108,7 @@ public class TaxiOptimizerTests {
 		for (TaxiConfigVariant v : variants) {
 			v.updateTaxiConfig(taxiCfg);
 			benchmark.config.controler().setOutputDirectory(outputDir + "/" + i++);
+			benchmark.controler.resetInjector();
 			benchmark.controler.run();
 		}
 	}

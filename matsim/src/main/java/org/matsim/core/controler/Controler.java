@@ -378,6 +378,13 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	}
 
 	/**
+	 * Reset injector flag, so it will be re-created if the scenario is run again.
+	 */
+	public final void resetInjector() {
+		this.injectorCreated = false;
+	}
+
+	/**
 	 * @deprecated Do not use this, as it may not contain values in every
 	 *             iteration
 	 */
