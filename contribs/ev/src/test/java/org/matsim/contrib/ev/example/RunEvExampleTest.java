@@ -15,10 +15,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class RunEvExampleTest{
-	@Test
-	public void run() throws MalformedURLException {
-		new RunEvExample().run( new String[]{RunEvExample.DEFAULT_CONFIG_FILE});
-	}
 
 	private static final Logger log = LogManager.getLogger(RunEvExample.class );
 

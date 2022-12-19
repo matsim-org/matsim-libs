@@ -70,20 +70,6 @@ public class RunEvExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
-				installQSimModule(new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						bind(VehicleChargingHandler.class).asEagerSingleton();
-						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
-					}
-				});
-			}
-		});
-		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
 
 		controler.run();
 	}

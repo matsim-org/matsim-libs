@@ -60,7 +60,6 @@ public class RunEvExampleWithLTHConsumptionModel {
 	private static final Logger log = LogManager.getLogger(RunEvExampleWithLTHConsumptionModel.class);
 
 	public static void main(String[] args) throws IOException {
-		final URL configUrl;
 		if (args.length > 0) {
 			log.info("Starting simulation run with the following arguments:");
 			log.info("args=" + Arrays.toString( args ) );
@@ -98,17 +97,8 @@ public class RunEvExampleWithLTHConsumptionModel {
 				bind(DriveEnergyConsumption.Factory.class).toInstance(driveEnergyConsumptionFactory);
 				bind(AuxEnergyConsumption.Factory.class).toInstance(
 						electricVehicle -> (beginTime, duration, linkId) -> 0); //a dummy factory, as aux consumption is part of the drive consumption in the model
-				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
-				installQSimModule(new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						bind(VehicleChargingHandler.class).asEagerSingleton();
-						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
-					}
-				});
 			}
 		});
-		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
 
 		controler.run();
 	}
