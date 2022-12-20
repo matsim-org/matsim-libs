@@ -19,19 +19,6 @@
 
 package org.matsim.testcases;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.Permission;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -47,6 +34,19 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.Permission;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
@@ -357,8 +357,8 @@ public final class MatsimTestUtils extends TestWatcher {
     System.setSecurityManager(null);
   }
 
-  public static int compareEventsFiles( String filename1, String filename2 ) {
-	  return EventsFileComparator.compareAndReturnInt(filename1, filename2) ;
+  public static EventsFileComparator.Result compareEventsFiles( String filename1, String filename2 ) {
+	  return EventsFileComparator.compare(filename1, filename2) ;
   }
   public static void compareFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
