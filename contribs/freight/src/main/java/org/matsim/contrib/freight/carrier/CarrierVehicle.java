@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -132,7 +133,7 @@ public final class CarrierVehicle implements Vehicle {
 	private final Id<Link> locationId;
 	private final Id<Vehicle> vehicleId;
 	private final VehicleType vehicleType;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	private final double earliestStartTime;
 	private final double latestEndTime;
 

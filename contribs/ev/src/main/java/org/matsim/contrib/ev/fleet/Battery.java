@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import java.util.function.DoubleConsumer;
+
 public interface Battery {
 	/**
 	 * @return Battery Capacity [J]
@@ -40,12 +42,15 @@ public interface Battery {
 		return getCharge() / getCapacity();
 	}
 
-	/**
-	 * Changes charge, making sure the charge level does not increase above the battery capacity or decrease below 0.
-	 *
-	 * @param energy change in energy [J], can be negative or positive
-	 */
-	default void changeCharge(double energy) {
-		setCharge(getCharge() + energy);
+	// energy [J], positive value reduces the battery charge
+	// missingEnergyNotifier -- meant for emitting a MissingEnergyEvent, logging a warning or throwing an exception
+	default void dischargeEnergy(double energy, DoubleConsumer missingEnergyNotifier) {
+		double oldCharge = getCharge();
+		if (oldCharge < energy) {
+			missingEnergyNotifier.accept(energy - oldCharge);
+			setCharge(0);
+		} else {
+			setCharge(oldCharge - energy);
+		}
 	}
 }

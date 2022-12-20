@@ -50,6 +50,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -394,7 +395,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 
 		@Override
 		public Attributes getAttributes() {
-			return new Attributes();
+			return new AttributesImpl();
 		}
 	}
 }

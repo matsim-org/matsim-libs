@@ -47,6 +47,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -163,7 +164,7 @@ public class SwissRailRaptorTest {
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(16100, 5050);
         double depTime = 5.0 * 3600;
-        List<? extends PlanElement> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+        List<? extends PlanElement> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
         assertEquals(3, legs.size());
         assertEquals(TransportMode.walk, ((Leg)legs.get(0)).getMode());
         assertEquals(TransportMode.pt, ((Leg)legs.get(1)).getMode());
@@ -684,7 +685,7 @@ public class SwissRailRaptorTest {
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(28100, 4950);
         double depTime = 5.0 * 3600 + 50 * 60;
-        List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 600, depTime, depTime + 3600, null, new Attributes());
+        List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 600, depTime, depTime + 3600, null, new AttributesImpl());
 
         for (int i = 0; i < routes.size(); i++) {
             RaptorRoute route = routes.get(i);
@@ -750,7 +751,7 @@ public class SwissRailRaptorTest {
             Coord fromCoord = new Coord(0, 100);
             Coord toCoord = new Coord(20000, 100);
             double depTime = 6.0 * 3600;
-            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
@@ -770,7 +771,7 @@ public class SwissRailRaptorTest {
             Coord fromCoord = new Coord(0, 100);
             Coord toCoord = new Coord(20000, 100);
             double depTime = 6.0 * 3600;
-            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
@@ -790,7 +791,7 @@ public class SwissRailRaptorTest {
             Coord fromCoord = new Coord(0, 100);
             Coord toCoord = new Coord(20000, 100);
             double depTime = 6.0 * 3600;
-            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
@@ -810,7 +811,7 @@ public class SwissRailRaptorTest {
             Coord fromCoord = new Coord(0, 100);
             Coord toCoord = new Coord(40000, 100);
             double depTime = 6.0 * 3600;
-            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 

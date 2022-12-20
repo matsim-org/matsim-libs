@@ -33,6 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.IdentifiableArrayMap;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /*deliberately package*/ class NodeImpl implements Node, Lockable {
 
@@ -51,7 +52,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private boolean locked = false ;
 
 	private final static Logger log = LogManager.getLogger(Node.class);
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor

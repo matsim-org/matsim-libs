@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * For performance reasons.
@@ -51,7 +52,7 @@ public final class PlanWithCachedJointPlan implements Plan {
 	private final int[] keys = new int[ SIZE ];
 
 	private int accessCount = 0;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	@Override
 	public final Attributes getAttributes() {
 		return this.attributes;

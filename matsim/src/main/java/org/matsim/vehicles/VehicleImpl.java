@@ -22,6 +22,7 @@ package org.matsim.vehicles;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 final class VehicleImpl implements Vehicle {
 
@@ -34,7 +35,7 @@ final class VehicleImpl implements Vehicle {
         Gbl.assertNotNull(type);
         this.id = id;
         this.type = type;
-        this.attributes = new Attributes();
+        this.attributes = new AttributesImpl();
     }
 
     @Override
