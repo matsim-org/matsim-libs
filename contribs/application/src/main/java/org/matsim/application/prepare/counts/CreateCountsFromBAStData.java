@@ -237,9 +237,11 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 		try{
 			CSVParser records = CSVFormat
-					.newFormat(';')
-					.withAllowMissingColumnNames()
-					.withFirstRecordAsHeader()
+					.Builder.create()
+					.setAllowMissingColumnNames(false)
+					.setDelimiter(';')
+					.setHeader()
+					.build()
 					.parse(reader);
 
 			Set<String> keys = stations.keySet();
@@ -475,9 +477,11 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		try (BufferedReader reader = Files.newBufferedReader(pathToAggregatedData, StandardCharsets.ISO_8859_1)) {
 
 			CSVParser records = CSVFormat
-					.newFormat(';')
-					.withAllowMissingColumnNames()
-					.withFirstRecordAsHeader()
+					.Builder.create()
+					.setAllowMissingColumnNames(false)
+					.setDelimiter(';')
+					.setHeader()
+					.build()
 					.parse(reader);
 
 			for (var record : records) {
