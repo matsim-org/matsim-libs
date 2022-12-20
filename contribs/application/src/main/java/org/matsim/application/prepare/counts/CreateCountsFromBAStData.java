@@ -332,8 +332,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 	private boolean checkManualMatching(BAStCountStation station, Network network, Map<String, Id<Link>> manualMatched){
 		if(manualMatched.size() > 2){
-			log.warn("Too many manual matched links for station {}", station.getName());
-			return false;
+			throw new RuntimeException("Too many manual matched links for station " + station.getName());
 		}
 		// Check direction matching
 		String dir1 = station.getDir1();
@@ -343,18 +342,15 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 		List<String> manualDir = manualMatched.keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toList());
 
-		if(!manualDir.containsAll(bastDirections)){
-			log.warn("Wrong direction matching for station {}", station.getName());
-			return false;
-		}
+		if(!manualDir.containsAll(bastDirections))
+			throw new RuntimeException("Wrong direction matching for station " + station.getName());
+
 
 		//Check if link is in the network
 		for(Id<Link> id: manualMatched.values()){
 
-			if (!network.getLinks().containsKey(id)) {
-				log.warn("Manual matched station link {} is not in the network!", id);
-				return false;
-			}
+			if (!network.getLinks().containsKey(id))
+				throw new RuntimeException("Manual matched station link " + id + " is not in the network!");
 		}
 
 		return true;
