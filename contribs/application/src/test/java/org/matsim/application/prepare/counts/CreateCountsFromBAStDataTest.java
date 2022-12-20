@@ -12,9 +12,7 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.File;
 import java.util.Map;
-import java.util.Objects;
 
 public class CreateCountsFromBAStDataTest {
 
