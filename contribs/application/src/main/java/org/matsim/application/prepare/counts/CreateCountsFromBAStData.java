@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
@@ -52,9 +53,6 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 	@CommandLine.Option(names = "--network", description = "path to MATSim network", required = true)
 	private String network;
 
-	@CommandLine.Option(names = "--network-crs", description = "crs of MATSim network", defaultValue = "EPSG:25832")
-	private String networkCrs;
-
 	@CommandLine.Option(names = "--road-types", description = "Define on which roads counts are created")
 	private final List<String> roadTypes = List.of("motorway", "primary", "trunk");
 
@@ -85,6 +83,9 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final CountsOption counts = new CountsOption();
 
+	@CommandLine.Mixin
+	private final CrsOptions crs = new CrsOptions("EPSG:25832");
+
 	private static final Logger log = LogManager.getLogger(CreateCountsFromBAStData.class);
 
 	public static void main(String[] args) {
@@ -96,7 +97,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		Map<String, BAStCountStation> stations = readBAStCountStations(stationData, shp, counts);
 
 		// Assigns link ids in the station objects
-		matchBAStWithNetwork(network, stations, counts, networkCrs);
+		matchBAStWithNetwork(network, stations, counts, crs);
 
 		clean(stations);
 
@@ -440,7 +441,10 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		return filter;
 	}
 
-	private void matchBAStWithNetwork(String pathToNetwork, Map<String, BAStCountStation> stations, CountsOption countsOption, String networkCrs) {
+	private void matchBAStWithNetwork(String pathToNetwork, Map<String, BAStCountStation> stations, CountsOption countsOption, CrsOptions crs) {
+
+		if(crs.getTargetCRS() != null)
+			throw new RuntimeException("Please don't specify --target-crs. Only use --input-crs to determinate the network crs!");
 
 		Network filteredNetwork;
 
@@ -456,7 +460,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		}
 
 		Index index = new Index(filteredNetwork, searchRange);
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:25832", networkCrs);
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:25832", crs.getInputCRS());
 
 		log.info("+++++++ Match BASt stations with network +++++++");
 		for (var station : stations.values())
