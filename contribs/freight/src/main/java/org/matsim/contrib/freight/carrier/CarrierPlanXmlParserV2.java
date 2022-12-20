@@ -98,7 +98,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
-			new org.matsim.utils.objectattributes.attributable.Attributes();
+			new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 
 	/**
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 

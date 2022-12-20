@@ -398,9 +398,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	@Override
 	public String defaultValue(CommandLine.Model.ArgSpec argSpec) throws Exception {
 		Object obj = argSpec.userObject();
-		if (obj instanceof Field) {
-			Field field = (Field) obj;
-			if (field.getName().equals("scenario") && field.getDeclaringClass().equals(MATSimApplication.class)) {
+		if (obj instanceof Field field) {
+			// Make sure default config path is propagated to the field
+			if (field.getName().equals("configPath") && field.getDeclaringClass().equals(MATSimApplication.class)) {
 				return defaultScenario;
 			}
 		}

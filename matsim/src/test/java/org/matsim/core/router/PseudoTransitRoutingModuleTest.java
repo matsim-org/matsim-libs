@@ -54,6 +54,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class PseudoTransitRoutingModuleTest {
 
@@ -120,7 +121,7 @@ public class PseudoTransitRoutingModuleTest {
 			Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ) ;
 			Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() );
 			
-			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person, new Attributes()) ;
+			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person, new AttributesImpl()) ;
 			Gbl.assertIf( result.size()==1);
 			Leg newLeg = (Leg) result.get(0) ;
 
