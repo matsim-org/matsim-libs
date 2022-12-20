@@ -360,6 +360,11 @@ public final class MatsimTestUtils extends TestWatcher {
   public static int compareEventsFiles( String filename1, String filename2 ) {
 	  return EventsFileComparator.compareAndReturnInt(filename1, filename2) ;
   }
+
+  public static void assertEqualEventsFiles( String filename1, String filename2 ) {
+		Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
+	}
+
   public static void assertEqualFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
 	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
