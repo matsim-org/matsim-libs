@@ -9,9 +9,12 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
 import java.util.Map;
+import java.util.Objects;
 
 public class CreateCountsFromBAStDataTest {
 
@@ -20,8 +23,19 @@ public class CreateCountsFromBAStDataTest {
 
 	String carOutput = "car-test-counts.xml.gz";
 	String freightOutput = "freight-test-counts.xml.gz";
-	String ignoredCounts = "C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/ignored.csv";
-	String manualMatchedCounts = "C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/manual.csv";
+
+	String ignoredCounts = "ignored.csv";
+	String manualMatchedCounts = "manual.csv";
+	String wrongManualMatchedCounts = "wrong_manual.csv";
+
+	String network = ExamplesUtils.getTestScenarioURL("berlin") + "network.xml.gz";
+	String motorwayData = "2021_A_S_test_data.txt";
+	String primaryData = "2021_B_S_test_data.txt.gz";
+	String stationData = "Jawe2021_test_data.csv";
+	String shp = "Bezirke-Berlin-shp.zip";
+
+	String networkCrs = "EPSG:31468";
+	String shpCrs = "EPSG:3857";
 
 	@Test
 	public void testCreateCountsFromBAStData(){
@@ -31,12 +45,13 @@ public class CreateCountsFromBAStDataTest {
 		String freight = utils.getOutputDirectory() + version + freightOutput;
 
 		String[] args = new String[]{
-				"--station-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/Jawe2021_test_data.csv",
-				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
-				"--network-crs=EPSG:31468",
-				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.zip",
-				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
-				"--shp=C:\\Users\\ACER\\Desktop\\Uni\\SoSe_21\\MATSim\\Bezirke_-_Berlin-shp\\Berlin_Bezirke.shp",
+				"--station-data=" + utils.getPackageInputDirectory() + stationData,
+				"--network=" + network,
+				"--network-crs=" + networkCrs,
+				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+				"--shp=" + utils.getPackageInputDirectory() + shp,
+				"--shp-crs=" + shpCrs,
 				"--year=2021",
 				"--car-output=" + car,
 				"--freight-output=" + freight
@@ -60,12 +75,13 @@ public class CreateCountsFromBAStDataTest {
 		String freight1 = utils.getOutputDirectory() + version + freightOutput;
 
 		String[] args1 = new String[]{
-				"--station-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/Jawe2021_test_data.csv",
-				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
-				"--network-crs=EPSG:31468",
-				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.txt",
-				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
-				"--shp=C:\\Users\\ACER\\Desktop\\Uni\\SoSe_21\\MATSim\\Bezirke_-_Berlin-shp\\Berlin_Bezirke.shp",
+				"--station-data=" + utils.getPackageInputDirectory() + stationData,
+				"--network=" + network,
+				"--network-crs=" + networkCrs,
+				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+				"--shp=" + utils.getPackageInputDirectory() + shp,
+				"--shp-crs=" + shpCrs,
 				"--year=2021",
 				"--car-output=" + car1,
 				"--freight-output=" + freight1
@@ -77,16 +93,17 @@ public class CreateCountsFromBAStDataTest {
 		String freight2 = utils.getOutputDirectory() + "without-ignored-" + freightOutput;
 
 		String[] args2 = new String[]{
-				"--station-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/Jawe2021_test_data.csv",
-				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
-				"--network-crs=EPSG:31468",
-				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.txt",
-				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
-				"--shp=C:\\Users\\ACER\\Desktop\\Uni\\SoSe_21\\MATSim\\Bezirke_-_Berlin-shp\\Berlin_Bezirke.shp",
+				"--station-data=" + utils.getPackageInputDirectory() + stationData,
+				"--network=" + network,
+				"--network-crs=" + networkCrs,
+				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+				"--shp=" + utils.getPackageInputDirectory() + shp,
+				"--shp-crs=" + shpCrs,
 				"--year=2021",
 				"--car-output=" + car2,
 				"--freight-output=" + freight2,
-				"--ignored-counts=" + ignoredCounts,
+				"--ignored-counts=" + utils.getPackageInputDirectory() + ignoredCounts,
 		};
 
 		new CreateCountsFromBAStData().execute(args2);
@@ -110,16 +127,17 @@ public class CreateCountsFromBAStDataTest {
 		Map<Id<Link>, String> manual = Map.of(Id.createLinkId("4205"), "Neukölln", Id.createLinkId("4219"), "Neukölln");
 
 		String[] args = new String[]{
-				"--station-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/Jawe2021_test_data.csv",
-				"--network=C:\\Users\\ACER\\IdeaProjects\\matsim-libs\\examples\\scenarios\\berlin\\network.xml.gz",
-				"--network-crs=EPSG:31468",
-				"--motorway-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_A_S_test_data.txt",
-				"--primary-data=C:/Users/ACER/Desktop/Uni/VSP/Ruhrgebiet/Testdaten/2021_B_S_test_data.txt",
-				"--shp=C:\\Users\\ACER\\Desktop\\Uni\\SoSe_21\\MATSim\\Bezirke_-_Berlin-shp\\Berlin_Bezirke.shp",
+				"--station-data=" + utils.getPackageInputDirectory() + stationData,
+				"--network=" + network,
+				"--network-crs=" + networkCrs,
+				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+				"--shp=" + utils.getPackageInputDirectory() + shp,
+				"--shp-crs=" + shpCrs,
 				"--year=2021",
 				"--car-output=" + car,
 				"--freight-output=" + freight,
-				"--manual-matched-counts=" + manualMatchedCounts,
+				"--manual-matched-counts=" + utils.getPackageInputDirectory() + manualMatchedCounts,
 		};
 
 		new CreateCountsFromBAStData().execute(args);
@@ -140,5 +158,28 @@ public class CreateCountsFromBAStDataTest {
 
 			Assert.assertEquals(station, actualStation);
 		}
+	}
+
+	@Test
+	public void testManualMatchingWithWrongInput(){
+
+		String car = utils.getOutputDirectory() + "manual-matched-" + carOutput;
+		String freight = utils.getOutputDirectory() + "manual-matched-" + freightOutput;
+
+		String[] args = new String[]{
+				"--station-data=" + utils.getPackageInputDirectory() + stationData,
+				"--network=" + network,
+				"--network-crs=" + networkCrs,
+				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+				"--shp=" + utils.getPackageInputDirectory() + shp,
+				"--shp-crs=" + shpCrs,
+				"--year=2021",
+				"--car-output=" + car,
+				"--freight-output=" + freight,
+				"--manual-matched-counts=" + utils.getPackageInputDirectory() + wrongManualMatchedCounts,
+		};
+
+		Assert.assertThrows(RuntimeException.class, () -> new CreateCountsFromBAStData().execute(args));
 	}
 }
