@@ -5,12 +5,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
@@ -26,7 +29,7 @@ public class CreateCountsFromBAStDataTest {
 	String manualMatchedCounts = "manual.csv";
 	String wrongManualMatchedCounts = "wrong_manual.csv";
 
-	String network = ExamplesUtils.getTestScenarioURL("berlin") + "network.xml.gz";
+	String network = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString();
 	String motorwayData = "2021_A_S_test_data.txt";
 	String primaryData = "2021_B_S_test_data.txt.gz";
 	String stationData = "Jawe2021_test_data.csv";
@@ -45,7 +48,7 @@ public class CreateCountsFromBAStDataTest {
 		String[] args = new String[]{
 				"--station-data=" + utils.getPackageInputDirectory() + stationData,
 				"--network=" + network,
-				"--network-crs=" + networkCrs,
+				"--input-crs=" + networkCrs,
 				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
 				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
 				"--shp=" + utils.getPackageInputDirectory() + shp,
@@ -60,9 +63,9 @@ public class CreateCountsFromBAStDataTest {
 		Counts<Link> counts = new Counts<>();
 		new MatsimCountsReader(counts).readFile(car);
 
-		int size = counts.getCounts().size();
+		Integer size = counts.getCounts().size();
 
-		Assert.assertTrue(size > 0);
+		assertThat(size).isGreaterThan(0);
 	}
 
 	@Test
@@ -75,7 +78,7 @@ public class CreateCountsFromBAStDataTest {
 		String[] args1 = new String[]{
 				"--station-data=" + utils.getPackageInputDirectory() + stationData,
 				"--network=" + network,
-				"--network-crs=" + networkCrs,
+				"--input-crs=" + networkCrs,
 				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
 				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
 				"--shp=" + utils.getPackageInputDirectory() + shp,
@@ -93,7 +96,7 @@ public class CreateCountsFromBAStDataTest {
 		String[] args2 = new String[]{
 				"--station-data=" + utils.getPackageInputDirectory() + stationData,
 				"--network=" + network,
-				"--network-crs=" + networkCrs,
+				"--input-crs=" + networkCrs,
 				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
 				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
 				"--shp=" + utils.getPackageInputDirectory() + shp,
@@ -112,7 +115,10 @@ public class CreateCountsFromBAStDataTest {
 		new MatsimCountsReader(countsComplete).readFile(car1);
 		new MatsimCountsReader(countsWithoutIgnored).readFile(car2);
 
-		Assert.assertTrue(countsComplete.getCounts().size() > countsWithoutIgnored.getCounts().size());
+		int completeSize = countsComplete.getCounts().size();
+		int ignoredSize = countsWithoutIgnored.getCounts().size();
+
+		assertThat(completeSize).isGreaterThan(ignoredSize);
 	}
 
 	@Test
@@ -127,7 +133,7 @@ public class CreateCountsFromBAStDataTest {
 		String[] args = new String[]{
 				"--station-data=" + utils.getPackageInputDirectory() + stationData,
 				"--network=" + network,
-				"--network-crs=" + networkCrs,
+				"--input-crs=" + networkCrs,
 				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
 				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
 				"--shp=" + utils.getPackageInputDirectory() + shp,
@@ -167,7 +173,7 @@ public class CreateCountsFromBAStDataTest {
 		String[] args = new String[]{
 				"--station-data=" + utils.getPackageInputDirectory() + stationData,
 				"--network=" + network,
-				"--network-crs=" + networkCrs,
+				"--input-crs=" + networkCrs,
 				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
 				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
 				"--shp=" + utils.getPackageInputDirectory() + shp,
