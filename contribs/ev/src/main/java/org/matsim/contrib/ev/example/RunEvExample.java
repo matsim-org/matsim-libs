@@ -69,7 +69,15 @@ public class RunEvExample {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new EvModule());
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				install( new EvModule() );
+
+				addRoutingModuleBinding( TransportMode.car ).toProvider(new EvNetworkRoutingProvider(TransportMode.car) );
+				// a router that inserts charging activities when the battery is run empty.  there may be some other way to insert
+				// charging activities, based on the situation.  kai, dec'22
+			}
+		} );
 
 		controler.run();
 	}

@@ -69,7 +69,7 @@ public class VehicleChargingHandler
 	private final ImmutableListMultimap<Id<Link>, Charger> chargersAtLinks;
 
 	@Inject
-	public VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet) {
+	VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
 		chargersAtLinks = ChargingInfrastructures.getChargersAtLinks(chargingInfrastructure);
