@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +13,7 @@ import java.util.Collections;
 public class LSPDataObject<T> implements HasSimulationTrackers<T>, Attributable, Identifiable<T> {
 
 	private final Collection<LSPSimulationTracker<T>> trackers = new ArrayList<>();
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	private final Id<T> id;
 
 	public LSPDataObject(Id<T> id) {
