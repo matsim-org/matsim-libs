@@ -62,9 +62,9 @@ public final class MatsimTestUtils extends TestWatcher {
 	 */
 	public static final double EPSILON = 1e-10;
 
-	public static void compareFilesLineByLine(String inputFilename, String outputFilename) {
+	public static void assertEqualFilesLineByLine(String inputFilename, String outputFilename) {
 		try (BufferedReader readerV1Input = IOUtils.getBufferedReader(inputFilename);
-				BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename);) {
+				BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename)) {
 
 			String lineInput;
 			String lineOutput;
@@ -360,7 +360,12 @@ public final class MatsimTestUtils extends TestWatcher {
   public static EventsFileComparator.Result compareEventsFiles( String filename1, String filename2 ) {
 	  return EventsFileComparator.compare(filename1, filename2) ;
   }
-  public static void compareFilesBasedOnCRC( String filename1, String filename2 ) {
+
+  public static void assertEqualEventsFiles( String filename1, String filename2 ) {
+		Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
+	}
+
+  public static void assertEqualFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
 	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
 	  Assert.assertEquals( "different file checksums", checksum1, checksum2 );

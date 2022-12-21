@@ -42,7 +42,7 @@ public class VehicleWriteReadTest{
 		final String outputFilename = outputDirectory + OUTXML_v1;
 		writerV1.writeFile( outputFilename );
 
-		MatsimTestUtils.compareFilesLineByLine( inputFilename, outputFilename );
+		MatsimTestUtils.assertEqualFilesLineByLine( inputFilename, outputFilename );
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class VehicleWriteReadTest{
 		final String outFile = outputDirectory + OUTXML_v2;
 		writerV2.writeFile( outFile );
 
-		MatsimTestUtils.compareFilesLineByLine( inFile, outFile );
+		MatsimTestUtils.assertEqualFilesLineByLine( inFile, outFile );
 
 	}
 }
