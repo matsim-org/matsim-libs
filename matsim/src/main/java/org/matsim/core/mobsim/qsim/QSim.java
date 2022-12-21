@@ -150,7 +150,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		// global mutable data.
 
 		@Override
-		public synchronized void arrangeNextAgentState(MobsimAgent agent) {
+		public /*synchronized*/ void arrangeNextAgentState(MobsimAgent agent) {
 			QSim.this.arrangeNextAgentAction(agent);
 		}
 
