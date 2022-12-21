@@ -20,19 +20,9 @@
 package org.matsim.contrib.ev;
 
 import com.google.inject.Singleton;
-import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
-import org.matsim.contrib.ev.discharging.DischargingModule;
-import org.matsim.contrib.ev.fleet.ElectricFleetModule;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
-import org.matsim.contrib.ev.stats.EvStatsModule;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 public class EvModule extends AbstractModule {
 	public static final String EV_COMPONENT = "EV_COMPONENT";

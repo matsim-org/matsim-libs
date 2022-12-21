@@ -64,8 +64,8 @@ public class RunEvExample {
 		new RunEvExample().run(args);
 	}
 
-	public void run( String[] configUrl ) {
-		Config config = ConfigUtils.loadConfig(configUrl, new EvConfigGroup());
+	public void run( String[] args ) {
+		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
