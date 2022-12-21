@@ -50,7 +50,7 @@ public class ExampleSchedulingOfTransportChainHubsVsDirectTest {
 		}
 
 		//Compare events files
-		MatsimTestUtils.compareEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+		MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 	}
 
 	@Test
@@ -69,6 +69,6 @@ public class ExampleSchedulingOfTransportChainHubsVsDirectTest {
 		}
 
 		//Compare events files
-		MatsimTestUtils.compareEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+		MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
 	}
 }
