@@ -23,6 +23,8 @@ package lsp.usecase;
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
 import lsp.LogisticChainElement;
+import lsp.events.HandlingInHubEndsEvent;
+import lsp.events.HandlingInHubStartsEvent;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentLeg;
 import lsp.shipment.ShipmentPlanElement;
@@ -153,6 +155,8 @@ import java.util.Map;
 		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
 			lspShipment.getLog().addPlanElement(loadId, handle);
 		}
+		new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId);
+		new HandlingInHubEndsEvent(startTime + handlingTime, linkId, lspShipment.getId(), resourceId);
 
 	}
 

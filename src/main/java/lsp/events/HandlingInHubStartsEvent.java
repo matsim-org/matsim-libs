@@ -42,8 +42,8 @@ public final class HandlingInHubStartsEvent extends AbstractLogisticEvent implem
 	public static final String EVENT_TYPE = "Handling_started";
 	private final Id<LSPResource> hubId;
 
-	public HandlingInHubStartsEvent(Event event, Id<Link> linkId, Id<LSPShipment> lspShipmentId, Id<LSPResource> hubId) {
-		super(event.getTime(), linkId, lspShipmentId);
+	public HandlingInHubStartsEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId, Id<LSPResource> hubId) {
+		super(time, linkId, lspShipmentId);
 		this.hubId = hubId;
 	}
 
