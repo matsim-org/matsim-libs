@@ -26,19 +26,19 @@ public class CarrierVehicleTypeReaderTest {
 		inFilename = utils.getClassInputDirectory() + "vehicleTypes.xml";
 		new CarrierVehicleTypeReader(types).readFile( inFilename );
 	}
-	
+
 	@Test
 	public void test_whenReadingTypes_nuOfTypesIsReadCorrectly(){
 		assertEquals(2, types.getVehicleTypes().size());
 	}
-	
+
 	@Test
 	public void test_whenReadingTypes_itReadyExactlyTheTypesFromFile(){
 		assertTrue(types.getVehicleTypes().containsKey(Id.create("medium", org.matsim.vehicles.VehicleType.class ) ) );
 		assertTrue(types.getVehicleTypes().containsKey(Id.create("light", org.matsim.vehicles.VehicleType.class ) ) );
 		assertEquals(2, types.getVehicleTypes().size());
 	}
-	
+
 	@Test
 	public void test_whenReadingTypeMedium_itReadsDescriptionCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
@@ -50,7 +50,7 @@ public class CarrierVehicleTypeReaderTest {
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
 		assertEquals(30., (double) medium.getCapacity().getOther(), Double.MIN_VALUE );
 	}
-	
+
 	@Test
 	public void test_whenReadingTypeMedium_itReadsCostInfoCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
@@ -58,7 +58,7 @@ public class CarrierVehicleTypeReaderTest {
 		assertEquals(0.4, medium.getCostInformation().getCostsPerMeter(),0.01 );
 		assertEquals(30.0, medium.getCostInformation().getCostsPerSecond(),0.01 );
 	}
-	
+
 	@Test
 	public void test_whenReadingTypeMedium_itReadsEngineInfoCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
@@ -71,7 +71,7 @@ public class CarrierVehicleTypeReaderTest {
 		final String outFilename = utils.getOutputDirectory() + "/vehicleTypes_v2.xml";
 		new CarrierVehicleTypeWriter( types ).write( outFilename ) ;
 		final String referenceFilename = utils.getClassInputDirectory() + "/vehicleTypes_v2.xml" ;
-		MatsimTestUtils.compareFilesLineByLine( referenceFilename, outFilename );
+		MatsimTestUtils.assertEqualFilesLineByLine( referenceFilename, outFilename );
 	}
 
 	@Test
@@ -90,6 +90,6 @@ public class CarrierVehicleTypeReaderTest {
 		final String outFilename = utils.getOutputDirectory() + "/vehicleTypes_v2.xml";
 		new CarrierVehicleTypeWriter( types1 ).write( outFilename ) ;
 
-		MatsimTestUtils.compareFilesLineByLine( inFilename1, outFilename );
+		MatsimTestUtils.assertEqualFilesLineByLine( inFilename1, outFilename );
 	}
 }
