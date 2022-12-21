@@ -70,8 +70,14 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		for (LSP lsp : lsps.getLSPs().values()) {
 			((LSPImpl) lsp).setScorer( lspScoringFunctionFactory.createScoringFunction() );
 
+
 			// simulation trackers of lsp:
 			registerSimulationTrackers(lsp );
+
+			// simulation trackers of resources:
+			for (LSPResource resource : lsp.getResources()) {
+				registerSimulationTrackers(resource);
+			}
 
 			// simulation trackers of shipments:
 			for (LSPShipment shipment : lsp.getShipments()) {
@@ -94,9 +100,9 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		}
 	}
 
-	private void registerSimulationTrackers( HasSimulationTrackers<?> lsp ) {
+	private void registerSimulationTrackers( HasSimulationTrackers<?> hasSimulationTrackers) {
 		// get all simulation trackers ...
-		for (LSPSimulationTracker<?> simulationTracker : lsp.getSimulationTrackers()) {
+		for (LSPSimulationTracker<?> simulationTracker : hasSimulationTrackers.getSimulationTrackers()) {
 			// ... register them ...
 			if (!registeredHandlers.contains(simulationTracker)) {
 				log.warn("adding eventsHandler: " + simulationTracker);

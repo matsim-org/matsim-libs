@@ -41,14 +41,17 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/*package-private*/  class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
+/*package-private*/  class TransshipmentHubTourEndEventHandler implements BeforeMobsimListener, AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
 
 //	@Inject Scenario scenario;
 	private final Scenario scenario;
@@ -56,6 +59,7 @@ import java.util.Map;
 	private final TransshipmentHub transshipmentHub;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
+	private EventsManager eventsManager;
 
 	/**
 	 * What is a TranshipmentHubTour ??? KMT, Sep 22
@@ -69,6 +73,7 @@ import java.util.Map;
 		this.resourceId = transshipmentHub.getId();
 		this.scenario = scenario;
 		this.servicesWaitedFor = new HashMap<>();
+		this.transshipmentHub.addSimulationTracker(this);
 	}
 
 	@Override
@@ -155,8 +160,8 @@ import java.util.Map;
 		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
 			lspShipment.getLog().addPlanElement(loadId, handle);
 		}
-		new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId);
-		new HandlingInHubEndsEvent(startTime + handlingTime, linkId, lspShipment.getId(), resourceId);
+		eventsManager.processEvent(new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId));
+		eventsManager.processEvent(new HandlingInHubEndsEvent(startTime + handlingTime, linkId, lspShipment.getId(), resourceId));
 
 	}
 
@@ -195,6 +200,10 @@ import java.util.Map;
 
 	public Id<Link> getLinkId() {
 		return linkId;
+	}
+
+	@Override public void notifyBeforeMobsim(BeforeMobsimEvent beforeMobsimEvent) {
+		eventsManager = beforeMobsimEvent.getServices().getEvents();
 	}
 
 	static class TransshipmentHubEventHandlerPair {
