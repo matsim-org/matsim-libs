@@ -357,8 +357,8 @@ public final class MatsimTestUtils extends TestWatcher {
     System.setSecurityManager(null);
   }
 
-  public static int compareEventsFiles( String filename1, String filename2 ) {
-	  return EventsFileComparator.compareAndReturnInt(filename1, filename2) ;
+  public static EventsFileComparator.Result compareEventsFiles( String filename1, String filename2 ) {
+	  return EventsFileComparator.compare(filename1, filename2) ;
   }
 
   public static void assertEqualEventsFiles( String filename1, String filename2 ) {
