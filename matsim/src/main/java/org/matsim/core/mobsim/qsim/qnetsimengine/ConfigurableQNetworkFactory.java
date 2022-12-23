@@ -43,10 +43,10 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * @see DefaultQNetworkFactory
  */
 public final class ConfigurableQNetworkFactory implements QNetworkFactory {
-	private QSimConfigGroup qsimConfig;
-	private EventsManager events;
-	private Network network;
-	private Scenario scenario;
+	private final QSimConfigGroup qsimConfig;
+	private final EventsManager events;
+	private final Network network;
+	private final Scenario scenario;
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine;
 	private Optional<LinkSpeedCalculator> linkSpeedCalculator = Optional.empty();
@@ -63,16 +63,18 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	}
 
 	@Override
-	public void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
-		this.netsimEngine = netsimEngine1;
-		double effectiveCellSize = network.getEffectiveCellSize();
+	public void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine) {
+		this.netsimEngine = netsimEngine;
+
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis(qsimConfig.getLinkWidthForVis());
 		if (!Double.isNaN(network.getEffectiveLaneWidth())) {
 			linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}
+
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-		context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator);
+
+		context = new NetsimEngineContext(events, network.getEffectiveCellSize(), agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator);
 	}
 	@Override
 	public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {

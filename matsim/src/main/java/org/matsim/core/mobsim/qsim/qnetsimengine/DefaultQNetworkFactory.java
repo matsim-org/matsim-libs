@@ -31,8 +31,11 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+
+import java.util.Map;
 
 
 /**
@@ -42,7 +45,7 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * it us truly needed yet.
  * <li> Mobsim-specific objects, such as {@link AgentCounter} or {@link QNetsimEngineWithThreadpool}.  Since the mobsim is re-created in every
  * iteration, they cannot be injected via guice, at least not via the global inject mechanism that has the override facility.
- * <li> The last level are link- oder node-specific objects such as {@link Link}  or {@QNode}.  They are arguments to the 
+ * <li> The last level are link- oder node-specific objects such as {@link Link}  or {@link Node}.  They are arguments to the
  * creational methods.
  * <li> The main underlying implementations are {@link QueueWithBuffer}, the factory of which is inserted into {@link QLinkImpl}.  This
  * was the syntax that could subsume all other syntactic variants.  Builders are used to set defaults and to avoid overly long
@@ -61,20 +64,19 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * @see ConfigurableQNetworkFactory
  */
 public final class DefaultQNetworkFactory implements QNetworkFactory {
-	private EventsManager events ;
-	private Scenario scenario ;
+	private final EventsManager events ;
+	private final Scenario scenario ;
 	// (vis needs network and may need population attributes and config; in consequence, makes sense to have scenario here. kai, apr'16)
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine ;
-	@Inject
-	DefaultQNetworkFactory( EventsManager events, Scenario scenario ) {
+	@Inject Map<String, LinkSpeedCalculator> modeSpecificLinkSpeedCalculator;
+	@Inject DefaultQNetworkFactory( EventsManager events, Scenario scenario ) {
 		this.events = events;
 		this.scenario = scenario;
 	}
 	@Override
-	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
-		this.netsimEngine = netsimEngine1;
-		double effectiveCellSize = scenario.getNetwork().getEffectiveCellSize() ;
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine ) {
+		this.netsimEngine = netsimEngine;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
@@ -82,12 +84,13 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
-		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(), 
+		context = new NetsimEngineContext( events, scenario.getNetwork().getEffectiveCellSize(), agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(),
 				mobsimTimer, linkWidthCalculator );
 	}
 	@Override
 	public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+		linkBuilder.setLinkSpeedCalculator( modeSpecificLinkSpeedCalculator.get( "bicycle" ) );
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override

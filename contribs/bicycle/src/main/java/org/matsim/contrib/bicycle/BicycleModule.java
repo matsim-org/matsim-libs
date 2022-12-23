@@ -20,13 +20,17 @@ package org.matsim.contrib.bicycle;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.MapBinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -60,6 +64,23 @@ final class BicycleModule extends AbstractModule {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
 		}
 		addControlerListenerBinding().to(ConsistencyCheck.class);
+
+		this.installOverridingQSimModule( new AbstractQSimModule(){
+			@Inject EventsManager events;
+			@Inject Scenario scenario;
+			@Inject BicycleLinkSpeedCalculator bicycleLinkSpeedCalculator;
+			@Override protected void configureQSim(){
+//				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+//				factory.setLinkSpeedCalculator( bicycleLinkSpeedCalculator );
+//				bind( QNetworkFactory.class ).toInstance(factory );
+//				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring
+//				// it in every iteration via the initializeFactory(...) method. kai, mar'16
+
+				var linkSpeedCalculator = MapBinder.newMapBinder( this.binder(), String.class, LinkSpeedCalculator.class );
+				linkSpeedCalculator.addBinding( "bicycle" ).toInstance( bicycleLinkSpeedCalculator );
+
+			}
+		} );
 	}
 
 	static class ConsistencyCheck implements StartupListener {
