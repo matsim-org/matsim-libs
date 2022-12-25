@@ -36,7 +36,6 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Disable FISS in the last iteration to get events of all agents. May be required for post-processing")
-	@Positive
 	public boolean switchOffFISSLastIteration = true;
 
     public FISSConfigGroup() {
