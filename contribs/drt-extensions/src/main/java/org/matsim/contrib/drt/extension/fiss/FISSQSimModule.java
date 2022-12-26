@@ -17,6 +17,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.router.util.TravelTime;
@@ -35,11 +36,11 @@ public class FISSQSimModule extends AbstractQSimModule {
 
     @Provides
     @Singleton
-    FISS provideMultiModalDepartureHandler(QNetsimEngineI qNetsimEngine,
-            QSimConfigGroup qsimConfig, Scenario scenario, EventsManager eventsManager,
-            @Named(TransportMode.car) TravelTime travelTime) {
+    FISS provideMultiModalDepartureHandler(MatsimServices matsimServices, QNetsimEngineI qNetsimEngine,
+										   QSimConfigGroup qsimConfig, Scenario scenario, EventsManager eventsManager,
+										   @Named(TransportMode.car) TravelTime travelTime) {
         Config config = scenario.getConfig();
         FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
-        return new FISS(qNetsimEngine, scenario, eventsManager, fissConfigGroup, travelTime);
+		return new FISS(matsimServices, qNetsimEngine, scenario, eventsManager, fissConfigGroup, travelTime);
     }
 }
