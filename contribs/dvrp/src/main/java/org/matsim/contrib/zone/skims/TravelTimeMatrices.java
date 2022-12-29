@@ -32,28 +32,25 @@ import org.matsim.core.utils.misc.OptionalTime;
  */
 public final class TravelTimeMatrices {
 
-	public static Matrix calculateTravelTimeMatrix(Network routingNetwork, Map<Zone, Node> centralNodes,
-			double departureTime, TravelTime travelTime, TravelDisutility travelDisutility, int numberOfThreads) {
+	public static Matrix calculateTravelTimeMatrix(Network routingNetwork, Map<Zone, Node> centralNodes, double departureTime, TravelTime travelTime,
+			TravelDisutility travelDisutility, int numberOfThreads) {
 		SpeedyGraph graph = new SpeedyGraph(routingNetwork);
 		ExecutorServiceWithResource<LeastCostPathTree> executorService = new ExecutorServiceWithResource<>(
-				IntStream.range(0, numberOfThreads)
-						.mapToObj(i -> new LeastCostPathTree(graph, travelTime, travelDisutility))
-						.collect(toList()));
+				IntStream.range(0, numberOfThreads).mapToObj(i -> new LeastCostPathTree(graph, travelTime, travelDisutility)).collect(toList()));
 
 		Matrix travelTimeMatrix = new Matrix(centralNodes.keySet());
 		Counter counter = new Counter("DVRP free-speed TT matrix: zone ", " / " + centralNodes.size());
 		executorService.submitRunnablesAndWait(centralNodes.keySet()
 				.stream()
-				.map(z -> (lcpTree -> computeForDepartureZone(z, centralNodes, departureTime, travelTimeMatrix, lcpTree,
-						counter))));
+				.map(z -> (lcpTree -> computeForDepartureZone(z, centralNodes, departureTime, travelTimeMatrix, lcpTree, counter))));
 		counter.printCounter();
 
 		executorService.shutdown();
 		return travelTimeMatrix;
 	}
 
-	private static void computeForDepartureZone(Zone fromZone, Map<Zone, Node> centralNodes, double departureTime,
-			Matrix travelTimeMatrix, LeastCostPathTree lcpTree, Counter counter) {
+	private static void computeForDepartureZone(Zone fromZone, Map<Zone, Node> centralNodes, double departureTime, Matrix travelTimeMatrix,
+			LeastCostPathTree lcpTree, Counter counter) {
 		counter.incCounter();
 		Node fromNode = centralNodes.get(fromZone);
 		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null);
@@ -73,25 +70,21 @@ public final class TravelTimeMatrices {
 			double departureTime, TravelTime travelTime, TravelDisutility travelDisutility, int numberOfThreads) {
 		SpeedyGraph graph = new SpeedyGraph(routingNetwork);
 		ExecutorServiceWithResource<LeastCostPathTree> executorService = new ExecutorServiceWithResource<>(
-				IntStream.range(0, numberOfThreads)
-						.mapToObj(i -> new LeastCostPathTree(graph, travelTime, travelDisutility))
-						.collect(toList()));
+				IntStream.range(0, numberOfThreads).mapToObj(i -> new LeastCostPathTree(graph, travelTime, travelDisutility)).collect(toList()));
 
 		SparseMatrix travelTimeMatrix = new SparseMatrix();
 		var nodes = routingNetwork.getNodes().values();
-		Counter counter = new Counter("DVRP free-speed TT sparse matrix: node ",
-				" / " + routingNetwork.getNodes().size());
+		Counter counter = new Counter("DVRP free-speed TT sparse matrix: node ", " / " + routingNetwork.getNodes().size());
 		executorService.submitRunnablesAndWait(nodes.stream()
-				.map(n -> (lcpTree -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree,
-						counter, maxDistance))));
+				.map(n -> (lcpTree -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree, counter, maxDistance))));
 		counter.printCounter();
 
 		executorService.shutdown();
 		return travelTimeMatrix;
 	}
 
-	private static void computeForDepartureNode(Node fromNode, Collection<? extends Node> nodes, double departureTime,
-			SparseMatrix sparseMatrix, LeastCostPathTree lcpTree, Counter counter, double maxDistance) {
+	private static void computeForDepartureNode(Node fromNode, Collection<? extends Node> nodes, double departureTime, SparseMatrix sparseMatrix,
+			LeastCostPathTree lcpTree, Counter counter, double maxDistance) {
 		counter.incCounter();
 
 		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null,
@@ -104,6 +97,7 @@ public final class TravelTimeMatrices {
 			if (currOptionalTime.isUndefined()) {
 				continue;
 			}
+			// these values may not the actual minimum, because many nodes may not get fully relaxed (due to the early termination)
 			double currTime = currOptionalTime.seconds();
 			double time = currTime - departureTime;
 			neighborNodes.add(new NodeAndTime(toNodeIndex, time));
