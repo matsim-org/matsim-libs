@@ -34,16 +34,16 @@ import com.google.common.base.Preconditions;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public final class SparseMatrix {
+final class SparseMatrix {
 	//Range of unsigned short: 0-65535 (18:12:15)
 	//In case 18 hours is not enough, we can reduce the resolution from seconds to tens of seconds
 	private static final int MAX_UNSIGNED_SHORT = Short.MAX_VALUE - Short.MIN_VALUE;
 
-	public static class NodeAndTime {
+	static class NodeAndTime {
 		private final int nodeIdx;
 		private final double time;
 
-		public NodeAndTime(int nodeIdx, double time) {
+		NodeAndTime(int nodeIdx, double time) {
 			this.nodeIdx = nodeIdx;
 			this.time = time;
 		}
@@ -73,7 +73,7 @@ public final class SparseMatrix {
 		}
 	}
 
-	public static final class SparseRow {
+	static final class SparseRow {
 		// 64-128 seemed to work best when micro-benchmarking the berlin network from the robo-taxi papers
 		// for a bigger neighbourhood (maxNeighborDistance = 4000). On average, there is 620 neighbouring nodes
 		// (min 2; max 1941).
@@ -86,7 +86,7 @@ public final class SparseMatrix {
 
 		private final BitSet presentNodes = new BitSet();
 
-		public SparseRow(List<NodeAndTime> nodeAndTimes) {
+		SparseRow(List<NodeAndTime> nodeAndTimes) {
 			if (nodeAndTimes.isEmpty()) {
 				mask = 0;
 				buckets = null;
@@ -116,26 +116,24 @@ public final class SparseMatrix {
 			}
 		}
 
-		public int get(int toNodeIndex) {
-			return presentNodes.get(toNodeIndex) ?
-					buckets[toNodeIndex & mask].get(toNodeIndex) :
-					-1; // value not present in the row
+		int get(int toNodeIndex) {
+			return presentNodes.get(toNodeIndex) ? buckets[toNodeIndex & mask].get(toNodeIndex) : -1; // value not present in the row
 		}
 	}
 
 	private final SparseRow[] rows = new SparseRow[Id.getNumberOfIds(Node.class)];
 
-	public int get(int fromNode, int toNode) {
+	int get(int fromNode, int toNode) {
 		var row = rows[fromNode];
 		return row != null ? row.get(toNode) // get the value from the selected row
 				: -1; // value not present if no row
 	}
 
-	public int get(Node fromNode, Node toNode) {
+	int get(Node fromNode, Node toNode) {
 		return get(fromNode.getId().index(), toNode.getId().index());
 	}
 
-	public void setRow(Node fromNode, SparseRow row) {
+	void setRow(Node fromNode, SparseRow row) {
 		rows[fromNode.getId().index()] = row;
 	}
 }
