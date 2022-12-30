@@ -30,9 +30,11 @@ import org.matsim.core.utils.misc.OptionalTime;
  */
 public final class TravelTimeMatrices {
 
-	public static Matrix calculateTravelTimeMatrix(Network routingNetwork, Map<Zone, Node> centralNodes, double departureTime, TravelTime travelTime,
-			TravelDisutility travelDisutility, int numberOfThreads) {
-		var executorService = createExecutorService(routingNetwork, travelTime, travelDisutility, numberOfThreads);
+	public record RoutingParams(Network routingNetwork, TravelTime travelTime, TravelDisutility travelDisutility, int numberOfThreads) {
+	}
+
+	public static Matrix calculateTravelTimeMatrix(RoutingParams params, Map<Zone, Node> centralNodes, double departureTime) {
+		var executorService = createExecutorService(params);
 
 		Matrix travelTimeMatrix = new Matrix(centralNodes.keySet());
 		Counter counter = new Counter("DVRP free-speed TT matrix: zone ", " / " + centralNodes.size());
@@ -62,13 +64,12 @@ public final class TravelTimeMatrices {
 		}
 	}
 
-	public static SparseMatrix calculateTravelTimeSparseMatrix(Network routingNetwork, double maxDistance, double departureTime,
-			TravelTime travelTime, TravelDisutility travelDisutility, int numberOfThreads) {
-		var executorService = createExecutorService(routingNetwork, travelTime, travelDisutility, numberOfThreads);
+	public static SparseMatrix calculateTravelTimeSparseMatrix(RoutingParams params, double maxDistance, double departureTime) {
+		var executorService = createExecutorService(params);
 
 		SparseMatrix travelTimeMatrix = new SparseMatrix();
-		var nodes = routingNetwork.getNodes().values();
-		Counter counter = new Counter("DVRP free-speed TT sparse matrix: node ", " / " + routingNetwork.getNodes().size());
+		var nodes = params.routingNetwork.getNodes().values();
+		Counter counter = new Counter("DVRP free-speed TT sparse matrix: node ", " / " + params.routingNetwork.getNodes().size());
 		executorService.submitRunnablesAndWait(nodes.stream()
 				.map(n -> (lcpTree -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree, counter, maxDistance))));
 		counter.printCounter();
@@ -77,10 +78,9 @@ public final class TravelTimeMatrices {
 		return travelTimeMatrix;
 	}
 
-	private static ExecutorServiceWithResource<LeastCostPathTree> createExecutorService(Network routingNetwork, TravelTime travelTime,
-			TravelDisutility travelDisutility, int numberOfThreads) {
-		var trees = IntStream.range(0, numberOfThreads)
-				.mapToObj(i -> new LeastCostPathTree(new SpeedyGraph(routingNetwork), travelTime, travelDisutility))
+	private static ExecutorServiceWithResource<LeastCostPathTree> createExecutorService(RoutingParams params) {
+		var trees = IntStream.range(0, params.numberOfThreads)
+				.mapToObj(i -> new LeastCostPathTree(new SpeedyGraph(params.routingNetwork), params.travelTime, params.travelDisutility))
 				.toList();
 		return new ExecutorServiceWithResource<>(trees);
 	}

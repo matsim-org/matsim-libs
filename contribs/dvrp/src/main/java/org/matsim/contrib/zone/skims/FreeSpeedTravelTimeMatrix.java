@@ -45,10 +45,9 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 		gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.cellSize);
 		var centralNodes = ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), gridSystem);
 		var travelDisutility = new TimeAsTravelDisutility(travelTime);
-		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(dvrpNetwork, centralNodes, 0, travelTime, travelDisutility,
-				numberOfThreads);
-		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(dvrpNetwork, params.maxNeighborDistance, 0, travelTime,
-				travelDisutility, numberOfThreads);
+		var routingParams = new TravelTimeMatrices.RoutingParams(dvrpNetwork, travelTime, travelDisutility, numberOfThreads);
+		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(routingParams, centralNodes, 0);
+		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams, params.maxNeighborDistance, 0);
 	}
 
 	@Override
@@ -65,6 +64,5 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 
 	public int getZonalTravelTime(Node fromNode, Node toNode, double departureTime) {
 		return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
-
 	}
 }
