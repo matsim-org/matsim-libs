@@ -4,8 +4,6 @@
 
 package org.matsim.contrib.zone.skims;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,9 +32,7 @@ public final class TravelTimeMatrices {
 
 	public static Matrix calculateTravelTimeMatrix(Network routingNetwork, Map<Zone, Node> centralNodes, double departureTime, TravelTime travelTime,
 			TravelDisutility travelDisutility, int numberOfThreads) {
-		SpeedyGraph graph = new SpeedyGraph(routingNetwork);
-		ExecutorServiceWithResource<LeastCostPathTree> executorService = new ExecutorServiceWithResource<>(
-				IntStream.range(0, numberOfThreads).mapToObj(i -> new LeastCostPathTree(graph, travelTime, travelDisutility)).collect(toList()));
+		var executorService = createExecutorService(routingNetwork, travelTime, travelDisutility, numberOfThreads);
 
 		Matrix travelTimeMatrix = new Matrix(centralNodes.keySet());
 		Counter counter = new Counter("DVRP free-speed TT matrix: zone ", " / " + centralNodes.size());
@@ -66,11 +62,9 @@ public final class TravelTimeMatrices {
 		}
 	}
 
-	public static SparseMatrix calculateTravelTimeSparseMatrix(Network routingNetwork, double maxDistance,
-			double departureTime, TravelTime travelTime, TravelDisutility travelDisutility, int numberOfThreads) {
-		SpeedyGraph graph = new SpeedyGraph(routingNetwork);
-		ExecutorServiceWithResource<LeastCostPathTree> executorService = new ExecutorServiceWithResource<>(
-				IntStream.range(0, numberOfThreads).mapToObj(i -> new LeastCostPathTree(graph, travelTime, travelDisutility)).collect(toList()));
+	public static SparseMatrix calculateTravelTimeSparseMatrix(Network routingNetwork, double maxDistance, double departureTime,
+			TravelTime travelTime, TravelDisutility travelDisutility, int numberOfThreads) {
+		var executorService = createExecutorService(routingNetwork, travelTime, travelDisutility, numberOfThreads);
 
 		SparseMatrix travelTimeMatrix = new SparseMatrix();
 		var nodes = routingNetwork.getNodes().values();
@@ -81,6 +75,14 @@ public final class TravelTimeMatrices {
 
 		executorService.shutdown();
 		return travelTimeMatrix;
+	}
+
+	private static ExecutorServiceWithResource<LeastCostPathTree> createExecutorService(Network routingNetwork, TravelTime travelTime,
+			TravelDisutility travelDisutility, int numberOfThreads) {
+		var trees = IntStream.range(0, numberOfThreads)
+				.mapToObj(i -> new LeastCostPathTree(new SpeedyGraph(routingNetwork), travelTime, travelDisutility))
+				.toList();
+		return new ExecutorServiceWithResource<>(trees);
 	}
 
 	private static void computeForDepartureNode(Node fromNode, Collection<? extends Node> nodes, double departureTime, SparseMatrix sparseMatrix,
