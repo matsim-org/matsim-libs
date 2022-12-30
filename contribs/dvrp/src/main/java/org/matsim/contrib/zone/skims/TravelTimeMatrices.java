@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.network.Network;
@@ -34,22 +35,15 @@ public final class TravelTimeMatrices {
 	}
 
 	public static Matrix calculateTravelTimeMatrix(RoutingParams params, Map<Zone, Node> centralNodes, double departureTime) {
-		var executorService = createExecutorService(params);
-
 		Matrix travelTimeMatrix = new Matrix(centralNodes.keySet());
-		Counter counter = new Counter("DVRP free-speed TT matrix: zone ", " / " + centralNodes.size());
-		executorService.submitRunnablesAndWait(centralNodes.keySet()
-				.stream()
-				.map(z -> (lcpTree -> computeForDepartureZone(z, centralNodes, departureTime, travelTimeMatrix, lcpTree, counter))));
-		counter.printCounter();
-
-		executorService.shutdown();
+		BiConsumer<LeastCostPathTree, Zone> calculation = (lcpTree, z) -> computeForDepartureZone(z, centralNodes, departureTime, travelTimeMatrix,
+				lcpTree);
+		calculate(params, centralNodes.keySet(), calculation, "DVRP free-speed TT matrix: zone ");
 		return travelTimeMatrix;
 	}
 
 	private static void computeForDepartureZone(Zone fromZone, Map<Zone, Node> centralNodes, double departureTime, Matrix travelTimeMatrix,
-			LeastCostPathTree lcpTree, Counter counter) {
-		counter.incCounter();
+			LeastCostPathTree lcpTree) {
 		Node fromNode = centralNodes.get(fromZone);
 		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null);
 
@@ -65,30 +59,17 @@ public final class TravelTimeMatrices {
 	}
 
 	public static SparseMatrix calculateTravelTimeSparseMatrix(RoutingParams params, double maxDistance, double departureTime) {
-		var executorService = createExecutorService(params);
-
 		SparseMatrix travelTimeMatrix = new SparseMatrix();
 		var nodes = params.routingNetwork.getNodes().values();
-		Counter counter = new Counter("DVRP free-speed TT sparse matrix: node ", " / " + params.routingNetwork.getNodes().size());
-		executorService.submitRunnablesAndWait(nodes.stream()
-				.map(n -> (lcpTree -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree, counter, maxDistance))));
-		counter.printCounter();
-
-		executorService.shutdown();
+		var counter = "DVRP free-speed TT sparse matrix: node ";
+		BiConsumer<LeastCostPathTree, Node> calculation = (lcpTree, n) -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree,
+				maxDistance);
+		calculate(params, nodes, calculation, counter);
 		return travelTimeMatrix;
 	}
 
-	private static ExecutorServiceWithResource<LeastCostPathTree> createExecutorService(RoutingParams params) {
-		var trees = IntStream.range(0, params.numberOfThreads)
-				.mapToObj(i -> new LeastCostPathTree(new SpeedyGraph(params.routingNetwork), params.travelTime, params.travelDisutility))
-				.toList();
-		return new ExecutorServiceWithResource<>(trees);
-	}
-
 	private static void computeForDepartureNode(Node fromNode, Collection<? extends Node> nodes, double departureTime, SparseMatrix sparseMatrix,
-			LeastCostPathTree lcpTree, Counter counter, double maxDistance) {
-		counter.incCounter();
-
+			LeastCostPathTree lcpTree, double maxDistance) {
 		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null,
 				(nodeIndex, arrivalTime, travelCost, distance, departTime) -> distance >= maxDistance);
 
@@ -107,5 +88,22 @@ public final class TravelTimeMatrices {
 
 		var sparseRow = new SparseRow(neighborNodes);
 		sparseMatrix.setRow(fromNode, sparseRow);
+	}
+
+	private static <E> void calculate(RoutingParams params, Collection<? extends E> elements, BiConsumer<LeastCostPathTree, E> calculation,
+			String counterPrefix) {
+		var trees = IntStream.range(0, params.numberOfThreads)
+				.mapToObj(i -> new LeastCostPathTree(new SpeedyGraph(params.routingNetwork), params.travelTime, params.travelDisutility))
+				.toList();
+		var executorService = new ExecutorServiceWithResource<>(trees);
+		var counter = new Counter(counterPrefix, " / " + elements.size());
+
+		executorService.submitRunnablesAndWait(elements.stream().map(e -> (lcpTree -> {
+			counter.incCounter();
+			calculation.accept(lcpTree, e);
+		})));
+
+		counter.printCounter();
+		executorService.shutdown();
 	}
 }
