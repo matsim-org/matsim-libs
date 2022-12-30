@@ -39,14 +39,7 @@ final class SparseMatrix {
 	//In case 18 hours is not enough, we can reduce the resolution from seconds to tens of seconds
 	private static final int MAX_UNSIGNED_SHORT = Short.MAX_VALUE - Short.MIN_VALUE;
 
-	static class NodeAndTime {
-		private final int nodeIdx;
-		private final double time;
-
-		NodeAndTime(int nodeIdx, double time) {
-			this.nodeIdx = nodeIdx;
-			this.time = time;
-		}
+	record NodeAndTime(int nodeIdx, double time) {
 	}
 
 	private static final class Bucket {
