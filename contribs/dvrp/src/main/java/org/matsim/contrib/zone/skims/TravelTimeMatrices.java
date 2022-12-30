@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.network.Network;
@@ -36,8 +35,7 @@ public final class TravelTimeMatrices {
 
 	public static Matrix calculateTravelTimeMatrix(RoutingParams params, Map<Zone, Node> centralNodes, double departureTime) {
 		Matrix travelTimeMatrix = new Matrix(centralNodes.keySet());
-		BiConsumer<LeastCostPathTree, Zone> calculation = (lcpTree, z) -> computeForDepartureZone(z, centralNodes, departureTime, travelTimeMatrix,
-				lcpTree);
+		Calculation<Zone> calculation = (lcpTree, z) -> computeForDepartureZone(z, centralNodes, departureTime, travelTimeMatrix, lcpTree);
 		calculate(params, centralNodes.keySet(), calculation, "DVRP free-speed TT matrix: zone ");
 		return travelTimeMatrix;
 	}
@@ -62,8 +60,7 @@ public final class TravelTimeMatrices {
 		SparseMatrix travelTimeMatrix = new SparseMatrix();
 		var nodes = params.routingNetwork.getNodes().values();
 		var counter = "DVRP free-speed TT sparse matrix: node ";
-		BiConsumer<LeastCostPathTree, Node> calculation = (lcpTree, n) -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree,
-				maxDistance);
+		Calculation<Node> calculation = (lcpTree, n) -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree, maxDistance);
 		calculate(params, nodes, calculation, counter);
 		return travelTimeMatrix;
 	}
@@ -90,8 +87,11 @@ public final class TravelTimeMatrices {
 		sparseMatrix.setRow(fromNode, sparseRow);
 	}
 
-	private static <E> void calculate(RoutingParams params, Collection<? extends E> elements, BiConsumer<LeastCostPathTree, E> calculation,
-			String counterPrefix) {
+	private interface Calculation<E> {
+		void calculate(LeastCostPathTree lcpTree, E element);
+	}
+
+	private static <E> void calculate(RoutingParams params, Collection<? extends E> elements, Calculation<E> calculation, String counterPrefix) {
 		var trees = IntStream.range(0, params.numberOfThreads)
 				.mapToObj(i -> new LeastCostPathTree(new SpeedyGraph(params.routingNetwork), params.travelTime, params.travelDisutility))
 				.toList();
@@ -100,7 +100,7 @@ public final class TravelTimeMatrices {
 
 		executorService.submitRunnablesAndWait(elements.stream().map(e -> (lcpTree -> {
 			counter.incCounter();
-			calculation.accept(lcpTree, e);
+			calculation.calculate(lcpTree, e);
 		})));
 
 		counter.printCounter();
