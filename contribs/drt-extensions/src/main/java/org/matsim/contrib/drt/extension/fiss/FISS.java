@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -66,8 +67,10 @@ public class FISS implements DepartureHandler, MobsimEngine {
 	private final TravelTime travelTime;
 	private final Random random;
 
+	private final MatsimServices matsimServices;
 
-	FISS(QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
+
+	FISS(MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
 			TravelTime travelTime) {
 		this.qNetsimEngine = qNetsimEngine;
         this.delegate = qNetsimEngine.getDepartureHandler();
@@ -76,12 +79,13 @@ public class FISS implements DepartureHandler, MobsimEngine {
 		this.travelTime = travelTime;
 		this.network = scenario.getNetwork();
 		this.random = MatsimRandom.getLocalInstance();
+		this.matsimServices = matsimServices;
 	}
 
     @Override
     public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if (this.fissConfigGroup.sampledModes.contains(agent.getMode())) {
-			if (random.nextDouble() < fissConfigGroup.sampleFactor || agent instanceof TransitDriverAgent) {
+			if (random.nextDouble() < fissConfigGroup.sampleFactor || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
 				return delegate.handleDeparture(now, agent, linkId);
 			} else {
 				if (!(agent instanceof DynAgent)) {
@@ -146,6 +150,10 @@ public class FISS implements DepartureHandler, MobsimEngine {
 	@Override
 	public void afterSim() {
 		teleport.afterSim();
+	}
+
+	private boolean switchOffFISS() {
+		return this.matsimServices.getConfig().controler().getLastIteration() == this.matsimServices.getIterationNumber();
 	}
 
 	@Override
