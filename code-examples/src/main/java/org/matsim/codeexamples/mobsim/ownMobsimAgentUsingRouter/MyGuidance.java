@@ -29,7 +29,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.List;
 
