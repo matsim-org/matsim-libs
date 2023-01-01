@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.freight.utils;
+package org.matsim.contrib.freight.controler;
 
 import com.graphhopper.jsprit.analysis.toolbox.StopWatch;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 
 /**
  * Utils for the work with the freight contrib
- * 
+ *
  * @author kturner
  *
  */
@@ -82,9 +82,8 @@ public class FreightUtils {
 	public static void runJsprit(Scenario scenario) throws ExecutionException, InterruptedException{
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightConfigGroup.class );
 
-		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(
-				scenario.getNetwork(), FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().values() );
-		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
+		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(
+				scenario.getNetwork(), FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().values() ).build() ;
 
 		Carriers carriers = FreightUtils.getCarriers(scenario);
 
@@ -97,8 +96,8 @@ public class FreightUtils {
 		}
 
 		HashMap<Id<Carrier>, Integer> sortedMap = carrierActivityCounterMap.entrySet().stream()
-				.sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+										   .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+										   .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
 
 		ArrayList<Id<Carrier>> tempList = new ArrayList<>(sortedMap.keySet());
 		ForkJoinPool forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
@@ -109,20 +108,18 @@ public class FreightUtils {
 			int serviceCount = carrier.getServices().size();
 			log.info("Start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
 
-			VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
-					.setRoutingCost(netBasedCosts)
-					.build();
+			VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork()).setRoutingCost(netBasedCosts).build();
 			VehicleRoutingAlgorithm algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightConfigGroup, netBasedCosts, problem);
 
 			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
 			int jspritIterations = CarrierUtils.getJspritIterations(carrier);
 			try {
 				if (jspritIterations > 0) {
-				algorithm.setMaxIterations(jspritIterations);
+					algorithm.setMaxIterations(jspritIterations);
 				} else {
-				throw new InvalidAttributeValueException(
-						"Carrier has invalid number of jsprit iterations. They must be positive! Carrier id: "
-								+ carrier.getId().toString());}
+					throw new InvalidAttributeValueException(
+							"Carrier has invalid number of jsprit iterations. They must be positive! Carrier id: "
+									+ carrier.getId().toString());}
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 //				e.printStackTrace();
@@ -130,16 +127,14 @@ public class FreightUtils {
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 
-			log.info("tour planning for carrier " + carrier.getId() + " took "
-					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
+			log.info("tour planning for carrier " + carrier.getId() + " took " + (System.currentTimeMillis() - start) / 1000 + " seconds.");
 
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
 			// yy In principle, the carrier should know the vehicle types that it can deploy.
 
 			log.info("routing plan for carrier " + carrier.getId());
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
-			log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took "
-					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
+			log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took " + (System.currentTimeMillis() - start) / 1000 + " seconds.");
 
 			carrier.setSelectedPlan(newPlan);
 		})).get();
@@ -304,15 +299,15 @@ public class FreightUtils {
 		for (CarrierService carrierService : carrier.getServices().values()) {
 			log.debug("Converting CarrierService to CarrierShipment: " + carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder
-					.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
-							depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
-							carrierService.getCapacityDemand())
-					.setDeliveryServiceTime(carrierService.getServiceDuration())
-					// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
-					// have now time for that. Maybe change it later, kmt sep18
-					.setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
-					.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// Limited to end of delivery timeWindow (pickup later than latest delivery is not useful).
-					.build();
+									  .newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
+											  depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
+											  carrierService.getCapacityDemand())
+									  .setDeliveryServiceTime(carrierService.getServiceDuration())
+									  // .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
+									  // have now time for that. Maybe change it later, kmt sep18
+									  .setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
+									  .setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// Limited to end of delivery timeWindow (pickup later than latest delivery is not useful).
+									  .build();
 			CarrierUtils.addShipment(carrierWS, carrierShipment);
 		}
 	}
@@ -530,5 +525,9 @@ public class FreightUtils {
 
 	public static void writeCarriers( Carriers carriers, String filename ) {
 		new CarrierPlanWriter( carriers ).write( filename );
+	}
+
+	public static CarrierStrategyManager createDefaultCarrierStrategyManager() {
+		return new CarrierStrategyManagerImpl();
 	}
 }

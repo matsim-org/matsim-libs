@@ -48,7 +48,7 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;

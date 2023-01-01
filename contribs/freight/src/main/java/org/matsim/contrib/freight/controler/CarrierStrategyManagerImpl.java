@@ -3,6 +3,8 @@ package org.matsim.contrib.freight.controler;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.GenericStrategyManagerImpl;
@@ -11,7 +13,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 
 import java.util.List;
 
-public class CarrierStrategyManagerImpl implements CarrierStrategyManager{
+class CarrierStrategyManagerImpl implements CarrierStrategyManager{
 	final GenericStrategyManager<CarrierPlan, Carrier> delegate = new GenericStrategyManagerImpl<>();
 	@Override public void addStrategy( GenericPlanStrategy<CarrierPlan, Carrier> strategy, String subpopulation, double weight ){
 		delegate.addStrategy( strategy, subpopulation, weight );
