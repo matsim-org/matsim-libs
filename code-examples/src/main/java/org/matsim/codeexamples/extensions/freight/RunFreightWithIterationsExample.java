@@ -18,26 +18,43 @@
 
 package org.matsim.codeexamples.extensions.freight;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
-import org.matsim.contrib.freight.controler.CarrierModule;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.controler.*;
+import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
+import org.matsim.contrib.freight.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.replanning.selectors.KeepSelected;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
+import javax.inject.Inject;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 
 /**
  * @see org.matsim.contrib.freight
  */
-public class RunFreightExample {
+public class RunFreightWithIterationsExample{
 
 	public static void main(String[] args) throws ExecutionException, InterruptedException{
 
@@ -50,7 +67,7 @@ public class RunFreightExample {
 		//more general settings
 		config.controler().setOutputDirectory("./output/freight" );
 
-		config.controler().setLastIteration(0 );		// yyyyyy iterations currently do not work; needs to be fixed.  (Internal discussion at end of file.)
+		config.controler().setLastIteration( 1 );
 
 		//freight settings
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
@@ -80,7 +97,13 @@ public class RunFreightExample {
 		// ## MATSim configuration:  ##
 		final Controler controler = new Controler( scenario ) ;
 		controler.addOverridingModule(new CarrierModule() );
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( CarrierStrategyManager.class ).toProvider( new MyCarrierPlanStrategyManagerProvider( ) );
+				bind( CarrierScoringFunctionFactory.class ).to( MyCarrierScoringFunctionFactory.class );
 
+			}
+		} );
 
 		// otfvis (if you want to use):
 		controler.addOverridingModule( new OTFVisLiveModule() );
@@ -89,24 +112,44 @@ public class RunFreightExample {
 		controler.run();
 	}
 
-	// yyyy I think that having a central freight StrategyManager would be better than the current approach that builds an ad-hoc such
-	// strategy manager, with the strategies hardcoded there as well.  I currently see two approaches:
+	private static class MyCarrierScoringFunctionFactory implements CarrierScoringFunctionFactory {
+		@Inject private Network network;
+		@Override public ScoringFunction createScoringFunction( Carrier carrier ) {
+			SumScoringFunction sf = new SumScoringFunction();
+			sf.addScoringFunction( new CarrierScoringFunctionFactoryImpl.SimpleDriversLegScoring(carrier, network) );
+			sf.addScoringFunction( new CarrierScoringFunctionFactoryImpl.SimpleVehicleEmploymentScoring(carrier) );
+			sf.addScoringFunction( new CarrierScoringFunctionFactoryImpl.SimpleDriversActivityScoring() );
+			return sf;
+		}
+	}
 
-	// (1) freight strategy manager separate from  standard strategy manager.
+	/**
+	 * See {@link CarrierStrategyManager} for some explanation of how this currently works.  kai, jan'23
+	 */
+	private static class MyCarrierPlanStrategyManagerProvider implements Provider<CarrierStrategyManager>{
+		@Inject private Network network;
+		@Inject private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+		@Inject private Map<String, TravelTime> modeTravelTimes;
+		@Inject private Scenario scenario;
+		@Override
+		public CarrierStrategyManager get() {
+			final CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+			strategyManager.setMaxPlansPerAgent(5);
+			{
+				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>( new ExpBetaPlanChanger.Factory<CarrierPlan,Carrier>().build() );
+				strategyManager.addStrategy(strategy, null, 1.0);
+			}
+			{
+				final TravelDisutility travelDisutility = CarrierTravelDisutilities.createBaseDisutility( FreightUtils.getCarrierVehicleTypes( scenario ), modeTravelTimes.get( TransportMode.car ) );
+				final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network, travelDisutility, modeTravelTimes.get(TransportMode.car ) );
 
-	// (2) re-use standard strategy manager.
-
-	// Advantage of (2) would be that we could re-use the existing strategy manager infrastructure, including the way it is configured.
-	// Disadvantage would be that the "freight" subpopulation (or maybe even freight*) would be an implicitly reserved keyword.  Todos for this path:
-
-	// * remove deprecated methods from StrategyManager so that it becomes shorter; make final; etc. etc.
-
-	// * try to completely remove StrategyManager and replace by GenericStrategyManager.  Since only then will it accept Carriers and CarrierPlans.
-
-	// Note that the freight strategy manager operates on CarrierPlans, which include _all_ tours/drivers.  One could also have drivers optimize
-	// individually.  They are, however, not part of the standard population.
-
-	// kai, jan'22
-
+				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>( new KeepSelected<>());
+				strategy.addStrategyModule(new CarrierTimeAllocationMutator.Factory().build() );
+				strategy.addStrategyModule(new CarrierReRouteVehicles.Factory(router, network, modeTravelTimes.get(TransportMode.car ) ).build() );
+				strategyManager.addStrategy(strategy, null, 0.5);
+			}
+			return strategyManager;
+		}
+	}
 
 }
