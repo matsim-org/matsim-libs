@@ -50,7 +50,7 @@ public class RunFreightExample {
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ) );
 			config.plans().setInputFile( null ); // remove passenger input
 			config.controler().setOutputDirectory( "./output/freight" );
-			config.controler().setLastIteration( 0 );                // yyyyyy iterations currently do not work; needs to be fixed.  (Internal discussion at end of file.)
+			config.controler().setLastIteration( 0 );  // no iterations; for iterations see RunFreightWithIterationsExample.  kai, jan'23
 
 			FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
 			freightConfigGroup.setCarriersFile( "singleCarrierFiveActivitiesWithoutRoutes.xml" );
@@ -90,25 +90,5 @@ public class RunFreightExample {
 		// ## Start of the MATSim-Run: ##
 		controler.run();
 	}
-
-	// yyyy I think that having a central freight StrategyManager would be better than the current approach that builds an ad-hoc such
-	// strategy manager, with the strategies hardcoded there as well.  I currently see two approaches:
-
-	// (1) freight strategy manager separate from  standard strategy manager.
-
-	// (2) re-use standard strategy manager.
-
-	// Advantage of (2) would be that we could re-use the existing strategy manager infrastructure, including the way it is configured.
-	// Disadvantage would be that the "freight" subpopulation (or maybe even freight*) would be an implicitly reserved keyword.  Todos for this path:
-
-	// * remove deprecated methods from StrategyManager so that it becomes shorter; make final; etc. etc.
-
-	// * try to completely remove StrategyManager and replace by GenericStrategyManager.  Since only then will it accept Carriers and CarrierPlans.
-
-	// Note that the freight strategy manager operates on CarrierPlans, which include _all_ tours/drivers.  One could also have drivers optimize
-	// individually.  They are, however, not part of the standard population.
-
-	// kai, jan'22
-
 
 }
