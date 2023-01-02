@@ -59,6 +59,10 @@
             <id>matsim</id>
             <url>https://repo.matsim.org/repository/matsim</url>
         </repository>
+	    <repository>
+		    <id>boundless</id>
+		    <url>https://repo.boundlessgeo.com/main/</url>
+	    </repository>
     </repositories>
 
     <distributionManagement>
