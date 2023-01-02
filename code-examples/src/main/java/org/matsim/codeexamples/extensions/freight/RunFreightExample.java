@@ -40,22 +40,24 @@ import java.util.concurrent.ExecutionException;
 public class RunFreightExample {
 
 	public static void main(String[] args) throws ExecutionException, InterruptedException{
+		run(args, true);
+	}
+	public static void run( String[] args, boolean runWithOTFVis ) throws ExecutionException, InterruptedException{
 
 		// ### config stuff: ###
+		Config config;
+		if ( args==null || args.length==0 || args[0]==null ){
+			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ) );
+			config.plans().setInputFile( null ); // remove passenger input
+			config.controler().setOutputDirectory( "./output/freight" );
+			config.controler().setLastIteration( 0 );                // yyyyyy iterations currently do not work; needs to be fixed.  (Internal discussion at end of file.)
 
-		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ) );
-
-		config.plans().setInputFile( null ); // remove passenger input
-
-		//more general settings
-		config.controler().setOutputDirectory("./output/freight" );
-
-		config.controler().setLastIteration(0 );		// yyyyyy iterations currently do not work; needs to be fixed.  (Internal discussion at end of file.)
-
-		//freight settings
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
-		freightConfigGroup.setCarriersFile( "singleCarrierFiveActivitiesWithoutRoutes.xml");
-		freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml");
+			FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
+			freightConfigGroup.setCarriersFile( "singleCarrierFiveActivitiesWithoutRoutes.xml" );
+			freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml" );
+		} else {
+			config = ConfigUtils.loadConfig( args, new FreightConfigGroup() );
+		}
 
 		// load scenario (this is not loading the freight material):
 		Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -81,9 +83,9 @@ public class RunFreightExample {
 		final Controler controler = new Controler( scenario ) ;
 		controler.addOverridingModule(new CarrierModule() );
 
-
-		// otfvis (if you want to use):
-		controler.addOverridingModule( new OTFVisLiveModule() );
+		if ( runWithOTFVis ){
+			controler.addOverridingModule( new OTFVisLiveModule() );
+		}
 
 		// ## Start of the MATSim-Run: ##
 		controler.run();
