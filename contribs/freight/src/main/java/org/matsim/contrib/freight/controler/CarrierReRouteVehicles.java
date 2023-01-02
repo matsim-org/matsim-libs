@@ -32,64 +32,60 @@ import org.matsim.core.router.util.TravelTime;
 
 /**
  * Strategy module to reRoute a carrierPlan.
- * 
+ *
  * @author sschroeder
  *
  */
-public class ReRouteVehicles implements GenericPlanStrategyModule<CarrierPlan>{
+public class CarrierReRouteVehicles implements GenericPlanStrategyModule<CarrierPlan>{
 
 	@SuppressWarnings("unused")
-	private static final Logger logger = LogManager.getLogger(ReRouteVehicles.class);
-	
-	private LeastCostPathCalculator router;
-	
-	private Network network;
-	
-	private TravelTime travelTime;
+	private static final Logger logger = LogManager.getLogger( CarrierReRouteVehicles.class );
 
-    private double probability = 1.;
-	
-	/**
-	 * Constructs the module with a leastCostPathRouter, network and travelTime.
-	 * 
-	 * @param router
-	 * @param network
-	 * @param travelTime
-	 * @see LeastCostPathCalculator, Network, TravelTime
-	 */
-	public ReRouteVehicles(LeastCostPathCalculator router, Network network, TravelTime travelTime) {
+	public static final class Factory {
+		private final LeastCostPathCalculator router;
+		private final Network network;
+		private final TravelTime travelTime;
+		private double probability = 1.;
+		public Factory( LeastCostPathCalculator router, Network network, TravelTime travelTime ){
+			this.router = router;
+			this.network = network;
+			this.travelTime = travelTime;
+		}
+		public CarrierReRouteVehicles build() {
+			return new CarrierReRouteVehicles( router, network, travelTime, probability );
+		}
+		public Factory setProbability( double probability ){
+			this.probability = probability;
+			return this;
+		}
+	}
+
+	private final LeastCostPathCalculator router;
+	private final Network network;
+	private final TravelTime travelTime;
+	private final double probability ;
+	private CarrierReRouteVehicles( LeastCostPathCalculator router, Network network, TravelTime travelTime, double probability ) {
 		super();
 		this.router = router;
 		this.network = network;
 		this.travelTime = travelTime;
+		this.probability = probability;
 	}
-
-    public ReRouteVehicles(LeastCostPathCalculator router, Network network, TravelTime travelTime, double probability) {
-        super();
-        this.router = router;
-        this.network = network;
-        this.travelTime = travelTime;
-        this.probability = probability;
-    }
 
 	/**
 	 * Routes the carrierPlan in time and space.
-	 * 
+	 *
 	 * @param carrierPlan
 	 * @throws IllegalStateException if carrierPlan is null.
-	 * @see TimeAndSpaceTourRouter
+	 * @see CarrierTimeAndSpaceTourRouter
 	 */
 	@Override
 	public void handlePlan(CarrierPlan carrierPlan) {
 		if(carrierPlan == null) throw new IllegalStateException("carrierPlan is null and cannot be handled.");
-		route(carrierPlan);
-	}
-	
-	private void route(CarrierPlan carrierPlan) {
 		for(ScheduledTour tour : carrierPlan.getScheduledTours()){
-            if(MatsimRandom.getRandom().nextDouble() < probability){
-                new TimeAndSpaceTourRouter(router, network, travelTime).route(tour);
-            }
+			if(MatsimRandom.getRandom().nextDouble() < probability){
+				new CarrierTimeAndSpaceTourRouter(router, network, travelTime).route(tour );
+			}
 		}
 	}
 

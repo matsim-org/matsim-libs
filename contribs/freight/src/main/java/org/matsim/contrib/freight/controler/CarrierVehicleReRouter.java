@@ -21,10 +21,8 @@
 
 package org.matsim.contrib.freight.controler;
 
-import java.io.File;
 import java.util.Collection;
 
-import com.graphhopper.jsprit.analysis.toolbox.AlgorithmSearchProgressChartListener;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
@@ -51,7 +49,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.router.util.TravelTime;
 
-class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
+class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     private final Network network;
 //
@@ -67,7 +65,7 @@ class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     private VehicleTypeDependentRoadPricingCalculator roadPricing;
 
-    public VehicleReRouter(Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, String vrpAlgoConfigFile, VehicleTypeDependentRoadPricingCalculator roadPricing) {
+    public CarrierVehicleReRouter( Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, String vrpAlgoConfigFile, VehicleTypeDependentRoadPricingCalculator roadPricing ) {
         this.network = network;
         vehicleRoutingTransportCosts = getNetworkBasedTransportCosts(network,vehicleTypes,travelTimes,roadPricing);
         vehicleRoutingActivityCosts = new VehicleRoutingActivityCosts() {
@@ -93,7 +91,7 @@ class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         vrpAlgorithmConfig = vrpAlgoConfigFile;
     }
 
-    public VehicleReRouter(Network network, VehicleRoutingTransportCosts transportCosts, VehicleRoutingActivityCosts activityCosts, String vrpAlgoConfigFile){
+    public CarrierVehicleReRouter( Network network, VehicleRoutingTransportCosts transportCosts, VehicleRoutingActivityCosts activityCosts, String vrpAlgoConfigFile ){
         this.network = network;
         vehicleRoutingActivityCosts = activityCosts;
         vehicleRoutingTransportCosts = transportCosts;

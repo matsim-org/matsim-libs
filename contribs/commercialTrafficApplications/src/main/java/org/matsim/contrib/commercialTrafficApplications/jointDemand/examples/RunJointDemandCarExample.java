@@ -26,7 +26,7 @@ import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommer
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
