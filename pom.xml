@@ -59,10 +59,6 @@
             <id>matsim</id>
             <url>https://repo.matsim.org/repository/matsim</url>
         </repository>
-<!--	    <repository>-->
-<!--		    <id>geo-solutions</id>-->
-<!--		    <url>https://maven.geo-solutions.it/</url>-->
-<!--	    </repository>-->
     </repositories>
 
     <distributionManagement>
@@ -295,35 +291,35 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-enforcer-plugin</artifactId>-->
-<!--                <version>3.1.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>enforce</id>-->
-<!--                        <goals>-->
-<!--                            <goal>enforce</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <rules>-->
-<!--                        <requireUpperBoundDeps/>-->
-<!--                        <banDuplicatePomDependencyVersions/>-->
-<!--						<requireReleaseDeps>-->
-<!--							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>-->
-<!--							<excludes>-->
-<!--								<exclude>org.matsim:*</exclude>-->
-<!--								<exclude>org.matsim.contrib:*</exclude>-->
-<!--							</excludes>-->
-<!--						</requireReleaseDeps>-->
-<!--                        <requireMavenVersion>-->
-<!--                            <version>3.6.3</version>-->
-<!--                        </requireMavenVersion>-->
-<!--                    </rules>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <rules>
+                        <requireUpperBoundDeps/>
+                        <banDuplicatePomDependencyVersions/>
+						<requireReleaseDeps>
+							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
+							<excludes>
+								<exclude>org.matsim:*</exclude>
+								<exclude>org.matsim.contrib:*</exclude>
+							</excludes>
+						</requireReleaseDeps>
+                        <requireMavenVersion>
+                            <version>3.6.3</version>
+                        </requireMavenVersion>
+                    </rules>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
