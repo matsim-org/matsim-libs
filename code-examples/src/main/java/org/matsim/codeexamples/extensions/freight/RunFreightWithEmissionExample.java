@@ -27,7 +27,7 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
