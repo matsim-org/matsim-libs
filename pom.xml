@@ -59,6 +59,10 @@
             <id>matsim</id>
             <url>https://repo.matsim.org/repository/matsim</url>
         </repository>
+	    <repository>
+		    <id>geo-solutions</id>
+		    <url>https://maven.geo-solutions.it/</url>
+	    </repository>
     </repositories>
 
     <distributionManagement>
