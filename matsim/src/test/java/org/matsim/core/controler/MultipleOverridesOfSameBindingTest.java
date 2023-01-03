@@ -1,7 +1,8 @@
 package org.matsim.core.controler;
 
 import com.google.inject.CreationException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,8 +13,8 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class MultipleOverridesOfSameBinding{
-	private static final Logger log = Logger.getLogger( MultipleOverridesOfSameBinding.class ) ;
+public class MultipleOverridesOfSameBindingTest {
+	private static final Logger log = LogManager.getLogger( MultipleOverridesOfSameBindingTest.class ) ;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -23,8 +24,8 @@ public class MultipleOverridesOfSameBinding{
 	public void testSecondOverridesFirst() {
 		Controler controler = getControler();
 
-		controler.addOverridingModule( new Mobsim1Module() ) ;
-		controler.addOverridingModule( new Mobsim2Module() ) ;
+		controler.addFullyOverridingModule( new Mobsim1Module() ) ;
+		controler.addFullyOverridingModule( new Mobsim2Module() ) ;
 
 		controler.run() ;
 
@@ -36,7 +37,7 @@ public class MultipleOverridesOfSameBinding{
 		Controler controler = getControler();
 
 		try{
-			controler.addOverridingModule( new AbstractModule(){
+			controler.addFullyOverridingModule( new AbstractModule(){
 				@Override public void install(){
 					install( new Mobsim1Module() );
 					install( new Mobsim2Module() );
@@ -52,8 +53,8 @@ public class MultipleOverridesOfSameBinding{
 		Controler controler = getControler();
 
 		try{
-			controler.addModule( new Mobsim1Module() );
-			controler.addModule( new Mobsim2Module() );
+			controler.addOverridingModule( new Mobsim1Module() );
+			controler.addOverridingModule( new Mobsim2Module() );
 		} catch ( Exception ee ) {
 			Assert.assertTrue( ee instanceof CreationException );
 		}

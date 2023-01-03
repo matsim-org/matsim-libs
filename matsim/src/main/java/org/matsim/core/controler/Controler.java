@@ -470,12 +470,15 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		if (this.injectorCreated) {
 			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
 		}
-		this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
+		this.modulesToAdd.add( abstractModule ) ;
 		return this ;
 	}
 
-	public final Controler addModule( AbstractModule abstractModule ) {
-		this.modulesToAdd.add( abstractModule ) ;
+	public final Controler addFullyOverridingModule( AbstractModule abstractModule ) {
+		if (this.injectorCreated) {
+			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
+		}
+		this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
 		return this ;
 	}
 
