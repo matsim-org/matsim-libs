@@ -3,7 +3,8 @@ package org.matsim.contrib.carsharing.relocation.qsim;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -24,6 +25,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
@@ -36,7 +38,7 @@ import org.matsim.vehicles.Vehicle;
  */
 
 public class RelocationAgent implements MobsimDriverAgent {
-	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
+	private static final Logger log = LogManager.getLogger(PersonDriverAgentImpl.class);
 
 	private Id<Person> id;
 	private String companyId;
@@ -141,7 +143,7 @@ public class RelocationAgent implements MobsimDriverAgent {
 	protected void endLeg() {
 		try {
 			Leg leg = (Leg) this.getCurrentPlanElement();
-			leg.setTravelTime(this.getTimeOfDay() - leg.getDepartureTime());
+			leg.setTravelTime(this.getTimeOfDay() - leg.getDepartureTime().seconds());
 		} catch (Exception e) {
 			// do nothing
 		}
@@ -289,10 +291,11 @@ public class RelocationAgent implements MobsimDriverAgent {
 		this.state = State.ABORT;
 	}
 
+	private static final OptionalTime BIKE_EXPECTED_TRAVEL_TIME = OptionalTime.defined(600);
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		if (this.transportMode.equals("bike"))
-			return 600.0;
+			return BIKE_EXPECTED_TRAVEL_TIME;
 		else
 			return this.guidance.getExpectedTravelTime(this.network.getLinks().get(this.getCurrentLinkId()),
 					this.network.getLinks().get(this.getDestinationLinkId()), this.getTimeOfDay(), this.transportMode,

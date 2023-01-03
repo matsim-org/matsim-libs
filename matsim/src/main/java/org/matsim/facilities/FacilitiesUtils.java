@@ -23,16 +23,21 @@ package org.matsim.facilities;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.LinkWrapperFacility;
-import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
+import org.matsim.core.router.LinkWrapperFacilityWithSpecificCoord;
+import org.matsim.core.router.MultimodalLinkChooser;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * Contains several helper methods for working with {@link ActivityFacility facilities}.
@@ -40,7 +45,7 @@ import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
  * @author cdobler
  */
 public class FacilitiesUtils {
-	private static final Logger log = Logger.getLogger( FacilitiesUtils.class ) ;
+	private static final Logger log = LogManager.getLogger( FacilitiesUtils.class ) ;
 	
 	private FacilitiesUtils() {} // container for static methods; do not instantiate
 	
@@ -66,7 +71,34 @@ public class FacilitiesUtils {
 			throw new RuntimeException("cannot set linkID for this facility type; API needs to be cleaned up") ;
 		}
 	}
-	
+	/**
+	 * Compare to {@link #decideOnLink(Facility, Network)}.  Sometimes only the linkId is needed, and often it is cheaper to obtain than the full link.
+	 * Then call this method.
+	 *
+	 * @param facility
+	 * @param network
+	 * @return
+	 */
+	public static Id<Link> decideOnLinkId( final Facility facility, final Network network ) {
+		Link accessActLink = null ;
+
+		Id<Link> accessActLinkId = null ;
+		try {
+			accessActLinkId = facility.getLinkId() ;
+		} catch ( Exception ee ) {
+			// there are implementations that throw an exception here although "null" is, in fact, an interpretable value. kai, oct'18
+		}
+		if ( accessActLinkId!=null ) {
+			return accessActLinkId ;
+		}
+		return decideOnLink( facility, network ).getId() ;
+	}
+
+	/**
+	 * @deprecated
+	 * Please use {@link MultimodalLinkChooser} instead
+	 */
+	@Deprecated
 	public static Link decideOnLink( final Facility facility, final Network network ) {
 		Link accessActLink = null ;
 		
@@ -94,6 +126,8 @@ public class FacilitiesUtils {
 			
 			accessActLink = NetworkUtils.getNearestLink(network, facility.getCoord()) ;
 			if ( accessActLink == null ) {
+				log.warn("Facility without link for which no nearest link on the respective network could be found. " +
+						"About to abort. Writing out the first 10 links to understand which subnetwork was used to help debugging.");
 				int ii = 0 ;
 				for ( Link link : network.getLinks().values() ) {
 					if ( ii==10 ) {
@@ -133,16 +167,57 @@ public class FacilitiesUtils {
 	public static Facility wrapLink( final Link link ) {
 		return new LinkWrapperFacility( link ) ;
 	}
+	public static Facility wrapLinkAndCoord(final Link link, final Coord coord){
+		return new LinkWrapperFacilityWithSpecificCoord(link,coord);
+	}
 
 	/**
 	 *  We have situations where the coordinate field in facility is not filled out.
 	 */
-	public static Coord decideOnCoord( final Facility facility, final Network network ) {
-		Coord coord = facility.getCoord() ;
-		if ( coord == null ) {
-			coord = network.getLinks().get( facility.getLinkId() ).getCoord() ;
+	public static Coord decideOnCoord( final Facility facility, final Network network, final Config config ) {
+		return decideOnCoord( facility, network, config.global().getRelativePositionOfEntryExitOnLink() ) ;
+	}
+	/**
+	 *  We have situations where the coordinate field in facility is not filled out.
+	 */
+	public static Coord decideOnCoord( final Facility facility, final Network network, double relativePositionOfEntryExitOnLink ) {
+		if ( facility.getCoord() != null && ! ( facility instanceof LinkWrapperFacility)) {
+			return facility.getCoord() ;
 		}
-		return coord ;
+
+		if ( facility.getLinkId()==null ) {
+			if ( facility instanceof Identifiable ) {
+				throw new RuntimeException( "facility with id=" + ((Identifiable) facility).getId() + " has neither coord nor linkId.  This " +
+									    "does not work ..." ) ;
+			} else {
+				throw new RuntimeException( "facility which does not implement Identifiable has neither coord nor linkId.  This " +
+									    "does not work ..." ) ;
+			}
+		}
+
+		Gbl.assertNotNull( network ) ;
+		Link link = network.getLinks().get( facility.getLinkId() ) ;
+		Gbl.assertNotNull( link );
+		Coord fromCoord = link.getFromNode().getCoord() ;
+		Coord toCoord = link.getToNode().getCoord() ;
+		return new Coord( fromCoord.getX() + relativePositionOfEntryExitOnLink *( toCoord.getX() - fromCoord.getX()) , fromCoord.getY() + relativePositionOfEntryExitOnLink *( toCoord.getY() - fromCoord.getY() ) );
+
 	}
 
+	// Logic gotten from PopulationUtils, but I am actually a bit unsure about the value of those methods now that
+	// attributable is the only way to get attributes... td, aug'19
+	// yy I would agree.  They are useful to manage the transition, but can be inlined afterwards.  I would inline for all code we can reach, afterwards
+	// resurrect them but mark as deprecated.  kai, nov'19
+
+	public static <F extends Facility & Attributable> Object getFacilityAttribute(F facility, String key) {
+		return facility.getAttributes().getAttribute( key );
+	}
+
+	public static <F extends Facility & Attributable> void putFacilityAttribute(F facility, String key, Object value ) {
+		facility.getAttributes().putAttribute( key, value ) ;
+	}
+
+	public static <F extends Facility & Attributable> Object removeFacilityAttribute( F facility, String key ) {
+		return facility.getAttributes().removeAttribute( key );
+	}
 }

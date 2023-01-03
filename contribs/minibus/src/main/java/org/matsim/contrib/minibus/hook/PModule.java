@@ -22,22 +22,19 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
-import org.matsim.contrib.minibus.operator.POperators;
-import org.matsim.contrib.minibus.operator.PerPassengerSubsidy;
-import org.matsim.contrib.minibus.operator.SubsidyI;
 import org.matsim.contrib.minibus.stats.PStatsModule;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.LineId2PtMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.pt.router.TransitRouter;
 
 public final class PModule extends AbstractModule {
-	private final static Logger log = Logger.getLogger(PModule.class);
+	private final static Logger log = LogManager.getLogger(PModule.class);
 
 	@Override public void install() {
 

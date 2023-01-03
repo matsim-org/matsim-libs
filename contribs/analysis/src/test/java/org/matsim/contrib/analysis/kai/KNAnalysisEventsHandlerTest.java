@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.analysis.kai;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -60,8 +61,8 @@ public class KNAnalysisEventsHandlerTest {
 	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
 
 	public static final String BASE_FILE_NAME = "stats_";
-	public static final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
-	public static final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
+	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
+	public final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
 
 	private Scenario scenario = null ;
 	private Population population = null ;
@@ -132,27 +133,31 @@ public class KNAnalysisEventsHandlerTest {
 
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));
-		leg.setTravelTime( Time.parseTime("07:30:00") - leg.getDepartureTime() );
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		leg.setTravelTime( Time.parseTime("07:30:00") - leg.getDepartureTime().seconds());
+		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
-		leg.setTravelTime( Time.parseTime("07:10:00") - leg.getDepartureTime() );
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		leg.setTravelTime( Time.parseTime("07:10:00") - leg.getDepartureTime().seconds());
+		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("31:12:00"));
-		leg.setTravelTime( Time.parseTime("31:22:00") - leg.getDepartureTime() );
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		leg.setTravelTime( Time.parseTime("31:22:00") - leg.getDepartureTime().seconds());
+		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
-		leg.setTravelTime( Time.parseTime("30:12:01") - leg.getDepartureTime() );
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		leg.setTravelTime( Time.parseTime("30:12:01") - leg.getDepartureTime().seconds());
+		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		this.runTest(testee);
 	}
@@ -164,7 +169,7 @@ public class KNAnalysisEventsHandlerTest {
 		// actual test: compare checksums of the files
 		for ( StatType type : StatType.values() ) {
 			final String str = KNAnalysisEventsHandlerTest.BASE_FILE_NAME + type.toString() + ".txt" ;
-			Logger.getLogger(this.getClass()).info( "comparing " + str );
+			LogManager.getLogger(this.getClass()).info( "comparing " + str );
 			final long expectedChecksum = CRCChecksum.getCRCFromFile(utils.getInputDirectory() + str);
 			final long actualChecksum = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + str);
 			Assert.assertEquals("Output files differ.", expectedChecksum, actualChecksum);

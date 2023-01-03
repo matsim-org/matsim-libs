@@ -22,7 +22,8 @@ package org.matsim.contrib.accessibility.gis;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -43,9 +44,9 @@ import org.opengis.referencing.operation.TransformException;
  * @author illenberger
  * 
  */
-public final class CRSUtils {
+final class CRSUtils {
 
-	private static Logger logger = Logger.getLogger(CRSUtils.class);
+	private static final Logger logger = LogManager.getLogger(CRSUtils.class);
 
 	private static final Map<Integer, CoordinateReferenceSystem> crsMappings = new ConcurrentHashMap<Integer, CoordinateReferenceSystem>();
 

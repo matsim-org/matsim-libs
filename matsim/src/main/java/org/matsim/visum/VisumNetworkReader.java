@@ -24,7 +24,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +44,7 @@ public class VisumNetworkReader {
 
 	private final VisumNetwork network;
 
-	private final Logger log = Logger.getLogger(VisumNetworkReader.class);
+	private final Logger log = LogManager.getLogger(VisumNetworkReader.class);
 
 	/** index for accessing the localized strings. */
 	private int language = 0;
@@ -154,7 +155,7 @@ public class VisumNetworkReader {
 	}
 
 	public void read(final String filename) throws UncheckedIOException {
-		BufferedReader reader = IOUtils.getBufferedReader(filename, Charset.forName("ISO-8859-1"));
+		BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(filename), Charset.forName("ISO-8859-1"));
 
 		try {
 			String line = reader.readLine();

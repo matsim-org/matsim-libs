@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
@@ -45,18 +46,18 @@ import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 public class AllocateVehicleToSubtourAlgorithm implements PlanAlgorithm {
 	private final String mode;
 	private final VehicleRessources vehicleRessources;
-	private final TripRouter tripRouter;
+	private final MainModeIdentifier mainModeIdentifier;
 	private final Random random;
 
 	public AllocateVehicleToSubtourAlgorithm(
 			final Random random,
 			final String mode,
-			final TripRouter router,
-			final VehicleRessources vehicleRessources) {
+			final VehicleRessources vehicleRessources,
+			final MainModeIdentifier mainModeIdentifier ) {
 		this.random = random;
 		this.mode = mode;
-		this.tripRouter = router;
 		this.vehicleRessources = vehicleRessources;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
@@ -84,11 +85,11 @@ public class AllocateVehicleToSubtourAlgorithm implements PlanAlgorithm {
 	}
 
 	private String identifyMainMode(final Trip t) {
-		return tripRouter.getMainModeIdentifier().identifyMainMode( t.getTripElements() );
+		return mainModeIdentifier.identifyMainMode( t.getTripElements() );
 	}
 
 	private List<Subtour> getRootSubtoursWithMode(final Plan plan) {
-		final Collection<Subtour> allSubtours = TripStructureUtils.getSubtours( plan , tripRouter.getStageActivityTypes() );
+		final Collection<Subtour> allSubtours = TripStructureUtils.getSubtours( plan );
 		final List<Subtour> roots = new ArrayList<Subtour>();
 
 		for ( Subtour s : allSubtours ) {
@@ -102,7 +103,7 @@ public class AllocateVehicleToSubtourAlgorithm implements PlanAlgorithm {
 
 	private boolean containsMode( final Subtour s ) {
 		for ( Trip t : s.getTrips() ) {
-			if ( tripRouter.getMainModeIdentifier().identifyMainMode(
+			if ( mainModeIdentifier.identifyMainMode(
 						t.getTripElements() ).equals( mode ) ) {
 				return true;
 			}

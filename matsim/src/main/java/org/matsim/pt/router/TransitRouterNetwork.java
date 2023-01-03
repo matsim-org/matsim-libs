@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -56,10 +57,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 public final class TransitRouterNetwork implements Network {
 
-	private final static Logger log = Logger.getLogger(TransitRouterNetwork.class);
+	private final static Logger log = LogManager.getLogger(TransitRouterNetwork.class);
 
-	private final Map<Id<Link>, TransitRouterNetworkLink> links = new LinkedHashMap<Id<Link>, TransitRouterNetworkLink>();
-	private final Map<Id<Node>, TransitRouterNetworkNode> nodes = new LinkedHashMap<Id<Node>, TransitRouterNetworkNode>();
+	private final Map<Id<Link>, TransitRouterNetworkLink> links = new LinkedHashMap<>();
+	private final Map<Id<Node>, TransitRouterNetworkNode> nodes = new LinkedHashMap<>();
 	private QuadTree<TransitRouterNetworkNode> qtNodes = null;
 
 	private long nextNodeId = 0;
@@ -72,8 +73,8 @@ public final class TransitRouterNetwork implements Network {
 		public final TransitRoute route;
 		public final TransitLine line;
 		final Id<Node> id;
-		final Map<Id<Link>, TransitRouterNetworkLink> ingoingLinks = new IdentifiableArrayMap<Link, TransitRouterNetworkLink>();
-		final Map<Id<Link>, TransitRouterNetworkLink> outgoingLinks = new IdentifiableArrayMap<Link, TransitRouterNetworkLink>();
+		final Map<Id<Link>, TransitRouterNetworkLink> ingoingLinks = new IdentifiableArrayMap<>();
+		final Map<Id<Link>, TransitRouterNetworkLink> outgoingLinks = new IdentifiableArrayMap<>();
 
 		public TransitRouterNetworkNode(final Id<Node> id, final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 			this.id = id;
@@ -189,22 +190,22 @@ public final class TransitRouterNetwork implements Network {
 
 		@Override
 		public double getCapacity() {
-			return getCapacity(Time.UNDEFINED_TIME);
-		}
-
-		@Override
-		public double getCapacity(final double time) {
 			return 9999;
 		}
 
 		@Override
+		public double getCapacity(final double time) {
+			return getCapacity();
+		}
+
+		@Override
 		public double getFreespeed() {
-			return getFreespeed(Time.UNDEFINED_TIME);
+			return 10;
 		}
 
 		@Override
 		public double getFreespeed(final double time) {
-			return 10;
+			return getFreespeed();
 		}
 
 		@Override
@@ -214,12 +215,12 @@ public final class TransitRouterNetwork implements Network {
 
 		@Override
 		public double getNumberOfLanes() {
-			return getNumberOfLanes(Time.UNDEFINED_TIME);
+			return 1;
 		}
 
 		@Override
 		public double getNumberOfLanes(final double time) {
-			return 1;
+			return getNumberOfLanes();
 		}
 
 		@Override
@@ -286,13 +287,8 @@ public final class TransitRouterNetwork implements Network {
 		}
 
 		@Override
-		public double getFlowCapacityPerSec() {
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		public double getFlowCapacityPerSec(double time) {
-			throw new RuntimeException("not implemented") ;
+		public double getCapacityPeriod() {
+			throw new UnsupportedOperationException();
 		}
 
 		@Override

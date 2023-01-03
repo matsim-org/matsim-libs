@@ -27,11 +27,11 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * Idle vehicles (=StayTask) may be re-allocated using this interface.
- * 
+ *
  * @author michalm
  */
 public interface RebalancingStrategy {
-	public class Relocation {
+	class Relocation {
 		public final DvrpVehicle vehicle;
 		public final Link link;
 
@@ -43,7 +43,7 @@ public interface RebalancingStrategy {
 
 	/**
 	 * This method is called at each re-balancing step (interval defined in config).
-	 * 
+	 *
 	 */
 	List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time);
 }

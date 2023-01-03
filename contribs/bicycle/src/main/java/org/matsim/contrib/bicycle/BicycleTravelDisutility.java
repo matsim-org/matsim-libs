@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -84,7 +85,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
 		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
-		String type = (String) link.getAttributes().getAttribute("type");
+		String type = NetworkUtils.getType( link ) ;
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
 
 		double distance = link.getLength();
@@ -115,6 +116,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 						+ "sigma to zero.") ;
 			}
 			normalRndLink = 0.05 * random.nextGaussian();
+			// yyyyyy are we sure that this is a good approach?  In high resolution networks, this leads to quirky detours ...  kai, sep'19
 			if (person != prevPerson) {
 				prevPerson = person;
 
@@ -150,6 +152,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 //				+ " / rndDist = " + logNormalRndDist + " / rndInf = "	+ logNormalRndInf + " / rndComf = " + logNormalRndComf + " / rndGrad = " + logNormalRndGrad);
 		double disutility = (1 + normalRndLink) * travelTimeDisutility + logNormalRndDist * distanceDisutility + logNormalRndInf * infrastructureDisutility
 				+ logNormalRndComf * comfortDisutility + logNormalRndGrad * gradientDisutility;
+		// note that "normalRndLink" follows a Gaussian distribution, not a lognormal one as the others do!
 //		double disutility = travelTimeDisutility + logNormalRndDist * distanceDisutility + (1 + normalRndLink) * logNormalRndInf * infrastructureDisutility
 //				+ (1 + normalRndLink) * logNormalRndComf * comfortDisutility + (1 + normalRndLink) * logNormalRndGrad * gradientDisutility;
 //		LOG.warn("Disutility = " + disutility);

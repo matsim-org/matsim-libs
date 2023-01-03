@@ -23,12 +23,8 @@
  */
 package org.matsim.contrib.accessibility.osm;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.MapUtils;
@@ -54,11 +50,16 @@ import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author dziemke
  */
 public class OsmPoiReader {
-	private final static Logger LOG = Logger.getLogger(OsmPoiReader.class);
+	private final static Logger LOG = LogManager.getLogger(OsmPoiReader.class);
 	
 	private File inputFile;
 	private ActivityFacilities facilities;
@@ -81,11 +82,15 @@ public class OsmPoiReader {
 	 * Parses a given <i>OpenStreetMap</i> file for data in it that can be converted into MATSim facilities.
 	 */
 	public void parseOsmFileAndAddFacilities(Map<String, String> osmToMatsimTypeMap, String osmKey) {
+		parseOsmFileAndAddFacilities(osmToMatsimTypeMap,  osmKey, CompressionMethod.None);
+	}
+
+	public void parseOsmFileAndAddFacilities(Map<String, String> osmToMatsimTypeMap, String osmKey, CompressionMethod compressionMethod) {
 		OsmPoiSink sink = new OsmPoiSink(this.ct, osmToMatsimTypeMap, osmKey, useGeneralTypeIsSpecificTypeUnknown);
-		XmlReader xmlReader = new XmlReader(inputFile, false, CompressionMethod.None);
+		XmlReader xmlReader = new XmlReader(inputFile, false, compressionMethod);
 		xmlReader.setSink(sink);
-		xmlReader.run();		
-		
+		xmlReader.run();
+
 		for (ActivityFacility af : sink.getFacilities().getFacilities().values()) {
 			if (!this.facilities.getFacilities().containsKey(af.getId())) {
 				this.facilities.addActivityFacility(af);
@@ -115,7 +120,7 @@ public class OsmPoiReader {
 	
 	//------------------------------------------------------------------------------------------------------
 	public class OsmPoiSink implements Sink {
-		private final Logger LOG = Logger.getLogger(OsmPoiSink.class);
+		private final Logger LOG = LogManager.getLogger(OsmPoiSink.class);
 		
 		private final CoordinateTransformation ct;
 		private Map<String, String> typeMap = new HashMap<>();
@@ -190,7 +195,7 @@ public class OsmPoiReader {
 		}
 
 		@Override
-		public void release() {
+		public void close() {
 		}
 
 		/**
@@ -241,5 +246,6 @@ public class OsmPoiReader {
 		@Override
 		public void initialize(Map<String, Object> metaData) {
 		}
+
 	}
 }

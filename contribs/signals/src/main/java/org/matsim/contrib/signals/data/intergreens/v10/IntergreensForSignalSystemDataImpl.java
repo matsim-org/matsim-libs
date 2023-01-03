@@ -35,7 +35,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public class IntergreensForSignalSystemDataImpl implements IntergreensForSignalSystemData {
+public final class IntergreensForSignalSystemDataImpl implements IntergreensForSignalSystemData {
 
 	private Id<SignalSystem> signalSystemId;
 	private Map<Id<SignalGroup>, Map<Id<SignalGroup>, Integer>> endingGroupToBeginningGroupTimeMap = new HashMap<>();

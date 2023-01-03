@@ -39,6 +39,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -49,11 +50,11 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -61,6 +62,8 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import com.google.inject.Inject;
 
 import javax.inject.Provider;
 
@@ -97,14 +100,15 @@ public class LocationChoiceIT extends MatsimTestCase {
 
 		// set locachoice strategy:
 		controler.addOverridingModule(new AbstractModule() {
-
 			@Override
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Inject TimeInterpretation timeInterpretation;
+					
 					@Override
 					public PlanStrategy get() {
-						return new LocationChoicePlanStrategy(scenario, tripRouterProvider);
+						return new LocationChoicePlanStrategy(scenario, tripRouterProvider, timeInterpretation);
 					}
 				});
 			}
@@ -125,7 +129,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if (!config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			newWork = (Activity) newPlan.getPlanElements().get(6);
 		}
 		assertNotNull( newWork ) ;

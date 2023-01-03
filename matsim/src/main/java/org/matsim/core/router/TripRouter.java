@@ -27,7 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -37,11 +41,10 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import com.google.common.base.Preconditions;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -58,28 +61,21 @@ import javax.inject.Provider;
  * @author thibautd
  */
 public final class TripRouter implements MatsimExtensionPoint {
-	private static final Logger log = Logger.getLogger(TripRouter.class );
-	
-	private final Map<String, RoutingModule> routingModules = new HashMap<>();
-	
-	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
+	private static final Logger log = LogManager.getLogger(TripRouter.class );
 
-	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+	private final Map<String, RoutingModule> routingModules = new HashMap<>();
+	private final FallbackRoutingModule fallbackRoutingModule;
 
 	private Config config;
 	// (I need the config in the PlanRouter to figure out activity end times. And since the PlanRouter is not
 	// injected, I cannot get it there directly.  kai, oct'17)
-	
+
 	public static final class Builder {
 		private final Config config;
-		private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+		private FallbackRoutingModule fallbackRoutingModule = new FallbackRoutingModuleDefaultImpl() ;
 		private Map<String, Provider<RoutingModule>> routingModuleProviders = new LinkedHashMap<>() ;
 		public Builder( Config config ) {
 			this.config = config ;
-		}
-		public Builder setMainModeIdentifier( MainModeIdentifier identifier ) {
-			this.mainModeIdentifier = identifier ;
-			return this ;
 		}
 		public Builder setRoutingModule(String mainMode, RoutingModule routingModule ) {
 			// the initial API accepted routing modules.  injection, however, takes routing module providers.  (why?)
@@ -92,7 +88,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			return this ;
 		}
 		public TripRouter build() {
-			return new TripRouter( routingModuleProviders, mainModeIdentifier, config ) ;
+			return new TripRouter( routingModuleProviders, config, fallbackRoutingModule ) ;
 		}
 	}
 
@@ -105,12 +101,13 @@ public final class TripRouter implements MatsimExtensionPoint {
 //	// kai, sep'16
 
 	@Inject
-	TripRouter(Map<String, Provider<RoutingModule>> routingModuleProviders, MainModeIdentifier mainModeIdentifier, Config config ) {
-		
+	TripRouter( Map<String, Provider<RoutingModule>> routingModuleProviders, Config config,
+			FallbackRoutingModule fallbackRoutingModule ) {
+		this.fallbackRoutingModule = fallbackRoutingModule;
+
 		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModuleProviders.entrySet()) {
 			setRoutingModule(entry.getKey(), entry.getValue().get());
 		}
-		setMainModeIdentifier(mainModeIdentifier);
 		this.config = config ;
 	}
 
@@ -133,22 +130,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final RoutingModule module) {
 		RoutingModule old = routingModules.put( mainMode , module );
 
-		if (old != null) {
-			final StageActivityTypes oldTypes = old.getStageActivityTypes();
-			final boolean removed = checker.removeActivityTypes( oldTypes );
-			if ( !removed ) {
-				throw new RuntimeException( "could not remove "+oldTypes+" associated to "+old+". This may be due to a routing module creating a new instance at each call of getStageActivityTypes()" );
-			}
-		}
-
-		final StageActivityTypes types = module.getStageActivityTypes();
-		if ( types == null ) {
-			// we do not want to accept that, this would risk to mess up
-			// with replacement, and it generally makes code messy.
-			throw new RuntimeException( module+" returns null stage activity types. This is not a valid value. Return EmptyStageActivityTypes.INSTANCE instead." );
-		}
-		checker.addActivityTypes( types );
-
 		return old;
 	}
 
@@ -158,33 +139,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 	public Set<String> getRegisteredModes() {
 		return Collections.unmodifiableSet( routingModules.keySet() );
-	}
-
-	/**
-	 * Gives access to the stage activity types, for all modes.
-	 * @return a {@link StageActivityTypes} considering all registered modules
-	 */
-	public StageActivityTypes getStageActivityTypes() {
-		return checker;
-	}
-
-	/**
-	 * Sets the {@link MainModeIdentifier} instance returned by this trip router.
-	 * Note that it is not used internally: it is just provided here because it is useful
-	 * mainly for users of this class.
-	 *
-	 * @param newIdentifier the instance to register
-	 * @return the previous registered instance
-	 */
-	@Deprecated // use the Builder instead.  kai, oct'17
-	/* package-private */ MainModeIdentifier setMainModeIdentifier(final MainModeIdentifier newIdentifier) {
-		final MainModeIdentifier old = this.mainModeIdentifier;
-		this.mainModeIdentifier = newIdentifier;
-		return old;
-	}
-
-	public MainModeIdentifier getMainModeIdentifier() {
-		return mainModeIdentifier;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -208,27 +162,32 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
-			final Person person) {
+			final Person person,
+			final Attributes routingAttributes) {
 		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
 		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
-		
+
 		Gbl.assertNotNull( fromFacility );
 		Gbl.assertNotNull( toFacility );
-		
+
 		RoutingModule module = routingModules.get( mainMode );
-		
+
 		if (module != null) {
-			final List<? extends PlanElement> trip =
-					module.calcRoute(
-						fromFacility,
-						toFacility,
-						departureTime,
-						person);
+			RoutingRequest request = DefaultRoutingRequest.of(
+					fromFacility,
+					toFacility,
+					departureTime,
+					person,
+					routingAttributes);
+					
+			List<? extends PlanElement> trip = module.calcRoute(request);
 
 			if ( trip == null ) {
-				throw new NullPointerException( "Routing module "+module+" returned a null Trip for main mode "+mainMode );
+				trip = fallbackRoutingModule.calcRoute(request) ;
 			}
-
+			for (Leg leg: TripStructureUtils.getLegs(trip)) {
+				TripStructureUtils.setRoutingMode(leg, mainMode);
+			}
 			return trip;
 		}
 
@@ -245,45 +204,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 	// /////////////////////////////////////////////////////////////////////////
 	// public static convenience methods.
 	// /////////////////////////////////////////////////////////////////////////
-	/**
-	 * Helper method, that can be used to compute start time of legs.
-	 * (it is also used internally).
-	 * It is provided here, because such an operation is mainly useful for routing,
-	 * but it may be externalized in a "util" class...
-	 * @param config TODO
-	 */
-	public static double calcEndOfPlanElement(
-			final double now,
-			final PlanElement pe, Config config) {
-
-		if (Time.isUndefinedTime(now)) {
-			throw new RuntimeException("got undefined now to update with plan element" + pe);
-		}
-
-		if (pe instanceof Activity) {
-			Activity act = (Activity) pe;
-			return PopulationUtils.decideOnActivityEndTime(act, now, config ) ;
-		}
-		else {
-//			// take travel time from route if possible
-//			Route route = ((Leg) pe).getRoute();
-//			double travelTime = route != null ? route.getTravelTime() : Time.getUndefinedTime();
-//
-//			// travel time from leg will override this
-//			travelTime = Time.isUndefinedTime(travelTime) ? ((Leg) pe).getTravelTime() : travelTime;
-//
-//			// if still undefined, assume zero:
-//			return now + (Time.isUndefinedTime(travelTime) ? 0 : travelTime);
-
-			// replace above by already existing centralized method.  Which, however, does less hedging, and prioritizes route ttime over leg ttime.  Let's run the tests ...
-
-			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe );
-			if ( Time.isUndefinedTime( ttime ) ) {
-				ttime = 0. ;
-			}
-			return now + ttime;
-		}
-	}
 
 	/**
 	 * Inserts a trip between two activities in the sequence of plan elements
@@ -349,10 +269,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 		// check validity
 		if (indexOfOrigin < 0) {
-			throw new RuntimeException( "could not find origin "+origin+" in "+plan ); 
+			throw new RuntimeException( "could not find origin "+origin+" in "+plan );
 		}
 		if (indexOfDestination < 0) {
-			throw new RuntimeException( "could not find destination "+destination+" in "+plan ); 
+			throw new RuntimeException( "could not find destination "+destination+" in "+plan );
 		}
 
 		// replace the trip and return the former one
@@ -369,5 +289,14 @@ public final class TripRouter implements MatsimExtensionPoint {
 		return config;
 	}
 
+	@Deprecated // #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
+	public static String getFallbackMode(String transportMode) {
+		return transportMode + FallbackRoutingModuleDefaultImpl._fallback;
+	}
+
+	@Deprecated // #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
+	public static boolean isFallbackMode(String mode) {
+		return mode.endsWith(FallbackRoutingModuleDefaultImpl._fallback);
+	}
 }
 

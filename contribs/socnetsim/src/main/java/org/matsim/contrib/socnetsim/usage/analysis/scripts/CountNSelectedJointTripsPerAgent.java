@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,9 +54,7 @@ public class CountNSelectedJointTripsPerAgent {
 
 			for (Person p : sc.getPopulation().getPersons().values()) {
 				final List<Trip> trips =
-					TripStructureUtils.getTrips(
-							p.getSelectedPlan(),
-							EmptyStageActivityTypes.INSTANCE );
+					TripStructureUtils.getTrips(p.getSelectedPlan());
 
 				int countPassenger = 0;
 				int countDriver = 0;

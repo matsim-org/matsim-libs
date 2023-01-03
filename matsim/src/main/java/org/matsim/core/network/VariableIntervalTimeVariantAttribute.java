@@ -19,10 +19,12 @@
 
 package org.matsim.core.network;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.TreeMap;
 
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
+import com.google.common.base.Preconditions;
 
 final class VariableIntervalTimeVariantAttribute
 implements TimeVariantAttribute
@@ -97,6 +99,7 @@ implements TimeVariantAttribute
 	@Override
 	public double getValue(final double time)
 	{
+		Preconditions.checkArgument(!Double.isNaN(time), "NaN time is not supported");
 		// after we have put everything into an array by recalc, we just need a binary search:
 		int key = Arrays.binarySearch(this.aTimes, time);
 		key = key >= 0 ? key : -key - 2;

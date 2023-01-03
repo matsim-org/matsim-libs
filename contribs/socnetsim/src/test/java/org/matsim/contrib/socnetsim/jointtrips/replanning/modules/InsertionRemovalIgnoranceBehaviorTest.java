@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -29,12 +30,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
@@ -58,11 +58,6 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 	private Random random;
 
 	@Before
-	public void configureLogging() {
-		Logger.getLogger( JointTripInsertorAndRemoverAlgorithm.class ).setLevel( Level.TRACE );
-	}
-
-	@Before
 	public void init() {
 		config = JointScenarioUtils.createConfig();
 //		tripRouter = new  TripRouter();
@@ -72,7 +67,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 	@Test
 	public void testRemoverIgnorance() throws Exception {
-		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() );
+		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , new MainModeIdentifierImpl() );
 		
 		JointPlan jointPlan = createPlanWithJointTrips();
 
@@ -89,7 +84,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 					random,
 					null,
 					(JointTripInsertorConfigGroup) config.getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
-					tripRouter );
+					TripStructureUtils.getRoutingModeIdentifier() ); // yyyyyy ??????
 		
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 

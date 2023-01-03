@@ -27,7 +27,7 @@ import org.matsim.core.router.util.TravelTime;
 public class Time {
 	// yy there is now java.time, which integrates joda.time into the standard
 	// jdk.  should we consider looking into this?  kai, dec'17
-	
+
 	
 	private Time() {} // namespace only, do not instantiate
 
@@ -40,9 +40,8 @@ public class Time {
 	 * time is given as {@link Time#UNDEFINED_TIME} then {@link Path#travelTime}
 	 * will return {@link Double#NaN}, even though the {@link TravelTime#getLinkTravelTime}
 	 * is independent of the start time. */
-	@Deprecated // rather use Time.isUndefinedTime( time ), since that opens up the path to a later change
 	// of the convention.  kai, nov'17
-	public final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
+	final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
 	/**
 	 * The end of a day in MATSim in seconds
 	 */
@@ -58,19 +57,6 @@ public class Time {
 
 	private final static String[] timeElements;
 	
-	public static boolean isUndefinedTime( final double time ) {
-		// give the option to change the convention at some point in time.  kai, nov'17
-		return time==UNDEFINED_TIME ;
-	}
-	public static double getUndefinedTime() {
-		// give the option to change the convention at some point in time.  kai, nov'17
-		return UNDEFINED_TIME ;
-	}
-	public static double getVeryLargeTime() {
-		// give the option to change the convention at some point in time.  kai, nov'17
-		return Long.MAX_VALUE ;
-	}
-
 	static {
 		timeElements = new String[60];
 		for (int i = 0; i < 10; i++) {
@@ -103,6 +89,10 @@ public class Time {
 		return writeTime(seconds, defaultTimeFormat, ':');
 	}
 
+	public static final String writeTime(final OptionalTime time) {
+		return writeTime(time.orElse(UNDEFINED_TIME));
+	}
+
 	/**
 	 * Converts the given time in seconds after midnight into a textual representation
 	 *
@@ -115,8 +105,10 @@ public class Time {
 		if (TIMEFORMAT_SSSS.equals(timeformat)) {
 			return Long.toString((long)seconds);
 		}
+		if (seconds == UNDEFINED_TIME) {
+			return "undefined";
+		}
 		if (seconds < 0) {
-			if (seconds == UNDEFINED_TIME) return "undefined";
 			return "-" + writeTime(Math.abs(seconds), timeformat, separator);
 		}
 		double s = seconds;
@@ -169,8 +161,13 @@ public class Time {
 	 * @throws IllegalArgumentException when the string cannot be interpreted as a valid time.
 	 */
 	public static final double parseTime(final String time) {
+		return parseTime(time, ':').seconds();
+	}
+
+	public static final OptionalTime parseOptionalTime(final String time) {
 		return parseTime(time, ':');
 	}
+
 
 	/**
 	 * Parses the given string for a textual representation for time and returns
@@ -184,9 +181,9 @@ public class Time {
 	 *
 	 * @throws IllegalArgumentException when the string cannot be interpreted as a valid time.
 	 */
-	public static final double parseTime(final String time, final char separator) {
+	public static final OptionalTime parseTime(final String time, final char separator) {
 		if (time == null || time.length() == 0 || time.equals("undefined")) {
-			return Time.UNDEFINED_TIME;
+			return OptionalTime.undefined();
 		}
 		boolean isNegative = (time.charAt(0) == '-');
 		String[] strings = (isNegative
@@ -224,7 +221,7 @@ public class Time {
 		if (isNegative) {
 			seconds = -seconds;
 		}
-		return seconds;
+		return seconds == Time.UNDEFINED_TIME ? OptionalTime.undefined() : OptionalTime.defined(seconds);
 	}
 
 	/**

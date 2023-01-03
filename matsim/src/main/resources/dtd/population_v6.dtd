@@ -49,6 +49,10 @@
           vehicleRefId           CDATA #IMPLIED
           >
 
+<!--TODOS:-->
+
+<!--change max_dur to duration-->
+
 <!-- ============================================================ -->
 
 <!-- ROOT ELEMENT population:

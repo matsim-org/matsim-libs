@@ -21,11 +21,11 @@ package org.matsim.contrib.taxi.util.stats;
 
 import java.util.List;
 
-import org.matsim.contrib.util.CSVReaders;
+import org.matsim.contrib.common.csv.CSVReaders;
 
 public class TaxiStatsReader {
 	public enum Section {
-		PassengerWaitTime, VehicleEmptyDriveRatio, VehicleWaitRatio, TaskTypeTotalDuration;
+		PassengerWaitTime, VehicleEmptyDriveRatio, VehicleWaitRatio, TaskTypeTotalDuration
 	}
 
 	private final List<String[]> content;
@@ -65,6 +65,6 @@ public class TaxiStatsReader {
 
 		int row = section.ordinal() * (hours + 4) + hour + 2;
 
-		return Double.valueOf(content.get(row)[col]);
+		return Double.parseDouble(content.get(row)[col]);
 	}
 }

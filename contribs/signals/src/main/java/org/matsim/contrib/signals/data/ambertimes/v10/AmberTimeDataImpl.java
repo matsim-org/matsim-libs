@@ -31,7 +31,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author jbischoff
  * @author dgrether
  */
-public class AmberTimeDataImpl implements AmberTimeData {
+final class AmberTimeDataImpl implements AmberTimeData {
 
 	private Integer defaultRedAmberTime;
 	private Integer defaultAmberTime;

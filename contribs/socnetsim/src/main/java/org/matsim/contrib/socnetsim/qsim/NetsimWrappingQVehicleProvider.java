@@ -20,17 +20,17 @@
 package org.matsim.contrib.socnetsim.qsim;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 /**
  * @author thibautd
  */
 public class NetsimWrappingQVehicleProvider implements QVehicleProvider {
-	private final QNetsimEngine netsim;
+	private final QNetsimEngineI netsim;
 
 	public NetsimWrappingQVehicleProvider(
-			final QNetsimEngine netsim) {
+			final QNetsimEngineI netsim) {
 		this.netsim = netsim;
 	}
 

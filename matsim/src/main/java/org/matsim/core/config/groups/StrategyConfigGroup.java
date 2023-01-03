@@ -92,18 +92,28 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			
 			StringBuilder sels = new StringBuilder() ;
 			sels.append( DefaultSelector.SelectRandom ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.BestScore ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.KeepLastSelected ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.ChangeExpBeta ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.SelectExpBeta ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.SelectPathSizeLogit ) ;
 			
 			StringBuilder strats = new StringBuilder() ;
 			strats.append( DefaultStrategy.ReRoute ) ;
+			sels.append( ' ' );
 			strats.append( DefaultStrategy.TimeAllocationMutator ) ;
+			sels.append( ' ' );
 			strats.append( DefaultStrategy.TimeAllocationMutator_ReRoute ) ;
+			sels.append( ' ' );
 			strats.append( DefaultStrategy.ChangeSingleTripMode ) ;
+			sels.append( ' ' );
 			strats.append( DefaultStrategy.ChangeTripMode ) ;
+			sels.append( ' ' );
 			strats.append( DefaultStrategy.SubtourModeChoice ) ;
 			
 			map.put( "strategyName",

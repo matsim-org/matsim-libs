@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,26 +40,23 @@ public class TaxiOptimizerTests {
 		final boolean vehicleDiversion;
 		final double pickupDuration;
 		final double dropoffDuration;
-		final double AStarEuclideanOverdoFactor;
 		final boolean onlineVehicleTracker;
 
 		private TaxiConfigVariant(boolean destinationKnown, boolean vehicleDiversion, double pickupDuration,
-				double dropoffDuration, double AStarEuclideanOverdoFactor, boolean onlineVehicleTracker) {
+				double dropoffDuration, boolean onlineVehicleTracker) {
 			this.destinationKnown = destinationKnown;
 			this.vehicleDiversion = vehicleDiversion;
 			this.pickupDuration = pickupDuration;
 			this.dropoffDuration = dropoffDuration;
-			this.AStarEuclideanOverdoFactor = AStarEuclideanOverdoFactor;
 			this.onlineVehicleTracker = onlineVehicleTracker;
 		}
 
 		void updateTaxiConfig(TaxiConfigGroup taxiCfg) {
-			taxiCfg.setDestinationKnown(destinationKnown);
-			taxiCfg.setVehicleDiversion(vehicleDiversion);
-			taxiCfg.setPickupDuration(pickupDuration);
-			taxiCfg.setDropoffDuration(dropoffDuration);
-			taxiCfg.setAStarEuclideanOverdoFactor(AStarEuclideanOverdoFactor);
-			taxiCfg.setOnlineVehicleTracker(onlineVehicleTracker);
+			taxiCfg.destinationKnown = destinationKnown;
+			taxiCfg.vehicleDiversion = vehicleDiversion;
+			taxiCfg.pickupDuration = pickupDuration;
+			taxiCfg.dropoffDuration = dropoffDuration;
+			taxiCfg.onlineVehicleTracker = onlineVehicleTracker;
 		}
 	}
 
@@ -66,17 +64,17 @@ public class TaxiOptimizerTests {
 		List<TaxiConfigVariant> variants = new ArrayList<>();
 
 		// onlineVehicleTracker == false ==> vehicleDiversion == false
-		variants.add(new TaxiConfigVariant(false, false, 120, 60, 1.5, false));
-		variants.add(new TaxiConfigVariant(true, false, 1, 1, 1.5, false));
+		variants.add(new TaxiConfigVariant(false, false, 120, 60, false));
+		variants.add(new TaxiConfigVariant(true, false, 1, 1, false));
 
 		if (diversionSupported) {
 			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, true, 1, 1, 1.5, true));
-			variants.add(new TaxiConfigVariant(true, true, 120, 60, 1.5, true));
+			variants.add(new TaxiConfigVariant(false, true, 1, 1, true));
+			variants.add(new TaxiConfigVariant(true, true, 120, 60, true));
 		} else {
 			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, false, 1, 1, 1.5, true));
-			variants.add(new TaxiConfigVariant(true, false, 120, 60, 1.5, true));
+			variants.add(new TaxiConfigVariant(false, false, 1, 1, true));
+			variants.add(new TaxiConfigVariant(true, false, 120, 60, true));
 		}
 
 		return variants;
@@ -87,14 +85,14 @@ public class TaxiOptimizerTests {
 		private final Controler controler;
 
 		public PreloadedBenchmark(String plansSuffix, String taxisSuffix) {
-			URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+			URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 					"mielec_taxi_benchmark_config.xml");
 
-			TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-			config = ConfigUtils.loadConfig(configUrl, taxiCfg, new DvrpConfigGroup());
+			config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
+			TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
 
 			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
-			taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");
+			taxiCfg.taxisFile = "taxis_mini_benchmark-" + taxisSuffix + ".xml";
 
 			controler = RunTaxiBenchmark.createControler(config, 1);
 		}
@@ -102,7 +100,7 @@ public class TaxiOptimizerTests {
 
 	public static void runBenchmark(List<TaxiConfigVariant> variants, AbstractTaxiOptimizerParams taxiOptimizerParams,
 			PreloadedBenchmark benchmark, String outputDir) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(benchmark.config);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(benchmark.config);
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
 		taxiCfg.addParameterSet(taxiOptimizerParams);
 

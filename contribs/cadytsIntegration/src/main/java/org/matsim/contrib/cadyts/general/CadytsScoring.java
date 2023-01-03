@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.cadyts.general;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -31,7 +32,7 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
  */
 public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(CadytsScoring.class);
+	private static final Logger log = LogManager.getLogger(CadytsScoring.class);
 
 	private double score = 0.;
 	private PlansTranslator<T> plansTranslator;
@@ -52,9 +53,9 @@ public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 		cadyts.demand.Plan<T> currentPlanSteps = this.plansTranslator.getCadytsPlan(plan);
 		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
 		this.score = weightOfCadytsCorrection * currentPlanCadytsCorrection;
-		if ( currentPlanCadytsCorrection!= 0. ){
-			log.warn( "weight=" + weightOfCadytsCorrection + "; corr=" + currentPlanCadytsCorrection );
-		}
+//		if ( currentPlanCadytsCorrection!= 0. ){
+//			log.warn( "weight=" + weightOfCadytsCorrection + "; corr=" + currentPlanCadytsCorrection );
+//		}
 	}
 
 	@Override

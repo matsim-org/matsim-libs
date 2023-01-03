@@ -21,6 +21,7 @@ package org.matsim.contrib.minibus.integration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -131,15 +132,15 @@ public class PControlerTestIT implements TabularFileHandler{
 
 		Assert.assertEquals("Number of coops (last iteration)", "3", this.pStatsResults.get(11)[1]);
 		Assert.assertEquals("Number of routes (last iteration)", "3", this.pStatsResults.get(11)[3]);
-		Assert.assertEquals("Number of pax (last iteration)", "6321", this.pStatsResults.get(11)[5]);
+		Assert.assertEquals("Number of pax (last iteration)", "6728", this.pStatsResults.get(11)[5]);
 		Assert.assertEquals("Number of veh (last iteration)", "10", this.pStatsResults.get(11)[7]);
-		Assert.assertEquals("Number of budget (last iteration)", "54.8098518518", this.pStatsResults.get(11)[9]);
+		Assert.assertEquals("Number of budget (last iteration)", "68.7117037037", this.pStatsResults.get(11)[9]);
 
 		Assert.assertEquals("Number of +coops (last iteration)", "2", this.pStatsResults.get(11)[2]);
 		Assert.assertEquals("Number of +routes (last iteration)", "2", this.pStatsResults.get(11)[4]);
-		Assert.assertEquals("Number of +pax (last iteration)", "6105", this.pStatsResults.get(11)[6]);
+		Assert.assertEquals("Number of +pax (last iteration)", "6508", this.pStatsResults.get(11)[6]);
 		Assert.assertEquals("Number of +veh (last iteration)", "7", this.pStatsResults.get(11)[8]);
-		Assert.assertEquals("Number of +budget (last iteration)", "92.5477777778", this.pStatsResults.get(11)[10]);
+		Assert.assertEquals("Number of +budget (last iteration)", "113.2005555555", this.pStatsResults.get(11)[10]);
 	}
 
 	@Override

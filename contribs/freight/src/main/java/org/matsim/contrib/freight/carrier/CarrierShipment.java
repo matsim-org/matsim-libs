@@ -1,7 +1,31 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * A shipment from one location to another, with certain size and other constraints such as time-windows and service-times.
@@ -12,7 +36,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author sschroeder
  *
  */
-public final class CarrierShipment {
+public final class CarrierShipment implements Attributable {
 
 	/**
 	 * A builder that builds shipments.
@@ -110,29 +134,15 @@ public final class CarrierShipment {
 	}
 	
 	private final Id<CarrierShipment> id;
-	
 	private final Id<Link> from;
-
 	private final Id<Link> to;
-
 	private final int size;
-
 	private final TimeWindow pickupTimeWindow;
-
 	private final TimeWindow deliveryTimeWindow;
-
 	private double pickupServiceTime;
-
 	private double deliveryServiceTime;
+	private final Attributes attributes = new AttributesImpl();
 
-//	public CarrierShipment(final Id from, final Id to, final int size, final TimeWindow pickupTimeWindow, final TimeWindow deliveryTimeWindow) {
-//		super();
-//		this.from = from;
-//		this.to = to;
-//		this.size = size;
-//		this.pickupTimeWindow = pickupTimeWindow;
-//		this.deliveryTimeWindow = deliveryTimeWindow;
-//	}
 
 	private CarrierShipment(Builder builder) {
 		id = builder.id;
@@ -185,6 +195,11 @@ public final class CarrierShipment {
 	}
 
 	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+	@Override
 	public String toString() {
 		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + from.toString() + "][to=" + to.toString() + "][size=" + size + "][pickupServiceTime=" + pickupServiceTime + "]" +
 				"[deliveryServiceTime="+deliveryServiceTime+"][pickupTimeWindow="+pickupTimeWindow+"][deliveryTimeWindow="+deliveryTimeWindow+"]";
@@ -214,11 +229,8 @@ public final class CarrierShipment {
 			return false;
 		CarrierShipment other = (CarrierShipment) obj;
 		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+			return other.id == null;
+		} else return id.equals(other.id);
 	}
 
 

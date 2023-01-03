@@ -29,18 +29,18 @@ import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.contrib.signals.data.conflicts.Direction;
 import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanDataImpl;
-import org.matsim.contrib.signals.data.signalcontrol.v20.SignalSystemControllerDataImpl;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerDataImpl;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.contrib.signals.model.Signal;
@@ -53,7 +53,7 @@ import org.matsim.lanes.Lane;
  * @author dgrether
  * 
  */
-public class SignalUtils {
+public final class SignalUtils {
 
 	/**
 	 * Create an empty SignalsData object

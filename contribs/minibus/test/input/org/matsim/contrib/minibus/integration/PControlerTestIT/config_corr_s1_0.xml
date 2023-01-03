@@ -229,7 +229,7 @@
 
 		<!-- Speed for a teleported mode based on beeline-distance: (<beeline distance> * beelineDistanceFactor) / speed. Insert a line like this for every such mode. -->
 		<param name="teleportedModeSpeed_walk" value="1.111111111111111" />
-		
+
 		<!-- write a plans file in each iteration directory which contains what each agent actually did, and the score it received. -->
 		<!--<param name="writeExperiencedPlans" value="true" />-->
 	</module>

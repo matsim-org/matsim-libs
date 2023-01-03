@@ -25,24 +25,15 @@ import java.util.Map;
 
 //import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.fare.StageContainerCreator;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
-import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.OperatorInitializer;
-import org.matsim.contrib.minibus.operator.PFranchise;
-import org.matsim.contrib.minibus.operator.POperators;
-import org.matsim.contrib.minibus.operator.SubsidyI;
-import org.matsim.contrib.minibus.operator.TimeProvider;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.schedule.PStopsFactory;
-import org.matsim.contrib.minibus.scoring.OperatorCostCollectorHandler;
-import org.matsim.contrib.minibus.scoring.PScoreContainer;
-import org.matsim.contrib.minibus.scoring.PScorePlansHandler;
-import org.matsim.contrib.minibus.scoring.StageContainer2AgentMoneyEvent;
 import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -64,7 +55,7 @@ import com.google.inject.Inject;
 public final class PBox implements POperators {
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(PBox.class);
+	private final static Logger log = LogManager.getLogger(PBox.class);
 
 	private LinkedList<Operator> operators;
 
@@ -82,7 +73,7 @@ public final class PBox implements POperators {
 	private final RouteDesignScoringManager routeDesignScoreManager = new RouteDesignScoringManager();
 
 	private final TicketMachineI ticketMachine;
-	
+
 	@Inject(optional=true) private SubsidyI subsidy;
 	// yy my intuition would be to pass an empty subsidy rather than making it optional. 
 
@@ -128,7 +119,7 @@ public final class PBox implements POperators {
 		this.stageCollectorHandler.addStageContainerHandler(fare2AgentMoney);
 
 		// init possible paratransit stops
-		this.pStopsOnly = PStopsFactory.createPStops(event.getServices().getScenario().getNetwork(), this.pConfig, event.getServices().getScenario().getTransitSchedule());
+		this.pStopsOnly = PStopsFactory.createPStops(event.getServices().getScenario().getNetwork(), this.pConfig, event.getServices().getScenario().getTransitSchedule(), event.getServices().getScenario().getConfig().network());
 
 		this.operators = new LinkedList<>();
 		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getServices(), timeProvider);

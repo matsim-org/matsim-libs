@@ -24,11 +24,12 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -44,9 +45,9 @@ import org.matsim.contrib.signals.model.SignalGroup;
 /**
  * @author dgrether
  */
-public class IntergreenTimesWriter10 extends MatsimJaxbXmlWriter {
+public final class IntergreenTimesWriter10 extends MatsimJaxbXmlWriter {
 	
-		private static final Logger log = Logger.getLogger(IntergreenTimesWriter10.class);
+		private static final Logger log = LogManager.getLogger(IntergreenTimesWriter10.class);
 		
 		private IntergreenTimesData intergreensData;
 	

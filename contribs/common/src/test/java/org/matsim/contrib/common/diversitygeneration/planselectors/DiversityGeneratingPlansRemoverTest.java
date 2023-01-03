@@ -2,7 +2,8 @@ package org.matsim.contrib.common.diversitygeneration.planselectors;
 
 import com.google.common.primitives.Doubles;
 import gnu.trove.map.TMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -35,15 +36,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class DiversityGeneratingPlansRemoverTest {
-	private static final Logger log = Logger.getLogger( DiversityGeneratingPlansRemoverTest.class ) ;
+	private static final Logger log = LogManager.getLogger( DiversityGeneratingPlansRemoverTest.class ) ;
 	
-	private static final Id<Node> node0 = Id.createNodeId( "node0" ) ;
-	private static final Id<Node> node1 = Id.createNodeId( "node1" ) ;
-	private static final Id<Node> node2 = Id.createNodeId( "node2" ) ;
-	private static final Id<Node> node3 = Id.createNodeId( "node3" ) ;
-	private static final Id<Link> link0_1 = Id.createLinkId( "dummy0-1" );
-	private static final Id<Link> link1_2 = Id.createLinkId( "dummy1-2" );
-	private static final Id<Link> link2_3 = Id.createLinkId( "dummyN" );
+	private final Id<Node> node0 = Id.createNodeId( "node0" ) ;
+	private final Id<Node> node1 = Id.createNodeId( "node1" ) ;
+	private final Id<Node> node2 = Id.createNodeId( "node2" ) ;
+	private final Id<Node> node3 = Id.createNodeId( "node3" ) ;
+	private final Id<Link> link0_1 = Id.createLinkId( "dummy0-1" );
+	private final Id<Link> link1_2 = Id.createLinkId( "dummy1-2" );
+	private final Id<Link> link2_3 = Id.createLinkId( "dummyN" );
 	
 	@Test
 	public void calcWeights() {
@@ -116,11 +117,13 @@ public class DiversityGeneratingPlansRemoverTest {
 				{
 					Leg leg = legs.get(0) ;
 					leg.setMode( TransportMode.pt );
+					TripStructureUtils.setRoutingMode(leg, TransportMode.pt );
 					leg.setRoute( pf.getRouteFactories().createRoute( GenericRouteImpl.class , link0_1, link2_3 ) ) ;
 				}
 				{
 					Leg leg = legs.get(1) ;
 					leg.setMode( TransportMode.pt );
+					TripStructureUtils.setRoutingMode(leg, TransportMode.pt );
 					leg.setRoute( pf.getRouteFactories().createRoute( GenericRouteImpl.class , link2_3, link0_1 ) ) ;
 				}
 				person.addPlan( plan ) ;
@@ -177,7 +180,7 @@ public class DiversityGeneratingPlansRemoverTest {
 		
 	}
 	
-	private static Plan createHwhPlan( final PopulationFactory pf ) {
+	private Plan createHwhPlan( final PopulationFactory pf ) {
 		Plan plan = pf.createPlan() ;
 		{
 			Activity act = pf.createActivityFromCoord( "home", new Coord(0.,0.) ) ;

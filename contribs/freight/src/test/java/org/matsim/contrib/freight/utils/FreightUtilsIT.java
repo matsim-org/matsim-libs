@@ -20,27 +20,15 @@ package org.matsim.contrib.freight.utils;
 
 import java.util.Collection;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
@@ -48,9 +36,8 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
-import org.matsim.vehicles.EngineInformationImpl;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
@@ -68,51 +55,56 @@ import org.junit.Assert;
  */
 public class FreightUtilsIT {
 	
-	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
-	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
+	private final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
+	private final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
+
+	private Carrier carrierWServices;
+	private Carrier carrierWShipments;
+
+	private Carrier carrierWShipmentsOnlyFromCarrierWServices;
+	private Carrier carrierWShipmentsOnlyFromCarrierWShipments;
 	
-	private static Carriers carriersWithServicesAndShpiments;
-	private static Carrier carrierWServices;
-	private static Carrier carrierWShipments;
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	private static Carriers carriersWithShipmentsOnly;
-	private static Carrier carrierWShipmentsOnlyFromCarrierWServices;
-	private static Carrier carrierWShipmentsOnlyFromCarrierWShipments;
-	
-	/** Commented out because it is not working even as @Rule nor as @ClassRule due to different reasons, 
-	* e.g. @BeforeClass needs @ClassRule, but MatsimTestUtils does not work together with @ClassRule ;
-	*  MatsimTestUtils needs be static vs static not allowed in @Rule, KMT sep/18
-	**/
-//	@Rule		
-//	public static MatsimTestUtils testUtils = new MatsimTestUtils();
-	
-	@BeforeClass
-	public static void setUp() {
+	@Before
+	public void setUp() {
 		
 		//Create carrier with services and shipments
-		carriersWithServicesAndShpiments = new Carriers() ;
-		carrierWServices = CarrierImpl.newInstance(CARRIER_SERVICES_ID );
-		carrierWServices.getServices().add(createMatsimService("Service1", "i(3,9)", 2));
-		carrierWServices.getServices().add(createMatsimService("Service2", "i(4,9)", 2));
+		Carriers carriersWithServicesAndShpiments = new Carriers();
+		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
+		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
+		CarrierUtils.addService(carrierWServices, service1);
+		CarrierService service2 = createMatsimService("Service2", "i(4,9)", 2);
+		CarrierUtils.addService(carrierWServices, service2);
 		
 		//Create carrier with shipments
-		carrierWShipments = CarrierImpl.newInstance(CARRIER_SHIPMENTS_ID);
-		carrierWShipments.getShipments().add(createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1)); 
-		carrierWShipments.getShipments().add(createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2));
+		carrierWShipments = CarrierUtils.createCarrier(CARRIER_SHIPMENTS_ID );
+		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
+		CarrierUtils.addShipment(carrierWShipments, shipment1);
+		CarrierShipment shipment2 = createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2);
+		CarrierUtils.addShipment(carrierWShipments, shipment2);
 
 		//Create vehicle for Carriers
-		CarrierVehicleType carrierVehType = CarrierVehicleType.Builder.newInstance(Id.create("gridType", VehicleType.class))
-				.setCapacity(3)
-				.setMaxVelocity(10)
-				.setCostPerDistanceUnit(0.0001)
-				.setCostPerTimeUnit(0.001)
-				.setFixCost(130)
-				.setEngineInformation(new EngineInformationImpl(FuelType.diesel, 0.015))
-				.build();
+		final Id<VehicleType> vehTypeId = Id.create( "gridType", VehicleType.class );
+		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehTypeId );;
+		EngineInformation engineInformation = carrierVehType.getEngineInformation() ;
+		engineInformation.setFuelType( FuelType.diesel );
+		engineInformation.setFuelConsumption( 0.015 );
+		VehicleCapacity capacity = carrierVehType.getCapacity() ;
+		capacity.setOther( 3. ) ;
+		CostInformation costInfo = carrierVehType.getCostInformation();
+		costInfo.setCostsPerSecond( 0.001 ) ;
+		costInfo.setCostsPerMeter( 0.0001 ) ;
+		costInfo.setFixedCost( 130. ) ;
+//		VehicleType carrierVehType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( vehTypeId )
+		carrierVehType.setMaximumVelocity(10);
+
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 		
-		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType.getId()).build();
+		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
+				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance() 
 				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)
@@ -129,7 +121,7 @@ public class FreightUtilsIT {
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(getPackageInputDirectory() + "grid-network.xml"); 
+		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
@@ -156,7 +148,8 @@ public class FreightUtilsIT {
 		 */
 
 		//Convert to jsprit VRP
-		carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
+		Carriers carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(
+				carriersWithServicesAndShpiments );
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;	
@@ -198,7 +191,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursInitialCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-270.4, carrierWServices.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-270.462, carrierWServices.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
 //			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
@@ -220,7 +213,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursInitialCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.8, carrierWShipments.getSelectedPlan().getScore(), 0.1);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-136.87, carrierWShipments.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
@@ -244,7 +237,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-140.4, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-140.462, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours()){
@@ -270,7 +263,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.8, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18		
+		Assert.assertEquals(-136.87, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours()){
@@ -303,7 +296,7 @@ public class FreightUtilsIT {
 
 		return CarrierShipment.Builder.newInstance(shipmentId, fromLinkId, toLinkId, size)
 				.setDeliveryServiceTime(30.0)
-				.setDeliveryTimeWindow(TimeWindow.newInstance(3600.0, 36000.0))
+				.setDeliveryTimeWindow(TimeWindow.newInstance(0.0, 36000.0))
 				.setPickupServiceTime(5.0)
 				.setPickupTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
 				.build();
@@ -313,20 +306,7 @@ public class FreightUtilsIT {
 		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
 				.setCapacityDemand(size)
 				.setServiceDuration(31.0)
-				.setServiceStartTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
+				.setServiceStartTimeWindow(TimeWindow.newInstance(0.0, 36001.0))
 				.build();
 	}
-	
-	
-	/**
-	 * Note: Manually added here, because MatsimTestUtils does not work with @BeforeClass; KMT sep/18
-	 * @return String location of the packageInputDirectory
-	 */
-	private static String getPackageInputDirectory() {
-		String classInputDirectory = "test/input/" + TestFreightUtils.class.getCanonicalName().replace('.', '/') + "/";
-		String packageInputDirectory = classInputDirectory.substring(0, classInputDirectory.lastIndexOf('/'));
-		packageInputDirectory = packageInputDirectory.substring(0, packageInputDirectory.lastIndexOf('/') + 1);
-		return packageInputDirectory;
-	}
-
 }

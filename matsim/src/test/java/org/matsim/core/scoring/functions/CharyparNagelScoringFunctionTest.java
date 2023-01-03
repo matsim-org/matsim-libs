@@ -22,28 +22,27 @@ package org.matsim.core.scoring.functions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-import org.junit.runner.RunWith;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -53,7 +52,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationSco
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -340,7 +338,7 @@ public class CharyparNagelScoringFunctionTest {
 		// not longer true, since not doing a scheduled activity now carries a penalty.  kai, nov'13
 		double score_home = perf_hrs * 15.0 * Math.log(14.75 / getZeroUtilDuration_hrs(15.0, 1.0)) ;
 
-		final double typicalDuration_work_sec = wParams.getTypicalDuration();
+		final double typicalDuration_work_sec = wParams.getTypicalDuration().seconds();
 		final double zeroUtilityDuration_work_sec = 3600. * getZeroUtilDuration_hrs(typicalDuration_work_sec/3600., 1. );
 		double slope_work_at_zero_utility_h = perf_hrs * typicalDuration_work_sec / zeroUtilityDuration_work_sec ;
 		double score_work = - zeroUtilityDuration_work_sec * slope_work_at_zero_utility_h / 3600. ;
@@ -603,7 +601,7 @@ public class CharyparNagelScoringFunctionTest {
 		Route route2 = RouteUtils.createGenericRouteImpl(null, null);
 		leg1.setRoute(route2);
 		route2.setDistance(20000.0);
-		Activity act1b = PopulationUtils.createAndAddActivityFromLinkId(plan1, "work", (Id<Link>)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		Activity act1b = PopulationUtils.createAndAddActivityFromLinkId(plan1, "work", (Id<Link>)null);//, 7.0*3600+100, Time.getUndefinedTime(), Time.getUndefinedTime(), false);
 		act1b.setStartTime(f.secondLegStartTime + f.secondLegTravelTime);
 		ScoringFunction sf1 = getScoringFunctionInstance(f, person1);
 		sf1.handleActivity(act1a);
@@ -621,6 +619,48 @@ public class CharyparNagelScoringFunctionTest {
 		sf2.handleActivity(act1b);
 		sf2.addMoney(4.86);
 		sf2.addMoney(-0.28);
+		sf2.finish();
+		double score2 = sf2.getScore();
+
+		assertEquals(1.23 - 2.46 + 4.86 - 0.28, score2 - score1, EPSILON);
+	}
+
+	/**
+	 * Tests if the scoring function correctly handles {@link PersonScoreEvent}.
+	 */
+	@Test
+	public void testAddScore() {
+		Fixture f = new Fixture();
+
+		// score the same plan twice
+		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan plan1 = PersonUtils.createAndAddPlan(person1, true);
+		Activity act1a = PopulationUtils.createAndAddActivityFromLinkId(plan1, "home", (Id<Link>)null);//, 0, 7.0*3600, 7*3600, false);
+		act1a.setEndTime(f.secondLegStartTime);
+		Leg leg1 = PopulationUtils.createAndAddLeg( plan1, TransportMode.car );//, 7*3600, 100, 7*3600+100);
+		leg1.setDepartureTime(f.secondLegStartTime);
+		leg1.setTravelTime(f.secondLegTravelTime);
+		Route route2 = RouteUtils.createGenericRouteImpl(null, null);
+		leg1.setRoute(route2);
+		route2.setDistance(20000.0);
+		Activity act1b = PopulationUtils.createAndAddActivityFromLinkId(plan1, "work", (Id<Link>)null);//, 7.0*3600+100, Time.getUndefinedTime(), Time.getUndefinedTime(), false);
+		act1b.setStartTime(f.secondLegStartTime + f.secondLegTravelTime);
+		ScoringFunction sf1 = getScoringFunctionInstance(f, person1);
+		sf1.handleActivity(act1a);
+		sf1.handleLeg(leg1);
+		sf1.handleActivity(act1b);
+
+		sf1.finish();
+		double score1 = sf1.getScore();
+
+		ScoringFunction sf2 = getScoringFunctionInstance(f, person1);
+		sf2.handleActivity(act1a);
+		sf2.addScore(1.23);
+		sf2.handleLeg(leg1);
+		sf2.addScore(-2.46);
+		sf2.handleActivity(act1b);
+		sf2.addScore(4.86);
+		sf2.addScore(-0.28);
 		sf2.finish();
 		double score2 = sf2.getScore();
 

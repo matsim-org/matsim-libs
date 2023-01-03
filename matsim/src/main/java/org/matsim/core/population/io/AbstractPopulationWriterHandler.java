@@ -19,7 +19,8 @@
 
 package org.matsim.core.population.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -38,7 +39,7 @@ abstract class AbstractPopulationWriterHandler implements PopulationWriterHandle
 	// all public non-final methods are empty. 
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(AbstractPopulationWriterHandler.class);
+	private final static Logger log = LogManager.getLogger(AbstractPopulationWriterHandler.class);
 	
 	@Override
 	public final void writePerson(final Person person, final BufferedWriter writer) throws IOException {

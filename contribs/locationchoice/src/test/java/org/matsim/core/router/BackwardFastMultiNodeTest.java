@@ -56,12 +56,14 @@ public class BackwardFastMultiNodeTest {
 	private void runTestBackwardsFastMultiNodeDijkstra_OneToOne(boolean searchAllEndNodes) {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness(0.);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardFastMultiNodeDijkstraFactory(searchAllEndNodes).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -114,12 +116,14 @@ public class BackwardFastMultiNodeTest {
 	public void testBackwardsFastMultiNodeDijkstra_OneToMany() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness(0.);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardFastMultiNodeDijkstraFactory(false).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -202,12 +206,14 @@ public class BackwardFastMultiNodeTest {
 	public void testBackwardsFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness(0.);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardFastMultiNodeDijkstraFactory(true).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		

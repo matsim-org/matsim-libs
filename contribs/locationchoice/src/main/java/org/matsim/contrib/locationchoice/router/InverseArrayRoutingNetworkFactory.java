@@ -23,7 +23,8 @@ package org.matsim.contrib.locationchoice.router;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -45,7 +46,7 @@ import org.matsim.core.router.util.RoutingNetworkNode;
  */
 public class InverseArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 	
-	private final static Logger log = Logger.getLogger(ArrayRoutingNetworkFactory.class);
+	private final static Logger log = LogManager.getLogger(ArrayRoutingNetworkFactory.class);
 	
 	private int nodeArrayIndexCounter;
 	private int linkArrayIndexCounter;
@@ -100,10 +101,5 @@ public class InverseArrayRoutingNetworkFactory extends AbstractRoutingNetworkFac
 	public ArrayRoutingNetworkLink createRoutingNetworkLink(Link link,
 			RoutingNetworkNode fromNode, RoutingNetworkNode toNode) {
 		return new ArrayRoutingNetworkLink(link, fromNode, toNode, linkArrayIndexCounter++);
-	}
-
-	@Override
-	public void setLinkFactory(LinkFactory factory) {
-		throw new RuntimeException("not implemented") ;
 	}
 }

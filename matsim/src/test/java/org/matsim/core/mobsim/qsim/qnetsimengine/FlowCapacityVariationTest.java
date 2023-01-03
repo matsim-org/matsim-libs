@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -175,14 +176,14 @@ public class FlowCapacityVariationTest {
 				p.addPlan(plan);
 				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
 
-				a1.setEndTime(0*3600);
+				a1.setEndTime(0 * 3600);
 				Leg leg = population.getFactory().createLeg(travelMode);
 				plan.addActivity(a1);
 				plan.addLeg(leg);
 				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 				NetworkRoute route;
 				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				route= (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
+				route = (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
 				linkIds.add(link2.getId());
 				route.setLinkIds(link1.getId(), linkIds, link3.getId());
 				leg.setRoute(route);
@@ -191,8 +192,8 @@ public class FlowCapacityVariationTest {
 				plan.addActivity(a2);
 				population.addPerson(p);
 
-				Id<Vehicle> vehId = Id.create(i,Vehicle.class);
-				VehicleUtils.insertVehicleIdIntoAttributes(p, travelMode, vehId);
+				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
+				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
 				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
 				scenario.getVehicles().addVehicle(veh);
 			}
@@ -210,7 +211,7 @@ public class FlowCapacityVariationTest {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Logger.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
+			LogManager.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
 			Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
 			if (times == null) {
 				times = new HashMap<>();
@@ -229,7 +230,7 @@ public class FlowCapacityVariationTest {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Logger.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
+			LogManager.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
 			Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
 			if (times != null) {
 				double linkEnterTime = times.get(event.getLinkId())[0];

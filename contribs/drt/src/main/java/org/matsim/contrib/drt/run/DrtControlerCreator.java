@@ -53,23 +53,23 @@ public final class DrtControlerCreator {
 	}
 
 	/**
-	 * Creates a controller in one step. Assumes a single DRT service.
+	 * Creates a controller in one step.
 	 *
 	 * @param config
 	 * @param otfvis
 	 * @return
 	 */
-	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
-		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
+	public static Controler createControler(Config config, boolean otfvis) {
+		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.planCalcScore(), config.plansCalcRoute());
 
 		Scenario scenario = createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new DrtModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtCfg.getMode()));
+		controler.addOverridingModule(new MultiModeDrtModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

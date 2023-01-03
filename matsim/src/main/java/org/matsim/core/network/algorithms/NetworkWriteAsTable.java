@@ -23,7 +23,8 @@ package org.matsim.core.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,7 +41,7 @@ public final class NetworkWriteAsTable implements NetworkRunnable {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(NetworkWriteAsTable.class);
+	private final static Logger log = LogManager.getLogger(NetworkWriteAsTable.class);
 
 	private final String outdir;
 	private final double offset;
@@ -111,13 +112,13 @@ public final class NetworkWriteAsTable implements NetworkRunnable {
 				out_l.write(tc.getX() + "\t" + tc.getY() + "\t" + l.getLength() + "\t");
 				out_l.write(l.getFreespeed()+"\t"
 						+(l.getCapacity()/capperiod)+"\t"
-						+ NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), l)+"\t"
+						+ NetworkUtils.getNumberOfLanesAsInt(l)+"\t"
 						+l.getAllowedModes().toString()+"\n");
 				out_l.flush();
 
 				out_et.write(l.getId() + "\t" + l.getFromNode().getId() + "\t" + l.getToNode().getId() + "\t");
 				out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed()*3.6) + "\t");
-				out_et.write(Math.round(l.getCapacity()/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), l) + "\t");
+				out_et.write(Math.round(l.getCapacity()/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(l) + "\t");
 				out_et.write(NetworkUtils.getOrigId( ((Link) l) ) + "\t" + NetworkUtils.getType(((Link) l)) + "\t"+l.getAllowedModes().toString()+"\n");
 				out_et.write(fc.getX() + "\t" + fc.getY() + "\n");
 				out_et.write(tc.getX() + "\t" + tc.getY() + "\n");

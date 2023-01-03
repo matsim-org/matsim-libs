@@ -24,7 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -41,7 +42,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class LinkImplTest {
 
-	private final static Logger log = Logger.getLogger(LinkImplTest.class);
+	private final static Logger log = LogManager.getLogger(LinkImplTest.class);
 	private static final double EPSILON = 1e-7;
 
 
@@ -62,7 +63,7 @@ public class LinkImplTest {
 		 * The network contains an exactly horizontal, an exactly vertical, an exactly diagonal
 		 * and another link with no special slope to also test possible special cases.
 		 */
-		final Network network = new NetworkImpl();
+		final Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
@@ -180,7 +181,7 @@ public class LinkImplTest {
 
 	@Test
 	public void testSetAttributes() {
-		Network network = new NetworkImpl();
+		Network network = new NetworkImpl(new LinkFactoryImpl());
 		network.setCapacityPeriod(3600.0);
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 50, (double) 50));
@@ -200,7 +201,7 @@ public class LinkImplTest {
 	 */
 	@Test
 	public void testAllowedModes() {
-		Network network = new NetworkImpl();
+		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node n1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = n1;

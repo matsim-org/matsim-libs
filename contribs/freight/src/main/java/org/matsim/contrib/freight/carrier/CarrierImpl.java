@@ -1,11 +1,34 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
@@ -14,33 +37,27 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author sschroeder, mzilske
  *
  */
-public class CarrierImpl implements Carrier {
-
-	public static Carrier newInstance(Id<Carrier> id){
-		return new CarrierImpl(id);
+public final class CarrierImpl implements Carrier {
+	@Deprecated // refactoring device, please inline
+	public static Carrier newInstance( Id<Carrier> carrierId ){
+		return CarrierUtils.createCarrier( carrierId ) ;
 	}
-	
+
 	private final Id<Carrier> id;
-
 	private final List<CarrierPlan> plans;
-
-	private final Collection<CarrierShipment> shipments; 
-
-	private final Collection<CarrierService> services;
-
+	private final Map<Id<CarrierShipment>, CarrierShipment> shipments;
+	private final Map<Id<CarrierService>, CarrierService> services;
 	private CarrierCapabilities carrierCapabilities;
-	
 	private CarrierPlan selectedPlan;
+	private final Attributes attributes = new AttributesImpl();
 
-//	private final Attributes attributes = new Attributes();
-
-	private CarrierImpl(final Id<Carrier> id) {
+	CarrierImpl( final Id<Carrier> id ) {
 		super();
 		this.carrierCapabilities = CarrierCapabilities.newInstance();
 		this.id = id;
-		services = new ArrayList<CarrierService>();
-		shipments = new ArrayList<CarrierShipment>();
-		plans = new ArrayList<CarrierPlan>();
+		services = new LinkedHashMap<>();
+		shipments = new LinkedHashMap<>();
+		plans = new ArrayList<>();
 	}
 
 	@Override
@@ -48,10 +65,6 @@ public class CarrierImpl implements Carrier {
 		return id;
 	}
 
-//	@Override
-//	public Id getDepotLinkId() {
-//		return depotLinkId;
-//	}
 
 	@Override
 	public List<CarrierPlan> getPlans() {
@@ -59,7 +72,7 @@ public class CarrierImpl implements Carrier {
 	}
 
 	@Override
-	public Collection<CarrierShipment> getShipments() {
+	public Map<Id<CarrierShipment>, CarrierShipment> getShipments() {
 		return shipments;
 	}
 
@@ -92,7 +105,7 @@ public class CarrierImpl implements Carrier {
 	}
 
 	@Override
-	public Collection<CarrierService> getServices(){
+	public Map<Id<CarrierService>, CarrierService> getServices(){
 		return services;
 	}
 
@@ -103,24 +116,9 @@ public class CarrierImpl implements Carrier {
 
 	@Override
 	public CarrierPlan createCopyOfSelectedPlanAndMakeSelected() {
-		CarrierPlan newPlan = CarrierImpl.copyPlan(this.selectedPlan) ;
+		CarrierPlan newPlan = CarrierUtils.copyPlan(this.selectedPlan ) ;
 		this.setSelectedPlan( newPlan ) ;
 		return newPlan ;
-	}
-
-	public static CarrierPlan copyPlan(CarrierPlan plan2copy) {
-		List<ScheduledTour> tours = new ArrayList<ScheduledTour>();
-		for (ScheduledTour sTour : plan2copy.getScheduledTours()) {
-			double depTime = sTour.getDeparture();
-			CarrierVehicle vehicle = sTour.getVehicle();
-			Tour tour = sTour.getTour().duplicate();
-			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
-		}
-		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
-		double initialScoreOfCopiedPlan = plan2copy.getScore();
-		copiedPlan.setScore(initialScoreOfCopiedPlan);
-		return copiedPlan;
-	
 	}
 
 	@Override
@@ -131,11 +129,9 @@ public class CarrierImpl implements Carrier {
 	@Override
 	public void clearPlans() { this.plans.clear(); }
 
-//	@Override
-//	public Attributes getAttributes() {
-//		return attributes;
-//	}
-
-
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
 
 }

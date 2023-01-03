@@ -26,12 +26,12 @@ import java.util.stream.Stream;
 
 /*
  * The original source code: https://github.com/indy256/codelibrary
- * 
+ *
  * "indy256/codelibrary" is licensed under the "Unlicense":
  * A license with no conditions whatsoever which dedicates works to the public domain.
  * Unlicensed works, modifications, and larger works may be distributed under different terms and without source code.
- * 
- * See: https://github.com/indy256/codelibrary/blob/master/UNLICENSE 
+ *
+ * See: https://github.com/indy256/codelibrary/blob/master/UNLICENSE
  */
 
 /**
@@ -40,7 +40,11 @@ import java.util.stream.Stream;
 public class MinCostFlow {
 
 	public static class Edge {
-		int to, f, cap, cost, rev;
+		final int to;
+		int f;
+		final int cap;
+		final int cost;
+		final int rev;
 
 		Edge(int to, int cap, int cost, int rev) {
 			this.to = to;

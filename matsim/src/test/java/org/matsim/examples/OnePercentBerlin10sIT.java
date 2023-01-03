@@ -20,7 +20,8 @@
 
 package org.matsim.examples;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -39,7 +40,7 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class OnePercentBerlin10sIT extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(OnePercentBerlin10sIT.class);
+	private static final Logger log = LogManager.getLogger(OnePercentBerlin10sIT.class);
 
 	public void testOnePercent10sQSim() {
 		Config config = loadConfig(null);
@@ -82,8 +83,9 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		writer.closeFile();
 
 		System.out.println("reffile: " + referenceEventsFileName);
-		assertTrue("different event files", EventsFileComparator.compareAndReturnInt(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
-		
+		assertEquals( "different event files", EventsFileComparator.Result.FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ) );
+
 	}
 
 	public void testOnePercent10sQSimTryEndTimeThenDuration() {
@@ -124,8 +126,9 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 
 		writer.closeFile();
 
-		assertTrue("different event files", EventsFileComparator.compareAndReturnInt(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
-		
+		assertEquals( "different event files", EventsFileComparator.Result.FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ) );
+
 	}
 
 }

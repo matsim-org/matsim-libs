@@ -29,7 +29,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * Precise version of FreeSpeedTravelTime that takes into account the way QSim moves vehicles along links and over
  * nodes. Useful for simulations with congestion-free (i.e. via super high flow/storage capacity factors) QSim.
- * 
+ *
  * @author michalm
  */
 public class QSimFreeSpeedTravelTime implements TravelTime {
@@ -37,13 +37,17 @@ public class QSimFreeSpeedTravelTime implements TravelTime {
 
 	@Inject
 	public QSimFreeSpeedTravelTime(QSimConfigGroup qsimCfg) {
-		this.timeStepSize = qsimCfg.getTimeStepSize();
+		this(qsimCfg.getTimeStepSize());
+	}
+
+	public QSimFreeSpeedTravelTime(double timeStepSize) {
+		this.timeStepSize = timeStepSize;
 	}
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		double freeSpeedTT = link.getLength() / link.getFreespeed(time); // equiv. to FreeSpeedTravelTime
 		double linkTravelTime = timeStepSize * Math.floor(freeSpeedTT / timeStepSize); // used in QSim for TT at link
-		return linkTravelTime + 1;// adds 1 extra second for moving over nodes
+		return linkTravelTime + timeStepSize;// adds 1 extra time step for moving over nodes
 	}
 }

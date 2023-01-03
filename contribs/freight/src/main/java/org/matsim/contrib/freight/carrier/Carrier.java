@@ -1,10 +1,32 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * A carrier.
@@ -12,7 +34,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  * @author sschroeder
  *
  */
-public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
+public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier>, Attributable{
 	
 	public static int PLAN_MEMORY = 5;
 
@@ -37,14 +59,14 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
 	 * 
 	 * @return collection of {@link CarrierShipment}
 	 */
-	public abstract Collection<CarrierShipment> getShipments();
+	public abstract Map<Id<CarrierShipment>, CarrierShipment> getShipments();
 	
 	/**
 	 * Gets a collection of carrierServices
 	 * 
 	 * @return collection of {@link CarrierService}
 	 */
-	public abstract Collection<CarrierService> getServices();
+	public abstract Map<Id<CarrierService>, CarrierService> getServices();
 
 	/**
 	 * Gets the selected plan.

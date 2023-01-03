@@ -20,7 +20,8 @@
 
 package org.matsim.core.network;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -37,11 +38,11 @@ import org.matsim.core.gbl.Gbl;
  */
 public class NetworkImplTest extends AbstractNetworkTest {
 
-	private static final Logger log = Logger.getLogger(NetworkImplTest.class);
+	private static final Logger log = LogManager.getLogger(NetworkImplTest.class);
 
 	@Override
 	public Network getEmptyTestNetwork() {
-		return new NetworkImpl();
+		return new NetworkImpl(new LinkFactoryImpl());
 	}
 	
 	/**
@@ -49,7 +50,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 */
 	@Test
 	public void testDefaultValues(){
-		Network net = new NetworkImpl();
+		Network net = new NetworkImpl(new LinkFactoryImpl());
 		Assert.assertEquals(7.5, net.getEffectiveCellSize(), 0.0);
 		Assert.assertEquals(3.75, net.getEffectiveLaneWidth(), 0.0);
 		Assert.assertEquals(3600.0, net.getCapacityPeriod(), 0.0);
@@ -72,7 +73,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 */
 	@Test
 	public void testAddLink_existingId() {
-		Network network = new NetworkImpl();
+		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		Node node3 = NetworkUtils.createNode(Id.create(3, Node.class), new Coord((double) 2000, (double) 500));
@@ -110,7 +111,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddLink_noNodes(){
 		Network n = NetworkUtils.createNetwork();
-		Node a = n.getFactory().createNode(Id.create("a", Node.class), new Coord(0.0, 0.0));
+        Node a = n.getFactory().createNode(Id.create("a", Node.class), new Coord(0.0, 0.0));
 		Node b = n.getFactory().createNode(Id.create("b", Node.class), new Coord(1000.0, 0.0));
 		Node c = n.getFactory().createNode(Id.create("c", Node.class), new Coord(0.0, 1000.0));
 		
@@ -158,7 +159,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	
 	@Test
 	public void testAddNode_existingId() {
-		Network network = new NetworkImpl();
+		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		Node node3 = NetworkUtils.createNode(Id.create(3, Node.class), new Coord((double) 2000, (double) 500));
@@ -187,7 +188,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 */
 	@Test
 	public void testAddNode_singleNodeFirstOnly() {
-		Network network = new NetworkImpl();
+		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
 
@@ -210,7 +211,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 */
 	@Test
 	public void testAddTwoNodes_initializedEmptyQuadtree() {
-		Network network = new NetworkImpl();
+		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
 
@@ -231,7 +232,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 
 	@Test
 	public void testRemoveLink_alsoInQuadTrees() {
-		Network network = new NetworkImpl();
+		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord(100, 100));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord(1000, 200));
 		Node node3 = NetworkUtils.createNode(Id.create(3, Node.class), new Coord(500, 700));
@@ -269,7 +270,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 
 	@Test
 	public void testAddLink_alsoInQuadTrees() {
-		Network network = new NetworkImpl();
+		Network network = new NetworkImpl(new LinkFactoryImpl());
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord(100, 100));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord(1000, 200));
 		Node node3 = NetworkUtils.createNode(Id.create(3, Node.class), new Coord(500, 700));
@@ -296,7 +297,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 
 	@Test
 	public void testAddLink_intoEmptyQuadTree() {
-		Network network = new NetworkImpl();
+		Network network = new NetworkImpl(new LinkFactoryImpl());
 
 		Assert.assertEquals(0, network.getLinks().size());
 		Assert.assertNull(NetworkUtils.getNearestLink(network, new Coord(300, 200))); // this will force the node QuadTree to be built

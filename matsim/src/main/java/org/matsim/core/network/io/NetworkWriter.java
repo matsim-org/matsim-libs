@@ -20,7 +20,8 @@
 
 package org.matsim.core.network.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -39,7 +40,7 @@ import java.util.Map;
 
 public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	
-	private static final Logger log = Logger.getLogger(NetworkWriter.class);
+	private static final Logger log = LogManager.getLogger(NetworkWriter.class);
 	
 	private final Network network;
 	private final CoordinateTransformation transformation;
@@ -75,8 +76,13 @@ public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter
 	public void writeFileV1(final String filename) {
 		String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
 		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
-
 		writeFile( dtd , handler , filename );
+	}
+
+	public void writeStreamV1(final OutputStream stream) {
+		String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
+		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
+		writeStream(dtd, handler, stream);
 	}
 
 	public void writeFileV2(final String filename) {
@@ -85,7 +91,7 @@ public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter
 
 		handler.putAttributeConverters( converters );
 
-		writeFile( dtd , handler , filename );
+		writeFile(dtd, handler, filename);
 	}
 
 	public void writeStreamV2(final OutputStream stream) {

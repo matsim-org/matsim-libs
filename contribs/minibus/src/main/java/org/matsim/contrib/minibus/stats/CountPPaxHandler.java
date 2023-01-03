@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -42,7 +43,7 @@ import java.util.TreeSet;
  */
 final class CountPPaxHandler implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
-	private static final Logger log = Logger.getLogger(CountPPaxHandler.class);
+	private static final Logger log = LogManager.getLogger(CountPPaxHandler.class);
 	
 	private final String pIdentifier;
 	private HashMap<Id<Link>, HashMap<String, Integer>> linkId2LineId2CountsMap;

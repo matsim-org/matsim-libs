@@ -20,6 +20,9 @@
 
 package org.matsim.core.router;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -30,9 +33,6 @@ import org.matsim.core.router.util.RoutingNetworkFactory;
 import org.matsim.core.router.util.RoutingNetworkNode;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author cdobler
@@ -45,9 +45,9 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 	private final double overdoFactor;
 
 	public FastAStarEuclideanFactory() {
-		this(1);		
+		this(1);
 	}
-	
+
 	public FastAStarEuclideanFactory(double overdoFactor) {
 		this(FastRouterType.ARRAY, overdoFactor);
 	}
@@ -55,38 +55,39 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 	private FastAStarEuclideanFactory(final FastRouterType fastRouterType, double overdoFactor) {
 		this.overdoFactor = overdoFactor;
 		switch (fastRouterType) {
-		case ARRAY:
-			this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
-			break;
-		case POINTER:
-			throw new RuntimeException("PointerRoutingNetworks are no longer supported. Use ArrayRoutingNetworks instead. Aborting!");
-		default:
-			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
+			case ARRAY:
+				this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
+				break;
+			case POINTER:
+				throw new RuntimeException(
+						"PointerRoutingNetworks are no longer supported. Use ArrayRoutingNetworks instead. Aborting!");
+			default:
+				throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
 	}
 
 	@Override
-	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network,
+			final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
 		PreProcessEuclidean preProcessEuclidean = this.preProcessData.get(network);
-		
+
 		if (routingNetwork == null) {
 			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
-			
-			if (preProcessEuclidean == null) {
-				preProcessEuclidean = new PreProcessEuclidean(travelCosts);
-				preProcessEuclidean.run(network);
-				this.preProcessData.put(network, preProcessEuclidean);
 
-				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-					node.setDeadEndData(preProcessEuclidean.getNodeData(node.getNode()));
-				}
-			}				
-			
+			preProcessEuclidean = new PreProcessEuclidean(travelCosts);
+			preProcessEuclidean.run(network);
+			this.preProcessData.put(network, preProcessEuclidean);
+
+			for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+				node.setDeadEndData(preProcessEuclidean.getNodeData(node.getNode()));
+			}
+
 			this.routingNetworks.put(network, routingNetwork);
 		}
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		
-		return new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelCosts, travelTimes, overdoFactor, fastRouterFactory);
+
+		return new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelCosts, travelTimes, overdoFactor,
+				fastRouterFactory);
 	}
 }

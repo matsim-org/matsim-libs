@@ -22,9 +22,8 @@ package org.matsim.contrib.minibus.replanning;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.PPlan;
-import org.matsim.contrib.minibus.replanning.MaxRandomEndTimeAllocator;
+import org.matsim.contrib.minibus.hook.Operator;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
 import org.matsim.testcases.MatsimTestUtils;
 

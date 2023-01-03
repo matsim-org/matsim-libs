@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
 
 /**
  * Changes the transportation mode of one leg in a plan to a randomly chosen
@@ -102,7 +103,9 @@ public final class ChooseRandomSingleLegMode implements PlanAlgorithm {
 	}
 
 	private void setRandomLegMode(final Leg leg, final boolean forbidCar) {
-		leg.setMode(chooseModeOtherThan(leg.getMode(), forbidCar));
+		String newMode = chooseModeOtherThan(leg.getMode(), forbidCar);
+		leg.setMode(newMode);
+		TripStructureUtils.setRoutingMode(leg, newMode);
 		Route route = leg.getRoute() ;
 		if ( route != null && route instanceof NetworkRoute) {
 			((NetworkRoute)route).setVehicleId(null);

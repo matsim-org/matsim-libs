@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+
+<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="car_0" x="1000.0" y="0.0" >
+		</node>
+		<node id="car_1" x="0.0" y="2000.0" >
+		</node>
+		<node id="car_2" x="1000.0" y="2000.0" >
+		</node>
+		<node id="car_3" x="2000.0" y="2000.0" >
+		</node>
+		<node id="pt0" x="0.0" y="0.0" >
+		</node>
+		<node id="pt2" x="2000.0" y="0.0" >
+		</node>
+		<node id="ptLeftOf3" x="-1000.0" y="900.0" >
+		</node>
+		<node id="pt3Signal" x="-100.0" y="900.0" >
+		</node>
+		<node id="carLeftOf3" x="-1000.0" y="1100.0" >
+		</node>
+		<node id="pt3" x="0.0" y="1000.0" >
+		</node>
+		<node id="pt4" x="1000.0" y="1000.0" >
+		</node>
+		<node id="pt5" x="2000.0" y="1000.0" >
+		</node>
+		<node id="home" x="-100.0" y="0.0" >
+		</node>
+		<node id="work" x="2100.0" y="1000.0" >
+		</node>
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="car_0" from="pt0" to="pt3" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_1" from="pt0" to="car_0" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_10" from="pt3" to="car_1" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_11" from="pt5" to="pt4" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_12" from="pt5" to="pt2" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_13" from="pt5" to="car_3" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_14" from="car_0" to="pt0" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_15" from="car_0" to="pt4" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_16" from="car_0" to="pt2" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_17" from="car_1" to="pt3" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_17bIn" from="carLeftOf3" to="pt3" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_17bOut" from="pt3" to="carLeftOf3" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_18" from="car_1" to="car_2" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_19" from="car_2" to="pt4" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_2" from="pt4" to="pt3" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_20" from="car_2" to="car_1" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_21" from="car_2" to="car_3" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_22" from="car_3" to="pt5" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_23" from="car_3" to="car_2" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_3" from="pt4" to="pt5" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_4" from="pt4" to="car_0" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_5" from="pt4" to="car_2" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_6" from="pt2" to="pt5" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_7" from="pt2" to="car_0" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_8" from="pt3" to="pt0" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="car_9" from="pt3" to="pt4" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="pt0" from="pt0" to="pt0" length="50.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt1" from="pt0" to="pt4" length="1414.213562373095" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt10" from="pt5" to="pt4" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt11" from="pt4" to="pt3" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt2" from="pt4" to="pt2" length="1414.213562373095" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt3" from="pt2" to="pt2" length="50.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt4" from="pt2" to="pt4" length="1414.213562373095" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt5" from="pt4" to="pt0" length="1414.213562373095" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt6" from="ptLeftOf3" to="ptLeftOf3" length="50.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt6b" from="ptLeftOf3" to="pt3Signal" length="800.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt6c" from="pt3Signal" to="pt3" length="200.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt7" from="pt3" to="pt4" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt8" from="pt4" to="pt5" length="1000.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="pt9" from="pt5" to="pt5" length="50.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt" >
+		</link>
+		<link id="home0" from="home" to="pt0" length="100.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt, car" >
+		</link>
+		<link id="home1" from="pt0" to="home" length="100.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt, car" >
+		</link>
+		<link id="work0" from="work" to="pt5" length="100.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt, car" >
+		</link>
+		<link id="work1" from="pt5" to="work" length="100.0" freespeed="8.333333333333334" capacity="500.0" permlanes="1.0" oneway="1" modes="pt, car" >
+		</link>
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>

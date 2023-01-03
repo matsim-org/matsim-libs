@@ -25,7 +25,8 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -33,12 +34,12 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.model.Signal;
@@ -64,7 +65,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class CreateSignalInputExample {
 
-	private static final Logger log = Logger.getLogger(CreateSignalInputExample.class);
+	private static final Logger log = LogManager.getLogger(CreateSignalInputExample.class);
 	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/createSignalInput/";
 	
 	/**

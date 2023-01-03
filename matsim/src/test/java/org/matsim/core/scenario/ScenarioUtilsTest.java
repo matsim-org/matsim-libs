@@ -19,7 +19,8 @@
 
 package org.matsim.core.scenario;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -29,7 +30,7 @@ import org.matsim.api.core.v01.Scenario;
  */
 public class ScenarioUtilsTest {
 
-	private final static Logger log = Logger.getLogger(ScenarioUtilsTest.class);
+	private final static Logger log = LogManager.getLogger(ScenarioUtilsTest.class);
 
 	@Test
 	public void testCreateScenario_nullConfig() {

@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.roadpricing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +41,7 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	// needs to be public. kai, sep'14
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(RoadPricingSchemeUsingTollFactor.class);
+	private static final Logger log = LogManager.getLogger(RoadPricingSchemeUsingTollFactor.class);
 
 	private RoadPricingScheme delegate;
 	private final TollFactor tollFactor;
@@ -62,7 +63,7 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	private RoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor, Scenario scenario ) {
 
 		// read the road pricing scheme from file
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
 			rpReader.readURL(pricingSchemeFileName);
@@ -74,9 +75,9 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 
 	}
 
-	public static void createAndRegisterRoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor,
+	public static RoadPricingSchemeUsingTollFactor createAndRegisterRoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor,
 																																			 Scenario scenario ){
-		new RoadPricingSchemeUsingTollFactor( pricingSchemeFileName, tollFactor, scenario );
+		return new RoadPricingSchemeUsingTollFactor( pricingSchemeFileName, tollFactor, scenario );
 		// yy todo: inline constructor. kai, jul'19
 	}
 

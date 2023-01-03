@@ -24,14 +24,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.utils.EditTrips;
@@ -46,12 +46,12 @@ import org.matsim.withinday.utils.EditTrips;
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 	private final TripRouter tripRouter;
-	private final QSim qsim;
-	
-	/*package*/ NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter, QSim qsim) {
+	private final TimeInterpretation timeInterpretation;
+
+	NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter, TimeInterpretation timeInterpretation) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
-		this.qsim = qsim;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -64,15 +64,15 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 		// Get the activity currently performed by the agent as well as the subsequent trip.
 		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
-		Trip trip = TripStructureUtils.findTripStartingAtActivity(currentActivity, executedPlan, this.tripRouter.getStageActivityTypes() );
+		Trip trip = TripStructureUtils.findTripStartingAtActivity( currentActivity, executedPlan );
 
 		// If there is no trip after the activity.
 		if (trip == null) return false;
 		
-		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-		double departureTime = TripStructureUtils.getDepartureTime(trip);
+		String routingMode = TripStructureUtils.identifyMainMode(trip.getTripElements());
+		OptionalTime departureTime = TripStructureUtils.getDepartureTime(trip);
 		// To replan pt legs, we would need internalInterface of type InternalInterface.class
-		new EditTrips( this.tripRouter, scenario, null ).replanFutureTrip(trip, executedPlan, mainMode, departureTime );
+		new EditTrips( this.tripRouter, scenario, null, timeInterpretation ).replanFutureTrip(trip, executedPlan, routingMode, departureTime.seconds() );
 		
 		return true;
 	}

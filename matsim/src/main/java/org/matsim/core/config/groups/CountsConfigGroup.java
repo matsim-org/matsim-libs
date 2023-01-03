@@ -81,7 +81,7 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 
 	// the following are public so they can be re-used in PtCountsComparisonConfigGroup.  Once that group is moved into the same
 	// package, they can be made package-private.  kai, oct'10
-	public static final String COUNTS_OUTPUTFORMAT_COMMENT = "possible values: `html', `kml', `txt', `all'"  ;
+	public static final String COUNTS_OUTPUTFORMAT_COMMENT = "possible values: `html', `txt', `all'"  ;
 	public static final String COUNTS_DISTANCEFILTER_COMMENT = "distance to distanceFilterCenterNode to include counting stations. The unit of distance is "
 		+ "the Euclidean distance implied by the coordinate system" ;
 	public static final String COUNTS_DISTANCEFILTERCENTERNODE_COMMENT = "node id for center node of distance filter" ;

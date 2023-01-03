@@ -22,6 +22,7 @@ package org.matsim.core.router;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -51,10 +52,15 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class PseudoTransitRoutingModuleTest {
 
-	@SuppressWarnings("static-method")
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void testRouteLeg() {
 		final Fixture f = new Fixture();
@@ -76,7 +82,7 @@ public class PseudoTransitRoutingModuleTest {
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(400.0, tt, 1e-8);
-			Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
+			Assert.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
@@ -87,7 +93,7 @@ public class PseudoTransitRoutingModuleTest {
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(600.0, tt, 1e-8);
-			Assert.assertEquals(600.0, leg.getTravelTime(), 1e-8);
+			Assert.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
 			Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			// the following test is newer than the ones above.  I wanted to test the freespeed limit.  But could not do it in the same way
@@ -99,6 +105,7 @@ public class PseudoTransitRoutingModuleTest {
 			params.setBeelineDistanceFactor(1.);
 			params.setTeleportedModeFreespeedLimit(5.);
 			f.s.getConfig().plansCalcRoute().addModeRoutingParams(params);
+			f.s.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
 			
 			com.google.inject.Injector injector = Injector.createInjector(f.s.getConfig(), new AbstractModule() {
 				@Override public void install() {
@@ -114,11 +121,11 @@ public class PseudoTransitRoutingModuleTest {
 			Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ) ;
 			Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() );
 			
-			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person) ;
+			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person, new AttributesImpl()) ;
 			Gbl.assertIf( result.size()==1);
 			Leg newLeg = (Leg) result.get(0) ;
-			
-			Assert.assertEquals(800.0, newLeg.getTravelTime(), 1e-8);
+
+			Assert.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assert.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
 		}
@@ -129,6 +136,10 @@ public class PseudoTransitRoutingModuleTest {
 
 		public Fixture() {
 			s.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			ModeRoutingParams walk = new ModeRoutingParams(TransportMode.walk);
+			walk.setBeelineDistanceFactor(1.3);
+			walk.setTeleportedModeSpeed(3.0 / 3.6);
+			s.getConfig().plansCalcRoute().addModeRoutingParams(walk);
 			
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();

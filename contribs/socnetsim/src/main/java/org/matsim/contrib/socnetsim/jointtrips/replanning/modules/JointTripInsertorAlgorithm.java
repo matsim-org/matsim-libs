@@ -31,31 +31,28 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
-
-import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
-import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * An algorithm which creates joint trips from nothing,
@@ -63,11 +60,11 @@ import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
  * @author thibautd
  */
 public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPlan> {
-	private final TripRouter router;
 	private final List<String> chainBasedModes;
 	private final double betaDetour;
 	private final double scale;
 	private final Random random;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	private final SocialNetwork socialNetwork;
 
@@ -75,13 +72,13 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final Random random,
 			final SocialNetwork socialNetwork,
 			final JointTripInsertorConfigGroup config,
-			final TripRouter router) {
-		this.router = router;
+			final MainModeIdentifier mainModeIdentifier ) {
 		this.socialNetwork = socialNetwork;
 		chainBasedModes = config.getChainBasedModes();
 		betaDetour = config.getBetaDetour();
 		scale = config.getScale();
 		this.random = random;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
@@ -117,15 +114,11 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			// identify the joint trips as one single trips.
 			// Otherwise, the process will insert joint trips to access pick-ups
 			// or go from drop offs...
-			final CompositeStageActivityTypes types = new CompositeStageActivityTypes();
-			types.addActivityTypes( router.getStageActivityTypes() );
-			types.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-
 			final MainModeIdentifier mainModeIdentifier =
 				new JointMainModeIdentifier(
-						router.getMainModeIdentifier() );
+						this.mainModeIdentifier );
 
-			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , types ) ) {
+			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , JointActingTypes.JOINT_STAGE_ACTS::contains ) ) {
 				final String mode = mainModeIdentifier.identifyMainMode( trip.getTripElements() );
 
 				if ( mode.equals( TransportMode.car ) ) {
@@ -336,7 +329,8 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	private static double calcEndOfActivity(
 			final Activity activity,
 			final Plan plan) {
-		if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
+		if (activity.getEndTime().isDefined())
+			return activity.getEndTime().seconds();
 
 		// no sufficient information in the activity...
 		// do it the long way.
@@ -358,27 +352,26 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final PlanElement pe) {
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			double endTime = act.getEndTime();
-			double startTime = act.getStartTime();
-			double dur = (act instanceof Activity ? ((Activity) act).getMaximumDuration() : Time.UNDEFINED_TIME);
-			if (endTime != Time.UNDEFINED_TIME) {
+			OptionalTime startTime = act.getStartTime();
+			OptionalTime dur = act.getMaximumDuration();
+			if (act.getEndTime().isDefined()) {
 				// use fromAct.endTime as time for routing
-				return endTime;
+				return act.getEndTime().seconds();
 			}
-			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+			else if (startTime.isDefined() && dur.isDefined()) {
 				// use fromAct.startTime + fromAct.duration as time for routing
-				return startTime + dur;
+				return startTime.seconds() + dur.seconds();
 			}
-			else if (dur != Time.UNDEFINED_TIME) {
+			else if (dur.isDefined()) {
 				// use last used time + fromAct.duration as time for routing
-				return now + dur;
+				return now + dur.seconds();
 			}
 			else {
 				throw new RuntimeException("activity has neither end-time nor duration." + act);
 			}
 		}
-		double tt = ((Leg) pe).getTravelTime();
-		return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
+		return now + ((Leg) pe).getTravelTime().orElse(0);
+
 	}	
 
 	// /////////////////////////////////////////////////////////////////////////

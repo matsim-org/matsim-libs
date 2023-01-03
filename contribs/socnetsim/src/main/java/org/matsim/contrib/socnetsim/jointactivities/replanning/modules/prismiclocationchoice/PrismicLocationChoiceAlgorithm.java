@@ -31,10 +31,8 @@ import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.collections.QuadTree;
@@ -62,19 +60,19 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 
 	private final LocationChooser chooser;
 	
-	private final StageActivityTypes stages;
+	private final Set<String> stageActivityTypes;
 
 	public PrismicLocationChoiceAlgorithm(
 			final PrismicLocationChoiceConfigGroup config,
 			final ActivityFacilities facilities,
 			final SocialNetwork socialNetwork,
-			final StageActivityTypes stages) {
+			final Set<String> stageActivityTypes) {
 		this(
 			config,
 			getChooser( config ),
 			facilities,
 			socialNetwork,
-			stages );
+			stageActivityTypes );
 	}
 
 	private static LocationChooser getChooser(
@@ -98,13 +96,13 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			final LocationChooser chooser,
 			final ActivityFacilities facilities,
 			final SocialNetwork socialNetwork,
-			final StageActivityTypes stages) {
+			final Set<String> stageActivityTypes) {
 		this.random = MatsimRandom.getLocalInstance();
 		this.chooser = chooser;
 		this.config = config;
 		this.facilities = facilities;
 		this.socialNetwork = socialNetwork;
-		this.stages = stages;
+		this.stageActivityTypes = stageActivityTypes;
 
 		this.facilitiesPerType = new HashMap<String, QuadTree<ActivityFacility>>();
 		for ( String type : config.getTypes() ) {
@@ -240,7 +238,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 		final List<Subchain> potentialSubchains = new ArrayList<Subchain>();
 
 		Trip accessTrip = null;
-		for ( Trip trip : TripStructureUtils.getTrips( plan , stages ) ) {
+		for ( Trip trip : TripStructureUtils.getTrips( plan , stageActivityTypes::contains ) ) {
 			if ( accessTrip != null ) {
 				assert accessTrip.getDestinationActivity() == trip.getOriginActivity() : accessTrip.getDestinationActivity()+" != "+trip.getOriginActivity();
 				potentialSubchains.add(

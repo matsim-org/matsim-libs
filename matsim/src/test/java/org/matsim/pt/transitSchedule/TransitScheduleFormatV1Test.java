@@ -33,10 +33,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -62,7 +60,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 	public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		Network network = NetworkUtils.createNetwork();
-		Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+        Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 0));
 		Node n3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 0, (double) 0));
 		Node n4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 0, (double) 0));
@@ -96,12 +94,12 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 
 		// prepare some schedule, without network-route
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(4);
-		stops.add(builder.createTransitRouteStop(stop1, Time.UNDEFINED_TIME, 0));
+		stops.add(builder.createTransitRouteStopBuilder(stop1).departureOffset(0).build());
 		stops.add(builder.createTransitRouteStop(stop2, 90, 120));
-		TransitRouteStop routeStop3 = builder.createTransitRouteStop(stop3, Time.UNDEFINED_TIME, 300);
+		TransitRouteStop routeStop3 = builder.createTransitRouteStopBuilder(stop3).departureOffset(300).build();
 		routeStop3.setAwaitDepartureTime(true);
 		stops.add(routeStop3);
-		stops.add(builder.createTransitRouteStop(stop4, 400, Time.UNDEFINED_TIME));
+		stops.add(builder.createTransitRouteStopBuilder(stop4).arrivalOffset(400).build());
 
 		TransitRoute route1 = builder.createTransitRoute(Id.create(1, TransitRoute.class), null, stops, "bus");
 		route1.setDescription("Just a comment.");
@@ -179,8 +177,8 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 					TransitRouteStop stopA = routeA.getStops().get(i);
 					assertNotNull("stop not found", stopA);
 					assertEquals("different stop facilities.", stopE.getStopFacility().getId(), stopA.getStopFacility().getId());
-					assertEquals("different arrival delay.", stopE.getArrivalOffset(), stopA.getArrivalOffset(), EPSILON);
-					assertEquals("different departure delay.", stopE.getDepartureOffset(), stopA.getDepartureOffset(), EPSILON);
+					assertEquals("different arrival delay.", stopE.getArrivalOffset(), stopA.getArrivalOffset());
+					assertEquals("different departure delay.", stopE.getDepartureOffset(), stopA.getDepartureOffset());
 					assertEquals("different awaitDepartureTime.", stopE.isAwaitDepartureTime(), stopA.isAwaitDepartureTime());
 				}
 

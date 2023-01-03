@@ -27,34 +27,47 @@ import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
+import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
+import org.matsim.core.router.util.TravelTime;
 
+import com.google.inject.Key;
 import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class OneTaxiModule extends AbstractDvrpModeModule {
 	private final URL fleetSpecificationUrl;
+	private final PassengerEngineType passengerEngineType;
 
-	public OneTaxiModule(URL fleetSpecificationUrl) {
+	public OneTaxiModule(URL fleetSpecificationUrl, PassengerEngineType passengerEngineType) {
 		super(TransportMode.taxi);
 		this.fleetSpecificationUrl = fleetSpecificationUrl;
+		this.passengerEngineType = passengerEngineType;
 	}
 
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
-		install(DvrpRoutingNetworkProvider.createDvrpModeRoutingNetworkModule(getMode(), false));
-		addRoutingModuleBinding(getMode()).toInstance(new DynRoutingModule(getMode()));
+		install(new DvrpModeRoutingNetworkModule(getMode(), false));
+
+		install(new DvrpModeRoutingModule(getMode(), new SpeedyDijkstraFactory()));
+		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
+		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
 		install(new FleetModule(getMode(), fleetSpecificationUrl));
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class);
@@ -63,7 +76,7 @@ public class OneTaxiModule extends AbstractDvrpModeModule {
 			@Override
 			protected void configureQSim() {
 				install(new VrpAgentSourceQSimModule(getMode()));
-				install(new PassengerEngineQSimModule(getMode()));
+				install(new PassengerEngineQSimModule(getMode(), passengerEngineType));
 
 				// optimizer that dispatches taxis
 				bindModal(VrpOptimizer.class).to(OneTaxiOptimizer.class).in(Singleton.class);

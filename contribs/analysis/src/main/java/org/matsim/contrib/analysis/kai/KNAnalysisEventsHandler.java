@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.analysis.kai;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,6 +30,7 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.roadpricing.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -37,7 +39,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -59,7 +60,7 @@ import java.util.Map.Entry;
 public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonMoneyEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler,
 									  VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
+	private final static Logger log = LogManager.getLogger(KNAnalysisEventsHandler.class);
 
 	public static final String PAYMENTS = "payments";
 	public static final String TRAV_TIME = "travTime" ;
@@ -69,13 +70,6 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	private Scenario scenario = null ;
 	private final TreeMap<Id<Person>, Double> agentDepartures = new TreeMap<>();
 	private final TreeMap<Id<Person>, Integer> agentLegs = new TreeMap<>();
-
-	private final StageActivityTypes stageActivities = new StageActivityTypes(){
-		@Override public boolean isStageActivity(String activityType) {
-			return activityType.contains("interaction") ;
-			// yyyy Hopefully nobody defines a standard activity type with name "people_interaction" or similar ...  kai, sep'16
-		}
-	} ;
 
 	//	private final MainModeIdentifier mainModeIdentifier = new TransportPlanningMainModeIdentifier() ;
 	private final MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl() ;
@@ -127,7 +121,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	private KNAnalysisEventsHandler( final Scenario scenario, final String otherTollLinkFile ) {
 		this( scenario ) ;
 		if ( otherTollLinkFile != null && !otherTollLinkFile.equals("") ) {
-			RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+			RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 			try {
 				rpReader.readFile( otherTollLinkFile  );
@@ -145,7 +139,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 
 		final String tollLinksFileName = ConfigUtils.addOrGetModule(this.scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile();
 		if ( tollLinksFileName != null && !tollLinksFileName.equals("") ) {
-			RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+			RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 			try {
 				rpReader.readFile( tollLinksFileName  );
@@ -327,11 +321,11 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	}
 
 	private String getSubpopName(Person person) {
-		return "yy_" + getSubpopName( person, this.scenario.getConfig().plans().getSubpopulationAttributeName() ) ;
+		return "yy_" + getSubpopName( person, this.scenario.getConfig() ) ;
 	}
-	private String getSubpopName( Person person, String subpopAttrName ) {
+	private String getSubpopName( Person person, Config config ) {
 //		String subpop = (String) personAttributes.getAttribute( personId.toString(), subpopAttrName ) ;
-		String subpop = (String) PopulationUtils.getPersonAttribute( person, subpopAttrName) ;
+		String subpop = PopulationUtils.getSubpopulation(person );
 		return "subpop_" + subpop;
 	}
 
@@ -432,7 +426,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 				}
 			}
 			{
-				for ( Trip trip : TripStructureUtils.getTrips(selectedPlan, stageActivities ) ) {
+				for ( Trip trip : TripStructureUtils.getTrips(selectedPlan) ) {
 					String mainMode = mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
 					double item = calcBeelineDistance(trip.getOriginActivity(), trip.getDestinationActivity() ) ;
 
@@ -481,7 +475,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 			if ( payment > maxPayment ) {
 				maxPayment = payment ;
 			}
-			String subPopType = (String) PopulationUtils.getPersonAttribute( person, SUBPOPULATION) ;
+			String subPopType = (String) person.getAttributes().getAttribute( SUBPOPULATION );
 			if (subPopType!=null) subPopTypes.add(subPopType) ;
 		}
 
@@ -496,7 +490,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		for ( Person person : pop.getPersons().values() ) {
-			String subPopType = (String) PopulationUtils.getPersonAttribute( person, SUBPOPULATION) ;
+			String subPopType = (String) person.getAttributes().getAttribute( SUBPOPULATION );
 			Double payment = (Double) attribs.getAttribute( person.getId().toString(), PAYMENTS ) ;
 			if (payment==null || subPopType == null) continue ;
 			int bin = (int) (payment/binSize) ;
@@ -673,9 +667,9 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 			if ( wrnCnt==0 ) {
 				wrnCnt++ ;
 				//				throw new RuntimeException("vehicle arrival for vehicle that never entered link.  teleportation?") ;
-				Logger.getLogger(this.getClass()).warn("vehicle arrival for vehicle that never entered link.  I think this can happen with departures "
+				LogManager.getLogger(this.getClass()).warn("vehicle arrival for vehicle that never entered link.  I think this can happen with departures "
 											     + "that have empty routes, i.e. go to a location on the same link. kai, may'14");
-				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
+				LogManager.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
 			}
 		}
 	}

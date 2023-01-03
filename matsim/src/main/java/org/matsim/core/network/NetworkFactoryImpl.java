@@ -19,7 +19,8 @@
 
 package org.matsim.core.network;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -35,15 +36,15 @@ import org.matsim.core.utils.geometry.CoordUtils;
 /*deliberately package*/ final class NetworkFactoryImpl implements NetworkFactory {
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(NetworkFactory.class);
+	private final static Logger log = LogManager.getLogger(NetworkFactory.class);
 
-	private LinkFactory linkFactory = null;
+	private final LinkFactory linkFactory;
 
 	private final Network network;
 
-	NetworkFactoryImpl(final Network network) {
+	NetworkFactoryImpl(final Network network, final LinkFactory linkFactory) {
 		this.network = network;
-		this.linkFactory = NetworkUtils.createLinkFactory();
+		this.linkFactory = linkFactory;
 	}
 
 	@Override
@@ -57,9 +58,5 @@ import org.matsim.core.utils.geometry.CoordUtils;
 	public Link createLink(Id<Link> id, Node fromNode, Node toNode) {
 		return this.linkFactory.createLink(id, fromNode, toNode, 
 				this.network, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0, 1.0);
-	}
-	@Override
-	public void setLinkFactory(final LinkFactory factory) {
-		this.linkFactory = factory;
 	}
 }

@@ -21,10 +21,10 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -43,29 +43,30 @@ import org.matsim.vis.snapshotwriters.VisLink;
 
 public class QNetwork implements NetsimNetwork {
 
-	private final Map<Id<Link>, QLinkI> links;
+	private final IdMap<Link, QLinkI> links;
 
-	private final Map<Id<Node>, QNodeI> nodes;
+	private final IdMap<Node, QNodeI> nodes;
 
 	private final Network network;
 
 	private final QNetworkFactory queueNetworkFactory;
-	QNetsimEngine simEngine;
+
+	QNetsimEngineI simEngine; // only for tests...
 
 	QNetwork(final Network network, final QNetworkFactory netsimNetworkFactory ) {
 		this.network = network;
 		this.queueNetworkFactory = netsimNetworkFactory;
-		this.links = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
-		this.nodes = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
+		this.links = new IdMap<>(Link.class);
+		this.nodes = new IdMap<>(Node.class);
 	}
 
-	public void initialize(QNetsimEngine simEngine1, AgentCounter agentCounter, MobsimTimer simTimer) {
-		this.simEngine = simEngine1;
-		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine1.ii );
-		for (Node n : network.getNodes().values()) {
+	public void initialize(QNetsimEngineI simEngine, AgentCounter agentCounter, MobsimTimer simTimer) {
+		this.simEngine = simEngine;
+		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine.getNetsimInternalInterface());
+		for (Node n : this.network.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n));
 		}
-		for (Link l : network.getLinks().values()) {
+		for (Link l : this.network.getLinks().values()) {
 			final QLinkI qlink = this.queueNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId()));
 			this.links.put(l.getId(), qlink);
 		}

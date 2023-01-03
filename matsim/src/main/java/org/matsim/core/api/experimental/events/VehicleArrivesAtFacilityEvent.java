@@ -20,12 +20,12 @@
 
 package org.matsim.core.api.experimental.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
 
 /**
  * @author mrieser
@@ -42,7 +42,7 @@ public final class VehicleArrivesAtFacilityEvent extends Event {
 
 	private final Id<Vehicle> vehicleId;
 	private final Id<TransitStopFacility> facilityId;
-	private final double delay;
+	private double delay;
 
 	public VehicleArrivesAtFacilityEvent(final double time, final Id<Vehicle> vehicleId, 
 			final Id<TransitStopFacility> facilityId, double delay) {
@@ -51,8 +51,7 @@ public final class VehicleArrivesAtFacilityEvent extends Event {
 		this.facilityId = facilityId;
 		this.delay = delay;
 	}
-	
-	@Deprecated
+
 	public double getDelay() {
 		return this.delay;
 	}
@@ -68,6 +67,10 @@ public final class VehicleArrivesAtFacilityEvent extends Event {
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+
+	public void setDelay(double delay) {
+		this.delay = delay;
 	}
 
 	@Override

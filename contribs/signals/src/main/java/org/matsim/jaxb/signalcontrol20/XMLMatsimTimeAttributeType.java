@@ -8,10 +8,10 @@
 
 package org.matsim.jaxb.signalcontrol20;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -35,10 +35,10 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "matsimTimeAttributeType")
-public class XMLMatsimTimeAttributeType {
+final class XMLMatsimTimeAttributeType {
 
     @XmlAttribute(required = true)
-    protected double seconds;
+    private double seconds;
 
     /**
      * Gets the value of the seconds property.

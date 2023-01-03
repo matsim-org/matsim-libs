@@ -1,0 +1,3 @@
+vehicleId	vehicleType	carrierId	driverID	usageTime	roadTime	travelDistance	vehicleCost	tripCount
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	6689.0	6195.0	35000.0	50.88999999999996	6
+freight_carrier1_veh_carrier_19_lightVehicle_1	light	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_1	3818.0	3684.0	23000.0	65.33799999999991	3

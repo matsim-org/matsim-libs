@@ -50,7 +50,9 @@ public class TransitDriverStartsEventHandlerIntegrationTest {
 
 		Assert.assertEquals(0, eh.events.size());
 
+		em.initProcessing();
 		em.processEvent(e1);
+		em.finishProcessing();
 
 		Assert.assertEquals(1, eh.events.size());
 		Assert.assertEquals(e1, eh.events.get(0));

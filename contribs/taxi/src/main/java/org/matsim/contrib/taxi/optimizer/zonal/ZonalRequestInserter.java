@@ -30,21 +30,21 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
-import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
-import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.contrib.zone.Zones;
 import org.matsim.contrib.zone.util.NetworkWithZonesUtils;
 import org.matsim.contrib.zone.util.ZoneFinderImpl;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -67,27 +67,28 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 
 	public ZonalRequestInserter(Fleet fleet, TaxiScheduler scheduler, MobsimTimer timer, Network network,
 			TravelTime travelTime, TravelDisutility travelDisutility, ZonalTaxiOptimizerParams params,
-			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry,
-			URL context) {
+			ZonalRegisters zonalRegisters, URL context) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
-		this.dispatchFinder = new BestDispatchFinder(scheduler, network, timer, travelTime, travelDisutility);
+		this.dispatchFinder = new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime,
+				travelDisutility);
 		this.requestInserter = new RuleBasedRequestInserter(scheduler, timer, dispatchFinder,
-				params.getRuleBasedTaxiOptimizerParams(), idleTaxiRegistry, unplannedRequestRegistry);
+				params.getRuleBasedTaxiOptimizerParams(), zonalRegisters);
 
 		ZonalSystemParams zonalSystemParams = params.getZonalSystemParams();
-		zones = Zones.readZones(zonalSystemParams.getZonesXmlUrl(context), zonalSystemParams.getZonesShpUrl(context));
+		zones = Zones.readZones(ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesXmlFile),
+				ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesShpFile));
 		System.err.println("No conversion of SRS is done");
 
 		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(network,
-				new ZoneFinderImpl(zones, zonalSystemParams.getExpansionDistance()));
+				new ZoneFinderImpl(zones, zonalSystemParams.expansionDistance));
 
 		// FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
 		// the zones used in ZonalTaxiOptim (for dispatching)
 	}
 
 	@Override
-	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
+	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
 		initIdleVehiclesInZones();
 		scheduleUnplannedRequestsWithinZones(unplannedRequests);
 
@@ -101,11 +102,11 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 
 		zoneToIdleVehicleQueue = new HashMap<>();
 		for (Id<Zone> zoneId : zones.keySet()) {
-			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<DvrpVehicle>(10, LONGEST_WAITING_FIRST));
+			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<>(10, LONGEST_WAITING_FIRST));
 		}
 
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {
-			if (scheduler.isIdle(veh)) {
+			if (scheduler.getScheduleInquiry().isIdle(veh)) {
 				Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
 				Zone zone = linkToZone.get(link.getId());
 				if (zone != null) {
@@ -116,10 +117,10 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 		}
 	}
 
-	private void scheduleUnplannedRequestsWithinZones(Collection<TaxiRequest> unplannedRequests) {
-		Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
+	private void scheduleUnplannedRequestsWithinZones(Collection<DrtRequest> unplannedRequests) {
+		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
-			TaxiRequest req = reqIter.next();
+			DrtRequest req = reqIter.next();
 
 			Zone zone = linkToZone.get(req.getFromLink().getId());
 			if (zone == null) {
@@ -132,7 +133,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 			}
 
 			Stream<DvrpVehicle> filteredVehs = Stream.of(idleVehsInZone.peek());
-			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req, filteredVehs);
+			BestDispatchFinder.Dispatch<DrtRequest> best = dispatchFinder.findBestVehicleForRequest(req, filteredVehs);
 
 			if (best != null) {
 				scheduler.scheduleRequest(best.vehicle, best.destination, best.path);

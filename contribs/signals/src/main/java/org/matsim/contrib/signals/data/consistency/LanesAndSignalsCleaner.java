@@ -26,7 +26,7 @@ import org.matsim.lanes.LanesConsistencyChecker;
 /**
  * @author tthunig
  */
-public class LanesAndSignalsCleaner {
+public final class LanesAndSignalsCleaner {
 
     public void run(Scenario scenario){
         LanesConsistencyChecker lanesConsistency = new LanesConsistencyChecker(scenario.getNetwork(), scenario.getLanes());

@@ -25,7 +25,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +53,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -68,8 +68,9 @@ import cadyts.supply.SimResults;
  */
 public class CadytsPtContext implements StartupListener, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener,
 CadytsContextI<TransitStopFacility> {
+	// can be/remain public as long as constructor is package-private. kai, feb'20
 
-	private final static Logger log = Logger.getLogger(CadytsPtContext.class);
+	private final static Logger log = LogManager.getLogger(CadytsPtContext.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
@@ -77,7 +78,7 @@ CadytsContextI<TransitStopFacility> {
 
 	private AnalyticalCalibrator<TransitStopFacility> calibrator = null;
 	private final SimResults<TransitStopFacility> simResults;
-	private final Counts occupCounts = new Counts();
+	private final Counts<TransitStopFacility> occupCounts = new Counts<>();
 	//	private final Counts boardCounts = new Counts();
 	//	private final Counts alightCounts = new Counts();
 	private final CadytsPtOccupancyAnalyzerI cadytsPtOccupAnalyzer;
@@ -148,7 +149,7 @@ CadytsContextI<TransitStopFacility> {
 		this.calibrator = CadytsBuilderImpl.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
 
 		// === find out which plan is contributing what to each measurement:
-		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedItems()));
+		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedLines()));
 		events.addHandler(ptStep);
 	}
 
@@ -166,7 +167,7 @@ CadytsContextI<TransitStopFacility> {
 
 		// Get all stations of all analyzed lines and invoke the method write to get all information of them
 		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
-		for ( String pseudoLineId : this.cadytsConfig.getCalibratedItems()) {
+		for ( String pseudoLineId : this.cadytsConfig.getCalibratedLines()) {
 			Id<TransitLine> lineId = Id.create(pseudoLineId, TransitLine.class);
 			TransitLine line = scenario.getTransitSchedule().getTransitLines().get(lineId);
 			for (TransitRoute route : line.getRoutes().values()) {
@@ -241,20 +242,6 @@ CadytsContextI<TransitStopFacility> {
 		ccaOccupancy.calculateComparison();
 
 		String outputFormat = ptCountsConfig.getOutputFormat();
-		if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-			String filename = controlerIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
-			final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(scenario.getConfig()
-					.global().getCoordinateSystem(), TransformationFactory.WGS84);
-//			PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(null,
-//					null, ccaOccupancy.getComparison(), coordTransform, null, null, 
-//					this.occupCounts);
-
-			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), this.occupCounts, coordTransform, "ptCountsOccup") ;
-
-			kmlWriter.setIterationNumber(iter);
-			kmlWriter.writeFile(filename);
-		}
-
 		if (outputFormat.contains("txt") || outputFormat.contains("all")) {
 			//  As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
 			//  yyyyyy As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13

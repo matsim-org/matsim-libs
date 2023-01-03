@@ -11,10 +11,10 @@ package org.matsim.jaxb.signalsystems20;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -50,12 +50,10 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "signalSystemType", propOrder = {
     "signals"
 })
-public class XMLSignalSystemType
-    extends XMLMatsimObjectType
-{
+public final class XMLSignalSystemType extends XMLMatsimObjectType {
 
     @XmlElement(required = true)
-    protected XMLSignalSystemType.XMLSignals signals;
+    private XMLSignalSystemType.XMLSignals signals;
 
     /**
      * Gets the value of the signals property.

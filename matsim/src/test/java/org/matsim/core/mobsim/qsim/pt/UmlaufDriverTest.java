@@ -20,7 +20,12 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,7 +49,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -56,15 +60,8 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.matsim.vehicles.VehicleUtils;
 
 
 /**
@@ -72,7 +69,7 @@ import java.util.List;
  */
 public class UmlaufDriverTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(UmlaufDriverTest.class);
+	private static final Logger log = LogManager.getLogger(UmlaufDriverTest.class);
 
 	@Override
 	protected void setUp() throws Exception {
@@ -86,7 +83,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
@@ -126,11 +123,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.walk, null, trEngine.getInternalInterface());
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		driver.setVehicle(queueVehicle);
 		driver.endActivityAndComputeNextState(0);
@@ -224,11 +221,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Umlauf umlauf = buildUmlauf(tLine);
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
 
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -267,11 +264,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 				.build(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(4));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(4));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -345,11 +342,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tqsim.addMobsimEngine(trEngine) ;
 
 
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(5);
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(5);
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -409,11 +406,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine) ;
 
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(5);
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(5);
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -452,11 +449,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
 		
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -483,14 +480,13 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
 		double departureOffset1 = 60;
 		double departureOffset2 = 160;
-		double departureOffset3 = Time.getUndefinedTime();
 		TransitRouteStop routeStop1 = builder.createTransitRouteStop(stop1, departureOffset1 - 10.0, departureOffset1);
 		routeStop1.setAwaitDepartureTime(true);
 		stops.add(routeStop1);
 		TransitRouteStop routeStop2 = builder.createTransitRouteStop(stop2, departureOffset2 - 10.0, departureOffset2);
 		routeStop2.setAwaitDepartureTime(false);
 		stops.add(routeStop2);
-		TransitRouteStop routeStop3 = builder.createTransitRouteStop(stop3, Time.getUndefinedTime(), departureOffset3);
+		TransitRouteStop routeStop3 = builder.createTransitRouteStopBuilder(stop3).build();
 		routeStop3.setAwaitDepartureTime(true);
 		stops.add(routeStop3);
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
@@ -506,11 +502,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -559,11 +555,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(5);
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(5);
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);

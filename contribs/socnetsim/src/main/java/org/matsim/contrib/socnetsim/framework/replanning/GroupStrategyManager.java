@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -34,7 +35,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
@@ -48,7 +48,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
  */
 public class GroupStrategyManager {
 	private static final Logger log =
-		Logger.getLogger(GroupStrategyManager.class);
+		LogManager.getLogger(GroupStrategyManager.class);
 
 	private IterationStopWatch stopWatch;
 
@@ -119,14 +119,11 @@ public class GroupStrategyManager {
 	private static String identifySubpopulation(
 			final ReplanningGroup g,
 			final Scenario sc) {
-		final String attName = sc.getConfig().plans().getSubpopulationAttributeName();
-//		final ObjectAttributes atts = sc.getPopulation().getPersonAttributes();
 
 		String name = null;
 
 		for ( Person p : g.getPersons() ) {
-//			final String persSubPop = (String) atts.getAttribute( p.getId().toString() , attName );
-			final String persSubPop = (String) PopulationUtils.getPersonAttribute( p, attName );
+			final String persSubPop = PopulationUtils.getSubpopulation( p );
 			if ( persSubPop == null && name != null ) throw new RuntimeException( "inconsistent subpopulations in group "+g );
 			if ( name != null && !name.equals( persSubPop ) ) throw new RuntimeException( "inconsistent subpopulations in group "+g );
 			name = persSubPop;

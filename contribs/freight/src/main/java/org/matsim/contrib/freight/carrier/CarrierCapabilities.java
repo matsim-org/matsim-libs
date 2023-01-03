@@ -1,11 +1,30 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -27,14 +46,14 @@ public class CarrierCapabilities {
 	}
 	
 	public static class Builder {
-		
+
 		public static Builder newInstance(){ return new Builder(); }
 		
-		private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
+		private final Collection<VehicleType> vehicleTypes = new ArrayList<>();
+
+		private final Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
 		
-		private Collection<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>();
-		
-		private Set<Id<VehicleType>> typeIds = new HashSet<>();
+		private final Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
 		
 		private FleetSize fleetSize = FleetSize.FINITE;
 		
@@ -42,8 +61,14 @@ public class CarrierCapabilities {
 			this.fleetSize = fleetSize;
 			return this;
 		}
-		
-		public Builder addType(CarrierVehicleType type){
+
+		/**
+		 * @deprecated Since the vehicle type is in the {@link CarrierVehicleTypes}
+		 * container, it should not be duplicated here. It is also not written
+		 * to file when writing {@link CarrierPlanXmlWriterV2}.
+		 */
+		@Deprecated
+		public Builder addType( VehicleType type ){
 			if(!typeIds.contains(type.getId())){
 				vehicleTypes.add(type);
 				typeIds.add(type.getId());
@@ -52,8 +77,8 @@ public class CarrierCapabilities {
 		}
 		
 		public Builder addVehicle(CarrierVehicle carrierVehicle){
-			vehicles.add(carrierVehicle);
-			if(carrierVehicle.getVehicleType() != null) addType(carrierVehicle.getVehicleType());
+			vehicles.put(carrierVehicle.getId(), carrierVehicle);
+			if(carrierVehicle.getType() != null) addType(carrierVehicle.getType() );
 			return this;
 		}
 		
@@ -83,9 +108,9 @@ public class CarrierCapabilities {
 		this.fleetSize = builder.fleetSize;
 	}
 	
-	private Collection<CarrierVehicle> carrierVehicles = new ArrayList<CarrierVehicle>();
+	private Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = new LinkedHashMap<>();
 	
-	private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
+	private Collection<VehicleType> vehicleTypes = new ArrayList<>();
 	
 	
 	/**
@@ -109,7 +134,7 @@ public class CarrierCapabilities {
 	 * @return collection of carrierVehicles
 	 * @see CarrierVehicle
 	 */
-	public Collection<CarrierVehicle> getCarrierVehicles() {
+	public Map<Id<Vehicle>, CarrierVehicle> getCarrierVehicles() {
 		return carrierVehicles;
 	}
 	
@@ -130,9 +155,9 @@ public class CarrierCapabilities {
 	 * Returns a collection of CarrierVehicleTypes.
 	 * 
 	 * @return a collection of vehicleTypes
-	 * @see CarrierVehicleType
+	 * @see VehicleType
 	 */
-	public Collection<CarrierVehicleType> getVehicleTypes() {
+	public Collection<VehicleType> getVehicleTypes() {
 		return vehicleTypes;
 	}
 

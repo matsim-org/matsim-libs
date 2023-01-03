@@ -19,9 +19,12 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalDouble;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
-import org.matsim.contrib.util.*;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 public class TaxiStats {
 	public final String id;
@@ -34,7 +37,7 @@ public class TaxiStats {
 	// (vehicle may not operate all the time)
 	// similar, yet slightly less accurate, results can be obtained by averaging time profile
 	// values in a given time period
-	public final EnumAdder<TaxiTaskType, Long> taskTimeSumsByType = new LongEnumAdder<>(TaxiTaskType.class);
+	public final Map<Task.TaskType, Double> taskTypeDurations = new HashMap<>();
 
 	// all drives that started within the analyzed time period
 	// in the case of hourly stats, expect high variations:
@@ -50,21 +53,19 @@ public class TaxiStats {
 		this.id = id;
 	}
 
-	public double getFleetEmptyDriveRatio() {
-		double empty = taskTimeSumsByType.get(TaxiTaskType.EMPTY_DRIVE).doubleValue();
-		double occupied = taskTimeSumsByType.get(TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
-		return empty / (empty + occupied);
+	public double calculateTotalDuration() {
+		return taskTypeDurations.values().stream().mapToDouble(Double::doubleValue).sum();
 	}
 
-	public double getFleetStayRatio() {
-		double stay = taskTimeSumsByType.get(TaxiTaskType.STAY).doubleValue();
-		double total = taskTimeSumsByType.getTotal().doubleValue();
-		return stay / total;
+	public OptionalDouble calculateFleetEmptyDriveRatio() {
+		return TaxiStatsCalculator.calculateEmptyDriveRatio(taskTypeDurations);
 	}
 
-	public double getOccupiedDriveRatio() {
-		double occupied = taskTimeSumsByType.get(TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
-		double total = taskTimeSumsByType.getTotal().doubleValue();
-		return occupied / total;
+	public OptionalDouble calculateFleetStayRatio() {
+		return TaxiStatsCalculator.calculateStayRatio(taskTypeDurations);
+	}
+
+	public OptionalDouble calculateOccupiedDriveRatio() {
+		return TaxiStatsCalculator.calculateOccupiedDriveRatio(taskTypeDurations);
 	}
 }

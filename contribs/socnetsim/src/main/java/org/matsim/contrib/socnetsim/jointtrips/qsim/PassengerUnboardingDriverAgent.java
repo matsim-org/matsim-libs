@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.qsim;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -26,27 +30,28 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
+import org.matsim.contrib.socnetsim.utils.IdentifiableCollectionsUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.utils.IdentifiableCollectionsUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, PassengerAgent, PTPassengerAgent, HasPerson {
 	private final MobsimDriverAgent delegate;
@@ -223,7 +228,7 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 	}
 
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		return delegate.getExpectedTravelTime();
 	}
 

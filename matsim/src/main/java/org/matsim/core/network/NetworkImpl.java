@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007 by the members listed in the COPYING,        *
@@ -20,9 +18,11 @@
 
 package org.matsim.core.network;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -30,16 +30,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Design thoughts:<ul>
@@ -54,13 +47,13 @@ import java.util.Queue;
  */
 /*deliberately package*/ final class NetworkImpl implements Network, Lockable, TimeDependentNetwork, SearchableNetwork {
 
-	private final static Logger log = Logger.getLogger(NetworkImpl.class);
+	private final static Logger log = LogManager.getLogger(NetworkImpl.class);
 
 	private double capacityPeriod = 3600.0 ;
 
-	private final Map<Id<Node>, Node> nodes = new LinkedHashMap<>();
+	private final IdMap<Node, Node> nodes = new IdMap<>(Node.class);
 
-	private final Map<Id<Link>, Link> links = new LinkedHashMap<>();
+	private final IdMap<Link, Link> links = new IdMap<>(Link.class);
 
 	private QuadTree<Node> nodeQuadTree = null;
 
@@ -96,10 +89,10 @@ import java.util.Queue;
 	private int nextMsg2=1;
 
 	private boolean locked = false ;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
-	NetworkImpl() {
-		this.factory = new NetworkFactoryImpl(this);
+	NetworkImpl(LinkFactory linkFactory) {
+		this.factory = new NetworkFactoryImpl(this, linkFactory);
 	}
 
 	@Override
@@ -115,25 +108,30 @@ import java.util.Queue;
 					".\nLink is not added to the network.");
 		}
 
-		/* Check if the link's nodes are in the network. */
-		Node fromNode = nodes.get( link.getFromNode().getId() );
-		if(fromNode == null){
-			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its fromNode = " + link.getFromNode().getId() + " has not been added to the network.");
-		}
-		Node toNode = nodes.get( link.getToNode().getId() );
-		if(toNode == null){
-			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its toNode = " + link.getToNode().getId() + " has not been added to the network.");
-		}
+        /* Check if the link's nodes are in the network. */
+        Node fromNode = nodes.get(link.getFromNode().getId());
+        if (fromNode == null) {
+            throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its fromNode = " + link.getFromNode().getId() + " has not been added to the network.");
+        }
+        Node toNode = nodes.get(link.getToNode().getId());
+        if (toNode == null) {
+            throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its toNode = " + link.getToNode().getId() + " has not been added to the network.");
+        }
 
-		fromNode.addOutLink(link);
-		toNode.addInLink(link);
+        if (!fromNode.getOutLinks().containsKey(link.getId()))
+            fromNode.addOutLink(link);
+        if (!toNode.getInLinks().containsKey(link.getId()))
+            toNode.addInLink(link);
 
-		links.put(link.getId(), link);
+        link.setFromNode(fromNode);
+        link.setToNode(toNode);
 
-		if (this.linkQuadTree != null) {
-			double linkMinX = Math.min(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
-			double linkMaxX = Math.max(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
-			double linkMinY = Math.min(link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getY());
+        links.put(link.getId(), link);
+
+        if (this.linkQuadTree != null) {
+            double linkMinX = Math.min(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
+            double linkMaxX = Math.max(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
+            double linkMinY = Math.min(link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getY());
 			double linkMaxY = Math.max(link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getY());
 			if (Double.isInfinite(this.linkQuadTree.getMinEasting())) {
 				// looks like the quad tree was initialized with infinite bounds, see MATSIM-278.
@@ -345,10 +343,7 @@ import java.util.Queue;
 	}
 
 	@Override public Link getNearestLinkExactly(final Coord coord) {
-		if (this.linkQuadTree == null) {
-			buildLinkQuadTree();
-		}
-		return this.linkQuadTree.getNearest(coord.getX(), coord.getY());
+		return this.getLinkQuadTree().getNearest(coord.getX(), coord.getY());
 	}
 
 	/**
@@ -358,8 +353,7 @@ import java.util.Queue;
 	 * @return the closest node found, null if none
 	 */
 	@Override public Node getNearestNode(final Coord coord) {
-		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		return this.nodeQuadTree.getClosest(coord.getX(), coord.getY());
+		return this.getNodeQuadTree().getClosest(coord.getX(), coord.getY());
 	}
 
 	/**
@@ -370,8 +364,7 @@ import java.util.Queue;
 	 * @return all nodes within distance to <code>coord</code>
 	 */
 	@Override public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
-		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		return this.nodeQuadTree.getDisk(coord.getX(), coord.getY(), distance);
+		return this.getNodeQuadTree().getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 	@Override
@@ -506,10 +499,12 @@ import java.util.Queue;
 	@Override public Attributes getAttributes() {
 		return attributes;
 	}
-	@Override public final LinkQuadTree getLinkQuadTree() {
+	@Override public LinkQuadTree getLinkQuadTree() {
+		if (this.linkQuadTree == null) buildLinkQuadTree();
 		return this.linkQuadTree ;
 	}
-	@Override public final QuadTree<Node> getNodeQuadTree() {
+	@Override public QuadTree<Node> getNodeQuadTree() {
+		if (this.nodeQuadTree == null) buildQuadTree();
 		return this.nodeQuadTree ;
 	}
 }

@@ -20,7 +20,8 @@
 
 package org.matsim.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -44,7 +45,7 @@ final class LegHistogramListener implements IterationEndsListener, IterationStar
 	@Inject private ControlerConfigGroup controlerConfigGroup;
 	@Inject private OutputDirectoryHierarchy controlerIO;
 
-	static private final Logger log = Logger.getLogger(LegHistogramListener.class);
+	static private final Logger log = LogManager.getLogger(LegHistogramListener.class);
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {

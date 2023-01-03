@@ -45,16 +45,12 @@
  *
  * <ul>
  * <li> the {@link org.matsim.core.router.RoutingModule}s are responsible for computing trips
- * between individual O/D couples, for a given mode. They moreover provide
- * access to an object allowing to identify their stage activities, implementing
- * {@link org.matsim.core.router.StageActivityTypes}.
+ * between individual O/D couples, for a given mode.
  * <li> the {@link org.matsim.core.router.TripRouter} registers {@link org.matsim.core.router.RoutingModule}s for each
  * mode, and allows to route between O/D pairs for any (registered) mode.
  * It does not modify the plan, but provides convenience methods to
  * identify trips and easily insert a trip between two activities in a plan.
  * <br>
- * It moreover provides access to a {@link org.matsim.core.router.StageActivityTypes} instance allowing
- * to identify all possible stage activities, for all modes.
  * <li> the {@link org.matsim.core.router.PlanRouter} provides a {@link org.matsim.core.population.algorithms.PlanAlgorithm} to
  * route all trips in a plan.
  * </ul>

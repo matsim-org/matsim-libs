@@ -26,14 +26,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.Operator;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -60,7 +61,7 @@ import org.matsim.vehicles.Vehicle;
 @Deprecated
 final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	
-	private final static Logger log = Logger.getLogger(SimpleBackAndForthScheduleProvider.class);
+	private final static Logger log = LogManager.getLogger(SimpleBackAndForthScheduleProvider.class);
 	public final static String NAME = "SimpleBackAndForthScheduleProvider";
 	
 	private final String pIdentifier;
@@ -110,20 +111,20 @@ final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		/* After finishing one tour, vehicles wait the driver rest time and then start the next tour immediately.
 		 * So, headway is a function of the number of vehicles and the time spent on one tour of the TransitRoute.
 		 */
-		int headway = (int) (transitRoute_H.getStop(endStop).getDepartureOffset() + transitRoute_R.getStop(startStop).getDepartureOffset() + this.driverRestTime) / numberOfVehicles;
+		int headway = (int) (transitRoute_H.getStop(endStop).getDepartureOffset().seconds() + transitRoute_R.getStop(startStop).getDepartureOffset().seconds() + this.driverRestTime) / numberOfVehicles;
 		// (headway = round trip time / number of vehicles)
 		for (int i = 0; i < numberOfVehicles; i++) {
 			for (double j = startTime + i * headway; j < endTime; ) {
 				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
 				departure.setVehicleId(Id.create(pLineId.toString() + "-" + i, Vehicle.class));
 				transitRoute_H.addDeparture(departure);
-				j += transitRoute_H.getStop(endStop).getDepartureOffset() + 1 *60;
+				j += transitRoute_H.getStop(endStop).getDepartureOffset().seconds() + 1 *60;
 				n++;
 
 				departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
 				departure.setVehicleId(Id.create(pLineId.toString() + "-" + i, Vehicle.class));
 				transitRoute_R.addDeparture(departure);
-				j += transitRoute_R.getStop(startStop).getDepartureOffset() + this.driverRestTime;
+				j += transitRoute_R.getStop(startStop).getDepartureOffset().seconds() + this.driverRestTime;
 				n++;
 			}
 		}		

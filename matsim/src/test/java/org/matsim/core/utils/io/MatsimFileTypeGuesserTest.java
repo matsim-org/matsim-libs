@@ -27,7 +27,8 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.matsim.lanes.LanesReader;
 
@@ -37,7 +38,7 @@ import org.matsim.lanes.LanesReader;
 public class MatsimFileTypeGuesserTest {
 
 
-	private final static Logger log = Logger.getLogger(MatsimFileTypeGuesserTest.class);
+	private final static Logger log = LogManager.getLogger(MatsimFileTypeGuesserTest.class);
 
 	@Test
 	public void testNetworkV1Dtd() throws IOException {
@@ -123,7 +124,7 @@ public class MatsimFileTypeGuesserTest {
 
 	@Test
 	public void testVehiclesV1XML() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/vehicles/testVehicles.xml");
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/vehicles/testVehicles_v1.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Vehicles, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNotNull(g.getSystemId());

@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +62,7 @@ import java.util.*;
  */
 @RunWith(Parameterized.class)
 public class SeepageTest {
-	static private final Logger log = Logger.getLogger( SeepageTest.class);
+	static private final Logger log = LogManager.getLogger( SeepageTest.class);
 
 	private final boolean isUsingFastCapacityUpdate;
 	
@@ -129,10 +130,10 @@ public class SeepageTest {
 			Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
 			plan.addActivity(a2);
 			net.population.addPerson(p);
-			
-			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
-			VehicleUtils.insertVehicleIdIntoAttributes(p, leg.getMode(), vehicleId);
-			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(leg.getMode()));
+
+			Id<Vehicle> vehicleId = Id.create(p.getId(), Vehicle.class);
+			VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(leg.getMode(), vehicleId));
+			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modesType.get(leg.getMode()));
 			sc.getVehicles().addVehicle(vehicle);
 		}
 		

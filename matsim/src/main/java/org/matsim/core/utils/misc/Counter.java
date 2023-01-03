@@ -22,7 +22,8 @@ package org.matsim.core.utils.misc;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A simple class that implements a counter that outputs the current counter-value from time to time.
@@ -36,7 +37,7 @@ public final class Counter {
 	private final int multiplier;
 	private final AtomicLong counter = new AtomicLong(0);
 	private final AtomicLong nextCounter = new AtomicLong(1);
-	private static final Logger log = Logger.getLogger(Counter.class);
+	private static final Logger log = LogManager.getLogger(Counter.class);
 
 	/**
 	 * @param prefix Some text that is output just before the counter-value.
@@ -65,10 +66,8 @@ public final class Counter {
 	public void incCounter() {
 		long i = this.counter.incrementAndGet();
 		long n = this.nextCounter.get();
-		if (i >= n) {
-			if (this.nextCounter.compareAndSet(n, n*multiplier)) {
-				log.info(this.prefix + n + this.suffix);
-			}
+		if ((i >= n) && (this.nextCounter.compareAndSet(n, n*multiplier))) {
+			log.info(this.prefix + n + this.suffix);
 		}
 	}
 

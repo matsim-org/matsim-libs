@@ -61,7 +61,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsLogger;
 import org.matsim.vehicles.Vehicle;
@@ -276,8 +275,6 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 */
 	private static Network createNetwork(Scenario scenario) {
 		// create a network
-		NetworkFactory nf = (NetworkFactory) scenario.getNetwork().getFactory();
-		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		final Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 
@@ -345,10 +342,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		private final Id<Link> linkId;
 		private Id<Vehicle> vehicleId1;
 		private Id<Vehicle> vehicleId2;
-		protected double person1enterTime = Time.getUndefinedTime();
-		protected double person1leaveTime = Time.getUndefinedTime();
-		protected double person2enterTime = Time.getUndefinedTime();
-		protected double person2leaveTime = Time.getUndefinedTime();
+		protected Double person1enterTime = null;
+		protected Double person1leaveTime = null;
+		protected Double person2enterTime = null;
+		protected Double person2leaveTime = null;
 
 		protected TestTravelTimeCalculator(final Id<Person> personId1, final Id<Person> personId2, final Id<Link> linkId) {
 			this.personId1 = personId1;

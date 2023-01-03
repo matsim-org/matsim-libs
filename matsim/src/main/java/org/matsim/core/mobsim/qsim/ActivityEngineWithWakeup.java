@@ -19,41 +19,38 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.PriorityBlockingQueue;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
-
-	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
-	// moved to here for time being so I can make some other clase package-private. kai, mar'19
+	public static final String COMPONENT_NAME = "ActivityEngineWithWakeup";
 
 	private final EventsManager eventsManager;
-	private PreplanningEngine preplanningEngine;
-	private ActivityEngine delegate;
+	private final PreplanningEngine preplanningEngine;
+	private final ActivityEngine delegate;
 
-	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
-		int cmp = Double.compare(o1.time, o2.time);
-		return cmp != 0 ? cmp : o1.agent.getId().compareTo(o2.agent.getId());
-	});
+	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500,
+			Comparator.comparingDouble((AgentEntry o) -> o.time).thenComparing(o -> o.agent.getId()));
 	private InternalInterface internalInterface;
 
 	@Inject
-	ActivityEngineWithWakeup( EventsManager eventsManager, PreplanningEngine preplanningEngine ) {
+	ActivityEngineWithWakeup(EventsManager eventsManager, PreplanningEngine preplanningEngine) {
 		this.delegate = new ActivityEngineDefaultImpl(eventsManager);
 		this.eventsManager = eventsManager;
-		this.preplanningEngine = preplanningEngine ;
+		this.preplanningEngine = preplanningEngine;
 	}
 
 	@Override
@@ -78,7 +75,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface ;
+		this.internalInterface = internalInterface;
 		delegate.setInternalInterface(internalInterface);
 	}
 
@@ -92,11 +89,14 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
-		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 
-		Activity act = (Activity) WithinDayAgentUtils.getCurrentPlanElement( agent );
-		if ( !act.getType().contains( "interaction" ) ){
-			wakeUpList.addAll( preplanningEngine.generateWakeups( agent, now ) );
+//		Activity act = (Activity)WithinDayAgentUtils.getCurrentPlanElement(agent);
+		if ( agent instanceof PlanAgent ) {
+			Activity act = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
+			if (!act.getType().contains("interaction")) {
+				wakeUpList.addAll(preplanningEngine.generateWakeups(agent, now));
+			}
 		}
 
 		return delegate.handleActivity(agent);
@@ -129,7 +129,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	 * cdobler, apr'12
 	 */
 	static class AgentEntry {
-		public AgentEntry(MobsimAgent agent, double time, AgentWakeup agentWakeup) {
+		AgentEntry( MobsimAgent agent, double time, AgentWakeup agentWakeup ) {
 			// yyyy Let us be careful that the executeOnWakeUp does not become overkill here; if we want something more
 			// general, rather move on a completely general MessageQueue.  kai, mar'19
 
@@ -146,7 +146,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public final static class AgentWakeupEvent extends Event implements HasPersonId {
 		private final Id<Person> personId;
 
-		public AgentWakeupEvent(double now, Id<Person> personId) {
+		AgentWakeupEvent( double now, Id<Person> personId ) {
 			super(now);
 			this.personId = personId;
 		}

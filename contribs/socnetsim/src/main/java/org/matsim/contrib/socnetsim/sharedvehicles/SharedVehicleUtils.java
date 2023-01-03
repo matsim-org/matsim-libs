@@ -38,8 +38,7 @@ import org.matsim.contrib.socnetsim.framework.population.JointPlan;
  * @author thibautd
  */
 public final class SharedVehicleUtils {
-	public static Collection<String> DEFAULT_VEHICULAR_MODES =
-			Arrays.asList(
+	public static final  Collection<String> DEFAULT_VEHICULAR_MODES = Arrays.asList(
 					TransportMode.car,
 					JointActingTypes.DRIVER);
 

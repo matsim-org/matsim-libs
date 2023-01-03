@@ -31,11 +31,10 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.MobsimScopeEventHandler;
-import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -46,8 +45,7 @@ import com.google.inject.Inject;
  * aux discharge process (see {@link AuxDischargingHandler}).
  */
 public class DriveDischargingHandler
-		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
-		MobsimScopeEventHandler {
+		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler {
 	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;
 		private final ElectricVehicle ev;
@@ -65,17 +63,17 @@ public class DriveDischargingHandler
 	}
 
 	private final Network network;
-	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
+	private EventsManager eventsManager;
+	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
-	private Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
+	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
 	@Inject
-	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg,
-			MobsimScopeEventHandling events) {
+	DriveDischargingHandler(ElectricFleet data, Network network, EventsManager eventsManager) {
 		this.network = network;
+		this.eventsManager = eventsManager;
 		eVehicles = data.getElectricVehicles();
 		evDrives = new HashMap<>(eVehicles.size() / 10);
-		events.addMobsimScopeHandler(this);
 	}
 
 	@Override
@@ -103,8 +101,8 @@ public class DriveDischargingHandler
 		}
 	}
 
-	//XXX The current implementation is thread-safe because no other EventHandler modifies battery SOC
-	// (for instance, AUX discharging and battery charging modifies SOC outside event handling
+	//XXX The current implementation is thread-safe because no other EventHandler modifies battery charge
+	// (for instance, AUX discharging and battery charging modifies charge outside event handling
 	// (as MobsimAfterSimStepListeners)
 	//TODO In the long term, it will be safer to move the discharging procedure to a MobsimAfterSimStepListener
 	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime) {
@@ -113,10 +111,12 @@ public class DriveDischargingHandler
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
 			ElectricVehicle ev = evDrive.ev;
-			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt)
-					+ ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
+			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt) + ev.getAuxEnergyConsumption()
+					.calcEnergyConsumption(eventTime - tt, tt, linkId);
 			//Energy consumption might be negative on links with negative slope
-			ev.getBattery().changeSoc(-energy);
+			ev.getBattery()
+					.dischargeEnergy(energy,
+							missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(eventTime, ev.getId(), link.getId(), missingEnergy)));
 
 			//FIXME emit a DriveOnLinkEnergyConsumptionEvent instead of calculating it here...
 			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);

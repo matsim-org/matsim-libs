@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 
 /**
@@ -34,20 +35,18 @@ final class VisUtils {
 	/**
 	 * Returns all the people sitting in this vehicle.
 	 *
-	 * @param vehicle
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
-	final static List<Identifiable<?>> getPeopleInVehicle(QVehicle vehicle) {
-		ArrayList<Identifiable<?>> people = new ArrayList<>();
-		people.add(vehicle.getDriver());
-		for ( PassengerAgent passenger : vehicle.getPassengers() ) {
-			people.add(passenger) ;
-		}
-		return people;
+	static List<Identifiable<Person>> getPeopleInVehicle(QVehicle vehicle) {
+
+		List<Identifiable<Person>> result = new ArrayList<>();
+		result.add(vehicle.getDriver());
+		result.addAll(vehicle.getPassengers());
+		return result;
 	}
 
-	public final static Integer guessLane(QVehicle veh, int numberOfLanes){
-		Integer tmpLane;
+	public static int guessLane(QVehicle veh, int numberOfLanes){
+		int tmpLane;
 		try {
 			tmpLane = Integer.parseInt(veh.getId().toString()) ;
 		} catch ( NumberFormatException ee ) {
@@ -56,17 +55,15 @@ final class VisUtils {
 				tmpLane = -tmpLane;
 			}
 		}
-		int lane = 1 + (tmpLane % numberOfLanes);
-		return lane;
+		return 1 + (tmpLane % numberOfLanes);
 	}
 
-	public final static double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
+	public static double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
 		int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 		// "inverseSimulatedFlowCapacity" is there to keep vehicles green that only wait for capacity (i.e. have no vehicle
 		// ahead). Especially important with small samples sizes.  This is debatable :-).  kai, jan'11
-	
-		double speed = (now > cmp ? 0.0 : 1.0);
-		return speed;
+
+		return (now > cmp ? 0.0 : 1.0);
 	}
 
 }

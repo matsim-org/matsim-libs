@@ -19,15 +19,16 @@
 
 package org.matsim.core.utils.collections;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 
 /**
  * Memory-optimized map, backed by a simple array, for storing small number of {@link Identifiable}s.
@@ -39,8 +40,10 @@ import org.matsim.api.core.v01.Identifiable;
  */
 public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<Id<S>, T> {
 
+	private final static Identifiable[] EMPTY = new Identifiable[0];
+
 	@SuppressWarnings("unchecked")
-	private T[] data = (T[]) new Identifiable[0];
+	private T[] data = (T[]) EMPTY;
 	
 	@Override
 	public int size() {
@@ -86,8 +89,7 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 	public T put(final T value) {
 		return put(value.getId(), value);
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	@Override
 	public T put(final Id<S> key, final T value) {
 		for (int i = 0; i < this.data.length; i++) {
@@ -97,10 +99,8 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 				return old;
 			}
 		}
-		Identifiable<S>[] tmp = new Identifiable[this.data.length + 1];
-		System.arraycopy(this.data, 0, tmp, 0, this.data.length);
-		tmp[this.data.length] = value;
-		this.data = (T[]) tmp;
+		this.data = Arrays.copyOf(this.data, this.data.length + 1);
+		this.data[this.data.length - 1] = value;
 		return null;
 	}
 
@@ -238,7 +238,12 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 
 		@Override
 		public <TT> TT[] toArray(final TT[] a) {
-			return (TT[]) this.data.clone();
+			TT[] dest = a;
+			if (a.length != this.data.length) {
+				dest = Arrays.copyOf(a, this.data.length);
+			}
+			System.arraycopy(this.data, 0, dest, 0, this.data.length);
+			return dest;
 		}
 
 		@Override

@@ -19,6 +19,11 @@
 
 package org.matsim.pt.transitSchedule;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -29,7 +34,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -40,11 +44,6 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopArea;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author mrieser / SBB
@@ -79,8 +78,8 @@ public class TransitScheduleIOTest {
 					new Id[]{Id.create("aboveGround", Link.class), Id.create("belowSky", Link.class)},
 					Id.create("sky", Link.class));
 			List<TransitRouteStop> stops = new ArrayList<>();
-			TransitRouteStop rStop1 = f.createTransitRouteStop(stop1, Time.UNDEFINED_TIME, 0.0);
-			TransitRouteStop rStop2 = f.createTransitRouteStop(stop1, 9999.9, Time.UNDEFINED_TIME);
+			TransitRouteStop rStop1 = f.createTransitRouteStopBuilder(stop1).departureOffset(0.0).build();
+			TransitRouteStop rStop2 = f.createTransitRouteStopBuilder(stop1).arrivalOffset(9999.9).build();
 			stops.add(rStop1);
 			stops.add(rStop2);
 			TransitRoute route1a = f.createTransitRoute(Id.create("upwards", TransitRoute.class), netRoute, stops, "elevator");

@@ -33,14 +33,11 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
  * @author dgrether
  *
  */
-public class OTFLaneReader extends OTFDataReader {
+class OTFLaneReader extends OTFDataReader {
 	
-	protected OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
+	OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
 
 	private VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
-	
-	public OTFLaneReader(){
-	}
 	
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {

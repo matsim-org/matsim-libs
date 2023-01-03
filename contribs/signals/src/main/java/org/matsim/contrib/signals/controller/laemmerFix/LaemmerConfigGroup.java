@@ -125,10 +125,13 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
     public enum StabilizationStrategy {USE_MAX_LANECOUNT, PRIORIZE_HIGHER_POSITIONS, COMBINE_SIMILAR_REGULATIONTIME, HEURISTIC}; 
     private StabilizationStrategy activeStabilizationStrategy = StabilizationStrategy.HEURISTIC;
     
-    //size of timeBuckets for LaneSensor and LinkSensor
-    private double timeBucketSize = Double.POSITIVE_INFINITY; //15.0; 5.0*60.0; 1.5*60.0;  
-    //lookBackTime for LaneSensor and LinkSensor
-    private double lookBackTime = Double.POSITIVE_INFINITY; //300.0; 15.0*60.0; //6.0*60.0;
+    /** size of timeBuckets in seconds for live arrival rates in LaneSensor and LinkSensor.
+     *  Setting this only has an effect if lookBackTime is different to Double.POSITIVE_INFINITY. */
+    private double timeBucketSize = 30.;
+    /** lookBackTime in seconds for live arrival rates in LaneSensor and LinkSensor.
+     *  If you use Double.POSITIVE_INFINITY, the sensor will start monitoring the arrival rates newly each time the link is empty; 
+     *  as long as the link is not empty, it simply averages all past arrivals. */
+    private double lookBackTime = 5 * 60.;
 
     private Map<Id<Link>, Double> linkArrivalRates = new HashMap<>();
     private Map<Id<Link>, Map<Id<Lane>,Double>> laneArrivalRates = new HashMap<>();
@@ -237,11 +240,11 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
 	
 	/**
 	 * Configure the sensor for live arrival rates. Live arrival Rate can be calculated from the time, the first car entered the Link/Lane until now or by getting an average from lookBackTime.
-	 * If using last option, lookBackTime will be splitted in buckets with timeBucketsSize. Only finished buckets will be used to calculate the average.
+	 * If using last option, lookBackTime will be splitted in buckets with duration timeBucketsSize. Only finished buckets will be used to calculate the average.
 	 * @param lookBackTime For which duration of passed time the average should be calculated. Set to Double.POSITIVE_INFINITY to calculate from time the first car enters the link on. 
 	 * @param timeBucketSize Resolution of lookBackTime. Average is calculated only with full time buckets. Set to Double.POSITIVE_INFINITY to calculate from time the first car enters the link on. 
 	 */
-	public void setAvgCarSensorBucketParameters(double lookBackTime, double timeBucketSize) {
+	public void setTimeBucketParametersForLiveArrivalRates(double lookBackTime, double timeBucketSize) {
 		this.lookBackTime = lookBackTime;
 		this.timeBucketSize = timeBucketSize;
 	}

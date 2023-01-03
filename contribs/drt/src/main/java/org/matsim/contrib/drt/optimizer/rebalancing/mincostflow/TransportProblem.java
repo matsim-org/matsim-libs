@@ -25,7 +25,8 @@ import java.util.function.ToIntBiFunction;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.common.util.DistanceUtils;
 
 import graphs.flows.MinCostFlow;
 import graphs.flows.MinCostFlow.Edge;
@@ -34,13 +35,43 @@ import graphs.flows.MinCostFlow.Edge;
  * @author michalm
  */
 public class TransportProblem<P, C> {
+	public static List<Flow<DrtZone, DrtZone>> solveForVehicleSurplus(
+			List<AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus> vehicleSurplus) {
+		List<Pair<DrtZone, Integer>> supply = new ArrayList<>();
+		List<Pair<DrtZone, Integer>> demand = new ArrayList<>();
+		for (AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus s : vehicleSurplus) {
+			if (s.surplus > 0) {
+				supply.add(Pair.of(s.zone, s.surplus));
+			} else if (s.surplus < 0) {
+				demand.add(Pair.of(s.zone, -s.surplus));
+			}
+		}
+		return new TransportProblem<DrtZone, DrtZone>(TransportProblem::calcStraightLineDistance).solve(supply, demand);
+	}
+
+	private static int calcStraightLineDistance(DrtZone zone1, DrtZone zone2) {
+		return (int)DistanceUtils.calculateDistance(zone1.getCentroid(), zone2.getCentroid());
+	}
+
+	public static class Flow<P, C> {
+		public final P origin;
+		public final C destination;
+		public final int amount;
+
+		private Flow(P origin, C destination, int amount) {
+			this.origin = origin;
+			this.destination = destination;
+			this.amount = amount;
+		}
+	}
+
 	private final ToIntBiFunction<P, C> costFunction;
 
 	public TransportProblem(ToIntBiFunction<P, C> costFunction) {
 		this.costFunction = costFunction;
 	}
 
-	public List<Triple<P, C, Integer>> solve(List<Pair<P, Integer>> supply, List<Pair<C, Integer>> demand) {
+	public List<Flow<P, C>> solve(List<Pair<P, Integer>> supply, List<Pair<C, Integer>> demand) {
 		final int P = supply.size();
 		final int C = demand.size();
 		final int N = P + C + 2;
@@ -88,7 +119,7 @@ public class TransportProblem<P, C> {
 		}
 
 		// extract flows
-		List<Triple<P, C, Integer>> flows = new ArrayList<>();
+		List<Flow<P, C>> flows = new ArrayList<>();
 		for (int i = 0; i < P; i++) {
 			P from = supply.get(i).getKey();
 			for (Edge e : graph[1 + i]) {
@@ -96,7 +127,7 @@ public class TransportProblem<P, C> {
 				if (flow > 0) {
 					int j = e.getTo() - (1 + P);
 					C to = demand.get(j).getKey();
-					flows.add(Triple.of(from, to, flow));
+					flows.add(new Flow<>(from, to, flow));
 				}
 			}
 		}

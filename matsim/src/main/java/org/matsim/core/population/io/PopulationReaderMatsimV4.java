@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -96,7 +97,7 @@ import org.xml.sax.Attributes;
 
 	private Activity prevAct = null;
 
-	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
+	private final static Logger log = LogManager.getLogger(PopulationReaderMatsimV4.class);
 
 	public PopulationReaderMatsimV4(final Scenario scenario) {
 		this(new IdentityTransformation(), scenario);
@@ -275,9 +276,14 @@ import org.xml.sax.Attributes;
 			throw new IllegalArgumentException(
 					"In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
-		this.curract.setStartTime(Time.parseTime(atts.getValue("start_time")));
-		this.curract.setMaximumDuration(Time.parseTime(atts.getValue("dur")));
-		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
+
+		Time.parseOptionalTime(atts.getValue("start_time"))
+				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
+		Time.parseOptionalTime(atts.getValue("dur"))
+				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
+		Time.parseOptionalTime(atts.getValue("end_time"))
+				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
+
 		String fId = atts.getValue("facility");
 		if (fId != null) {
 			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
@@ -320,8 +326,10 @@ import org.xml.sax.Attributes;
 			mode = "undefined";
 		}
 		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
-		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
-		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+		Time.parseOptionalTime(atts.getValue("dep_time"))
+				.ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
+		Time.parseOptionalTime(atts.getValue("trav_time"))
+				.ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
 //		LegImpl r = this.currleg;
 //		r.setTravelTime( Time.parseTime(atts.getValue("arr_time")) - r.getDepartureTime() );
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
@@ -341,7 +349,8 @@ import org.xml.sax.Attributes;
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));
 		}
 		if (atts.getValue("trav_time") != null) {
-			this.currRoute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+			Time.parseOptionalTime(atts.getValue("trav_time"))
+					.ifDefinedOrElse(currRoute::setTravelTime, currRoute::setTravelTimeUndefined);
 		}
 	}
 

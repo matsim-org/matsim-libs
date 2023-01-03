@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="EV_30.0kWh">
+
+		<capacity seats="0" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="chargerTypes" class="java.util.Collections$UnmodifiableCollection">["default"]</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">30.0</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="EV_77.0kWh">
+
+		<capacity seats="0" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="chargerTypes" class="java.util.Collections$UnmodifiableCollection">["default"]</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">77.0</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="drt_0" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_1" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_10" type="EV_30.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_11" type="EV_30.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_12" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_13" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_14" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_15" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_16" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_17" type="EV_30.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_18" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_19" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_2" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_3" type="EV_30.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_4" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_5" type="EV_30.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_6" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_7" type="EV_30.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_8" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="drt_9" type="EV_77.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+		
+
+</vehicleDefinitions>

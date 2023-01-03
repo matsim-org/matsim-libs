@@ -25,6 +25,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.Month;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author thibautd
@@ -46,5 +53,67 @@ public class ObjectAttributesConverterTest {
 		final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 		Object converted = converter.convert(Month.class.getCanonicalName(), "JANUARY");
 		Assert.assertEquals("unexpected enum converted from String value", Month.JANUARY, converted);
+	}
+
+	@Test
+	public void testHashMap() {
+
+		var expectedString = "{\"a\":\"value-a\",\"b\":\"value-b\"}";
+		final var converter = new ObjectAttributesConverter();
+
+		Map<String, String> parsed = (Map<String, String>) converter.convert("java.util.Map", expectedString);
+		var serialized = converter.convertToString(parsed);
+
+		assertEquals(expectedString, serialized);
+	}
+
+	@Test
+	public void testEmptyHashMap() {
+
+		var expectedString = "{}";
+		final var converter = new ObjectAttributesConverter();
+
+		Map<String, String> parsed = new HashMap<>();
+		var serialized = converter.convertToString(parsed);
+
+		assertEquals(expectedString, serialized);
+	}
+
+	@Test
+	public void testCollection() {
+
+		var expectedString = "[\"a\",\"b\"]";
+		final var converter = new ObjectAttributesConverter();
+
+		Collection<String> parsed = (Collection<String>) converter.convert("java.util.Collection", expectedString);
+		var serialized = converter.convertToString(parsed);
+
+		assertEquals(expectedString, serialized);
+	}
+
+	@Test
+	public void testEmptyCollection() {
+
+		var expectedString = "[]";
+		final var converter = new ObjectAttributesConverter();
+
+		Collection<String> parsed = Arrays.asList();
+		var serialized = converter.convertToString(parsed);
+
+		assertEquals(expectedString, serialized);
+	}
+
+	@Test
+	public void testUnsupported() {
+
+		final var converter = new ObjectAttributesConverter();
+		var serialized = converter.convertToString(new UnsupportedType());
+		var parsed = converter.convert(UnsupportedType.class.getName(), "some-value");
+
+		assertNull(serialized);
+		assertNull(parsed);
+	}
+
+	private static class UnsupportedType {
 	}
 }

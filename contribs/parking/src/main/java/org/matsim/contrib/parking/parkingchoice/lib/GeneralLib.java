@@ -19,27 +19,6 @@
 
 package org.matsim.contrib.parking.parkingchoice.lib;
 
-import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.StringTokenizer;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -68,8 +47,6 @@ import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.io.KmlNetworkWriter;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -79,20 +56,15 @@ import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.vis.kml.KMZWriter;
-import org.xml.sax.SAXException;
 
-import net.opengis.kml.v_2_2_0.DocumentType;
-import net.opengis.kml.v_2_2_0.KmlType;
-import net.opengis.kml.v_2_2_0.ObjectFactory;
+import java.awt.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class GeneralLib {
 
@@ -231,7 +203,7 @@ public class GeneralLib {
 	 */
 	public static double[][] trimMatrix(double[][] matrix, int numberOfRows,
 			int numberOfColumns) {
-		double newMatrix[][] = new double[numberOfRows][numberOfColumns];
+		double[][] newMatrix = new double[numberOfRows][numberOfColumns];
 
 		for (int i = 0; i < numberOfRows; i++) {
 			for (int j = 0; j < numberOfColumns; j++) {
@@ -689,12 +661,8 @@ public class GeneralLib {
 			return true;
 		}
 
-		if (startIntervalTime > endIntervalTime
-				&& (timeToCheck >= startIntervalTime || timeToCheck <= endIntervalTime)) {
-			return true;
-		}
-
-		return false;
+		return startIntervalTime > endIntervalTime
+				&& (timeToCheck >= startIntervalTime || timeToCheck <= endIntervalTime);
 	}
 
 	public static void errorIfNot24HourProjectedTime(double time) {
@@ -770,49 +738,6 @@ public class GeneralLib {
 		return newPerson;
 	}
 
-	public static void convertMATSimNetworkToKmz(String matsimNetworkFileName,
-			String outputKmzFileName) throws IOException {
-		Network network = readNetwork(matsimNetworkFileName);
-
-		ObjectFactory kmlObjectFactory = new ObjectFactory();
-		KMZWriter kmzWriter = new KMZWriter(outputKmzFileName);
-
-		KmlType mainKml = kmlObjectFactory.createKmlType();
-		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
-		mainKml.setAbstractFeatureGroup(kmlObjectFactory
-				.createDocument(mainDoc));
-
-		// KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new
-		// AtlantisToWGS84(), kmzWriter, mainDoc);
-		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,
-				new CH1903LV03toWGS84(), kmzWriter, mainDoc);
-		// KmlNetworkWriter kmlNetworkWriter = new
-		// KmlNetworkWriter(network,TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S,
-		// TransformationFactory.WGS84), kmzWriter, mainDoc);
-
-		mainDoc.getAbstractFeatureGroup().add(
-				kmlObjectFactory.createFolder(kmlNetworkWriter
-						.getNetworkFolder()));
-
-		kmzWriter.writeMainKml(mainKml);
-		kmzWriter.close();
-	}
-
-	public static Network convertOsmNetworkToMATSimNetwork(String osmNetworkFile)
-			throws SAXException, ParserConfigurationException, IOException {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network net = sc.getNetwork();
-
-		CoordinateTransformation ct = new WGS84toCH1903LV03();
-
-		OsmNetworkReader reader = new OsmNetworkReader(net, ct);
-		reader.setKeepPaths(true);
-		reader.parse(osmNetworkFile);
-
-		new NetworkCleaner().run(net);
-		return net;
-	}
-
 	// TODO: there are some classes (e.g.
 	// playground.wrashid.PSF.data.HubLinkMapping and HubPriceInfo, which could
 	// be refactored by calling this method.
@@ -826,7 +751,7 @@ public class GeneralLib {
 		try {
 
 			FileInputStream fis = new FileInputStream(fileName);
-			InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-1");
+			InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.ISO_8859_1);
 
 			BufferedReader br = new BufferedReader(isr);
 			String line;
@@ -852,15 +777,15 @@ public class GeneralLib {
 			// FileReader fr = new FileReader(fileName);
 
 			FileInputStream fis = new FileInputStream(fileName);
-			InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-1");
+			InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.ISO_8859_1);
 
-			BufferedReader br=null;
+			BufferedReader br = null;
 			if (fileName.toLowerCase(Locale.ROOT).endsWith(".gz")) {
 				br = IOUtils.getBufferedReader(fileName);
 			} else {
 				br = new BufferedReader(isr);
 			}
-			
+
 			String line;
 			StringTokenizer tokenizer;
 			line = br.readLine();
@@ -929,10 +854,7 @@ public class GeneralLib {
 
 	private static boolean isNumberInBetweenOrdered(double smallerNumber,
 			double biggerNumber, double numberToCheck) {
-		if (smallerNumber < numberToCheck && biggerNumber > numberToCheck) {
-			return true;
-		}
-		return false;
+		return smallerNumber < numberToCheck && biggerNumber > numberToCheck;
 	}
 
 	public static double getWalkingTravelDuration(double distance, PlansCalcRouteConfigGroup pcrConfig) {
@@ -966,9 +888,7 @@ public class GeneralLib {
 
 	public static boolean isInZHCityRectangle(Coord coord) {
 		if (coord.getX() > 676227.0 && coord.getX() < 689671.0) {
-			if (coord.getY() > 241585.0 && coord.getY() < 254320.0) {
-				return true;
-			}
+			return coord.getY() > 241585.0 && coord.getY() < 254320.0;
 		}
 
 		return false;
@@ -976,7 +896,7 @@ public class GeneralLib {
 
 	public static void writeArrayToFile(double[] array, String fileName,
 			String headerLine) {
-		double matrix[][] = new double[array.length][1];
+		double[][] matrix = new double[array.length][1];
 
 		for (int i = 0; i < array.length; i++) {
 			matrix[i][0] = array[i];

@@ -32,36 +32,29 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.name.Named;
 
 /**
  * @author jbischoff
- *
  */
 public class WithinDayParkingRouter implements ParkingRouter {
 
-	private Network network;
-
-	private TravelTime travelTime;
-	private TravelDisutility travelDisutility;
-	private LeastCostPathCalculator pathCalculator;
+	private final Network network;
+	private final LeastCostPathCalculator pathCalculator;
 
 	@Inject
 	WithinDayParkingRouter(@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, Network network) {
-		this.travelTime = travelTime;
-		travelDisutility = new TimeAsTravelDisutility(this.travelTime);
 		this.network = network;
-		pathCalculator = new DijkstraFactory().createPathCalculator(network, travelDisutility, this.travelTime);
+		pathCalculator = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
+				travelTime);
 	}
 
 	@Override
 	public NetworkRoute getRouteFromParkingToDestination(Id<Link> destinationLinkId, double departureTime,
 			Id<Link> startLinkId) {
 
-		
 		Link startLink = this.network.getLinks().get(startLinkId);
 		Link endLink = this.network.getLinks().get(destinationLinkId);
 

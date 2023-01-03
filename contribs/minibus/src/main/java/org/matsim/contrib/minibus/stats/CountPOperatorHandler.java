@@ -19,14 +19,15 @@
 
 package org.matsim.contrib.minibus.stats;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.minibus.operator.Operator;
+import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
 
@@ -43,7 +44,7 @@ import java.util.TreeSet;
 final class CountPOperatorHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler{
 	
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(CountPOperatorHandler.class);
+	private static final Logger log = LogManager.getLogger(CountPOperatorHandler.class);
 	
 	private final String pIdentifier;
 	private HashMap<Id<Link>, Set<Id<Operator>>> linkId2OperatorIdsSetMap;

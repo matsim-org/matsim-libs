@@ -20,9 +20,10 @@
 
 package org.matsim.core.scoring.functions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -31,14 +32,10 @@ import org.matsim.core.utils.misc.Time;
  * @author rashid_waraich
  */
 public final class CharyparNagelActivityScoring implements org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
-
-	private double score;
-	private double currentActivityStartTime;
-	private double firstActivityEndTime;
-
-	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final double INITIAL_FIRST_ACT_END_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
+
+	private double score = INITIAL_SCORE;
+
 
 	private static int firstLastActWarning = 0;
 	private static short firstLastActOpeningTimesWarning = 0;
@@ -48,7 +45,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 	private Activity firstActivity;
 
-	private static final Logger log = Logger.getLogger(CharyparNagelActivityScoring.class);
+	private static final Logger log = LogManager.getLogger(CharyparNagelActivityScoring.class);
 
 	public CharyparNagelActivityScoring(final ScoringParameters params) {
 		this(params, new ActivityTypeOpeningIntervalCalculator(params));
@@ -56,9 +53,6 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 	public CharyparNagelActivityScoring(final ScoringParameters params, final OpeningIntervalCalculator openingIntervalCalculator) {
 		this.params = params;
-		this.currentActivityStartTime = INITIAL_LAST_TIME;
-		this.firstActivityEndTime = INITIAL_FIRST_ACT_END_TIME;
-		this.score = INITIAL_SCORE;
 
 //		firstLastActWarning = 0 ;
 		firstLastActOpeningTimesWarning = 0 ;
@@ -120,21 +114,21 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			 * assume A <= D
 			 */
 
-			double[] openingInterval = openingIntervalCalculator.getOpeningInterval(act);
-			double openingTime = openingInterval[0];
-			double closingTime = openingInterval[1];
+			OptionalTime[] openingInterval = openingIntervalCalculator.getOpeningInterval(act);
+			OptionalTime openingTime = openingInterval[0];
+			OptionalTime closingTime = openingInterval[1];
 
 			double activityStart = arrivalTime;
 			double activityEnd = departureTime;
 
-			if ((openingTime >=  0) && (arrivalTime < openingTime)) {
-				activityStart = openingTime;
+			if (openingTime.isDefined() && arrivalTime < openingTime.seconds()) {
+				activityStart = openingTime.seconds();
 			}
-			if ((closingTime >= 0) && (closingTime < departureTime)) {
-				activityEnd = closingTime;
+			if (closingTime.isDefined() && closingTime.seconds() < departureTime) {
+				activityEnd = closingTime.seconds();
 			}
-			if ((openingTime >= 0) && (closingTime >= 0)
-					&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
+			if (openingTime.isDefined() && closingTime.isDefined()
+					&& (openingTime.seconds() > departureTime || closingTime.seconds() < arrivalTime)) {
 				// agent could not perform action
 				activityStart = departureTime;
 				activityEnd = departureTime;
@@ -149,9 +143,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 			// disutility if too late
 
-			double latestStartTime = actParams.getLatestStartTime();
-			if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
+			OptionalTime latestStartTime = actParams.getLatestStartTime();
+			if (latestStartTime.isDefined() && (activityStart > latestStartTime.seconds())) {
+				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime.seconds());
 			}
 
 			// utility of performing an action, duration is >= 1, thus log is no problem
@@ -200,9 +194,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			}
 
 			// disutility if stopping too early
-			double earliestEndTime = actParams.getEarliestEndTime();
-			if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
+			OptionalTime earliestEndTime = actParams.getEarliestEndTime();
+			if ((earliestEndTime.isDefined()) && (activityEnd < earliestEndTime.seconds())) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime.seconds() - activityEnd);
 			}
 
 			// disutility if going to away to late
@@ -211,9 +205,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			}
 
 			// disutility if duration was too short
-			double minimalDuration = actParams.getMinimalDuration();
-			if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
+			OptionalTime minimalDuration = actParams.getMinimalDuration();
+			if ((minimalDuration.isDefined()) && (duration < minimalDuration.seconds())) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration.seconds() - duration);
 			}
 		}
 		return tmpScore;
@@ -230,8 +224,8 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			
 			// the first Act and the last Act have the same type:
 			if (firstLastActOpeningTimesWarning <= 10) {
-				double[] openInterval = openingIntervalCalculator.getOpeningInterval(lastActivity);
-				if (openInterval[0] >= 0 || openInterval[1] >= 0){
+				OptionalTime[] openInterval = openingIntervalCalculator.getOpeningInterval(lastActivity);
+				if (openInterval[0].isDefined() || openInterval[1].isDefined()){
 					log.warn("There are opening or closing times defined for the first and last activity. The correctness of the scoring function can thus not be guaranteed.");
 					log.warn("first activity: " + firstActivity ) ;
 					log.warn("last activity: " + lastActivity ) ;
@@ -241,8 +235,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 					firstLastActOpeningTimesWarning++;
 				}
 			}
-			
-			double calcActScore = calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity);
+
+			double calcActScore = calcActScore(lastActivity.getStartTime().seconds(),
+					this.firstActivity.getEndTime().seconds() + 24 * 3600, lastActivity);
 			this.score += calcActScore; // SCENARIO_DURATION
 		} else {
 			// the first Act and the last Act have NOT the same type:
@@ -262,9 +257,10 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 				}
 
 				// score first activity
-				this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+				this.score += calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity);
 				// score last activity
-				this.score += calcActScore(this.currentActivityStartTime, this.params.simulationPeriodInDays * 24*3600, lastActivity);
+				this.score += calcActScore(lastActivity.getStartTime().seconds(),
+						this.params.simulationPeriodInDays * 24 * 3600, lastActivity);
 			}
 		}
 	}
@@ -272,24 +268,22 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 	private void handleMorningActivity() {
 		assert firstActivity != null;
 		// score first activity
-		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+		this.score += calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity);
 	}
 
 	@Override
 	public void handleFirstActivity(Activity act) {
 		assert act != null;
-		this.firstActivityEndTime = act.getEndTime();
 		this.firstActivity = act;
 	}
 
 	@Override
 	public void handleActivity(Activity act) {
-		this.score += calcActScore(act.getStartTime(), act.getEndTime(), act);
+		this.score += calcActScore(act.getStartTime().seconds(), act.getEndTime().seconds(), act);
 	}
 
 	@Override
 	public void handleLastActivity(Activity act) {
-		this.currentActivityStartTime = act.getStartTime();
 		this.handleOvernightActivity(act);
 		this.firstActivity = null;
 	}

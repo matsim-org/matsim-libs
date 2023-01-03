@@ -21,6 +21,7 @@ package org.matsim.integration.population;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,12 +36,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -66,6 +67,7 @@ public class NonAlternatingPlanElementsIT {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(10);
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 		config.strategy().addParam("Module_2", "ReRoute");
 		config.strategy().addParam("ModuleProbability_2", "1.0");		
 		config.transit().setUseTransit(true);
@@ -97,6 +99,7 @@ public class NonAlternatingPlanElementsIT {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(10);
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 		config.strategy().addParam("Module_2", "ReRoute");
 		config.strategy().addParam("ModuleProbability_2", "1.0");
 		config.transit().setUseTransit(true);
@@ -240,8 +243,8 @@ public class NonAlternatingPlanElementsIT {
 		TransitLine line1 = f.createTransitLine(Id.create(1, TransitLine.class));
 		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(Id.create("14", Link.class), new Id[] { Id.create("20", Link.class) }, Id.create("21", Link.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		stops.add(f.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0));
-		stops.add(f.createTransitRouteStop(stopFacility2, 180, Time.UNDEFINED_TIME));
+		stops.add(f.createTransitRouteStopBuilder(stopFacility1).departureOffset(0).build());
+		stops.add(f.createTransitRouteStopBuilder(stopFacility2).arrivalOffset(180).build());
 		TransitRoute route1 = f.createTransitRoute(Id.create(1, TransitRoute.class), netRoute, stops, "bus");
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);

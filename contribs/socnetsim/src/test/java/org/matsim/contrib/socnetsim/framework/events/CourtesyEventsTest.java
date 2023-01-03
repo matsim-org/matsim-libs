@@ -22,7 +22,8 @@ package org.matsim.contrib.socnetsim.framework.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -44,11 +45,11 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
  */
 public class CourtesyEventsTest {
 	private static final Logger log =
-		Logger.getLogger(CourtesyEventsTest.class);
-	public static final Id<Person> ID_1 = Id.create("tintin", Person.class);
-	public static final Id<Person> ID_2 = Id.create("milou", Person.class);
-	public static final Id<Link> LINK_ID = Id.createLinkId("Link");
-	public static final Id<ActivityFacility> FACILITY_ID = Id.create("Facility", ActivityFacility.class);
+		LogManager.getLogger(CourtesyEventsTest.class);
+	public final Id<Person> ID_1 = Id.create("tintin", Person.class);
+	public final Id<Person> ID_2 = Id.create("milou", Person.class);
+	public final Id<Link> LINK_ID = Id.createLinkId("Link");
+	public final Id<ActivityFacility> FACILITY_ID = Id.create("Facility", ActivityFacility.class);
 	public static final String TYPE = "type";
 
 	@Test
@@ -234,7 +235,11 @@ public class CourtesyEventsTest {
 						}
 				});
 
+		eventManager.initProcessing();
+
 		for ( Event e : events ) eventManager.processEvent( e );
+
+		eventManager.finishProcessing();
 
 		Assert.assertEquals(
 				"wrong number of events in "+collected,

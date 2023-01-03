@@ -50,9 +50,6 @@ public class TransitPerformanceRecorder {
     private MobSimSwitcher switcher;
     private TransitPerformance transitPerformance;
     private VehicleTrackerCollection vehicletrackers;
-    private Map<Id<Departure>, TransitRoute> departureIdToRoute;
-
-
 
     private boolean shouldReset() {
         if(switcher == null)

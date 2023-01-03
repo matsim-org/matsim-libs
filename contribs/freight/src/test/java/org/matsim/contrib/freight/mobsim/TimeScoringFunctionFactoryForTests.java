@@ -5,6 +5,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -13,9 +15,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
@@ -29,17 +32,12 @@ import org.matsim.vehicles.Vehicle;
 public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
 
 	 static class DriverLegScoring implements BasicScoring, LegScoring{
-			
-			private double score = 0.0;
 
+			private double score = 0.0;
 			private final Network network;
-			
 			private final Carrier carrier;
-			
-			private Set<CarrierVehicle> employedVehicles;
-			
+			private final Set<CarrierVehicle> employedVehicles;
 			private Leg currentLeg = null;
-			
 			private double currentLegStartTime;
 			
 			public DriverLegScoring(Carrier carrier, Network network) {
@@ -81,7 +79,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 				if(currentLeg.getRoute() instanceof NetworkRoute){
 					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
-					CarrierVehicle vehicle = getVehicle(vehicleId);
+					CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
 					assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
 					if(!employedVehicles.contains(vehicle)){
 						employedVehicles.add(vehicle);
@@ -121,15 +119,13 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 				return 1.0;
 			}
 
-			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
-				for(CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()){
-					if(cv.getVehicleId().equals(vehicleId)){
-						return cv;
-					}
-				}
-				return null;
-			}
-			
+//			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
+//				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+//					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+//				}
+//				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
+//				return null;
+//			}
 		}
 	
 	 static class DriverActScoring implements BasicScoring, ActivityScoring{

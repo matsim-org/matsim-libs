@@ -27,7 +27,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -64,7 +65,7 @@ import org.xml.sax.SAXException;
  */
 public class TravelTimeCalculatorTest extends MatsimTestCase {
 
-	private final static Logger log = Logger.getLogger(TravelTimeCalculatorTest.class);
+	private final static Logger log = LogManager.getLogger(TravelTimeCalculatorTest.class);
 
 	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 
@@ -178,7 +179,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
+		events.initProcessing();
 		new MatsimEventsReader(events).readFile(eventsFile);
+		events.finishProcessing();
 
 		EventsManager events2 = EventsUtils.createEventsManager();
 
@@ -187,9 +190,11 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		ttcalc.aggregator = aggregator ;
 		ttcalc.setTtDataFactory( ttDataFactory );
 		events2.addHandler(ttcalc);
+		events2.initProcessing();
 		for (Event e : collector.getEvents()) {
 			events2.processEvent(e);
 		}
+		events2.finishProcessing();
 
 		final int numberOfTimeSlotsToTest = 4*24;
 		
@@ -236,7 +241,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		// do comparison
 		for (int i = 0; i < numberOfTimeSlotsToTest; i++) {
 			double ttime = ttcalc.getLinkTravelTimes().getLinkTravelTime(link10, i*timeBinSize, null, null);
-			assertEquals(compareData[i], Double.toString(ttime));
+			assertEquals(Double.parseDouble(compareData[i]), ttime, 1e-3); // traveltimecalculator has a resolution of 0.001 seconds
 		}
 	}
 
@@ -348,13 +353,14 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttCalc);
-				
+		events.initProcessing();
 		new MatsimEventsReader(events).readFile(eventsFilename);
-		
+		events.finishProcessing();
+
 		Link link10 = network.getLinks().get(Id.create("10", Link.class));
 
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTimes().getLinkTravelTime(link10, 6.0 * 3600, null, null), EPSILON);
-		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTimes().getLinkTravelTime(link10, 6.25 * 3600, null, null), EPSILON);
+		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTimes().getLinkTravelTime(link10, 6.25 * 3600, null, null), 1e-3); // traveltimecalculator has a resolution of 0.001 seconds
 	}
 
 	/**
@@ -362,7 +368,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 */
 	public void testGetLinkTravelTime_ignorePtVehiclesAtStop() {
 		Network network = NetworkUtils.createNetwork();
-		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+        TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
@@ -389,8 +395,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser / senozon
 	 */
 	public void testGetLinkTravelTime_usePtVehiclesWithoutStop() {
-		Network network = NetworkUtils.createNetwork();
-		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+        Network network = NetworkUtils.createNetwork();
+        TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
@@ -419,8 +425,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_NoAnalyzedModes() {
-		Network network = NetworkUtils.createNetwork();
-		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+        Network network = NetworkUtils.createNetwork();
+        TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setAnalyzedModesAsString("" );
 		config.setFilterModes(true);
@@ -455,8 +461,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_CarAnalyzedModes() {
-		Network network = NetworkUtils.createNetwork();
-		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+        Network network = NetworkUtils.createNetwork();
+        TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setAnalyzedModesAsString(TransportMode.car );
 		config.setFilterModes(true);
@@ -496,8 +502,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_NoFilterModes() {
-		Network network = NetworkUtils.createNetwork();
-		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+        Network network = NetworkUtils.createNetwork();
+        TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setAnalyzedModesAsString("" );
 		config.setFilterModes(false);
@@ -537,8 +543,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_FilterDefaultModes() {
-		Network network = NetworkUtils.createNetwork();
-		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+        Network network = NetworkUtils.createNetwork();
+        TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setFilterModes(true);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);

@@ -22,13 +22,13 @@ package org.matsim.deprecated.scoring;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * 
@@ -97,7 +97,7 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
 		void handleEvent( final Event event ) ;
 	}
 	
-	private static Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
+	private static final  Logger log = LogManager.getLogger(ScoringFunctionAccumulator.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
@@ -111,18 +111,18 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
 
 	@Override
 	public final void handleActivity(Activity activity) {
-        if (activity.getStartTime() != Time.UNDEFINED_TIME) {
-            startActivity(activity.getStartTime(), activity);
+		if (activity.getStartTime().isDefined()) {
+			startActivity(activity.getStartTime().seconds(), activity);
         }
-        if (activity.getEndTime() != Time.UNDEFINED_TIME) {
-            endActivity(activity.getEndTime(), activity);
+		if (activity.getEndTime().isDefined()) {
+			endActivity(activity.getEndTime().seconds(), activity);
         }
     }
 
 	@Override
     public final void handleLeg(Leg leg) {
-        startLeg(leg.getDepartureTime(), leg);
-        endLeg(leg.getDepartureTime() + leg.getTravelTime());
+		startLeg(leg.getDepartureTime().seconds(), leg);
+		endLeg(leg.getDepartureTime().seconds() + leg.getTravelTime().seconds());
     }
 	
 	@Override
@@ -130,6 +130,11 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
 		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
 			moneyScoringFunction.addMoney(amount);
 		}
+	}
+
+	@Override
+	public void addScore(double amount) {
+		// unsupported in deprecated class
 	}
 
 	@Override

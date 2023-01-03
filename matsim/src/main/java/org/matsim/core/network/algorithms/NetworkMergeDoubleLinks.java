@@ -20,7 +20,8 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -47,7 +48,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 		MAXIMUM
 	}
 
-	private final static Logger log = Logger.getLogger(NetworkMergeDoubleLinks.class);
+	private final static Logger log = LogManager.getLogger(NetworkMergeDoubleLinks.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -94,7 +95,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 
 				double cap = link1.getCapacity() + link2.getCapacity();
 				double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
-				int lanes = NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), link1) + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2);
+				int lanes = NetworkUtils.getNumberOfLanesAsInt(link1) + NetworkUtils.getNumberOfLanesAsInt(link2);
 				double length = Math.max(link1.getLength(),link2.getLength());
 				//			String origid = "add-merge(" + link1.getId() + "," + link2.getId() + ")";
 				link1.setCapacity(cap);
@@ -112,7 +113,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 				{
 					double cap = Math.max(link1.getCapacity(),link2.getCapacity());
 					double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
-					int lanes = Math.max(NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), link1), NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2));
+					int lanes = Math.max(NetworkUtils.getNumberOfLanesAsInt(link1), NetworkUtils.getNumberOfLanesAsInt(link2));
 					double length = Math.max(link1.getLength(),link2.getLength());
 					//			String origid = "max-merge(" + link1.getId() + "," + link2.getId() + ")";
 					link1.setCapacity(cap);

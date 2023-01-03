@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
@@ -38,9 +37,10 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
-import org.matsim.vis.snapshotwriters.KmlSnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.TransimsSnapshotWriter;
+
+import static org.matsim.core.config.groups.ControlerConfigGroup.*;
 
 /**
  * Converts  an events file to a snapshot file.
@@ -205,17 +205,22 @@ public class Events2Snapshot {
 			this.visualizer.addSnapshotWriter(this.writer);
 		}
 
-		Collection<String> snapshotFormat = this.config.controler().getSnapshotFormat();
+		Collection<SnapshotFormat> snapshotFormats = this.config.controler().getSnapshotFormat();
 
-		if (snapshotFormat.contains("transims")) {
-			String snapshotFile = outputDir + "T.veh";
-			this.visualizer.addSnapshotWriter(new TransimsSnapshotWriter(snapshotFile));
-		}
-		if (snapshotFormat.contains("googleearth")) {
-			String snapshotFile = outputDir + "googleearth.kmz";
-			String coordSystem = this.config.global().getCoordinateSystem();
-			this.visualizer.addSnapshotWriter(new KmlSnapshotWriter(snapshotFile,
-					TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
+		for( SnapshotFormat snapshotFormat : snapshotFormats ){
+			switch( snapshotFormat ){
+				case transims: {
+					String snapshotFile = outputDir + "T.veh";
+					this.visualizer.addSnapshotWriter(new TransimsSnapshotWriter(snapshotFile));
+					break; }
+				case googleearth:
+					// KML support removed, michalm, may'22
+				case otfvis:
+					// this was not filled in when I found it, but I think it should.  kai, feb'20
+				case positionevents:
+				default:
+					throw new IllegalStateException( "Unexpected value: " + snapshotFormat );
+			}
 		}
 	}
 

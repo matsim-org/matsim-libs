@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans>
+
+<!-- ====================================================================== -->
+
+	<person id="testAgent1" employed="no">
+		<plan selected="yes">
+			<act type="h" link="linkId1_" x="100.0" y="0" end_time="08:13:40" />
+			<leg mode="car">
+			</leg>
+			<act type="w" link="linkId3_" x="1400.0" y="0" end_time="17:00:00" />
+			<leg mode="car">
+			</leg>
+			<act type="h" link="linkId1_" x="100.0" y="0" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+<person id="testAgent2" employed="no">
+		<plan selected="yes">
+			<act type="h" link="linkId1_" x="100.0" y="0" end_time="08:13:41" />
+			<leg mode="car">
+			</leg>
+			<act type="w" link="linkId3_" x="1400.0" y="0" end_time="17:02:00" />
+			<leg mode="car">
+			</leg>
+			<act type="h" link="linkId1_" x="100.0" y="0" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="testAgent3" employed="no">
+		<plan selected="yes">
+			<act type="h" link="linkId1_" x="100.0" y="0" end_time="08:13:42" />
+			<leg mode="car">
+			</leg>
+			<act type="w" link="linkId3_" x="1400.0" y="0" end_time="17:04:00" />
+			<leg mode="car">
+			</leg>
+			<act type="h" link="linkId1_" x="100.0" y="0" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+
+	<person id="testAgent4" employed="no">
+		<plan selected="yes">
+			<act type="h" link="linkId1_" x="100.0" y="0" end_time="08:20:00" />
+			<leg mode="car">
+			</leg>
+			<act type="w" link="linkId3_" x="1400.0" y="0" end_time="17:06:00" />
+			<leg mode="car">
+			</leg>
+			<act type="h" link="linkId1_" x="100.0" y="0" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="testAgent5" employed="no">
+		<plan selected="yes">
+			<act type="h" link="linkId1_" x="100.0" y="0" end_time="08:20:01" />
+			<leg mode="car">
+			</leg>
+			<act type="w" link="linkId3_" x="1400.0" y="0" end_time="17:08:00" />
+			<leg mode="car">
+			</leg>
+			<act type="h" link="linkId1_" x="100.0" y="0" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="testAgent6" employed="no">
+		<plan selected="yes">
+			<act type="h" link="linkId1_" x="100.0" y="0" end_time="08:20:02" />
+			<leg mode="car">
+			</leg>
+			<act type="w" link="linkId3_" x="1400.0" y="0" end_time="17:10:00" />
+			<leg mode="car">
+			</leg>
+			<act type="h" link="linkId1_" x="100.0" y="0" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+
+</plans>

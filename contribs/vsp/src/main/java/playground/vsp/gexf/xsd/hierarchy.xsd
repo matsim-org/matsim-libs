@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.gexf.net/1.2draft" xmlns:ns1="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz">
+  <xs:import namespace="http://www.gexf.net/1.2draft/viz" schemaLocation="viz.xsd"/>
+  <!-- extension point -->
+</xs:schema>

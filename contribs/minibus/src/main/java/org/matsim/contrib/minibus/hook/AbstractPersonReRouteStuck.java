@@ -21,7 +21,8 @@ package org.matsim.contrib.minibus.hook;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -41,7 +42,7 @@ abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm  {
 	
 	final PlanAlgorithm router;
 
-    private static final Logger log = Logger.getLogger(PersonReRouteStuck.class);
+    private static final Logger log = LogManager.getLogger(PersonReRouteStuck.class);
 	
 	final Set<Id<Person>> agentsStuck;
 
@@ -53,7 +54,7 @@ abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm  {
 		if (NetworkUtils.isMultimodal(network)) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			net = NetworkUtils.createNetwork();
+			net = NetworkUtils.createNetwork(scenario.getConfig().network());
 			HashSet<String> modes = new HashSet<>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);

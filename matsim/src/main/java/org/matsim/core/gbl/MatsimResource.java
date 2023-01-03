@@ -31,7 +31,8 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Helper class to load data from files in the resource directory
@@ -60,7 +61,7 @@ public abstract class MatsimResource {
 	private static final String RES_PATH_LOCAL = "./res/";  //NOPMD // this line should be ignored for PMD analysis
 	private static final String RES_PATH_LOCAL2 = "./src/main/resources/res/";  //NOPMD // this line should be ignored for PMD analysis
 
-	private static final Logger log = Logger.getLogger(MatsimResource.class);
+	private static final Logger log = LogManager.getLogger(MatsimResource.class);
 
 	/**
 	 * @param filename relative path from within the resource directory to a file to be loaded

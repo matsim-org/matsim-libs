@@ -23,7 +23,8 @@ package org.matsim.core.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -40,7 +41,7 @@ import org.matsim.core.population.PersonUtils;
  * no plans are removed from the population.
  */
 public final class PlansFilterByLegMode {
-	private static final Logger log = Logger.getLogger(PlansFilterByLegMode.class);
+	private static final Logger log = LogManager.getLogger(PlansFilterByLegMode.class);
 
 	private String legMode;
 

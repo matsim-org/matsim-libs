@@ -19,17 +19,20 @@
 
 package org.matsim.core.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.utils.MemoryObserver;
 
 /*package*/ abstract class AbstractController {
     // we already had one case where a method of this was removed, causing downstream failures; better just not
 	// offer it at all; framework with injector should now be flexible enough.  kai, mar'18
 
-    private static Logger log = Logger.getLogger(AbstractController.class);
+    private static final  Logger log = LogManager.getLogger(AbstractController.class);
 
     private OutputDirectoryHierarchy controlerIO;
 
@@ -58,10 +61,8 @@ import org.matsim.core.gbl.MatsimRandom;
     private void resetRandomNumbers(long seed, int iteration) {
         MatsimRandom.reset(seed + iteration);
         MatsimRandom.getRandom().nextDouble(); // draw one because of strange
-        // "not-randomness" is the first
-        // draw...
-        // Fixme [kn] this should really be ten thousand draws instead of just
-        // one
+        // "not-randomness" is the first draw...
+        // Fixme [kn] this should really be ten thousand draws instead of just one
     }
 
     final void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
@@ -70,6 +71,7 @@ import org.matsim.core.gbl.MatsimRandom;
     }
 
     protected final void run(final Config config) {
+        MemoryObserver.start(60);
         MatsimRuntimeModifications.MyRunnable runnable = new MatsimRuntimeModifications.MyRunnable() {
             @Override
             public void run() throws MatsimRuntimeModifications.UnexpectedShutdownException {
@@ -82,11 +84,12 @@ import org.matsim.core.gbl.MatsimRandom;
 
             @Override
             public void shutdown(boolean unexpected) {
-                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected);
+                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration);
             }
         };
         MatsimRuntimeModifications.run(runnable);
         OutputDirectoryLogging.closeOutputDirLogging();
+        MemoryObserver.stop();
     }
 
     protected abstract void loadCoreListeners();
@@ -105,18 +108,26 @@ import org.matsim.core.gbl.MatsimRandom;
      * method in the SimplifiedControllerUtils class ... as with all other abstract methods.
      * </ul>
      */
-    protected abstract boolean continueIterations(int iteration);
+	protected abstract boolean mayTerminateAfterIteration(int iteration);
+	protected abstract boolean shouldTerminate(int iteration);
 
     private void doIterations(Config config) throws MatsimRuntimeModifications.UnexpectedShutdownException {
-        for (int iteration = config.controler().getFirstIteration(); continueIterations(iteration); iteration++) {
-            iteration(config, iteration);
-        }
+    	int iteration = config.controler().getFirstIteration();
+    	
+    	// Special case if lastIteration == -1 -> Do not run any Mobsim
+    	boolean doTerminate = config.controler().getLastIteration() < iteration;
+    	
+    	while (!doTerminate) {
+    		boolean isLastIteration = mayTerminateAfterIteration(iteration);
+    		iteration(config, iteration, isLastIteration);
+    		doTerminate = isLastIteration && shouldTerminate(iteration);
+    		iteration++;
+    	}
     }
-    
     
     final String MARKER = "### ";
 
-    private void iteration(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
+    private void iteration(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         this.thisIteration = iteration;
         this.getStopwatch().beginIteration(iteration);
 
@@ -128,7 +139,7 @@ import org.matsim.core.gbl.MatsimRandom;
         iterationStep("iterationStartsListeners", new Runnable() {
             @Override
             public void run() {
-                controlerListenerManagerImpl.fireControlerIterationStartsEvent(iteration);
+                controlerListenerManagerImpl.fireControlerIterationStartsEvent(iteration, isLastIteration);
             }
         });
 
@@ -136,18 +147,18 @@ import org.matsim.core.gbl.MatsimRandom;
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManagerImpl.fireControlerReplanningEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerReplanningEvent(iteration, isLastIteration);
                 }
             });
         }
 
-        mobsim(config, iteration);
+        mobsim(config, iteration, isLastIteration);
 
         iterationStep("scoring", new Runnable() {
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires scoring event");
-                controlerListenerManagerImpl.fireControlerScoringEvent(iteration);
+                controlerListenerManagerImpl.fireControlerScoringEvent(iteration, isLastIteration);
             }
         });
 
@@ -155,12 +166,16 @@ import org.matsim.core.gbl.MatsimRandom;
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires iteration end event");
-                controlerListenerManagerImpl.fireControlerIterationEndsEvent(iteration);
+                controlerListenerManagerImpl.fireControlerIterationEndsEvent(iteration, isLastIteration);
             }
         });
 
         this.getStopwatch().endIteration();
-        this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        try {
+            this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        } catch (UncheckedIOException e) {
+            log.error("Could not write stopwatch file.", e);
+        }
         if (config.controler().isCreateGraphs()) {
             this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
         }
@@ -168,7 +183,7 @@ import org.matsim.core.gbl.MatsimRandom;
         log.info(Controler.DIVIDER);
     }
 
-    private void mobsim(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
+    private void mobsim(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         // ControlerListeners may create managed resources in
         // beforeMobsim which need to be cleaned up in afterMobsim.
         // Hence the finally block.
@@ -178,7 +193,7 @@ import org.matsim.core.gbl.MatsimRandom;
             iterationStep("beforeMobsimListeners", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration, isLastIteration);
                 }
             });
             
@@ -218,7 +233,7 @@ import org.matsim.core.gbl.MatsimRandom;
                 @Override
                 public void run() {
                     log.info(MARKER + "ITERATION " + iteration + " fires after mobsim event");
-                    controlerListenerManagerImpl.fireControlerAfterMobsimEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerAfterMobsimEvent(iteration, isLastIteration);
                 }
             });
         }

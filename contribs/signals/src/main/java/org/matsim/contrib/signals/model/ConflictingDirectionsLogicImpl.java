@@ -24,7 +24,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,8 +34,8 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup.ActionOnSignalSpecsVi
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.conflicts.Direction;
 import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
@@ -47,9 +48,9 @@ import org.matsim.lanes.Lanes;
  * @author tthunig
  *
  */
-public class ConflictingDirectionsLogicImpl implements ConflictingDirectionsLogic {
+public final class ConflictingDirectionsLogicImpl implements ConflictingDirectionsLogic {
 
-private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImpl.class);
+	private static final Logger log = LogManager.getLogger(ConflictingDirectionsLogicImpl.class);
 
 	private ActionOnSignalSpecsViolation actionOnConflictingDirectionsViolation;
 	private Map<Id<Signal>, Set<Tuple<Id<Link>, Id<Link>>>> setOfLinkTuplesPerSignal = new HashMap<>();

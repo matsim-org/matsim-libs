@@ -29,7 +29,11 @@
 
 <carriers>
 		<carrier id="testCarrier">
-			<capabilities fleetSize="infinite">	
+			<attributes>
+				<attribute name="carrierMode" class="java.lang.String">drt</attribute>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
+			<capabilities fleetSize="infinite">
 				<vehicles>
 					<vehicle id="lightVehicle" depotLinkId="1" typeId="light" earliestStart="21900" latestEnd="23:59:59"/>
 					<vehicle id="mediumVehicle" depotLinkId="1" typeId="medium" earliestStart="21900" latestEnd="23:59:59"/>
@@ -39,13 +43,21 @@
 			</capabilities>
 			
 			<services>
-				<service id="serv1" to="22" capacityDemand="30" earliestStart="0.0" latestEnd="72000.0" serviceDuration="3600.0"/>
+				<service id="serv1" to="22" capacityDemand="30" earliestStart="0.0" latestEnd="72000.0" serviceDuration="3600.0">
+				<attributes>
+					<attribute name="customer" class="java.lang.String">someRandomCustomer</attribute>
+				</attributes>
+				</service>
 				<service id="serv2" to="22" capacityDemand="30" earliestStart="0.0" latestEnd="72000.0" serviceDuration="3600.0"/>
 				<service id="serv3" to="22" capacityDemand="30" earliestStart="0.0" latestEnd="72000.0" serviceDuration="3600.0"/>
 			</services>
 			
 			<shipments>
-				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/>
+				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0">
+				<attributes>
+					<attribute name="customer" class="java.lang.String">someRandomCustomer</attribute>
+				</attributes>
+				</shipment>
 				<shipment id="s2" from="20" to="22" size="10" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/>
 			</shipments>
 			

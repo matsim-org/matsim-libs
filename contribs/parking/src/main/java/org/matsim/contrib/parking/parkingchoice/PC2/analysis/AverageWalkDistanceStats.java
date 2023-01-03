@@ -21,8 +21,9 @@ package org.matsim.contrib.parking.parkingchoice.PC2.analysis;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -35,7 +36,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 
 public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 
-	private static final Logger log = Logger.getLogger(AverageWalkDistanceStats.class);
+	private static final Logger log = LogManager.getLogger(AverageWalkDistanceStats.class);
 
 	private HashMap<Id<PC2Parking>, PC2Parking> parking;
 

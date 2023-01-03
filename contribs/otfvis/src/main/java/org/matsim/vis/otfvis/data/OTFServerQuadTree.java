@@ -22,12 +22,14 @@ package org.matsim.vis.otfvis.data;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.QuadTree;
@@ -47,7 +49,7 @@ import org.matsim.vis.otfvis.interfaces.OTFServer;
  */
 public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 
-	private static final Logger log = Logger.getLogger(OTFServerQuadTree.class);
+	private static final Logger log = LogManager.getLogger(OTFServerQuadTree.class);
 
 	private final List<OTFDataWriter> additionalElements = new LinkedList<OTFDataWriter>();
 
@@ -124,12 +126,14 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 			Collection<Class<OTFDataReader>> readerClasses = connect.getReadersForWriter(element.getClass());
 			for (Class<? extends OTFDataReader> readerClass : readerClasses) {
 				try {
-					Object reader = readerClass.newInstance();
-					client.addAdditionalElement((OTFDataReader)reader);
+					Constructor<? extends OTFDataReader> constructor = readerClass.getDeclaredConstructor();
+					if (!constructor.canAccess(null))
+						constructor.setAccessible(true);
+
+					OTFDataReader reader = constructor.newInstance();
+					client.addAdditionalElement(reader);
 					log.info("Connected additional element writer " + element.getClass().getName() + "(" + element + ")  to " + reader.getClass().getName() + " (" + reader + ")");
-				} catch (InstantiationException e) {
-					throw new RuntimeException(e);
-				} catch (IllegalAccessException e) {
+				} catch (ReflectiveOperationException e) {
 					throw new RuntimeException(e);
 				}
 			}
@@ -220,7 +224,13 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 			Collection<Class<?>> readerClasses = this.connect.getToEntries(writer.getClass());
 			for (Class readerClass : readerClasses) {
 				try {
-					OTFDataReader reader = (OTFDataReader)readerClass.newInstance();
+					Constructor constructor = readerClass.getDeclaredConstructor();
+
+					// some constructors are package private
+					if (!constructor.canAccess(null))
+						constructor.setAccessible(true);
+
+					OTFDataReader reader = (OTFDataReader) constructor.newInstance();
 					reader.setSrc(writer);
 					this.client.put(x, y, reader);
 				} catch (Exception e) {

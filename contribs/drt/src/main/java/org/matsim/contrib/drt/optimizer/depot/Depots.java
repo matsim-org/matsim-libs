@@ -19,17 +19,19 @@
 
 package org.matsim.contrib.drt.optimizer.depot;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
+
 import java.util.Comparator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.common.util.DistanceUtils;
 
 /**
  * @author michalm
@@ -44,22 +46,24 @@ public class Depots {
 		}
 
 		// current task is STAY
-		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-		if (currentTask.getDrtTaskType() != DrtTaskType.STAY) {
+		Task currentTask = schedule.getCurrentTask();
+		if (!STAY.isBaseTypeOf(currentTask)) {
 			return false;
 		}
 
 		// previous task was STOP
 		int previousTaskIdx = currentTask.getTaskIdx() - 1;
-		return (previousTaskIdx >= 0
-				&& ((DrtTask)schedule.getTasks().get(previousTaskIdx)).getDrtTaskType() == DrtTaskType.STOP);
+		return (previousTaskIdx >= 0 && STOP.isBaseTypeOf(schedule.getTasks().get(previousTaskIdx)));
 	}
 
 	public static Link findStraightLineNearestDepot(DvrpVehicle vehicle, Set<Link> links) {
 		Link currentLink = ((DrtStayTask)vehicle.getSchedule().getCurrentTask()).getLink();
-		return links.contains(currentLink) ? null /* already at a depot*/ : links.stream()
+		return links.contains(currentLink) ?
+				null /* already at a depot*/ :
+				links.stream()
 						.min(Comparator.comparing(
-								l -> DistanceUtils.calculateSquaredDistance(currentLink.getCoord(), l.getCoord())))
+								l -> DistanceUtils.calculateSquaredDistance(currentLink.getToNode().getCoord(),
+										l.getFromNode().getCoord())))
 						.get();
 	}
 }

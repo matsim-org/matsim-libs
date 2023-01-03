@@ -23,7 +23,7 @@ package org.matsim.core.population.routes;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Default, abstract implementation of the {@link Route}-interface.
@@ -34,12 +34,14 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	// This has a public non-final non-empty method, which is "clone".  But in the end this is how it is designed.
 	// So we leave it as is; if we ever want to re-design it in the core, we will have to copy it and start
 	// from the copy.  kai, may'17
-	
+
+	protected static final double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
+
 	private boolean locked = false ;
 
 	private double dist = Double.NaN;
 
-	private double travTime = Time.getUndefinedTime();
+	protected double travTime = UNDEFINED_TIME;
 
 	private Id<Link> startLinkId = null;
 	private Id<Link> endLinkId = null;
@@ -47,6 +49,10 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	public AbstractRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		this.startLinkId = startLinkId;
 		this.endLinkId = endLinkId;
+	}
+
+	protected static OptionalTime asOptionalTime(double seconds) {
+		return Double.isInfinite(seconds) ? OptionalTime.undefined() : OptionalTime.defined(seconds);
 	}
 
 	@Override
@@ -60,13 +66,18 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	}
 
 	@Override
-	public final double getTravelTime() {
-		return this.travTime;
+	public final OptionalTime getTravelTime() {
+		return asOptionalTime(this.travTime);
 	}
 
 	@Override
 	public final void setTravelTime(final double travTime) {
 		this.travTime = travTime;
+	}
+
+	@Override
+	public void setTravelTimeUndefined() {
+		this.travTime = UNDEFINED_TIME;
 	}
 
 	@Override
@@ -124,7 +135,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 		String str = "";
 		str +=  " startLinkId=" + startLinkId ;
 		str += " endLinkId=" + endLinkId ;
-		str += " travTime=" + travTime ;
+		str += " travTime=" + travTime;
 		str += " dist=" + dist ;
 		return str ;
 	}

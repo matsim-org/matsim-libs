@@ -11,10 +11,10 @@ package org.matsim.jaxb.signalsystems20;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -60,14 +60,12 @@ import javax.xml.bind.annotation.XmlType;
     "lane",
     "turningMoveRestrictions"
 })
-public class XMLSignalType
-    extends XMLMatsimObjectType
-{
+public final class XMLSignalType extends XMLMatsimObjectType {
 
-    protected List<XMLSignalType.XMLLane> lane;
-    protected XMLSignalType.XMLTurningMoveRestrictions turningMoveRestrictions;
+    private List<XMLSignalType.XMLLane> lane;
+    private XMLSignalType.XMLTurningMoveRestrictions turningMoveRestrictions;
     @XmlAttribute(required = true)
-    protected String linkIdRef;
+    private String linkIdRef;
 
     /**
      * Gets the value of the lane property.

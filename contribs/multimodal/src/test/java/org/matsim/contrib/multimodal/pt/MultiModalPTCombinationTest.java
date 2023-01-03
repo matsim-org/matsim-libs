@@ -23,7 +23,8 @@ package org.matsim.contrib.multimodal.pt;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,7 +58,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class MultiModalPTCombinationTest {
 
-	private static final Logger log = Logger.getLogger(MultiModalPTCombinationTest.class);
+	private static final Logger log = LogManager.getLogger(MultiModalPTCombinationTest.class);
 	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -67,7 +68,9 @@ public class MultiModalPTCombinationTest {
 	 * - Multi-modal simulation can handle TransitAgents (previously, the TransitAgent class did not implement
 	 *   the HasPerson interface. As a result, the multi-modal simulation crashed since it could not access
 	 *   the person).
-	 * - Multi-modal simulaition can handle transit_walk legs (not yet ready...).
+	 * - Multi-modal simulation can handle transit_walk legs (not yet ready...).
+	 * ---> in nov'19 we are trying to replace transit_walk by normal walk and routingMode=pt, so this test is 
+	 * probably no longer very useful, there is no more special walk mode for pt agents - gl-nov'19
 	 */
 	@Test
 	public void testMultiModalPtCombination() {
@@ -75,8 +78,9 @@ public class MultiModalPTCombinationTest {
 		Fixture f = new Fixture();
 		f.init();
 		
-		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.transit_walk);
-		Person walkPerson = f.createPersonAndAdd(f.scenario, "1", TransportMode.walk);
+//		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.transit_walk);
+		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.walk, TransportMode.pt);
+		Person walkPerson = f.createPersonAndAdd(f.scenario, "1", TransportMode.walk, TransportMode.walk);
 		
 		Scenario scenario = f.scenario;
 		Config config = scenario.getConfig();
@@ -84,7 +88,7 @@ public class MultiModalPTCombinationTest {
 		
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setMultiModalSimulationEnabled(true);
-		mmcg.setSimulatedModes(TransportMode.walk + "," + TransportMode.transit_walk);
+		mmcg.setSimulatedModes(TransportMode.walk + "," + TransportMode.transit_walk);//TODO: is this still useful if no agent can still use transit_walk?
 		config.addModule(mmcg);
 		
 		config.qsim().setEndTime(24*3600);
@@ -102,13 +106,9 @@ public class MultiModalPTCombinationTest {
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
 		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
-//		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.transit_walk, defaultWalkSpeed);
 		final PlansCalcRouteConfigGroup.ModeRoutingParams pt = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.pt );
 		pt.setTeleportedModeFreespeedFactor( 2.0 );
 		config.plansCalcRoute().addParameterSet( pt );
-
-//		config.plansCalcRoute().setNetworkModes(CollectionUtils.stringToSet(TransportMode.car + "," + TransportMode.walk +
-//				"," + TransportMode.transit_walk));
 
         config.travelTimeCalculator().setFilterModes(true);
 
@@ -130,13 +130,13 @@ public class MultiModalPTCombinationTest {
 		 * "home-transit_walk-pt_interact-pt-pt_interact-transit_walk-home"
 		 */
 		Plan ptPlan = ptPerson.getSelectedPlan();
-		Assert.assertEquals(7, ptPlan.getPlanElements().size());
+		Assert.assertEquals(ptPlan.getPlanElements().toString(), 7, ptPlan.getPlanElements().size());
 
 		Plan walkPlan = walkPerson.getSelectedPlan();
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-			Assert.assertEquals(7, walkPlan.getPlanElements().size());
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+			Assert.assertEquals(walkPlan.getPlanElements().toString(), 7, walkPlan.getPlanElements().size());
 		} else {
-			Assert.assertEquals(3, walkPlan.getPlanElements().size());
+			Assert.assertEquals(walkPlan.getPlanElements().toString(), 3, walkPlan.getPlanElements().size());
 		}
 		
 		/*
@@ -220,8 +220,8 @@ public class MultiModalPTCombinationTest {
 			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
 			Double modeTravelTime = this.travelTimesPerMode.get(mode);
 			if ( modeTravelTime==null ) {
-				Logger.getLogger(this.getClass()).warn("mode:" + mode );
-				Logger.getLogger(this.getClass()).warn("travelTimesPerMode:" + mode );
+				LogManager.getLogger(this.getClass()).warn("mode:" + mode );
+				LogManager.getLogger(this.getClass()).warn("travelTimesPerMode:" + mode );
 			}
 			this.travelTimesPerMode.put(mode, modeTravelTime + tripTravelTime);
 		}

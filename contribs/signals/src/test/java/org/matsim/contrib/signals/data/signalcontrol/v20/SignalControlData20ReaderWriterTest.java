@@ -21,18 +21,16 @@ package org.matsim.contrib.signals.data.signalcontrol.v20;
 
 import java.io.IOException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -45,7 +43,7 @@ import org.xml.sax.SAXException;
  */
 public class SignalControlData20ReaderWriterTest {
 
-	private static final Logger log = Logger.getLogger(SignalControlData20ReaderWriterTest.class);
+	private static final Logger log = LogManager.getLogger(SignalControlData20ReaderWriterTest.class);
 
 	private static final String TESTXML = "testSignalControl_v2.0.xml";
 

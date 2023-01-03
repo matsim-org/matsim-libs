@@ -34,7 +34,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 /**
  * @author tthunig
  */
-public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirectionsWriterHandler {
+final class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirectionsWriterHandler {
 
 	@Override
 	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {

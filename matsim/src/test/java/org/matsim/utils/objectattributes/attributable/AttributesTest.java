@@ -24,13 +24,17 @@
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
 /**
  * @author thibautd
  */
 public class AttributesTest {
 	@Test
 	public void testInsertion() {
-		final Attributes attributes = new Attributes();
+		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
 		attributes.putAttribute( "rain is nice" , false );
@@ -59,7 +63,7 @@ public class AttributesTest {
 
 	@Test
 	public void testReplacement() {
-		final Attributes attributes = new Attributes();
+		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
 		attributes.putAttribute( "rain is nice" , false );
@@ -82,7 +86,7 @@ public class AttributesTest {
 
 	@Test
 	public void testRemoval() {
-		final Attributes attributes = new Attributes();
+		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
 		attributes.putAttribute( "rain is nice" , false );
@@ -100,5 +104,53 @@ public class AttributesTest {
 
 		Assert.assertNull( "unexpected mapping " ,
 				attributes.getAttribute( "rain is nice" ) );
+	}
+
+	@Test
+	public void testGetAsMap() {
+		final Attributes attributes = new AttributesImpl();
+
+		attributes.putAttribute( "sun" , "nice" );
+		attributes.putAttribute( "rain is nice" , false );
+
+		Map<String, Object> map = attributes.getAsMap();
+		Assert.assertEquals(2, map.size());
+
+		Assert.assertEquals("nice", map.get("sun"));
+		Assert.assertEquals(false, map.get("rain is nice"));
+
+		Iterator<Map.Entry<String, Object>> iter = map.entrySet().iterator();
+		boolean foundSun = false;
+		boolean foundRain = false;
+		Assert.assertTrue(iter.hasNext());
+		Map.Entry<String, Object> e = iter.next();
+		if (e.getKey().equals("sun") && e.getValue().equals("nice")) {
+			foundSun = true;
+		}
+		if (e.getKey().equals("rain is nice") && e.getValue().equals(false)) {
+			foundRain = true;
+		}
+		Assert.assertTrue(iter.hasNext());
+		e = iter.next();
+		if (e.getKey().equals("sun") && e.getValue().equals("nice")) {
+			foundSun = true;
+		}
+		if (e.getKey().equals("rain is nice") && e.getValue().equals(false)) {
+			foundRain = true;
+		}
+		Assert.assertFalse(iter.hasNext());
+
+		Assert.assertTrue(foundSun);
+		Assert.assertTrue(foundRain);
+
+		try {
+			iter.next();
+			Assert.fail("Expected NoSuchElementException, but got none.");
+		} catch (NoSuchElementException ignore) {
+			// expected
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			Assert.fail("Expected NoSuchElementException, but caught a different one.");
+		}
 	}
 }

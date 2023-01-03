@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.controller.SignalController;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
@@ -36,12 +35,8 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
  * @author dgrether
  *
  */
-public class SignalSystemImpl implements SignalSystem {
-	
-	private static final Logger log = Logger.getLogger(SignalSystemImpl.class);
+public final class SignalSystemImpl implements SignalSystem {
 
-	public static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
-	
 	private SignalController signalController;
 	private Map<Id<SignalGroup>, SignalGroup> signalGroups = new HashMap<>();
 	private SignalSystemsManager signalManager;
@@ -111,6 +106,10 @@ public class SignalSystemImpl implements SignalSystem {
 
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
+		// new iteration starts: clear reset lists from the last iteration
+		this.sortedRequests.clear();
+		this.requests.clear();
+		
 		this.signalController.simulationInitialized(simStartTimeSeconds);
 	}
 

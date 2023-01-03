@@ -23,7 +23,8 @@ package org.matsim.core.population.io;
 import java.util.Locale;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,7 +44,6 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 
@@ -81,7 +81,7 @@ import org.xml.sax.Attributes;
 	private Activity prevAct = null;
 	private String routeNodes = null;
 
-	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
+	private static final Logger log = LogManager.getLogger(PopulationReaderMatsimV0.class);
 
 	protected PopulationReaderMatsimV0(
 			final Scenario scenario) {
@@ -176,9 +176,12 @@ import org.xml.sax.Attributes;
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}
-		act.setStartTime(Time.parseTime(atts.getValue("start_time")));
-		act.setMaximumDuration(Time.parseTime(atts.getValue("dur")));
-		act.setEndTime(Time.parseTime(atts.getValue("end_time")));
+		Time.parseOptionalTime(atts.getValue("start_time"))
+				.ifDefinedOrElse(act::setStartTime, act::setStartTimeUndefined);
+		Time.parseOptionalTime(atts.getValue("dur"))
+				.ifDefinedOrElse(act::setMaximumDuration, act::setMaximumDurationUndefined);
+		Time.parseOptionalTime(atts.getValue("end_time"))
+				.ifDefinedOrElse(act::setEndTime, act::setEndTimeUndefined);
 
 		if (this.routeNodes != null) {
 			this.currroute.setLinkIds(this.prevAct.getLinkId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeNodes))), act.getLinkId());
@@ -197,8 +200,10 @@ import org.xml.sax.Attributes;
 
 	private void startLeg(final Attributes atts) {
 		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, atts.getValue("mode").toLowerCase(Locale.ROOT).intern() );
-		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
-		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+		Time.parseOptionalTime(atts.getValue("dep_time"))
+				.ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
+		Time.parseOptionalTime(atts.getValue("trav_time"))
+				.ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
 //		LegImpl r = this.currleg;
 //		r.setTravelTime( Time.parseTime(atts.getValue("arr_time")) - r.getDepartureTime() );
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16

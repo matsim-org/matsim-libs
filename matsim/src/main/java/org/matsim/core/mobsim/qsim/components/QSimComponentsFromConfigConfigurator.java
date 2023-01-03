@@ -34,6 +34,7 @@ public class QSimComponentsFromConfigConfigurator implements QSimComponentsConfi
 	public void configure(QSimComponentsConfig components) {
 		QSimComponentsConfigGroup componentsConfig = (QSimComponentsConfigGroup) config.getModules()
 				.get(QSimComponentsConfigGroup.GROUP_NAME);
+		// we do not want addOrCreateModule(...) since the design has a specific execution path for "null" (see below).  kai, nov'19
 
 		if (componentsConfig != null) {
 			components.clear();

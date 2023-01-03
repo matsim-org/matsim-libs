@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,6 +39,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -80,7 +82,15 @@ public abstract class AbstractModule implements Module {
 	private Binder binder;
 	private Multibinder<EventHandler> eventHandlerMultibinder;
 	private Multibinder<ControlerListener> controlerListenerMultibinder;
+
+	/**
+	 * Contents retrieved (I think) by injected method QSim#addQueueSimulationListeners(...).  Is not public, and therefore cannot be referenced from here.
+	 * <br/>
+	 * I think that that method will be called every time the mobsim will be constructed.  If the injected classes are singletons, they will
+	 * presumably be re-used, otherwise they will be newly constructed.
+	 */
 	private Multibinder<MobsimListener> mobsimListenerMultibinder;
+
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
 	private MapBinder<Class<?>, AttributeConverter<?>> attributeConverterMapBinder;
 	private Multibinder<AbstractQSimModule> qsimModulesMultibinder;
@@ -88,6 +98,7 @@ public abstract class AbstractModule implements Module {
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
 	private Config config;
+	private Multibinder<AbstractQSimModule> qsimOverridingModulesMultibinder;
 
 	public AbstractModule() {
 		// config will be injected later
@@ -105,6 +116,7 @@ public abstract class AbstractModule implements Module {
 		// Guice error messages should give the code location of the error in the user's module,
 		// not in this class.
 		this.binder = binder.skipSources(AbstractModule.class);
+
 		this.mobsimListenerMultibinder = Multibinder.newSetBinder(this.binder, MobsimListener.class);
 		this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
 		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
@@ -115,6 +127,7 @@ public abstract class AbstractModule implements Module {
 						new TypeLiteral<Class<?>>(){},
 						new TypeLiteral<AttributeConverter<?>>() {} );
 		this.qsimModulesMultibinder = Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
+		this.qsimOverridingModulesMultibinder = Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) );
 		this.install();
 	}
 
@@ -132,14 +145,15 @@ public abstract class AbstractModule implements Module {
 	protected final LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
 		return eventHandlerMultibinder.addBinding();
 	}
-	
+
 	protected final void installQSimModule(AbstractQSimModule qsimModule) {
 		qsimModulesMultibinder.addBinding().toInstance(qsimModule);
 	}
-	
+	protected final void installOverridingQSimModule(AbstractQSimModule qsimModule) {
+		qsimOverridingModulesMultibinder.addBinding().toInstance(qsimModule);
+	}
+
 	/**
-	 * See {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample} for an example.
-	 * 
 	 * @see ControlerListener
 	 */
 	protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
@@ -147,8 +161,6 @@ public abstract class AbstractModule implements Module {
 	}
 
 	/**
-	 * See {@link tutorial.programming.planStrategyForRemoval.RunPlanSelectorForRemovalExample} for an example.
-	 * 
 	 * @see StrategyManagerModule
 	 */
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
@@ -178,9 +190,12 @@ public abstract class AbstractModule implements Module {
 	protected final LinkedBindingBuilder<AttributeConverter<?>> addAttributeConverterBinding(final Class<?> clazz ) {
 		return attributeConverterMapBinder.addBinding( clazz );
 	}
-
+	/**
+	 * @deprecated better use {@link #addTravelDisutilityFactoryBinding(String)}.
+	 */
+	@Deprecated
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindCarTravelDisutilityFactory() {
-		return bind(carTravelDisutilityFactoryKey());
+		return addTravelDisutilityFactoryBinding( TransportMode.car );
 	}
 
 	@SuppressWarnings("static-method")
@@ -208,6 +223,10 @@ public abstract class AbstractModule implements Module {
 		return binder().bind(EventsManager.class);
 	}
 
+	/**
+	 * @deprecated besser use {@link #addTravelTimeBinding(String)}.
+	 */
+	@Deprecated
 	protected final LinkedBindingBuilder<TravelTime> bindNetworkTravelTime() {
 		return bind(networkTravelTime());
 	}

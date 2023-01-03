@@ -21,12 +21,15 @@
 package org.matsim.contrib.ev.fleet;
 
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.vehicles.Vehicles;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -40,17 +43,23 @@ public class ElectricFleetModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(ElectricFleetSpecification.class).toProvider(() -> {
-			ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
-			new ElectricFleetReader(fleetSpecification).parse(
-					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getVehiclesFile()));
-			return fleetSpecification;
+		bind(ElectricFleetSpecification.class).toProvider(new Provider<>() {
+			@Inject
+			private Vehicles vehicles;
+
+			@Override
+			public ElectricFleetSpecification get() {
+				ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
+				ElectricVehicleSpecificationImpl.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification,
+						vehicles.getVehicles().values());
+				return fleetSpecification;
+			}
 		}).asEagerSingleton();
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(ElectricFleet.class).toProvider(new Provider<ElectricFleet>() {
+				bind(ElectricFleet.class).toProvider(new Provider<>() {
 					@Inject
 					private ElectricFleetSpecification fleetSpecification;
 					@Inject
@@ -62,10 +71,29 @@ public class ElectricFleetModule extends AbstractModule {
 
 					@Override
 					public ElectricFleet get() {
-						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory,
-								auxConsumptionFactory, chargingPowerFactory);
+						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory, auxConsumptionFactory,
+								chargingPowerFactory);
 					}
 				}).asEagerSingleton();
+
+				if (evCfg.transferFinalSoCToNextIteration) {
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toInstance(new MobsimBeforeCleanupListener() {
+						@Inject
+						private ElectricFleetSpecification electricFleetSpecification;
+
+						@Inject
+						private ElectricFleet electricFleet;
+
+						@Override
+						public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+							for (var oldSpec : electricFleetSpecification.getVehicleSpecifications().values()) {
+								var matsimVehicle = oldSpec.getMatsimVehicle();
+								double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles().get(oldSpec.getId()).getBattery().getSoc();
+								ElectricVehicleSpecifications.setInitialSoc(matsimVehicle, socAtEndOfCurrentIteration);
+							}
+						}
+					});
+				}
 			}
 		});
 	}

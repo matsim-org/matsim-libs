@@ -11,11 +11,11 @@ package org.matsim.jaxb.amberTimes10;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -63,10 +63,10 @@ import javax.xml.bind.annotation.XmlType;
     "signalSystem"
 })
 @XmlRootElement(name = "amberTimes")
-public class XMLAmberTimes {
+public final class XMLAmberTimes {
 
-    protected XMLGlobalDefaultsType globalDefaults;
-    protected List<XMLAmberTimes.XMLSignalSystem> signalSystem;
+    private XMLGlobalDefaultsType globalDefaults;
+    private List<XMLAmberTimes.XMLSignalSystem> signalSystem;
 
     /**
      * Gets the value of the globalDefaults property.
@@ -235,9 +235,7 @@ public class XMLAmberTimes {
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "")
-        public static class XMLSignal
-            extends XMLAmberTimesType
-        {
+        public static class XMLSignal extends XMLAmberTimesType {
 
             @XmlAttribute(required = true)
             protected String refId;

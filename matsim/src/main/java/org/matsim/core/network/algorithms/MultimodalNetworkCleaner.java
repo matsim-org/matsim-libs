@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -47,7 +48,7 @@ import org.matsim.api.core.v01.network.Node;
  */
 public final class MultimodalNetworkCleaner {
 
-	private final static Logger log = Logger.getLogger(MultimodalNetworkCleaner.class);
+	private final static Logger log = LogManager.getLogger(MultimodalNetworkCleaner.class);
 
 	private final Network network;
 	

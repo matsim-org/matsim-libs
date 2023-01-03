@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.lanes.Lane;
@@ -36,7 +36,7 @@ import org.matsim.lanes.Lane;
  * @author dgrether
  *
  */
-public class DatabasedSignal implements Signal {
+public final class DatabasedSignal implements Signal {
 
 	private List<SignalizeableItem> signalizedItems = new ArrayList<SignalizeableItem>();
 

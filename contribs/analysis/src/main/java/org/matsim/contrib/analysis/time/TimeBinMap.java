@@ -3,6 +3,7 @@ package org.matsim.contrib.analysis.time;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Maps values to time bins. Time bins have a fixed size and are relative to the chosen start time. If no start time is
@@ -65,9 +66,18 @@ public class TimeBinMap<T> {
         return endTimeOfLastBucket;
     }
 
+    public double getStartTime() {
+        return startTime;
+    }
+
+    public double getBinSize() {
+        return binSize;
+    }
+
     /**
      * Retrieve all time bins. Note: There is no guarantee that time bins are consecutive. Since only requested bins are
      * created, it is possible that there are 'gaps' in the time series.
+     *
      * @return all time bins
      */
     public Collection<TimeBin<T>> getTimeBins() {
@@ -89,7 +99,7 @@ public class TimeBinMap<T> {
 
     public static class TimeBin<T> {
 
-        private double startTime;
+        private final double startTime;
         private T value;
 
         private TimeBin(double startTime) {
@@ -108,8 +118,16 @@ public class TimeBinMap<T> {
             this.value = value;
         }
 
-        public boolean hasValue() {
-            return this.value != null;
-        }
-    }
+		public T computeIfAbsent(Supplier<T> computeIfAbsent) {
+
+			if (!hasValue()) {
+				setValue(computeIfAbsent.get());
+			}
+			return value;
+		}
+
+		public boolean hasValue() {
+			return this.value != null;
+		}
+	}
 }

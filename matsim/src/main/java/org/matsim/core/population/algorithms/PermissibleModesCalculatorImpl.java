@@ -24,32 +24,33 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
+import javax.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonUtils;
 
 public final class PermissibleModesCalculatorImpl implements PermissibleModesCalculator {
+
 	private final List<String> availableModes;
 	private final List<String> availableModesWithoutCar;
 	private final boolean considerCarAvailability;
 
-	public PermissibleModesCalculatorImpl(
-			final String[] availableModes,
-			final boolean considerCarAvailability) {
-		this.availableModes = Arrays.asList(availableModes);
+	@Inject
+	public PermissibleModesCalculatorImpl(Config config) {
+		this.availableModes = Arrays.asList(config.subtourModeChoice().getModes());
 
-		if ( this.availableModes.contains( TransportMode.car ) ) {
-			final List<String> l = new ArrayList<String>( this.availableModes );
-			while ( l.remove( TransportMode.car ) ) {}
-			this.availableModesWithoutCar = Collections.unmodifiableList( l );
-		}
-		else {
+		if (this.availableModes.contains(TransportMode.car)) {
+			final List<String> l = new ArrayList<String>(this.availableModes);
+			while (l.remove(TransportMode.car)) {
+			}
+			this.availableModesWithoutCar = Collections.unmodifiableList(l);
+		} else {
 			this.availableModesWithoutCar = this.availableModes;
 		}
 
-		this.considerCarAvailability = considerCarAvailability;
+		this.considerCarAvailability = config.subtourModeChoice().considerCarAvailability();
 	}
 
 	@Override

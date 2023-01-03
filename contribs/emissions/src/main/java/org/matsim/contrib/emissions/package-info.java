@@ -1,9 +1,9 @@
 /**
  * <h2>Usage</h2>
- * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample} or {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample} from the example package.
+ * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOnlineExample} or {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample} from the example package.
  * <ul>
  * <li> {@link org.matsim.contrib.emissions.example.CreateEmissionConfig}: Creates a MATSim config file with links to emission related input files as {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup}. </li>
- * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample}: Writes emission events to the events file during the simulation. </li>
+ * <li> {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOnlineExample}: Writes emission events to the events file during the simulation. </li>
  * <li> {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample}: Writes emission events to the events file based on a standard MATSim events file. </li>
  * </ul>
  * The online example as well as the offline example use a config file as created by {@link org.matsim.contrib.emissions.example.CreateEmissionConfig}.
@@ -46,7 +46,7 @@
  * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup} for a detailed description.
  * 
  * <li>emissionVehicleFile: This data type is defined in the EmissionsConfigGroup,
- * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.EmissionSpecificationMarker}. It is described as "definition of a vehicle
+ * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.EmissionUtils.EmissionSpecificationMarker}. It is described as "definition of a vehicle
  *  for every person (who is allowed to choose a vehicle in the simulation):
  *  <ul>
  *  <li> REQUIRED: Vehicle description must start with the respective HbefaVehicleCategory followed by ";"
@@ -55,7 +55,7 @@
  * </ul>
  *
  * Optional: If you want to use vehicle specific emission calculations, set isUsingDetailedEmissionCalculation to <code>true</code> in the
- * {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample} or
+ * {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOnlineExample} or
  * {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample} class.
  * Define the input paths for
  * <ul>
@@ -81,7 +81,7 @@
  * This way a calculation of emissions for undefined vehicle types can be performed.
  * Any instance of {@link org.matsim.contrib.emissions.HbefaWarmEmissionFactorKey} contains a vehicle category, a warm pollutant; a road category,
  * a traffic situation and three vehicle attributes (technology, size class, em concept).
- * Any instance of {@link org.matsim.contrib.emissions.HbefaTrafficSituation} specifies one of 4 traffic situations.
+ * Any instance of {@link org.matsim.contrib.emissions.HbefaTrafficSituation} specifies one of 5 traffic situations.
  * Instances of {@link org.matsim.contrib.emissions.HbefaColdEmissionFactorKey} contain a vehicle category, a cold pollutant, a parking time range,
  * a distance, which is driven after parking and, again, vehicle attributes.
  * The cold/warm emission factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.

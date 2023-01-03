@@ -3,8 +3,9 @@ package org.matsim.contrib.carsharing.runExample;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
@@ -39,8 +40,7 @@ import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.router.CarsharingRoute;
 import org.matsim.contrib.carsharing.router.CarsharingRouteFactory;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -61,19 +61,18 @@ import com.google.inject.name.Names;
 public class RunCarsharing {
 
 	public static void main(String[] args) {
-		Logger.getLogger("org.matsim.core.controler.Injector").setLevel(Level.OFF);
-
 		final Config config = ConfigUtils.loadConfig(args[0]);
 
 		if (Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
-			Logger.getLogger("org.matsim.core.controler").warn(
+			LogManager.getLogger("org.matsim.core.controler").warn(
 					"Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
 
 		CarsharingUtils.addConfigModules(config);
 
-		final Scenario sc = ScenarioUtils.loadScenario(config);
+		final Scenario sc = ScenarioUtils.createScenario(config);
 		sc.getPopulation().getFactory().getRouteFactories().setRouteFactory(CarsharingRoute.class,
 				new CarsharingRouteFactory());
+		ScenarioUtils.loadScenario(sc);
 
 		final Controler controler = new Controler(sc);
 
@@ -143,7 +142,8 @@ public class RunCarsharing {
 				bind(CarsharingManagerInterface.class).to(CarsharingManagerNew.class);
 				bind(VehicleChoiceAgent.class).toInstance(vehicleChoiceAgent);
 				bind(DemandHandler.class).asEagerSingleton();
-				bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)).to(Network.class);
+				bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
+						.to(Network.class);
 
 				bind(Network.class).annotatedWith(Names.named("carnetwork")).toInstance(networkFF);
 				bind(TravelTime.class).annotatedWith(Names.named("ff"))

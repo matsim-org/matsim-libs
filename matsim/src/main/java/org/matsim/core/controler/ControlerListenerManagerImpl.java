@@ -20,7 +20,8 @@
 
 package org.matsim.core.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.utils.misc.ClassUtils;
@@ -34,7 +35,7 @@ import javax.swing.event.EventListenerList;
  */
 public final class ControlerListenerManagerImpl implements ControlerListenerManager {
 
-	private final static Logger log = Logger.getLogger(ControlerListenerManagerImpl.class);
+	private final static Logger log = LogManager.getLogger(ControlerListenerManagerImpl.class);
 
     private MatsimServices controler = null;
 
@@ -114,8 +115,8 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 * Notifies all ControlerListeners
 	 * @param unexpected Whether the shutdown is unexpected or not.
 	 */
-	public void fireControlerShutdownEvent(final boolean unexpected) {
-		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected);
+	public void fireControlerShutdownEvent(final boolean unexpected, int iteration) {
+		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected, iteration);
         ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
         for (ShutdownListener aListener : listener) {
             log.info("calling notifyShutdown on " + aListener.getClass().getName());
@@ -133,8 +134,8 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 * Notifies all ControlerSetupIterationStartsListeners
      *
 	 */
-	public void fireControlerIterationStartsEvent(final int iteration) {
-		IterationStartsEvent event = new IterationStartsEvent(this.controler, iteration);
+	public void fireControlerIterationStartsEvent(final int iteration, boolean isLastIteration) {
+		IterationStartsEvent event = new IterationStartsEvent(this.controler, iteration, isLastIteration);
 		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
         for (IterationStartsListener aListener : listener) {
             log.info("calling notifyIterationStarts on " + aListener.getClass().getName());
@@ -152,8 +153,8 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 * Notifies all ControlerIterationEndsListeners
 	 *
 	 */
-	public void fireControlerIterationEndsEvent(final int iteration) {
-		IterationEndsEvent event = new IterationEndsEvent(this.controler, iteration);
+	public void fireControlerIterationEndsEvent(final int iteration, boolean isLastIteration) {
+		IterationEndsEvent event = new IterationEndsEvent(this.controler, iteration, isLastIteration);
 		{
 			IterationEndsListener[] listener = this.coreListenerList.getListeners(IterationEndsListener.class);
             for (IterationEndsListener aListener : listener) {
@@ -175,8 +176,8 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 * Notifies all ControlerScoringListeners
 	 *
 	 */
-	public void fireControlerScoringEvent(final int iteration) {
-		ScoringEvent event = new ScoringEvent(this.controler, iteration);
+	public void fireControlerScoringEvent(final int iteration, boolean isLastIteration) {
+		ScoringEvent event = new ScoringEvent(this.controler, iteration, isLastIteration);
 		{
 			ScoringListener[] listener = this.coreListenerList.getListeners(ScoringListener.class);
             for (ScoringListener aListener : listener) {
@@ -198,8 +199,8 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 * Notifies all ControlerReplanningListeners
 	 *
 	 */
-	public void fireControlerReplanningEvent(final int iteration) {
-		ReplanningEvent event = new ReplanningEvent(this.controler, iteration);
+	public void fireControlerReplanningEvent(final int iteration, boolean isLastIteration) {
+		ReplanningEvent event = new ReplanningEvent(this.controler, iteration, isLastIteration);
 		ReplanningListener[] listener = this.coreListenerList.getListeners(ReplanningListener.class);
         for (ReplanningListener aListener : listener) {
             log.info("calling notifyReplanning on " + aListener.getClass().getName());
@@ -217,8 +218,8 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 * Notifies all ControlerBeforeMobsimListeners
 	 *
 	 */
-	public void fireControlerBeforeMobsimEvent(final int iteration) {
-		BeforeMobsimEvent event = new BeforeMobsimEvent(this.controler, iteration);
+	public void fireControlerBeforeMobsimEvent(final int iteration, boolean isLastIteration) {
+		BeforeMobsimEvent event = new BeforeMobsimEvent(this.controler, iteration, isLastIteration);
 		BeforeMobsimListener[] listener = this.coreListenerList.getListeners(BeforeMobsimListener.class);
         for (BeforeMobsimListener aListener : listener) {
             log.info("calling notifyBeforeMobsim on " + aListener.getClass().getName());
@@ -236,8 +237,8 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 * Notifies all ControlerAfterMobsimListeners
 	 *
 	 */
-	public void fireControlerAfterMobsimEvent(final int iteration) {
-		AfterMobsimEvent event = new AfterMobsimEvent(this.controler, iteration);
+	public void fireControlerAfterMobsimEvent(final int iteration, boolean isLastIteration) {
+		AfterMobsimEvent event = new AfterMobsimEvent(this.controler, iteration, isLastIteration);
 		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
         for (AfterMobsimListener aListener : listener) {
             log.info("calling notifyAfterMobsim on " + aListener.getClass().getName());

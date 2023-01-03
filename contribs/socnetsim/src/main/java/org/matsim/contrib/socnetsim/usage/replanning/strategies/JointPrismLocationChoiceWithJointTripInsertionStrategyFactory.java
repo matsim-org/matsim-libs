@@ -22,8 +22,9 @@ package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
-
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -53,15 +54,21 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
 	private javax.inject.Provider<TripRouter> tripRouterProvider;
+	private final MainModeIdentifier mainModeIdentifier;
+	private final TimeInterpretation timeInterpretation;
 
 	@Inject
 	public JointPrismLocationChoiceWithJointTripInsertionStrategyFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
-																		 Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier, javax.inject.Provider<TripRouter> tripRouterProvider) {
+																		 Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier, 
+																		 javax.inject.Provider<TripRouter> tripRouterProvider, MainModeIdentifier mainModeIdentifier,
+																		 TimeInterpretation timeInterpretation) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
 		this.tripRouterProvider = tripRouterProvider;
+		this.mainModeIdentifier = mainModeIdentifier;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 
@@ -76,7 +83,7 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
 						sc.getConfig(),
-						tripRouterFactory) );
+						mainModeIdentifier) );
 		
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
@@ -93,7 +100,7 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 								MatsimRandom.getLocalInstance(),
 								(SocialNetwork) sc.getScenarioElement(  SocialNetwork.ELEMENT_NAME ),
 								(JointTripInsertorConfigGroup) sc.getConfig().getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
-								tripRouterFactory.get());
+								mainModeIdentifier);
 						}
 						
 						@Override
@@ -122,7 +129,7 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
 					sc.getConfig(),
-					tripRouterFactory) );
+					tripRouterFactory, timeInterpretation) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(

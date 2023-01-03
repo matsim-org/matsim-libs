@@ -21,7 +21,8 @@
  */
 package org.matsim.contrib.signals.controller.sylvia;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,8 +43,13 @@ import org.matsim.contrib.signals.builder.Signals;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.*;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
@@ -77,7 +83,7 @@ import java.util.Map;
  */
 public class SylviaIT {
 
-	private static final Logger log = Logger.getLogger(SylviaIT.class);
+	private static final Logger log = LogManager.getLogger(SylviaIT.class);
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

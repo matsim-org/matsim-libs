@@ -23,14 +23,15 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.signalcontrol20.ObjectFactory;
@@ -46,19 +47,16 @@ import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLStop;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 
 
 /**
  * @author dgrether
  *
  */
-public class SignalControlWriter20 extends MatsimJaxbXmlWriter {
+public final class SignalControlWriter20 extends MatsimJaxbXmlWriter {
 
-	private static final Logger log = Logger.getLogger(SignalControlWriter20.class);
+	private static final Logger log = LogManager.getLogger(SignalControlWriter20.class);
 	
 	private SignalControlData data;
 

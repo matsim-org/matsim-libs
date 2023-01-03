@@ -19,7 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import org.apache.log4j.Logger;
+import java.util.List;
+import java.util.ListIterator;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -36,7 +40,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -44,12 +48,9 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.List;
-import java.util.ListIterator;
-
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
-	private static final Logger log = Logger.getLogger(AbstractTransitDriverAgent.class);
+	private static final Logger log = LogManager.getLogger(AbstractTransitDriverAgent.class);
 
 	private EventsManager eventsManager;
 
@@ -225,16 +226,13 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
 			double delay = now - this.getDeparture().getDepartureTime();
-			if (! ( Double.isNaN(this.currentStop.getArrivalOffset()) 
-					&&   Double.isInfinite(this.currentStop.getArrivalOffset())) ){
-				delay = delay - this.currentStop.getArrivalOffset();
-			}
-			else if (! (Double.isNaN(this.currentStop.getDepartureOffset()) &&   Double.isInfinite(this.currentStop.getDepartureOffset()))) {
-				delay =  delay - this.currentStop.getDepartureOffset();
-			}
-			else {
-				log.warn("Could not calculate delay!");
-			}
+			delay -= this.currentStop.getArrivalOffset()
+					.or(this.currentStop::getDepartureOffset)
+					.orElseGet(() -> {
+								log.warn("Could not calculate delay!");
+								return 0;
+							}
+					);
 			eventsManager.processEvent(new VehicleArrivesAtFacilityEvent(now, this.vehicle.getVehicle().getId(), stop.getId(),
 					delay));
 		}
@@ -248,8 +246,8 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now,
 			final double stopTime) {
-		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
-			double earliestDepTime = getActivityEndTime() + this.nextStop.getDepartureOffset();
+		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset().isDefined())) {
+			double earliestDepTime = getActivityEndTime() + this.nextStop.getDepartureOffset().seconds();
 			if (now + stopTime < earliestDepTime) {
 				return earliestDepTime - now;
 			}
@@ -257,24 +255,15 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		return stopTime;
 	}
 
-	private boolean isBadDouble(double d){
-		return Double.isNaN(d) || Double.isInfinite(d);
-	}
-
 	private void depart(final double now) {
 		double delay = now - this.getDeparture().getDepartureTime();
-		if (this.isBadDouble(this.getDeparture().getDepartureTime())){ //this is the case if the next stop is null
-			delay = 0;
-		}
-		if (! this.isBadDouble(this.currentStop.getDepartureOffset())){
-			delay =  delay - this.currentStop.getDepartureOffset();
-		}
-		else if (! this.isBadDouble(this.currentStop.getArrivalOffset()) ){
-			delay = delay - this.currentStop.getArrivalOffset();
-		}
-		else {
-			log.warn("Could not calculate delay!");
-		}
+		delay -= this.currentStop.getDepartureOffset()
+				.or(this.currentStop::getArrivalOffset)
+				.orElseGet(() -> {
+							log.warn("Could not calculate delay!");
+							return 0;
+						}
+				);
 		eventsManager.processEvent(new VehicleDepartsAtFacilityEvent(now, this.vehicle.getVehicle().getId(),
 				this.currentStop.getStopFacility().getId(),
 				delay));
@@ -417,7 +406,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 		@Deprecated
 		@Override
-		public double getTravelTime() {
+		public OptionalTime getTravelTime() {
 			return this.delegate.getTravelTime();
 		}
 
@@ -428,6 +417,11 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 		@Override
 		public void setTravelTime(final double travelTime) {
+			throw new UnsupportedOperationException("read only route.");
+		}
+
+		@Override
+		public void setTravelTimeUndefined() {
 			throw new UnsupportedOperationException("read only route.");
 		}
 

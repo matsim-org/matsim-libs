@@ -23,11 +23,12 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
@@ -40,16 +41,15 @@ import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.lanes.Lane;
 import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 
 
 /**
  * @author dgrether
  *
  */
-public class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
+public final class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
 	
-	private static final Logger log = Logger.getLogger(SignalSystemsWriter20.class);
+	private static final Logger log = LogManager.getLogger(SignalSystemsWriter20.class);
 	
 	private SignalSystemsData signalData;
 	

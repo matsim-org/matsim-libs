@@ -22,7 +22,8 @@ package org.matsim.core.gbl;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -33,7 +34,7 @@ import org.apache.log4j.Logger;
  * @author mrieser
  */
 public abstract class MatsimRandom {
-	private static final Logger log = Logger.getLogger( MatsimRandom.class ) ;
+	private static final Logger log = LogManager.getLogger( MatsimRandom.class ) ;
 
 	private static final class InstrumentedRandom extends Random {
 		InstrumentedRandom(long defaultRandomSeed) {

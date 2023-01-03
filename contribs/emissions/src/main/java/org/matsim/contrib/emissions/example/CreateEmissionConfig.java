@@ -31,14 +31,17 @@ import org.matsim.core.controler.MatsimServices;
 /**
  * 
  * Creates a config file 
- * with necessary emission input files for the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}.
+ * with necessary emission input files for the {@link EmissionsConfigGroup EmissionsConfigGroup}.
  * 
  * This config file is used by the {@link RunDetailedEmissionToolOfflineExample OfflineExample} and
- * the {@link RunEmissionToolOnlineExample OnlineExample}
+ * the {@link RunDetailedEmissionToolOnlineExample OnlineExample}
  * 
  * @author benjamin, julia
  *
+ * @deprecated -- has not been maintained and should in consequence be phased out.  kai, nov'21
+ *
  */
+@Deprecated // has not been maintained and should in consequence be phased out.  kai, nov'21
 public final class CreateEmissionConfig {
 
 		private static final String inputPath = "./test/input/org/matsim/contrib/emissions/";
@@ -110,24 +113,30 @@ public final class CreateEmissionConfig {
 	        controler.getConfig().addModule(ecg);
 
 			// one can now directly set the hbefa road types as link attributes
-	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-			ecg.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromFile);
+//	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+//			ecg.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromFile);
 
 	        // emission vehicles are now set in the default vehicle container
 	        config.vehicles().setVehiclesFile(emissionVehicleFile);
 
-	        ecg.setUsingVehicleTypeIdAsVehicleDescription(false);
+			if ( (Boolean) false ==null ) {
+				ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+			} else if ( false ) {
+				ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+			} else {
+				ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+			}
 
-	        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
+			ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 	        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
-	        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
+//	        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 	        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 	        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 
 	        ecg.setWritingEmissionsEvents(false);
-	        ecg.setEmissionCostMultiplicationFactor(1.0);
-	        ecg.setConsideringCO2Costs(true);
-	        ecg.setEmissionEfficiencyFactor(1.0);
+//	        ecg.setEmissionCostMultiplicationFactor(1.0);
+//	        ecg.setConsideringCO2Costs(true);
+//	        ecg.setEmissionEfficiencyFactor(1.0);
 	        
 	   // write config     
 	        ConfigWriter cw = new ConfigWriter(config);

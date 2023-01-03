@@ -42,13 +42,15 @@ public final class MainModeIdentifierImpl implements MainModeIdentifier {
 			// Marcel's SBB raptor returns access/egress_walk to and from pt, and transit_walk only
 			// for direct walk (and presumably in between pt legs, if necessary).  kai/gregor, sep'18
 		}
+		if ( mode.endsWith( "_fallback" ) )  {
+			return mode.substring(0, mode.length() - 9) ;
+		}
 		
 		for ( PlanElement pe : tripElements ) {
 			if ( pe instanceof Leg ) {
 				Leg leg = (Leg) pe ;
 				String mode2 = leg.getMode() ;
 				if ( !mode2.contains( TransportMode.non_network_walk ) &&
-						!mode2.contains( TransportMode.non_network_walk ) &&
 						!mode2.contains( TransportMode.transit_walk ) ) {
 					return mode2 ;
 				}

@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.qsim;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,7 +77,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class JointTravelingSimulationIntegrationTest {
 	private static final Logger log =
-		Logger.getLogger(JointTravelingSimulationIntegrationTest.class);
+		LogManager.getLogger(JointTravelingSimulationIntegrationTest.class);
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -92,26 +93,18 @@ public class JointTravelingSimulationIntegrationTest {
 	// => to set to true when fixing tests only
 	private static final boolean DUMP_EVENTS = false;
 
-	static {
-		Logger.getLogger( "org.matsim" ).setLevel( Level.WARN );
-		Logger.getLogger( EventsManagerImpl.class ).setLevel( Level.WARN );
-		Logger.getLogger( Gbl.class ).setLevel( Level.WARN );
-
-		log.setLevel( Level.WARN );
-	}
-
 	private static final int N_RANDOM_SCENARIOS = 20;
 	private static final int N_LAPS = 5;
 
-	private static final Id<Link> ORIGIN_LINK = Id.create("origin", Link.class);
-	private static final Id<Link> TO_PU_LINK = Id.create("toPu", Link.class);
-	private static final Id<Link> PU_LINK = Id.create("pu", Link.class);
-	private static final Id<Link> TRAVEL_LINK_1 = Id.create(1, Link.class);
-	private static final Id<Link> TRAVEL_LINK_2 = Id.create(2, Link.class);
-	private static final Id<Link> DO_LINK = Id.create("do", Link.class);
-	private static final Id<Link> TO_DESTINATION_LINK = Id.create("to_destination", Link.class);
-	private static final Id<Link> DESTINATION_LINK = Id.create("destination", Link.class);
-	private static final Id<Link> RETURN_LINK = Id.create("return", Link.class);
+	private final Id<Link> ORIGIN_LINK = Id.create("origin", Link.class);
+	private final Id<Link> TO_PU_LINK = Id.create("toPu", Link.class);
+	private final Id<Link> PU_LINK = Id.create("pu", Link.class);
+	private final Id<Link> TRAVEL_LINK_1 = Id.create(1, Link.class);
+	private final Id<Link> TRAVEL_LINK_2 = Id.create(2, Link.class);
+	private final Id<Link> DO_LINK = Id.create("do", Link.class);
+	private final Id<Link> TO_DESTINATION_LINK = Id.create("to_destination", Link.class);
+	private final Id<Link> DESTINATION_LINK = Id.create("destination", Link.class);
+	private final Id<Link> RETURN_LINK = Id.create("return", Link.class);
 
 	private static final String ORIGIN_ACT = "chill";
 	private static final String DESTINATION_ACT = "stress";
@@ -186,7 +179,6 @@ public class JointTravelingSimulationIntegrationTest {
 
 		// To make the output more readable (otherwise, warning that driver mode
 		// is added as a main mode is logged each time)
-		Logger.getLogger( JointQSimFactory.class ).setLevel( Level.ERROR );
 		for (int i=0; i < N_RANDOM_SCENARIOS; i++) {
 			log.info( "random test scenario "+i );
 			final Scenario sc =
@@ -343,7 +335,7 @@ public class JointTravelingSimulationIntegrationTest {
 		}
 	}
 
-	private static Fixture createFixture(
+	private Fixture createFixture(
 			final boolean insertDummyActivities,
 			final RouteType routeType) {
 		switch ( routeType ) {
@@ -412,7 +404,7 @@ public class JointTravelingSimulationIntegrationTest {
 		}
 	}
 
-	private static Scenario createTestScenario(
+	private Scenario createTestScenario(
 			final Fixture fixture,
 			final Random random) {
 		final Config config = ConfigUtils.createConfig();
@@ -572,7 +564,7 @@ public class JointTravelingSimulationIntegrationTest {
 		return sc;
 	}
 
-	private static void createNetwork(final Network network) {
+	private void createNetwork(final Network network) {
 		int c = 0;
 		int d = 0;
 

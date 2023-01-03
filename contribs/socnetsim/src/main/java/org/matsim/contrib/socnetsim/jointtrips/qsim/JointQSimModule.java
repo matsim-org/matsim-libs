@@ -8,11 +8,11 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -29,12 +29,12 @@ public class JointQSimModule extends AbstractQSimModule {
 		addNamedComponent(PassengerUnboardingAgentFactory.class, JOINT_PASSENGER_UNBOARDING);
 		addNamedComponent(JointModesDepartureHandler.class, JOINT_MODES_DEPARTURE_HANDLER);
 		addNamedComponent(PopulationAgentSourceWithVehicles.class, AGENTS_SOURCE_WITH_VEHICLES);
-		addNamedComponent(QNetsimEngine.class, REPLACEMENT_QNETSIM_ENGINE);
+		addNamedComponent(QNetsimEngineI.class, REPLACEMENT_QNETSIM_ENGINE);
 	}
 
 	@Provides
 	@Singleton
-	JointModesDepartureHandler provideJoinModesDepartureHandler(QNetsimEngine netsimEngine) {
+	JointModesDepartureHandler provideJoinModesDepartureHandler(QNetsimEngineI netsimEngine) {
 		return new JointModesDepartureHandler(netsimEngine);
 	}
 
@@ -48,9 +48,9 @@ public class JointQSimModule extends AbstractQSimModule {
 	@Provides
 	@Singleton
 	PassengerUnboardingAgentFactory providePassengerUnboardingAgentFactory(Config config, QSim qsim,
-			QNetsimEngine netsimEngine) {
+			QNetsimEngineI netsimEngine, TimeInterpretation timeInterpretation) {
 		return new PassengerUnboardingAgentFactory(
-				config.transit().isUseTransit() ? new TransitAgentFactory(qsim) : new DefaultAgentFactory(qsim),
+				config.transit().isUseTransit() ? new TransitAgentFactory(qsim, timeInterpretation) : new DefaultAgentFactory(qsim, timeInterpretation),
 				new NetsimWrappingQVehicleProvider(netsimEngine));
 	}
 	

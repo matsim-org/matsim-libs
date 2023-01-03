@@ -22,16 +22,24 @@
 
 package org.matsim.pt.router;
 
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.matsim.core.controler.AbstractModule;
-
-import javax.inject.Provider;
 
 public class TransitRouterModule extends AbstractModule {
 
     @Override
     public void install() {
         if (getConfig().transit().isUseTransit()) {
-            bind(TransitRouter.class).toProvider(TransitRouterImplFactory.class);
+            switch (getConfig().transit().getRoutingAlgorithmType()) {
+                case DijkstraBased:
+                    bind(TransitRouter.class).toProvider(TransitRouterImplFactory.class);
+                    break;
+                case SwissRailRaptor:
+                    install(new SwissRailRaptorModule());
+                    break;
+                default:
+                    throw new RuntimeException("Unsupported transit routing algorithm type: " + getConfig().transit().getRoutingAlgorithmType().name());
+            }
         }
     }
 

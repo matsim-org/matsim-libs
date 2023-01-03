@@ -21,8 +21,9 @@ package org.matsim.core.controler.corelisteners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -38,10 +39,9 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.facilities.ActivityFacilities;
@@ -54,21 +54,16 @@ import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.AttributeConverter;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.Map;
 
 @Singleton
 final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
-	private static final Logger log = Logger.getLogger( DumpDataAtEndImpl.class );
+	private static final Logger log = LogManager.getLogger( DumpDataAtEndImpl.class );
 
 	@Inject
 	private Config config;
@@ -108,6 +103,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private Lanes lanes;
 
 	@Inject
+	private Scenario scenario;
+
+	@Inject
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
@@ -131,40 +129,72 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		dumpLanes();
 		dumpCounts();
 
-		if (!event.isUnexpected() && vspConfig.isWritingOutputEvents() && (controlerConfigGroup.getWriteEventsInterval()!=0)) {
-			dumpOutputEvents();
+		if (!event.isUnexpected() && this.vspConfig.isWritingOutputEvents() && (this.controlerConfigGroup.getWriteEventsInterval()!=0)) {
+			dumpOutputEvents(event.getIteration());
 		}
-		
-		dumpExperiencedPlans() ;
-	}
+		dumpOutputTrips(event.getIteration());
+        dumpOutputLegs(event.getIteration());
+		dumpExperiencedPlans(event.getIteration()) ;
 
-	private void dumpOutputEvents() {
-		try {
-			File toFile = new File(	controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_EVENTS_XML));
-			File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), Controler.FILENAME_EVENTS_XML));
-			try {
-				Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
-					+ "generated in the final iteration" );
+		if (controlerConfigGroup.getCleanItersAtEnd() == ControlerConfigGroup.CleanIterations.delete) {
+			this.controlerIO.deleteIterationDirectory();
 		}
 	}
 
-	private void dumpExperiencedPlans() {
-		if ( config.planCalcScore().isWriteExperiencedPlans() ) {
-			try {
-				File toFile = new File(	controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_EXPERIENCED_PLANS));
-				File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), Controler.FILENAME_EXPERIENCED_PLANS));
-				try {
-					Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
+	private void dumpOutputEvents(int iteration) {
+		for (ControlerConfigGroup.EventsFileFormat format : this.controlerConfigGroup.getEventsFileFormats()) {
+			try{
+				Controler.DefaultFiles file;
+				switch (format) {
+					case xml:
+						file = Controler.DefaultFiles.events;
+						break;
+					case pb:
+						file = Controler.DefaultFiles.eventsPb;
+						break;
+					case json:
+						file = Controler.DefaultFiles.eventsJson;
+						break;
+					default:
+						continue;
 				}
+
+				IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, file),
+						this.controlerIO.getOutputFilename(file));
+			} catch (Exception ee) {
+				LogManager.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
+						+ "generated in the final iteration");
+			}
+		}
+	}
+
+	private void dumpOutputTrips(int iteration) {
+		try {
+			IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.tripscsv),
+					this.controlerIO.getOutputFilename(Controler.DefaultFiles.tripscsv));
+		} catch (Exception ee) {
+			LogManager.getLogger(this.getClass()).error("writing output trips did not work; probably parameters were such that no trips CSV were "
+					+ "generated in the final iteration");
+		}
+	}
+
+    private void dumpOutputLegs(int iteration) {
+        try {
+			IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.legscsv),
+					this.controlerIO.getOutputFilename(Controler.DefaultFiles.legscsv));
+        } catch (Exception ee) {
+            LogManager.getLogger(this.getClass()).error("writing output legs did not work; probably parameters were such that no legs CSV were "
+                    + "generated in the final iteration");
+        }
+    }
+
+	private void dumpExperiencedPlans(int iteration) {
+		if (this.config.planCalcScore().isWriteExperiencedPlans() ) {
+			try {
+				IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.experiencedPlans),
+						this.controlerIO.getOutputFilename(Controler.DefaultFiles.experiencedPlans));
 			} catch ( Exception ee ) {
-				Logger.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
+				LogManager.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
 						+ "were not generated in the final iteration", ee);
 			}
 		}
@@ -172,12 +202,12 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpCounts() {
 		try {
-			if ( counts != null ) {
-				final String inputCRS = config.counts().getInputCRS();
-				final String internalCRS = config.global().getCoordinateSystem();
+			if (this.counts != null ) {
+				final String inputCRS = this.config.counts().getInputCRS();
+				final String internalCRS = this.config.global().getCoordinateSystem();
 
 				if ( inputCRS == null ) {
-					new CountsWriter(counts).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_COUNTS));
+					new CountsWriter(this.counts).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.counts));
 				}
 				else {
 					log.info( "re-projecting counts from "+internalCRS+" back to "+inputCRS+" for export" );
@@ -187,7 +217,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 									internalCRS,
 									inputCRS );
 
-					new CountsWriter( transformation , counts).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_COUNTS));
+					new CountsWriter( transformation , this.counts).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.counts));
 				}
 			}
 		} catch ( Exception ee ) {
@@ -197,7 +227,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpLanes() {
 		try {
-			new LanesWriter(lanes).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_LANES));
+			if ( this.lanes!=null && !this.lanes.getLanesToLinkAssignments().isEmpty() ){
+				new LanesWriter( this.lanes ).write( this.controlerIO.getOutputFilename( Controler.DefaultFiles.lanes ) );
+			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing lanes.", ee);
 		}
@@ -205,7 +237,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpHouseholds() {
 		try {
-			new HouseholdsWriterV10(households).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_HOUSEHOLDS));
+			new HouseholdsWriterV10(this.households).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.households));
 		} catch ( Exception ee ) {
 			log.error("Exception writing households.", ee);
 		}
@@ -213,7 +245,11 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpVehicles() {
 		try {
-			new VehicleWriterV1(vehicles).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_VEHICLES));
+			new MatsimVehicleWriter(this.vehicles).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.vehicles));
+			Vehicles allVehicles = VehicleUtils.getOrCreateAllvehicles( scenario );
+			if ( allVehicles!=null && !allVehicles.getVehicleTypes().isEmpty() ){
+				new MatsimVehicleWriter( allVehicles ).writeFile( this.controlerIO.getOutputFilename( Controler.DefaultFiles.allVehicles ) );
+			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing vehicles.", ee);
 		}
@@ -221,8 +257,8 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpTransitVehicles() {
 		try {
-			if ( transitVehicles != null ) {
-				new VehicleWriterV1(transitVehicles).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_TRANSIT_VEHICLES));
+			if (this.transitVehicles != null ) {
+				new MatsimVehicleWriter(this.transitVehicles).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.transitVehicles));
 			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing transit vehicles.", ee);
@@ -231,11 +267,8 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpTransitSchedule() {
 		try {
-			if ( transitSchedule != null ) {
-				final String inputCRS = config.transit().getInputScheduleCRS();
-				final String internalCRS = config.global().getCoordinateSystem();
-
-				new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_TRANSIT_SCHEDULE));
+			if (this.transitSchedule != null ) {
+				new TransitScheduleWriter(this.transitSchedule).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.transitSchedule));
 			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing transit schedule.", ee);
@@ -243,19 +276,16 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	}
 
 	private void dumpNetworkChangeEvents() {
-		if (config.network().isTimeVariantNetwork()) {
-			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_CHANGE_EVENTS_XML),
-					NetworkUtils.getNetworkChangeEvents(network));
+		if (this.config.network().isTimeVariantNetwork()) {
+			new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.changeEvents),
+					NetworkUtils.getNetworkChangeEvents(this.network));
 		}
 	}
 
 	private void dumpFacilities() {
 		// dump facilities
 		try {
-			final String inputCRS = config.facilities().getInputCRS();
-			final String internalCRS = config.global().getCoordinateSystem();
-
-			new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_FACILITIES));
+			new FacilitiesWriter(this.activityFacilities).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.facilities));
 		} catch ( Exception ee ) {
 			log.error("Exception writing facilities.", ee);
 		}
@@ -263,21 +293,21 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpConfig() {
 		// dump config
-		new ConfigWriter(config).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_CONFIG));
-		new ConfigWriter(config, ConfigWriter.Verbosity.minimal).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_CONFIG_REDUCED));
+		new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.config, ControlerConfigGroup.CompressionType.none));
+		new ConfigWriter(this.config, ConfigWriter.Verbosity.minimal).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.configReduced, ControlerConfigGroup.CompressionType.none));
 	}
 
 	private void dumpNetwork() {
 		// dump network
-		new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_NETWORK));
+		new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.network));
 	}
 
 	private void dumpPlans() {
 		// dump plans
 
-		final PopulationWriter writer = new PopulationWriter(population, network);
-		writer.putAttributeConverters( attributeConverters );
-		writer.write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION));
+		final PopulationWriter writer = new PopulationWriter(this.population, this.network);
+		writer.putAttributeConverters(this.attributeConverters);
+		writer.write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.population));
 	}
 
 }

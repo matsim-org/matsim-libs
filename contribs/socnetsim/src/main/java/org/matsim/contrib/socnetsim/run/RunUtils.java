@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.run;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,9 +32,8 @@ import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 /**
@@ -48,7 +46,7 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
  */
 public class RunUtils {
 	static final Logger log =
-		Logger.getLogger(RunUtils.class);
+		LogManager.getLogger(RunUtils.class);
 
 	private RunUtils() {}
 
@@ -189,7 +187,7 @@ public class RunUtils {
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				for (Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE )) {
+				for (Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.StagesAsNormalActivities )) {
 					if (act.getCoord() != null) continue;
 					if (act.getLinkId() == null) throw new NullPointerException();
 					act.setCoord(

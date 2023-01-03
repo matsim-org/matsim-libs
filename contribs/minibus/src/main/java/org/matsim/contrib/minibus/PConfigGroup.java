@@ -22,17 +22,18 @@ package org.matsim.contrib.minibus;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.minibus.operator.BasicOperator;
+import org.matsim.contrib.minibus.hook.BasicOperator;
 import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * Config group to configure p
@@ -46,7 +47,7 @@ public final class PConfigGroup extends ConfigGroup{
 	 * TODO [AN] This one has to be checked
 	 */
 	private static final long serialVersionUID = 4840713748058034511L;
-	private static final Logger log = Logger.getLogger(PConfigGroup.class);
+	private static final Logger log = LogManager.getLogger(PConfigGroup.class);
 	
 	public static enum StopLocationSelector {allCarLinks ("allCarLinks"), 
 		junctionApproachesAndBetweenJunctions ("junctionApproachesAndBetweenJunctions");
@@ -133,7 +134,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private double vehicleMaximumVelocity = Double.POSITIVE_INFINITY;
 	private double delayPerBoardingPassenger = 2.0;
 	private double delayPerAlightingPassenger = 1.0;
-	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
+	private VehicleType.DoorOperationMode doorOperationMode = VehicleType.DoorOperationMode.serial;
 	private int numberOfIterationsForProspecting = 0;
 	private double initialBudget = 0.0;
 	private double costPerVehicleAndDay = 0.0;
@@ -221,10 +222,10 @@ public final class PConfigGroup extends ConfigGroup{
 		} else if (DELAY_PER_ALIGHTING_PASSENGER.equals(key)) {
 			this.delayPerAlightingPassenger = Double.parseDouble(value);
 		} else if (DOOR_OPERATION_MODE.equals(key)) { 
-			if (DoorOperationMode.serial.toString().equalsIgnoreCase(value)){
-				this.doorOperationMode = DoorOperationMode.serial;
-			} else if (DoorOperationMode.parallel.toString().equalsIgnoreCase(value)){
-				this.doorOperationMode = DoorOperationMode.parallel;
+			if ( VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase(value )){
+				this.doorOperationMode = VehicleType.DoorOperationMode.serial;
+			} else if ( VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase(value )){
+				this.doorOperationMode = VehicleType.DoorOperationMode.parallel;
 			} 
 		} else if (COST_PER_VEHICLE_AND_DAY.equals(key)){
 			this.costPerVehicleAndDay = Double.parseDouble(value);
@@ -511,7 +512,7 @@ public final class PConfigGroup extends ConfigGroup{
 		return this.delayPerAlightingPassenger;
 	}
 	
-	public DoorOperationMode getDoorOperationMode() {
+	public VehicleType.DoorOperationMode getDoorOperationMode() {
 		return this.doorOperationMode;
 	}
 	

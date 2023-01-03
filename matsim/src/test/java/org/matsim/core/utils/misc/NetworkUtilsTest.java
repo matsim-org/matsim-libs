@@ -29,7 +29,8 @@ import java.util.List;
 
 import org.junit.Assert;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -46,7 +47,7 @@ import org.matsim.testcases.fakes.FakeNode;
  */
 public class NetworkUtilsTest {
 
-	private final static Logger log = Logger.getLogger(NetworkUtilsTest.class);
+	private final static Logger log = LogManager.getLogger(NetworkUtilsTest.class);
 	private final static double EPSILON = 1e-8;
 
 	@Test
@@ -161,6 +162,20 @@ public class NetworkUtilsTest {
 		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.5)));
 		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.1)));
 		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.0)));
+
+		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(3.2)));
+		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(3.1)));
+		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(3.0)));
+		assertEquals(2, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(2.9)));
+		assertEquals(2, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(2.5)));
+		assertEquals(2, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(2.0)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(1.9)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(1.5)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(1.0)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(0.9)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(0.5)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(0.1)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(0.0)));
 	}
 
 	@Test
@@ -297,7 +312,7 @@ public class NetworkUtilsTest {
 		}
 
 		@Override
-		public double getNumberOfLanes(final double time) {
+		public double getNumberOfLanes() {
 			return this.nOfLanes;
 		}
 	}
@@ -318,7 +333,7 @@ public class NetworkUtilsTest {
 		int numOfLinks = 5;
 
 		Network network = NetworkUtils.createNetwork();
-		Node[] nodes = new Node[numOfLinks+1];
+        Node[] nodes = new Node[numOfLinks + 1];
 		for (int i = 0; i <= numOfLinks; i++) {
 			nodes[i] = NetworkUtils.createAndAddNode(network, Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
 		}
@@ -329,8 +344,8 @@ public class NetworkUtilsTest {
 	}
 
 	private static class MultimodalFixture {
-		/*package*/ final Network network = NetworkUtils.createNetwork();
-		Node[] nodes = new Node[6];
+        /*package*/ final Network network = NetworkUtils.createNetwork();
+        Node[] nodes = new Node[6];
 		Link[] links = new Link[this.nodes.length - 1];
 
 		public MultimodalFixture() {

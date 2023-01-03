@@ -50,7 +50,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import javax.swing.*;
 import java.awt.*;
 
-public class OTFClientLiveWithSignals {
+final class OTFClientLiveWithSignals {
 
 	public static void run(final Config config, final OTFServer server) {
 		SwingUtilities.invokeLater(new Runnable() {

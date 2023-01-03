@@ -20,11 +20,14 @@
 
 package org.matsim.contrib.eventsBasedPTRouter;
 
-import com.google.inject.Provider;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
@@ -33,10 +36,8 @@ import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Provider;
 
 /**
  * TravelTime and TravelDisutility calculator to be used with the transit network used for transit routing.
@@ -55,11 +56,11 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWS extends TransitRouter
 	private final double timeSlot;
 
 	public TransitRouterNetworkTravelTimeAndDisutilityWS(final TransitRouterConfig config, TransitRouterNetworkWW routerNetwork, Provider<WaitTime> waitTime, Provider<StopStopTime> stopStopTime, TravelTimeCalculatorConfigGroup tTConfigGroup, QSimConfigGroup qSimConfigGroup, PreparedTransitSchedule preparedTransitSchedule) {
-		this(config, routerNetwork, waitTime.get(), stopStopTime.get(), tTConfigGroup, qSimConfigGroup.getStartTime(), qSimConfigGroup.getEndTime(), preparedTransitSchedule);
+		this(config, routerNetwork, waitTime.get(), stopStopTime.get(), tTConfigGroup, qSimConfigGroup.getStartTime().seconds(), qSimConfigGroup.getEndTime().seconds(), preparedTransitSchedule);
 	}
 
 	public TransitRouterNetworkTravelTimeAndDisutilityWS(final TransitRouterConfig config, TransitRouterNetworkWW routerNetwork, WaitTime waitTime, StopStopTime stopStopTime, TravelTimeCalculatorConfigGroup tTConfigGroup, QSimConfigGroup qSimConfigGroup, PreparedTransitSchedule preparedTransitSchedule) {
-		this(config, routerNetwork, waitTime, stopStopTime, tTConfigGroup, qSimConfigGroup.getStartTime(), qSimConfigGroup.getEndTime(), preparedTransitSchedule);
+		this(config, routerNetwork, waitTime, stopStopTime, tTConfigGroup, qSimConfigGroup.getStartTime().seconds(), qSimConfigGroup.getEndTime().seconds(), preparedTransitSchedule);
 	}
 	public TransitRouterNetworkTravelTimeAndDisutilityWS(final TransitRouterConfig config, TransitRouterNetworkWW routerNetwork, WaitTime waitTime, StopStopTime stopStopTime, TravelTimeCalculatorConfigGroup tTConfigGroup, double startTime, double endTime, PreparedTransitSchedule preparedTransitSchedule) {
 		super(config, preparedTransitSchedule);

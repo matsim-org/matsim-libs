@@ -21,12 +21,15 @@
 
  package org.matsim.utils.objectattributes.attributeconverters;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
+import java.util.Locale;
+
 public class CoordConverter implements AttributeConverter<Coord> {
-	private final Logger log = Logger.getLogger(CoordConverter.class);
+	private final Logger log = LogManager.getLogger(CoordConverter.class);
 
 	@Override
 	public Coord convert(String value) {
@@ -44,7 +47,7 @@ public class CoordConverter implements AttributeConverter<Coord> {
 		}
 		Coord c = (Coord)o;
 		
-		return String.format("(%.2f;%.2f)", c.getX(), c.getY());
+		return String.format("(%s;%s)", Double.toString(c.getX()), Double.toString(c.getY()));
 	}
 
 }

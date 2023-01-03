@@ -1,145 +1,173 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.vehicles.MatsimVehicleReader;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType.VehicleCostInformation;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.EngineInformation.FuelType;
-import org.matsim.vehicles.EngineInformationImpl;
-import org.matsim.vehicles.VehicleType;
-import org.xml.sax.Attributes;
-
 /**
- * Reader reading carrierVehicleTypes from an xml-file.
+ * Reader reading carrierVehicleTypes from a xml-file.
  * 
  * @author sschroeder
  *
  */
-public class CarrierVehicleTypeReader extends MatsimXmlParser {
-	
-	private static Logger logger = Logger.getLogger(CarrierVehicleTypeReader.class);
-	
-	private CarrierVehicleTypes carrierVehicleTypes;
+public class CarrierVehicleTypeReader implements MatsimReader{
+	private static final Logger log = LogManager.getLogger(CarrierVehicleTypeReader.class);
+	private static final String MSG="With early carrier vehicle type file formats, there will be an expected exception in the following." ;
+	private final CarrierVehicleTypeParser reader;
 
-	private Id<VehicleType> currentTypeId;
-
-	private String currentDescription;
-
-	
-
-//	private Integer currentCap;
-
-	private VehicleCostInformation currentVehicleCosts;
-
-	private EngineInformation currentEngineInfo;
-
-	private String currentCapacity;
-	
-	private String maxVelo;
-
-	public CarrierVehicleTypeReader(CarrierVehicleTypes carrierVehicleTypes) {
-		super();
-		this.carrierVehicleTypes = carrierVehicleTypes;
-		this.setValidating(false);
-	}
-	
-//	/**
-//	 * Reads types from xml-file.
-//	 * 
-//	 * @param xml-filename containing vehicleTypes
-//	 */
-//	/* This is somewhat problematic for me (JWJoubert, Nov '13). The MatsimXmlParser
-//	 * has a parse method, yet when calling it, it results in an XML error. Maybe 
-//	 * it would be better to 
-//	 * a) use a dtd file, and
-//	 * b) rather use the infrastructure provided by the MatsimXmlParser, and 
-//	 *    override it if required.
-//	 */
-//	public void read(String filename){
-//		logger.info("read vehicle types");
-//		this.setValidating(false);
-//		read(filename);
-//		logger.info("done");
-//	}
-
-	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if(name.equals("vehicleType")){
-			this.currentTypeId = Id.create(atts.getValue("id"), VehicleType.class);
-		}
-		if(name.equals("allowableWeight")){
-			String weight = atts.getValue("weight");
-			parseDouble(weight);
-		}
-		if(name.equals("engineInformation")){
-			String fuelType = atts.getValue("fuelType");
-			String gasConsumption = atts.getValue("gasConsumption");
-			EngineInformation engineInfo = new EngineInformationImpl(parseFuelType(fuelType), parseDouble(gasConsumption));
-			this.currentEngineInfo = engineInfo;
-		}
-		
-		if(name.equals("costInformation")){
-			String fix = atts.getValue("fix");
-			String perMeter = atts.getValue("perMeter");
-			String perSecond = atts.getValue("perSecond");
-			if(fix == null || perMeter == null || perSecond == null) throw new IllegalStateException("cannot read costInformation correctly. probably the paramName was written wrongly");
-			VehicleCostInformation vehicleCosts = new VehicleCostInformation(parseDouble(fix), parseDouble(perMeter), parseDouble(perSecond));
-			this.currentVehicleCosts = vehicleCosts;
-		}
-	}
-
-	private FuelType parseFuelType(String fuelType) {
-		if(fuelType.equals(FuelType.diesel.toString())){
-			return FuelType.diesel;
-		}
-		else if(fuelType.equals(FuelType.electricity.toString())){
-			return FuelType.electricity;
-		}
-		else if(fuelType.equals(FuelType.gasoline.toString())){
-			return FuelType.gasoline;
-		}
-		throw new IllegalStateException("fuelType " + fuelType + " is not supported");
-	}
-
-	private double parseDouble(String weight) {
-		return Double.parseDouble(weight);
+	public CarrierVehicleTypeReader( final CarrierVehicleTypes types ) {
+		System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefinition_v2.0.xsd is online
+		this.reader = new CarrierVehicleTypeParser( types ) ;
 	}
 
 	@Override
-	public void endTag(String name, String content, Stack<String> context) {
-		if(name.equals("description")){
-			this.currentDescription = content;
+	public void readFile( String filename ){
+		log.info(MSG) ;
+		try {
+			reader.setValidating(true) ;
+			reader.readFile( filename );
+		} catch (Exception e) {
+			log.warn("### Exception: Message=" + e.getMessage() + " ; cause=" + e.getCause() + " ; class=" + e.getClass());
+			if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
+				log.warn("read with validation = true failed. Try it again without validation. filename: " + filename);
+				reader.setValidating(false);
+				reader.readFile(filename);
+			} else { //other problem: e.g. validation does not work, because of missing validation file.
+				throw  e;
+			}
 		}
-		if(name.equals("capacity")){
-			this.currentCapacity = content;
-		}
-		if(name.equals("maxVelocity")){
-			this.maxVelo = content;
-		}
-		if(name.equals("vehicleType")){
-			CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(currentTypeId);
-			if(currentDescription != null) typeBuilder.setDescription(currentDescription);
-//			if(currentWeight != null) vehType.setAllowableTotalWeight(currentWeight);
-//			if(currentCap != null) vehType.setFreightCapacity(currentCap);
-			if(currentVehicleCosts != null) typeBuilder.setVehicleCostInformation(currentVehicleCosts);
-			if(currentEngineInfo != null) typeBuilder.setEngineInformation(currentEngineInfo);
-			if(currentCapacity != null) typeBuilder.setCapacity(Integer.parseInt(currentCapacity));
-			if(maxVelo != null) typeBuilder.setMaxVelocity(Double.parseDouble(maxVelo));
-			CarrierVehicleType vehType = typeBuilder.build();
-			carrierVehicleTypes.getVehicleTypes().put(vehType.getId(), vehType);
-			reset();
-		}
-		
 	}
 
-	private void reset() {
-		currentTypeId = null;
-		currentDescription = null;
-		currentVehicleCosts = null;
-		currentEngineInfo = null;
+	@Override
+	public void readURL( URL url ){
+		log.info(MSG) ;
+		try {
+			reader.setValidating(true) ;
+			reader.readURL(url);
+		}  catch (Exception e) {
+			log.warn("### Exception: Message=" + e.getMessage() );
+			log.warn("### Exception: Cause=" + e.getCause() );
+			log.warn("### Exception: Class=" + e.getClass() );
+			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
+				log.warn("read with validation = true failed. Try it again without validation... url: " + url.toString());
+				reader.setValidating(false);
+				reader.readURL(url);
+			} else { //other problem: e.g. validation does not work, because of missing validation file.
+				throw  e;
+			}
+		}
+	}
+
+	public void readStream( InputStream inputStream ){
+		log.info(MSG) ;
+		try {
+			reader.setValidating(true) ;
+			reader.parse( inputStream ) ;
+		} catch (Exception e)
+		{log.warn("### Exception found while trying to read Carrier Vehicle Type: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
+			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
+				log.warn("read with validation = true failed. Try it again without validation... ");
+				reader.setValidating(false);
+				reader.parse(inputStream);
+			} else { //other problem: e.g. validation does not work, because of missing validation file.
+				throw  e;
+			}
+		}
+	}
+
+	private static final class CarrierVehicleTypeParser extends MatsimXmlParser {
+
+		private final CarrierVehicleTypes vehicleTypes;
+		private Vehicles vehicles = null ;
+		private MatsimXmlParser delegate = null;
+
+		CarrierVehicleTypeParser(CarrierVehicleTypes vehicleTypes) {
+			this.vehicleTypes = vehicleTypes ;
+		}
+
+		@Override
+		public void startTag(final String name, final Attributes attributes, final Stack<String> context) {
+			log.debug("Reading start tag. name: " + name + " , attributes: " + attributes.toString() + " , context: " + context);
+			if ( "vehicleTypes".equalsIgnoreCase( name ) ) {
+				String str = attributes.getValue( "xsi:schemaLocation" );
+				log.info("Found following schemeLocation in carriers definition file: " + str);
+				if (str == null){
+					log.warn( "No validation information found. Using ReaderV1." );
+					delegate = new CarrierVehicleTypeReaderV1( vehicleTypes );
+				} else{
+					throw new RuntimeException( "should not happen" ) ;
+				}
+			} else if ( "vehicleDefinitions".equalsIgnoreCase( name ) ){
+				String str = attributes.getValue( "xsi:schemaLocation" );
+				if ( str==null ){
+					throw new RuntimeException( "should not happen" );
+				} else {
+					log.info("Using central vehicle parser") ;
+					vehicles = VehicleUtils.createVehiclesContainer();
+					delegate = new MatsimVehicleReader.VehicleReader(vehicles) ;
+					// only takes a vehicle container as argument :-(
+				}
+
+				// Note that if it is a v1 file, it starts with
+				// <vehicleTypes>.  If it is a later file, it starts with <vehicleDefinitions>. kai, sep'19
+
+			}
+			this.delegate.startTag( name, attributes, context );
+		}
+
+		@Override
+		public void endTag(final String name, final String content, final Stack<String> context) {
+			this.delegate.endTag(name, content, context);
+		}
+
+		@Override
+		public void endDocument() {
+			try {
+				this.delegate.endDocument();
+			} catch ( SAXException e) {
+				throw new RuntimeException(e);
+			}
+			if ( vehicles != null ) {
+				for( Map.Entry<Id<VehicleType>, VehicleType> entry : vehicles.getVehicleTypes().entrySet() ){
+					vehicleTypes.getVehicleTypes().put( entry.getKey(), entry.getValue() ) ;
+					// need to copy from vehicles container to provided vehicle types :-(
+				}
+			}
+		}
 	}
 
 }

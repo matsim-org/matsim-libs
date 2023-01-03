@@ -37,12 +37,12 @@ import org.matsim.core.population.routes.NetworkRoute;
  * This class could be useful for jUnit testing of compatibility of DynAgent with PersonDriverAgentImpl (i.e. comparing
  * events thrown during 2 different QSims, one with {@code PlanToDynAgentLogicAdapter} while the other with
  * {@code PersonDriverAgentImpl}).
- * 
+ *
  * @author michalm
  */
 public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
 	private DynAgent agent;
-	private Iterator<PlanElement> planElemIter;
+	private final Iterator<PlanElement> planElemIter;
 
 	/**
 	 * @param plan
@@ -57,7 +57,7 @@ public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
 		this.agent = adapterAgent;
 
 		Activity act = (Activity)planElemIter.next();
-		return new IdleDynActivity(act.getType(), act.getEndTime());
+		return new IdleDynActivity(act.getType(), act.getEndTime().seconds());
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
 
 		if (planElem instanceof Activity) {
 			Activity act = (Activity)planElem;
-			return new IdleDynActivity(act.getType(), act.getEndTime());
+			return new IdleDynActivity(act.getType(), act.getEndTime().seconds());
 		}
 
 		// only the 'car' mode supported right now

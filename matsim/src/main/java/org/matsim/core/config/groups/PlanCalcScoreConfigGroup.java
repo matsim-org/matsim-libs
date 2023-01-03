@@ -20,17 +20,26 @@
 
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-
-import java.util.*;
 
 /**
  * Design decisions:
@@ -49,7 +58,7 @@ import java.util.*;
  */
 public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
-	private static final Logger log = Logger.getLogger(PlanCalcScoreConfigGroup.class);
+	private static final Logger log = LogManager.getLogger(PlanCalcScoreConfigGroup.class);
 
 	public static final String GROUP_NAME = "planCalcScore";
 
@@ -78,6 +87,38 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		this.addScoringParameters(new ScoringParameterSet());
 
+		// what follows now has weird consequences:
+		// * the material is added to the ScoringParameterSet of the default subpopulation
+		// * if someone uses the following in the config.xml:
+		//      < ... planCalcScore ... >
+		//            <... modeParams ... >
+		//                   < ... mode ... abc ... />
+		//    then abc will be _added_ to the modes info below (same for activities)
+		//  * if, however, someone uses in the config.xml:
+		//      < ... planCalcScore ... >
+		//            < ... scoringParameters ... >
+		//                  <... modeParams ... >
+		//                        < ... mode ... abc ... />
+		//     (= fully hierarchical format), then the default modes will be removed before adding mode abc.  The reason for this is that the second
+		//     syntax clears the scoring params for the default subpopulation.
+
+		//  Unfortunately, it continues:
+		//  * Normally, we need a "clear defaults with first configured entry" (see PlansCalcRouteConfigGroup).  Otherwise, we fail the write-read
+		//  test: Assume we end up with a config that has _less_ material than the defaults.  Then we write this to file, and read it back in.  If
+		//  the defaults are not cleared, they would now be fully there.
+		//  * The reason why this works here is that all the material is written out with the fully hierarchical format.  I.e. it actually clears the
+		//  defaults when being read it.
+
+		// I am not sure if it can stay the way it is right now; took me several hours to understand it (and fix a problem we had not by
+		// trial-and-error but by understanding the root cause).  Considerations:
+		// * Easiest would be to not have defaults.  However, defaults are helpful in particular to avoid that everybody uses different parameters.
+		// * We could also have the "manual addition triggers clearing" logic.  In PlansCalcRouteConfigGroup I now have this with a warning, which
+		// can be switched off with a switch.  I find this a good solution; I am, however, not 100% certain that it is robust since that switch is a
+		// "state" while "clearing the defaults" is an action, and I am not sure if they can be mapped into each other in all cases.
+		// * We could, together with the previous point, disallow the not fully hierarchical format.
+
+		// kai, dec'19
+
 		this.addModeParams(new ModeParams(TransportMode.car));
 		this.addModeParams(new ModeParams(TransportMode.pt));
 		this.addModeParams(new ModeParams(TransportMode.walk));
@@ -85,56 +126,26 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		this.addModeParams(new ModeParams(TransportMode.ride));
 		this.addModeParams(new ModeParams(TransportMode.other));
 
-		{
-			ActivityParams params = new ActivityParams("dummy");
-			params.setTypicalDuration(2. * 3600.);
+		this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
+		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
+		// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
 //			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
-			this.addActivityParams(params);
-			// (this is there so that an empty config prints out at least one
-			// activity type,
-			// so that the explanations of this important concept show up e.g.
-			// in defaultConfig.xml, created from the GUI. kai, jul'17
-		}
 
 		// yyyyyy find better solution for this. kai, dec'15
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.car ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.pt ));
-			// need this for self-programmed pseudo pt. kai, nov'16
+		// Probably no longer needed; see checkConsistency method.  kai, jan'21
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.pt )).setScoringThisActivityAtAll(false ) );
+		// (need this for self-programmed pseudo pt. kai, nov'16)
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.bike ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.drt ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.taxi ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.other ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.walk ) ).setScoringThisActivityAtAll(false ) );
+		// (bushwhacking_walk---network_walk---bushwhacking_walk)
+	}
 
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.bike ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.drt ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.taxi ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.other ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams( createStageActivityType( TransportMode.walk ) );
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-			// bushwhacking_walk---network_walk---bushwhacking_walk
-		}
+	public static ActivityParams createStageActivityParams( String mode ) {
+		return new ActivityParams( createStageActivityType( mode ) ).setScoringThisActivityAtAll( false );
 	}
 
 	// ---
@@ -175,6 +186,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	
 	@Override
 	public void addParam(final String key, final String value) {
+		testForLocked();
 		if (key.startsWith("monetaryDistanceCostRate")) {
 			throw new RuntimeException("Please use monetaryDistanceRate (without `cost').  Even better, use config v2, "
 					+ "mode-parameters (see output of any recent run), and mode-specific monetary " + "distance rate.");
@@ -201,32 +213,32 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityTypicalDuration_".length()));
-			actParams.setTypicalDuration(Time.parseTime(value));
+			actParams.typicalDuration = Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityMinimalDuration_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityMinimalDuration_".length()));
-			actParams.setMinimalDuration(Time.parseTime(value));
+			actParams.minimalDuration = Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityOpeningTime_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityOpeningTime_".length()));
-			actParams.setOpeningTime(Time.parseTime(value));
+			actParams.openingTime=Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityLatestStartTime_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityLatestStartTime_".length()));
-			actParams.setLatestStartTime(Time.parseTime(value));
+			actParams.latestStartTime = Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityEarliestEndTime_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityEarliestEndTime_".length()));
-			actParams.setEarliestEndTime(Time.parseTime(value));
+			actParams.earliestEndTime = Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityClosingTime_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityClosingTime_".length()));
-			actParams.setClosingTime(Time.parseTime(value));
+			actParams.closingTime = Time.parseOptionalTime(value);
 		} else if (key.startsWith("scoringThisActivityAtAll_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
@@ -608,34 +620,48 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 						+ " Otherwise, crashes can be expected.");
 			}
 		}
-		if (config.plansCalcRoute().isInsertingAccessEgressWalk()) {
-			// adding the interaction activities that result from access/egress
-			// routing. this is strictly speaking
-			// not a consistency check, but I don't know a better place where to
-			// add this. kai, jan'18
-			for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
-				for (String mode : config.plansCalcRoute().getNetworkModes()) {
-					String interactionActivityType = mode + " interaction";
-					ActivityParams set = scoringParameterSet.getActivityParamsPerType().get(interactionActivityType);
-					if (set == null) {
-						ActivityParams params = new ActivityParams();
-						params.setActivityType(interactionActivityType);
-						params.setScoringThisActivityAtAll(false);
-						scoringParameterSet.addActivityParams(params);
-					}
-				}
+//		if (!config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
 
+		// there are modes such as pt or drt that need interaction params even without accessEgress switched on.  The policy so far was that
+		// they had to define them by themselves.  For drt, this needs to be done manually (adjustDrtConfigGroup) since it is not a core
+		// contrib.  At least from a user perspective, it will be easier if they are all generated here.  Result of current variant is that they are now also generated
+		// for situations where accessEgress routing is not switched on.  Since, in general, our data model assumes that there is always
+		// access/egress, I think that this is acceptable.  kai, jan'21
+
+			// adding the interaction activities that result from access/egress routing. this is strictly speaking not a consistency
+			// check, but I don't know a better place where to add this. kai, jan'18
+
+			for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
+
+				for (String mode : config.plansCalcRoute().getNetworkModes()) {
+					createAndAddInteractionActivity( scoringParameterSet, mode );
+				}
+				// (In principle, the for loop following next should be sufficient, i.e. taking the necessary modes from scoring.
+				// There is, however, a test that checks if all network modes from planCalcRoute have
+				// interaction activities.  So we rather satisfy it than changing the test.  kai, jan'21
+
+				for( String mode : scoringParameterSet.getModes().keySet() ){
+					createAndAddInteractionActivity( scoringParameterSet, mode );
+				}
 			}
-		}
+//		}
 
 		for (ActivityParams params : this.getActivityParams()) {
-			if (params.isScoringThisActivityAtAll() && Time.isUndefinedTime(params.getTypicalDuration())) {
+			if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
 				throw new RuntimeException("In activity type=" + params.getActivityType()
 						+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
 						+ "so rather aborting here.");
 			}
 		}
 
+	}
+	private static void createAndAddInteractionActivity( ScoringParameterSet scoringParameterSet, String mode ){
+		String interactionActivityType = createStageActivityType( mode );
+		ActivityParams set = scoringParameterSet.getActivityParamsPerType().get( interactionActivityType );
+		if( set == null ){
+//						 (we do not want to overwrite this if the use has already set it with other params!)
+			scoringParameterSet.addActivityParams( createStageActivityParams( mode ) );
+		}
 	}
 
 	public boolean isMemorizingExperiencedPlans() {
@@ -789,10 +815,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	// CLASSES
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
-		// in normal pgm execution, code will presumably lock instance of
-		// PlanCalcScoreConfigGroup, but not instance of
-		// ActivityParams. I will try to pass the locked setting through the
-		// getters. kai, jun'15
+		// in normal pgm execution, code will presumably lock instance of PlanCalcScoreConfigGroup, but not instance of
+		// ActivityParams. I will try to pass the locked setting through the getters. kai, jun'15
 
 		public final static String SET_TYPE = "activityParams";
 		
@@ -817,7 +841,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		/**
 		 * {@value TYPICAL_DURATION_CMT}
 		 */
-		public double getTypicalDuration() {
+		public OptionalTime getTypicalDuration() {
 			return this.typicalDuration;
 		}
 
@@ -827,7 +851,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@StringSetter(TYPICAL_DURATION)
 		private ActivityParams setTypicalDuration(final String typicalDuration) {
 			testForLocked();
-			return setTypicalDuration(Time.parseTime(typicalDuration));
+			this.typicalDuration = Time.parseOptionalTime(typicalDuration);
+			return this;
 		}
 
 		/**
@@ -835,7 +860,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		 */
 		public ActivityParams setTypicalDuration(final double typicalDuration) {
 			testForLocked();
-			this.typicalDuration = typicalDuration;
+			this.typicalDuration = OptionalTime.defined(typicalDuration);
 			return this ;
 		}
 
@@ -865,12 +890,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		// ---
 
 		private double priority = 1.0;
-		private double typicalDuration = Time.getUndefinedTime();
-		private double minimalDuration = Time.getUndefinedTime();
-		private double openingTime = Time.getUndefinedTime();
-		private double latestStartTime = Time.getUndefinedTime();
-		private double earliestEndTime = Time.getUndefinedTime();
-		private double closingTime = Time.getUndefinedTime();
+		private OptionalTime typicalDuration = OptionalTime.undefined();
+		private OptionalTime minimalDuration = OptionalTime.undefined();
+		private OptionalTime openingTime =     OptionalTime.undefined();
+		private OptionalTime latestStartTime = OptionalTime.undefined();
+		private OptionalTime earliestEndTime = OptionalTime.undefined();
+		private OptionalTime closingTime =     OptionalTime.undefined();
 
 		public ActivityParams() {
 			super(SET_TYPE);
@@ -927,119 +952,120 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringGetter("minimalDuration")
 		private String getMinimalDurationString() {
-			return Time.writeTime(getMinimalDuration());
+			return Time.writeTime(minimalDuration);
 		}
 
-		public double getMinimalDuration() {
-			return this.minimalDuration;
+		public OptionalTime getMinimalDuration() {
+			return minimalDuration;
 		}
 
 		@StringSetter("minimalDuration")
 		private ActivityParams setMinimalDuration(final String minimalDuration) {
 			testForLocked();
-			return setMinimalDuration(Time.parseTime(minimalDuration));
+			this.minimalDuration = Time.parseOptionalTime(minimalDuration);
+			return this;
 		}
 
 		private static int minDurCnt = 0;
 
 		public ActivityParams setMinimalDuration(final double minimalDuration) {
 			testForLocked();
-			if ((!Time.isUndefinedTime(minimalDuration)) && (minDurCnt < 1)) {
+			if (minDurCnt < 1) {
 				minDurCnt++;
 				log.warn(
 						"Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, "
 								+ "but there is as of now no indication that it makes the results more realistic.  KN, Sep'08"
 								+ Gbl.ONLYONCE);
 			}
-			this.minimalDuration = minimalDuration;
+			this.minimalDuration = OptionalTime.defined(minimalDuration);
 			return this ;
 		}
 
 		@StringGetter("openingTime")
 		private String getOpeningTimeString() {
-			return Time.writeTime(getOpeningTime());
+			return Time.writeTime(this.openingTime);
 		}
 
-		public double getOpeningTime() {
-			return this.openingTime;
+		public OptionalTime getOpeningTime() {
+			return openingTime;
 		}
 
 		@StringSetter("openingTime")
 		private ActivityParams setOpeningTime(final String openingTime) {
 			testForLocked();
-			setOpeningTime(Time.parseTime(openingTime));
+			this.openingTime =Time.parseOptionalTime(openingTime);
 			return this ;
 		}
 
 		public ActivityParams setOpeningTime(final double openingTime) {
 			testForLocked();
-			this.openingTime = openingTime;
+			this.openingTime = OptionalTime.defined(openingTime);
 			return this ;
 		}
 
 		@StringGetter("latestStartTime")
 		private String getLatestStartTimeString() {
-			return Time.writeTime(getLatestStartTime());
+			return Time.writeTime(latestStartTime);
 		}
 
-		public double getLatestStartTime() {
+		public OptionalTime getLatestStartTime() {
 			return this.latestStartTime;
 		}
 
 		@StringSetter("latestStartTime")
 		private ActivityParams setLatestStartTime(final String latestStartTime) {
 			testForLocked();
-			setLatestStartTime(Time.parseTime(latestStartTime));
+			this.latestStartTime = Time.parseOptionalTime(latestStartTime);
 			return this ;
 		}
 
 		public ActivityParams setLatestStartTime(final double latestStartTime) {
 			testForLocked();
-			this.latestStartTime = latestStartTime;
+			this.latestStartTime = OptionalTime.defined(latestStartTime);
 			return this ;
 		}
 
 		@StringGetter("earliestEndTime")
 		private String getEarliestEndTimeString() {
-			return Time.writeTime(getEarliestEndTime());
+			return Time.writeTime(earliestEndTime);
 		}
 
-		public double getEarliestEndTime() {
-			return this.earliestEndTime;
+		public OptionalTime getEarliestEndTime() {
+			return earliestEndTime;
 		}
 
 		@StringSetter("earliestEndTime")
 		private ActivityParams setEarliestEndTime(final String earliestEndTime) {
 			testForLocked();
-			setEarliestEndTime(Time.parseTime(earliestEndTime));
+			this.earliestEndTime = Time.parseOptionalTime(earliestEndTime);
 			return this ;
 		}
 
 		public ActivityParams setEarliestEndTime(final double earliestEndTime) {
 			testForLocked();
-			this.earliestEndTime = earliestEndTime;
+			this.earliestEndTime = OptionalTime.defined(earliestEndTime);
 			return this ;
 		}
 
 		@StringGetter("closingTime")
 		private String getClosingTimeString() {
-			return Time.writeTime(getClosingTime());
+			return Time.writeTime(closingTime);
 		}
 
-		public double getClosingTime() {
-			return this.closingTime;
+		public OptionalTime getClosingTime() {
+			return closingTime;
 		}
 
 		@StringSetter("closingTime")
 		private ActivityParams setClosingTime(final String closingTime) {
 			testForLocked();
-			setClosingTime(Time.parseTime(closingTime));
+			this.closingTime = (Time.parseOptionalTime(closingTime));
 			return this ;
 		}
 
 		public ActivityParams setClosingTime(final double closingTime) {
 			testForLocked();
-			this.closingTime = closingTime;
+			this.closingTime = OptionalTime.defined(closingTime);
 			return this ;
 		}
 
@@ -1076,8 +1102,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		public static final String MODE = "mode";
 		
-		static final String DAILY_MONETARY_CONSTANT = "dailyMonetaryConstant";
-		static final String DAILY_UTILITY_CONSTANT = "dailyUtilityConstant";
+		private static final String DAILY_MONETARY_CONSTANT = "dailyMonetaryConstant";
+		private static final String DAILY_MONETARY_CONSTANT_CMT = "[unit_of_money/day] Fixed cost of mode, per day.";
+
+		private static final String DAILY_UTILITY_CONSTANT = "dailyUtilityConstant";
 		
 		private String mode = null;
 		private double traveling = -6.0;
@@ -1118,8 +1146,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			map.put(CONSTANT, CONSTANT_CMT );
 			map.put(DAILY_UTILITY_CONSTANT, "[utils] daily utility constant. "
 					+ "default=0 to be backwards compatible");
-			map.put(DAILY_MONETARY_CONSTANT, "[money] daily monetary constant. "
-					+ "default=0 to be backwards compatible");
+			map.put(DAILY_MONETARY_CONSTANT, DAILY_MONETARY_CONSTANT_CMT ) ;
 			return map;
 		}
 
@@ -1191,11 +1218,17 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.monetaryDistanceRate = monetaryDistanceRate;
 			return this ;
 		}
+		/**
+		 * @return {@value #DAILY_MONETARY_CONSTANT_CMT}
+		 */
 		@StringGetter(DAILY_MONETARY_CONSTANT)
 		public double getDailyMonetaryConstant() {
 			return dailyMonetaryConstant;
 		}
 
+		/**
+		 * @param dailyMonetaryConstant -- {@value #DAILY_MONETARY_CONSTANT_CMT}
+		 */
 		@StringSetter(DAILY_MONETARY_CONSTANT)
 		public ModeParams setDailyMonetaryConstant(double dailyMonetaryConstant) {
 			this.dailyMonetaryConstant = dailyMonetaryConstant;
@@ -1297,8 +1330,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.utilityOfLineSwitch = utilityOfLineSwitch;
 		}
 
-		private static int setWaitingCnt = 0;
-
 		@StringGetter(WAITING)
 		public double getMarginalUtlOfWaiting_utils_hr() {
 			return this.waiting;
@@ -1315,6 +1346,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return subpopulation;
 		}
 
+		/**
+		 * This method is there to make the StringSetter/Getter automagic happy, but it is not meant to be used.
+		 */
 		@StringSetter("subpopulation")
 		public void setSubpopulation(String subpopulation) {
 			// TODO: handle case of default subpopulation
@@ -1503,17 +1537,17 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				if (actType.isScoringThisActivityAtAll()) {
 					// (checking consistency only if activity is scored at all)
 
-					if ((!Time.isUndefinedTime(actType.getOpeningTime()))
-							&& (!Time.isUndefinedTime(actType.getClosingTime()))) {
+					if (actType.getOpeningTime().isDefined() && actType.getClosingTime().isDefined()) {
 						hasOpeningAndClosingTime = true;
+
+						if (actType.getOpeningTime().seconds() == 0. && actType.getClosingTime().seconds() > 24. * 3600 - 1) {
+							log.error("it looks like you have an activity type with opening time set to 0:00 and closing "
+									+ "time set to 24:00. This is most probably not the same as not setting them at all.  "
+									+ "In particular, activities which extend past midnight may not accumulate scores.");
+						}
 					}
-					if ((!Time.isUndefinedTime(actType.getOpeningTime())) && (getLateArrival_utils_hr() < -0.001)) {
+					if (actType.getOpeningTime().isDefined() && (getLateArrival_utils_hr() < -0.001)) {
 						hasOpeningTimeAndLatePenalty = true;
-					}
-					if (actType.getOpeningTime() == 0. && actType.getClosingTime() > 24. * 3600 - 1) {
-						log.error("it looks like you have an activity type with opening time set to 0:00 and closing "
-								+ "time set to 24:00. This is most probably not the same as not setting them at all.  "
-								+ "In particular, activities which extend past midnight may not accumulate scores.");
 					}
 				}
 			}
@@ -1605,6 +1639,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION)
 		public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
+			// should be disabled like in the following.  kai, may'22
+//			if ( usingOldScoringBelowZeroUtilityDuration ) {
+//				throw new RuntimeException( "using old scoringBelowZeroUtility duration is no longer possible.  Use matsim version 14.0 " +
+//									    "or older if you truly need this for backwards compatibility." )
+//			}
 			testForLocked();
 			this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
 		}

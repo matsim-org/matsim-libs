@@ -20,14 +20,22 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
+ * In order to simulate charging, we only need ChargingPower (no need to implement BatteryCharging), which is easier
+ * to implement (and faster to compute). It works well if we simulate charging with relatively small time steps.
+ * <p>
+ * BatteryCharging extends ChargingPower and introduces methods for computing charging times/energies in a longer time
+ * horizon (e.g. charging time until the SoC reaches 90%, or recharged energy given 1 hour of charging).
+ * These additional methods are useful for instance in the eVRP context, where we need to plan charging along
+ * with other tasks.
+ *
  * @author Michal Maciejewski (michalm)
  */
 public interface BatteryCharging extends ChargingPower {
-	//XXX consider adding if/when needed
-	//double calcEnergyCharge(Charger charger, double chargePeriod);
 
-	double calcChargingTime(Charger charger, double energy);
+	double calcEnergyCharged(ChargerSpecification charger, double chargingPeriod);
+
+	double calcChargingTime(ChargerSpecification charger, double energy);
 }

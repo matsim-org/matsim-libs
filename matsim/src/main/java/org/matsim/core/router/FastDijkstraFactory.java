@@ -20,6 +20,12 @@
 
 package org.matsim.core.router;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -31,15 +37,9 @@ import org.matsim.core.router.util.RoutingNetworkNode;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import java.util.HashMap;
-import java.util.Map;
-
 @Singleton
 public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
-	
+
 	private final boolean usePreProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
@@ -50,49 +50,48 @@ public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 		this(false, FastRouterType.ARRAY);
 	}
 
-    public FastDijkstraFactory(final boolean usePreProcessData) {
+	public FastDijkstraFactory(final boolean usePreProcessData) {
 		this(usePreProcessData, FastRouterType.ARRAY);
 	}
 
 	private FastDijkstraFactory(final boolean usePreProcessData, final FastRouterType fastRouterType) {
 		this.usePreProcessData = usePreProcessData;
-				
+
 		switch (fastRouterType) {
-		case ARRAY:
-			this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
-			break;
-		case POINTER:
-			throw new RuntimeException("PointerRoutingNetworks are no longer supported. "
-					+ "Use ArrayRoutingNetworks instead. Aborting!");
-		default:
-			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
+			case ARRAY:
+				this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
+				break;
+			case POINTER:
+				throw new RuntimeException("PointerRoutingNetworks are no longer supported. "
+						+ "Use ArrayRoutingNetworks instead. Aborting!");
+			default:
+				throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
 	}
 
 	@Override
-	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network,
+			final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
 		PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
 
 		if (routingNetwork == null) {
 			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
-			
+
 			if (this.usePreProcessData) {
-				if (preProcessDijkstra == null) {
-					preProcessDijkstra = new PreProcessDijkstra();
-					preProcessDijkstra.run(network);
-					this.preProcessData.put(network, preProcessDijkstra);
-					
-					for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-						node.setDeadEndData(preProcessDijkstra.getNodeData(node.getNode()));
-					}
+				preProcessDijkstra = new PreProcessDijkstra();
+				preProcessDijkstra.run(network);
+				this.preProcessData.put(network, preProcessDijkstra);
+
+				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+					node.setDeadEndData(preProcessDijkstra.getNodeData(node.getNode()));
 				}
 			}
-			
+
 			this.routingNetworks.put(network, routingNetwork);
 		}
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		
+
 		return new FastDijkstra(routingNetwork, travelCosts, travelTimes, preProcessDijkstra, fastRouterFactory);
 	}
 }

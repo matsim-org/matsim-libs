@@ -11,12 +11,12 @@ package org.matsim.jaxb.signalcontrol20;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.matsim.jaxb.Adapter1;
@@ -88,15 +88,13 @@ import org.matsim.jaxb.Adapter1;
     "offset",
     "signalGroupSettings"
 })
-public class XMLSignalPlanType
-    extends XMLMatsimObjectType
-{
+public final class XMLSignalPlanType extends XMLMatsimObjectType {
 
-    protected XMLSignalPlanType.XMLStart start;
-    protected XMLSignalPlanType.XMLStop stop;
-    protected XMLSignalPlanType.XMLCycleTime cycleTime;
-    protected XMLSignalPlanType.XMLOffset offset;
-    protected List<XMLSignalGroupSettingsType> signalGroupSettings;
+    private XMLSignalPlanType.XMLStart start;
+    private XMLSignalPlanType.XMLStop stop;
+    private XMLSignalPlanType.XMLCycleTime cycleTime;
+    private XMLSignalPlanType.XMLOffset offset;
+    private List<XMLSignalGroupSettingsType> signalGroupSettings;
 
     /**
      * Gets the value of the start property.

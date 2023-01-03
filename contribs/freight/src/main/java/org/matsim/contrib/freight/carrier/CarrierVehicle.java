@@ -1,7 +1,33 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -11,7 +37,9 @@ import org.matsim.vehicles.VehicleType;
  * @author sschroeder
  *
  */
-public class CarrierVehicle {
+public final class CarrierVehicle implements Vehicle {
+
+	private static final Logger log = LogManager.getLogger(CarrierVehicle.class);
 
 	/**
 	 * Returns a new instance of carrierVehicle.
@@ -23,8 +51,8 @@ public class CarrierVehicle {
 	 * @return CarrierVehicle
 	 * @see CarrierVehicle
 	 */
-	public static CarrierVehicle newInstance(Id<Vehicle> vehicleId, Id<Link> locationId){
-		return new CarrierVehicle(vehicleId, locationId);
+	public static CarrierVehicle newInstance(Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType carrierVehicleType ){
+		return new Builder( vehicleId, locationId, carrierVehicleType ).build();
 	}
 
 	/**
@@ -42,33 +70,46 @@ public class CarrierVehicle {
 		 * 
 		 * @param vehicleId
 		 * @param locationId
+		 * @param vehicleType
 		 * @return a new vehicle builder
 		 */
-		public static Builder newInstance(Id<Vehicle> vehicleId, Id<Link> locationId){
-			return new Builder(vehicleId,locationId);
+		public static Builder newInstance( Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType vehicleType ){
+			return new Builder(vehicleId, locationId, vehicleType );
 		}
 		
-		private Id<Link> locationId;
-		private Id<Vehicle> vehicleId;
-		private CarrierVehicleType type;
-		private Id<VehicleType> typeId;
+		private final Id<Link> locationId;
+		private final Id<Vehicle> vehicleId;
+		private final VehicleType type;
+//		private Id<org.matsim.vehicles.VehicleType> typeId;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
 		
 		
-		public Builder(Id<Vehicle> vehicleId, Id<Link> locationId){
+		public Builder( Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType vehicleType ){
 			this.locationId = locationId;
 			this.vehicleId = vehicleId;
+			this.type = vehicleType;
 		}
-		
-		public Builder setType(CarrierVehicleType type){
-			this.type=type;
+
+		/**
+		 * @param type
+		 * @deprecated The vehicleType need now to be set in the constructor kai/kai jan'22
+		 */
+		@Deprecated
+		public Builder setType( VehicleType type ){
+			log.warn(".setType has no functionality anymore and is deprecated");
+//			this.type=type;
 			return this;
 		}
-		
-		
-		public Builder setTypeId(Id<VehicleType> typeId){
-			this.typeId = typeId;
+
+		/**
+		 * @param typeId
+		 * @deprecated The vehicleTypeId is no longer needed and was confusing -> Use getType().getId kai/kai jan'22
+		 */
+		@Deprecated
+		public Builder setTypeId(Id<VehicleType> typeId ){
+			log.warn(".setTypeId has no functionality anymore and is deprecated");
+//			this.typeId = typeId;
 			return this;
 		}
 		
@@ -84,43 +125,38 @@ public class CarrierVehicle {
 		}
 		
 		public CarrierVehicle build(){
+			Gbl.assertNotNull( this.type );
 			return new CarrierVehicle(this);
 		}
 	}
 	
 	private final Id<Link> locationId;
-
 	private final Id<Vehicle> vehicleId;
-	
-	private Id<VehicleType> typeId;
+	private final VehicleType vehicleType;
+	private final Attributes attributes = new AttributesImpl();
+	private final double earliestStartTime;
+	private final double latestEndTime;
 
-	private CarrierVehicleType vehicleType;
-
-	private double earliestStartTime;
-
-	private double latestEndTime;
-
-	private CarrierVehicle(final Id<Vehicle> vehicleId, final Id<Link> location) {
-		this.vehicleId = vehicleId;
-		this.locationId = location;
-		earliestStartTime = 0.0;
-		latestEndTime = Integer.MAX_VALUE;
-	}
-	
 	private CarrierVehicle(Builder builder){
 		vehicleId = builder.vehicleId;
 		locationId = builder.locationId;
 		vehicleType = builder.type;
 		earliestStartTime = builder.earliestStart;
 		latestEndTime = builder.latestEnd;
-		typeId = builder.typeId;
 	}
 
-	public Id<Link> getLocation() {
+	/**
+	 * Used to be getLocation.  Can't say if this is meant to contain only the starting position, or if it is meant to be changed over the day.  kai, jul'22
+	 */
+	public final Id<Link> getLinkId() {
 		return locationId;
 	}
-
-	public Id<Vehicle> getVehicleId() {
+	/**
+	 * @deprecated -- please inline.  kai, jul'22
+	 */
+	public final Id<Link> getLocation() { return getLinkId(); }
+	@Override
+	public Id<Vehicle> getId() {
 		return vehicleId;
 	}
 	
@@ -128,18 +164,19 @@ public class CarrierVehicle {
 	public String toString() {
 		return vehicleId + " stationed at " + locationId;
 	}
-
-	public CarrierVehicleType getVehicleType() {
+	@Override
+	public VehicleType getType() {
 		return vehicleType;
 	}
 
-	public void setVehicleType(CarrierVehicleType vehicleType) {
-		this.vehicleType = vehicleType;
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
 	}
 
 
 	/**
-	 * Returns the earliest time a vehicle can be deployed (and thus can departure from its origin).
+	 * Returns the earliest time a vehicle can be deployed (and thus can depart from its origin).
 	 * 
 	 * The default value is 0.0;
 	 * 
@@ -162,7 +199,8 @@ public class CarrierVehicle {
 
 	
 	public Id<VehicleType> getVehicleTypeId() {
-		return typeId;
+//		return typeId;
+		return vehicleType.getId();
 	}
 
 }

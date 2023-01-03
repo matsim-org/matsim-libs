@@ -26,5 +26,5 @@
 // Generated on: 2012.02.13 at 12:10:00 AM MEZ 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.matsim.org/files/dtd", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.matsim.org/files/dtd", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.matsim.jaxb.lanedefinitions20;

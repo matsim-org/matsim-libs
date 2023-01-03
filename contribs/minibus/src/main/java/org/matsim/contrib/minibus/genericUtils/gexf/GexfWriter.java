@@ -19,13 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.minibus.genericUtils.gexf;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
@@ -37,7 +38,7 @@ import java.io.IOException;
  */
 class GexfWriter extends MatsimJaxbXmlWriter {
 
-	private static final Logger log = Logger.getLogger(GexfWriter.class);
+	private static final Logger log = LogManager.getLogger(GexfWriter.class);
 	
 	private final static String xsdPath = "http://www.gexf.net/1.2draft/gexf.xsd";
 

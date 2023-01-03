@@ -19,7 +19,7 @@
 
 package org.matsim.core.config.consistency;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,8 +37,6 @@ import java.util.Set;
  */
 public class ConfigConsistencyCheckerImplTest {
 
-
-
 	@Test
 	public void testCheckPlanCalcScore_DefaultsOk() {
 		Config config = new Config();
@@ -46,12 +44,12 @@ public class ConfigConsistencyCheckerImplTest {
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
-			logger.activiate();
-			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			logger.activate();
+			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
 			Assert.assertEquals(0, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
-			logger.deactiviate();
+			logger.deactivate();
 		}
 	}
 
@@ -64,12 +62,12 @@ public class ConfigConsistencyCheckerImplTest {
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
-			logger.activiate();
-			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			logger.activate();
+			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
 			Assert.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
-			logger.deactiviate();
+			logger.deactivate();
 		}
 	}
 
@@ -82,12 +80,12 @@ public class ConfigConsistencyCheckerImplTest {
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
-			logger.activiate();
-			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			logger.activate();
+			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
 			Assert.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
-			logger.deactiviate();
+			logger.deactivate();
 		}
 	}
 
@@ -100,12 +98,12 @@ public class ConfigConsistencyCheckerImplTest {
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
-			logger.activiate();
-			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			logger.activate();
+			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
 			Assert.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
-			logger.deactiviate();
+			logger.deactivate();
 		}
 	}
 
@@ -118,12 +116,12 @@ public class ConfigConsistencyCheckerImplTest {
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
-			logger.activiate();
-			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			logger.activate();
+			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
 			Assert.assertEquals(1, logger.getWarnCount());
 		} finally {
 			// make sure counter is deactivated at the end
-			logger.deactiviate();
+			logger.deactivate();
 		}
 	}
 	
@@ -137,7 +135,7 @@ public class ConfigConsistencyCheckerImplTest {
 		config.planCalcScore().addActivityParams(transitActivityParams);
 
 		try {
-			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
 			Assert.assertEquals(0,1) ; // should never get here
 		} catch ( Exception ee ){
 			

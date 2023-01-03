@@ -20,7 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import org.apache.log4j.Logger;
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -48,7 +55,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -60,27 +66,15 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author mrieser
  */
 public class TransitDriverTest {
 
-	private static final Logger log = Logger.getLogger(TransitDriverTest.class);
+	private static final Logger log = LogManager.getLogger(TransitDriverTest.class);
 
 	public MatsimTestUtils util = new MatsimTestUtils();
 	
@@ -136,10 +130,10 @@ public class TransitDriverTest {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
-		VehicleType vehType = new VehicleTypeImpl(Id.create("T1", VehicleType.class));
-		vehType.setCapacity(new VehicleCapacityImpl());
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("T1", VehicleType.class ) );
+//		vehType.setCapacity(new VehicleCapacity() );
 		vehType.getCapacity().setSeats(5);
-		driver.setVehicle(new TransitQVehicle(new VehicleImpl(Id.create("V1", Vehicle.class), vehType)));
+		driver.setVehicle(new TransitQVehicle( VehicleUtils.createVehicle(Id.create("V1", Vehicle.class ), vehType ) ) );
 
 		driver.endActivityAndComputeNextState(0.0);
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
@@ -232,11 +226,11 @@ public class TransitDriverTest {
 		tqsim.addMobsimEngine(trEngine);
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(5);
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(5);
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -288,11 +282,11 @@ public class TransitDriverTest {
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(4));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(4));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
@@ -385,11 +379,11 @@ public class TransitDriverTest {
 		tqsim.addMobsimEngine(trEngine);
 
 
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
@@ -450,11 +444,11 @@ public class TransitDriverTest {
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
@@ -479,14 +473,13 @@ public class TransitDriverTest {
 		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
 		double departureOffset1 = 60;
 		double departureOffset2 = 160;
-		double departureOffset3 = Time.getUndefinedTime();
 		TransitRouteStop routeStop1 = builder.createTransitRouteStop(stop1, departureOffset1 - 10.0, departureOffset1);
 		routeStop1.setAwaitDepartureTime(true);
 		stops.add(routeStop1);
 		TransitRouteStop routeStop2 = builder.createTransitRouteStop(stop2, departureOffset2 - 10.0, departureOffset2);
 		routeStop2.setAwaitDepartureTime(false);
 		stops.add(routeStop2);
-		TransitRouteStop routeStop3 = builder.createTransitRouteStop(stop3, Time.getUndefinedTime(), departureOffset3);
+		TransitRouteStop routeStop3 = builder.createTransitRouteStopBuilder(stop3).build();
 		routeStop3.setAwaitDepartureTime(true);
 		stops.add(routeStop3);
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
@@ -504,11 +497,11 @@ public class TransitDriverTest {
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
 		
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
@@ -556,11 +549,11 @@ public class TransitDriverTest {
 				.build(scenario, eventsManager);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
@@ -618,11 +611,11 @@ public class TransitDriverTest {
 				.build(scenario, eventsManager);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(5);
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(5);
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);

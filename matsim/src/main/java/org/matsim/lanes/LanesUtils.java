@@ -113,18 +113,20 @@ public final class LanesUtils {
 	public static List<ModelLane> createLanes(Link link, LanesToLinkAssignment lanesToLinkAssignment) {
 		List<ModelLane> queueLanes = new ArrayList<>();
 		List<Lane> sortedLanes =  new ArrayList<>(lanesToLinkAssignment.getLanes().values());
-		Collections.sort(sortedLanes, new Comparator<Lane>() {
-			@Override
-			public int compare(Lane o1, Lane o2) {
-				if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
-					return -1;
-				} else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
-					return 1;
-				} else {
-					return 0;
+
+		// orders lanes by start on link an whether they are outgoing or not o the start is the same
+		sortedLanes.sort(Comparator.comparingDouble(Lane::getStartsAtMeterFromLinkEnd).thenComparing(
+				(l1, l2) -> {
+					boolean l1Outgoing = l1.getToLinkIds() != null && !l1.getToLinkIds().isEmpty();
+					boolean l2Outgoing = l2.getToLinkIds() != null && !l2.getToLinkIds().isEmpty();
+					if (l1Outgoing && !l2Outgoing)
+						return -1;
+					else if(l2Outgoing && !l1Outgoing)
+						return 1;
+					else
+						return 0;
 				}
-			}
-		});
+		));
 		Collections.reverse(sortedLanes);
 
 		List<ModelLane> laneList = new LinkedList<>();

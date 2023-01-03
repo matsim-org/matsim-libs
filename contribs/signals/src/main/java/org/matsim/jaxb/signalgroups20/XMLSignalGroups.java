@@ -11,10 +11,10 @@ package org.matsim.jaxb.signalgroups20;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -41,9 +41,9 @@ import javax.xml.bind.annotation.XmlType;
     "signalSystem"
 })
 @XmlRootElement(name = "signalGroups")
-public class XMLSignalGroups {
+public final class XMLSignalGroups {
 
-    protected List<XMLSignalSystemSignalGroupType> signalSystem;
+    private List<XMLSignalSystemSignalGroupType> signalSystem;
 
     /**
      * Gets the value of the signalSystem property.

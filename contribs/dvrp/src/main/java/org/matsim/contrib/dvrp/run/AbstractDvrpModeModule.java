@@ -20,37 +20,13 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.function.Function;
-
-import org.matsim.core.controler.AbstractModule;
-
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.binder.LinkedBindingBuilder;
+import org.matsim.core.modal.AbstractModalModule;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public abstract class AbstractDvrpModeModule extends AbstractModule {
-	private final String mode;
-
+public abstract class AbstractDvrpModeModule extends AbstractModalModule<DvrpMode> {
 	protected AbstractDvrpModeModule(String mode) {
-		this.mode = mode;
-	}
-
-	protected String getMode() {
-		return mode;
-	}
-
-	protected <T> Key<T> modalKey(Class<T> type) {
-		return DvrpModes.key(type, mode);
-	}
-
-	protected <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
-		return bind(modalKey(type));
-	}
-
-	protected <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {
-		return ModalProviders.createProvider(mode, delegate);
+		super(mode, DvrpModes::mode);
 	}
 }

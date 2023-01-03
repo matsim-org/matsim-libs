@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierModule;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericStrategyModule;
@@ -65,11 +65,10 @@ public class GroupPlanStrategyFactoryUtils {
 
 	public static GenericStrategyModule<GroupPlans> createSynchronizerModule(
 			final Config config,
-			final Provider<TripRouter> tripRouterFactory) {
+			final Provider<TripRouter> tripRouterFactory, TimeInterpretation timeInterpretation) {
 		return new JointPlanBasedGroupStrategyModule(
 				new SynchronizeCoTravelerPlansModule(
-					config.global().getNumberOfThreads(),
-					tripRouterFactory.get().getStageActivityTypes() ) );
+					config.global().getNumberOfThreads(), timeInterpretation ) );
 	}
 
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(
@@ -87,16 +86,12 @@ public class GroupPlanStrategyFactoryUtils {
 
 	public static GenericStrategyModule<GroupPlans> createJointTripAwareTourModeUnifierModule(
 			final Config config,
-			final Provider<TripRouter> tripRouterFactory) {
-		final TripRouter router = tripRouterFactory.get();
-		final CompositeStageActivityTypes stageTypes = new CompositeStageActivityTypes();
-		stageTypes.addActivityTypes( router.getStageActivityTypes() );
-		stageTypes.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
+			final MainModeIdentifier mainModeIdentifier) {
 
 		return new IndividualBasedGroupStrategyModule(
 				new TourModeUnifierModule(
 					config.global().getNumberOfThreads(),
-					stageTypes,
+					JointActingTypes.JOINT_STAGE_ACTS::contains,
 					new MainModeIdentifier() {
 						@Override
 						public String identifyMainMode(
@@ -112,8 +107,11 @@ public class GroupPlanStrategyFactoryUtils {
 								}
 
 							}
+							// The idea, I guess, is that in subtour mode choice the driver needs to conserve her/his vehicle, while the
+							// passenger does not.  The above implementation seems incomplete in the sense that it only looks at the _first_
+							// occurence of a joint leg, i.e. someone who starts as a passenger always needs to be a passenger, etc.
 
-							return router.getMainModeIdentifier().identifyMainMode( tripElements );
+							return mainModeIdentifier.identifyMainMode( tripElements );
 						}
 					}) );
 	}

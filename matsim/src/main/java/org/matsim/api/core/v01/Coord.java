@@ -91,7 +91,7 @@ public final class Coord implements Serializable {
 		return this.y;
 	}
 	
-	public double getZ() {
+	public double getZ() throws IllegalStateException {
 		if ( !hasZ() ){
 			throw new IllegalStateException("Requesting elevation (z) without having first set it.");
 		}
@@ -148,9 +148,9 @@ public final class Coord implements Serializable {
 	@Override
 	public final String toString() {
 		if( !hasZ() ){
-			return "[x=" + this.x + "][y=" + this.y + "]";
+			return "[x=" + this.x + " | y=" + this.y + "]";
 		} else{
-			return "[x=" + this.x + "][y=" + this.y + "][z=" + this.z + "]";
+			return "[x=" + this.x + " | y=" + this.y + " | z=" + this.z + "]";
 		}
 	}
 }

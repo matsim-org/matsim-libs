@@ -41,12 +41,12 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
@@ -73,6 +73,8 @@ public class PlanRouterWithVehicleRessourcesTest {
 		firstAct.setEndTime( 223 );
 
 		final Leg leg = factory.createLeg( TransportMode.car );
+		leg.setTravelTime(0.0);
+		TripStructureUtils.setRoutingMode( leg, leg.getMode() );
 		plan.addLeg( leg );
 		final NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(linkId, Collections.<Id<Link>>emptyList(), linkId);
 		route.setVehicleId( vehicleId );
@@ -84,11 +86,11 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 		final PlanRouterWithVehicleRessources router =
 			new PlanRouterWithVehicleRessources(
-				new PlanRouter( tripRouter ) );
+				new PlanRouter( tripRouter, TimeInterpretation.create(config) ) );
 
 		router.run( plan );
 
-		for ( Trip trip : TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() ) ) {
+		for ( Trip trip : TripStructureUtils.getTrips( plan ) ) {
 			for (Leg l : trip.getLegsOnly()) {
 				assertEquals(
 					"unexpected vehicle id",
@@ -100,38 +102,36 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 	private static TripRouter createTripRouter(final PopulationFactory factory, Config config) {
 		// create some stages to check the behavior with that
-		final String stage = "realize that actually, you did't forget to close the window, and go again";
+		final String stage = "realize that actually, you did't forget to close the window, and go again interaction";
 		final TripRouter.Builder builder = new TripRouter.Builder(config) ;
 		builder.setRoutingModule(
 				TransportMode.car,
 				new RoutingModule() {
 					@Override
-					public List<? extends PlanElement> calcRoute(
-							final Facility fromFacility,
-							final Facility toFacility,
-							final double departureTime,
-							final Person p) {
+					public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+						final Facility fromFacility = request.getFromFacility();
+						final Facility toFacility = request.getToFacility();
+						
 						final List<PlanElement> legs = new ArrayList<PlanElement>();
 
 						for (int i=0; i < 5; i++) {
 							final Leg l = factory.createLeg( TransportMode.car );	
+							l.setTravelTime(0.0);
 							l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(),
 									fromFacility.getLinkId()) );
 							legs.add( l );
 							legs.add( factory.createActivityFromLinkId( stage , fromFacility.getLinkId() ) );
+							((Activity) legs.get(legs.size() - 1)).setMaximumDuration(0.0);
 						}
 
 						final Leg l = factory.createLeg( TransportMode.car );	
+						l.setTravelTime(0.0);
 						l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(), toFacility.getLinkId()) );
 						legs.add( l );
 
 						return legs ;
 					}
 
-					@Override
-					public StageActivityTypes getStageActivityTypes() {
-						return new StageActivityTypesImpl( stage );
-					}
 				});
 		return builder.build() ;
 	}

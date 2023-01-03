@@ -80,22 +80,22 @@ public class FakeLink implements Link {
 
 	@Override
 	public double getCapacity() {
-		return getCapacity(Time.UNDEFINED_TIME);
-	}
-
-	@Override
-	public double getCapacity(final double time) {
 		return 2000.0;
 	}
 
 	@Override
+	public double getCapacity(final double time) {
+		return getCapacity();
+	}
+
+	@Override
 	public double getFreespeed() {
-		return getFreespeed(Time.UNDEFINED_TIME);
+		return 15.0;
 	}
 
 	@Override
 	public double getFreespeed(final double time) {
-		return 15.0;
+		return getFreespeed();
 	}
 
 	@Override
@@ -105,12 +105,12 @@ public class FakeLink implements Link {
 
 	@Override
 	public double getNumberOfLanes() {
-		return getNumberOfLanes(Time.UNDEFINED_TIME);
+		return 1.0;
 	}
 
 	@Override
 	public double getNumberOfLanes(final double time) {
-		return 1.0;
+		return getNumberOfLanes();
 	}
 
 	@Override
@@ -164,13 +164,8 @@ public class FakeLink implements Link {
 	}
 
 	@Override
-	public double getFlowCapacityPerSec() {
-		throw new RuntimeException("not implemented") ;
-	}
-
-	@Override
-	public double getFlowCapacityPerSec(double time) {
-		throw new RuntimeException("not implemented") ;
+	public double getCapacityPeriod() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

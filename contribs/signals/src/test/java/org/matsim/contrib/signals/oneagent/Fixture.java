@@ -33,12 +33,12 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup.IntersectionLogic;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.conflicts.Direction;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
@@ -59,17 +59,17 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class Fixture {
 
-	static final Id<Link> linkId1 = Id.create(1, Link.class);
-	static final Id<Link> linkId2 = Id.create(2, Link.class);
-	static final Id<Node> nodeId2 = Id.create(2, Node.class);
-	static final Id<SignalPlan> signalPlanId2 = Id.create(2, SignalPlan.class);
-	static final Id<SignalSystem> signalSystemId2 = Id.create(2, SignalSystem.class);
-	static final Id<SignalGroup> signalGroupId100 = Id.create(100, SignalGroup.class);
+	final Id<Link> linkId1 = Id.create(1, Link.class);
+	final Id<Link> linkId2 = Id.create(2, Link.class);
+	final Id<Node> nodeId2 = Id.create(2, Node.class);
+	final Id<SignalPlan> signalPlanId2 = Id.create(2, SignalPlan.class);
+	final Id<SignalSystem> signalSystemId2 = Id.create(2, SignalSystem.class);
+	final Id<SignalGroup> signalGroupId100 = Id.create(100, SignalGroup.class);
 	
 	// only available if 'TwoSignals'-Method is used
-	static final Id<SignalGroup> signalGroupId200 = Id.create(200, SignalGroup.class);
-	static final Id<Link> linkId6 = Id.create(6, Link.class);
-	static final Id<Node> nodeId6 = Id.create(6, Node.class);
+	final Id<SignalGroup> signalGroupId200 = Id.create(200, SignalGroup.class);
+	final Id<Link> linkId6 = Id.create(6, Link.class);
+	final Id<Node> nodeId6 = Id.create(6, Node.class);
 	
 
 	public Scenario createAndLoadTestScenarioOneSignal(Boolean useIntergreens){

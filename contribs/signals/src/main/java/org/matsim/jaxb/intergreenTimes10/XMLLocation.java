@@ -8,10 +8,10 @@
 
 package org.matsim.jaxb.intergreenTimes10;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -40,10 +40,10 @@ import javax.xml.bind.annotation.XmlType;
     "actLocation"
 })
 @XmlRootElement(name = "location")
-public class XMLLocation {
+final class XMLLocation {
 
-    protected XMLCoordinateType coordinate;
-    protected XMLActLocationType actLocation;
+    private XMLCoordinateType coordinate;
+    private XMLActLocationType actLocation;
 
     /**
      * Gets the value of the coordinate property.

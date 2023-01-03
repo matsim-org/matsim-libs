@@ -19,8 +19,9 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
+package org.matsim.core.mobsim.qsim;
 
+import static java.util.Comparator.comparing;
 import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
 
 import java.util.ArrayList;
@@ -28,12 +29,13 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -53,15 +55,13 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -76,10 +76,9 @@ public final class PreplanningEngine implements MobsimEngine {
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
-	private static final Logger log = Logger.getLogger( PreplanningEngine.class );
+	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
 
-	public static final StageActivityTypes drtStageActivities = new StageActivityTypesImpl(
-		  createStageActivityType(TransportMode.drt), createStageActivityType(TransportMode.walk));
+	private static final Logger log = LogManager.getLogger(PreplanningEngine.class);
 
 	private final ActivityFacilities facilities;
 
@@ -90,26 +89,29 @@ public final class PreplanningEngine implements MobsimEngine {
 	private final Network network;
 	private final Scenario scenario;
 
-	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new TreeMap<>( ( o1, o2 ) -> o1.getId().compareTo( o2.getId() ) ) ;
+	// (we are in the mobsim, so we don't need to play around with IDs)
+	private final Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new TreeMap<>(comparing(Identifiable::getId ));
 	// yyyy not sure about possible race conditions here! kai, feb'19
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
-	private Map<MobsimAgent, TripInfoRequest> tripInfoRequestMap = new TreeMap<>( ( o1, o2 ) -> o1.getId().compareTo( o2.getId() ) ) ;
+	private final Map<MobsimAgent, TripInfo.Request> tripInfoRequestMap = new TreeMap<>(comparing(Identifiable::getId ));
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
 	private EditTrips editTrips;
-	private EditPlans editPlans = null;
+	private EditPlans editPlans;
 
 	private final TripRouter tripRouter;
 	private InternalInterface internalInterface;
+	private final TimeInterpretation timeInterpretation;
 
 	@Inject
-	PreplanningEngine( TripRouter tripRouter, Scenario scenario ) {
+	PreplanningEngine(TripRouter tripRouter, Scenario scenario, TimeInterpretation timeInterpretation) {
 		this.tripRouter = tripRouter;
 		this.population = scenario.getPopulation();
-		this.facilities = scenario.getActivityFacilities() ;
-		this.network = scenario.getNetwork() ;
-		this.scenario = scenario ;
+		this.facilities = scenario.getActivityFacilities();
+		this.network = scenario.getNetwork();
+		this.scenario = scenario;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -117,7 +119,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		for (DepartureHandler departureHandler : internalInterface.getDepartureHandlers()) {
 			if (departureHandler instanceof TripInfo.Provider) {
 				String mode = ((TripInfo.Provider)departureHandler).getMode();
-				log.warn("registering TripInfo.Provider for mode=" + mode ) ;
+				log.warn("registering TripInfo.Provider for mode=" + mode);
 				this.tripInfoProviders.put(mode, (TripInfo.Provider)departureHandler);
 			}
 		}
@@ -129,55 +131,71 @@ public final class PreplanningEngine implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.editTrips = new EditTrips( tripRouter, scenario, internalInterface );
-		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
-		this.internalInterface = internalInterface ;
+		this.editTrips = new EditTrips(tripRouter, scenario, internalInterface, timeInterpretation);
+		this.editPlans = new EditPlans(internalInterface.getMobsim(), editTrips);
+		this.internalInterface = internalInterface;
 	}
 
 	@Override
 	public void doSimStep(double time) {
-		//first process requests  and then infos --> trips without booking required can be processed in 1 time step
+		//first process requests and then infos --> trips without booking required can be processed in 1 time step
 		//booking confirmation always comes later (e.g. next time step)
-		processTripInfoRequests();
-		processTripInfoUpdates();
-	}
 
-	public synchronized final void notifyChangedTripInformation( MobsimAgent agent, Optional<TripInfo> tripInfoUpdate ) {
-		// needs to be public because this is what the Drt Passenger Engine uses
+		// (I have inlined the below methods since I find this for the time being easier to read.  Can be extracted again at some later point in time .
+		// kai, jan'20)
 
-		// (we are in the mobsim, so we don't need to play around with IDs)
-		tripInfoUpdatesMap.put(agent, tripInfoUpdate);
-	}
+		// process all (initial) requests:
+		for (Map.Entry<MobsimAgent, TripInfo.Request> entry : tripInfoRequestMap.entrySet()) {
+			final MobsimAgent mobsimAgent = entry.getKey();
+			final TripInfo.Request request = entry.getValue();
 
-	synchronized final void notifyTripInfoNeeded( MobsimAgent agent, TripInfoRequest tripInfoRequest ) {
-//		log.info("entering notifyTripInfoRequestSent with agentId=" + agent.getId());
-		tripInfoRequestMap.put(agent, tripInfoRequest);
-	}
-
-	private void processTripInfoRequests() {
-		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
-//			log.warn("processing tripInfoRequests for agentId=" + entry.getKey().getId());
-			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
+			List<TripInfo> allTripInfos = new ArrayList<>();
 			for (TripInfo.Provider provider : tripInfoProviders.values()) {
-//				log.warn("querying provider of " + provider.getMode() + " for tripInfo") ;
-				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
-				for (TripInfo tripInfo : tripInfos) {
-//					log.warn("tripInfo=" + toString( tripInfo ) ) ;
-					allTripInfos.put(tripInfo, provider);
-				}
+				allTripInfos.addAll( provider.getTripInfos( request ) );
 			}
 
 			// TODO add info for mode that is in agent plan, if not returned by trip info provider
+			// not sure if that is needed. kai, jan'20
 
-			decide(entry.getKey(), allTripInfos);
+			decide( mobsimAgent, allTripInfos );
 		}
-
 		tripInfoRequestMap.clear();
+
+		// process all updates:
+		for (Map.Entry<MobsimAgent, Optional<TripInfo>> entry : tripInfoUpdatesMap.entrySet()) {
+			MobsimAgent agent = entry.getKey();
+
+			Optional<TripInfo> tripInfo = entry.getValue();
+
+			if (tripInfo.isPresent()) {
+				TripInfo actualTripInfo = tripInfo.get();
+				updateAgentPlan(agent, actualTripInfo);
+			} else {
+				TripInfo.Request request = null;
+				//TODO get it from where ??? from TripInfo???
+				//TODO agent should adapt trip info request given that the previous one got rejected??
+				//TODO or it should skip the rejected option during "accept()"
+				notifyTripInfoNeeded(agent, request);//start over again in the next time step
+			}
+		}
+		tripInfoUpdatesMap.clear();
+
+		// (I have inlined the above methods since I find this for the time being easier to read.  Can be extracted again at some later point in time . kai, jan'20)
 	}
 
-	private void decide(MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos) {
-//		log.warn("entering decide for agentId=" + agent.getId());
+	public synchronized final void notifyChangedTripInformation(MobsimAgent agent, Optional<TripInfo> tripInfoUpdate) {
+		// yyyy My IDE complains about "Optional" in method signatures.  kai, jan'20
 
+		tripInfoUpdatesMap.put(agent, tripInfoUpdate);
+	}
+
+	private synchronized void notifyTripInfoNeeded( MobsimAgent agent, TripInfo.Request tripInfoRequest ) {
+		tripInfoRequestMap.put(agent, tripInfoRequest);
+	}
+
+	private void decide(MobsimAgent agent, List<TripInfo> allTripInfos) {
+
+		// for otfvis:
 		this.population.getPersons().get(agent.getId()).getAttributes().putAttribute(AgentSnapshotInfo.marker, true);
 
 		if (allTripInfos.isEmpty()) {
@@ -186,20 +204,24 @@ public final class PreplanningEngine implements MobsimEngine {
 
 		// to get started, we assume that we are only getting one drt option back.
 		// TODO: make complete
-		TripInfo tripInfo = allTripInfos.keySet().iterator().next();
+		TripInfo tripInfo = allTripInfos.iterator().next();
 
 		if (tripInfo instanceof TripInfoWithRequiredBooking) {
-			tripInfoProviders.get(tripInfo.getMode()).bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
-//			log.warn("booked trip with tripInfo=" + toString( tripInfo ));
+//			tripInfoProviders.get(tripInfo.getMode())
+//					.bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
 			// yyyy can't we really not use the tripInfo handle directly as I had it before?  We may, e.g., have different providers of the same mode.  kai, mar'19
+
+			tripInfo.bookTrip( (MobsimPassengerAgent) agent );
 
 			//to reduce number of possibilities, I would simply assume that notification always comes later
 			//
 			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
 
 			// wait for notification:
-//			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
-			tripInfo.getOriginalRequest().getFromActivity().setEndTime( Double.MAX_VALUE );
+			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
+//			TripInfoRequestWithActivities tripInfoRequest = (TripInfoRequestWithActivities)tripInfo.getOriginalRequest();
+//			tripInfoRequest.getFromActivity().setEndTime(Double.MAX_VALUE);
+			// There is no guarantee that the activity that is in the tripInfoRequest is still the behavioral object of the agent.  kai, jan'20
 
 			// one corner case is that the sim start time is set to later than some agent activity end time.  Then, depending on the order of the engines, it may happen
 			// that the agent departs.  It will _then_ attempt to pre-book the trip, and up here, and then evidently cannot be cast into an activity.
@@ -209,67 +231,40 @@ public final class PreplanningEngine implements MobsimEngine {
 		} else {
 			notifyChangedTripInformation(agent, Optional.of(tripInfo));//no booking here
 		}
-		log.warn("---") ;
+		log.warn("---");
 	}
 
-	private void processTripInfoUpdates() {
-		for (Map.Entry<MobsimAgent, Optional<TripInfo>> entry : tripInfoUpdatesMap.entrySet()) {
-			MobsimAgent agent = entry.getKey();
-			Optional<TripInfo> tripInfo = entry.getValue();
-
-			if (tripInfo.isPresent()) {
-				TripInfo actualTripInfo = tripInfo.get();
-				updateAgentPlan(agent, actualTripInfo);
-			} else {
-				TripInfoRequest request = null;
-				//TODO get it from where ??? from TripInfo???
-				//TODO agent should adapt trip info request given that the previous one got rejected??
-				//TODO or it should skip the rejected option during "accept()"
-				notifyTripInfoNeeded(agent, request );//start over again in the next time step
-			}
-		}
-
-		tripInfoUpdatesMap.clear();
-	}
-
-	public List<ActivityEngineWithWakeup.AgentEntry> generateWakeups( MobsimAgent agent, double now ) {
+	List<ActivityEngineWithWakeup.AgentEntry> generateWakeups( MobsimAgent agent, double now ) {
 		if (!(agent instanceof HasModifiablePlan)) {
 			// (we don't want to treat DvrpAgents, CarrierAgents, TransitVehicleDrivers etc. here)
 			return Collections.emptyList();
 		}
 
-		List<ActivityEngineWithWakeup.AgentEntry> wakeups = new ArrayList<>() ;
 
-		Double prebookingOffset_s = (Double)((PlanAgent)agent).getCurrentPlan()
-											.getAttributes()
-											.getAttribute( ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME );
+		Double prebookingOffset_s = (Double)((PlanAgent)agent).getCurrentPlan().getAttributes().getAttribute(PREBOOKING_OFFSET_ATTRIBUTE_NAME);
+		// yyyy prebooking info needs to be in plan since it will not survive in the leg.  :-(  kai, jan'20
 
-		if ( prebookingOffset_s == null ) {
-			log.warn("not prebooking") ;
-			return wakeups ;
+		if (prebookingOffset_s == null) {
+			log.warn("not prebooking");
+			return Collections.emptyList();
 		}
 
-		for( String mode : new String[]{TransportMode.drt, TransportMode.taxi} ){
-			for ( Leg drtLeg : findLegsWithModeInFuture(agent, mode)) {
-				//				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
-				// yyyyyy the info will not survive in the leg!
-				//			if (prebookingOffset_s == null) {
-				//				log.warn("not prebooking");
-				//				continue;
-				//			}
-				final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
-				if (prebookingTime < agent.getActivityEndTime()){
+		List<ActivityEngineWithWakeup.AgentEntry> wakeups = new ArrayList<>();
+
+		for (String mode : new String[] { TransportMode.drt, TransportMode.taxi } ) {
+			for (Leg drtLeg : EditPlans.findLegsWithModeInFuture(agent, mode )) {
+				final double prebookingTime = drtLeg.getDepartureTime().seconds() - prebookingOffset_s;
+				if (prebookingTime < agent.getActivityEndTime()) {
 					// yyyy and here one sees that having this in the activity engine is not very practical
-					log.info( "adding agent to wakeup list" );
-					wakeups.add( new ActivityEngineWithWakeup.AgentEntry( agent, prebookingTime, ( agent1, then ) -> wakeUpAgent( agent1, then, drtLeg ) ) ) ;
+					log.info("adding agent to wakeup list");
+					wakeups.add(new ActivityEngineWithWakeup.AgentEntry(agent, prebookingTime, (agent1, then) -> preplanLeg(agent1, then, drtLeg )) );
 				}
 
-				Activity originActivity = editTrips.findTripAtPlanElement( agent, drtLeg ).getOriginActivity() ;
-				if ( originActivity.getEndTime() < now+2. ){
-					originActivity.setEndTime( now + 2. );
-					WithinDayAgentUtils.resetCaches( agent ); // !!!!!!!!
+				Activity originActivity = EditTrips.findTripAtPlanElement(agent, drtLeg ).getOriginActivity();
+				if (originActivity.getEndTime().seconds() < now + 2.) {
+					originActivity.setEndTime(now + 2.);
+					WithinDayAgentUtils.resetCaches(agent); // !!!!!!!!
 				}
-
 
 				// (we are still before "handleActivity" so we don't want to reschedule because then it will end
 				// up twice in the wakeup queue)
@@ -286,58 +281,49 @@ public final class PreplanningEngine implements MobsimEngine {
 		return wakeups;
 	}
 
-	public static List<Leg> findLegsWithModeInFuture(MobsimAgent agent, String mode) {
-		List<Leg> retVal = new ArrayList<>();
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent );
-		for (int ii = WithinDayAgentUtils.getCurrentPlanElementIndex(agent); ii < plan.getPlanElements().size(); ii++) {
-			PlanElement pe = plan.getPlanElements().get(ii);
-			if (pe instanceof Leg) {
-				if (Objects.equals(mode, ((Leg)pe).getMode())) {
-					retVal.add((Leg)pe);
-				}
-			}
-		}
-		return retVal;
-	}
-
-	private void wakeUpAgent(MobsimAgent agent, double now, Leg leg) {
-		//		log.warn("entering wakeUpAgent with agentId=" + agent.getId() ) ;
-
+	private void preplanLeg( MobsimAgent agent, double now, Leg leg ) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
-		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
-		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, drtStageActivities );
-		Gbl.assertNotNull(drtTrip );
+		// () search for drt trip corresponding to drt leg.  Trick is using our own stage activities (drtStageActivities).
+		// () existing tests pass, but probably it is currently wrong after removing stage activity types
+		// and thereby losing the ability to only consider drtStageActivities as stage activities and nothing else
+		// () I think that this is now fixed.  yyyy But there should also be a test for it.  kai, jan'20
+		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals );
+		Gbl.assertNotNull(drtTrip);
 
-		final TripInfoRequest request = new TripInfoRequest.Builder(scenario).setFromActivity(drtTrip.getOriginActivity() )
-												 .setToActivity( drtTrip.getDestinationActivity() )
-												 .setTime(drtTrip.getOriginActivity().getEndTime())
-												 .createRequest();
+		final double expectedEndTimeOfOriginActivity = timeInterpretation.decideOnActivityEndTime( drtTrip.getOriginActivity(), now ).seconds();
+
+		final TripInfo.Request request = new TripInfoRequestWithActivities.Builder(scenario)
+								 .setFromActivity( drtTrip.getOriginActivity() )
+								 .setToActivity(drtTrip.getDestinationActivity())
+								 .setTime( expectedEndTimeOfOriginActivity )
+								 .setPlannedRoute( leg.getRoute() )
+								 .createRequest();
 
 		//first simulate ActivityEngineWithWakeup and then PreplanningEngine --> decision process
 		//in the same time step
-		this.notifyTripInfoNeeded(agent, request );
+		this.notifyTripInfoNeeded(agent, request);
 	}
 
-
 	private void updateAgentPlan(MobsimAgent agent, TripInfo tripInfo) {
-//		Gbl.assertIf(WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Activity);
+		//		Gbl.assertIf(WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Activity);
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		TripStructureUtils.Trip inputTrip = null;
-		Coord pickupCoord = FacilitiesUtils.decideOnCoord( tripInfo.getPickupLocation(), network ) ;
-		Coord dropoffCoord = FacilitiesUtils.decideOnCoord( tripInfo.getDropoffLocation(), network ) ;
-		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips(plan, PreplanningEngine.drtStageActivities )) {
+		Coord pickupCoord = FacilitiesUtils.decideOnCoord(tripInfo.getPickupLocation(), network, scenario.getConfig());
+		Coord dropoffCoord = FacilitiesUtils.decideOnCoord(tripInfo.getDropoffLocation(), network, scenario.getConfig());
+		// TODO: check: was PreplanningEngine.drtStageActivities, so drt* interaction only?
+		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips(plan)) {
 			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
 			// could instead use some kind of ID.  Not sure if that would really be better.
 			// So here we are looking for a trip where origin and destination are close to pickup and dropoff:
-			Coord coordOrigin = PopulationUtils.decideOnCoordForActivity( drtTrip.getOriginActivity(), scenario ) ;
-			if ( CoordUtils.calcEuclideanDistance( coordOrigin, pickupCoord ) > 1000.) {
+			Coord coordOrigin = PopulationUtils.decideOnCoordForActivity(drtTrip.getOriginActivity(), scenario);
+			if (CoordUtils.calcEuclideanDistance(coordOrigin, pickupCoord) > 1000.) {
 				continue;
 			}
-			Coord coordDestination = PopulationUtils.decideOnCoordForActivity( drtTrip.getDestinationActivity(), scenario ) ;
-			if (CoordUtils.calcEuclideanDistance( coordDestination, dropoffCoord ) > 1000.) {
+			Coord coordDestination = PopulationUtils.decideOnCoordForActivity(drtTrip.getDestinationActivity(), scenario);
+			if (CoordUtils.calcEuclideanDistance(coordDestination, dropoffCoord) > 1000.) {
 				continue;
 			}
 			inputTrip = drtTrip;
@@ -345,87 +331,95 @@ public final class PreplanningEngine implements MobsimEngine {
 		}
 		Gbl.assertNotNull(inputTrip);
 
-		List<PlanElement> result = new ArrayList<>(  ) ;
+		List<PlanElement> result = new ArrayList<>();
 
-		inputTrip.getOriginActivity().setEndTime( tripInfo.getExpectedBoardingTime() - 900 );
+		inputTrip.getOriginActivity().setEndTime(tripInfo.getExpectedBoardingTime() - 900);
 		// yyyy means for time being we always depart 15min before pickup.  kai, mar'19
-		WithinDayAgentUtils.resetCaches( agent );
+		WithinDayAgentUtils.resetCaches(agent);
 
-		log.warn( "agentId=" + agent.getId() + " | newActEndTime=" + inputTrip.getOriginActivity().getEndTime() ) ;
+		log.warn("agentId=" + agent.getId() + " | newActEndTime=" + inputTrip.getOriginActivity()
+				.getEndTime()
+				.seconds());
 
-//		result.add( inputTrip.getOriginActivity() ) ;
+		//		result.add( inputTrip.getOriginActivity() ) ;
 		// ---
 
 		PopulationFactory pf = population.getFactory();
 		{
-			Facility fromFacility = FacilitiesUtils.toFacility( inputTrip.getOriginActivity(), facilities ) ;
-			Facility toFacility = tripInfo.getPickupLocation() ;
-			double departureTime = tripInfo.getExpectedBoardingTime() - 900. ; // always depart 15min before pickup
-			List<? extends PlanElement> planElements = tripRouter.calcRoute( TransportMode.walk, fromFacility, toFacility, departureTime, null );;
+			Facility fromFacility = FacilitiesUtils.toFacility(inputTrip.getOriginActivity(), facilities);
+			Facility toFacility = tripInfo.getPickupLocation();
+			double departureTime = tripInfo.getExpectedBoardingTime() - 900.; // always depart 15min before pickup
+			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, fromFacility,
+					toFacility, departureTime, null, inputTrip.getTripAttributes());
+			;
 			// not sure if this works for walk, but it should ...
 
-			result.addAll( planElements ) ;
+			result.addAll(planElements);
 		}
 		{
-			Activity act = pf.createActivityFromLinkId( createStageActivityType( TransportMode.taxi ), tripInfo.getPickupLocation().getLinkId() );
-			act.setMaximumDuration( 0. );
-			result.add( act );
+			Activity act = pf.createActivityFromLinkId(createStageActivityType(TransportMode.taxi),
+					tripInfo.getPickupLocation().getLinkId());
+			act.setMaximumDuration(0.);
+			result.add(act);
 		}
 		{
-			Leg leg = pf.createLeg( TransportMode.taxi );
-			result.add( leg );
-			Route route = pf.getRouteFactories().createRoute( GenericRouteImpl.class, tripInfo.getPickupLocation().getLinkId(), tripInfo.getDropoffLocation().getLinkId() ) ;
-			leg.setRoute( route );
+			Leg leg = pf.createLeg(TransportMode.taxi);
+			result.add(leg);
+			Route route = pf.getRouteFactories()
+					.createRoute(GenericRouteImpl.class, tripInfo.getPickupLocation().getLinkId(),
+							tripInfo.getDropoffLocation().getLinkId());
+			leg.setRoute(route);
 		}
 		{
-			Activity act = pf.createActivityFromLinkId( createStageActivityType( TransportMode.taxi ), tripInfo.getDropoffLocation().getLinkId() );
-			act.setMaximumDuration( 0. );
-			result.add( act );
+			Activity act = pf.createActivityFromLinkId(createStageActivityType(TransportMode.taxi),
+					tripInfo.getDropoffLocation().getLinkId());
+			act.setMaximumDuration(0.);
+			result.add(act);
 		}
 		{
-			Facility fromFacility = tripInfo.getDropoffLocation() ;
-			Facility toFacility = FacilitiesUtils.toFacility( inputTrip.getDestinationActivity(), facilities ) ;
-			double expectedTravelTime ;
+			Facility fromFacility = tripInfo.getDropoffLocation();
+			Facility toFacility = FacilitiesUtils.toFacility(inputTrip.getDestinationActivity(), facilities);
+			double expectedTravelTime;
 			try {
-				expectedTravelTime = tripInfo.getExpectedTravelTime() ;
-			} catch( Exception ee ) {
-				expectedTravelTime = 15.*60 ; // using 15min as quick fix since dvrp refuses to provide this. kai, mar'19
+				expectedTravelTime = tripInfo.getExpectedTravelTime();
+			} catch (Exception ee) {
+				expectedTravelTime = 15.
+						* 60; // using 15min as quick fix since dvrp refuses to provide this. kai, mar'19
 			}
-			double departureTime = tripInfo.getExpectedBoardingTime() + expectedTravelTime ;
-			List<? extends PlanElement> planElements = tripRouter.calcRoute( TransportMode.walk, fromFacility, toFacility, departureTime, null );
+			double departureTime = tripInfo.getExpectedBoardingTime() + expectedTravelTime;
+			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, fromFacility,
+					toFacility, departureTime, null, inputTrip.getOriginActivity().getAttributes());
 
-			result.addAll( planElements ) ;
+			result.addAll(planElements);
 		}
 
-//		result.add( inputTrip.getDestinationActivity() ) ;
+		//		result.add( inputTrip.getDestinationActivity() ) ;
 
-		TripRouter.insertTrip( plan, inputTrip.getOriginActivity(), result, inputTrip.getDestinationActivity() ) ;
+		TripRouter.insertTrip(plan, inputTrip.getOriginActivity(), result, inputTrip.getDestinationActivity());
 
-		editPlans.rescheduleActivityEnd( agent );
+		editPlans.rescheduleActivityEnd(agent);
 		// I don't think that this can ever do damage.
 
-		log.warn("new plan for agentId=" + agent.getId() ) ;
-		for( PlanElement planElement : plan.getPlanElements() ){
-			log.warn(planElement.toString()) ;
+		log.warn("new plan for agentId=" + agent.getId());
+		for (PlanElement planElement : plan.getPlanElements()) {
+			log.warn(planElement.toString());
 		}
-		log.warn("---") ;
+		log.warn("---");
 
 	}
 
-
-	static String toString( TripInfo info ) {
-		StringBuilder strb = new StringBuilder(  ) ;
-		strb.append("[ ") ;
-		strb.append( "mode=" ).append( info.getMode() ) ;
-		strb.append(" | ") ;
-		strb.append( "des/expBoardingTime=").append( info.getExpectedBoardingTime() ) ;
-//		strb.append(" | ") ;
-//		strb.append( "pickupLoc=" ).append( info.getPickupLocation() ) ;
-//		strb.append(" | ") ;
-//		strb.append( "dropoffLoc=" ).append( info.getDropoffLocation() ) ;
-		strb.append( " ]" ) ;
-		return strb.toString() ;
+	static String toString(TripInfo info) {
+		StringBuilder strb = new StringBuilder();
+		strb.append("[ ");
+		strb.append("mode=").append(info.getMode());
+		strb.append(" | ");
+		strb.append("des/expBoardingTime=").append(info.getExpectedBoardingTime());
+		//		strb.append(" | ") ;
+		//		strb.append( "pickupLoc=" ).append( info.getPickupLocation() ) ;
+		//		strb.append(" | ") ;
+		//		strb.append( "dropoffLoc=" ).append( info.getDropoffLocation() ) ;
+		strb.append(" ]");
+		return strb.toString();
 	}
-
 
 }

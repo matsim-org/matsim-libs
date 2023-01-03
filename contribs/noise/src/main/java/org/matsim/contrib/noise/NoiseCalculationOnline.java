@@ -22,10 +22,8 @@
  */
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.data.NoiseReceiverPoint;
-import org.matsim.contrib.noise.handler.NoiseTimeTracker;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -41,8 +39,8 @@ import com.google.inject.Inject;
  * @author ikaddoura
  *
  */
-public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener, StartupListener {
-	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
+final class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener, StartupListener {
+	private static final Logger log = LogManager.getLogger(NoiseCalculationOnline.class);
 	
 	@Inject
 	private NoiseContext noiseContext;
@@ -70,7 +68,6 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-				
 		timeTracker.computeFinalTimeIntervals();
 		log.info("Noise calculation completed.");
 	}

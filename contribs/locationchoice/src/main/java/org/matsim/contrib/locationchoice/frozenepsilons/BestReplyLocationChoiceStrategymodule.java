@@ -21,7 +21,8 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,6 +45,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -56,7 +58,7 @@ import javax.inject.Provider;
  */
 final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedModule {
 
-	private static final Logger log = Logger.getLogger( BestReplyLocationChoiceStrategymodule.class );
+	private static final Logger log = LogManager.getLogger( BestReplyLocationChoiceStrategymodule.class );
 	private final Provider<TripRouter> tripRouterProvider;
 
 	private ObjectAttributes personsMaxEpsUnscaled;
@@ -69,6 +71,7 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 	private final LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
 	private final LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
 	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
+	private final TimeInterpretation timeInterpretation;
 
 	public static double useScaleEpsilonFromConfig = -99.0;
 	private ScoringFunctionFactory scoringFunctionFactory;
@@ -76,12 +79,14 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
 	public BestReplyLocationChoiceStrategymodule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
-								    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities ) {
+								    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities,
+								    TimeInterpretation timeInterpretation) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.travelTimes = travelTimes;
 		this.travelDisutilities = travelDisutilities;
+		this.timeInterpretation = timeInterpretation;
 
 		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( lcContext.getScenario().getConfig(), FrozenTastesConfigGroup.class );
 		if (!FrozenTastesConfigGroup.Algotype.bestResponse.equals( dccg.getAlgorithm() )) {
@@ -151,6 +156,6 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 		int iteration = replanningContext.getIteration();
 
 		return new BestReplyLocationChoicePlanAlgorithm(this.quadTreesOfType, this.personsMaxEpsUnscaled,
-			  this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
+			  this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks, timeInterpretation);
 	}
 }

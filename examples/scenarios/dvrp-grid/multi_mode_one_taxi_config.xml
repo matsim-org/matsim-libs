@@ -86,6 +86,16 @@
 	<module name="planCalcScore">
 		<param name="activityType_0" value="dummy"/>
 		<param name="activityTypicalDuration_0" value="24:00:00"/>
+
+		<param name="activityType_1" value="taxi_A interaction"/>
+		<param name="activityTypicalDuration_1" value="00:00:01"/>
+
+		<param name="activityType_2" value="taxi_B interaction"/>
+		<param name="activityTypicalDuration_2" value="00:00:01"/>
+
+		<param name="activityType_3" value="taxi_C interaction"/>
+		<param name="activityTypicalDuration_3" value="00:00:01"/>
+
 		<param name="traveling_taxi_A" value="-6"/>
 		<param name="traveling_taxi_B" value="-6"/>
 		<param name="traveling_taxi_C" value="-6"/>

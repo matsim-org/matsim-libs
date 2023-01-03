@@ -28,7 +28,7 @@ import java.util.TreeSet;
 public class ActivityOptionImpl implements ActivityOption {
 
 	private final String type;
-	private Double capacity = Double.valueOf(Integer.MAX_VALUE);
+	private Double capacity = (double)Integer.MAX_VALUE;
 	private SortedSet<OpeningTime> openingTimes = new TreeSet<>();
 
 	public ActivityOptionImpl(final String type) {

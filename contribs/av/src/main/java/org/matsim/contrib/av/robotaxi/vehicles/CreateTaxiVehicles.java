@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.av.robotaxi.vehicles;
 
@@ -60,8 +60,7 @@ public class CreateTaxiVehicles {
 		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfile);
-		List<Id<Link>> allLinks = new ArrayList<>();
-		allLinks.addAll(scenario.getNetwork().getLinks().keySet());
+		List<Id<Link>> allLinks = new ArrayList<>(scenario.getNetwork().getLinks().keySet());
 		for (int i = 0; i< numberofVehicles;i++){
 			Link startLink;
 			do {
@@ -76,7 +75,7 @@ public class CreateTaxiVehicles {
 					.serviceBeginTime(operationStartTime)
 					.serviceEndTime(operationEndTime)
 					.build());
-			
+
 		}
 		new FleetWriter(vehicles.stream()).write(taxisFile);
 	}

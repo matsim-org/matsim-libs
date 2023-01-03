@@ -22,7 +22,10 @@ package org.matsim.contrib.roadpricing;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -54,18 +57,19 @@ import org.matsim.core.router.util.TravelDisutility;
  */
 class RoadPricingControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
+	final static private Logger log = LogManager.getLogger(RoadPricingControlerListener.class);
 
 	private final RoadPricingScheme scheme;
 	private final RoadPricingTollCalculator calcPaidToll;
 	private final CalcAverageTolledTripLength cattl;
-	private OutputDirectoryHierarchy controlerIO;
+	private final OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-	RoadPricingControlerListener(RoadPricingScheme scheme, RoadPricingTollCalculator calcPaidToll, CalcAverageTolledTripLength cattl, OutputDirectoryHierarchy controlerIO) {
+	RoadPricingControlerListener( RoadPricingScheme scheme, Network network,
+				      EventsManager events, OutputDirectoryHierarchy controlerIO ) {
 		this.scheme = scheme;
-		this.calcPaidToll = calcPaidToll;
-		this.cattl = cattl;
+		this.calcPaidToll = new RoadPricingTollCalculator( network, scheme, events );
+		this.cattl = new CalcAverageTolledTripLength( network, scheme, events );
 		this.controlerIO = controlerIO;
 		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}

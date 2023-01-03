@@ -19,51 +19,26 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
-import com.google.inject.Inject;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
-
-import javax.inject.Provider;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
 /**
  * @author thibautd
  */
 public class ActivitySequenceMutatorModule extends AbstractMultithreadedModule {
-	private final StageActivityTypes additionalBlackList;
-
-	private final Provider<TripRouter> tripRouterProvider;
 
 	public ActivitySequenceMutatorModule(
-			final int numOfThreads, Provider<TripRouter> tripRouterProvider) {
-		this( numOfThreads , null , tripRouterProvider);
-	}
-
-	public ActivitySequenceMutatorModule(
-			final int numOfThreads,
-			final StageActivityTypes additionalBlackList, Provider<TripRouter> tripRouterProvider) {
+			final int numOfThreads) {
 		super(numOfThreads);
-		this.additionalBlackList = additionalBlackList;
-		this.tripRouterProvider = tripRouterProvider;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final CompositeStageActivityTypes actualBlackList = new CompositeStageActivityTypes();
-		actualBlackList.addActivityTypes(
-				tripRouterProvider.get().getStageActivityTypes());
-
-		if ( additionalBlackList != null ) {
-			actualBlackList.addActivityTypes(
-					additionalBlackList );
-		}
-
 		return new ActivitySequenceMutatorAlgorithm(
 				MatsimRandom.getLocalInstance(),
-				actualBlackList );
+				StageActivityHandling.ExcludeStageActivities );
 	}
 }
 

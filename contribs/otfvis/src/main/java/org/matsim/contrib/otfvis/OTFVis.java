@@ -20,15 +20,8 @@
 
 package org.matsim.contrib.otfvis;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -58,14 +51,11 @@ import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
-import org.matsim.vis.snapshotwriters.VisData;
-import org.matsim.vis.snapshotwriters.VisLink;
-import org.matsim.vis.snapshotwriters.VisMobsim;
-import org.matsim.vis.snapshotwriters.VisNetwork;
-import org.matsim.vis.snapshotwriters.VisVehicle;
+import org.matsim.vis.snapshotwriters.*;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.*;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -74,7 +64,7 @@ import org.matsim.vis.snapshotwriters.VisVehicle;
  * @author mrieser
  */
 public class OTFVis {
-	private static final Logger log = Logger.getLogger(OTFVis.class);
+	private static final Logger log = LogManager.getLogger(OTFVis.class);
 
 	private static void printUsage() {
 		System.out.println();
@@ -185,20 +175,20 @@ public class OTFVis {
 
 			Network network = scenario.getNetwork();
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();
-			
+
 //			TransitQSimEngine transitEngine = qSim.getTransitEngine();
 //			AgentTracker agentTracker = transitEngine.getAgentTracker();
-			
+
 //			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getagentsnapshotinfofactory();
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-			linkWidthCalculator.setLinkWidthForVis( config.qsim().getLinkWidthForVis() );
-			if (! Double.isNaN(network.getEffectiveLaneWidth())){
-				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+			linkWidthCalculator.setLinkWidthForVis(config.qsim().getLinkWidthForVis());
+			if (!Double.isNaN(network.getEffectiveLaneWidth())) {
+				linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 			}
-			AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
-			for ( AgentTracker agentTracker : qSim.getAgentTrackers() ) {
-				FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
+			var positionInfoBuilder = new PositionInfo.LinkBasedBuilder().setLinkWidthCalculator(linkWidthCalculator);
+			for (AgentTracker agentTracker : qSim.getAgentTrackers()) {
+				FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, positionInfoBuilder);
 				server.addAdditionalElement(facilityWriter);
 			}
 		}
@@ -227,12 +217,7 @@ public class OTFVis {
 
 				@Override
 				public VisData getVisData() {
-					return new VisData() {
-						@Override
-						public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
-							return Collections.emptyList();
-						}
-					};
+					return positions -> Collections.emptyList();
 				}
 			});
 		}
@@ -269,12 +254,7 @@ public class OTFVis {
 
 			@Override
 			public VisData getNonNetworkAgentSnapshots() {
-				return new VisData() {
-					@Override
-					public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
-						return Collections.emptyList();
-					}
-				};
+				return positions -> Collections.emptyList();
 			}
 		});
 

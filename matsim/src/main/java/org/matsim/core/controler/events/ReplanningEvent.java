@@ -28,27 +28,13 @@ import org.matsim.core.replanning.ReplanningContext;
  *
  * @author mrieser
  */
-public final class ReplanningEvent extends ControlerEvent {
-
-	/**
-	 * The iteration number
-	 */
-	private final int iteration;
-
-	public ReplanningEvent(final MatsimServices controler, final int iteration) {
-		super(controler);
-		this.iteration = iteration;
-	}
-
-	/**
-	 * @return the number of the current iteration
-	 */
-	public int getIteration() {
-		return this.iteration;
+public final class ReplanningEvent extends AbstractIterationEvent {
+	public ReplanningEvent(MatsimServices services, int iteration, boolean isLastIteration) {
+		super(services, iteration, isLastIteration);
 	}
 
 	public ReplanningContext getReplanningContext() {
-        return services.getInjector().getInstance(ReplanningContext.class);
-    }
+		return services.getInjector().getInstance(ReplanningContext.class);
+	}
 
 }

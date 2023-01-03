@@ -20,8 +20,9 @@
 
 package org.matsim.analysis;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -39,7 +40,6 @@ import org.matsim.core.utils.misc.Time;
 import javax.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -48,23 +48,23 @@ import java.util.TreeMap;
  *
  * Calculates the distribution of legs-durations, e.g. how many legs took at
  * most 5 minutes, how many between 5 and 10 minutes, and so on.
- * Also calculates the average trip duration.
- * Trips ended because of vehicles being stuck are not counted.
+ * Also calculates the average leg duration.
+ * Legs ended because of vehicles being stuck are not counted.
  */
 public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
 	ActivityEndEventHandler, ActivityStartEventHandler {
 
-	private final static Logger log = Logger.getLogger(CalcLegTimes.class);
-	
-	private static final int SLOT_SIZE = 300;	// 5-min slots
+	private final static Logger log = LogManager.getLogger(CalcLegTimes.class);
+
+	private static final int SLOT_SIZE = 300;    // 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
 
-	private final Map<Id<Person>, Double> agentDepartures = new HashMap<>();
-	private final Map<Id<Person>, Double> agentArrivals = new HashMap<>();
+	private final IdMap<Person, Double> agentDepartures = new IdMap<>(Person.class);
+	private final IdMap<Person, Double> agentArrivals = new IdMap<>(Person.class);
 	private final Map<String, int[]> legStats = new TreeMap<>();
-	private final Map<Id<Person>, String> previousActivityTypes = new HashMap<>();
-	private double sumTripDurations = 0;
-	private int sumTrips = 0;
+	private final IdMap<Person, String> previousActivityTypes = new IdMap<>(Person.class);
+	private double sumLegDurations = 0;
+	private int sumLegs = 0;
 
 	@Inject
 	CalcLegTimes(EventsManager eventsManager) {
@@ -102,7 +102,7 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 			String legType = fromActType + "---" + toActType;
 			int[] stats = this.legStats.get(legType);
 			if (stats == null) {
-				stats = new int[MAXINDEX+1];
+				stats = new int[MAXINDEX + 1];
 				for (int i = 0; i <= MAXINDEX; i++) {
 					stats[i] = 0;
 				}
@@ -110,8 +110,8 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 			}
 			stats[getTimeslotIndex(travTime)]++;
 
-			this.sumTripDurations += travTime;
-			this.sumTrips++;
+			this.sumLegDurations += travTime;
+			this.sumLegs++;
 		}
 	}
 
@@ -121,8 +121,8 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 		this.previousActivityTypes.clear();
 		this.agentDepartures.clear();
 		this.legStats.clear();
-		this.sumTripDurations = 0;
-		this.sumTrips = 0;
+		this.sumLegDurations = 0;
+		this.sumLegs = 0;
 	}
 
 	public Map<String, int[]> getLegStats() {
@@ -130,13 +130,13 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	}
 
 	public static int getTimeslotIndex(final double time_s) {
-		int idx = (int)(time_s / SLOT_SIZE);
+		int idx = (int) (time_s / SLOT_SIZE);
 		if (idx > MAXINDEX) idx = MAXINDEX;
 		return idx;
 	}
 
-	public double getAverageTripDuration() {
-		return (this.sumTripDurations / this.sumTrips);
+	public double getAverageLegDuration() {
+		return (this.sumLegDurations / this.sumLegs);
 	}
 
 	public void writeStats(final String filename) {
@@ -149,33 +149,34 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 
 	public void writeStats(final java.io.Writer out) throws UncheckedIOException {
 		try {
-		boolean first = true;
-		for (Map.Entry<String, int[]> entry : this.legStats.entrySet()) {
-			String key = entry.getKey();
-			int[] counts = entry.getValue();
-			if (first) {
-				first = false;
-				out.write("pattern");
-				for (int i = 0; i < counts.length; i++) {
-					out.write("\t" + (i*SLOT_SIZE/60) + "+");
+			boolean first = true;
+			for (Map.Entry<String, int[]> entry : this.legStats.entrySet()) {
+				String key = entry.getKey();
+				int[] counts = entry.getValue();
+				if (first) {
+					first = false;
+					out.write("pattern");
+					for (int i = 0; i < counts.length; i++) {
+						out.write("\t" + (i * SLOT_SIZE / 60) + "+");
+					}
+					out.write("\n");
+				}
+				out.write(key);
+				for (int count : counts) {
+					out.write("\t" + count);
 				}
 				out.write("\n");
 			}
-			out.write(key);
-            for (int count : counts) {
-                out.write("\t" + count);
-            }
 			out.write("\n");
-		}
-		out.write("\n");
-		if (this.sumTrips == 0) {
-			out.write("average trip duration: no trips!");
-		} else {
-			out.write("average trip duration: "
-					+ (this.sumTripDurations / this.sumTrips) + " seconds = "
-					+ Time.writeTime(((int)(this.sumTripDurations / this.sumTrips))));
-		}
-		out.write("\n");
+			if (this.sumLegs == 0) {
+				out.write("average legs duration: no legs!");
+			} else {
+				out.write("average leg duration: "
+						+ (this.sumLegDurations / this.sumLegs)
+						+ " seconds = "
+						+ Time.writeTime(((int) (this.sumLegDurations / this.sumLegs))));
+			}
+			out.write("\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} finally {

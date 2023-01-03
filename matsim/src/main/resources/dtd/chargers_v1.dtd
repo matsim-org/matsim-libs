@@ -11,9 +11,13 @@
 
 <!ELEMENT charger EMPTY>
 
+<!-- link - id of the link where the charger is located -->
+<!-- plug_power - in kWh -->
+<!-- plug_count - number of plugs; 1 if not provided -->
+<!-- type CDATA - "default" if not provided -->
 <!ATTLIST charger
-	id       CDATA   #REQUIRED
-	link     CDATA   #REQUIRED
-		power    CDATA   #REQUIRED
-		capacity CDATA   #REQUIRED
-		type     CDATA   #IMPLIED >
+	id CDATA #REQUIRED
+	link CDATA #REQUIRED
+	plug_power CDATA #REQUIRED
+	plug_count CDATA #IMPLIED
+	type CDATA #IMPLIED >

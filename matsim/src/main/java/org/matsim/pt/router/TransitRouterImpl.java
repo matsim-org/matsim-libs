@@ -24,7 +24,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
@@ -110,7 +112,12 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
     }
 
     @Override
-    public List<Leg> calcRoute( final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
+    public List<? extends PlanElement> calcRoute( final RoutingRequest request ) {
+    	final Facility fromFacility = request.getFromFacility();
+    	final Facility toFacility = request.getToFacility();
+    	final double departureTime = request.getDepartureTime();
+    	final Person person = request.getPerson();
+    	
         // find possible start stops
         Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person,
                 fromFacility.getCoord(),
@@ -122,7 +129,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
                 toFacility.getCoord(),
                 departureTime);
 
-        TransitPassengerRoute transitPassengerRoute = null;
+        InternalTransitPassengerRoute transitPassengerRoute = null;
 
         if (cacheTree) {
         	if ((fromFacility != previousFromFacility) && (departureTime != previousDepartureTime)) { // Compute tree only if fromFacility and departure time are different from previous request.
@@ -147,15 +154,14 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
         transitPassengerRoute = tree.getTransitPassengerRoute(wrappedToNodes);
 
         if (transitPassengerRoute == null) {
-//				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
-            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
+			return null; // TripRouter / FallbackRoutingModule will create a direct walk leg
         }
         double pathCost = transitPassengerRoute.getTravelCost();
 
         double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
 
         if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost) {
-            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
+			return null; // TripRouter / FallbackRoutingModule will create a direct walk leg
         }
         
         previousFromFacility = fromFacility;

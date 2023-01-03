@@ -25,10 +25,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
+
+import static org.matsim.contrib.emissions.Pollutant.*;
 
 
 /*
@@ -49,36 +52,43 @@ public class TestColdEmissionEventImpl {
     private final Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
     private final Id<Link> linkId = Id.create("link 1", Link.class);
 
-	private final Set<String> coldPollutants = new HashSet<>(Arrays.asList("CO", "FC", "HC", "NMHC", "NOx", "NO2","PM"));
+	private final Set<Pollutant> coldPollutants = new HashSet<>(Arrays.asList(CO, FC, HC, NMHC, NOx, NO2,PM));
 
 	@Test
 	public final void testGetAttributesForCompleteEmissionMaps(){
 		//test normal functionality
 
 		//create a normal event impl
-		Map<String, Double> coldEmissionsMap = new HashMap<>();
+		Map<Pollutant, Double> coldEmissionsMap = new HashMap<>();
 		setColdEmissions(coldEmissionsMap);
 		ColdEmissionEvent ce = new ColdEmissionEvent(0.0, linkId, vehicleId, coldEmissionsMap);
 		
 		Map<String, String> ceg = ce.getAttributes();
-		Assert.assertEquals("the CO value of this cold emission event was "+ Double.parseDouble(ceg.get("CO"))+ "but should have been "+ co, Double.parseDouble(ceg.get("CO")), co, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the FC value of this cold emission event was "+ Double.parseDouble(ceg.get("FC"))+ "but should have been "+ fc, Double.parseDouble(ceg.get("FC")), fc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the HC value of this cold emission event was "+ Double.parseDouble(ceg.get("HC"))+ "but should have been "+ hc, Double.parseDouble(ceg.get("HC")), hc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NMHC value of this cold emission event was "+ Double.parseDouble(ceg.get("NMHC"))+ "but should have been "+ nm, Double.parseDouble(ceg.get("NMHC")), nm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NO2 value of this cold emission event was "+ Double.parseDouble(ceg.get("NO2"))+ "but should have been "+ n2, Double.parseDouble(ceg.get("NO2")), n2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NOx value of this cold emission event was "+ Double.parseDouble(ceg.get("NOx"))+ "but should have been "+ nx, Double.parseDouble(ceg.get("NOx")), nx, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the PM value of this cold emission event was "+ Double.parseDouble(ceg.get("PM"))+ "but should have been "+ pm, Double.parseDouble(ceg.get("PM")), pm, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the CO value of this cold emission event was "+ Double.parseDouble(ceg.get(CO.name()))+ "but should have been "+ co,
+				Double.parseDouble(ceg.get(CO.name())), co, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the FC value of this cold emission event was "+ Double.parseDouble(ceg.get(FC.name()))+ "but should have been "+ fc,
+				Double.parseDouble(ceg.get(FC.name())), fc, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the HC value of this cold emission event was "+ Double.parseDouble(ceg.get(HC.name()))+ "but should have been "+ hc,
+				Double.parseDouble(ceg.get(HC.name())), hc, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NMHC value of this cold emission event was "+ Double.parseDouble(ceg.get(NMHC.name()))+ "but should have been "+ nm,
+				Double.parseDouble(ceg.get(NMHC.name())), nm, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NO2 value of this cold emission event was "+ Double.parseDouble(ceg.get(NO2.name()))+ "but should have been "+ n2,
+				Double.parseDouble(ceg.get(NO2.name())), n2, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NOx value of this cold emission event was "+ Double.parseDouble(ceg.get(NOx.name()))+ "but should have been "+ nx,
+				Double.parseDouble(ceg.get(NOx.name())), nx, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the PM value of this cold emission event was "+ Double.parseDouble(ceg.get(PM.name()))+ "but should have been "+ pm,
+				Double.parseDouble(ceg.get(PM.name())), pm, MatsimTestUtils.EPSILON);
 		
 	}
 
-	private void setColdEmissions(Map<String, Double> coldEmissionsMap) {
-		coldEmissionsMap.put("CO", co);
-		coldEmissionsMap.put("FC", fc);
-		coldEmissionsMap.put("HC", hc);
-		coldEmissionsMap.put("NMHC", nm);
-		coldEmissionsMap.put("NO2", n2);
-		coldEmissionsMap.put("NOx", nx);
-		coldEmissionsMap.put("PM", pm);
+	private void setColdEmissions( Map<Pollutant, Double> coldEmissionsMap ) {
+		coldEmissionsMap.put(CO, co);
+		coldEmissionsMap.put(FC, fc);
+		coldEmissionsMap.put(HC, hc);
+		coldEmissionsMap.put(NMHC, nm);
+		coldEmissionsMap.put(NO2, n2);
+		coldEmissionsMap.put(NOx, nx);
+		coldEmissionsMap.put(PM, pm);
 
 	}
 	
@@ -90,18 +100,18 @@ public class TestColdEmissionEventImpl {
 		// - throw NullPointerExceptions if no emission map is assigned 
 		
 		//empty map
-		Map<String, Double> emptyMap = new HashMap<>();
+		Map<Pollutant, Double> emptyMap = new HashMap<>();
 		ColdEmissionEvent emptyMapEvent = new ColdEmissionEvent(22., linkId, vehicleId, emptyMap);
 		
 		//values not set
-		Map<String, Double> valuesNotSet = new HashMap<>();
-		valuesNotSet.put("CO", null);
-		valuesNotSet.put("FC", null);
-		valuesNotSet.put("HC", null);
-		valuesNotSet.put("NMHC", null);
-		valuesNotSet.put("NO2", null);
-		valuesNotSet.put("NOx", null);
-		valuesNotSet.put("PM", null);
+		Map<Pollutant, Double> valuesNotSet = new HashMap<>();
+		valuesNotSet.put(CO, null);
+		valuesNotSet.put(FC, null);
+		valuesNotSet.put(HC, null);
+		valuesNotSet.put(NMHC, null);
+		valuesNotSet.put(NO2, null);
+		valuesNotSet.put(NOx, null);
+		valuesNotSet.put(PM, null);
 		ColdEmissionEvent valuesNotSetEvent = new ColdEmissionEvent(44., linkId, vehicleId, valuesNotSet);
 		
 		//no map
@@ -111,7 +121,7 @@ public class TestColdEmissionEventImpl {
 
 		int valNullPointers = 0, noMapNullPointers=0;
 		
-		for(String cp : coldPollutants){
+		for(Pollutant cp : coldPollutants){
 
 			//empty map
 			Assert.assertNull(emptyMapEvent.getAttributes().get(cp));

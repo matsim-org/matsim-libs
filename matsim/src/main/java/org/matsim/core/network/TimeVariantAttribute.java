@@ -49,6 +49,11 @@ public interface TimeVariantAttribute
 		}
 	};
 
+	/**
+	 * For base value, use {@link Double#NEGATIVE_INFINITY}. {@link Double#NaN} is not supported
+	 * @param time
+	 * @return
+	 */
 	double getValue(final double time);
 
 	boolean isRecalcRequired();

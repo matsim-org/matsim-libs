@@ -19,72 +19,80 @@
 
 package org.matsim.contrib.etaxi.util;
 
-import java.util.List;
+import static org.matsim.contrib.util.stats.DurationStats.stateDurationByTimeBinAndState;
 
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.stream.Stream;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.etaxi.util.ETaxiStats.ETaxiState;
-import org.matsim.contrib.ev.dvrp.ChargingTask;
-import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculators;
+import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector.ChargingSequence;
+import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
+import org.matsim.contrib.util.stats.DurationStats;
+import org.matsim.contrib.util.stats.DurationStats.State;
+import org.matsim.contrib.util.stats.TimeBinSample;
+import org.matsim.contrib.util.stats.TimeBinSamples;
+
+import com.google.common.collect.ImmutableList;
+
+import one.util.streamex.StreamEx;
 
 public class ETaxiStatsCalculator {
-	private final int hours;
-	private final ETaxiStats[] hourlyEStats;
-	private final ETaxiStats dailyEStats = new ETaxiStats(TaxiStatsCalculators.DAILY_STATS_ID);
-	private final List<ETaxiStats> eTaxiStats;
+	private final SortedMap<Integer, ETaxiStats> hourlyEStats = new TreeMap<>();
+	private final ETaxiStats dailyEStats = new ETaxiStats(TaxiStatsCalculator.DAILY_STATS_ID);
 
-	public ETaxiStatsCalculator(Iterable<? extends DvrpVehicle> vehicles) {
-		hours = TaxiStatsCalculators.calcHourCount(vehicles);
-		hourlyEStats = new ETaxiStats[hours];
-		for (int h = 0; h < hours; h++) {
-			hourlyEStats[h] = new ETaxiStats(h + "");
-		}
+	public ETaxiStatsCalculator(List<ChargingSequence> chargingSequences, FleetSpecification fleetSpecification) {
+		for (ChargingSequence sequence : chargingSequences) {
+			//only calculate stats for EVs belonging to a given mode/fleet
+			var vehicleId = Id.create(sequence.getChargingStart().getVehicleId(), DvrpVehicle.class);
+			if (!fleetSpecification.getVehicleSpecifications().containsKey(vehicleId)) {
+				continue;
+			}
 
-		eTaxiStats = TaxiStatsCalculators.createStatsList(hourlyEStats, dailyEStats);
+			stateDurationByTimeBinAndState(getStateSampleStream(sequence, 3600), 3600).forEach(
+					(hour, stateDurations) -> updateStateDurations(getHourlyStats(hour), stateDurations));
 
-		for (DvrpVehicle v : vehicles) {
-			updateEStatsForVehicle(v);
+			Map<ETaxiState, Double> dailyStateDuration = DurationStats.stateDurationByTimeBinAndState(
+							getStateSampleStream(sequence, Integer.MAX_VALUE), Integer.MAX_VALUE)
+					.entrySet()
+					.iterator()
+					.next()
+					.getValue();
+			updateStateDurations(dailyEStats, dailyStateDuration);
 		}
 	}
 
-	public List<ETaxiStats> geteTaxiStats() {
-		return eTaxiStats;
+	public ImmutableList<ETaxiStats> getETaxiStats() {
+		return ImmutableList.<ETaxiStats>builder().addAll(hourlyEStats.values()).add(dailyEStats).build();
 	}
 
 	public ETaxiStats getDailyEStats() {
 		return dailyEStats;
 	}
 
-	private void updateEStatsForVehicle(DvrpVehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
-			return;// do not evaluate - the vehicle is unused
-		}
+	private Stream<TimeBinSample<State<ETaxiState>>> getStateSampleStream(ChargingSequence seq, int binSize) {
+		var pluggedState = new State<>(ETaxiState.PLUGGED, seq.getChargingStart().getTime(),
+				seq.getChargingEnd().getTime());
+		var states = StreamEx.of(pluggedState);
 
-		for (Task t : schedule.getTasks()) {
-			if (t instanceof ChargingTask) {
-				ChargingTask chargingTask = (ChargingTask)t;
+		//optionally (only if queueing occurred)
+		seq.getQueuedAtCharger()
+				.map(e -> new State<>(ETaxiState.QUEUED, e.getTime(), pluggedState.beginTime))
+				.ifPresent(states::prepend);
 
-				int arrivalTime = (int)t.getBeginTime();
-				int chargingStartTime = (int)chargingTask.getChargingStartedTime();
-				int chargingEndTime = (int)t.getEndTime();
-
-				updateHourlyStateTimes(ETaxiState.QUEUED, arrivalTime, chargingStartTime);
-				updateHourlyStateTimes(ETaxiState.PLUGGED, chargingStartTime, chargingEndTime);
-
-				dailyEStats.stateTimeSumsByState.add(ETaxiState.QUEUED, chargingStartTime - arrivalTime);
-				dailyEStats.stateTimeSumsByState.add(ETaxiState.PLUGGED, chargingEndTime - chargingStartTime);
-			}
-		}
+		return states.flatMap(eTaxiStateState -> TimeBinSamples.stateSamples(eTaxiStateState, binSize));
 	}
 
-	private void updateHourlyStateTimes(ETaxiState state, int from, int to) {
-		int[] hourlyDurations = TaxiStatsCalculators.calcHourlyDurations(from, to);
-		int fromHour = TaxiStatsCalculators.getHour(from);
-		for (int i = 0; i < hourlyDurations.length; i++) {
-			hourlyEStats[fromHour + i].stateTimeSumsByState.add(state, hourlyDurations[i]);
-		}
+	private ETaxiStats getHourlyStats(int hour) {
+		return hourlyEStats.computeIfAbsent(hour, h -> new ETaxiStats(h + ""));
+	}
+
+	private static void updateStateDurations(ETaxiStats stats, Map<ETaxiState, Double> stateDurations) {
+		stateDurations.forEach((state, duration) -> stats.stateDurations.merge(state, duration, Double::sum));
 	}
 }

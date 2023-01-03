@@ -8,6 +8,7 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -22,7 +23,7 @@ public class MinibusPopulationModule extends AbstractQSimModule {
 
 	@Provides
 	@Singleton
-	PTransitAgentFactory provideAgentFactory(Netsim netsim) {
-		return new PTransitAgentFactory(netsim);
+	PTransitAgentFactory provideAgentFactory(Netsim netsim, TimeInterpretation timeInterpretation) {
+		return new PTransitAgentFactory(netsim, timeInterpretation);
 	}
 }

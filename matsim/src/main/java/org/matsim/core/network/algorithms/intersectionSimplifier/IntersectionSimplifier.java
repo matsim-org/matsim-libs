@@ -32,12 +32,14 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.ClusterActivity;
@@ -49,7 +51,7 @@ import org.matsim.core.utils.collections.QuadTree;
  * @author jwjoubert
  */
 public class IntersectionSimplifier {
-	final private static Logger LOG = Logger.getLogger(IntersectionSimplifier.class);
+	final private static Logger LOG = LogManager.getLogger(IntersectionSimplifier.class);
 	final private double pmin;
 	final private int epsilon;
 
@@ -63,8 +65,6 @@ public class IntersectionSimplifier {
 	}
 
 	public Network simplify(Network network) {
-		/* TODO The clusterFile argument can eventually be removed. */
-
 		if(this.djc != null) {
 			LOG.error("This NetworkSimplifier has already been used to simplify a network!");
 			throw new RuntimeException("Should instantiate a new NetworkSimplifier");
@@ -106,15 +106,15 @@ public class IntersectionSimplifier {
 			for (ClusterActivity nodeInCluster : cluster.getPoints()) {
 				nodeIdsInCluster.add(nodeInCluster.getNode().getId().toString());
 			}
-			String clusteredNodeName = "";
+			StringBuilder clusteredNodeName = new StringBuilder();
 			for (String nodeInCluster : nodeIdsInCluster) {
 				/* Don't add "-" if no node id is in the clusteredNodeName yet */
-				if (! clusteredNodeName.equals("")) {
-					clusteredNodeName = clusteredNodeName + "-";
+				if (clusteredNodeName.length() > 0) {
+					clusteredNodeName.append('-');
 				}
-				clusteredNodeName = clusteredNodeName + nodeInCluster;
+				clusteredNodeName.append(nodeInCluster);
 			}
-			Id<Node> newId = Id.createNodeId(clusteredNodeName);
+			Id<Node> newId = Id.createNodeId(clusteredNodeName.toString());
 			
 			Node newNode = network.getFactory().createNode(newId, cluster.getCenterOfGravity());
 			Set<Id<Node>> includedNodes = new HashSet<>();
@@ -151,14 +151,7 @@ public class IntersectionSimplifier {
 				 * Coords will now be the same. The link can be completely ignored, 
 				 * so we do not need to process it here any further. */
 			} else {
-				
-				/* FIXME Remove after debugging. */
-				if(newFromNode.getId().toString().equalsIgnoreCase("2") || newToNode.getId().toString().equalsIgnoreCase("2")) {
-					LOG.info("Got node \"2\"");
-				}
-				
-				
-				
+
 				if(!newNetwork.getNodes().containsKey(newLink.getFromNode().getId())) {
 					/* FIXME currently the new node carries no additional 
 					 * information from the original network. */

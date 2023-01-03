@@ -22,13 +22,14 @@ package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.LogRouteDesignScore;
 import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -50,7 +51,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 class AreaBtwStopsVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
-	final static Logger log = Logger.getLogger(AreaBtwStopsVsTerminiBeelinePenalty.class);
+	final static Logger log = LogManager.getLogger(AreaBtwStopsVsTerminiBeelinePenalty.class);
 	private final RouteDesignScoreParams params;
 
 	public AreaBtwStopsVsTerminiBeelinePenalty(RouteDesignScoreParams params) {

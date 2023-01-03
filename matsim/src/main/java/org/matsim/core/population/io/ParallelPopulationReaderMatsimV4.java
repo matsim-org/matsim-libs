@@ -20,14 +20,8 @@
 
 package org.matsim.core.population.io;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -41,10 +35,16 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.core.population.PersonAttributes;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Parallel implementation of the PopulationReaderMatsimV4. The main thread only reads
@@ -58,7 +58,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 /* deliberately package */  class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	
-	static final Logger log = Logger.getLogger(ParallelPopulationReaderMatsimV4.class);
+	static final Logger log = LogManager.getLogger(ParallelPopulationReaderMatsimV4.class);
 
 	private final boolean isPopulationStreaming;
 	private final int numThreads;

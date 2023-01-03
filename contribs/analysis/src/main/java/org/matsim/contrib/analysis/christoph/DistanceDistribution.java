@@ -28,7 +28,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.matsim.api.core.v01.network.Network;
@@ -43,7 +44,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.charts.BarChart;
@@ -59,20 +59,18 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class DistanceDistribution implements IterationEndsListener {
 
-	private final static Logger log = Logger.getLogger(DistanceDistribution.class);
+	private final static Logger log = LogManager.getLogger(DistanceDistribution.class);
 	
 	private final Network network;
 	private final Population population;
 	private final MainModeIdentifier mainModeIdentifier;
-	private final StageActivityTypes stageActivityTypes;
 	private final List<DistributionClass> classes;
 	
 	public DistanceDistribution(final Network network, final Population population,
-			final MainModeIdentifier mainModeIdentifier, final StageActivityTypes stageActivityTypes) {
+			final MainModeIdentifier mainModeIdentifier) {
 		this.network = network;
 		this.population = population;
 		this.mainModeIdentifier = mainModeIdentifier;
-		this.stageActivityTypes = stageActivityTypes;
 		
 		this.classes = new ArrayList<DistributionClass>();
 	}
@@ -85,7 +83,7 @@ public class DistanceDistribution implements IterationEndsListener {
 	}
 	
 	private void analyzePlan(Plan plan) {
-		List<Trip> trips = TripStructureUtils.getTrips(plan , stageActivityTypes);
+		List<Trip> trips = TripStructureUtils.getTrips(plan);
 		
 		for (Trip trip : trips) {
 			String originActivityType = trip.getOriginActivity().getType();

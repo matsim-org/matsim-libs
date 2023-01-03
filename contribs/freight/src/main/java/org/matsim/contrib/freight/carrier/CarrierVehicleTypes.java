@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import java.util.HashMap;
@@ -5,6 +26,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * VehicleTypeContainer mapping all vehicleTypes.
@@ -17,8 +39,8 @@ public class CarrierVehicleTypes {
 	public static CarrierVehicleTypes getVehicleTypes(Carriers carriers){
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		for(Carrier c : carriers.getCarriers().values()){
-			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-				CarrierVehicleType vehicleType = v.getVehicleType();
+			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles().values()){
+				VehicleType vehicleType = v.getType();
 				if(vehicleType != null){
 					types.getVehicleTypes().put(vehicleType.getId(), vehicleType);
 				}
@@ -27,14 +49,16 @@ public class CarrierVehicleTypes {
 		return types;
 	}
 	
-	private Map<Id<VehicleType>,CarrierVehicleType> vehicleTypes;
+	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
 
 	public CarrierVehicleTypes() {
 		super();
 		this.vehicleTypes = new HashMap<>();
+//		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType(Id.create("default", VehicleType.class ) );
+//		this.vehicleTypes.put( defaultVehicleType.getId(), defaultVehicleType );
 	}
 
-	public Map<Id<VehicleType>, CarrierVehicleType> getVehicleTypes() {
+	public Map<Id<VehicleType>, VehicleType> getVehicleTypes() {
 		return vehicleTypes;
 	}
 }

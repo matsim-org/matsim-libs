@@ -20,19 +20,16 @@
 
 package org.matsim.facilities;
 
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
-public class OpeningTimeImpl implements OpeningTime {
+import com.google.common.base.Preconditions;
 
-	public static enum TimeRelation { 
-		START_AND_END_BEFORE, 
-		START_AND_END_AFTER, 
-		START_AND_END_WITHIN, 
-		START_BEFORE_END_WITHIN,
-		START_WITHIN_END_AFTER,
-		START_BEFORE_END_AFTER
+public class OpeningTimeImpl implements OpeningTime {
+	public static OpeningTime createFromOptionalTimes(OptionalTime start, OptionalTime end) {
+		return new OpeningTimeImpl(start.orElse(Double.NEGATIVE_INFINITY), end.orElse(Double.POSITIVE_INFINITY));
 	}
-	
+
 	private double startTime;
 	private double endTime;
 	
@@ -54,47 +51,47 @@ public class OpeningTimeImpl implements OpeningTime {
 		// 1. the earlier start_time comes before the other. If they're the same,
 		//    the end times decides which comes first
 		// 2. the meaning of the return value. See the ASCII figures for that.
-		if (this.startTime > other.getEndTime()) {         // this:       |-----|
+		if (this.startTime > other.getEndTime()) {           // this:       |-----|
 			return -6;                                       // other: |--|
 		}
-		else if (this.startTime == other.getEndTime()) {   // this:       |-----|
+		else if (this.startTime == other.getEndTime()) {     // this:       |-----|
 			return -5;                                       // other: |----|
 		}
 		else if (this.startTime > other.getStartTime()) {
-			if (this.endTime > other.getEndTime()) {         // this:       |-----|
+			if (this.endTime > other.getEndTime()) {           // this:       |-----|
 				return -4;                                     // other: |--------|
 			}
-			else if (this.endTime == other.getEndTime()) {   // this:       |-----|
+			else if (this.endTime == other.getEndTime()) {     // this:       |-----|
 				return -3;                                     // other: |----------|
 			}
-			else {                                        // this:       |-----|
+			else {                                          // this:       |-----|
 				return -2;                                  // other: |---------------|
 			}
 		}
 		else if (this.startTime == other.getStartTime()) {
-			if (this.endTime > other.getEndTime()) {         // this:       |-----|
+			if (this.endTime > other.getEndTime()) {           // this:       |-----|
 				return -1;                                     // other:      |---|
 			}
-			else if (this.endTime == other.getEndTime()) {   // this:       |-----|
+			else if (this.endTime == other.getEndTime()) {     // this:       |-----|
 				return 0;                                      // other:      |-----|
 			}
-			else {                                           // this:       |-----|
+			else {                                             // this:       |-----|
 				return 3;                                      // other:      |----------|
 			}
 		}
-		else if (this.endTime > other.getEndTime()) {      // this:       |-----|
+		else if (this.endTime > other.getEndTime()) {        // this:       |-----|
 			return 2;                                        // other:        |-|
 		}
 		else if (this.endTime == other.getEndTime()) {     // this:       |-----|
-			return 1;                                     // other:        |---|
+			return 1;                                      // other:        |---|
 		}
 		else if (this.endTime > other.getStartTime()) {    // this:       |-----|
-			return 4;                                     // other:        |--------|
+			return 4;                                      // other:        |--------|
 		}
 		else if (this.endTime == other.getStartTime()) {   // this:       |-----|
-			return 5;                                     // other:            |----|
+			return 5;                                      // other:            |----|
 		}
-		else {                                          // this:       |-----|
+		else {                                            // this:       |-----|
 			return 6;                                     // other:              |--|
 		}
 	}
@@ -117,14 +114,15 @@ public class OpeningTimeImpl implements OpeningTime {
 	@Override
 	public final int hashCode() {
 		/* equals() checks day, startTime and endTime, so we should include those into hashCode as well */
-		return (Double.valueOf(this.startTime).hashCode()
-				+ Double.valueOf(this.endTime).hashCode());
+		return (Double.hashCode(this.startTime)
+				+ Double.hashCode(this.endTime));
 	}
 
 	private final void validateTimes() {
-		if (this.startTime != Time.UNDEFINED_TIME && this.endTime != Time.UNDEFINED_TIME && this.startTime >= this.endTime) {
-			throw new RuntimeException(this + "[startTime=" + this.startTime + " >= endTime=" + this.endTime + " not allowed]");
-		}
+		Preconditions.checkState(startTime != Double.POSITIVE_INFINITY);
+		Preconditions.checkState(endTime != Double.NEGATIVE_INFINITY);
+		Preconditions.checkState(this.startTime < this.endTime,
+			"[startTime=%s] >= [endTime=%s] not allowed]", this.startTime, this.endTime);
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -35,7 +35,7 @@ import org.matsim.core.utils.misc.Time;
 public class Road extends SimUnit {
 
 	// default
-	protected static JDEQSimConfigGroup config = new JDEQSimConfigGroup();
+	static JDEQSimConfigGroup config = new JDEQSimConfigGroup();
 
 	public static void setConfig(JDEQSimConfigGroup config) {
 		Road.config = config;
@@ -111,7 +111,7 @@ public class Road extends SimUnit {
 		 * same time
 		 */
 		this.maxNumberOfCarsOnRoad = Math.round(link.getLength()
-				* NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), link)
+				* NetworkUtils.getNumberOfLanesAsInt(link)
 				* config.getStorageCapacityFactor() / config.getCarSize());
 
 		/**
@@ -123,7 +123,7 @@ public class Road extends SimUnit {
 		}
 
 		double maxInverseInFlowCapacity = 3600 / (config.getMinimumInFlowCapacity()
-				* config.getFlowCapacityFactor() * NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), link));
+				* config.getFlowCapacityFactor() * NetworkUtils.getNumberOfLanesAsInt(link));
 
 		this.inverseOutFlowCapacity = 1 / (link.getFlowCapacityPerSec() * config.getFlowCapacityFactor());
 

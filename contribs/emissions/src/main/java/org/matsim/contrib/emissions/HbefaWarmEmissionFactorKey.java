@@ -21,99 +21,65 @@ package org.matsim.contrib.emissions;
 
 /**
  * @author benjamin
- *
  */
-class HbefaWarmEmissionFactorKey {
-	
-	private HbefaVehicleCategory hbefaVehicleCategory;
-	private String hbefaComponent;
-	private String hbefaRoadCategory;
-	private HbefaTrafficSituation hbefaTrafficSituation;
-	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-	
-	public HbefaWarmEmissionFactorKey(){
+class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
+
+	private String roadCategory;
+	private HbefaTrafficSituation trafficSituation;
+
+	/*package-private*/ HbefaWarmEmissionFactorKey() {
 	}
 
-    public HbefaWarmEmissionFactorKey(HbefaWarmEmissionFactorKey key) {
-        this.hbefaVehicleCategory = key.hbefaVehicleCategory;
-        this.hbefaComponent = key.hbefaComponent;
-        this.hbefaRoadCategory = key.hbefaRoadCategory;
-        this.hbefaVehicleAttributes = key.hbefaVehicleAttributes;
-    }
-
-    HbefaVehicleCategory getHbefaVehicleCategory() {
-		return this.hbefaVehicleCategory;
+	public HbefaWarmEmissionFactorKey(HbefaWarmEmissionFactorKey key) {
+		super(key);
+		this.roadCategory = key.roadCategory;
+		this.trafficSituation = key.trafficSituation;
 	}
 
-	public void setHbefaVehicleCategory(HbefaVehicleCategory hbefaVehicleCategory) {
-		this.hbefaVehicleCategory = hbefaVehicleCategory;
+	String getRoadCategory() {
+		return this.roadCategory;
 	}
 
-	String getHbefaComponent(){
-		return this.hbefaComponent;
-	}
-	
-	public void setHbefaComponent(String warmPollutant) {
-		this.hbefaComponent = warmPollutant;
+	/*package-private*/ void setRoadCategory(String roadCategory) {
+		this.roadCategory = roadCategory;
 	}
 
-	String getHbefaRoadCategory() {
-		return this.hbefaRoadCategory;
+	/*package-private*/ HbefaTrafficSituation getTrafficSituation() {
+		return this.trafficSituation;
 	}
 
-	public void setHbefaRoadCategory(String hbefaRoadCategory) {
-		this.hbefaRoadCategory = hbefaRoadCategory;
+	/*package-private*/ void setTrafficSituation(HbefaTrafficSituation trafficSituation) {
+		this.trafficSituation = trafficSituation;
 	}
 
-	public HbefaTrafficSituation getHbefaTrafficSituation() {
-		return this.hbefaTrafficSituation;
-	}
-
-	public void setHbefaTrafficSituation(HbefaTrafficSituation hbefaTrafficSituation) {
-		this.hbefaTrafficSituation = hbefaTrafficSituation;
-	}
-
-	HbefaVehicleAttributes getHbefaVehicleAttributes(){
-		return this.hbefaVehicleAttributes;
-	}
-	
-	public void setHbefaVehicleAttributes(HbefaVehicleAttributes hbefaVehicleAttributes) {
-		this.hbefaVehicleAttributes = hbefaVehicleAttributes;		
-	}
-	
-	/* need to implement the "equals" method in order to be able to construct an "equal" key
-	 later on (e.g. from data available in the simulation)*/
 	@Override
-	public boolean equals(Object obj) {
-	        if(this == obj) {
-	              return true;
-	         }
-	         if (!(obj instanceof HbefaWarmEmissionFactorKey)) {
-	                return false; 
-	         }
-	         HbefaWarmEmissionFactorKey key = (HbefaWarmEmissionFactorKey) obj;
-	         return
-	            hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
-	         && hbefaComponent.equals(key.getHbefaComponent())
-	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
-	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation())
-	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+
+		var that = (HbefaWarmEmissionFactorKey) o;
+
+		if (trafficSituation != that.trafficSituation) return false;
+		return roadCategory.equals(that.roadCategory);
 	}
 
-	// if "equals" is implemented, "hashCode also needs to be implemented
 	@Override
-	public int hashCode(){
-		return toString().hashCode();
+	public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + trafficSituation.hashCode();
+		result = 31 * result + roadCategory.hashCode();
+		return result;
 	}
 
 	// needed for "hashCode" method
 	@Override
 	public String toString(){
 		return
-		  hbefaVehicleCategory + "; " 
-		+ hbefaComponent + "; " 
-		+ hbefaRoadCategory + "; " 
-		+ hbefaTrafficSituation + "; "
-		+ hbefaVehicleAttributes;
+				getVehicleCategory() + "; "
+						+ getComponent() + "; "
+						+ roadCategory + "; "
+						+ trafficSituation + "; "
+						+ getVehicleAttributes();
 	}
 }

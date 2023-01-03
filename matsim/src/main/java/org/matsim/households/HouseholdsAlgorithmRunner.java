@@ -22,7 +22,8 @@ package org.matsim.households;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.algorithms.HouseholdAlgorithm;
 
@@ -34,7 +35,7 @@ import org.matsim.households.algorithms.HouseholdAlgorithm;
  */
 public class HouseholdsAlgorithmRunner {
 	
-	private static final Logger log = Logger.getLogger(HouseholdsAlgorithmRunner.class);
+	private static final Logger log = LogManager.getLogger(HouseholdsAlgorithmRunner.class);
 	
 	private final List<HouseholdAlgorithm> householdAlgorithms = new ArrayList<HouseholdAlgorithm>();
 

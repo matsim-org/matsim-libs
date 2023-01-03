@@ -24,7 +24,8 @@ package org.matsim.contrib.multimodal;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -48,7 +49,7 @@ import java.util.Set;
 
 public class MultiModalModule extends AbstractModule {
 
-    private static final Logger log = Logger.getLogger(MultiModalModule.class);
+    private static final Logger log = LogManager.getLogger(MultiModalModule.class);
 
     private final Map<String, Provider<TravelTime>> additionalTravelTimeFactories = new LinkedHashMap<>();
 
@@ -56,41 +57,55 @@ public class MultiModalModule extends AbstractModule {
 
     @Override
     public void install() {
+        // yyyy with some thinking and testing, the following could be collapsed into nearly nothing:
+        // * Factories for network-based routing can now be provided by config, so no need to provide them here.
+        // * The multi-modal contrib now essentially is (I think) a "parallel" network for each mode.  In consequence, the corresponding network-based router
+        // would just operate on that sub-network.
+        // kai, dec'19
+
         PlansCalcRouteConfigGroup plansCalcRouteConfigGroup = getConfig().plansCalcRoute();
         PlanCalcScoreConfigGroup cnScoringGroup = getConfig().planCalcScore();
         MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
         Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
         for (String mode : simulatedModes) {
-            if (mode.equals(TransportMode.walk)) {
-                Provider<TravelTime> factory = new WalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
-                addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ) );
-                addRoutingModuleBinding(mode).toProvider(new NetworkRoutingProvider(mode));
-            } else if (mode.equals(TransportMode.transit_walk)) {
+            switch( mode ){
+                case TransportMode.walk:{
+                    Provider<TravelTime> factory = new WalkTravelTimeFactory( plansCalcRouteConfigGroup, linkSlopes );
+                    addTravelTimeBinding( mode ).toProvider( factory );
+                    addTravelDisutilityFactoryBinding( mode ).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() ) );
+                    addRoutingModuleBinding( mode ).toProvider( new NetworkRoutingProvider( mode ) );
+                    break;
+                }
+                case TransportMode.transit_walk:
 //                Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
 //                addTravelTimeBinding(mode).toProvider(factory);
 //                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
-                addRoutingModuleBinding(mode).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
-            } else if (mode.equals(TransportMode.bike)) {
-                Provider<TravelTime> factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
-                addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ) );
-                addRoutingModuleBinding(mode).toProvider(new NetworkRoutingProvider(mode));
-            } else {
-                Provider<TravelTime> factory = additionalTravelTimeFactories.get(mode);
-                if (factory == null) {
-                    log.warn("Mode " + mode + " is not supported! " +
-                            "Use a constructor where you provide the travel time objects. " +
-                            "Using an UnknownTravelTime calculator based on constant speed." +
-                            "Agent specific attributes are not taken into account!");
-                    factory = new UnknownTravelTimeFactory(mode, plansCalcRouteConfigGroup);
-                } else {
-                    log.info("Found additional travel time factory from type " + factory.getClass().toString() +
-                            " for mode " + mode + ".");
+                    addRoutingModuleBinding( mode ).to( Key.get( RoutingModule.class, Names.named( TransportMode.walk ) ) );
+                    break;
+                case TransportMode.bike:{
+                    Provider<TravelTime> factory = new BikeTravelTimeFactory( plansCalcRouteConfigGroup, linkSlopes );
+                    addTravelTimeBinding( mode ).toProvider( factory );
+                    addTravelDisutilityFactoryBinding( mode ).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() ) );
+                    addRoutingModuleBinding( mode ).toProvider( new NetworkRoutingProvider( mode ) );
+                    break;
                 }
-                addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ));
-                addRoutingModuleBinding(mode).toProvider(new NetworkRoutingProvider(mode));
+                default:{
+                    Provider<TravelTime> factory = additionalTravelTimeFactories.get( mode );
+                    if( factory == null ){
+                        log.warn( "Mode " + mode + " is not supported! " +
+                                                  "Use a constructor where you provide the travel time objects. " +
+                                                  "Using an UnknownTravelTime calculator based on constant speed." +
+                                                  "Agent specific attributes are not taken into account!" );
+                        factory = new UnknownTravelTimeFactory( mode, plansCalcRouteConfigGroup );
+                    } else{
+                        log.info( "Found additional travel time factory from type " + factory.getClass().toString() +
+                                                  " for mode " + mode + "." );
+                    }
+                    addTravelTimeBinding( mode ).toProvider( factory );
+                    addTravelDisutilityFactoryBinding( mode ).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() ) );
+                    addRoutingModuleBinding( mode ).toProvider( new NetworkRoutingProvider( mode ) );
+                    break;
+                }
             }
         }
         addControlerListenerBinding().to(MultiModalControlerListener.class);

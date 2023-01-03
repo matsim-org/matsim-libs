@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
 
 /*
@@ -41,7 +41,7 @@ public abstract class WithinDayReplanner<T extends AgentSelector> {
 	protected final Scenario scenario;
 	protected final ActivityEndRescheduler internalInterface;
 
-	protected double time = Time.UNDEFINED_TIME;
+	protected OptionalTime time = OptionalTime.undefined();
 
 	public WithinDayReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler activityEndRescheduler) {
 		this.id = id;
@@ -55,16 +55,16 @@ public abstract class WithinDayReplanner<T extends AgentSelector> {
 		return this.id;
 	}
 	
-	public final double getTime() {
+	public final OptionalTime getTime() {
 		return this.time;
 	}
 	
 	public final void setTime(double time) {
-		this.time = time;
+		this.time = OptionalTime.defined(time);
 	}
 	
 	public void reset() {
-		this.time = Time.UNDEFINED_TIME;
+		this.time = OptionalTime.undefined();
 	}
 	
 	@Override	

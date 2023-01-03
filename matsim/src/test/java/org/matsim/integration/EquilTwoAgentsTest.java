@@ -19,7 +19,8 @@
 
 package org.matsim.integration;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -50,8 +51,6 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import javax.inject.Inject;
 
-import java.net.URL;
-
 import static org.junit.Assert.assertEquals;
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;
 
@@ -73,7 +72,7 @@ public class EquilTwoAgentsTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/*package*/ final static Logger log = Logger.getLogger(EquilTwoAgentsTest.class);
+	/*package*/ final static Logger log = LogManager.getLogger(EquilTwoAgentsTest.class);
 
 	/*package*/ final static Id<Person> personId1 = Id.create("1", Person.class);
 	/*package*/ final static Id<Person> personId2 = Id.create("2", Person.class);
@@ -90,9 +89,9 @@ public class EquilTwoAgentsTest {
 
 	@Test
 	public void testSingleIterationPlansV4() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		ConfigUtils.loadConfig(config, IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
-		config.plans().setInputFile(IOUtils.newUrl(utils.classInputResourcePath(), "plans2.xml").toString());
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		ConfigUtils.loadConfig(config, IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
+		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans2.xml").toString());
 
 		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
 		ActivityParams params = new ActivityParams("h") ;
@@ -116,8 +115,18 @@ public class EquilTwoAgentsTest {
 
 					@Override
 					public void notifyStartup(final StartupEvent event) {
-						double agent1LeaveHomeTime = ((Activity) population.getPersons().get(personId1).getPlans().get(0).getPlanElements().get(0)).getEndTime();
-						double agent2LeaveHomeTime = ((Activity) population.getPersons().get(personId2).getPlans().get(0).getPlanElements().get(0)).getEndTime();
+						double agent1LeaveHomeTime = ((Activity)population.getPersons()
+								.get(personId1)
+								.getPlans()
+								.get(0)
+								.getPlanElements()
+								.get(0)).getEndTime().seconds();
+						double agent2LeaveHomeTime = ((Activity)population.getPersons()
+								.get(personId2)
+								.getPlans()
+								.get(0)
+								.getPlanElements()
+								.get(0)).getEndTime().seconds();
 						handler = new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime);
 						eventsManager.addHandler(handler);
 					}

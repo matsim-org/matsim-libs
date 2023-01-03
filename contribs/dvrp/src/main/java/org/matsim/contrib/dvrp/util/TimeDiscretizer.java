@@ -19,11 +19,13 @@
 
 package org.matsim.contrib.dvrp.util;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 
 public class TimeDiscretizer {
 	public enum Type {
-		ACYCLIC, CYCLIC, OPEN_ENDED;
+		ACYCLIC, CYCLIC, OPEN_ENDED
 	}
 
 	public static final TimeDiscretizer ACYCLIC_1_SEC = new TimeDiscretizer(30 * 3600, 1, Type.ACYCLIC);
@@ -49,35 +51,39 @@ public class TimeDiscretizer {
 	private final Type type;
 
 	public TimeDiscretizer(TravelTimeCalculatorConfigGroup ttcConfig) {
-		this(ttcConfig.getMaxTime(), ttcConfig.getTraveltimeBinSize(), Type.OPEN_ENDED);
+		this(ttcConfig.getMaxTime(), ttcConfig.getTraveltimeBinSize());
+	}
+
+	public TimeDiscretizer(int maxTime, int timeInterval) {
+		this(maxTime, timeInterval, Type.OPEN_ENDED);
 	}
 
 	public TimeDiscretizer(int maxTime, int timeInterval, Type type) {
+		checkArgument(timeInterval > 0, "interval size must be positive");
+		checkArgument(maxTime >= 0, "maxTime must not be negative");
 		this.timeInterval = timeInterval;
 		this.type = type;
-
-		if (maxTime % timeInterval != 0) {
-			throw new IllegalArgumentException();
-		}
-
 		// option: additional open-end bin
 		intervalCount = maxTime / timeInterval + (type == Type.OPEN_ENDED ? 1 : 0);
 	}
 
 	public int getIdx(double time) {
-		if (time < 0) {
-			throw new IllegalArgumentException();
-		}
-
+		checkArgument(time >= 0);
 		int idx = (int)time / timeInterval;// rounding down
-
 		if (idx < intervalCount) {
 			return idx;
 		}
 
 		switch (type) {
 			case ACYCLIC:
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("Out of bound index: time="
+						+ time
+						+ ", timeInterval="
+						+ timeInterval
+						+ ", idx="
+						+ idx
+						+ ", intervalCount="
+						+ intervalCount);
 
 			case CYCLIC:
 				return idx % intervalCount;
@@ -91,8 +97,7 @@ public class TimeDiscretizer {
 	}
 
 	public int discretize(double time) {
-		int idx = getIdx(time);
-		return idx * timeInterval;
+		return getIdx(time) * timeInterval;
 	}
 
 	public int getTimeInterval() {
@@ -101,5 +106,15 @@ public class TimeDiscretizer {
 
 	public int getIntervalCount() {
 		return intervalCount;
+	}
+
+	public interface TimeBinConsumer {
+		void accept(int bin, int time);
+	}
+
+	public void forEach(TimeBinConsumer consumer) {
+		for (int i = 0; i < intervalCount; i++) {
+			consumer.accept(i, i * timeInterval);
+		}
 	}
 }

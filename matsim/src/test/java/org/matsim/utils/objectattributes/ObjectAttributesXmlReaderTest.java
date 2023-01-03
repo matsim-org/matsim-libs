@@ -51,7 +51,7 @@ public class ObjectAttributesXmlReaderTest {
 		"</objectAttributes>";
 		ObjectAttributes attributes = new ObjectAttributes();
 		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(attributes);
-		reader.putAttributeConverter(MyTuple.class, new MyTupleConverter());
+		reader.putAttributeConverter(MyTuple.class, new MyTuple.MyTupleConverter());
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
 		Object o = attributes.getAttribute("one", "a");
@@ -134,29 +134,4 @@ public class ObjectAttributesXmlReaderTest {
 		Assert.assertEquals(42, ((Integer) o).intValue());
 	}
 
-	public static class MyTuple {
-		public final int a;
-		public final int b;
-		public MyTuple(final int a, final int b) {
-			this.a = a;
-			this.b = b;
-		}
-		@Override
-		public String toString() {
-			return a + "," + b;
-		}
-	}
-
-	public static class MyTupleConverter implements AttributeConverter<MyTuple> {
-		@Override
-		public MyTuple convert(String value) {
-			String[] parts = value.split(",");
-			return new MyTuple(Integer.valueOf(parts[0]), Integer.valueOf(parts[1]));
-		}
-		@Override
-		public String convertToString(Object o) {
-			MyTuple t = (MyTuple) o;
-			return t.a + "," + t.b;
-		}
-	}
 }

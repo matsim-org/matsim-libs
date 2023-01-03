@@ -25,7 +25,8 @@ package org.matsim.contrib.signals.builder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.controller.SignalControllerFactory;
@@ -37,12 +38,10 @@ import org.matsim.contrib.signals.sensor.DownstreamSensor;
 import org.matsim.contrib.signals.sensor.LinkSensorManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QSignalsNetworkFactory;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
-import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 
 /**
@@ -60,7 +59,7 @@ class SignalsModule extends AbstractModule {
 	// This is no longer public since there is now also material that needs to be injected at the QSim level (see
 	// Signals.configure(...)), and making SignalsModule nonpublic seems the best way of forcibly notifying users.  kai, nov'18
 
-	private static final Logger log = Logger.getLogger( SignalsModule.class ) ;
+	private static final Logger log = LogManager.getLogger( SignalsModule.class ) ;
 
 	private MapBinder<String, SignalControllerFactory> signalControllerFactoryMultibinder;
 	private Map<String, Class<? extends SignalControllerFactory>> signalControllerFactoryClassNames = new HashMap<>();
@@ -85,8 +84,8 @@ class SignalsModule extends AbstractModule {
 			// bindings for sensor-based signals (also works for fixed-time signals)
 			bind(SignalModelFactory.class).to(SignalModelFactoryImpl.class);
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
-			bind(LinkSensorManager.class).asEagerSingleton();
-			bind(DownstreamSensor.class).asEagerSingleton();
+			bind(LinkSensorManager.class).in(Singleton.class);
+			bind(DownstreamSensor.class).in(Singleton.class);
 //			// bind factory for all specified signal controller
 			for (String identifier : signalControllerFactoryClassNames.keySet()) {
 				/* note: This cannot be called before (e.g. in the constructor or from outside),
@@ -96,7 +95,7 @@ class SignalsModule extends AbstractModule {
 			}
 			
 			// general signal bindings
-			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class);
+			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class).in(Singleton.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
 //			bind(QNetworkFactory.class).to(QSignalsNetworkFactory.class);
 

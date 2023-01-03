@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.roadpricing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -37,7 +38,7 @@ import org.matsim.vehicles.Vehicle;
 class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger( TravelDisutilityIncludingToll.class ) ;
+	private static final Logger log = LogManager.getLogger( TravelDisutilityIncludingToll.class ) ;
 
 	private final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
@@ -59,13 +60,13 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 		this.normalTravelDisutility = normalTravelDisutility;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
 			this.tollCostHandler = new DistanceTollCostBehaviour();
-		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
+		} else if ( scheme.getType().equals( RoadPricingScheme.TOLL_TYPE_AREA ) ) {
 			this.tollCostHandler = new AreaTollCostBehaviour();
-			Logger.getLogger(this.getClass()).warn("area pricing is more brittle than the other toll schemes; " +
+			LogManager.getLogger(this.getClass()).warn("area pricing is more brittle than the other toll schemes; " +
 					"make sure you know what you are doing.  kai, apr'13 & sep'14") ;
-		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) {
-			this.tollCostHandler = new CordonTollCostBehaviour();
-		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_LINK) {
+		} else if ( scheme.getType().equals( RoadPricingScheme.TOLL_TYPE_CORDON ) ) {
+			throw new RuntimeException("Use LINK toll type for cordon pricing (charge toll on links traversing cordon)");
+		} else if ( scheme.getType().equals( RoadPricingScheme.TOLL_TYPE_LINK ) ) {
 			this.tollCostHandler = new LinkTollCostBehaviour();
 		} else {
 			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
@@ -73,7 +74,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney ;
 		if ( utlOfMoneyWrnCnt < 1 && this.marginalUtilityOfMoney != 1. ) {
 			utlOfMoneyWrnCnt ++ ;
-			Logger.getLogger(this.getClass()).warn("There are no test cases for marginalUtilityOfMoney != 1.  Please write one " +
+			LogManager.getLogger(this.getClass()).warn("There are no test cases for marginalUtilityOfMoney != 1.  Please write one " +
 					"and delete this message.  kai, apr'13 ") ;
 		}
 
@@ -131,21 +132,10 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 			 * route could be found if there is no other possibility. */
 			if ( wrnCnt2 < 1 ) {
 				wrnCnt2 ++ ;
-				Logger.getLogger(this.getClass()).warn("at least here, the area toll does not use the true toll value. " +
+				LogManager.getLogger(this.getClass()).warn("at least here, the area toll does not use the true toll value. " +
 						"This may work anyways, but without more explanation it is not obvious to me.  kai, mar'11") ;
 			}
 			return 1000;
-		}
-	}
-
-	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
-		@Override
-		public double getTypicalTollCost(final Link link, final double time) {
-			Cost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
-			if (cost == null) {
-				return 0.0;
-			}
-			return cost.amount;
 		}
 	}
 

@@ -21,6 +21,7 @@ package org.matsim.contrib.dynagent;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.misc.OptionalTime;
 
 public interface DynLeg extends DynAction {
 	String getMode();
@@ -29,7 +30,7 @@ public interface DynLeg extends DynAction {
 
 	Id<Link> getDestinationLinkId();
 
-	Double getExpectedTravelTime();
+	OptionalTime getExpectedTravelTime();
 
 	Double getExpectedTravelDistance();
 }

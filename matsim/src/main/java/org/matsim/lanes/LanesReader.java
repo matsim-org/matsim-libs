@@ -24,12 +24,13 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -49,7 +50,7 @@ import org.xml.sax.SAXException;
  */
 public final class LanesReader implements MatsimReader {
 	
-	private static final Logger log = Logger.getLogger(LanesReader.class);
+	private static final Logger log = LogManager.getLogger(LanesReader.class);
 	
 	@Deprecated
 	public static final String SCHEMALOCATIONV11 = "http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd";
@@ -70,7 +71,7 @@ public final class LanesReader implements MatsimReader {
 	public void readFile(final String filename) {
 		try {
 			log.info("reading file " + filename);
-			InputStream inputStream = IOUtils.getInputStream(filename);
+			InputStream inputStream = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
 			parse(inputStream);
 		} catch (JAXBException | SAXException e) {
 			throw new RuntimeException(e);
@@ -152,7 +153,7 @@ public final class LanesReader implements MatsimReader {
 						// the attribute was read as String. This is inconsistent with the way attributes are read normally,
 						// and I cannot see a use for it, so I just ignored the attribute, as is done in other readers.
 						// td, apr 18
-						if (attribute != null) lane.getAttributes().putAttribute(att.getKey(), attribute);
+						if (attribute != null) lane.getAttributes().putAttribute(att.getName(), attribute);
 					}
 				}
 

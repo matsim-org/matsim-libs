@@ -22,7 +22,8 @@ package org.matsim.contrib.cadyts.general;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,7 +40,9 @@ import java.util.Map;
  * @author mrieser
  */
 public final class CadytsBuilderImpl {
-	private static Logger log = Logger.getLogger( CadytsBuilderImpl.class ) ;
+	private static final  Logger log = LogManager.getLogger( CadytsBuilderImpl.class );
+
+	private CadytsBuilderImpl(){} // do not instantiate
 
 	public static <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
 																				LookUpItemFromId<T> lookUp, Class<T> idType) {

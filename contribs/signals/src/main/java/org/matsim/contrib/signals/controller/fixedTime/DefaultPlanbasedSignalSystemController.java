@@ -25,7 +25,8 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.controller.AbstractSignalController;
 import org.matsim.contrib.signals.controller.SignalController;
@@ -33,7 +34,6 @@ import org.matsim.contrib.signals.controller.SignalControllerFactory;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemImpl;
 
 
 /**
@@ -42,9 +42,9 @@ import org.matsim.contrib.signals.model.SignalSystemImpl;
  * @author dgrether, tthunig
  *
  */
-public class DefaultPlanbasedSignalSystemController extends AbstractSignalController implements SignalController {
+public final class DefaultPlanbasedSignalSystemController extends AbstractSignalController implements SignalController {
 	
-	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemController.class);
+	private static final Logger log = LogManager.getLogger(DefaultPlanbasedSignalSystemController.class);
 	
 	/* an identifier 'PlanbasedSignalControl' would be better analogously to all other identifiers of signal controller
 	 * but renaming would cause to much problems with old signal control input files. theresa jan'17
@@ -116,7 +116,7 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 		if (nextPlan.getStartTime() == now % (3600*24)) {
 			/* start time of next signal plan is reached: 
 			 * stop active plan (if it is still running) and start next signal plan */
-			log.info("Starting signal control plan " + nextPlan.getId());
+//			log.info("Starting signal control plan " + nextPlan.getId());
 			startFirstPlanInQueue(now);
 		}
 		else if (this.activePlan != null && now % (3600*24) == this.activePlan.getEndTime()) {
@@ -126,7 +126,7 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 //			if (nextPlan.getStartTime() > (now % (3600*24) + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
 			double diff = nextPlan.getStartTime() - this.activePlan.getEndTime() + 24*3600;
 			double mod = diff % (24*3600);
-			if (mod > SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH){
+			if (mod > SignalSystem.SWITCH_OFF_SEQUENCE_LENGTH){
 				// switch off the signals if next plan is starting in more than 5 seconds
 				this.system.switchOff(now);
 			}
@@ -156,7 +156,7 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 	@Override
 	public void simulationInitialized(double simStartTime) {		
 		// store all plans in a queue, sort them according to their end times and validate them
-		this.planQueue = new LinkedList<SignalPlan>(this.signalPlans.values());
+		this.planQueue = new LinkedList<>(this.signalPlans.values());
 		Collections.sort(planQueue, new SignalPlanEndTimeComparator(simStartTime));
 		validateSignalPlans();
 		

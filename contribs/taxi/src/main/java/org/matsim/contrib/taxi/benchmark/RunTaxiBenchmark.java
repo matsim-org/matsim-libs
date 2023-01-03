@@ -19,28 +19,25 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
+
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
-import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.FixedIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
@@ -54,7 +51,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class RunTaxiBenchmark {
 	public static void run(URL configUrl, int runs) {
-		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup(), new DvrpConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
 		createControler(config, runs).run();
 	}
 
@@ -64,38 +61,29 @@ public class RunTaxiBenchmark {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setCreateGraphs(false);
+		DvrpBenchmarks.adjustConfig(config);
 
-		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of());// to switch off network filtering
-		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
-
-		String mode = TaxiConfigGroup.get(config).getMode();
-		Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
+		Scenario scenario = createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler = new Controler(scenario);
-		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new DvrpBenchmarkModule());
+		DvrpBenchmarks.initController(controler);
+
+		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new MultiModeTaxiModule());
 
-		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(TaxiBenchmarkStats.class)
-				.mode(mode)
-				.objectClass(Fleet.class)
-				.listenerCreator(getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
-				.build());
-
+		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
+			@Override
+			public void install() {
+				bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
+						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+								getter.getModal(ExecutedScheduleCollector.class),
+								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+				addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
+			}
+		});
 		return controler;
-	}
-
-	public static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime) {
-		Scenario scenario = new ScenarioBuilder(config).build();
-
-		if (config.network().isTimeVariantNetwork()) {
-			((Network)scenario.getNetwork()).getFactory()
-					.setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
-		}
-
-		ScenarioUtils.loadScenario(scenario);
-		return scenario;
 	}
 }

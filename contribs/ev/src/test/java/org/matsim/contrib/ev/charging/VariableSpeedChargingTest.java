@@ -25,16 +25,12 @@ import org.assertj.core.data.Percentage;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
-import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.ev.infrastructure.ChargerImpl;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.testcases.fakes.FakeLink;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.ImmutableList;
 
@@ -82,31 +78,29 @@ public class VariableSpeedChargingTest {
 		assertCalcChargingPower(100, 100, 50, 5);
 	}
 
-	private void assertCalcChargingPower(double capacity_kWh, double soc_kWh, double chargerPower_kW,
+	private void assertCalcChargingPower(double capacity_kWh, double charge_kWh, double chargerPower_kW,
 			double expectedChargingPower_kW) {
-		ElectricVehicleSpecification specification = ImmutableElectricVehicleSpecification.newBuilder()
-				.id(Id.create("ev_id", ElectricVehicle.class))
-				.vehicleType("vt")
-				.chargerTypes(ImmutableList.of("ct"))
-				.batteryCapacity(EvUnits.kWh_to_J(capacity_kWh))
-				.initialSoc(EvUnits.kWh_to_J(soc_kWh))
-				.build();
-		ChargerSpecification chargerSpecification = ImmutableChargerSpecification.newBuilder()
+		// this record is a bit hacky implementation of ElectricVehicleSpecification just meant for tests
+		record TestEvSpecification(Id<Vehicle> getId, Vehicle getMatsimVehicle, String getVehicleType,
+								   ImmutableList<String> getChargerTypes, double getBatteryCapacity,
+								   double getInitialSoc) implements ElectricVehicleSpecification {
+		}
+		var specification = new TestEvSpecification(Id.create("ev_id", Vehicle.class), null, "vt",
+				ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), charge_kWh / capacity_kWh);
+
+		var charger = ImmutableChargerSpecification.newBuilder()
 				.id(Id.create("charger_id", Charger.class))
 				.chargerType(ChargerSpecification.DEFAULT_CHARGER_TYPE)
 				.linkId(Id.createLinkId("link_id"))
-				.maxPower(EvUnits.kW_to_W(chargerPower_kW))
+				.plugPower(EvUnits.kW_to_W(chargerPower_kW))
 				.plugCount(1)
 				.build();
-		Charger charger = ChargerImpl.create(chargerSpecification, new FakeLink(Id.createLinkId("link_id")),
-				ch -> new ChargingWithQueueingLogic(ch, new ChargeUpToMaxSocStrategy(ch, 1), new EventsManagerImpl()));
 
-		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification,
-				ev -> (link, travelTime, linkEnterTime) -> {
-					throw new UnsupportedOperationException();
-				}, ev -> (beginTime, duration, linkId) -> {
-					throw new UnsupportedOperationException();
-				}, VariableSpeedCharging::createForTesla);
+		var electricVehicle = ElectricVehicleImpl.create(specification, ev -> (link, travelTime, linkEnterTime) -> {
+			throw new UnsupportedOperationException();
+		}, ev -> (beginTime, duration, linkId) -> {
+			throw new UnsupportedOperationException();
+		}, VariableSpeedCharging::createForTesla);
 		Assertions.assertThat(electricVehicle.getChargingPower().calcChargingPower(charger))
 				.isCloseTo(EvUnits.kW_to_W(expectedChargingPower_kW), Percentage.withPercentage(1e-13));
 	}

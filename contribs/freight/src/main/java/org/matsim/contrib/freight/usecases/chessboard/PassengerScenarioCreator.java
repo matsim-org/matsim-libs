@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.usecases.chessboard;
 
 import java.util.ArrayList;
@@ -82,7 +103,8 @@ final class PassengerScenarioCreator {
 			act1.setEndTime(8*60*60);
 			plan.addActivity(act1);
 			Leg leg1 = popFactory.createLeg(TransportMode.car);
-			Path path1 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(homeId).getToNode(), scenario.getNetwork().getLinks().get(workId).getFromNode(), act1.getEndTime(), person, null);
+			Path path1 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(homeId).getToNode(), scenario.getNetwork().getLinks().get(workId).getFromNode(),
+					act1.getEndTime().seconds(), person, null);
 			NetworkRoute linkNetworkRoute = RouteUtils.createLinkNetworkRouteImpl(homeId, getLinkIds(path1), workId);
 			leg1.setRoute(linkNetworkRoute);
 			plan.addLeg(leg1);
@@ -92,7 +114,8 @@ final class PassengerScenarioCreator {
 			plan.addActivity(act2);
 
 			Leg leg2 = popFactory.createLeg(TransportMode.car);
-			Path path2 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(workId).getToNode(), scenario.getNetwork().getLinks().get(homeId).getFromNode(), act1.getEndTime(), person, null);
+			Path path2 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(workId).getToNode(), scenario.getNetwork().getLinks().get(homeId).getFromNode(),
+					act1.getEndTime().seconds(), person, null);
 			NetworkRoute linkNetworkRoute2 = RouteUtils.createLinkNetworkRouteImpl(workId, getLinkIds(path2), homeId);
 			leg2.setRoute(linkNetworkRoute2);
 			plan.addLeg(leg2);

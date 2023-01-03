@@ -26,7 +26,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
  * @author dgrether
  *
  */
-public class SignalGroupStateChangeRequestImpl implements SignalGroupStateChangeRequest {
+final class SignalGroupStateChangeRequestImpl implements SignalGroupStateChangeRequest {
 	
 	private SignalGroupState newState;
 	private double timeSec;
@@ -34,7 +34,7 @@ public class SignalGroupStateChangeRequestImpl implements SignalGroupStateChange
 	
 	private String hashCode = null;
 	
-	public SignalGroupStateChangeRequestImpl(Id<SignalGroup> groupId, SignalGroupState newState, double timeSeconds){
+	SignalGroupStateChangeRequestImpl(Id<SignalGroup> groupId, SignalGroupState newState, double timeSeconds){
 		this.signalGroupId = groupId;
 		this.newState = newState;
 		this.timeSec = timeSeconds;

@@ -22,7 +22,10 @@ package org.matsim.contrib.accessibility.osm;
 /**
  * @author dziemke
  */
-public class AccessibilityOsmUtils {
+public final class AccessibilityOsmUtils {
+	// used from vsp-playgrounds
+
+	private AccessibilityOsmUtils(){} // do not instantiate
 	
 	public static String simplifyString(String name) {
 		if(name != null) {

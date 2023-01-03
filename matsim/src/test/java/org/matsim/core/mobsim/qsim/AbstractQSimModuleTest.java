@@ -29,6 +29,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -39,6 +41,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -85,8 +88,11 @@ public class AbstractQSimModuleTest {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId("person"));
-		person.addPlan(scenario.getPopulation().getFactory().createPlan());
+		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+		Person person = populationFactory.createPerson(Id.createPersonId("person"));
+		Plan plan =  populationFactory.createPlan();
+		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 
 		AtomicLong value = new AtomicLong(0);
@@ -96,6 +102,33 @@ public class AbstractQSimModuleTest {
 		controler.run();
 
 		Assert.assertTrue(value.get() > 0);
+	}
+	
+	@Test
+	public void testOverrideAgentFactoryTwice() {
+		Config config = ConfigUtils.createConfig();
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(0);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+		Person person = populationFactory.createPerson(Id.createPersonId("person"));
+		Plan plan =  populationFactory.createPlan();
+		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+		person.addPlan(plan);
+		scenario.getPopulation().addPerson(person);
+
+		AtomicLong value1 = new AtomicLong(0);
+		AtomicLong value2 = new AtomicLong(0);
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingQSimModule(new TestQSimModule(value1));
+		controler.addOverridingQSimModule(new TestQSimModule(value2));
+		controler.run();
+
+		Assert.assertTrue(value1.get() == 0);
+		Assert.assertTrue(value2.get() > 0);
 	}
 
 	private class TestQSimModule extends AbstractQSimModule {
@@ -117,8 +150,8 @@ public class AbstractQSimModuleTest {
 		private final AtomicLong value;
 
 		@Inject
-		public TestAgentFactory(Netsim simulation, AtomicLong value) {
-			delegate = new DefaultAgentFactory(simulation);
+		public TestAgentFactory(Netsim simulation, AtomicLong value, TimeInterpretation timeInterpretation) {
+			delegate = new DefaultAgentFactory(simulation, timeInterpretation);
 			this.value = value;
 		}
 

@@ -43,6 +43,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -616,6 +617,7 @@ public class CadytsPtIT {
 		config.network().setInputFile(inputDir + "network.xml") ;
 		// ---
 		config.plans().setInputFile(inputDir + "4plans.xml") ;
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 		// ---
 		config.transit().setUseTransit(true) ;
 		// ---
@@ -647,10 +649,13 @@ public class CadytsPtIT {
 			params.setTypicalDuration(8*60*60.) ;
 		}
 		// ---
-		ConfigGroup cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
+//		ConfigGroup cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
+		CadytsConfigGroup cadytsPtConfig = ConfigUtils.addOrGetModule( config, CadytsConfigGroup.class );
 
-		cadytsPtConfig.addParam(CadytsConfigGroup.START_TIME, "04:00:00") ;
-		cadytsPtConfig.addParam(CadytsConfigGroup.END_TIME, "20:00:00" ) ;
+//		cadytsPtConfig.addParam(CadytsConfigGroup.START_TIME, "04:00:00") ;
+		cadytsPtConfig.setStartTime( 4*3600 );
+//		cadytsPtConfig.addParam(CadytsConfigGroup.END_TIME, "20:00:00" ) ;
+		cadytsPtConfig.setEndTime( 20*3600 );
 		cadytsPtConfig.addParam(CadytsConfigGroup.REGRESSION_INERTIA, "0.95") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.USE_BRUTE_FORCE, "true") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.MIN_FLOW_STDDEV, "8") ;
@@ -658,8 +663,8 @@ public class CadytsPtIT {
 		cadytsPtConfig.addParam(CadytsConfigGroup.TIME_BIN_SIZE, "3600") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.CALIBRATED_LINES, "M44,M43") ;
 
-		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
-		config.addModule(ccc) ;
+//		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
+//		config.addModule(ccc) ;
 
 
 		// ---

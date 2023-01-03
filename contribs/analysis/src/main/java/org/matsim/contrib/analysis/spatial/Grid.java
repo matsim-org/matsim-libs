@@ -8,6 +8,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.matsim.core.utils.collections.QuadTree;
 
 /**
@@ -22,6 +24,10 @@ public abstract class Grid<T> {
     QuadTree<Cell<T>> quadTree;
 
     public Grid(final double horizontalCentroidDistance, final Supplier<T> initialValueSupplier, final Geometry bounds) {
+        this(horizontalCentroidDistance, initialValueSupplier, new PreparedGeometryFactory().create(bounds));
+    }
+
+    public Grid(final double horizontalCentroidDistance, final Supplier<T> initialValueSupplier, final PreparedGeometry bounds) {
         this.horizontalCentroidDistance = horizontalCentroidDistance;
         generateGrid(initialValueSupplier, bounds);
     }
@@ -88,22 +94,22 @@ public abstract class Grid<T> {
      */
     public abstract double getCellArea();
 
-    private void generateGrid(Supplier<T> initialValueSupplier, final Geometry bounds) {
+    private void generateGrid(Supplier<T> initialValueSupplier, final PreparedGeometry bounds) {
 
-        Envelope envelope = bounds.getEnvelopeInternal();
+        Envelope envelope = bounds.getGeometry().getEnvelopeInternal();
 
         quadTree = new QuadTree<>(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
         generateAllRows(initialValueSupplier, bounds);
     }
 
-    private void generateAllRows(final Supplier<T> initialValueSupplier, final Geometry bounds) {
+    private void generateAllRows(final Supplier<T> initialValueSupplier, final PreparedGeometry bounds) {
 
         for (double y = getMinY(); y <= quadTree.getMaxNorthing(); y += getCentroidDistanceY()) {
             generateRow(y, initialValueSupplier, bounds);
         }
     }
 
-    private void generateRow(final double y, final Supplier<T> initialValueSupplier, final Geometry bounds) {
+    private void generateRow(final double y, final Supplier<T> initialValueSupplier, final PreparedGeometry bounds) {
 
         for (double x = getMinX(y); x <= quadTree.getMaxEasting(); x += getCentroidDistanceX()) {
             Coordinate coord = new Coordinate(x, y);

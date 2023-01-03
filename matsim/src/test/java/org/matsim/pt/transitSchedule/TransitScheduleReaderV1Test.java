@@ -20,11 +20,7 @@
 
 package org.matsim.pt.transitSchedule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Stack;
 
@@ -35,8 +31,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -89,8 +85,8 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testStopFacility_withLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		final Node fromNode = node1;
 		final Node toNode = node2;
@@ -120,9 +116,9 @@ public class TransitScheduleReaderV1Test {
 
 	@Test
 	public void testStopFacility_withBadLink() {
-		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+        TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		final Node fromNode = node1;
 		final Node toNode = node2;
@@ -458,9 +454,9 @@ public class TransitScheduleReaderV1Test {
 		TransitRouteStop stop1 = route.getStops().get(0);
 		assertNotNull(stop1);
 		assertEquals(schedule.getFacilities().get(stopId), stop1.getStopFacility());
-		assertEquals(Time.getUndefinedTime(), stop1.getArrivalOffset(), MatsimTestCase.EPSILON);
-		assertEquals(Time.getUndefinedTime(), stop1.getDepartureOffset(), MatsimTestCase.EPSILON);
-		assertEquals(false, stop1.isAwaitDepartureTime());
+		assertTrue(stop1.getArrivalOffset().isUndefined());
+		assertTrue(stop1.getDepartureOffset().isUndefined());
+		assertFalse(stop1.isAwaitDepartureTime());
 	}
 
 	@Test
@@ -608,26 +604,26 @@ public class TransitScheduleReaderV1Test {
 
 		assertNotNull(stop1);
 		assertEquals(schedule.getFacilities().get(stopId1), stop1.getStopFacility());
-		assertEquals(60.0, stop1.getArrivalOffset(), MatsimTestCase.EPSILON);
-		assertEquals(Time.getUndefinedTime(), stop1.getDepartureOffset(), MatsimTestCase.EPSILON);
+		assertEquals(60.0, stop1.getArrivalOffset().seconds(), MatsimTestCase.EPSILON);
+		assertTrue(stop1.getDepartureOffset().isUndefined());
 
 		TransitRouteStop stop2 = route.getStops().get(1);
 		assertNotNull(stop2);
 		assertEquals(schedule.getFacilities().get(stopId2), stop2.getStopFacility());
-		assertEquals(Time.getUndefinedTime(), stop2.getArrivalOffset(), MatsimTestCase.EPSILON);
-		assertEquals(90.0, stop2.getDepartureOffset(), MatsimTestCase.EPSILON);
+		assertTrue(stop2.getArrivalOffset().isUndefined());
+		assertEquals(90.0, stop2.getDepartureOffset().seconds(), MatsimTestCase.EPSILON);
 
 		TransitRouteStop stop3 = route.getStops().get(2);
 		assertNotNull(stop3);
 		assertEquals(schedule.getFacilities().get(stopId3), stop3.getStopFacility());
-		assertEquals(120.0, stop3.getArrivalOffset(), MatsimTestCase.EPSILON);
-		assertEquals(150.0, stop3.getDepartureOffset(), MatsimTestCase.EPSILON);
+		assertEquals(120.0, stop3.getArrivalOffset().seconds(), MatsimTestCase.EPSILON);
+		assertEquals(150.0, stop3.getDepartureOffset().seconds(), MatsimTestCase.EPSILON);
 
 		TransitRouteStop stop4 = route.getStops().get(3);
 		assertNotNull(stop4);
 		assertEquals(schedule.getFacilities().get(stopId4), stop4.getStopFacility());
-		assertEquals(Time.getUndefinedTime(), stop4.getArrivalOffset(), MatsimTestCase.EPSILON);
-		assertEquals(Time.getUndefinedTime(), stop4.getDepartureOffset(), MatsimTestCase.EPSILON);
+		assertTrue(stop4.getArrivalOffset().isUndefined());
+		assertTrue(stop4.getDepartureOffset().isUndefined());
 	}
 
 	@Test
@@ -742,8 +738,8 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_OneLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 5, (double) 11));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 5, (double) 11));
@@ -809,8 +805,8 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_TwoLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 5, (double) 11));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 5, (double) 11));
@@ -878,8 +874,8 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_MoreLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 5, (double) 11));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 5, (double) 11));

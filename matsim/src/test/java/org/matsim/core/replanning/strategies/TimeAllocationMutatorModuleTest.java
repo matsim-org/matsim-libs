@@ -20,6 +20,8 @@
 
 package org.matsim.core.replanning.strategies;
 
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,14 +43,11 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestCase;
-
-import javax.inject.Provider;
 
 /**
  * Tests the functionality of {@link TimeAllocationMutatorModule}, mainly that the
@@ -66,15 +65,15 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 	public void testMutationRangeParam() {
 		boolean affectingDuration = true ;
 
-		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
-		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
+		runMutationRangeTest(new TripPlanMutateTimeAllocation(750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
+		runMutationRangeTest(new TripPlanMutateTimeAllocation(7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
 	public void testSimplifiedMutation() {
 		boolean affectingDuration = true ;
 
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
 	public void testSubpopulations() {
@@ -83,7 +82,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 		String freightSubpopulation = "freight";
 		
 		Config config  = ConfigUtils.createConfig();
-		config.plans().setSubpopulationAttributeName("subpopulation");
+//		config.plans().setSubpopulationAttributeName("subpopulation");
 		config.timeAllocationMutator().setUseIndividualSettingsForSubpopulations(true);
 		config.timeAllocationMutator().setMutationRange(1800.0);
 		
@@ -124,7 +123,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 	 * @param tripPlanMutateTimeAllocation A preset TimeAllocationMutator to be used for the tests.
 	 * @param expectedMutationRange The expected range for mutation.
 	 */
-	private void runMutationRangeTest(final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange) {
+	private static void runMutationRangeTest( final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange ) {
 		// setup network
 		Network network = NetworkUtils.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
@@ -163,30 +162,26 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 		}
 
 		// run test
-		double act1Dur = act1.getEndTime();
+		double act1Dur = act1.getEndTime().seconds();
 		double minDiff1 = Double.POSITIVE_INFINITY;
 		double maxDiff1 = Double.NEGATIVE_INFINITY;
-		double act2Dur = act2.getMaximumDuration();
+		double act2Dur = act2.getMaximumDuration().seconds();
 		double minDiff2 = Double.POSITIVE_INFINITY;
 		double maxDiff2 = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < 150; i++) {
 			tripPlanMutateTimeAllocation.run(plan);
 			// test duration of act1
-			double diff = act1Dur - act1.getMaximumDuration();
+			double diff = act1Dur - act1.getMaximumDuration().seconds();
 			if (diff > maxDiff1) maxDiff1 = diff;
 			if (diff < minDiff1) minDiff1 = diff;
-			act1Dur = act1.getMaximumDuration();
-			if (!Time.isUndefinedTime(act1Dur)) {
-				assertTrue("activity duration cannot be smaller than 0, is " + act1Dur, act1Dur >= 0.0);
-			}
+			act1Dur = act1.getMaximumDuration().seconds();
+			assertTrue("activity duration cannot be smaller than 0, is " + act1Dur, act1Dur >= 0.0);
 			// test duration of act2
-			diff = act2Dur - act2.getMaximumDuration();
+			diff = act2Dur - act2.getMaximumDuration().seconds();
 			if (diff > maxDiff2) maxDiff2 = diff;
 			if (diff < minDiff2) minDiff2 = diff;
-			act2Dur = act2.getMaximumDuration();
-			if (!Time.isUndefinedTime(act2Dur)) {
-				assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
-			}
+			act2Dur = act2.getMaximumDuration().seconds();
+			assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
 		}
 		assertTrue("mutation range differences wrong (act1).", minDiff1 <= maxDiff1);
 		assertTrue("mutation range differences wrong (act2).", minDiff2 <= maxDiff2);
@@ -211,7 +206,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 	 */
 	private void runSimplifiedMutationRangeTest(final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange) {
 		// setup network
-		Network network = NetworkUtils.createNetwork();
+        Network network = NetworkUtils.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
@@ -248,30 +243,26 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 		}
 
 		// run test
-		double act1End = act1.getEndTime();
+		double act1End = act1.getEndTime().seconds();
 		double minDiff1 = Double.POSITIVE_INFINITY;
 		double maxDiff1 = Double.NEGATIVE_INFINITY;
-		double act2Dur = act2.getMaximumDuration();
+		double act2Dur = act2.getMaximumDuration().seconds();
 		double minDiff2 = Double.POSITIVE_INFINITY;
 		double maxDiff2 = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < 150; i++) {
 			tripPlanMutateTimeAllocation.run(plan);
 			// get end time of act1
-			double diff = act1End - act1.getEndTime();
+			double diff = act1End - act1.getEndTime().seconds();
 			if (diff > maxDiff1) maxDiff1 = diff;
 			if (diff < minDiff1) minDiff1 = diff;
-			act1End = act1.getEndTime();
-			if (!Time.isUndefinedTime(act1End)) {
-				assertTrue("activity end time cannot be smaller than 0, is " + act1End, act1End >= 0.0);
-			}
+			act1End = act1.getEndTime().seconds();
+			assertTrue("activity end time cannot be smaller than 0, is " + act1End, act1End >= 0.0);
 			// test end time of act2
-			diff = act2Dur - act2.getMaximumDuration();
+			diff = act2Dur - act2.getMaximumDuration().seconds();
 			if (diff > maxDiff2) maxDiff2 = diff;
 			if (diff < minDiff2) minDiff2 = diff;
-			act2Dur = act2.getMaximumDuration();
-			if (!Time.isUndefinedTime(act2Dur)) {
-				assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
-			}
+			act2Dur = act2.getMaximumDuration().seconds();
+			assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
 		}
 		assertTrue("mutation range differences wrong (act1).", minDiff1 <= maxDiff1);
 		assertTrue("mutation range differences wrong (act2).", minDiff2 <= maxDiff2);

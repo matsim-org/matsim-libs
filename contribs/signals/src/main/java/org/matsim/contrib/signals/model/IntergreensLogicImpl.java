@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
@@ -36,9 +37,9 @@ import org.matsim.contrib.signals.data.intergreens.v10.IntergreensForSignalSyste
  * @author dgrether
  *
  */
-public class IntergreensLogicImpl implements IntergreensLogic {
+public final class IntergreensLogicImpl implements IntergreensLogic {
 
-private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
+	private static final Logger log = LogManager.getLogger(IntergreensLogicImpl.class);
 
 	private final IntergreenTimesData intergreensData;
 	private final SignalSystemsConfigGroup signalsConfig;

@@ -27,14 +27,15 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author mrieser
  */
 public class PseudoRemovePriorityQueueTest extends TestCase {
 
-	private static final Logger log = Logger.getLogger(PseudoRemovePriorityQueueTest.class);
+	private static final Logger log = LogManager.getLogger(PseudoRemovePriorityQueueTest.class);
 
 	public void testAdd() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);

@@ -35,7 +35,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
  * @author dgrether
  *
  */
-public class AmberLogicImpl implements AmberLogic {
+public final class AmberLogicImpl implements AmberLogic {
 
 	private AmberTimesData data;
 

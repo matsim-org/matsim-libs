@@ -1,63 +1,59 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimWriter;
+import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType.VehicleCostInformation;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.vehicles.EngineInformation;
+import java.util.Map;
 
 /**
- * A writer that writes carriers and their plans in an xml-file.
+ * A writer that writes carriers and their plans in a xml-file.
  * 
  * @author sschroeder
  *
  */
-public class CarrierVehicleTypeWriter extends MatsimXmlWriter {
+public class CarrierVehicleTypeWriter implements MatsimWriter {
 
-	private static Logger logger = Logger.getLogger(CarrierVehicleTypeWriter.class);
+	private final MatsimVehicleWriter delegate ;
 
-	private CarrierVehicleTypes vehicleTypes;
+	public CarrierVehicleTypeWriter( CarrierVehicleTypes types ) {
+		// note: for reading, we do the automatic version handling.  for writing, we just always write the newest version; the older writer handlers are
+		// left around if someone insists on writing the old version.  Since the carrier vehicle type format is just a subset of the vehicle definitions,
+		// we can just use the normal vehicle writer.  kai, sep'19
 
-	
-	public CarrierVehicleTypeWriter(CarrierVehicleTypes carrierVehicleTypes) {
-		super();
-		this.vehicleTypes = carrierVehicleTypes;
-	}
-
-	
-	public void write(String filename) {
-		logger.info("write vehicle-types");
-		try {
-			openFile(filename);
-			writeXmlHead();
-			writeTypes(this.writer);
-			close();
-			logger.info("done");
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e);
-			System.exit(1);
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer() ;
+		for( Map.Entry<Id<VehicleType>, VehicleType> entry : types.getVehicleTypes().entrySet() ){
+			vehicles.addVehicleType( entry.getValue() );
 		}
+		delegate = new MatsimVehicleWriter( vehicles ) ;
 	}
 
-	private void writeTypes(BufferedWriter writer)throws IOException {
-		writer.write("\t<vehicleTypes>\n");
-		for(CarrierVehicleType type : vehicleTypes.getVehicleTypes().values()){
-			writer.write("\t\t<vehicleType id=\"" + type.getId() + "\">\n");
-			writer.write("\t\t\t<description>" + type.getDescription() + "</description>\n");
-			EngineInformation engineInformation = type.getEngineInformation();
-			if(engineInformation != null) writer.write("\t\t\t<engineInformation fuelType=\"" + engineInformation.getFuelType().toString() + "\" gasConsumption=\"" + engineInformation.getGasConsumption() + "\"/>\n");
-			writer.write("\t\t\t<capacity>" + type.getCarrierVehicleCapacity() + "</capacity>\n");
-			VehicleCostInformation vehicleCostInformation = type.getVehicleCostInformation();
-			if(vehicleCostInformation == null) throw new IllegalStateException("vehicleCostInformation is missing.");
-			writer.write("\t\t\t<costInformation fix=\"" + vehicleCostInformation.getFix() + "\" perMeter=\"" + vehicleCostInformation.getPerDistanceUnit() + 
-					"\" perSecond=\"" + vehicleCostInformation.getPerTimeUnit() + "\"/>\n");
-			writer.write("\t\t</vehicleType>\n");
-		}
-		writer.write("\t</vehicleTypes>\n\n");
+	@Override public void write( String filename ){
+		delegate.writeFile( filename );
 	}
 
-	
 }

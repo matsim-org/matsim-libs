@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**

@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 

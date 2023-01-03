@@ -19,16 +19,13 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,19 +35,22 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import static org.junit.Assert.*;
 
 /**
  * @author thibautd
  */
 public class TripStructureUtilsTest {
+	private static final Logger log = LogManager.getLogger( TripStructureUtilsTest.class ) ;
 	private static final PopulationFactory populationFactory =
             ScenarioUtils.createScenario(
 	        ConfigUtils.createConfig()).getPopulation().getFactory();
-    private static final String dummyType = "dummy";
-	private static final StageActivityTypes stageActivities =
-		new StageActivityTypesImpl( dummyType );
+    private static final String dummyType = "dummy interaction";
+	private static final String WITH_ACCESS_EGRESS = "with access/egress";
 
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 	private static class Fixture {
@@ -327,13 +327,62 @@ public class TripStructureUtilsTest {
 					nTrips));
 	}
 
+	@Before
+	public void createFixtureWithAccessEgress() {
+		final Plan plan = populationFactory.createPlan() ;
+
+		Id<Link> linkId = Id.createLinkId( 1 );
+		int nActs = 0;
+		int nTrips = 0;
+		int nLegs = 0;
+
+		nActs++ ;
+		plan.addActivity( populationFactory.createActivityFromLinkId( "home", linkId ) );
+
+		nTrips++ ;
+
+		nLegs++ ;
+		plan.addLeg( populationFactory.createLeg( "walk mode" ) );
+
+//		nActs++ ; // stage activities are not counted here
+		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "access mode" ), linkId ) );
+
+		nLegs++ ;
+		plan.addLeg( populationFactory.createLeg( "access mode" ) );
+
+//		nActs++ ;
+		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "access mode" ), linkId ) );
+
+		nLegs++ ;
+		plan.addLeg( populationFactory.createLeg( "walk mode" ) );
+
+//		nActs++ ;
+		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "main mode" ), linkId ) );
+
+		nLegs++ ;
+		plan.addLeg( populationFactory.createLeg( "main mode" ) );
+
+//		nActs++ ;
+		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "main mode" ), linkId ) );
+
+		nLegs++ ;
+		plan.addLeg( populationFactory.createLeg( "walk mode" ) );
+
+		nActs++ ;
+		plan.addActivity( populationFactory.createActivityFromLinkId( "work", linkId ) );
+
+		fixtures.add(  new Fixture( WITH_ACCESS_EGRESS, plan, nActs, nLegs, nTrips ) );
+	}
+
+
+
 	@Test
 	public void testActivities() throws Exception {
 		for (Fixture fixture : fixtures) {
 			final List<Activity> acts =
 				TripStructureUtils.getActivities(
 						fixture.plan, 
-						stageActivities);
+						StageActivityHandling.ExcludeStageActivities);
 
 			assertEquals(
 					"unexpected number of activities in "+acts+" for fixture "+fixture.name,
@@ -343,7 +392,7 @@ public class TripStructureUtilsTest {
 			for (Activity act : acts) {
 				assertFalse(
 						"found a dummy act in "+acts+" for fixture "+fixture.name,
-						stageActivities.isStageActivity( act.getType() ));
+						StageActivityTypeIdentifier.isStageActivity( act.getType() ));
 			}
 		}
 	}
@@ -352,9 +401,7 @@ public class TripStructureUtilsTest {
 	public void testTrips() throws Exception {
 		for (Fixture fixture : fixtures) {
 			final List<Trip> trips =
-				TripStructureUtils.getTrips(
-						fixture.plan, 
-						stageActivities);
+				TripStructureUtils.getTrips(fixture.plan);
 
 			assertEquals(
 					"unexpected number of trips in "+trips+" for fixture "+fixture.name,
@@ -366,7 +413,7 @@ public class TripStructureUtilsTest {
 					if (pe instanceof Leg) continue;
 					assertTrue(
 							"found a non-dummy act in "+trip.getTripElements()+" for fixture "+fixture.name,
-							stageActivities.isStageActivity( ((Activity) pe).getType() ));
+							StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() ));
 				}
 
 				final int indexOfStart =
@@ -392,9 +439,7 @@ public class TripStructureUtilsTest {
 	public void testLegs() throws Exception {
 		for (Fixture fixture : fixtures) {
 			final List<Trip> trips =
-				TripStructureUtils.getTrips(
-						fixture.plan, 
-						stageActivities);
+				TripStructureUtils.getTrips(fixture.plan);
 
 			int countLegs = 0;
 			for (Trip trip : trips) {
@@ -408,12 +453,14 @@ public class TripStructureUtilsTest {
 		}
 	}
 
+
 	@Test( expected=NullPointerException.class )
 	public void testNPEWhenLocationNullInSubtourAnalysis() {
 		// this may sound surprising, but for a long time the algorithm
 		// was perfectly fine with that if assertions were disabled...
 
 		final Plan plan = populationFactory.createPlan();
+
 		// link ids are null
 		plan.addActivity(
 				populationFactory.createActivityFromCoord(
@@ -425,7 +472,91 @@ public class TripStructureUtilsTest {
 					"type",
 						new Coord((double) 0, (double) 0)) );
 
-		TripStructureUtils.getSubtours( plan , EmptyStageActivityTypes.INSTANCE );
+		TripStructureUtils.getSubtours( plan );
+	}
+
+	@Test
+	public void testSubtourCoords() {
+
+		final Plan plan = populationFactory.createPlan();
+
+		// link ids are null
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord(0,  0)) );
+		plan.addLeg( populationFactory.createLeg( "mode" ) );
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord( 50, 50)) );
+		plan.addLeg( populationFactory.createLeg( "mode" ) );
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord( 10, 10)) );
+		plan.addLeg( populationFactory.createLeg( "mode" ) );
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord( 0, 0)) );
+
+		Collection<TripStructureUtils.Subtour> st = TripStructureUtils.getSubtours(plan, 14);
+
+		st.forEach(System.out::println);
+
+		System.out.println("---");
+
+		assert st.size() == 1;
+
+		// distance between 10,10 and 0,0 is sqrt(200), above this threshold there will be one more subtour
+		st = TripStructureUtils.getSubtours(plan, 15);
+
+		st.forEach(System.out::println);
+
+		assert st.size() == 2;
+
+	}
+
+	@Test
+	public void testFindTripAtPlanElement() {
+		Fixture theFixture = null ;
+		for( Fixture fixture : fixtures ){
+			if ( fixture.name.equals( WITH_ACCESS_EGRESS ) ){
+				theFixture = fixture;
+				log.info( "" );
+				for( PlanElement planElement : fixture.plan.getPlanElements() ){
+					log.info( planElement );
+				}
+				log.info( "" );
+			}
+		}
+		{
+			Fixture f0 = theFixture ;
+			final Leg leg = (Leg) f0.plan.getPlanElements().get( 3 );
+			{
+				Trip trip = TripStructureUtils.findTripAtPlanElement( leg, f0.plan );
+				log.info( "" );
+				log.info( "Trip=" );
+				for( PlanElement tripElement : trip.getTripElements() ){
+					log.info( tripElement );
+				}
+				log.info( "" );
+				Assert.assertEquals( 9, trip.getTripElements().size() );
+				Assert.assertEquals( 5, trip.getLegsOnly().size() );
+			}
+			{
+				Trip trip = TripStructureUtils.findTripAtPlanElement( leg, f0.plan, TripStructureUtils::isStageActivityType ) ;
+				log.info( "" );
+				log.info( "Trip=" );
+				for( PlanElement tripElement : trip.getTripElements() ){
+					log.info( tripElement );
+				}
+				log.info( "" );
+				Assert.assertEquals( 9, trip.getTripElements().size() );
+				Assert.assertEquals( 5, trip.getLegsOnly().size() );
+			}
+			{
+				Trip trip = TripStructureUtils.findTripAtPlanElement( leg, f0.plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals ) ;
+				log.info( "" );
+				log.info( "Trip=" );
+				for( PlanElement tripElement : trip.getTripElements() ){
+					log.info( tripElement );
+				}
+				log.info( "" );
+				Assert.assertEquals( 5, trip.getTripElements().size() );
+				Assert.assertEquals( 3, trip.getLegsOnly().size() );
+			}
+		}
+
 	}
 }
 

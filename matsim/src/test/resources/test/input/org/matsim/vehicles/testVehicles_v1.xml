@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+	<vehicleType id="normal&amp;Car">
+		<capacity>
+			<seats persons="5"/>
+			<standingRoom persons="20"/>
+			<freightCapacity>
+				<volume cubicMeters="23.23"/>
+			</freightCapacity>
+		</capacity>
+		<length meter="9.5"/>
+		<width meter="3.0"/>
+		<maximumVelocity meterPerSecond="42.0"/>
+		<engineInformation>
+			<fuelType>diesel</fuelType>
+			<gasConsumption literPerMeter="0.23"/>
+		</engineInformation>
+		<accessTime secondsPerPerson="23.23"/>
+		<egressTime secondsPerPerson="42.42"/>
+		<doorOperation mode="parallel"/>
+		<passengerCarEquivalents pce="2.0"/>
+	</vehicleType>
+	<vehicleType id="defaultValue&gt;Car">
+	</vehicleType>
+
+	<vehicle id="23" type="normal&amp;Car"/>
+	<vehicle id="42" type="defaultValue&gt;Car"/>
+	<vehicle id=" 42  23" type="defaultValue&gt;Car"/>
+</vehicleDefinitions>

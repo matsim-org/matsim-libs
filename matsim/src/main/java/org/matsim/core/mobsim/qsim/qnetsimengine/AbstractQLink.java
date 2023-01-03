@@ -33,13 +33,14 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -50,7 +51,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.network.NetworkUtils;
@@ -74,7 +75,7 @@ abstract class AbstractQLink implements QLinkI {
 
 	}
 
-	private static final Logger log = Logger.getLogger(AbstractQLink.class);
+	private static final Logger log = LogManager.getLogger(AbstractQLink.class);
 
 	private final Link link;
 
@@ -574,6 +575,10 @@ abstract class AbstractQLink implements QLinkI {
 		
 		public int getNumberOfLanesAsInt(double now) {
 			return NetworkUtils.getNumberOfLanesAsInt(now,AbstractQLink.this.link) ;
+		}
+		
+		public Link getLink() {
+			return AbstractQLink.this.link;
 		}
 	}
 	private final QLinkInternalInterface qLinkInternalInterface = new QLinkInternalInterface() ;

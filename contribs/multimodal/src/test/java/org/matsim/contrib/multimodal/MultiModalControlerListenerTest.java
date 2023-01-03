@@ -23,7 +23,8 @@ package org.matsim.contrib.multimodal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -52,6 +53,7 @@ import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -65,7 +67,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class MultiModalControlerListenerTest {
 
-	private static final Logger log = Logger.getLogger(MultiModalControlerListenerTest.class);
+	private static final Logger log = LogManager.getLogger(MultiModalControlerListenerTest.class);
 
 	@Rule 
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -206,7 +208,7 @@ public class MultiModalControlerListenerTest {
 	void runBerlinScenario(int numberOfThreads) {
 
 		String inputDir = this.utils.getClassInputDirectory();
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
 		ConfigUtils.loadConfig(config, inputDir + "config_berlin_multimodal.xml");
 		config.addModule(new MultiModalConfigGroup());
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
@@ -305,10 +307,10 @@ public class MultiModalControlerListenerTest {
 		double carTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.car);
 		double bikeTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.bike);
 		double walkTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.walk);
-		Logger.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
-		Logger.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
-		Logger.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		LogManager.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
+		LogManager.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
+		LogManager.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			Assert.assertEquals(
 					"unexpected total travel time for car mode with number of threads "+numberOfThreads,
 					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON);
@@ -433,8 +435,8 @@ public class MultiModalControlerListenerTest {
 			}
 			Double modeTravelTime = this.travelTimesPerMode.get(mode);
 			if ( modeTravelTime==null ) {
-				Logger.getLogger(this.getClass()).warn( "mode:" + mode );
-				Logger.getLogger(this.getClass()).warn( "travelTimesPerMode:" + this.travelTimesPerMode );
+				LogManager.getLogger(this.getClass()).warn( "mode:" + mode );
+				LogManager.getLogger(this.getClass()).warn( "travelTimesPerMode:" + this.travelTimesPerMode );
 			}
 			this.travelTimesPerMode.put(mode, modeTravelTime + tripTravelTime);
 		}

@@ -1,0 +1,148 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans xml:lang="de-CH">
+<person id="1">
+	<plan>
+		<act type="h" x="-2500" y="50" link="1" end_time="06:00" />
+		<leg mode="car">
+			<route>2 3</route>
+		</leg>
+		<act type="w" x="1000" y="0" link="3" dur="00:10" />
+		<leg mode="car">
+			<route></route>
+		</leg>
+		<act type="w" x="0" y="0" link="3" dur="03:30" />
+		<leg mode="car">
+			<route>1</route>
+		</leg>
+		<act type="h" x="-2500" y="50" link="1" />
+	</plan>
+</person>
+ 
+<person id="2">
+	<plan>
+		<act type="h" x="2500" y="0" link="3" end_time="05:59" />
+		<leg mode="car">
+			<route>1</route>
+		</leg>
+		<act type="w" x="-3000" y="200" link="1" dur="02:30" />
+		<leg mode="car">
+			<route>2 3</route>
+		</leg>
+		<act type="h" x="2500" y="0" link="3" />
+	</plan>
+</person>
+
+<person id="3">
+	<plan>
+		<act type="h" x="2500" y="1000" link="2" end_time="05:58:30" />
+		<leg mode="car">
+			<route>3</route>
+		</leg>
+		<act type="w" x="1000" y="0" link="3" dur="01:30" />
+		<leg mode="car">
+			<route>1 2</route>
+		</leg>
+		<act type="h" x="2500" y="1000" link="2" />
+	</plan>
+</person>
+
+<person id="4">
+	<plan>
+		<act type="h" x="-1000" y="5000" link="1" end_time="05:59:30" />
+		<leg mode="car">
+			<route>2 3 1</route>
+		</leg>
+		<act type="w" x="-3000" y="200" link="1" dur="02:30" />
+		<leg mode="car">
+			<route></route>
+		</leg>
+		<act type="h" x="-1000" y="5000" link="1" />
+	</plan>
+</person>
+
+<person id="5">
+	<plan>
+		<act type="h" x="0" y="0" link="3" end_time="06:00" />
+		<leg mode="car">
+			<route>1 2</route>
+		</leg>
+		<act type="w" x="1000" y="1000" link="2" dur="06:30" />
+		<leg mode="car">
+			<route>3</route>
+		</leg>
+		<act type="h" x="0" y="0" link="3" />
+	</plan>
+</person>
+
+<person id="6">
+	<plan>
+		<act type="h" x="0" y="3500" link="1" end_time="06:00" />
+		<leg mode="car">
+			<route>2 3</route>
+		</leg>
+		<act type="w" x="-1000" y="-500" link="3" dur="00:30" />
+		<leg mode="car">
+			<route>1</route>
+		</leg>
+		<act type="h" x="0" y="3500" link="1" />
+	</plan>
+</person>
+
+<person id="7">
+	<plan>
+		<act type="h" x="2500" y="1000" link="2" end_time="06:00" />
+		<leg mode="car">
+			<route>3 1</route>
+		</leg>
+		<act type="w" x="-3000" y="1000" link="1" dur="01:30" />
+		<leg mode="car">
+			<route>2</route>
+		</leg>
+		<act type="h" x="2500" y="1000" link="2" />
+	</plan>
+</person>
+
+<person id="8">
+	<plan>
+		<act type="h" x="-2500" y="0" link="1" end_time="06:00" />
+		<leg mode="car">
+			<route>2</route>
+		</leg>
+		<act type="w" x="3000" y="3500" link="2" dur="04:30" />
+		<leg mode="car">
+			<route>3 1</route>
+		</leg>
+		<act type="h" x="-2500" y="0" link="1" />
+	</plan>
+</person>
+
+<person id="9">
+	<plan>
+		<act type="h" x="4500" y="0" link="2" end_time="06:00" />
+		<leg mode="car">
+			<route>3 1 2</route>
+		</leg>
+		<act type="w" x="100" y="2000" link="2" dur="03:30" />
+		<leg mode="car">
+			<route></route>
+		</leg>
+		<act type="h" x="4500" y="0" link="2" />
+	</plan>
+</person>
+
+<person id="10">
+	<plan>
+		<act type="h" x="-1500" y="0" link="3" end_time="06:00" />
+		<leg mode="car">
+			<route>1 2 3</route>
+		</leg>
+		<act type="w" x="1000" y="0" link="3" dur="02:30" />
+		<leg mode="car">
+			<route></route>
+		</leg>
+		<act type="h" x="-1500" y="0" link="3" />
+	</plan>
+</person>
+
+</plans>

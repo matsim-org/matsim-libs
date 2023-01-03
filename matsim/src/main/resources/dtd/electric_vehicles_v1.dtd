@@ -11,10 +11,14 @@
 
 <!ELEMENT vehicle EMPTY>
 
+<!-- initial_soc - in kWh -->
+<!-- battery_capacity - in kWh -->
+<!-- charger_types - supported charger types; comma-separated list; "default" if not provided) -->
+<!-- vehicle_type - "defaultVehicleType" if not provided -->
 <!ATTLIST vehicle
-	id          CDATA   #REQUIRED
-	initial_soc    CDATA   #REQUIRED
-		battery_capacity  CDATA   #REQUIRED
-        chargerTypes    CDATA    #IMPLIED
-        vehicleType    CDATA    #IMPLIED>
+	id CDATA #REQUIRED
+	initial_soc CDATA #REQUIRED
+	battery_capacity CDATA #REQUIRED
+	charger_types CDATA #IMPLIED
+	vehicle_type CDATA #IMPLIED>
 	

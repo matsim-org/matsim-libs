@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<network name="internalization network">
+   <nodes>
+      <node id="1" x="-900" y="0"/>
+      <node id="2" x="-700" y="0"/>
+      <node id="3" x="0" y="500"/>
+      <node id="4" x="0" y="-100"/>
+      <node id="5" x="300" y="0"/>
+      <node id="6" x="500" y="0"/>
+   </nodes>
+   <links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75" >
+      <link id="1" from="1" to="2" length="200.00" capacity="36000" freespeed="27.77777777777778" permlanes="2" oneway="1" modes="car" />
+      <link id="2" from="2" to="3" length="860.00" capacity="72000" freespeed="13.88888888888889" permlanes="2" oneway="1" modes="car" />
+      <link id="3" from="3" to="5" length="590.00" capacity="72000" freespeed="13.88888888888889" permlanes="2"  oneway="1" modes="car" />
+      <link id="4" from="2" to="4" length="700.00" capacity="360" freespeed="27.77777777777778" permlanes="1"  oneway="1" modes="car" />
+      <link id="5" from="4" to="5" length="310.00" capacity="360" freespeed="27.77777777777778" permlanes="1"  oneway="1" modes="car" />
+      <link id="6" from="5" to="6" length="200.00" capacity="36000" freespeed="27.77777777777778" permlanes="2" oneway="1" modes="car" />
+   </links>
+</network>

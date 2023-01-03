@@ -19,12 +19,14 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.apache.log4j.Logger;
+import javax.inject.Inject;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -32,23 +34,20 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.utils.misc.Time;
 
-import javax.inject.Inject;
+class ActivityEngineDefaultImpl implements ActivityEngine {
+	private static final Logger log = LogManager.getLogger( ActivityEngineDefaultImpl.class ) ;
 
-public class ActivityEngineDefaultImpl implements ActivityEngine {
-	private static final Logger log = Logger.getLogger( ActivityEngineDefaultImpl.class ) ;
+	private final EventsManager eventsManager;
 
-	private EventsManager eventsManager;
 	@Inject
-	public ActivityEngineDefaultImpl( EventsManager eventsManager ) {
+	ActivityEngineDefaultImpl( EventsManager eventsManager ) {
 		this.eventsManager = eventsManager;
 	}
 
-	public ActivityEngineDefaultImpl( EventsManager eventsManager, AgentCounter agentCounter ) {
-		this.eventsManager = eventsManager;
-	}
+//	public ActivityEngineDefaultImpl( EventsManager eventsManager, AgentCounter agentCounter ) {
+//		this.eventsManager = eventsManager;
+//	}
 
 	/**
 	 * Agents cannot be added directly to the activityEndsList since that would
@@ -60,40 +59,35 @@ public class ActivityEngineDefaultImpl implements ActivityEngine {
 	 * cdobler, apr'12
 	 */
 	private static class AgentEntry {
-		public AgentEntry(MobsimAgent agent, double activityEndTime) {
+		AgentEntry( MobsimAgent agent, double activityEndTime ) {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;
 		}
-		final MobsimAgent agent;
-		final double activityEndTime;
+		private final MobsimAgent agent;
+		private final double activityEndTime;
 	}
 
 	private InternalInterface internalInterface;
-	
+
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for
 	 * thread-safety in the parallel qsim. cdobler, oct'10
 	 */
-	private final Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<>(500, new Comparator<AgentEntry>() {
-
-		@Override
-		public int compare(AgentEntry arg0, AgentEntry arg1) {
-			int cmp = Double.compare(arg0.activityEndTime, arg1.activityEndTime);
-			if (cmp == 0) {
-				// Both depart at the same time -> let the one with the larger id be first (=smaller)
-				//
-				// yy We are not sure what the above comment line is supposed to say.  Presumably, it is supposed
-				// to say that the agent with the larger ID should be "smaller" one in the comparison.
-				// In practice, it seems
-				// that something like "emob_9" is before "emob_8", and something like "emob_10" before "emob_1".
-				// It is unclear why this convention is supposed to be helpful.
-				// kai & dominik, jul'12
-				//
-				return arg1.agent.getId().compareTo(arg0.agent.getId());
-			}
-			return cmp;
+	private final Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<>(500, (e0, e1) -> {
+		int cmp = Double.compare(e0.activityEndTime, e1.activityEndTime);
+		if (cmp == 0) {
+			// Both depart at the same time -> let the one with the larger id be first (=smaller)
+			//
+			// yy We are not sure what the above comment line is supposed to say.  Presumably, it is supposed
+			// to say that the agent with the larger ID should be "smaller" one in the comparison.
+			// In practice, it seems
+			// that something like "emob_9" is before "emob_8", and something like "emob_10" before "emob_1".
+			// It is unclear why this convention is supposed to be helpful.
+			// kai & dominik, jul'12
+			//
+			return e1.agent.getId().compareTo(e0.agent.getId());
 		}
-
+		return cmp;
 	});
 	
 	// See handleActivity for the reason for this.
@@ -123,7 +117,7 @@ public class ActivityEngineDefaultImpl implements ActivityEngine {
 	public void afterSim() {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (AgentEntry entry : activityEndsList) {
-			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.UNDEFINED_TIME) {
+			if (entry.activityEndTime != Double.POSITIVE_INFINITY) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
 				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));

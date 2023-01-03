@@ -33,7 +33,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 
 /**
@@ -109,6 +110,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSe
  * <li><code>--config:MODULE.SET_TYPE[ID_PARAM=ID_VALUE].PARAM VALUE</code> sets
  * a value in a specific parameter set, which is identified using a specific
  * parameter in that set with a specific selection value.</li>
+ * <li><code>--config:MODULE.SET_TYPE[*=*].PARAM VALUE</code> sets a value in
+ * <i>all</i> parameter sets of SET_TYPE</li>
  * </ul>
  * 
  * Some examples:
@@ -122,7 +125,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSe
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
 public class CommandLine {
-	final private static Logger logger = Logger.getLogger(CommandLine.class);
+	final private static Logger logger = LogManager.getLogger(CommandLine.class);
 
 	final private static String CONFIG_PREFIX = "config";
 	final private static String FLAG_VALUE = "true";
@@ -412,11 +415,11 @@ public class CommandLine {
 		List<String> flatArguments = new LinkedList<>();
 
 		for (String argument : args) {
-			int index = argument.lastIndexOf("=");
-			int bracketIndex = argument.lastIndexOf("]");
+			int index = argument.lastIndexOf('=');
+			int bracketIndex = argument.lastIndexOf(']');
 
 			if (bracketIndex > index) {
-				index = argument.indexOf("=", bracketIndex);
+				index = argument.indexOf('=', bracketIndex);
 			}
 
 			if (index > -1) {
@@ -509,7 +512,7 @@ public class CommandLine {
 		List<String> nonPrefixedOptions = new LinkedList<>();
 
 		for (String option : options.keySet()) {
-			int separatorIndex = option.indexOf(":");
+			int separatorIndex = option.indexOf(':');
 
 			if (separatorIndex > -1) {
 				String prefix = option.substring(0, separatorIndex);
@@ -546,7 +549,7 @@ public class CommandLine {
 	}
 
 	private void processConfigOption(Config config, String option, String remainder) throws ConfigurationException {
-		int separatorIndex = remainder.indexOf(".");
+		int separatorIndex = remainder.indexOf('.');
 
 		if (separatorIndex > -1) {
 			String module = remainder.substring(0, separatorIndex);
@@ -567,9 +570,9 @@ public class CommandLine {
 	private void processParameter(String option, String path, ConfigGroup configGroup, String remainder)
 			throws ConfigurationException {
 		if (remainder.contains("[")) {
-			int selectorStartIndex = remainder.indexOf("[");
-			int selectorEndIndex = remainder.indexOf("]");
-			int equalIndex = remainder.indexOf("=");
+			int selectorStartIndex = remainder.indexOf('[');
+			int selectorEndIndex = remainder.indexOf(']');
+			int equalIndex = remainder.indexOf('=');
 
 			if (selectorStartIndex > -1 && selectorEndIndex > -1 && equalIndex > -1) {
 				if (selectorStartIndex < equalIndex && equalIndex < selectorEndIndex) {
@@ -588,14 +591,20 @@ public class CommandLine {
 						Collection<? extends ConfigGroup> parameterSets = configGroup
 								.getParameterSets(parameterSetType);
 
-						if (parameterSets.size() > 0) {
+						// change values in *all* parameter sets of parameterSetType
+						final boolean changeValueInAllSets = selectionParameter.equals("*") && selectionValue.equals("*");
+
+						if (!parameterSets.isEmpty()) {
 							for (ConfigGroup parameterSet : parameterSets) {
-								if (parameterSet.getParams().containsKey(selectionParameter)) {
+								if (changeValueInAllSets || parameterSet.getParams().containsKey(selectionParameter)) {
 									String comparisonValue = parameterSet.getParams().get(selectionParameter);
 
-									if (comparisonValue.equals(selectionValue)) {
+									if (changeValueInAllSets || comparisonValue.equals(selectionValue)) {
 										processParameter(option, newPath, parameterSet, newRemainder);
-										return;
+										if (!changeValueInAllSets) {
+											// retain current behavior to only change value in first matching parameter set
+											return;
+										}
 									}
 									
 									// allow for the case subpopulation = 'null' in the scoring parameters
@@ -607,9 +616,13 @@ public class CommandLine {
 								}
 							}
 
-							throw new ConfigurationException(
-									String.format("Parameter set '%s' with %s=%s for %s is not available in %s",
-											parameterSetType, selectionParameter, selectionValue, path, option));
+							if (changeValueInAllSets) {
+								return;
+							} else {
+								throw new ConfigurationException(
+										String.format("Parameter set '%s' with %s=%s for %s is not available in %s",
+												parameterSetType, selectionParameter, selectionValue, path, option));
+							}
 						} else {
 							throw new ConfigurationException(
 									String.format("Parameter set of type '%s' for %s is not available in %s",

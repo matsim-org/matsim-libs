@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 
@@ -8,7 +29,7 @@ import org.matsim.core.utils.misc.Time;
  * Q: What happens/should happen if the time window is not sufficient to unload, or
  * the vehicle arrives after the time window?
  * <p></p>
- * A: First, I (=sschroeder) interpret time-window as period of time where an
+ * A: First, I (=sschroeder) interpret time-window as period of time when an
  * (un)loading operation can start (which does not mean that it has to be
  * finished by the end of the time window). This is - I guess - in line with
  * most OR literature dealing with time-windows. There are 3 options to deal
@@ -60,6 +81,28 @@ public class TimeWindow {
 	@Override
 	public String toString() {
 		return "[start=" + Time.writeTime(start) + ", end=" + Time.writeTime(end) + "]";
+	}
+
+	@Override
+	public boolean equals(Object o){
+		if(o == this) return true;
+		if((o == null) || (o.getClass() != this.getClass())) {
+			return false;
+		}
+		TimeWindow t1 = (TimeWindow) o;
+		return (t1.getStart() == this.getStart() && t1.getEnd() == this.getEnd());
+	}
+
+	@Override
+	public int hashCode(){
+		int result = 59;
+		long startLong  = Double.doubleToLongBits(start);
+		int startHash = (int) (startLong^(startLong>>>32));
+		result = 31 * result + startHash;
+		long endLong  = Double.doubleToLongBits(end);
+		int endHash = (int) (endLong^(endLong>>>32));
+		result = 31 * result + endHash;
+		return result;
 	}
 
 }

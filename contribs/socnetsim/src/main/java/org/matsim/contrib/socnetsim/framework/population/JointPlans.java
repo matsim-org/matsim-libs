@@ -25,7 +25,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
@@ -43,14 +44,14 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  * @author thibautd
  */
 public class JointPlans implements MatsimToplevelContainer {
-	private static final Logger log = Logger.getLogger( JointPlans.class );
+	private static final Logger log = LogManager.getLogger( JointPlans.class );
 	public static final String ELEMENT_NAME = "jointPlans";
 
 	private final Map<Plan, JointPlan> planToJointPlan = new ConcurrentHashMap<>();
 
 	private final JointPlanFactory factory = new JointPlanFactory();
 
-	private static AtomicInteger globalInstanceCount = new AtomicInteger( 0 );
+	private static final  AtomicInteger globalInstanceCount = new AtomicInteger( 0 );
 	private final int instanceId = globalInstanceCount.getAndIncrement();
 	
 	public JointPlan getJointPlan(final Plan indivPlan) {

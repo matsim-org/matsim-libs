@@ -23,7 +23,8 @@ package org.matsim.core.network;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -32,6 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.IdentifiableArrayMap;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /*deliberately package*/ class NodeImpl implements Node, Lockable {
 
@@ -49,8 +51,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final Id<Node> id;
 	private boolean locked = false ;
 
-	private final static Logger log = Logger.getLogger(Node.class);
-	private final Attributes attributes = new Attributes();
+	private final static Logger log = LogManager.getLogger(Node.class);
+	private final Attributes attributes = new AttributesImpl();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -82,11 +84,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		if (this.inlinks.containsKey(linkid)) {
 			throw new IllegalArgumentException(this + ": inlink_id=" + inlink.getId() + " already exists");
 		}
-		if (this.outlinks.containsKey(linkid) && (cnt2 < 1)) {
-			cnt2++ ;
-			log.warn(this + ": inlink_id=" + inlink.getId() + " is now in- and out-link");
-			log.warn(Gbl.ONLYONCE) ;
-		}
+//		if (this.outlinks.containsKey(linkid) && (cnt2 < 1)) {
+//			cnt2++ ;
+//			log.warn(this + ": inlink_id=" + inlink.getId() + " is now in- and out-link");
+//			log.warn(Gbl.ONLYONCE) ;
+//		}
+		// (this means it is a loop link; they have become an acceptable data structure within matsim.  kai, sep'19)
 		this.inlinks.put(linkid, inlink);
 		return true; // yy should return true only if collection changed as result of call
 	}

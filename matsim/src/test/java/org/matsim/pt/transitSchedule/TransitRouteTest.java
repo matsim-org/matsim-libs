@@ -23,11 +23,11 @@ package org.matsim.pt.transitSchedule;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -42,7 +42,7 @@ import org.matsim.testcases.fakes.FakeLink;
  */
 public class TransitRouteTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(TransitRouteTest.class);
+	private static final Logger log = LogManager.getLogger(TransitRouteTest.class);
 
 	/**
 	 * In case we once should have more than one implementation of
@@ -65,7 +65,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
+		TransitRouteStop stop = new TransitRouteStopImpl.Builder().arrivalOffset(50).departureOffset(60).build();
 		stops.add(stop);
 
 		TransitRoute tRoute = createTransitRoute(id, route, stops, "train");
@@ -194,9 +194,9 @@ public class TransitRouteTest extends MatsimTestCase {
 		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
 		TransitStopFacility stopFacility3 = new TransitStopFacilityImpl(Id.create(3, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
 		TransitStopFacility stopFacility4 = new TransitStopFacilityImpl(Id.create(4, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-		TransitRouteStop stop1 = new TransitRouteStopImpl(stopFacility1, 50, 60);
-		TransitRouteStop stop2 = new TransitRouteStopImpl(stopFacility2, 150, 260);
-		TransitRouteStop stop3 = new TransitRouteStopImpl(stopFacility3, 250, 260);
+		TransitRouteStop stop1 = new TransitRouteStopImpl.Builder().stop(stopFacility1).arrivalOffset(50).departureOffset(60).build();
+		TransitRouteStop stop2 = new TransitRouteStopImpl.Builder().stop(stopFacility2).arrivalOffset(150).departureOffset(260).build();
+		TransitRouteStop stop3 = new TransitRouteStopImpl.Builder().stop(stopFacility3).arrivalOffset(250).departureOffset(260).build();
 		stops.add(stop1);
 		stops.add(stop2);
 		stops.add(stop3);
@@ -244,7 +244,7 @@ public class TransitRouteTest extends MatsimTestCase {
 			Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
 			NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 			this.stops = new ArrayList<TransitRouteStop>();
-			TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
+			TransitRouteStop stop = new TransitRouteStopImpl.Builder().arrivalOffset(50).departureOffset(60).build();
 			this.stops.add(stop);
 
 			this.tRoute = TransitRouteTest.createTransitRoute(id, route, this.stops, "train");

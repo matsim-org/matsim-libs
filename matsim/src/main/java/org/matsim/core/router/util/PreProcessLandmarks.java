@@ -20,12 +20,6 @@
 
 package org.matsim.core.router.util;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.MatsimComparator;
-
 import java.awt.geom.Rectangle2D;
 import java.util.Comparator;
 import java.util.Map;
@@ -33,6 +27,13 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimComparator;
 
 /**
  * Pre-processes a given network, gathering information which can be used by
@@ -53,7 +54,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	
 	private int numberOfThreads = 8;
 
-	private static final Logger log = Logger.getLogger(PreProcessLandmarks.class);
+	private static final Logger log = LogManager.getLogger(PreProcessLandmarks.class);
 
 	public PreProcessLandmarks(final TravelDisutility costFunction) {
 		this(costFunction, new Rectangle2D.Double());
@@ -138,7 +139,9 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		while (!executor.isTerminated()) {
 			log.info("wait for landmarks Calculator to finish...");
 			try {
-				executor.awaitTermination(10, TimeUnit.MINUTES);
+				if (!executor.awaitTermination(10, TimeUnit.MINUTES)) {
+					throw new RuntimeException("Landmarks pre-processing timeout.");
+				}
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}

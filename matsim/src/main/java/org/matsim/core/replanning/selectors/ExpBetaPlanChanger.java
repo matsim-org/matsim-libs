@@ -20,7 +20,8 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.gbl.MatsimRandom;
@@ -31,12 +32,27 @@ import org.matsim.core.gbl.MatsimRandom;
  * @author kn based on mrieser
  */
 public final class ExpBetaPlanChanger<T extends BasicPlan, I> implements PlanSelector<T, I> {
-	private static final Logger log = Logger.getLogger(ExpBetaPlanChanger.class);
+	private static final Logger log = LogManager.getLogger(ExpBetaPlanChanger.class);
+
+	public static final class Factory<T extends BasicPlan,I> {
+		private double beta = 1.;
+		public ExpBetaPlanChanger<T,I> build() {
+			return new ExpBetaPlanChanger<>( beta );
+		}
+		public Factory<T,I> setBetaValue( double beta ){
+			this.beta = beta;
+			return this;
+		}
+	}
 
 	private final double beta;
 	static boolean betaWrnFlag = true ;
 	static boolean scoreWrnFlag = true ;
 
+
+	/**
+	 * @deprecated -- use {@link Factory}
+	 */
 	public ExpBetaPlanChanger(double beta) {
 		this.beta = beta;
 	}
@@ -79,8 +95,8 @@ public final class ExpBetaPlanChanger<T extends BasicPlan, I> implements PlanSel
 			return currentPlan ;
 		}
 		
-		double currentScore = currentPlan.getScore().doubleValue();
-		double otherScore = otherPlan.getScore().doubleValue();
+		double currentScore = currentPlan.getScore();
+		double otherScore = otherPlan.getScore();
 
 		if ( betaWrnFlag ) {
 			log.warn("Would make sense to revise this once more.  See comments in code.  kai, nov08") ;

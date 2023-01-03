@@ -204,7 +204,7 @@ public final class IterationStopWatch {
 				writer.write('\t');
 				writer.write(identifier);
 			}
-			writer.newLine();
+			writer.write("\n");
 
 			// print data
 			for (Map.Entry<Integer, Map<String, Long>> entry : this.iterations.entrySet()) {
@@ -232,7 +232,7 @@ public final class IterationStopWatch {
 				}
 
 				// finish
-				writer.newLine();
+				writer.write("\n");
 			}
 			writer.flush();
 			writer.close();

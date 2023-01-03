@@ -22,7 +22,7 @@ USAGE (if you got the zip file):
 - Unzip the downloaded file
 - Click on matsim-x.y.z.jar or type java -jar matsim-x.y.z.jar
   This should start the GUI (from which you can run the simulation).
-- java -cp matsim-x.y.z.jar org.matsim.run.Controler myconfig.xml
+- java -cp matsim-x.y.z.jar org.matsim.run.RunMatsim myconfig.xml
   This should run the simulation.
 - A Tutorial can be found online: http://matsim.org/docs/tutorials
 - Some example files are included in this release, in the "examples" directory.

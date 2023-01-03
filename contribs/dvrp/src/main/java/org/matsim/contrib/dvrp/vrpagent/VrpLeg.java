@@ -24,7 +24,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.common.base.Preconditions;
 
 /**
  * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
@@ -46,14 +49,8 @@ public class VrpLeg implements DivertibleLeg {
 	}
 
 	public void initOnlineTracking(OnlineDriveTaskTracker onlineTracker) {
-		if (this.onlineTracker != null) {
-			throw new IllegalStateException("Tracking already initialized");
-		}
-
-		if (currentLinkIdx != 0) {
-			throw new IllegalStateException("Too late for initializing online tracking");
-		}
-
+		Preconditions.checkState(this.onlineTracker == null, "Tracking already initialized");
+		Preconditions.checkState(currentLinkIdx == 0, "Too late for initializing online tracking");
 		this.onlineTracker = onlineTracker;
 	}
 
@@ -80,15 +77,9 @@ public class VrpLeg implements DivertibleLeg {
 	@Override
 	public void pathDiverted(DivertedVrpPath divertedPath) {
 		int immediateDiversionLinkIdx = currentLinkIdx + (canChangeNextLink() ? 0 : 1);
-		if (divertedPath.getDiversionLinkIdx() < immediateDiversionLinkIdx) {
-			throw new IllegalStateException();
-		}
-
-		// divertedPath must be derived from the original one
-		if (divertedPath.getOriginalPath() != path) {
-			throw new IllegalArgumentException();
-		}
-
+		Preconditions.checkState(divertedPath.getDiversionLinkIdx() >= immediateDiversionLinkIdx);
+		Preconditions.checkArgument(divertedPath.getOriginalPath() == path,
+				"divertedPath must be derived from the original one");
 		path = divertedPath;
 	}
 
@@ -124,8 +115,8 @@ public class VrpLeg implements DivertibleLeg {
 	}
 
 	@Override
-	public Double getExpectedTravelTime() {
-		return null;// teleportation is not handled
+	public OptionalTime getExpectedTravelTime() {
+		return OptionalTime.undefined();// teleportation is not handled
 	}
 
 	@Override

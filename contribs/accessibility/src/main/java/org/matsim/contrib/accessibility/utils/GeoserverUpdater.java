@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -40,7 +41,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
+import org.matsim.contrib.accessibility.FacilityDataExchangeInterface;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -53,7 +54,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
-	static Logger LOG = Logger.getLogger(GeoserverUpdater.class);
+	static Logger LOG = LogManager.getLogger(GeoserverUpdater.class);
 
 	private String crs;
 	private String name;
@@ -77,8 +78,15 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
 
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay,	Map<String, Double> accessibilities) {
-		accessibilitiesMap.put(new Tuple<>(measurePoint, timeOfDay), accessibilities);
+	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, String mode, double accessibility) {
+	//public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities) {
+		//accessibilitiesMap.put(new Tuple<>(measurePoint, timeOfDay), accessibilities);
+		Tuple<ActivityFacility, Double> key = new Tuple<>(measurePoint, timeOfDay);
+		if (!accessibilitiesMap.containsKey(key)) {
+			Map<String,Double> accessibilitiesByMode = new HashMap<>();
+			accessibilitiesMap.put(key, accessibilitiesByMode);
+		}
+		accessibilitiesMap.get(key).put(mode, accessibility);
 	}
 
 	@Override

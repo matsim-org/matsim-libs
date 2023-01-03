@@ -3,6 +3,7 @@ package org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -16,7 +17,7 @@ class VehicleTracker implements Serializable {
     }
 
     transient private final FullDeparture fullDeparture;
-    transient private final Id driverId;
+    transient private final Id<Person> driverId;
     private int ridership = 0;
     private int capacity;
 
@@ -25,7 +26,7 @@ class VehicleTracker implements Serializable {
     private DwellEvent lastDwellEvent;
     private List<DwellEvent> stopsVisited = new ArrayList<>();
 
-    public VehicleTracker(FullDeparture fullDeparture, Id driverId, int capacity) {
+    public VehicleTracker(FullDeparture fullDeparture, Id<Person> driverId, int capacity) {
         super();
         this.fullDeparture = fullDeparture;
         this.driverId = driverId;

@@ -21,7 +21,8 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -33,17 +34,17 @@ import org.matsim.vehicles.Vehicle;
 
 class VehicularDepartureHandler implements DepartureHandler {
 
-    private static final Logger log = Logger.getLogger(VehicularDepartureHandler.class);
+    private static final Logger log = LogManager.getLogger(VehicularDepartureHandler.class);
 
 	private int cntTeleportVehicle = 0;
 
 	private final VehicleBehavior vehicleBehavior;
 
-	private final QNetsimEngine qNetsimEngine;
+	private final QNetsimEngineI qNetsimEngine;
 
 	private final Collection<String> transportModes;
 
-	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig) {
+	VehicularDepartureHandler(QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
 		this.transportModes =qsimConfig.getMainModes();

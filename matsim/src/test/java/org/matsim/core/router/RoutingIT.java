@@ -22,7 +22,8 @@ package org.matsim.core.router;
 
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,15 +41,19 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RoutingIT {
-	/*package*/ static final Logger log = Logger.getLogger(RoutingIT.class);
+	/*package*/ static final Logger log = LogManager.getLogger(RoutingIT.class);
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -82,7 +87,20 @@ public class RoutingIT {
 			}
 		});
 	}
-	@Test	
+	@Test
+	public void testSpeedyDijkstra() {
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "SpeedyDijkstra";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new SpeedyDijkstraFactory();
+			}
+		});
+	}
+	@Test
 	public void testDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
 			@Override
@@ -143,7 +161,7 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new AStarLandmarksFactory();
+				return new AStarLandmarksFactory(2);
 			}
 		});
 	}
@@ -156,7 +174,20 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarLandmarksFactory();
+				return new FastAStarLandmarksFactory(2);
+			}
+		});
+	}
+	@Test
+	public void testSpeedyALT() {
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "SpeedyALT";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new SpeedyALTFactory();
 			}
 		});
 	}
@@ -205,6 +236,7 @@ public class RoutingIT {
 					public void install() {
 						install(new ScenarioByInstanceModule(scenario));
 						addTravelTimeBinding("car").toInstance(calculator);
+						install(new TimeInterpretationModule());
 						addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
 							@Override
 							public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
@@ -218,7 +250,7 @@ public class RoutingIT {
 		});
 
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
-		final PersonAlgorithm router = new PlanRouter(tripRouter);
+		final PersonAlgorithm router = new PlanRouter(tripRouter, injector.getInstance(TimeInterpretation.class));
 		
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
 			router.run(p);

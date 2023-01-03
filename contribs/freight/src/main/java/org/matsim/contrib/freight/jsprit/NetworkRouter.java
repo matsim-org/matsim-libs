@@ -13,7 +13,8 @@
 package org.matsim.contrib.freight.jsprit;
 
 import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.router.TimeAndSpacePlanRouter;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.controler.CarrierTimeAndSpaceTourRouter;
 
 /**
  * Router that routes {@link CarrierPlan}.
@@ -31,8 +32,11 @@ public class NetworkRouter {
 	 * @param {@link CarrierPlan}
 	 * @param {@link NetworkBasedTransportCosts}
 	 */
-	public static void routePlan(CarrierPlan plan, NetworkBasedTransportCosts netbasedTransportCosts){
-		new TimeAndSpacePlanRouter(netbasedTransportCosts.getRouter(), netbasedTransportCosts.getNetwork(), netbasedTransportCosts.getTravelTime()).run(plan);
+	public static void routePlan(CarrierPlan plan, VRPTransportCosts freightTransportCosts){
+		if( plan == null) throw new IllegalStateException("plan is missing.");
+		for( ScheduledTour tour : plan.getScheduledTours()){
+			new CarrierTimeAndSpaceTourRouter( freightTransportCosts.getRouter(), freightTransportCosts.getNetwork(), freightTransportCosts.getTravelTime()).route(tour );
+		}
 	}
 
 }

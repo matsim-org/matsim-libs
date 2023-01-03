@@ -20,24 +20,16 @@
 
 package org.matsim.core.router.costcalculators;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Collections;
 import java.util.Random;
-import java.util.Set;
 
 /**
- * A simple cost calculator which only respects time and distance to calculate generalized costs
- *
  * @author mrieser
  */
 final class RandomizingTimeDistanceTravelDisutility implements TravelDisutility {
@@ -75,7 +67,7 @@ final class RandomizingTimeDistanceTravelDisutility implements TravelDisutility 
 		if ( sigma != 0. ) {
 			if ( person==null ) {
 				throw new RuntimeException("you cannot use the randomzing travel disutility without person.  If you need this without a person, set"
-						+ "sigma to zero.") ;
+						+ " sigma to zero. If you are loading a scenario from a config, set the routingRandomness in the plansCalcRoute config group to zero.") ;
 			}
 			if ( person != prevPerson ) {
 				prevPerson = person ;

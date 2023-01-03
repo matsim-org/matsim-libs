@@ -20,10 +20,14 @@
 
 package org.matsim.contrib.eventsBasedPTRouter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+import org.matsim.contrib.eventsBasedPTRouter.vehicleOccupancy.VehicleOccupancy;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -33,10 +37,6 @@ import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.contrib.eventsBasedPTRouter.vehicleOccupancy.VehicleOccupancy;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * TravelTime and TravelDisutility calculator to be used with the transit network used for transit routing.
@@ -57,7 +57,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWSV extends TransitRoute
 	private final double timeSlot;
 	
 	public TransitRouterNetworkTravelTimeAndDisutilityWSV(final TransitRouterConfig config, TransitRouterNetworkWW routerNetwork, WaitTime waitTime, StopStopTime stopStopTime, VehicleOccupancy vehicleOccupancy, TravelTimeCalculatorConfigGroup tTConfigGroup, QSimConfigGroup qSimConfigGroup, PreparedTransitSchedule preparedTransitSchedule) {
-		this(config, routerNetwork, waitTime, stopStopTime, vehicleOccupancy, tTConfigGroup, qSimConfigGroup.getStartTime(), qSimConfigGroup.getEndTime(), preparedTransitSchedule);
+		this(config, routerNetwork, waitTime, stopStopTime, vehicleOccupancy, tTConfigGroup, qSimConfigGroup.getStartTime().seconds(), qSimConfigGroup.getEndTime().seconds(), preparedTransitSchedule);
 	}
 	public TransitRouterNetworkTravelTimeAndDisutilityWSV(final TransitRouterConfig config, TransitRouterNetworkWW routerNetwork, WaitTime waitTime, StopStopTime stopStopTime, VehicleOccupancy vehicleOccupancy, TravelTimeCalculatorConfigGroup tTConfigGroup, double startTime, double endTime, PreparedTransitSchedule preparedTransitSchedule) {
 		super(config, preparedTransitSchedule);

@@ -6,6 +6,9 @@
         <param name="chargeTimeStep" value="5"/>
         <param name="chargersFile" value="chargers.xml"/>
         <param name="timeProfiles" value="true"/>
+	</module>
+
+	<module name="vehicles">
         <param name="vehiclesFile" value="evehicles.xml"/>
     </module>
 
@@ -59,7 +62,7 @@
         </parameterset>
 
         <parameterset type="activityParams">
-            <param name="activityType" value="car charging"/>
+            <param name="activityType" value="car charging interaction"/>
             <param name="typicalDuration" value="01:30:00"/>
             <param name="openingTime" value="07:30:00"/>
             <param name="closingTime" value="21:30:00"/>

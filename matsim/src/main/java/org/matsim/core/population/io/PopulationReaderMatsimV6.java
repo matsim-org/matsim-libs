@@ -19,35 +19,47 @@
 
 package org.matsim.core.population.io;
 
-import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Stack;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Stack;
+import com.google.inject.Inject;
 
 /**
  * A reader for plans files of MATSim according to <code>population_v6.dtd</code>.
@@ -57,7 +69,7 @@ import java.util.Stack;
  * @author balmermi
  */
 /* deliberately package */ class PopulationReaderMatsimV6 extends MatsimXmlParser implements MatsimReader {
-    private static final Logger log = Logger.getLogger(PopulationReaderMatsimV6.class);
+    private static final Logger log = LogManager.getLogger(PopulationReaderMatsimV6.class);
 
 	private final static String POPULATION = "population";
 	private final static String PERSON = "person";
@@ -161,7 +173,7 @@ import java.util.Stack;
 						currAttributes = curract.getAttributes();
 						break;
 					case LEG:
-						currAttributes = currleg.getAttributes();
+						currAttributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 						break;
 					default:
 						throw new RuntimeException( context.peek() );
@@ -198,19 +210,29 @@ import java.util.Stack;
 				this.attributesReader.endTag( name , content , context );
 				break;
 			case ATTRIBUTES:
-				if (context.peek().equals(POPULATION)) {
-					String inputCRS = ProjectionUtils.getCRS(scenario.getPopulation());
+				switch( context.peek() ) {
+					case POPULATION:
+						String inputCRS = ProjectionUtils.getCRS(scenario.getPopulation());
 
-					if (inputCRS != null && targetCRS != null) {
-						if (externalInputCRS != null) {
-							// warn or crash?
-							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+						if (inputCRS != null && targetCRS != null) {
+							if (externalInputCRS != null) {
+								// warn or crash?
+								log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+							}
+							coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
+							ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
 						}
-						coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
-						ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
-					}
+						break;
+					case LEG:
+						Object routingMode = currAttributes.getAttribute(TripStructureUtils.routingMode);
+						if (Objects.nonNull(routingMode) && routingMode instanceof String) {
+							currAttributes.removeAttribute(TripStructureUtils.routingMode);
+							currleg.setRoutingMode((String) routingMode);
+						}
+						AttributesUtils.copyTo(currAttributes, currleg.getAttributes());
+						break;
 				}
-			    break;
+				break;
 			case PLAN:
 				if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
 					((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
@@ -264,27 +286,59 @@ import java.util.Stack;
 	}
 
 	private void startAct(final Attributes atts) {
-		if (atts.getValue(ATTR_ACT_LINK) != null) {
-			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			final Id<Link> linkId1 = linkId;
-			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
+		final String actType = atts.getValue(ATTR_ACT_TYPE);
+		final boolean isStageActivity = StageActivityTypeIdentifier.isStageActivity(actType);
+		if (atts.getValue(ATTR_ACT_FACILITY) != null) {
+			final Id<ActivityFacility> facilityId = Id.create(atts.getValue(ATTR_ACT_FACILITY), ActivityFacility.class);
+			if (isStageActivity) {
+				this.curract = PopulationUtils.createInteractionActivityFromFacilityId(actType, facilityId);
+			} else {
+				this.curract = PopulationUtils.createActivityFromFacilityId(actType, facilityId);
+			}
+			if (atts.getValue(ATTR_ACT_LINK) != null) {
+				final Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
+				this.curract.setLinkId(linkId);
+			}
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-				final Coord coord = parseCoord( atts );
+				final Coord coord = parseCoord(atts);
+				this.curract.setCoord(coord);
+			}
+		} else if (atts.getValue(ATTR_ACT_LINK) != null) {
+			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
+			if (isStageActivity) {
+				this.curract = PopulationUtils.createInteractionActivityFromLinkId(actType, linkId);
+			} else {
+				this.curract = PopulationUtils.createActivityFromLinkId(actType, linkId);
+			}
+			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
+				final Coord coord = parseCoord(atts);
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-			final Coord coord = parseCoord( atts );
-			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
+			final Coord coord = parseCoord(atts);
+			if (isStageActivity) {
+				this.curract = PopulationUtils.createInteractionActivityFromCoord(actType, coord);
+			} else {
+				this.curract = PopulationUtils.createActivityFromCoord(actType, coord);
+			}
 		} else {
-			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
+			throw new IllegalArgumentException("In this version of MATSim either the facility, the link or the coords must be specified for an Act.");
 		}
-		this.curract.setStartTime(Time.parseTime(atts.getValue(ATTR_ACT_STARTTIME)));
-		this.curract.setMaximumDuration(Time.parseTime(atts.getValue(ATTR_ACT_MAXDUR)));
-		this.curract.setEndTime(Time.parseTime(atts.getValue(ATTR_ACT_ENDTIME)));
-		String fId = atts.getValue(ATTR_ACT_FACILITY);
-		if (fId != null) {
-			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
+
+		final OptionalTime startTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME));
+		final OptionalTime duration = Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR));
+		final OptionalTime endTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME));
+
+		// Check whether the given times match the assumptions made in InteractionActivity. Otherwise, convert it to a regular Activity.
+		if (isStageActivity && (startTime.isDefined() || endTime.isDefined() || duration.isUndefined() || duration.seconds() > 0.0)) {
+			this.curract = PopulationUtils.createActivity(this.curract);
+		} else {
+			startTime.ifDefinedOrElse(this.curract::setStartTime, this.curract::setStartTimeUndefined);
+			duration.ifDefinedOrElse(this.curract::setMaximumDuration, this.curract::setMaximumDurationUndefined);
+			endTime.ifDefinedOrElse(this.curract::setEndTime, this.curract::setEndTimeUndefined);
 		}
+		this.currplan.addActivity(this.curract);
+
 		if (this.routeDescription != null) {
 			finishLastRoute();
 		}
@@ -344,8 +398,8 @@ import java.util.Stack;
 				}
 			}
 		}
-		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+		if (this.currRoute.getTravelTime().isUndefined()) {
+			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
 		this.routeDescription = null;
@@ -381,8 +435,10 @@ import java.util.Stack;
 			mode = "undefined";
 		}
 		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
-		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
-		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
+		Time.parseOptionalTime(atts.getValue(ATTR_LEG_DEPTIME))
+				.ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
+		Time.parseOptionalTime(atts.getValue(ATTR_LEG_TRAVTIME))
+				.ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
 //		LegImpl r = this.currleg;
 //		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
@@ -411,8 +467,10 @@ import java.util.Stack;
 		this.currleg.setRoute(this.currRoute);
 
 		if (atts.getValue("trav_time") != null) {
-			this.currRoute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+			Time.parseOptionalTime(atts.getValue("trav_time"))
+					.ifDefinedOrElse(currRoute::setTravelTime, currRoute::setTravelTimeUndefined);
 		}
+
 		if (atts.getValue("distance") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("distance")));
 		}
@@ -451,8 +509,8 @@ import java.util.Stack;
 				}
 			}
 		}
-		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+		if (this.currRoute.getTravelTime().isUndefined()) {
+			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
 		if (this.currRoute.getEndLinkId() != null) {

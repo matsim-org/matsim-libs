@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -38,7 +37,7 @@ public class PersonLeavesVehicleEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	
 	private final Id<Person> personId;
-	private final Id<Vehicle> vehicleId;
+	private Id<Vehicle> vehicleId;
 
 	/*package*/ public PersonLeavesVehicleEvent(final double time, final Id<Person> personId, final Id<Vehicle> vehicleId) {
 		super(time);
@@ -54,7 +53,11 @@ public class PersonLeavesVehicleEvent extends Event implements HasPersonId {
 	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
-	
+
+	public void setVehicleId(Id<Vehicle> vehicleId) {
+		this.vehicleId = vehicleId;
+	}
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;

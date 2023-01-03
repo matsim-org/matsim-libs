@@ -63,7 +63,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 	private Population getTestPopulation() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "network.xml"));
+		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "network.xml"));
 
 		Link link1 = network.getLinks().get(Id.create(1, Link.class));
 		Link link20 = network.getLinks().get(Id.create(20, Link.class));

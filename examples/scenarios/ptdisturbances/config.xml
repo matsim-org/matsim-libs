@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="controler" >
+		<!-- Default=1000;  -->
+		<param name="lastIteration" value="0" />
+		<param name="outputDirectory" value="./scenarios/ptdisturbances/output/pt3-pt5" />
+		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+	</module>
+	<module name="facilities" >
+		<!-- A prefix to be used for auto-generated IDs. -->
+		<param name="idPrefix" value="" />
+	</module>
+	<module name="network" >
+		<param name="inputNetworkFile" value="./network.xml" />
+	</module>
+	<module name="planCalcScore" >
+		<param name="writeExperiencedPlans" value="true" />
+		<parameterset type="scoringParameters" >
+			<parameterset type="activityParams" >
+				<param name="activityType" value="dummy" />
+				<!-- typical duration of activity.  needs to be defined and non-zero.  in sec. -->
+				<param name="typicalDuration" value="02:00:00" />
+			</parameterset>
+			<parameterset type="activityParams" >
+				<param name="activityType" value="work" />
+				<param name="scoringThisActivityAtAll" value="false" />
+				<param name="typicalDuration" value="07:00:00" />
+			</parameterset>
+			<parameterset type="activityParams" >
+				<param name="activityType" value="home" />
+				<param name="scoringThisActivityAtAll" value="false" />
+				<param name="typicalDuration" value="16:00:00" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="car" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="walk" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="bike" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="ride" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="other" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="pt" />
+			</parameterset>
+		</parameterset>
+	</module>
+	<module name="plans" >
+		<param name="inputPlansFile" value="./population_pt3-pt5.xml" />
+	</module>
+	<module name="planscalcroute" >
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="bike" />
+			<param name="teleportedModeSpeed" value="4.166666666666667" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="walk" />
+			<param name="teleportedModeSpeed" value="0.8333333333333333" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="access_walk" />
+			<param name="teleportedModeSpeed" value="0.8333333333333333" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="egress_walk" />
+			<param name="teleportedModeSpeed" value="0.8333333333333333" />
+		</parameterset>
+	</module>
+	<module name="qsim" >
+		<param name="endTime" value="36:00:00" />
+		<!-- decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false -->
+<!--		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="false" />-->
+		<!-- snapshotStyle. One of: equiDist queue withHoles withHolesAndShowHoles kinematicWaves  -->
+<!--		<param name="snapshotStyle" value="queue" />-->
+	</module>
+	<module name="transit" >
+		<!-- Input file containing the transit schedule to be simulated. -->
+		<param name="transitScheduleFile" value="./schedule_wo-disturbance.xml" />
+		<!-- Set this parameter to true if transit should be simulated, false if not. -->
+		<param name="useTransit" value="true" />
+		<!-- Input file containing the vehicles used by the departures in the transit schedule. -->
+		<param name="vehiclesFile" value="./vehicles.xml" />
+	</module>
+	<module name="transitRouter" >
+		<!-- step size to increase searchRadius if no stops are found -->
+		<param name="extensionRadius" value="2000.0" />
+		<!-- the radius in which stop locations are searched, given a start or target coordinate -->
+		<param name="searchRadius" value="2000.0" />
+	</module>
+
+</config>

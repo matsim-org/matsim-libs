@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.analysis.vsp.qgis.GraduatedSymbolRenderer;
@@ -37,7 +38,7 @@ import org.matsim.core.utils.misc.ExeRunner;
  * @author nagel, dziemke
  */
 public class VisualizationUtils {
-	public static final Logger log = Logger.getLogger(VisualizationUtils.class);
+	public static final Logger log = LogManager.getLogger(VisualizationUtils.class);
 	private VisualizationUtils(){} // do not instantiate
 
 	
@@ -192,7 +193,7 @@ public class VisualizationUtils {
 			// if OS is Macintosh
 			// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
 		} else if ( osName.contains("Mac") || osName.contains("mac") ) {
-			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
+			String cmd = "/Applications/QGIS3.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
 					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
 
 			String stdoutFileName = workingDirectory + "snapshot_" + mode + ".log";

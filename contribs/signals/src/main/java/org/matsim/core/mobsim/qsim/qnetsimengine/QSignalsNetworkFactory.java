@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import com.google.inject.Inject;
@@ -42,7 +42,7 @@ import com.google.inject.Inject;
  * 
  * @author tthunig
  */
-public class QSignalsNetworkFactory implements QNetworkFactory{
+public final class QSignalsNetworkFactory implements QNetworkFactory{
 
 	private final QNetworkFactory delegate;
 	
@@ -68,7 +68,7 @@ public class QSignalsNetworkFactory implements QNetworkFactory{
 		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
 		linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
 		
-		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = AbstractQNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 		
 		this.netsimEngine = simEngine1;
 		this.context = new NetsimEngineContext( events, scenario.getNetwork().getEffectiveCellSize(), agentCounter, agentSnapshotInfoBuilder, 
@@ -79,7 +79,7 @@ public class QSignalsNetworkFactory implements QNetworkFactory{
 
 	@Override
 	public QNodeI createNetsimNode( Node node ) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, scenario.getConfig().qsim() ) ;
 		
 		// check whether turn acceptance logic is enabled
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),

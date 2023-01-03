@@ -24,7 +24,8 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -35,20 +36,24 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Provider;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.
@@ -57,7 +62,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 
 public class PlansCalcRouteWithTollOrNotTest {
-	private static final Logger log = Logger.getLogger( PlansCalcRouteWithTollOrNotTest.class );
+	private static final Logger log = LogManager.getLogger( PlansCalcRouteWithTollOrNotTest.class );
 
 	@Rule
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
@@ -73,10 +78,10 @@ public class PlansCalcRouteWithTollOrNotTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
-		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress?" + config.plansCalcRoute().getAccessEgressType() );
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
@@ -92,27 +97,33 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Id<Person> id1 = Id.createPersonId("1");
 
 		// case 1: toll only in morning, it is cheaper to drive around
-		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress?" + config.plansCalcRoute().getAccessEgressType() );
 		runOnAll(testee(scenario, toll), population);
-		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress?" + config.plansCalcRoute().getAccessEgressType() );
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
 		Cost afternoonCost = toll.createAndAddCost(14*3600, 18*3600, 0.12);
-		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress? " + config.plansCalcRoute().getAccessEgressType() );
 		runOnAll(testee(scenario, toll), population);
-		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress? " + config.plansCalcRoute().getAccessEgressType() );
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 3: change the second leg to a non-car mode, than it should be the same as case 1
-		String oldMode = getLeg3(config, population, id1).getMode();
-		getLeg3(config, population, id1).setMode(TransportMode.pt);
+		String oldLegMode = getLeg3(config, population, id1).getMode();
+		String oldRoutingMode = TripStructureUtils.getRoutingMode(getLeg3(config, population, id1));
+		Leg leg = getLeg3(config, population, id1);
+//		leg.setMode(TransportMode.pt);
+		leg.setRoute(null);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
 		runOnAll(testee(scenario, toll), population);
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		// and change the mode back
-		getLeg3(config, population, id1).setMode(oldMode);
+		Leg leg3 = getLeg3(config, population, id1);
+		leg3.setMode(oldLegMode);
+		TripStructureUtils.setRoutingMode(leg3, oldRoutingMode);
 
 		// case 4: now remove the costs and add them again, but with a higher amount
 		toll.removeCost(morningCost);
@@ -129,7 +140,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		for ( PlanElement pe : planElements ) {
 			log.warn( pe );
 		}
-		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( config.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			return (Leg) (planElements.get(1));
 		} else {
 			return (Leg) (planElements.get(3));
@@ -143,15 +154,24 @@ public class PlansCalcRouteWithTollOrNotTest {
 	}
 
 	private PlansCalcRouteWithTollOrNot testee(final Scenario scenario, final RoadPricingScheme toll) {
-		return Injector.createInjector(
-				scenario.getConfig(),
-				new RoadPricingModuleDefaults(toll),
-				/* FIXME Check/understand why the following is INcorrect, jwj '19. What's the difference? */
-//				RoadPricingUtils.createModule(toll),
+//		return Injector.createInjector(
+//				scenario.getConfig(),
+//				new RoadPricingModuleDefaults(toll),
+//				/* FIXME Check/understand why the following is INcorrect, jwj '19. What's the difference? */
+////				RoadPricingUtils.createModule(toll),
+//				new ScenarioByInstanceModule(scenario),
+//				new ControlerDefaultCoreListenersModule(),
+//				new NewControlerModule())
+//				.getInstance(PlansCalcRouteWithTollOrNot.class);
+		
+		Provider<TripRouter> tripRouterProvider = Injector.createInjector(scenario.getConfig(),
+				new RoadPricingModuleDefaults(toll), 
 				new ScenarioByInstanceModule(scenario),
-				new ControlerDefaultCoreListenersModule(),
-				new NewControlerModule())
-				.getInstance(PlansCalcRouteWithTollOrNot.class);
+				new ControlerDefaultCoreListenersModule(), 
+				new NewControlerModule()).getProvider(TripRouter.class);
+
+			return new PlansCalcRouteWithTollOrNot( toll, tripRouterProvider, TimeInterpretation.create(scenario.getConfig()) ) ;
+			// yy might be more plausible to get the full class out of the injector, but that ain't that easy ...  kai, oct'19
 	}
 
 	/**
@@ -164,7 +184,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		toll.setType("area");
 		Id.createLinkId("7");
 		toll.createAndAddCost(6*3600, 10*3600, 0.06);
@@ -190,7 +210,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("3"));
 		toll.addLink(Id.createLinkId("5"));
@@ -209,11 +229,10 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 	private static Leg getLeg3(Config config, Population population, Id<Person> id1) {
 		List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements() ;
-		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( config.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			return (Leg) (planElements.get(3));
 		} else {
-			StageActivityTypes adHocTypes = activityType -> activityType.contains("interaction");
-			List<Trip> trips = TripStructureUtils.getTrips(planElements, adHocTypes) ;
+			List<Trip> trips = TripStructureUtils.getTrips(planElements) ;
 			List<Leg> legs = trips.get(1).getLegsOnly() ;
 			if ( legs.size()==1 ) {
 				return legs.get(0) ;
@@ -230,7 +249,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));

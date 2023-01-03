@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
@@ -24,9 +22,9 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
@@ -73,31 +71,45 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	// not sufficient, people should use AbstractController.  kai, jan'13
 
 	public static final String DIRECTORY_ITERS = "ITERS";
-	public static final String FILENAME_CONFIG = "config.xml";
-	public static final String FILENAME_CONFIG_REDUCED = "config_reduced.xml";
-	public static final String FILENAME_NETWORK = "network.xml.gz";
-	public static final String FILENAME_LANES = "lanes.xml.gz";
-	public static final String FILENAME_CHANGE_EVENTS_XML = "change_events.xml.gz";
-	public static final String FILENAME_COUNTS = "counts.xml.gz" ;
-	public static final String FILENAME_POPULATION = "plans.xml.gz";
-	public static final String FILENAME_EXPERIENCED_PLANS = "experienced_plans.xml.gz";
-	public static final String FILENAME_PERSON_ATTRIBUTES = "personAttributes.xml.gz" ;
-	public static final String FILENAME_HOUSEHOLDS = "households.xml.gz";
-	public static final String FILENAME_FACILITIES = "facilities.xml.gz";
-	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
-	public static final String FILENAME_TRANSIT_SCHEDULE = "transitSchedule.xml.gz";
-	public static final String FILENAME_TRANSIT_VEHICLES = "transitVehicles.xml.gz";
-	public static final String FILENAME_VEHICLES = "vehicles.xml.gz";
-	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
-	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
-	public static final String OUTPUT_PREFIX = "output_";
+
+	public enum DefaultFiles {
+		config("config.xml"),
+		configReduced("config_reduced.xml"),
+		network("network.xml"),
+		lanes("lanes.xml"),
+		changeEvents("change_events.xml"),
+		counts("counts.xml"),
+		population("plans.xml"),
+		experiencedPlans("experienced_plans.xml"),
+		households("households.xml"),
+		facilities("facilities.xml"),
+		events("events.xml"),
+		eventsPb("events.pb"),
+		eventsJson("events.ndjson"),
+		transitSchedule("transitSchedule.xml"),
+		transitVehicles("transitVehicles.xml"),
+		vehicles("vehicles.xml"),
+		allVehicles("allVehicles.xml"),
+		linkstats("linkstats.txt"),
+		tripscsv("trips.csv"),
+		personscsv("persons.csv"),
+		legscsv("legs.csv"),
+        ;
+
+		final String filename;
+
+		DefaultFiles(String filename) {
+			this.filename = filename;
+		}
+	}
+
+	static final String OUTPUT_PREFIX = "output_";
 
 	public static final String DIVIDER = "###################################################";
 
-	private static final Logger log = Logger.getLogger(Controler.class);
+	private static final Logger log = LogManager.getLogger(Controler.class);
 
-	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
-		  "%d{ISO8601} %5p %C{1}:%L %m%n");
+	public static final PatternLayout DEFAULTLOG4JLAYOUT = PatternLayout.newBuilder().withPattern("%d{ISO8601} %5p %C{1}:%L %m%n").build();
 
 	private final Config config;
 	private Scenario scenario;
@@ -453,21 +465,6 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		});
 	}
 
-	/**
-	 * Allows you to set a factory for {@link org.matsim.core.router.TripRouter} instances.
-	 * Do this if your use-case requires custom routing logic, for instance if you
-	 * implement your own complex travel mode.
-	 * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
-	 */
-	@Deprecated // yyyy I don't think that it is plausible to have this as an official extension point. kai, mar'19
-	public final void setTripRouterFactory(final javax.inject.Provider<TripRouter> factory) {
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(TripRouter.class).toProvider(factory);
-			}
-		});
-	}
 	@Override
 	public final Controler addOverridingModule( AbstractModule abstractModule ) {
 		if (this.injectorCreated) {

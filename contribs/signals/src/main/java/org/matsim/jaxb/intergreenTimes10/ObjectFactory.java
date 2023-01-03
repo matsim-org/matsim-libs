@@ -8,9 +8,9 @@
 
 package org.matsim.jaxb.intergreenTimes10;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 
 
@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
  * 
  */
 @XmlRegistry
-public class ObjectFactory {
+public final class ObjectFactory {
 
     private final static QName _Coordinate_QNAME = new QName("http://www.matsim.org/files/dtd", "coordinate");
 

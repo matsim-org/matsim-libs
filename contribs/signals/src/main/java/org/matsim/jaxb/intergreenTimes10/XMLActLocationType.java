@@ -8,9 +8,9 @@
 
 package org.matsim.jaxb.intergreenTimes10;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -38,10 +38,10 @@ import javax.xml.bind.annotation.XmlType;
     "facilityId",
     "linkId"
 })
-public class XMLActLocationType {
+final class XMLActLocationType {
 
-    protected XMLFacilityId facilityId;
-    protected XMLLinkId linkId;
+    private XMLFacilityId facilityId;
+    private XMLLinkId linkId;
 
     /**
      * Gets the value of the facilityId property.

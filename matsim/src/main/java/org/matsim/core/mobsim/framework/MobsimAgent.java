@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 
 /**
@@ -94,8 +95,9 @@ public interface MobsimAgent extends NetworkAgent, Identifiable<Person> {
      * it is probably used by the TeleportationEngine to obtain the duration of the leg; it is probably ignored by all other modes.
      * One can probably return "null" if one wants an exception when this is passed to the teleportation engine, or "1"(sec) if
      * one wants some default behavior.
+     * @return
      */
-    public Double getExpectedTravelTime();
+    public OptionalTime getExpectedTravelTime();
 
     /**
      * This returns the expected travel distance of a leg that was just started.

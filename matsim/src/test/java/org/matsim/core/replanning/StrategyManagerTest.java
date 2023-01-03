@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
@@ -68,16 +67,16 @@ public class StrategyManagerTest {
 		StrategyCounter strategy3 = new StrategyCounter(new RandomPlanSelector<Plan, Person>());
 		StrategyCounter strategy4 = new StrategyCounter(new RandomPlanSelector<Plan, Person>());
 
-		manager.addStrategyForDefaultSubpopulation(strategy1, 0.10);
-		manager.addStrategyForDefaultSubpopulation(strategy2, 0.20);
-		manager.addStrategyForDefaultSubpopulation(strategy3, 0.30);
-		manager.addStrategyForDefaultSubpopulation(strategy4, 0.40);
+		manager.addStrategy( strategy1, null, 0.10 );
+		manager.addStrategy( strategy2, null, 0.20 );
+		manager.addStrategy( strategy3, null, 0.30 );
+		manager.addStrategy( strategy4, null, 0.40 );
 
 
 		// add ChangeRequests
-		manager.addChangeRequestForDefaultSubpopulation(11, strategy2, 0.0);
-		manager.addChangeRequestForDefaultSubpopulation(11, strategy3, 0.0);
-		manager.addChangeRequestForDefaultSubpopulation(12, strategy4, 0.1);
+		manager.addChangeRequest( 11, strategy2, null, 0.0 );
+		manager.addChangeRequest( 11, strategy3, null, 0.0 );
+		manager.addChangeRequest( 12, strategy4, null, 0.1 );
 
 		// run iteration 1
 		manager.run(population, 1, null);
@@ -156,8 +155,8 @@ public class StrategyManagerTest {
 		StrategyCounter strategy1 = new StrategyCounter(new RandomPlanSelector());
 		StrategyCounter strategy2 = new StrategyCounter(new RandomPlanSelector());
 
-		manager.addStrategyForDefaultSubpopulation(strategy1, 0.10);
-		manager.addStrategyForDefaultSubpopulation(strategy2, 0.20);
+		manager.addStrategy( strategy1, null, 0.10 );
+		manager.addStrategy( strategy2, null, 0.20 );
 
 		// run iteration 1
 		manager.run(population, 1, null);
@@ -170,7 +169,7 @@ public class StrategyManagerTest {
 		strategy2.resetCounter();
 
 		// remove 2nd strategy
-		manager.removeStrategyForDefaultSubpopulation(strategy2);
+		manager.removeStrategy( strategy2, null );
 
 		// run iteration 2
 		manager.run(population, 2, null);
@@ -183,7 +182,7 @@ public class StrategyManagerTest {
 		strategy2.resetCounter();
 
 		// try to remove strategy2 again
-		manager.removeStrategyForDefaultSubpopulation(strategy2);
+		manager.removeStrategy( strategy2, null );
 
 		// run iteration 3
 		manager.run(population, 3, null);
@@ -228,7 +227,7 @@ public class StrategyManagerTest {
 
 		StrategyManager manager = new StrategyManager();
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new TestPlanSelector());
-		manager.addStrategyForDefaultSubpopulation(strategy, 1.0);
+		manager.addStrategy( strategy, null, 1.0 );
 
 		// in each "iteration", an unscored plans should be selected
 		for (int i = 0; i < 4; i++) {
@@ -254,7 +253,7 @@ public class StrategyManagerTest {
 	public void testSetPlanSelectorForRemoval() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
-		manager.addStrategyForDefaultSubpopulation(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
+		manager.addStrategy( new PlanStrategyImpl(new RandomPlanSelector()), null, 1.0 );
 
 		// init Population
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -268,7 +267,7 @@ public class StrategyManagerTest {
 
 		// run with default settings
 		manager.setMaxPlansPerAgent(plans.length - 2);
-		manager.run(pop, null);
+		manager.run(pop, -1,null);
 
 		assertEquals("wrong number of plans.", 5, p.getPlans().size());
 		// default of StrategyManager is to remove worst plans:
@@ -279,7 +278,7 @@ public class StrategyManagerTest {
 		// change plan selector for removal and run again
 		manager.setPlanSelectorForRemoval(new BestPlanSelector<Plan, Person>());
 		manager.setMaxPlansPerAgent(plans.length - 4);
-		manager.run(pop, null);
+		manager.run(pop, -1,null);
 
 		assertEquals("wrong number of plans.", 3, p.getPlans().size());
 		// default of StrategyManager is to remove worst plans:
@@ -295,12 +294,12 @@ public class StrategyManagerTest {
 		PlanStrategy str1 = new PlanStrategyImpl(new RandomPlanSelector());
 		PlanStrategy str2 = new PlanStrategyImpl(new RandomPlanSelector());
 		PlanStrategy str3 = new PlanStrategyImpl(new RandomPlanSelector());
-		
-		manager.addStrategyForDefaultSubpopulation(str1, 1.0);
-		manager.addStrategyForDefaultSubpopulation(str2, 2.0);
-		manager.addStrategyForDefaultSubpopulation(str3, 0.5);
-		
-		List<GenericPlanStrategy<Plan, Person>> strategies = manager.getStrategiesOfDefaultSubpopulation();
+
+		manager.addStrategy( str1, null, 1.0 );
+		manager.addStrategy( str2, null, 2.0 );
+		manager.addStrategy( str3, null, 0.5 );
+
+		List<GenericPlanStrategy<Plan, Person>> strategies = manager.getStrategies( null );
 		Assert.assertEquals(3, strategies.size());
 
 		Assert.assertEquals(str1, strategies.get(0));
@@ -315,12 +314,12 @@ public class StrategyManagerTest {
 		PlanStrategy str1 = new PlanStrategyImpl(new RandomPlanSelector());
 		PlanStrategy str2 = new PlanStrategyImpl(new RandomPlanSelector());
 		PlanStrategy str3 = new PlanStrategyImpl(new RandomPlanSelector());
-		
-		manager.addStrategyForDefaultSubpopulation(str1, 1.0);
-		manager.addStrategyForDefaultSubpopulation(str2, 2.0);
-		manager.addStrategyForDefaultSubpopulation(str3, 0.5);
-		
-		List<Double> weights = manager.getWeightsOfDefaultSubpopulation();
+
+		manager.addStrategy( str1, null, 1.0 );
+		manager.addStrategy( str2, null, 2.0 );
+		manager.addStrategy( str3, null, 0.5 );
+
+		List<Double> weights = manager.getWeights( null );
 		Assert.assertEquals(3, weights.size());
 
 		Assert.assertEquals(1.0, weights.get(0), 1e-8);
@@ -335,19 +334,19 @@ public class StrategyManagerTest {
 		PlanStrategy str1 = new PlanStrategyImpl(new RandomPlanSelector());
 		PlanStrategy str2 = new PlanStrategyImpl(new RandomPlanSelector());
 		PlanStrategy str3 = new PlanStrategyImpl(new RandomPlanSelector());
-		
-		manager.addStrategyForDefaultSubpopulation(str1, 1.0);
-		manager.addStrategyForDefaultSubpopulation(str2, 2.0);
-		manager.addStrategyForDefaultSubpopulation(str3, 0.5);
 
-		manager.addChangeRequestForDefaultSubpopulation(5, str2, 3.0);
-		manager.addChangeRequestForDefaultSubpopulation(10, str3, 1.0);
+		manager.addStrategy( str1, null, 1.0 );
+		manager.addStrategy( str2, null, 2.0 );
+		manager.addStrategy( str3, null, 0.5 );
+
+		manager.addChangeRequest( 5, str2, null, 3.0 );
+		manager.addChangeRequest( 10, str3, null, 1.0 );
 
 		Population pop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 	
 		manager.run(pop, 1, null);
-		
-		List<Double> weights = manager.getWeightsOfDefaultSubpopulation();
+
+		List<Double> weights = manager.getWeights( null );
 		Assert.assertEquals(3, weights.size());
 		
 		Assert.assertEquals(1.0, weights.get(0), 1e-8);
@@ -355,8 +354,8 @@ public class StrategyManagerTest {
 		Assert.assertEquals(0.5, weights.get(2), 1e-8);
 
 		manager.run(pop, 5, null);
-		
-		weights = manager.getWeightsOfDefaultSubpopulation();
+
+		weights = manager.getWeights( null );
 		Assert.assertEquals(3, weights.size());
 		
 		Assert.assertEquals(1.0, weights.get(0), 1e-8);
@@ -364,8 +363,8 @@ public class StrategyManagerTest {
 		Assert.assertEquals(0.5, weights.get(2), 1e-8);
 
 		manager.run(pop, 10, null);
-		
-		weights = manager.getWeightsOfDefaultSubpopulation();
+
+		weights = manager.getWeights( null );
 		Assert.assertEquals(3, weights.size());
 		
 		Assert.assertEquals(1.0, weights.get(0), 1e-8);

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -36,9 +37,9 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -55,7 +56,7 @@ import java.util.Map.Entry;
 @Deprecated
 final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
 	
-	private static final Logger log = Logger.getLogger(GexfPPaxCount.class);
+	private static final Logger log = LogManager.getLogger(GexfPPaxCount.class);
 	
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
 	private final static String FILENAME = "pPaxCount.gexf.gz";

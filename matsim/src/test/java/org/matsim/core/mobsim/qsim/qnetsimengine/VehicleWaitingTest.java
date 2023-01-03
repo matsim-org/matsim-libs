@@ -50,6 +50,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -133,6 +134,7 @@ public class VehicleWaitingTest {
 			plan.addActivity( orig );
 			for ( int lap=0; lap < nLaps; lap++ ) {
 				final Leg leg = popFact.createLeg( TransportMode.car );
+				TripStructureUtils.setRoutingMode(leg, TransportMode.car );
 				final NetworkRoute route =
 					RouteUtils.createLinkNetworkRouteImpl(link1.getId(), Collections.singletonList( link2.getId() ), link3.getId());
 				route.setVehicleId( Id.create(personId1, Vehicle.class) ); // QSim creates a vehicle per person, with the ids of the persons
@@ -146,6 +148,7 @@ public class VehicleWaitingTest {
 				}
 
 				final Leg secondLeg = popFact.createLeg( TransportMode.car );
+				TripStructureUtils.setRoutingMode(secondLeg, TransportMode.car );
 				final NetworkRoute secondRoute =
 					RouteUtils.createLinkNetworkRouteImpl(link3.getId(), Collections.<Id<Link>>emptyList(), link1.getId());
 

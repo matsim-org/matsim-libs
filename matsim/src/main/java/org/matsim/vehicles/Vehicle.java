@@ -20,12 +20,11 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * @author dgrether
  */
-public interface Vehicle extends Identifiable<Vehicle> {
-
-	public VehicleType getType();
-	
+public interface Vehicle extends Attributable, Identifiable<Vehicle> {
+	VehicleType getType();
 }

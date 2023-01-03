@@ -32,7 +32,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class TransitRouteStopTest extends MatsimTestCase {
 
 	protected TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
-		return new TransitRouteStopImpl(stop, arrivalDelay, departureDelay);
+		return new TransitRouteStopImpl.Builder().stop(stop).arrivalOffset(arrivalDelay).departureOffset(departureDelay).build();
 	}
 
 	public void testInitialization() {
@@ -41,8 +41,8 @@ public class TransitRouteStopTest extends MatsimTestCase {
 		double departureDelay = 5;
 		TransitRouteStop routeStop = createTransitRouteStop(stopFacility, arrivalDelay, departureDelay);
 		assertEquals(stopFacility, routeStop.getStopFacility());
-		assertEquals(arrivalDelay, routeStop.getArrivalOffset(), EPSILON);
-		assertEquals(departureDelay, routeStop.getDepartureOffset(), EPSILON);
+		assertEquals(arrivalDelay, routeStop.getArrivalOffset().seconds(), EPSILON);
+		assertEquals(departureDelay, routeStop.getDepartureOffset().seconds(), EPSILON);
 	}
 
 	public void testStopFacility() {

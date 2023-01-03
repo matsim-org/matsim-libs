@@ -5,7 +5,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /** 
  * Data structure that allows to register data boundaries, and then to count data in the thereby defined categories. 
@@ -17,7 +18,7 @@ import org.apache.log4j.Logger;
  * @param <K>
  */
 public final class Databins<K> {
-	private static final Logger log = Logger.getLogger(Databins.class) ;
+	private static final Logger log = LogManager.getLogger(Databins.class) ;
 	private Map<K,double[]> delegate = new TreeMap<>() ;
 	private double[] dataBoundaries ;
 	private final String typeName;

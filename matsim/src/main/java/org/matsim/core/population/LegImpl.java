@@ -22,51 +22,85 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
-/* deliberately package */  final class LegImpl  implements Leg {
+/* deliberately package */ final class LegImpl implements Leg {
+
+	private static final double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
 
 	private Route route = null;
 
-	private double depTime = Time.getUndefinedTime();
-	private double travTime = Time.getUndefinedTime();
+	private double depTime = UNDEFINED_TIME;
+	private double travTime = UNDEFINED_TIME;
 	private String mode;
+	private String routingMode;
 
-	private final Attributes attributes = new Attributes();
+	private Attributes attributes = null;
 
-	/* deliberately package */  LegImpl(final String transportMode) {
+	/* deliberately package */ LegImpl(final String transportMode) {
 		this.mode = transportMode;
 	}
 
+
+	private static OptionalTime asOptionalTime(double seconds) {
+		return Double.isInfinite(seconds) ? OptionalTime.undefined() : OptionalTime.defined(seconds);
+	}
+
 	@Override
-	public final String getMode() {
+	public String getMode() {
 		return this.mode;
 	}
 
 	@Override
 	public final void setMode(String transportMode) {
-		this.mode = transportMode;
+		this.mode = transportMode == null ? null : transportMode.intern();
+		TripStructureUtils.setRoutingMode( this, null );
+//		TripStructureUtils.setRoutingMode( this, null ); // setting routingMode to null leads to exceptions in AttributesXmlWriterDelegate.writeAttributes() : Class<?> clazz = objAttribute.getValue().getClass();
+		// (yyyy or maybe "transportMode" instead of "null"?? kai, oct'19)
 	}
 
 	@Override
-	public final double getDepartureTime() {
-		return this.depTime;
+	public final String getRoutingMode() {
+		return this.routingMode;
 	}
 
 	@Override
-	public final void setDepartureTime(final double depTime) {
+	public final void setRoutingMode(String routingMode) {
+		this.routingMode = routingMode == null ? null : routingMode.intern();
+	}
+
+	@Override
+	public OptionalTime getDepartureTime() {
+		return asOptionalTime(this.depTime);
+	}
+
+	@Override
+	public void setDepartureTime(final double depTime) {
 		this.depTime = depTime;
 	}
 
 	@Override
-	public final double getTravelTime() {
-		return this.travTime;
+	public void setDepartureTimeUndefined() {
+		this.depTime = UNDEFINED_TIME;
 	}
 
 	@Override
-	public final void setTravelTime(final double travTime) {
+	public OptionalTime getTravelTime() {
+		return asOptionalTime(this.travTime);
+	}
+
+	@Override
+	public void setTravelTime(final double travTime) {
 		this.travTime = travTime;
+	}
+
+	@Override
+	public void setTravelTimeUndefined() {
+		this.travTime = UNDEFINED_TIME;
 	}
 
 	@Override
@@ -75,22 +109,38 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final void setRoute(Route route) {
+	public void setRoute(Route route) {
 		this.route = route;
 	}
 
 	@Override
-	public final String toString() {
-		return "leg [mode=" + this.getMode() + "]" +
-				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
-				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
-				"[arrTime=" + Time.writeTime(this.getDepartureTime() + this.getTravelTime()) + "]" +
-				"[route=" + this.route + "]";
+	public String toString() {
+		return "leg [mode="
+				+ this.getMode()
+				+ "]"
+				+ "[depTime="
+				+ Time.writeTime(this.getDepartureTime())
+				+ "]"
+				+ "[travTime="
+				+ Time.writeTime(this.getTravelTime())
+				+ "]"
+				+ "[arrTime="
+				+ (getDepartureTime().isDefined() && getTravelTime().isDefined() ?
+				Time.writeTime(getDepartureTime().seconds() + getTravelTime().seconds()) :
+				Time.writeTime(OptionalTime.undefined()))
+				+ "]"
+				+ "[route="
+				+ this.route
+				+ "]";
 	}
+
 
 	@Override
 	public Attributes getAttributes() {
-		return attributes;
+		if (this.attributes != null) {
+			return this.attributes;
+		}
+		return new LazyAllocationAttributes(attributes -> this.attributes = attributes, () -> this.attributes);
 	}
 
 	//	private boolean locked;

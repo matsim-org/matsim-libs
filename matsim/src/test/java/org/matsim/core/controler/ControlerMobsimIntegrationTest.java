@@ -20,7 +20,8 @@
 package org.matsim.core.controler;
 
 import com.google.inject.Provider;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,12 +39,12 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ControlerMobsimIntegrationTest {
 
-	private final static Logger log = Logger.getLogger(ControlerMobsimIntegrationTest.class);
+	private final static Logger log = LogManager.getLogger(ControlerMobsimIntegrationTest.class);
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testRunMobsim_customMobsim() {
-		Config cfg = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		Config cfg = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("counting");
 		cfg.controler().setWritePlansInterval(0);

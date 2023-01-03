@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-targetNamespace="http://www.matsim.org/files/dtd"
-xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
-xml:lang="en">
+ targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd" 
+ elementFormDefault="qualified" 
+ xml:lang="en">
 <!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
 <!-- This xml schema contains xml definitions for household information in the MATSim framework  -->
 

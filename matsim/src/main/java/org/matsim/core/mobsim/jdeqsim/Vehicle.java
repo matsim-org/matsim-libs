@@ -21,7 +21,8 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -29,9 +30,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * Represents a vehicle.
@@ -40,19 +40,19 @@ import org.matsim.core.population.routes.NetworkRoute;
  */
 public class Vehicle extends SimUnit {
 
-	private static final Logger log = Logger.getLogger(Vehicle.class);
+	private static final Logger log = LogManager.getLogger(Vehicle.class);
 	private Person ownerPerson = null;
 	private Leg currentLeg = null;
 	private int legIndex;
 	private Id<Link> currentLinkId = null;
 	private int linkIndex;
 	private Id<Link>[] currentLinkRoute = null;
-	private final PlansConfigGroup.ActivityDurationInterpretation activityEndTimeInterpretation;
+	private final TimeInterpretation timeInterpretation;
 
-	public Vehicle(Scheduler scheduler, Person ownerPerson, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
+	public Vehicle(Scheduler scheduler, Person ownerPerson, TimeInterpretation timeInterpretation) {
 		super(scheduler);
 		this.ownerPerson = ownerPerson;
-		this.activityEndTimeInterpretation = activityDurationInterpretation;
+		this.timeInterpretation = timeInterpretation;
 		initialize();
 	}
 
@@ -92,7 +92,7 @@ public class Vehicle extends SimUnit {
 		setCurrentLeg((Leg) actsLegs.get(legIndex));
 		Activity firstAct = (Activity) actsLegs.get(0);
 		// an agent starts the first leg at the end_time of the fist act
-		double departureTime = firstAct.getEndTime();
+		double departureTime = firstAct.getEndTime().seconds();
 
 		// this is the link, where the first activity took place
 		setCurrentLinkId(firstAct.getLinkId());
@@ -280,7 +280,7 @@ public class Vehicle extends SimUnit {
 	}
 
 	public void scheduleEndLegMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getEndLegMessage(road.scheduler, this), road, scheduleTime);
+		sendMessage(MessageFactory.getEndLegMessage(road.scheduler, this, timeInterpretation), road, scheduleTime);
 	}
 
 	public void scheduleStartingLegMessage(double scheduleTime, Road road) {
@@ -292,9 +292,4 @@ public class Vehicle extends SimUnit {
 		sendMessage(dpMessage, road, scheduleTime);
 		return dpMessage;
 	}
-
-	public PlansConfigGroup.ActivityDurationInterpretation getActivityEndTimeInterpretation() {
-		return this.activityEndTimeInterpretation ;
-	}
-
 }

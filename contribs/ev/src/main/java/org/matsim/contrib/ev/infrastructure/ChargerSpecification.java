@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Link;
  */
 public interface ChargerSpecification extends Identifiable<Charger> {
 	String DEFAULT_CHARGER_TYPE = "default";
+	int DEFAULT_PLUG_COUNT = 1;
 
 	Id<Link> getLinkId();
 
@@ -47,7 +48,7 @@ public interface ChargerSpecification extends Identifiable<Charger> {
 	/**
 	 * @return max power at a single plug, in [W]
 	 */
-	double getMaxPower();
+	double getPlugPower();
 
 	/**
 	 * @return number of plugs

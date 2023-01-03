@@ -28,7 +28,8 @@ import java.util.Arrays;
 
 import javax.swing.JTextArea;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -39,7 +40,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 /*package*/ class ExeRunner {
 
-	/*package*/ final static Logger log = Logger.getLogger(ExeRunner.class);
+	/*package*/ final static Logger log = LogManager.getLogger(ExeRunner.class);
 	
 	private final ExternalExecutor executor;
 
@@ -71,6 +72,10 @@ import org.matsim.core.utils.io.IOUtils;
 	}
 
 	private static class ExternalExecutor extends Thread {
+
+		// Environmental variables passed to process
+		final String[] envp = {"MATSIM_GUI=true"};
+
 		final String[] cmdArgs;
 		final JTextArea stdOut;
 		final JTextArea errOut;
@@ -96,9 +101,9 @@ import org.matsim.core.utils.io.IOUtils;
 		public void run()  {
 			try {
 				if (this.workingDirectory == null) {
-					this.p = Runtime.getRuntime().exec(this.cmdArgs);
+					this.p = Runtime.getRuntime().exec(this.cmdArgs, this.envp);
 				} else {
-					this.p = Runtime.getRuntime().exec(this.cmdArgs, null, new File(this.workingDirectory));
+					this.p = Runtime.getRuntime().exec(this.cmdArgs, this.envp, new File(this.workingDirectory));
 				}
 				
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.p.getInputStream()));

@@ -27,9 +27,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
 
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
@@ -49,21 +48,18 @@ public class PassengerRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(
-			final Facility fromFacility,
-			final Facility toFacility,
-			final double departureTime,
-			final Person person) {
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		final Facility fromFacility = request.getFromFacility();
+		final Facility toFacility = request.getToFacility();
+		final double departureTime = request.getDepartureTime();
+		
 		Leg l = popFactory.createLeg( modeName );
 		l.setDepartureTime( departureTime );
 		Route r = new PassengerRoute( fromFacility.getLinkId() , toFacility.getLinkId() );
 		l.setRoute( r );
+		l.setTravelTime(0.0);
 		return Collections.singletonList( l );
 	}
 
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
-	}
 }
 

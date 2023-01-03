@@ -22,6 +22,8 @@ package org.matsim.contrib.ev.discharging;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -30,24 +32,23 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.MobsimScopeEventHandler;
-import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 import com.google.inject.Inject;
 
 /**
- * AUX discharging is executed for non-moving vehicles. This is useful for vehicles with idle engines,
+ * AUX discharging is executed for non-moving vehicles. This is useful for vehicles with idling engines,
  * such as taxis (where heating is on during a stay at a taxi rank), but should not be used with ordinary passenger cars.
  * <p>
  * VehicleProvider is responsible to decide if AUX discharging applies to a given vehicle based on information from
  * ActivityStartEvent.
  */
 public class AuxDischargingHandler
-		implements MobsimAfterSimStepListener, ActivityStartEventHandler, ActivityEndEventHandler,
-		MobsimScopeEventHandler {
+		implements MobsimAfterSimStepListener, ActivityStartEventHandler, ActivityEndEventHandler, MobsimScopeEventHandler {
 	public interface VehicleProvider {
 		/**
 		 * During activities such as stopping at a bus stop or taxi rank, picking up/dropping off passengers etc.
@@ -59,7 +60,7 @@ public class AuxDischargingHandler
 		ElectricVehicle getVehicle(ActivityStartEvent event);
 	}
 
-	private final class VehicleAndLink {
+	private static final class VehicleAndLink {
 		private final ElectricVehicle vehicle;
 		private final Id<Link> linkId;
 
@@ -69,17 +70,19 @@ public class AuxDischargingHandler
 		}
 	}
 
+	private final static Logger log = LogManager.getLogger(AuxDischargingHandler.class );
+
 	private final VehicleProvider vehicleProvider;
 	private final int auxDischargeTimeStep;
+	private EventsManager eventsManager;
 
 	private final ConcurrentMap<Id<Person>, VehicleAndLink> vehicles = new ConcurrentHashMap<>();
 
 	@Inject
-	public AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg,
-			MobsimScopeEventHandling events) {
+	AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg, EventsManager eventsManager) {
 		this.vehicleProvider = vehicleProvider;
-		this.auxDischargeTimeStep = evCfg.getAuxDischargeTimeStep();
-		events.addMobsimScopeHandler(this);
+		this.auxDischargeTimeStep = evCfg.auxDischargeTimeStep;
+		this.eventsManager = eventsManager;
 	}
 
 	@Override
@@ -89,7 +92,9 @@ public class AuxDischargingHandler
 				ElectricVehicle ev = vehicleAndLink.vehicle;
 				double energy = ev.getAuxEnergyConsumption()
 						.calcEnergyConsumption(e.getSimulationTime(), auxDischargeTimeStep, vehicleAndLink.linkId);
-				ev.getBattery().changeSoc(-energy);
+				ev.getBattery()
+						.dischargeEnergy(energy, missingEnergy -> eventsManager.processEvent(
+								new MissingEnergyEvent(e.getSimulationTime(), ev.getId(), vehicleAndLink.linkId, missingEnergy)));
 			}
 		}
 	}

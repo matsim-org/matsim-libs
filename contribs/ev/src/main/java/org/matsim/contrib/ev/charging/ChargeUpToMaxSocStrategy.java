@@ -22,27 +22,27 @@ package org.matsim.contrib.ev.charging;
 
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
-	private final Charger charger;
-	private final double maxRelativeSoc;
+	private final ChargerSpecification charger;
+	private final double maxSoc;
 
-	public ChargeUpToMaxSocStrategy(Charger charger, double maxRelativeSoc) {
-		if (maxRelativeSoc < 0 || maxRelativeSoc > 1) {
+	public ChargeUpToMaxSocStrategy(ChargerSpecification charger, double maxSoc) {
+		if (maxSoc < 0 || maxSoc > 1) {
 			throw new IllegalArgumentException();
 		}
 		this.charger = charger;
-		this.maxRelativeSoc = maxRelativeSoc;
+		this.maxSoc = maxSoc;
 	}
 
 	@Override
 	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
 		Battery battery = ev.getBattery();
-		return maxRelativeSoc * battery.getCapacity() - battery.getSoc();
+		return maxSoc * battery.getCapacity() - battery.getCharge();
 	}
 
 	@Override

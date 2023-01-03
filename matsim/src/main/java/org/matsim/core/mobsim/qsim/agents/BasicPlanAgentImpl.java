@@ -23,7 +23,10 @@
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import jakarta.validation.constraints.NotNull;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -36,7 +39,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -47,14 +49,18 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
+
 public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
 	
-	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
+	private static final Logger log = LogManager.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;
 	private static int noRouteWrnCnt = 0;
 	
@@ -65,9 +71,11 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	private final EventsManager events;
 	private final MobsimTimer simTimer;
 	private MobsimVehicle vehicle ;
-	private double activityEndTime = Time.UNDEFINED_TIME;
+	private double activityEndTime;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
+	final private TimeInterpretation timeInterpretation;
+	
 	/**
 	 * This notes how far a route is advanced.  One could move this into the DriverAgent(Impl).  There, however, is no method to know about the
 	 * start of the route, thus one has to guess when to set it back to zero.  Also, IMO there is really some logic to providing this as a service
@@ -75,7 +83,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	 */
 	private int currentLinkIndex = 0;
 
-	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
+	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer, TimeInterpretation timeInterpretation) {
 
 		this.plan = PopulationUtils.unmodifiablePlan(plan2) ;
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
@@ -83,17 +91,17 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		this.scenario = scenario ;
 		this.events = events ;
 		this.simTimer = simTimer ;
-		List<PlanElement> planElements = this.getCurrentPlan().getPlanElements();
-		if (planElements.size() > 0) {
-			Activity firstAct = (Activity) planElements.get(0);				
-//			this.setCurrentLinkId( firstAct.getLinkId() ) ;
-			final Id<Link> linkId = PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig() );
-			Gbl.assertIf( linkId!=null );
-			this.setCurrentLinkId( linkId );
-			this.setState(MobsimAgent.State.ACTIVITY) ;
-			calculateAndSetDepartureTime(firstAct);
-		}
-}
+		this.timeInterpretation = timeInterpretation;
+
+		List<PlanElement> planElements = this.plan.getPlanElements();
+		Preconditions.checkArgument(!planElements.isEmpty(), "Plan must consist of at least one activity");
+		Activity firstAct = (Activity) planElements.get(0);
+		//this.setCurrentLinkId( firstAct.getLinkId() ) ;
+		final Id<Link> linkId = PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig() );
+		this.setCurrentLinkId( linkId );
+		this.setState(State.ACTIVITY) ;
+		calculateAndSetDepartureTime(firstAct);
+	}
 	
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
@@ -118,7 +126,6 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	@Override
 	public final void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
-		Gbl.assertNotNull(linkId);
 		this.setCurrentLinkId( linkId ) ;
 	}
 
@@ -160,7 +167,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	private void initializeActivity(Activity act, double now) {
 		this.setState(MobsimAgent.State.ACTIVITY) ;
-		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType()));
+		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType(),
+				act.getCoord() ) );
 		calculateAndSetDepartureTime(act);
 		getModifiablePlan(); // this is necessary to make the plan modifiable, so that setting the start time (next line) is actually feasible. kai/mz, oct'16
 		((Activity) getCurrentPlanElement()).setStartTime(now);
@@ -171,9 +179,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	 * ensure that the ActivityEndsList in the {@link QSim} is also updated.
 	 */
 	private final void calculateAndSetDepartureTime(Activity act) {
-		PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation = this.getScenario().getConfig().plans().getActivityDurationInterpretation();
 		double now = this.getSimTimer().getTimeOfDay() ;
-		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
+		double departure = Math.max(now, timeInterpretation.decideOnActivityEndTime(act, now).orElse(Double.POSITIVE_INFINITY));
 	
 		if ( this.getCurrentPlanElementIndex() == this.getCurrentPlan().getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
@@ -193,7 +200,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			log.warn( "trying to end an activity but current plan element is not an activity; agentId=" + this.getId() );
 		}
 		Activity act = (Activity) this.getCurrentPlanElement() ;
-		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType()));
+		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType(), act.getCoord()));
 	
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 		advancePlan(now);
@@ -248,19 +255,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		return ((Leg) currentPlanElement).getMode() ;
 	}
 	@Override
-	public final Double getExpectedTravelTime() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
-		}
-		final double travelTimeFromRoute = ((Leg) currentPlanElement).getRoute().getTravelTime();
-		if (  travelTimeFromRoute != Time.UNDEFINED_TIME ) {
-			return travelTimeFromRoute ;
-		} else if ( ((Leg) currentPlanElement).getTravelTime() != Time.UNDEFINED_TIME ) {
-			return ((Leg) currentPlanElement).getTravelTime()  ;
-		} else {
-			return null ;
-		}
+	public final OptionalTime getExpectedTravelTime() {
+		return timeInterpretation.decideOnLegTravelTime((Leg)this.getCurrentPlanElement());
 	}
 
     @Override
@@ -357,8 +353,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		return this.currentLinkId;
 	}
 	
-	/* package */ final void setCurrentLinkId( Id<Link> linkId ) {
-		this.currentLinkId = linkId ;
+	/* package */ final void setCurrentLinkId(@NotNull Id<Link> linkId ) {
+		this.currentLinkId = Preconditions.checkNotNull(linkId);
 	}
 	
 	@Override
@@ -416,10 +412,20 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 			// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
 			// factility should then sit in the leg (since there it is used for routing).  kai, dec'15
-		} else if ( pe instanceof Activity ) {
-			return null ;
+		} else if (pe instanceof Activity) {
+			return null;
 		}
-		throw new RuntimeException("unexpected type of PlanElement") ;
+		throw new RuntimeException("unexpected type of PlanElement");
 	}
 
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("plan", plan)
+				.add("vehicle", vehicle)
+				.add("state", state)
+				.add("currentPlanElementIndex", currentPlanElementIndex)
+				.add("currentLinkId", currentLinkId)
+				.toString();
+	}
 }

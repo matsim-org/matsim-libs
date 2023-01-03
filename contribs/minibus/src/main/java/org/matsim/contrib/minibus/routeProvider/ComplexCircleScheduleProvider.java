@@ -27,13 +27,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.Operator;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -59,7 +60,7 @@ import org.matsim.vehicles.Vehicle;
  */
 final class ComplexCircleScheduleProvider implements PRouteProvider {
 	
-	private final static Logger log = Logger.getLogger(ComplexCircleScheduleProvider.class);
+	private final static Logger log = LogManager.getLogger(ComplexCircleScheduleProvider.class);
 	public final static String NAME = "ComplexCircleScheduleProvider";
 	
 	private final Network net;
@@ -121,13 +122,13 @@ final class ComplexCircleScheduleProvider implements PRouteProvider {
 		/* After finishing one tour, vehicles wait the driver rest time and then start the next tour immediately.
 		 * So, headway is a function of the number of vehicles and the time spent on one tour of the TransitRoute.
 		 */
-		int headway = (int) (transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset() + this.driverRestTime) / numberOfVehicles;
+		int headway = (int) (transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset().seconds() + this.driverRestTime) / numberOfVehicles;
 		for (int i = 0; i < numberOfVehicles; i++) {
 			for (double j = startTime + i * headway; j <= endTime; ) {
 				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
 				departure.setVehicleId(Id.create(transitRoute.getId().toString() + "-" + i, Vehicle.class));
 				transitRoute.addDeparture(departure);
-				j += transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset() + this.driverRestTime;
+				j += transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset().seconds() + this.driverRestTime;
 				n++;
 			}
 		}		

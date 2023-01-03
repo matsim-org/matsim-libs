@@ -19,12 +19,10 @@
 
 package org.matsim.contrib.accessibility;
 
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.facilities.ActivityFacilities;
@@ -46,7 +44,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String BOUNDING_BOX_RIGHT = "boundingBoxRight";
 
 	@SuppressWarnings("unused")
-	private static Logger LOG = Logger.getLogger(AccessibilityConfigGroup.class);
+	private static final Logger LOG = LogManager.getLogger(AccessibilityConfigGroup.class);
 
 	public static final String GROUP_NAME = "accessibility";
 	
@@ -58,6 +56,9 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private boolean useOpportunityWeights = false;
 	private static final String WEIGHT_EXPONENT = "weightExponent";
 	private Double weightExponent = 1.;
+
+	private static final String USE_PARALLELIZATION = "useParallelization";
+	private boolean useParallelization = true;
 	
 //	private static final String ACCESSIBILITY_DESTINATION_SAMPLING_RATE = "accessibilityDestinationSamplingRate";
 //	private Double accessibilityDestinationSamplingRate;
@@ -154,6 +155,13 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	public Set<Modes4Accessibility> getIsComputingMode() {
 		return isComputingMode;
 	}
+	public Set<String> getModes() {
+		Set<String> result = new HashSet<>() ;
+		for( Modes4Accessibility modes4Accessibility : isComputingMode ){
+			result.add(  modes4Accessibility.name() ) ;
+		}
+		return result ;
+	}
 
 	
 	// NOTE: It seems ok to have the string constants immediately here since having them separately really does not help
@@ -221,6 +229,14 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     public void setUseOpportunityWeights(Boolean useOpportunityWeights) {
     	this.useOpportunityWeights = useOpportunityWeights;
     }
+	@StringGetter(USE_PARALLELIZATION)
+	public boolean isUseParallelization() {
+		return useParallelization;
+	}
+	@StringSetter(USE_PARALLELIZATION)
+	public void setUseParallelization(Boolean useParallelization) {
+		this.useParallelization = useParallelization;
+	}
     @StringGetter(WEIGHT_EXPONENT)
     public double getWeightExponent() {
     	return weightExponent;

@@ -35,7 +35,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -212,12 +211,10 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 		for (TransitRouteStop stop : stops) {
 			attributes.clear();
 			attributes.add(createTuple(Constants.REF_ID, stop.getStopFacility().getId().toString()));
-			if (stop.getArrivalOffset() != Time.UNDEFINED_TIME) {
-				attributes.add(createTimeTuple(Constants.ARRIVAL_OFFSET, stop.getArrivalOffset()));
-			}
-			if (stop.getDepartureOffset() != Time.UNDEFINED_TIME) {
-				attributes.add(createTimeTuple(Constants.DEPARTURE_OFFSET, stop.getDepartureOffset()));
-			}
+			stop.getArrivalOffset()
+					.ifDefined(offset -> attributes.add(createTimeTuple(Constants.ARRIVAL_OFFSET, offset)));
+			stop.getDepartureOffset().ifDefined(offset->
+					attributes.add(createTimeTuple(Constants.DEPARTURE_OFFSET, offset)));
 			attributes.add(createTuple(Constants.AWAIT_DEPARTURE, String.valueOf(stop.isAwaitDepartureTime())));
 			this.writeStartTag(Constants.STOP, attributes, true);
 		}

@@ -1,8 +1,9 @@
 package org.matsim.contrib.accessibility.interpolation;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.SpatialGrid;
 
 /**
  * Wrapper class for interpolation.
@@ -25,9 +26,10 @@ import org.matsim.contrib.accessibility.gis.SpatialGrid;
  * @author tthunig
  *
  */
-public class Interpolation {
+public final class Interpolation {
+	// used from outside
 
-	private static final Logger log = Logger.getLogger(Interpolation.class);
+	private static final Logger log = LogManager.getLogger(Interpolation.class);
 	
 	public static final int BILINEAR = 0;
 	public static final int BICUBIC = 1;

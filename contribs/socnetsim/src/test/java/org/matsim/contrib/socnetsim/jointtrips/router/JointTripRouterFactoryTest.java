@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +60,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.facilities.ActivityFacilities;
 
 import com.google.inject.Provider;
@@ -69,7 +72,7 @@ import com.google.inject.name.Names;
  */
 public class JointTripRouterFactoryTest {
 	private static final Logger log =
-		Logger.getLogger(JointTripRouterFactoryTest.class);
+		LogManager.getLogger(JointTripRouterFactoryTest.class);
 
 	private Provider<TripRouter> factory;
 	private Scenario scenario;
@@ -129,13 +132,14 @@ public class JointTripRouterFactoryTest {
 		final Id<Link> linkId = link1;
 
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "home", linkId).setEndTime( 32454 );
-		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		Leg leg5 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		final Id<Link> linkId1 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId1).setMaximumDuration( 0 );
-		Leg dLeg = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
+		Leg leg4 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER ) ;
+		Leg dLeg = leg4;
 		final Id<Link> linkId2 = link3;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId2).setMaximumDuration( 0 );
-		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		Leg leg3 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		final Id<Link> linkId3 = link3;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "home", linkId3);
 
@@ -155,17 +159,18 @@ public class JointTripRouterFactoryTest {
 		Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "home", linkId4);
 		a.setEndTime( 1246534 );
 		a.setCoord(new Coord((double) 0, (double) 1));
-		PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+		Leg leg2 = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
 		final Id<Link> linkId5 = link1;
 		a = PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId5);
 		a.setMaximumDuration( 0 );
 		a.setCoord(new Coord((double) 0, (double) 2));
-		Leg pLeg = PopulationUtils.createAndAddLeg( plan, JointActingTypes.PASSENGER );
+		Leg leg1 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.PASSENGER );
+		Leg pLeg = leg1;
 		final Id<Link> linkId6 = link3;
 		a = PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId6);
 		a.setMaximumDuration( 0 );
 		a.setCoord(new Coord((double) 0, (double) 3));
-		PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
 		final Id<Link> linkId7 = link3;
 		a = PopulationUtils.createAndAddActivityFromLinkId(plan, "home", linkId7);
 		a.setCoord(new Coord((double) 0, (double) 4));
@@ -188,6 +193,7 @@ public class JointTripRouterFactoryTest {
 						install(new TripRouterModule());
 						install(new TravelTimeCalculatorModule());
 						install(new TravelDisutilityModule());
+						install(new TimeInterpretationModule());
 						bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
 					}
 				}), new JointTripRouterModule()));
@@ -198,7 +204,7 @@ public class JointTripRouterFactoryTest {
 	@Test
 	public void testPassengerRoute() throws Exception {
 		final PlanAlgorithm planRouter =
-			new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
+			new JointPlanRouterFactory( (ActivityFacilities) null, TimeInterpretation.create(ConfigUtils.createConfig()) ).createPlanRoutingAlgorithm(
 					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
@@ -235,7 +241,7 @@ public class JointTripRouterFactoryTest {
 	@Test
 	public void testDriverRoute() throws Exception {
 		final PlanAlgorithm planRouter =
-			new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
+			new JointPlanRouterFactory( (ActivityFacilities) null, TimeInterpretation.create(ConfigUtils.createConfig()) ).createPlanRoutingAlgorithm(
 					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();

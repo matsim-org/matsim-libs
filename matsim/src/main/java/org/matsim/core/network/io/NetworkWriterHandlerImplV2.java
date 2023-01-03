@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
+
 /*package*/ class NetworkWriterHandlerImplV2 implements NetworkWriterHandler {
 	private final CoordinateTransformation transformation;
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
@@ -61,7 +63,7 @@ import java.util.Set;
 	public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
 		out.write("<network");
 		if (network.getName() != null) {
-			out.write(" name=\"" + network.getName() + "\"");
+			out.write(" name=\"" + encodeAttributeValue(network.getName()) + "\"");
 		}
 		out.write(">\n\n");
 
@@ -116,16 +118,16 @@ import java.util.Set;
 	@Override
 	public void startNode(final Node node, final BufferedWriter out) throws IOException {
 		out.write("\t\t<node");
-		out.write(" id=\"" + node.getId() + "\"");
+		out.write(" id=\"" + encodeAttributeValue(node.getId().toString()) + "\"");
 		final Coord coord = transformation.transform( node.getCoord() );
 		out.write(" x=\"" + coord.getX() + "\"");
 		out.write(" y=\"" + coord.getY() + "\"");
 		if ( coord.hasZ() ) out.write(" z=\"" + coord.getZ() + "\"");
 		if (NetworkUtils.getType( node ) != null) {
-			out.write(" type=\"" + NetworkUtils.getType( node ) + "\"");
+			out.write(" type=\"" + encodeAttributeValue(NetworkUtils.getType(node)) + "\"");
 		}
 		if (NetworkUtils.getOrigId( node ) != null) {
-			out.write(" origid=\"" + NetworkUtils.getOrigId( node ) + "\"");
+			out.write(" origid=\"" + encodeAttributeValue(NetworkUtils.getOrigId(node)) + "\"");
 		}
 		out.write(" >\n");
 
@@ -147,9 +149,9 @@ import java.util.Set;
 	@Override
 	public void startLink(final Link link, final BufferedWriter out) throws IOException {
 		out.write("\t\t<link");
-		out.write(" id=\"" + link.getId() + "\"");
-		out.write(" from=\"" + link.getFromNode().getId() + "\"");
-		out.write(" to=\"" + link.getToNode().getId() + "\"");
+		out.write(" id=\"" + encodeAttributeValue(link.getId().toString()) + "\"");
+		out.write(" from=\"" + encodeAttributeValue(link.getFromNode().getId().toString()) + "\"");
+		out.write(" to=\"" + encodeAttributeValue(link.getToNode().getId().toString()) + "\"");
 		out.write(" length=\"" + link.getLength() + "\"");
 		out.write(" freespeed=\"" + link.getFreespeed() + "\"");
 		out.write(" capacity=\"" + link.getCapacity() + "\"");
@@ -168,7 +170,7 @@ import java.util.Set;
 					buffer.append(mode);
 					counter++;
 				}
-				this.lastModes = buffer.toString();
+				this.lastModes = encodeAttributeValue(buffer.toString());
 				this.lastSet = modes;
 			}
 			out.write(" modes=\"" + this.lastModes + "\"");

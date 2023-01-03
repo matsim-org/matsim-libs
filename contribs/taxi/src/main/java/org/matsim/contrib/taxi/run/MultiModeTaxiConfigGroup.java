@@ -21,8 +21,7 @@
 package org.matsim.contrib.taxi.run;
 
 import java.util.Collection;
-
-import javax.validation.Valid;
+import java.util.function.Supplier;
 
 import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.contrib.dvrp.run.MultiModals;
@@ -30,44 +29,63 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import com.google.common.base.Verify;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
 public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
+
 	public static final String GROUP_NAME = "multiModeTaxi";
 
-	@SuppressWarnings("deprecation")
+	/**
+	 * @param config
+	 * @return MultiModeTaxiConfigGroup if exists. Otherwise fails
+	 */
 	public static MultiModeTaxiConfigGroup get(Config config) {
 		return (MultiModeTaxiConfigGroup)config.getModule(GROUP_NAME);
 	}
 
+	private final Supplier<TaxiConfigGroup> taxiConfigGroupSupplier;
+
 	public MultiModeTaxiConfigGroup() {
+		this(TaxiConfigGroup::new);
+	}
+
+	public MultiModeTaxiConfigGroup(Supplier<TaxiConfigGroup> taxiConfigGroupSupplier) {
 		super(GROUP_NAME);
+		this.taxiConfigGroupSupplier = taxiConfigGroupSupplier;
 	}
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-
-		if (TaxiConfigGroup.get(config) != null) {
-			throw new RuntimeException(
-					"In the multi-mode taxi setup, TaxiConfigGroup must not be defined at the config top level");
-		}
-
+		Verify.verify(config.getModule(TaxiConfigGroup.GROUP_NAME) == null,
+				"In the multi-mode taxi setup, TaxiConfigGroup must not be defined at the config top level");
 		MultiModals.requireAllModesUnique(this);
 	}
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
 		if (type.equals(TaxiConfigGroup.GROUP_NAME)) {
-			return new TaxiConfigGroup();
+			return taxiConfigGroupSupplier.get();
+		} else {
+			throw new IllegalArgumentException("Unsupported parameter set type: " + type);
 		}
-		throw new IllegalArgumentException(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof TaxiConfigGroup) {
+			super.addParameterSet(set);
+		} else {
+			throw new IllegalArgumentException("Unsupported parameter set class: " + set);
+		}
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<@Valid TaxiConfigGroup> getModalElements() {
+	public Collection<TaxiConfigGroup> getModalElements() {
 		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
 	}
 }

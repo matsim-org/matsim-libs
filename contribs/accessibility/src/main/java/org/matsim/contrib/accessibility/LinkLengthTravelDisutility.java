@@ -35,11 +35,11 @@ class LinkLengthTravelDisutility implements TravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		return link.getLength();	
+		return link.getLength();
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		return getLinkTravelDisutility(link, Time.UNDEFINED_TIME, null, null);
+		return link.getLength();
 	}
 }

@@ -31,7 +31,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 /**
  * @author tthunig
  */
-public class IntersectionDirectionsImpl implements IntersectionDirections {
+final class IntersectionDirectionsImpl implements IntersectionDirections {
 
 	private Id<SignalSystem> signalSystemId;
 	private Id<Node> nodeId;

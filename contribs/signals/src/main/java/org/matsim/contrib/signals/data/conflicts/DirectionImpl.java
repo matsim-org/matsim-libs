@@ -31,7 +31,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 /**
  * @author tthunig
  */
-public class DirectionImpl implements Direction {
+final class DirectionImpl implements Direction {
 
 	private Id<SignalSystem> signalSystemId;
 	private Id<Node> nodeId;

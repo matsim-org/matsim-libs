@@ -38,7 +38,7 @@ public class Transit implements Provider<RoutingModule> {
 	private final RoutingModule transitWalkRouter;
 
 	@Inject
-    Transit(TransitRouter transitRouter, Scenario scenario, @Named(TransportMode.transit_walk) RoutingModule transitWalkRouter) {
+    Transit(TransitRouter transitRouter, Scenario scenario, @Named(TransportMode.walk) RoutingModule transitWalkRouter) {
 		this.transitRouter = transitRouter;
 		this.scenario = scenario;
 		this.transitWalkRouter = transitWalkRouter;

@@ -20,7 +20,17 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import org.apache.log4j.Logger;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -37,14 +47,9 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.events.handler.ReplanningEventHandler;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class tracks agents and their activity end times. It can be used to identify
@@ -56,7 +61,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler, ReplanningEventHandler,
 		MobsimInitializedListener, MobsimAfterSimStepListener {
 
-	private static final Logger log = Logger.getLogger(ActivityReplanningMap.class);
+	private static final Logger log = LogManager.getLogger(ActivityReplanningMap.class);
 
 	private final MobsimDataProvider mobsimDataProvider;
 	
@@ -85,8 +90,8 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	private final Map<Integer, Map<Id<Person>, MobsimAgent>> activityPerformingAgents;
 	
 	// package protected to be accessible for test case
-	/*package*/ double simStartTime = Time.UNDEFINED_TIME;
-	/*package*/ double timeStepSize = Time.UNDEFINED_TIME;
+	/*package*/ double simStartTime;
+	/*package*/ double timeStepSize;
 
 	@Inject
 	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider, EventsManager eventsManager) {
@@ -98,7 +103,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		this.startingAgents = new HashMap<>();
 		this.activityEndTimes = new HashMap<>();
 		
-		this.activityPerformingAgents = new ConcurrentHashMap<Integer, Map<Id<Person>, MobsimAgent>>();
+		this.activityPerformingAgents = new ConcurrentHashMap<>();
 	}
 
 	/*

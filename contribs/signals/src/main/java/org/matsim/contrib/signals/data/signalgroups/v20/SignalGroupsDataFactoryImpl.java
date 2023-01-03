@@ -26,7 +26,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author jbischoff
  * 
  */
-public class SignalGroupsDataFactoryImpl implements SignalGroupsDataFactory {
+final class SignalGroupsDataFactoryImpl implements SignalGroupsDataFactory {
 
 	@Override
 	public SignalGroupData createSignalGroupData(Id<SignalSystem> signalSystemId, Id<SignalGroup> signalGroupId) {

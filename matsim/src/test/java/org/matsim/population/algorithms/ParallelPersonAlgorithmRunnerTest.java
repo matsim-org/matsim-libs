@@ -22,7 +22,8 @@ package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 
-import org.jfree.util.Log;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -88,7 +89,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 		}
 		Assert.assertEquals(sumRef, sum);
 	}
-	
+
 	@Test
 	public void testCrashingAlgorithm() {
 		try {
@@ -106,7 +107,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 			});
 			Assert.fail("Expected Exception, got none.");
 		} catch (RuntimeException e) {
-			Log.info("Catched expected exception.", e);
+			LogManager.getLogger(ParallelPersonAlgorithmRunnerTest.class).info("Catched expected exception.", e);
 		}
 	}
 

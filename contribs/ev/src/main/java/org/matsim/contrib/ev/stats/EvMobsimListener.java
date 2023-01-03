@@ -42,19 +42,15 @@ import java.util.Map;
 
 public class EvMobsimListener implements MobsimBeforeCleanupListener {
 
-	@Inject
-	DriveDischargingHandler driveDischargingHandler;
-	@Inject
-	ChargerPowerCollector chargerPowerCollector;
-	@Inject
-	OutputDirectoryHierarchy controlerIO;
-	@Inject
-	IterationCounter iterationCounter;
-	@Inject
-	Network network;
+	@Inject DriveDischargingHandler driveDischargingHandler;
+	@Inject ChargerPowerCollector chargerPowerCollector;
+	@Inject OutputDirectoryHierarchy controlerIO;
+	@Inject IterationCounter iterationCounter;
+	@Inject Network network;
 
-	@Override
-	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
+	@Inject EvMobsimListener(){} // to make the constructor non-public.
+
+	@Override public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
 
 
 		try {

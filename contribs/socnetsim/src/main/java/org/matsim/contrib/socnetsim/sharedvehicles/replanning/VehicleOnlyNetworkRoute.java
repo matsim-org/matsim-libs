@@ -24,6 +24,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * to put vehicle Id in legs without route.
@@ -62,12 +63,17 @@ class VehicleOnlyNetworkRoute implements NetworkRoute {
 	}
 
 	@Override
-	public double getTravelTime() {
+	public OptionalTime getTravelTime() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void setTravelTime(double travelTime) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setTravelTimeUndefined() {
 		throw new UnsupportedOperationException();
 	}
 

@@ -19,11 +19,12 @@
 
 package org.matsim.contrib.minibus.replanning;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.PConstants;
-import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.PPlan;
-import org.matsim.contrib.minibus.operator.TimeProvider;
+import org.matsim.contrib.minibus.hook.Operator;
+import org.matsim.contrib.minibus.hook.PPlan;
+import org.matsim.contrib.minibus.hook.TimeProvider;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -38,7 +39,7 @@ import java.util.ArrayList;
  */
 public final class CreateNewPlan extends AbstractPStrategyModule {
 	
-	private final static Logger log = Logger.getLogger(CreateNewPlan.class);
+	private final static Logger log = LogManager.getLogger(CreateNewPlan.class);
 	public static final String STRATEGY_NAME = "CreateNewPlan";
 
     private final double timeSlotSize;

@@ -19,30 +19,29 @@
 
 package org.matsim.contrib.taxi.schedule;
 
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.PICKUP;
 
-public class TaxiPickupTask extends StayTaskImpl implements TaxiTaskWithRequest {
-	private final TaxiRequest request;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
-	public TaxiPickupTask(double beginTime, double endTime, TaxiRequest request) {
-		super(beginTime, endTime, request.getFromLink());
+import com.google.common.base.MoreObjects;
 
+public class TaxiPickupTask extends DefaultStayTask {
+	public static final TaxiTaskType TYPE = new TaxiTaskType(PICKUP);
+
+	private final DrtRequest request;
+
+	public TaxiPickupTask(double beginTime, double endTime, DrtRequest request) {
+		super(TYPE, beginTime, endTime, request.getFromLink());
 		this.request = request;
-		request.setPickupTask(this);
 	}
 
-	@Override
-	public TaxiTaskType getTaxiTaskType() {
-		return TaxiTaskType.PICKUP;
-	}
-
-	public TaxiRequest getRequest() {
+	public DrtRequest getRequest() {
 		return request;
 	}
 
 	@Override
-	protected String commonToString() {
-		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("request", request).add("super", super.toString()).toString();
 	}
 }

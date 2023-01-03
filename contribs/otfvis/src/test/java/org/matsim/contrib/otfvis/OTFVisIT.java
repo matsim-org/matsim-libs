@@ -28,6 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
@@ -36,6 +37,9 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
+
+import static org.matsim.core.config.groups.ControlerConfigGroup.*;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
@@ -69,7 +73,7 @@ public class OTFVisIT {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
+		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.otfvis ) );
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setSnapshotPeriod(600);
 		qSimConfigGroup.setSnapshotStyle( SnapshotStyle.equiDist ) ;;

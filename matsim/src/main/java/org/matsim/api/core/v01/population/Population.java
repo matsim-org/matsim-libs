@@ -20,12 +20,11 @@
 
 package org.matsim.api.core.v01.population;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.core.population.PersonAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributable;
+
+import java.util.Map;
 
 /**
  * Root class of the population description (previously also called "plans file")

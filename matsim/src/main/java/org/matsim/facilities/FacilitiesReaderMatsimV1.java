@@ -20,7 +20,11 @@
 
 package org.matsim.facilities;
 
-import org.apache.log4j.Logger;
+import java.util.Map;
+import java.util.Stack;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,9 +38,6 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
-import java.util.Map;
-import java.util.Stack;
-
 /**
  * A reader for facilities-files of MATSim according to <code>facilities_v1.dtd</code>.
  *
@@ -44,7 +45,7 @@ import java.util.Stack;
  * @author balmermi
  */
 final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
-    private static Logger log = Logger.getLogger(FacilitiesReaderMatsimV1.class);
+    private static final  Logger log = LogManager.getLogger(FacilitiesReaderMatsimV1.class);
 
     private final static String FACILITIES = "facilities";
     private final static String FACILITY = "facility";
@@ -110,6 +111,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
     @Override
     public void endTag(final String name, final String content, final Stack<String> context) {
         if (FACILITY.equals(name)) {
+            this.facilities.addActivityFacility(this.currfacility);
             this.currfacility = null;
         } else if (ACTIVITY.equals(name)) {
             this.curractivity = null;
@@ -136,7 +138,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         this.facilities.setName(atts.getValue("name"));
         this.currAttributes = facilities.getAttributes();
         if (atts.getValue("aggregation_layer") != null) {
-            Logger.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
+            LogManager.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
         }
     }
 
@@ -171,7 +173,6 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
             }
         }
 
-        this.facilities.addActivityFacility(this.currfacility);
         ((ActivityFacilityImpl) this.currfacility).setDesc(atts.getValue("desc"));
     }
 
@@ -186,7 +187,9 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
     }
 
     private void startOpentime(final Attributes atts) {
-        this.curractivity.addOpeningTime(new OpeningTimeImpl(Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
+        this.curractivity.addOpeningTime(OpeningTimeImpl.createFromOptionalTimes(
+                Time.parseOptionalTime(atts.getValue("start_time")),
+                Time.parseOptionalTime(atts.getValue("end_time"))));
     }
 
 

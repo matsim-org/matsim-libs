@@ -22,8 +22,8 @@ package org.matsim.contrib.socnetsim.framework.replanning.modules;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
 import java.util.List;
 import java.util.Random;
@@ -35,18 +35,18 @@ import java.util.Random;
  */
 public class ActivitySequenceMutatorAlgorithm implements PlanAlgorithm {
 	private final Random random;
-	private final StageActivityTypes stageTypes;
+	private final StageActivityHandling stageActivityHandling;
 
 	public ActivitySequenceMutatorAlgorithm(
 			final Random random,
-			final StageActivityTypes stageTypes) {
+			final StageActivityHandling stageActivityHandling) {
 		this.random = random;
-		this.stageTypes = stageTypes;
+		this.stageActivityHandling = stageActivityHandling;
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Activity> activities = TripStructureUtils.getActivities( plan , stageTypes );
+		final List<Activity> activities = TripStructureUtils.getActivities( plan , stageActivityHandling );
 		// we need at least two activities in addition to the first/last
 		if ( activities.size() < 4 ) return;
 

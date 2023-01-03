@@ -22,6 +22,7 @@ package org.matsim.contrib.ev.stats;
 
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
@@ -36,21 +37,22 @@ public class EvStatsModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		bind(ChargingEventSequenceCollector.class).asEagerSingleton();
+		addEventHandlerBinding().to(ChargingEventSequenceCollector.class);
+
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				if (evCfg.getTimeProfiles()) {
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							SocHistogramTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							IndividualSocTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							ChargerOccupancyTimeProfileCollectorProvider.class);
+				if (evCfg.timeProfiles) {
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider( SocHistogramTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider( IndividualChargeTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider( ChargerOccupancyTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerOccupancyXYDataProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider( VehicleTypeAggregatedChargeTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
+
 					bind(ChargerPowerCollector.class).asEagerSingleton();
+					addMobsimScopeEventHandlerBinding().to(ChargerPowerCollector.class);
 					// add more time profiles if necessary
 				}
 			}

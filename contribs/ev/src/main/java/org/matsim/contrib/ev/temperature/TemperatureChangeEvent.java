@@ -21,19 +21,19 @@ package org.matsim.contrib.ev.temperature;/*
  * created by jbischoff, 15.08.2018
  */
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-
-import java.util.Map;
 
 public class TemperatureChangeEvent extends Event {
     public static final String EVENT_TYPE = "temperature_changed";
     public static final String ATTRIBUTE_LINK = "link";
     public static final String ATTRIBUTE_TEMP = "newTemperature";
 
-    private Id<Link> linkId;
-    private double newTemperatureC;
+    private final Id<Link> linkId;
+    private final double newTemperatureC;
 
     /**
      * @param time               eventTime

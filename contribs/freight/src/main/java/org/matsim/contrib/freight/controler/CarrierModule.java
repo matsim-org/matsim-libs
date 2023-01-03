@@ -23,96 +23,131 @@
 package org.matsim.contrib.freight.controler;
 
 import com.google.inject.Inject;
-import com.google.inject.Provides;
-import org.matsim.contrib.freight.CarrierConfigGroup;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
-import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
-import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.scoring.ScoringFunction;
 
-public class CarrierModule extends AbstractModule {
+import java.util.List;
 
-    // Not a real config group yet, but could be one.
-    private CarrierConfigGroup carrierConfig = new CarrierConfigGroup();
-
-    private Carriers carriers;
-    private CarrierPlanStrategyManagerFactory strategyManagerFactory;
-    private CarrierScoringFunctionFactory scoringFunctionFactory;
+public final class CarrierModule extends AbstractModule {
 
 
-    public CarrierModule() {
-    }
+	@Override public void install() {
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
 
-    /**
-     * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must me bound separately
-     * when this constructor is used.
-     */
-    public CarrierModule(Carriers carriers) {
-        this.carriers = carriers;
-    }
+		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
+		// this is probably ok
 
-    public CarrierModule(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-        this.carriers = carriers;
-        this.strategyManagerFactory = strategyManagerFactory;
-        this.scoringFunctionFactory = scoringFunctionFactory;
-    }
+		bind(CarrierControlerListener.class).in( Singleton.class );
+		addControlerListenerBinding().to(CarrierControlerListener.class);
 
-    @Override
-    public void install() {
-        // We put some things under dependency injection.
-        bind( CarrierConfigGroup.class ).toInstance(carrierConfig );
-        bind(Carriers.class).toInstance(carriers);
-        if (strategyManagerFactory != null) {
-            bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
-        }
-        if (scoringFunctionFactory != null) {
-            bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
-        }
+		bind(CarrierAgentTracker.class).in( Singleton.class );
+		addEventHandlerBinding().to( CarrierAgentTracker.class );
 
-        // First, we need a ControlerListener.
-        bind(CarrierControlerListener.class).asEagerSingleton();
-        addControlerListenerBinding().to(CarrierControlerListener.class);
+		{
+			// this switches on certain qsim components:
+			QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
+			List<String> components = qsimComponents.getActiveComponents();
+			components.add( FreightAgentSource.COMPONENT_NAME );
+			switch( freightConfig.getTimeWindowHandling() ){
+				case ignore:
+					break;
+				case enforceBeginnings:
+					components.add( WithinDayActivityReScheduling.COMPONENT_NAME );
+					break;
+				default:
+					throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
+			}
+			qsimComponents.setActiveComponents( components );
 
-        // Set the Mobsim. The FreightQSimFactory needs the CarrierAgentTracker (see constructor).
-        bindMobsim().toProvider(FreightQSimFactory.class);
+			// this installs qsim components, which are switched on (or not) via the above syntax:
+			this.installQSimModule( new AbstractQSimModule(){
+				@Override protected void configureQSim(){
+					this.bind( FreightAgentSource.class ).in( Singleton.class );
+					this.addQSimComponentBinding( FreightAgentSource.COMPONENT_NAME ).to( FreightAgentSource.class );
+					switch( freightConfig.getTimeWindowHandling() ){
+						case ignore:
+							break;
+						case enforceBeginnings:
+							this.addQSimComponentBinding( WithinDayActivityReScheduling.COMPONENT_NAME ).to( WithinDayActivityReScheduling.class );
+							break;
+						default:
+							throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
+					}
+				}
+			} );
+		}
 
-        this.addControlerListenerBinding().toInstance( new ShutdownListener(){
-            @Inject Config config ;
-            @Override public void notifyShutdown( ShutdownEvent event ){
-                writeAdditionalRunOutput( config, carriers );
-            }
-        } );
+		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFunctionFactoryDummyImpl.class ) ;
 
-    }
+		// yyyy in the long run, needs to be done differently (establish strategy manager as fixed infrastructure; have user code register strategies there).
+		// kai/kai, jan'21
+		// See javadoc of CarrierStrategyManager for some explanation of design decisions.  kai, jul'22
+		bind( CarrierStrategyManager.class ).toProvider( () -> null );
+		// (the null binding means that a zeroth iteration will run. kai, jul'22)
 
-    // We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
-    // The freight QSim needs it (see below).
-    @Provides
-    CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
-        return carrierControlerListener.getCarrierAgentTracker();
-    }
+		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), FreightUtils.getCarriers( event.getServices().getScenario() ) ));
 
-    public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {
-        this.carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(physicallyEnforceTimeWindowBeginnings);
-    }
+	}
+
+	// We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
+	// The freight QSim needs it (see below [[where?]]).
+	// yyyy this feels rather scary.  kai, oct'19
+	// Since we are exporting it anyways, we could as well also inject it.  kai, sep'20
+	// Is this maybe already resolved now?  kai, jul'22
+//	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
+//		return carrierControlerListener.getCarrierAgentTracker();
+//	}
+
+	private static class CarrierScoringFunctionFactoryDummyImpl implements CarrierScoringFunctionFactory {
+		@Override public ScoringFunction createScoringFunction( Carrier carrier ){
+			return new ScoringFunction(){
+				@Override public void handleActivity( Activity activity ){
+				}
+				@Override public void handleLeg( Leg leg ){
+				}
+				@Override public void agentStuck( double time ){
+				}
+				@Override public void addMoney( double amount ){
+				}
+				@Override public void addScore( double amount ){
+				}
+				@Override public void finish(){
+				}
+				@Override public double getScore(){
+					return Double.NEGATIVE_INFINITY;
+				}
+				@Override public void handleEvent( Event event ){
+				}
+			};
+		}
+	}
+
+	private static void writeAdditionalRunOutput( OutputDirectoryHierarchy controllerIO, Config config, Carriers carriers ) {
+		// ### some final output: ###
+		String compression = config.controler().getCompressionType().fileEnding;
+		new CarrierPlanWriter(carriers).write( controllerIO.getOutputFilename("output_carriers.xml" + compression));
+		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(controllerIO.getOutputFilename("output_carriersVehicleTypes.xml" + compression));
+	}
 
 
-    private static void writeAdditionalRunOutput( Config config, Carriers carriers ) {
-        // ### some final output: ###
-        new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml" ) ;
-        new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml.gz") ;
-        new CarrierVehicleTypeWriter( CarrierVehicleTypes.getVehicleTypes(carriers )).write(config.controler().getOutputDirectory() + "/output_vehicleTypes.xml" );
-        new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(config.controler().getOutputDirectory() + "/output_vehicleTypes.xml.gz");
-    }
-
-
-
+	private static class CarrierProvider implements Provider<Carriers> {
+		@Inject Scenario scenario;
+		@Override public Carriers get() {
+			return FreightUtils.getCarriers(scenario);
+		}
+	}
 }

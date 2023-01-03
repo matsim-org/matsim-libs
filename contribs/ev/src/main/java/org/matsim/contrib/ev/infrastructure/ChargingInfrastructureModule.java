@@ -58,14 +58,14 @@ public class ChargingInfrastructureModule extends AbstractModule {
 		bind(ChargingInfrastructureSpecification.class).toProvider(() -> {
 			ChargingInfrastructureSpecification chargingInfrastructureSpecification = new ChargingInfrastructureSpecificationImpl();
 			new ChargerReader(chargingInfrastructureSpecification).parse(
-					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getChargersFile()));
+					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.chargersFile));
 			return chargingInfrastructureSpecification;
 		}).asEagerSingleton();
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(ChargingInfrastructure.class).toProvider(new Provider<ChargingInfrastructure>() {
+				bind(ChargingInfrastructure.class).toProvider(new Provider<>() {
 					@Inject
 					@Named(CHARGERS)
 					private Network network;

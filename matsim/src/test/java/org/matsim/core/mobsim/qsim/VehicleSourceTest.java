@@ -53,10 +53,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A test to check the functionality of the VehicleSource.
@@ -67,12 +64,18 @@ import java.util.Map;
 @RunWith(Parameterized.class)
 public class VehicleSourceTest {
 
-	private final VehiclesSource vehicleSource;
-	private final boolean isUsingPersonIdForMissingVehicleId;
+	private final VehiclesSource vehiclesSource;
+	private final boolean usingPersonIdForMissingVehicleId;
 
-	public VehicleSourceTest(VehiclesSource vehicleSource, boolean isUsingPersonIdForMissingVehicleId) {
-		this.vehicleSource = vehicleSource;
-		this.isUsingPersonIdForMissingVehicleId = isUsingPersonIdForMissingVehicleId;
+	/**
+	 * testing if there is a meaningful error message if vehicles are _not_ added to person
+	 */
+	private final boolean providingVehiclesInPerson ;
+
+	public VehicleSourceTest( VehiclesSource vehiclesSource, boolean usingPersonIdForMissingVehicleId, boolean providingVehiclesInPerson ) {
+		this.vehiclesSource = vehiclesSource;
+		this.usingPersonIdForMissingVehicleId = usingPersonIdForMissingVehicleId;
+		this.providingVehiclesInPerson = providingVehiclesInPerson;
 	}
 
 	@Parameters(name = "{index}: vehicleSource == {0}; isUsingPersonIdForMissingVehicleId == {1}")
@@ -80,11 +83,20 @@ public class VehicleSourceTest {
 
 		// create the combinations manually, since 'fromVehiclesData' in combination with 'isUsingPersonIdForMissingVehicleId' doesn't make sense
 		return Arrays.asList(
-				new Object[]{VehiclesSource.defaultVehicle, true},
-				new Object[]{VehiclesSource.defaultVehicle, false},
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, true},
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, false},
-				new Object[]{VehiclesSource.fromVehiclesData, false}
+				new Object[]{VehiclesSource.defaultVehicle, true, true},
+//				new Object[]{VehiclesSource.defaultVehicle, true, false}, // not meaningful for defaultVehicle
+
+				new Object[]{VehiclesSource.defaultVehicle, false, true},
+//				new Object[]{VehiclesSource.defaultVehicle, false, false}, // not meaningful for defaultVehicle
+
+				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, true, true},
+				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, true, false},
+
+				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, false, true },
+				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, false, false },
+
+				new Object[]{VehiclesSource.fromVehiclesData, false, true },
+				new Object[]{VehiclesSource.fromVehiclesData, false, false }
 		);
 	}
 
@@ -109,8 +121,8 @@ public class VehicleSourceTest {
 		//config.plansCalcRoute().setNetworkModes(Arrays.asList(transportModes));
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
-		config.qsim().setVehiclesSource(this.vehicleSource);
-		config.qsim().setUsePersonIdForMissingVehicleId(this.isUsingPersonIdForMissingVehicleId);
+		config.qsim().setVehiclesSource(this.vehiclesSource );
+		config.qsim().setUsePersonIdForMissingVehicleId(this.usingPersonIdForMissingVehicleId );
 
 		config.controler().setOutputDirectory(helper.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -118,13 +130,8 @@ public class VehicleSourceTest {
 		config.controler().setCreateGraphs(false);
 		config.controler().setDumpDataAtEnd(false);
 
-		ActivityParams homeAct = new ActivityParams("h");
-		ActivityParams workAct = new ActivityParams("w");
-		homeAct.setTypicalDuration(1. * 3600.);
-		workAct.setTypicalDuration(1. * 3600.);
-
-		config.planCalcScore().addActivityParams(homeAct);
-		config.planCalcScore().addActivityParams(workAct);
+		config.planCalcScore().addActivityParams( new ActivityParams("h").setTypicalDuration(1. * 3600. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("w").setTypicalDuration(1. * 3600. ) );
 
 		final Controler cont = new Controler(scenario);
 		cont.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -138,12 +145,37 @@ public class VehicleSourceTest {
 				this.addEventHandlerBinding().toInstance(handler);
 			}
 		});
-		cont.run();
+
+		boolean expectedException = false ;
+		try{
+			cont.run();
+		} catch ( Exception ee ) {
+			if ( providingVehiclesInPerson ){
+				throw ee;
+			} else {
+				// (expected exception)
+				System.err.println();
+				System.err.println("The following is an expected exception:");
+				System.err.println();
+				System.err.println(ee.getMessage());
+				System.err.println();
+				System.err.println("(The above was an expected exception.)");
+				System.err.println();
+				expectedException = true;
+			}
+		}
+		if ( providingVehiclesInPerson ) {
+			Assert.assertFalse( expectedException );
+		} else {
+			Assert.assertTrue( expectedException );
+			return ;
+		}
+
 
 		// usually all vehicles will have an id of the form personId_mode. If person id for missing vehicle id is used
 		// the vehicle for mode car will have an id equal to the driver's id. All other modes will receive the normal ids
 		Id<Vehicle> carId;
-		if (isUsingPersonIdForMissingVehicleId) {
+		if ( usingPersonIdForMissingVehicleId ) {
 			carId = Id.createVehicleId("1");
 		} else {
 			carId = Id.createVehicleId("1_car");
@@ -155,7 +187,7 @@ public class VehicleSourceTest {
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
-		switch (this.vehicleSource) {
+		switch (this.vehiclesSource ) {
 			case defaultVehicle: // both bike and car are default vehicles (i.e. identical)
 				Assert.assertEquals("Both car, bike are default vehicles (i.e. identical), thus should have same travel time.",
 						0, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
@@ -173,8 +205,7 @@ public class VehicleSourceTest {
 	private void createNetwork(){
 		Network network = scenario.getNetwork();
 
-		double x = -100.0;
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(x, 0.0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord( -100.0, 0.0) );
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(0.0, 0.0));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord(0.0, 1000.0));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord(0.0, 1100.0));
@@ -204,46 +235,55 @@ public class VehicleSourceTest {
 			Person p = population.getFactory().createPerson(id);
 			Plan plan = population.getFactory().createPlan();
 			p.addPlan(plan);
-			Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
-			a1.setEndTime(8*3600+i*5);
-			Leg leg = population.getFactory().createLeg(transportModes[i]);
-			plan.addActivity(a1);
-			plan.addLeg(leg);
-			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-			NetworkRoute route = (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
-			route.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
-			leg.setRoute(route);
+			{
+				Activity a1 = population.getFactory().createActivityFromLinkId( "h", link1.getId() );
+				a1.setEndTime( 8 * 3600 + i * 5 );
+				plan.addActivity( a1 );
+			}
+			{
+				Leg leg = population.getFactory().createLeg( transportModes[i] );
+				plan.addLeg( leg );
+				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+				NetworkRoute route = (NetworkRoute) factory.createRoute( link1.getId(), link3.getId() );
+				route.setLinkIds( link1.getId(), Collections.singletonList( link2.getId() ), link3.getId() );
+				leg.setRoute( route );
+			}
+			{
+				Activity a2 = population.getFactory().createActivityFromLinkId( "w", link3.getId() );
+				plan.addActivity( a2 );
+				population.addPerson( p );
+			}
 
-			Activity a2 = population.getFactory().createActivityFromLinkId("w", link3.getId());
-			plan.addActivity(a2);
-			population.addPerson(p);
+			if ( !providingVehiclesInPerson ) {
+				// i.e. testing what happens if the vehicles are not added into the person
+				return ;
+			}
 
-			//adding vehicle type and vehicle to scenario if vehicleSource is not modeVehicleTypesFromVehiclesData
-
-			switch (this.vehicleSource) {
+			//adding vehicle type and vehicle to scenario as needed:
+			switch (this.vehiclesSource ) {
 				case defaultVehicle:
 					//don't add anything
 					break;
 				case modeVehicleTypesFromVehiclesData:
 					// only vehicle type is necessary
-					if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+					if (!scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
 						scenario.getVehicles().addVehicleType(vehTypes[i]);
 					}
 					break;
 				case fromVehiclesData:
 					// vehicle type as well as vehicle info is necessary
-					if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+					if (!scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
 						scenario.getVehicles().addVehicleType(vehTypes[i]);
 					}
 
 					Id<Vehicle> vId = VehicleUtils.createVehicleId(p, transportModes[i]);
 					Vehicle v = vehiclesFactory.createVehicle(vId, vehTypes[i]);
 					scenario.getVehicles().addVehicle(v);
-					VehicleUtils.insertVehicleIdIntoAttributes(p, transportModes[i], vId);
+					VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(transportModes[i], vId));
 
 					break;
-					default:
-						throw new RuntimeException("not implemented yet.");
+				default:
+					throw new RuntimeException("not implemented yet.");
 			}
 		}
 	}
@@ -252,18 +292,14 @@ public class VehicleSourceTest {
 
 		private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes;
 
-		public VehicleLinkTravelTimeEventHandler(Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes) {
+		VehicleLinkTravelTimeEventHandler( Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes ) {
 			this.vehicleTravelTimes = agentTravelTimes;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get(event.getVehicleId());
-			if (travelTimes == null) {
-				travelTimes = new HashMap<>();
-				this.vehicleTravelTimes.put(event.getVehicleId(), travelTimes);
-			}
-			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
+			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.computeIfAbsent( event.getVehicleId(), vehicleId -> new HashMap<>() );
+			travelTimes.put(event.getLinkId(), event.getTime() );
 		}
 
 		@Override
@@ -272,8 +308,8 @@ public class VehicleSourceTest {
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
 				if (d != null) {
-					double time = event.getTime() - d.doubleValue();
-					travelTimes.put(event.getLinkId(), Double.valueOf(time));
+					double time = event.getTime() - d;
+					travelTimes.put(event.getLinkId(), time );
 				}
 			}
 		}

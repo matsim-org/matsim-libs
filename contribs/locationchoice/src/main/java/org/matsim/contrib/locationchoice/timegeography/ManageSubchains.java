@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.population.Leg;
 		this.subChains.get(subChainIndex).defineMode(leg.getMode());
 		this.subChains.get(subChainIndex).addAct(act);
 		this.secondaryActFound = true;
-		this.ttBudget += leg.getTravelTime();
+		this.ttBudget += leg.getTravelTime().seconds();
 		this.totalTravelDistance += leg.getRoute().getDistance();
 	}
 
@@ -73,7 +73,7 @@ import org.matsim.api.core.v01.population.Leg;
 			this.subChains.get(subChainIndex).setStartCoord(act.getCoord());
 			this.chainStarted = true;
 			this.secondaryActFound = false;
-			this.ttBudget = leg.getTravelTime();
+			this.ttBudget = leg.getTravelTime().seconds();
 			this.totalTravelDistance = leg.getRoute().getDistance();
 			this.subChains.get(subChainIndex).defineMode(leg.getMode());
 		}

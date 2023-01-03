@@ -19,10 +19,11 @@
 
 package org.matsim.contrib.minibus.replanning;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.PPlan;
-import org.matsim.contrib.minibus.operator.TimeProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.contrib.minibus.hook.Operator;
+import org.matsim.contrib.minibus.hook.PPlan;
+import org.matsim.contrib.minibus.hook.TimeProvider;
 import org.matsim.core.gbl.MatsimRandom;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
  */
 public final class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 	
-	private final static Logger log = Logger.getLogger(MaxRandomStartTimeAllocator.class);
+	private final static Logger log = LogManager.getLogger(MaxRandomStartTimeAllocator.class);
 	public static final String STRATEGY_NAME = "MaxRandomStartTimeAllocator";
 	
 	private final int mutationRange;
