@@ -84,8 +84,8 @@ public final class StrategyOptions {
 		if (group.actEst)
 			log.accept(config, "act-est", "");
 
-		if (!group.timeMutation)
-			log.accept(config, "no-tm", "");
+		if (group.timeMutation != 0.05)
+			log.accept(config, "tm", group.timeMutation);
 
 		if (!group.innovateModes)
 			log.accept(config, "no-inv-modes", "");
@@ -134,13 +134,12 @@ public final class StrategyOptions {
 				).collect(Collectors.toList());
 
 
-		if (group.timeMutation) {
-			strategies.add(new StrategyConfigGroup.StrategySettings()
-					.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator)
-					.setSubpopulation(defaultSubpopulation)
-					.setWeight(0.025)
-			);
-		}
+		//add time mutation
+		strategies.add(new StrategyConfigGroup.StrategySettings()
+				.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator)
+				.setSubpopulation(defaultSubpopulation)
+				.setWeight(group.timeMutation)
+		);
 
 		if (getModeChoice() != ModeChoice.none) {
 
@@ -210,10 +209,8 @@ public final class StrategyOptions {
 		@CommandLine.Option(names = "--avoid-k", defaultValue = "10", description = "Avoid using recent mode types again")
 		private int avoidK;
 
-		// picocli has strange behaviour regarding default values of these boolean options
-		// Like this the default will be true
-		@CommandLine.Option(names = "--no-time-mutation", defaultValue = "true", description = "Enable time mutation strategy", negatable = true)
-		private boolean timeMutation;
+		@CommandLine.Option(names = "--time-mutation", defaultValue = "0.05", description = "Set time mutation strategy weight")
+		private double timeMutation;
 
 		@CommandLine.Option(names = "--mass-conservation", defaultValue = "false", description = "Enable mass conservation constraint", negatable = true)
 		private boolean massConservation;
