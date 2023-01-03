@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -54,7 +53,6 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -62,6 +60,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsLogger;
 import org.matsim.vehicles.Vehicle;
 
@@ -109,8 +108,8 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			.run();
 
 		// check that we get the expected result
-		assertEquals("Person 1 should travel for 11 seconds.", 10.0 + 1.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, EPSILON);
-		assertEquals("Person 2 should travel for 6 seconds.", 5.0 + 1.0, ttcalc.person2leaveTime - ttcalc.person2enterTime, EPSILON);
+		assertEquals("Person 1 should travel for 11 seconds.", 10.0 + 1.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, MatsimTestUtils.EPSILON);
+		assertEquals("Person 2 should travel for 6 seconds.", 5.0 + 1.0, ttcalc.person2leaveTime - ttcalc.person2enterTime, MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -179,8 +178,8 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		 * link 3 (because of the spill-back). The last person of the second
 		 * wave should have free-flow travel time.
 		 */
-		assertEquals("Person 1 should travel for 20 seconds.", 20.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, EPSILON);
-		assertEquals("Person 2 should travel for 11 seconds.", 10.0 + 1.0, ttcalc.person2leaveTime - ttcalc.person2enterTime, EPSILON);
+		assertEquals("Person 1 should travel for 20 seconds.", 20.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, MatsimTestUtils.EPSILON);
+		assertEquals("Person 2 should travel for 11 seconds.", 10.0 + 1.0, ttcalc.person2leaveTime - ttcalc.person2enterTime, MatsimTestUtils.EPSILON);
 
 	}
 
@@ -199,13 +198,13 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		final double simEndTime = 7200.0;
 		config.qsim().setEndTime(simEndTime);
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		
+
 
 		Network network = createNetwork(scenario);
 		final Id<Link> id1 = Id.create("1", Link.class);
 		final Id<Link> id2 = Id.create("2", Link.class);
 		final Id<Link> id3 = Id.create("3", Link.class);
-		
+
 		Link link1 = network.getLinks().get(id1);
 		Link link2 = network.getLinks().get(id2);
 		Link link3 = network.getLinks().get(id3);
@@ -240,20 +239,20 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			@Override
 			public void handleEvent(LinkEnterEvent event) {
 				if (id2.equals(event.getLinkId()))
-					Assert.assertEquals(1.0, event.getTime(), MatsimTestCase.EPSILON);
+					Assert.assertEquals(1.0, event.getTime(), MatsimTestUtils.EPSILON);
 				if (id3.equals(event.getLinkId()))
 					Assert.fail("Link 3 should never be reached as capacity of link 2 is set to 0");
 			}
 		});
-		
+
 		events.addHandler(new PersonStuckEventHandler() {
 			@Override
 			public void reset(int iteration) {}
-			
+
 			@Override
 			public void handleEvent(PersonStuckEvent event) {
 				Assert.assertEquals(id2, event.getLinkId());
-				Assert.assertEquals(simEndTime, event.getTime(), MatsimTestCase.EPSILON);
+				Assert.assertEquals(simEndTime, event.getTime(), MatsimTestUtils.EPSILON);
 				Assert.assertEquals(personId, event.getPersonId());
 			}
 		});
@@ -265,8 +264,8 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			.run();
 	}
 
-	
-	
+
+
 	/**
 	 * Creates a network with three links of length 100 m, capacity 3600 veh/h
 	 * and freespeed 10 m/s.

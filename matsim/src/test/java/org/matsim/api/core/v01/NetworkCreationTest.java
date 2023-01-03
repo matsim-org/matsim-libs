@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 
 /**
@@ -60,7 +61,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 		assertEquals(1.0, l1.getCapacity());
 		assertEquals(1.0, l1.getFreespeed());
 		assertEquals(1.0, l1.getNumberOfLanes());
-		assertEquals(1.0/3600.0, l1.getCapacity()/network.getCapacityPeriod(), MatsimTestCase.EPSILON);
+		assertEquals(1.0/3600.0, l1.getCapacity()/network.getCapacityPeriod(), MatsimTestUtils.EPSILON);
 		//the next lines are not obvious because only the references have been given to the builder
 		assertEquals(n1, l1.getFromNode());
 		assertEquals(n2, l1.getToNode());
@@ -72,7 +73,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 		l1.setCapacity(3600.0);
 		assertEquals(3600.0, l1.getCapacity());
 		//tests on LinkImpl
-		assertEquals(1.0, l1.getCapacity()/network.getCapacityPeriod(), EPSILON);
+		assertEquals(1.0, l1.getCapacity()/network.getCapacityPeriod(), MatsimTestUtils.EPSILON);
 
 		//add to network
 		network.addLink(l1);
@@ -80,6 +81,6 @@ public class NetworkCreationTest extends MatsimTestCase {
 		assertEquals(1000.0, l1.getLength());
 		assertEquals(100.0, l1.getFreespeed());
 		assertEquals(3600.0, l1.getCapacity());
-		assertEquals(1.0, l1.getCapacity()/network.getCapacityPeriod(), EPSILON);
+		assertEquals(1.0, l1.getCapacity()/network.getCapacityPeriod(), MatsimTestUtils.EPSILON);
 	}
 }

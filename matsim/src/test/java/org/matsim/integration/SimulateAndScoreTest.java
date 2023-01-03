@@ -71,9 +71,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
@@ -82,7 +82,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 	public void testRealPtScore() {
 		final Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
-		
+
 		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
 		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
@@ -99,9 +99,9 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		config.planCalcScore().addActivityParams(h);
 		config.planCalcScore().addActivityParams(w);
 		config.planCalcScore().addActivityParams(transitActivityParams);
-		
+
 		// ---
-		
+
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
@@ -158,7 +158,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		vehicleType.getCapacity().setStandingRoom(70);
 //		vehicleType.setCapacity(vehicleCapacity);
 		vehicles.addVehicleType(vehicleType);
-		
+
 		Vehicle vehicle = vehicles.getFactory().createVehicle(Id.create("V1", Vehicle.class), vehicleType);
 		vehicles.addVehicle(vehicle);
 
@@ -205,7 +205,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		scenario.getPopulation().addPerson(person);
 
 		// ---
-		
+
 		EventsManager events = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
@@ -291,7 +291,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		scorer.finish();
 
 		Double score = plan.getScore();
-		assertEquals("Expecting -1.0 from travel time, -1.0 from travel distance.", -2.0, score, EPSILON);
+		assertEquals("Expecting -1.0 from travel time, -1.0 from travel distance.", -2.0, score, MatsimTestUtils.EPSILON);
 
 	}
 

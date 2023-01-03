@@ -27,6 +27,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.List;
 import java.util.Random;
@@ -45,7 +46,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 	public void testConstructor() {
 		RecursiveLocationMutator locationmutator = this.initialize();
 		assertEquals(locationmutator.getMaxRecursions(), 10);
-		assertEquals(locationmutator.getRecursionTravelSpeedChange(), 0.1, EPSILON);
+		assertEquals(locationmutator.getRecursionTravelSpeedChange(), 0.1, MatsimTestUtils.EPSILON);
 	}
 
 
@@ -53,7 +54,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 		RecursiveLocationMutator locationmutator = this.initialize();
 		Plan plan = scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
 		locationmutator.run(plan);
-		assertEquals(PopulationUtils.getFirstActivity( ((Plan) plan) ).getCoord().getX(), -25000.0, EPSILON);
+		assertEquals(PopulationUtils.getFirstActivity( ((Plan) plan) ).getCoord().getX(), -25000.0, MatsimTestUtils.EPSILON);
 		assertEquals(PopulationUtils.getNextLeg(((Plan) plan), PopulationUtils.getFirstActivity( ((Plan) plan) )).getRoute(), null);
 	}
 

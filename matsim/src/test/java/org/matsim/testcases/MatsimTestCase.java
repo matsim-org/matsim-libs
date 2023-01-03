@@ -41,7 +41,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class MatsimTestCase extends TestCase {
 
 	/** A constant for the exactness when comparing doubles. */
-	public static final double EPSILON = 1e-10;
+	public static final double EPSILON = MatsimTestUtils.EPSILON;
 
 	/** The default output directory, where files of this test should be written to.
 	 * Includes the trailing '/' to denote a directory. */

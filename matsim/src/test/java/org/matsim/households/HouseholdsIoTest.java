@@ -20,13 +20,10 @@
 package org.matsim.households;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 
@@ -100,7 +97,7 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertNotNull(hh.getIncome().getIncomePeriod());
 		assertEquals(IncomePeriod.month, hh.getIncome().getIncomePeriod());
 		assertEquals("eur", hh.getIncome().getCurrency());
-		assertEquals(50000.0d, hh.getIncome().getIncome(), EPSILON);
+		assertEquals(50000.0d, hh.getIncome().getIncome(), MatsimTestUtils.EPSILON);
 
 		Attributes currentAttributes = hh.getAttributes();
 		assertNotNull("Custom attributes from household with id 23 should not be empty.", currentAttributes);
@@ -123,9 +120,9 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertNotNull(hh.getIncome().getIncomePeriod());
 		assertEquals(IncomePeriod.day, hh.getIncome().getIncomePeriod());
 		assertEquals("eur", hh.getIncome().getCurrency());
-		assertEquals(1000.0d, hh.getIncome().getIncome(), EPSILON);
-		
-		
+		assertEquals(1000.0d, hh.getIncome().getIncome(), MatsimTestUtils.EPSILON);
+
+
 		hh = households.getHouseholds().get(id25);
 		assertNotNull(hh);
 		assertEquals(id25, hh.getId());

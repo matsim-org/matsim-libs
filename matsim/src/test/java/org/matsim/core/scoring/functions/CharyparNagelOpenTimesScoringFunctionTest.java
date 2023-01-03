@@ -37,6 +37,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
@@ -67,13 +68,13 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object
 		final PopulationFactory pf = scenario.getPopulation().getFactory();
 		this.person = pf.createPerson(Id.create(1, Person.class));
-		
+
 		Plan plan = pf.createPlan() ;
 		this.person.addPlan(plan);
-		
+
 		Activity act = pf.createActivityFromCoord("shop", defaultCoord ) ;
 		plan.addActivity(act);
-		act.setFacilityId(testFacility.getId()); 
+		act.setFacilityId(testFacility.getId());
 		act.setStartTime(8.0 * 3600);
 		act.setEndTime(16.0 * 3600);
 	}
@@ -93,8 +94,8 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
 		OptionalTime[] openInterval = testee.getOpeningInterval(act);
 
-		assertEquals(6.0 * 3600, openInterval[0].seconds(), EPSILON);
-		assertEquals(19.0 * 3600, openInterval[1].seconds(), EPSILON);
+		assertEquals(6.0 * 3600, openInterval[0].seconds(), MatsimTestUtils.EPSILON);
+		assertEquals(19.0 * 3600, openInterval[1].seconds(), MatsimTestUtils.EPSILON);
 	}
 
 }

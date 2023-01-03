@@ -23,6 +23,7 @@ package org.matsim.pt.transitSchedule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -48,7 +49,7 @@ public class DepartureTest extends MatsimTestCase {
 		double time = 11.0 * 3600;
 		Departure dep = createDeparture(id, time);
 		assertEquals(id, dep.getId());
-		assertEquals(time, dep.getDepartureTime(), EPSILON);
+		assertEquals(time, dep.getDepartureTime(), MatsimTestUtils.EPSILON);
 	}
 
 	public void testVehicleId() {

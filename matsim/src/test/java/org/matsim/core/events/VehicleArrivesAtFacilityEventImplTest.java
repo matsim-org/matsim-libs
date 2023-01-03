@@ -25,17 +25,18 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 public class VehicleArrivesAtFacilityEventImplTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		VehicleArrivesAtFacilityEvent event = new VehicleArrivesAtFacilityEvent(Time.parseTime("10:55:00"), 
-				Id.create(5, Vehicle.class), 
-				Id.create(11, TransitStopFacility.class), 
+		VehicleArrivesAtFacilityEvent event = new VehicleArrivesAtFacilityEvent(Time.parseTime("10:55:00"),
+				Id.create(5, Vehicle.class),
+				Id.create(11, TransitStopFacility.class),
 				-1.2);
 		VehicleArrivesAtFacilityEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
-		assertEquals(Time.parseTime("10:55:00"), event2.getTime(), EPSILON);
+		assertEquals(Time.parseTime("10:55:00"), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(Id.create(5, Vehicle.class), event2.getVehicleId());
 		assertEquals(Id.create(11, TransitStopFacility.class), event2.getFacilityId());
 		assertEquals(Double.valueOf(-1.2), Double.valueOf(event2.getDelay()));

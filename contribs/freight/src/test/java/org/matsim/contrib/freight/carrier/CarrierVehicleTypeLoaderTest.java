@@ -3,6 +3,7 @@ package org.matsim.contrib.freight.carrier;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -11,7 +12,7 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 
 	private CarrierVehicleTypes types;
 	private Carriers carriers;
-	
+
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
@@ -31,15 +32,15 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 		assertNotNull(vehicleTypeLoaded);
 
 		assertEquals("light", vehicleTypeLoaded.getId().toString());
-		assertEquals(15, vehicleTypeLoaded.getCapacity().getOther(), EPSILON);
-		assertEquals(20, vehicleTypeLoaded.getCostInformation().getFixedCosts(), EPSILON);
-		assertEquals(0.35, vehicleTypeLoaded.getCostInformation().getCostsPerMeter(), EPSILON);
-		assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), EPSILON);
+		assertEquals(15, vehicleTypeLoaded.getCapacity().getOther(), MatsimTestUtils.EPSILON);
+		assertEquals(20, vehicleTypeLoaded.getCostInformation().getFixedCosts(), MatsimTestUtils.EPSILON);
+		assertEquals(0.35, vehicleTypeLoaded.getCostInformation().getCostsPerMeter(), MatsimTestUtils.EPSILON);
+		assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), MatsimTestUtils.EPSILON);
 
 		assertEquals("gasoline", vehicleTypeLoaded.getEngineInformation().getFuelType().toString());
-		assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), EPSILON);
+		assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), MatsimTestUtils.EPSILON);
 	}
-	
+
 	@Test
 	public void test_whenLoadingTypes_allAssignmentsInMediumVehicleAreCorrectly(){
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
@@ -50,14 +51,14 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 		assertNotNull(vehicleTypeLoaded);
 
 		assertEquals("medium", vehicleTypeLoaded.getId().toString());
-		assertEquals(30, vehicleTypeLoaded.getCapacity().getOther(), EPSILON);
-		assertEquals(50, vehicleTypeLoaded.getCostInformation().getFixedCosts(), EPSILON);
-		assertEquals(0.4, vehicleTypeLoaded.getCostInformation().getCostsPerMeter(), EPSILON);
-		assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), EPSILON);
+		assertEquals(30, vehicleTypeLoaded.getCapacity().getOther(), MatsimTestUtils.EPSILON);
+		assertEquals(50, vehicleTypeLoaded.getCostInformation().getFixedCosts(), MatsimTestUtils.EPSILON);
+		assertEquals(0.4, vehicleTypeLoaded.getCostInformation().getCostsPerMeter(), MatsimTestUtils.EPSILON);
+		assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), MatsimTestUtils.EPSILON);
 
 		assertEquals("gasoline", vehicleTypeLoaded.getEngineInformation().getFuelType().toString());
-		assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), EPSILON);
-		
+		assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), MatsimTestUtils.EPSILON);
+
 	}
 
 }

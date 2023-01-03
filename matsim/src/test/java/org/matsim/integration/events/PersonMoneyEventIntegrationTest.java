@@ -32,6 +32,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
 /**
@@ -75,39 +76,39 @@ public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 
 		assertTrue(collector.getEvents().get(0) instanceof PersonMoneyEvent);
 		PersonMoneyEvent e1 = (PersonMoneyEvent) collector.getEvents().get(0);
-		assertEquals(event1.getTime(), e1.getTime(), EPSILON);
+		assertEquals(event1.getTime(), e1.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getPersonId().toString(), e1.getPersonId().toString());
-		assertEquals(event1.getAmount(), e1.getAmount(), EPSILON);
+		assertEquals(event1.getAmount(), e1.getAmount(), MatsimTestUtils.EPSILON);
 
 		assertTrue(collector.getEvents().get(1) instanceof PersonMoneyEvent);
 		PersonMoneyEvent e2 = (PersonMoneyEvent) collector.getEvents().get(1);
-		assertEquals(event2.getTime(), e2.getTime(), EPSILON);
+		assertEquals(event2.getTime(), e2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event2.getPersonId().toString(), e2.getPersonId().toString());
-		assertEquals(event2.getAmount(), e2.getAmount(), EPSILON);
+		assertEquals(event2.getAmount(), e2.getAmount(), MatsimTestUtils.EPSILON);
 	}
-	
+
 	/**
 	 * Originally, the events were called AgentMoneyEvents and not PersonMoneyEvents (before Oct'13).
 	 * This test checks that old event files can still be parsed.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void testWriteReadXml_oldName() throws IOException {
-		
+
 		// write some events to file
-		
+
 		final String eventsFilename = getOutputDirectory() + "events.xml";
 		BufferedWriter writer = IOUtils.getBufferedWriter(eventsFilename);
-		
+
 		writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		writer.write("<events version=\"1.0\">");
 		writer.write("<event time=\"25200.0\" type=\"agentMoney\" amount=\"2.34\" person=\"1\"  />"); // do not add new fields purpose etc. here
 		writer.write("<event time=\"30600.0\" type=\"agentMoney\" amount=\"-3.45\" person=\"2\"  />");
 		writer.write("</events>");
-		
+
 		writer.close();
 
 		// read the events from file
-		
+
 		EventsManager readEvents = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		readEvents.addHandler(collector);
@@ -115,22 +116,22 @@ public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 		MatsimEventsReader reader = new MatsimEventsReader(readEvents);
 		reader.readFile(eventsFilename);
 		readEvents.finishProcessing();
-		
+
 		// compare the read events with the one written
-		
+
 		assertEquals(2, collector.getEvents().size());
-		
+
 		assertTrue(collector.getEvents().get(0) instanceof PersonMoneyEvent);
 		PersonMoneyEvent e1 = (PersonMoneyEvent) collector.getEvents().get(0);
-		assertEquals(25200.0, e1.getTime(), EPSILON);
+		assertEquals(25200.0, e1.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals("1", e1.getPersonId().toString());
-		assertEquals(2.34, e1.getAmount(), EPSILON);
-		
+		assertEquals(2.34, e1.getAmount(), MatsimTestUtils.EPSILON);
+
 		assertTrue(collector.getEvents().get(1) instanceof PersonMoneyEvent);
 		PersonMoneyEvent e2 = (PersonMoneyEvent) collector.getEvents().get(1);
-		assertEquals(30600.0, e2.getTime(), EPSILON);
+		assertEquals(30600.0, e2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals("2", e2.getPersonId().toString());
-		assertEquals(-3.45, e2.getAmount(), EPSILON);
+		assertEquals(-3.45, e2.getAmount(), MatsimTestUtils.EPSILON);
 	}
 
 }

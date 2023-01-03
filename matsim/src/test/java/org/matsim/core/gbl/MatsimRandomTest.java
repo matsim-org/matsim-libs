@@ -23,6 +23,7 @@ package org.matsim.core.gbl;
 import java.util.Random;
 
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
@@ -36,9 +37,9 @@ public class MatsimRandomTest extends MatsimTestCase {
 		final double value1 = MatsimRandom.getRandom().nextDouble();
 		final double value2 = MatsimRandom.getRandom().nextDouble();
 		final double value3 = MatsimRandom.getRandom().nextDouble();
-		assertTrue(Math.abs(value1 - value2) > EPSILON);
-		assertTrue(Math.abs(value1 - value3) > EPSILON);
-		assertTrue(Math.abs(value2 - value3) > EPSILON);
+		assertTrue(Math.abs(value1 - value2) > MatsimTestUtils.EPSILON);
+		assertTrue(Math.abs(value1 - value3) > MatsimTestUtils.EPSILON);
+		assertTrue(Math.abs(value2 - value3) > MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -64,11 +65,11 @@ public class MatsimRandomTest extends MatsimTestCase {
 		double value1 = MatsimRandom.getRandom().nextDouble();
 		MatsimRandom.reset(seed1);
 		double value2 = MatsimRandom.getRandom().nextDouble();
-		assertEquals(value1, value2, EPSILON);
+		assertEquals(value1, value2, MatsimTestUtils.EPSILON);
 
 		MatsimRandom.reset(seed2);
 		double value3 = MatsimRandom.getRandom().nextInt();
-		assertTrue(Math.abs(value1 - value3) > EPSILON);
+		assertTrue(Math.abs(value1 - value3) > MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -104,9 +105,9 @@ public class MatsimRandomTest extends MatsimTestCase {
 		Random local2b = MatsimRandom.getLocalInstance();
 		double value2b = local2b.nextDouble();
 
-		assertTrue(Math.abs(value1 - value2a) > EPSILON);
-		assertTrue(Math.abs(value2a - value2b) > EPSILON);
-		assertTrue(Math.abs(value1 - value2b) > EPSILON);
+		assertTrue(Math.abs(value1 - value2a) > MatsimTestUtils.EPSILON);
+		assertTrue(Math.abs(value2a - value2b) > MatsimTestUtils.EPSILON);
+		assertTrue(Math.abs(value1 - value2b) > MatsimTestUtils.EPSILON);
 	}
 
 	/** Test that two (Pseudo)Random Number Generators are equil by
@@ -117,7 +118,7 @@ public class MatsimRandomTest extends MatsimTestCase {
 	 */
 	private void assertEqualRandomNumberGenerators(final Random rng1, final Random rng2) {
 		for (int i = 0; i < 10; i++) {
-			assertEquals("different element at position " + i, rng1.nextDouble(), rng2.nextDouble(), EPSILON);
+			assertEquals("different element at position " + i, rng1.nextDouble(), rng2.nextDouble(), MatsimTestUtils.EPSILON);
 		}
 	}
 }

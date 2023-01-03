@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
@@ -50,8 +51,8 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertEquals(id.toString(), stop.getId().toString());
-		assertEquals(coord.getX(), stop.getCoord().getX(), EPSILON);
-		assertEquals(coord.getY(), stop.getCoord().getY(), EPSILON);
+		assertEquals(coord.getX(), stop.getCoord().getX(), MatsimTestUtils.EPSILON);
+		assertEquals(coord.getY(), stop.getCoord().getY(), MatsimTestUtils.EPSILON);
 		assertFalse(stop.getIsBlockingLane());
 	}
 
