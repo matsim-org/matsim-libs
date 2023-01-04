@@ -22,15 +22,14 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import java.util.List;
 import java.util.Map;
 
-public class PtTripFareEstimator extends PtTripEstimator {
+public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 
 	private final PtFareConfigGroup config;
 	private final DistanceBasedPtFareParams ptFare;
-
 	private final Map<Id<TransitStopFacility>, TransitStopFacility> facilities;
 
 	@Inject
-	public PtTripFareEstimator(TransitSchedule transitSchedule, PtFareConfigGroup config, DistanceBasedPtFareParams ptFare, Scenario scenario) {
+	public PtTripWithDistanceBasedFareEstimator(TransitSchedule transitSchedule, PtFareConfigGroup config, DistanceBasedPtFareParams ptFare, Scenario scenario) {
 		super(transitSchedule);
 		this.config = config;
 		this.ptFare = ptFare;

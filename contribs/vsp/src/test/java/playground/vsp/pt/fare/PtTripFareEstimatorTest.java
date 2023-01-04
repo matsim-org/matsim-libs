@@ -45,7 +45,7 @@ public class PtTripFareEstimatorTest {
 	private ScoringParametersForPerson params;
 	@Inject
 	private Map<String, TripEstimator<?>> tripEstimator;
-	private PtTripFareEstimator estimator;
+	private PtTripWithDistanceBasedFareEstimator estimator;
 
 	@Before
 	public void setUp() throws Exception {
@@ -78,7 +78,7 @@ public class PtTripFareEstimatorTest {
 
 		injector.injectMembers(this);
 
-		estimator = (PtTripFareEstimator) tripEstimator.get(TransportMode.pt);
+		estimator = (PtTripWithDistanceBasedFareEstimator) tripEstimator.get(TransportMode.pt);
 	}
 
 	private List<MinMaxEstimate> estimateAgent(Id<Person> personId) {

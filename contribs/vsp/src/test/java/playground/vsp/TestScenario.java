@@ -14,11 +14,9 @@ import org.matsim.modechoice.ModeOptions;
 import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.vsp.pt.fare.PtTripFareEstimator;
+import playground.vsp.pt.fare.PtTripWithDistanceBasedFareEstimator;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -59,7 +57,7 @@ public class TestScenario extends MATSimApplication {
 				.withFixedCosts(FixedCostsEstimator.DailyConstant.class, "car")
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.AlwaysAvailable.class, "bike", "walk")
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.ConsiderYesAndNo.class, "car")
-				.withTripEstimator(PtTripFareEstimator.class, ModeOptions.AlwaysAvailable.class, "pt");
+				.withTripEstimator(PtTripWithDistanceBasedFareEstimator.class, ModeOptions.AlwaysAvailable.class, "pt");
 
 		controler.addOverridingModule(builder.build());
 
