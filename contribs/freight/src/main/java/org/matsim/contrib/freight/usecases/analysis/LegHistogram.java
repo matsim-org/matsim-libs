@@ -55,7 +55,7 @@ import javax.inject.Inject;
 
 /**
  * It is a copy of {@link org.matsim.analysis.LegHistogram}. It is modified to include or exclude persons.
- * 
+ *
  * @author mrieser
  *
  * Counts the number of vehicles departed, arrived or got stuck per time bin
@@ -71,23 +71,23 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	private boolean inclPopulation = true;
 
-	private Population population; 
-	
+	private Population population;
+
 	/**
 	 * If true, it observes persons of population. Otherwise it excludes them from observation.
-	 * 
+	 *
 	 * @param inclPop
 	 */
 	public LegHistogram setInclPop(boolean inclPop) {
 		this.inclPopulation = inclPop;
 		return this;
 	}
-	
-	
+
+
 
 	/**
 	 * Sets the population.
-	 * 
+	 *
 	 * @param population the population to set
 	 */
 	@Inject
@@ -123,30 +123,24 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
-		if(!agentToBeObserved(event.getPersonId())) return; 
+		if(!agentToBeObserved(event.getPersonId())) return;
 		int index = getBinIndex(event.getTime());
 		this.allModesData.countsDep[index]++;
 		if (event.getLegMode() != null) {
 			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsDep[index]++;
 		}
-		
+
 	}
 
 	private boolean agentToBeObserved(Id<Person> personId) {
 		if(inclPopulation){
 			if(population == null) return false;
-			if(population.getPersons().containsKey(personId)){
-				return true;
-			}
-			else return false;
+			return population.getPersons().containsKey(personId);
 		}
 		else {
 			if(population == null) return true;
-			if(population.getPersons().containsKey(personId)){
-				return false;
-			}
-			else return true;
+			return !population.getPersons().containsKey(personId);
 		}
 	}
 
@@ -280,14 +274,14 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		final CategoryAxis axis1 = new CategoryAxis("hour");
 		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
 		plot.setDomainAxis(new NumberAxis("time"));
-		
+
 		plot.getRenderer().setSeriesStroke(0, new BasicStroke(2.0f));
 		plot.getRenderer().setSeriesStroke(1, new BasicStroke(2.0f));
 		plot.getRenderer().setSeriesStroke(2, new BasicStroke(2.0f));
 		plot.setBackgroundPaint(Color.white);
-		plot.setRangeGridlinePaint(Color.gray);  
-		plot.setDomainGridlinePaint(Color.gray);  
-		
+		plot.setRangeGridlinePaint(Color.gray);
+		plot.setDomainGridlinePaint(Color.gray);
+
 		return chart;
 	}
 

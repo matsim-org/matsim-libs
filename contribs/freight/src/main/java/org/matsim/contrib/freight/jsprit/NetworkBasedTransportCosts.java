@@ -213,11 +213,8 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			} else if (!to.equals(other.to))
 				return false;
 			if (vehicleType == null) {
-				if (other.vehicleType != null)
-					return false;
-			} else if (!vehicleType.equals(other.vehicleType))
-				return false;
-			return true;
+				return other.vehicleType == null;
+			} else return vehicleType.equals(other.vehicleType);
 		}
 
 	}
