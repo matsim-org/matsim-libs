@@ -72,7 +72,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
             private double penalty4missedTws = 0.01;
 
-            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Servie/WaitingTimeUnit ... but make sure that this were set correctly. 
+            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Servie/WaitingTimeUnit ... but make sure that this were set correctly.
             @Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
@@ -84,8 +84,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 			@Override
 			public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
 					Vehicle vehicle) {
-				double activityDuration = Math.max(0, tourAct.getEndTime() - tourAct.getArrTime()); //including waiting times
-				return activityDuration;
+				return Math.max(0, tourAct.getEndTime() - tourAct.getArrTime());
 			}
         };
         vrpAlgorithmConfig = vrpAlgoConfigFile;
@@ -123,15 +122,15 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
-        
+
         boolean addDefaultCostCalculators = true;
-         
+
         VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 
         //get configures algorithm
 //		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vrpAlgorithmConfig);
 //		vra.addListener(new AlgorithmSearchProgressChartListener("output/"+carrierPlan.getCarrier().getId() + "_" + carrierPlan.hashCode() + ".png"));
-        
+
         //add initial-solution - which is the initialSolution for the vehicle-routing-algo
         vra.addInitialSolution(MatsimJspritFactory.createSolution(carrierPlan, vrp));
 

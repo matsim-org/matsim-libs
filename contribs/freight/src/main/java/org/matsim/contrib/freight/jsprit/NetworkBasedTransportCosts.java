@@ -869,8 +869,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	}
 
 	private int getTimeSlice(double time) {
-		int timeSlice = (int) (time / timeSliceWidth);
-		return timeSlice;
+		return (int) (time / timeSliceWidth);
 	}
 
 	/**

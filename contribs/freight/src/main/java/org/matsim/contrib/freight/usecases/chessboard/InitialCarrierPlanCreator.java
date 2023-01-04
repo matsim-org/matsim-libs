@@ -62,13 +62,13 @@ final class InitialCarrierPlanCreator {
 //		NetworkBasedTransportCosts costs = costsBuilder.build();
 //		vrpBuilder.setRoutingCost(costs);
 //		VehicleRoutingProblem vrp = vrpBuilder.build();
-//		
+//
 //		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "input/usecases/chessboard/vrpalgo/ini_algorithm_v2.xml");
 ////		vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrier.getId()+".png"));
 //		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
-//		
+//
 //		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.bestOf(solutions));
-//		
+//
 
 
         //construct the routing problem - here the interface to jsprit comes into play
@@ -113,8 +113,7 @@ final class InitialCarrierPlanCreator {
 			@Override
 			public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
 					Vehicle vehicle) {
-				double activityDuration = Math.max(0, tourAct.getEndTime() - tourAct.getArrTime()); //including waiting times
-				return activityDuration;
+				return Math.max(0, tourAct.getEndTime() - tourAct.getArrTime());
 			}
 
         };
@@ -133,9 +132,9 @@ final class InitialCarrierPlanCreator {
 
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
-        
+
         boolean addDefaultCostCalculators = true;
-        
+
         VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 
         //get configures algorithm
