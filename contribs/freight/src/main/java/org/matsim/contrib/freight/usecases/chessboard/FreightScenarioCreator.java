@@ -95,7 +95,7 @@ final class FreightScenarioCreator {
 
 //        CarrierVehicleTypes types = CarrierVehicleTypes.getVehicleTypes(carriers);
 //        new CarrierVehicleTypeWriter(types).write("input/usecases/chessboard/freight/vehicleTypes.xml");
-        
+
         new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
     }
 
@@ -128,7 +128,7 @@ final class FreightScenarioCreator {
 
     private static List<Id<Link>> createOuterCityLinks(Network network) {
         List<Id<Link>> inner = new InnerOuterCityScenarioCreator().getInnerCityLinks();
-        List<Id<Link>> outer = new ArrayList<Id<Link>>();
+        List<Id<Link>> outer = new ArrayList<>();
         for(Id<Link> id : network.getLinks().keySet()){
             if(!inner.contains(id)){
                 outer.add(id);
@@ -139,7 +139,7 @@ final class FreightScenarioCreator {
 
     private static List<Id<Link>> createInnerCityLinks(Network network) {
         List<Id<Link>> inner = new InnerOuterCityScenarioCreator().getInnerCityLinks();
-        List<Id<Link>> innerCityLinkIds = new ArrayList<Id<Link>>();
+        List<Id<Link>> innerCityLinkIds = new ArrayList<>();
         for(Id<Link> id : inner){
             if(network.getLinks().containsKey(id)){
                 innerCityLinkIds.add(id);

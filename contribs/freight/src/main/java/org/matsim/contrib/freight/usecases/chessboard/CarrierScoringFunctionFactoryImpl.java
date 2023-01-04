@@ -193,7 +193,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 				if(leg.getRoute() instanceof NetworkRoute){
 					Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
 					distance += startLink.getLength();
-					for(Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()){
+					for(Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()){
 						distance += network.getLinks().get(linkId).getLength();
 
 					}

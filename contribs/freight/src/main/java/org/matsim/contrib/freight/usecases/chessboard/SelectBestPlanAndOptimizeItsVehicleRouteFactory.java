@@ -51,15 +51,15 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
-	
+
 	final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-	
+
 	private Network network;
-	
+
 	private CarrierVehicleTypes vehicleTypes;
-	
+
 	private TravelTime travelTimes;
-	
+
 	public SelectBestPlanAndOptimizeItsVehicleRouteFactory(Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes) {
 		super();
 		this.network = network;
@@ -69,18 +69,18 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 
 	public GenericPlanStrategy<CarrierPlan, Carrier> createStrategy(){
 //		CarrierReplanningStrategy replanningStrat = new CarrierReplanningStrategy(new SelectBestPlan());
-		GenericPlanStrategyImpl<CarrierPlan, Carrier> replanningStrat = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new BestPlanSelector<CarrierPlan, Carrier>() ) ;
-		
-		GenericPlanStrategyModule<CarrierPlan> vraModule = new GenericPlanStrategyModule<CarrierPlan>() {
-			
+		GenericPlanStrategyImpl<CarrierPlan, Carrier> replanningStrat = new GenericPlanStrategyImpl<>(new BestPlanSelector<>()) ;
+
+		GenericPlanStrategyModule<CarrierPlan> vraModule = new GenericPlanStrategyModule<>() {
+
 			@Override
 			public void handlePlan(CarrierPlan carrierPlan) {
 //				System.out.println("REPLAN " + carrierPlan.getCarrier().getId());
 				Carrier carrier = carrierPlan.getCarrier();
-				
+
 				//construct the routing problem - here the interface to jsprit comes into play
 				VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
-				
+
 				//******
 				//Define transport-costs
 				//******
@@ -91,24 +91,24 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 				tpcostsBuilder.setTravelTime(travelTimes);
 				//sets time-slice to build time-dependent tpcosts and traveltime matrices
 				tpcostsBuilder.setTimeSliceWidth(900);
-				
+
 				//assign netBasedCosts to RoutingProblem
 				NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
-				
+
 				//set transport-costs
 				vrpBuilder.setRoutingCost(netbasedTransportcosts);
-				
+
 				//******
 				//Define activity-costs
 				//******
-				//should be inline with activity-scoring 
-				VehicleRoutingActivityCosts activitycosts = new VehicleRoutingActivityCosts(){
+				//should be inline with activity-scoring
+				VehicleRoutingActivityCosts activitycosts = new VehicleRoutingActivityCosts() {
 
-					private double penalty4missedTws = 0.008; 
-					
+					private double penalty4missedTws = 0.008;
+
 					//TODO: Why is here always returned 0.0? KMT jan/2018
 					@Override
-					public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {	
+					public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
 						double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
 //						double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
 //						double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perTimeUnit;
@@ -119,44 +119,44 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 
 					@Override
 					public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
-							Vehicle vehicle) {
+													  Vehicle vehicle) {
 						// TODO Auto-generated method stub
 						return 0;
 					}
-					
+
 				};
 				vrpBuilder.setActivityCosts(activitycosts);
-				
+
 				//build the problem
 				VehicleRoutingProblem vrp = vrpBuilder.build();
-				
+
 				//get configures algorithm
 				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, IOUtils.extendUrl(url, "algorithm.xml"));
 //				vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrierPlan.getCarrier().getId() + "_" + carrierPlan.hashCode() + ".png"));
 				//add initial-solution - which is the initialSolution for the vehicle-routing-algo
 //				vra.addInitialSolution(MatsimJspritFactory.createSolution(carrierPlan, network));
-				
+
 				//solve problem
 				Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
-				
-				//get best 
+
+				//get best
 				VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
-				
+
 //				SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
-				
+
 				//create carrierPlan from solution
 				CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
-				
+
 				//route plan (currently jsprit does not memorizes the routes, thus route the plan)
 				NetworkRouter.routePlan(plan, netbasedTransportcosts);
-				
+
 				//set new plan
 				carrierPlan.getScheduledTours().clear();
 				carrierPlan.getScheduledTours().addAll(plan.getScheduledTours());
-				
+
 				//h
 //				carrierPlan.setScore(plan.getScore());
-				
+
 			}
 
 			@Override
@@ -166,9 +166,9 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 			@Override
 			public void finishReplanning() {
 			}
-		
+
 		};
-	
+
 		replanningStrat.addStrategyModule(vraModule) ;
 		return replanningStrat;
 	}

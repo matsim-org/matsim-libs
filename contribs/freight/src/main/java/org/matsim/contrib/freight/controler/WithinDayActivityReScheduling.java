@@ -46,20 +46,20 @@ import com.google.inject.Inject;
 /*
  * Physically enforces beginnings of time windows for freight activities, i.e. freight agents
  * wait before closed doors until they can deliver / pick up their goods.
- * 
+ *
  * Required because there is no way to encode this in a MATSim plan. There is no actual
  * within-day replanning taking place. What we would need is an ActivityDurationInterpretation
  * which allows this. Then this could go away.
- * 
+ *
  */
 class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener {
 	public static final String COMPONENT_NAME=WithinDayActivityReScheduling.class.getSimpleName() ;
 
 	private static final  Logger logger = LogManager.getLogger(WithinDayActivityReScheduling.class);
-	
+
 	private FreightAgentSource freightAgentSource;
-	
-	private Set<Activity> encounteredActivities = new HashSet<Activity>();
+
+	private Set<Activity> encounteredActivities = new HashSet<>();
 
 	private CarrierAgentTracker carrierAgentTracker;
 

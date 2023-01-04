@@ -66,7 +66,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	private int iteration = 0;
 	private final int binSize;
 	private final int nofBins;
-	private final Map<String, ModeData> data = new TreeMap<String, ModeData>();
+	private final Map<String, ModeData> data = new TreeMap<>();
 	private ModeData allModesData = null;
 
 	private boolean inclPopulation = true;

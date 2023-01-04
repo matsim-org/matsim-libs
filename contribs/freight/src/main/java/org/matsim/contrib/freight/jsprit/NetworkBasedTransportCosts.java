@@ -255,7 +255,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private TravelTime travelTime;
 
-		private Map<String, VehicleTypeVarCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeVarCosts>();
+		private Map<String, VehicleTypeVarCosts> typeSpecificCosts = new HashMap<>();
 
 		/**
 		 * Constructs travelDisutility according to the builder.
@@ -392,7 +392,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private Network network;
 
-		private Map<String, VehicleTypeVarCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeVarCosts>();
+		private Map<String, VehicleTypeVarCosts> typeSpecificCosts = new HashMap<>();
 
 		private boolean isFIFO = false;
 
@@ -537,13 +537,13 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 * cost-cache to cache transport-costs and transport-times (see
 	 * {@link TransportData}) according to {@link TransportDataKey}
 	 */
-	private final ConcurrentHashMap<TransportDataKey, TransportData> costCache = new ConcurrentHashMap<TransportDataKey, TransportData>();
+	private final ConcurrentHashMap<TransportDataKey, TransportData> costCache = new ConcurrentHashMap<>();
 
 	/**
 	 * caches leastCostPathCalculators according to
 	 * <code>Thread.currentThread().getId()</code>
 	 */
-	private final ConcurrentHashMap<Long, LeastCostPathCalculator> routerCache = new ConcurrentHashMap<Long, LeastCostPathCalculator>();
+	private final ConcurrentHashMap<Long, LeastCostPathCalculator> routerCache = new ConcurrentHashMap<>();
 
 	private final TravelDisutility travelDisutility;
 
@@ -558,7 +558,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	public final Counter ttRequestedCounter;
 
-	private Map<String, org.matsim.vehicles.Vehicle> matsimVehicles = new HashMap<String, org.matsim.vehicles.Vehicle>();
+	private Map<String, org.matsim.vehicles.Vehicle> matsimVehicles = new HashMap<>();
 
 	private VehicleTypeDependentRoadPricingCalculator roadPricingCalc;
 
@@ -567,7 +567,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 */
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
-	private Collection<InternalLeastCostPathCalculatorListener> listeners = new ArrayList<InternalLeastCostPathCalculatorListener>();
+	private Collection<InternalLeastCostPathCalculatorListener> listeners = new ArrayList<>();
 
 	private String defaultTypeId;
 
@@ -632,9 +632,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 					matsimVehicle);
 
 			double travelDistance = fromLink.getLength();
-			Iterator<Link> iter = path.links.iterator();
-			while (iter.hasNext()) {
-				Link link = iter.next();
+			for (Link link : path.links) {
 				travelDistance = travelDistance + link.getLength();
 			}
 			transportTime = path.travelTime;
@@ -716,9 +714,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			double additionalTimeTo = travelTime.getLinkTravelTime(toLink, departureTime + path.travelTime, null,
 					matsimVehicle);
 			double travelDistance = fromLink.getLength();
-			Iterator<Link> iter = path.links.iterator();
-			while (iter.hasNext()) {
-				Link link = iter.next();
+			for (Link link : path.links) {
 				travelDistance = travelDistance + link.getLength();
 			}
 
@@ -779,9 +775,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 					null, matsimVehicle);
 			double additionalTimeTo = travelTime.getLinkTravelTime(toLink, departureTime + path.travelTime, null,
 					matsimVehicle);
-			Iterator<Link> iter = path.links.iterator();
-			while (iter.hasNext()) {
-				Link link = iter.next();
+			for (Link link : path.links) {
 				travelDistance = travelDistance + link.getLength();
 			}
 			TransportData newData = new TransportData(path.travelCost + additionalCostTo,
