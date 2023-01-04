@@ -355,20 +355,15 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * By default it takes <code>link.getFreespeed(time);</code> to calculate the
 		 * travelTime over that link.
 		 */
-		private TravelTime travelTime = new TravelTime() {
-
-			@Override
-			public double getLinkTravelTime(Link link, double time, Person person,
-					org.matsim.vehicles.Vehicle vehicle) {
-				double velocity;
-				if (vehicle.getType().getMaximumVelocity() < link.getFreespeed(time)) {
-					velocity = vehicle.getType().getMaximumVelocity();
-				} else
-					velocity = link.getFreespeed(time);
-				if (velocity <= 0.0)
-					throw new IllegalStateException("velocity must be bigger than zero");
-				return link.getLength() / velocity;
-			}
+		private TravelTime travelTime = (link, time, person, vehicle) -> {
+			double velocity;
+			if (vehicle.getType().getMaximumVelocity() < link.getFreespeed(time)) {
+				velocity = vehicle.getType().getMaximumVelocity();
+			} else
+				velocity = link.getFreespeed(time);
+			if (velocity <= 0.0)
+				throw new IllegalStateException("velocity must be bigger than zero");
+			return link.getLength() / velocity;
 		};
 
 		private TravelDisutility baseDisutility;
@@ -377,14 +372,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private int timeSliceWidth = Integer.MAX_VALUE;
 
-		private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new LeastCostPathCalculatorFactory() {
-
-			@Override
-			public LeastCostPathCalculator createPathCalculator(Network network, TravelDisutility travelCosts,
-					TravelTime travelTimes) {
-				return new FastDijkstraFactory().createPathCalculator(network, travelCosts, travelTime);
-			}
-		};
+		private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = (network, travelCosts, travelTimes) -> new FastDijkstraFactory().createPathCalculator(network, travelCosts, travelTime);
 
 		private VehicleTypeDependentRoadPricingCalculator roadPricingCalculator = new VehicleTypeDependentRoadPricingCalculator();
 
