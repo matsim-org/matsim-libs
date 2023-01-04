@@ -26,16 +26,15 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 /**
  * VehicleTypeContainer mapping all vehicleTypes.
- * 
+ *
  * @author sschroeder
  *
  */
 public class CarrierVehicleTypes {
-	
+
 	public static CarrierVehicleTypes getVehicleTypes(Carriers carriers){
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		for(Carrier c : carriers.getCarriers().values()){
@@ -48,7 +47,7 @@ public class CarrierVehicleTypes {
 		}
 		return types;
 	}
-	
+
 	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
 
 	public CarrierVehicleTypes() {

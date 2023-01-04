@@ -20,7 +20,6 @@ package org.matsim.contrib.freight;
 
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.io.IOUtils;
 
 import jakarta.validation.constraints.Positive;
 import java.net.URL;

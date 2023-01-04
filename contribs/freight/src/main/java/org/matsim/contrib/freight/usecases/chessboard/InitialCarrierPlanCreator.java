@@ -40,7 +40,6 @@ import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;

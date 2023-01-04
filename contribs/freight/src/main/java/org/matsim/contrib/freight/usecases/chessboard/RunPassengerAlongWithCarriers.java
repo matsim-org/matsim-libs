@@ -32,7 +32,6 @@ import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.SimpleDriversActivityScoring;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.SimpleDriversLegScoring;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.SimpleVehicleEmploymentScoring;
-import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
