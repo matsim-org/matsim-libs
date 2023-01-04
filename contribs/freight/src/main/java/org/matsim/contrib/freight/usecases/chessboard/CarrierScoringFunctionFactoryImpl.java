@@ -39,6 +39,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -180,9 +181,8 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
 		@Override
 		public void handleLeg(Leg leg) {
-			if(leg.getRoute() instanceof NetworkRoute){
-				NetworkRoute nRoute = (NetworkRoute) leg.getRoute();
-				Id vehicleId = nRoute.getVehicleId();
+			if(leg.getRoute() instanceof NetworkRoute nRoute){
+				Id<Vehicle> vehicleId = nRoute.getVehicleId();
 				CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
 				Gbl.assertNotNull(vehicle);
 				if(!employedVehicles.contains(vehicle)){
