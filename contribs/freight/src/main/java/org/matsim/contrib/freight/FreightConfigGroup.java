@@ -49,9 +49,10 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     private static final String TRAVEL_TIME_SLICE_WIDTH_DESC = "time slice width used for calculation of travel times in seconds." +
             " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
             " Default value is 1800 seconds.";
-    
-    public enum UseDistanceConstraintForTourPlanning {noDistanceConstraint, basedOnEnergyConsumption};
-    static final String USE_DISTANCE_CONSTRAINT = "useDistanceConstraintForTourPlanning";
+
+    public enum UseDistanceConstraintForTourPlanning {noDistanceConstraint, basedOnEnergyConsumption}
+
+	static final String USE_DISTANCE_CONSTRAINT = "useDistanceConstraintForTourPlanning";
     private UseDistanceConstraintForTourPlanning useDistanceConstraintForTourPlanning = UseDistanceConstraintForTourPlanning.noDistanceConstraint;
     private static final String USE_DISTANCE_CONSTRAINT_DESC = "Use distance constraint within the tour planning phase. This does NOT ensure that the tours in MATSim will respect this limitation";
 
@@ -80,7 +81,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
         this.carriersFile = carriersFile;
     }
 
-    
+
     //### CarriersVehicleTypeFile ###
     /**
      * @return -- {@value #CARRIERS_VEHICLE_TYPE_DESC}
@@ -93,7 +94,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     URL getCarriersVehicleTypesFileUrl(URL context) {
         return ConfigGroup.getInputFileURL(context, this.carriersVehicleTypesFile);
     }
-    
+
     /**
      * @param -- {@value #CARRIERS_VEHICLE_TYPE_DESC}
      */
@@ -156,7 +157,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     }
 
 
-    
+
     //---
     //---
     /**

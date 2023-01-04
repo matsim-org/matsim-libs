@@ -75,7 +75,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 		double getDistance(TourActivity from, TourActivity to) {
 			double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), 0, null);
 			if (!(distance >= 0.))
-				throw new AssertionError("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString() + " distance " + distance);
+				throw new AssertionError("Distance must not be negativ! From, to" + from + ", " + to + " distance " + distance);
 			return distance;
 		}
 	}

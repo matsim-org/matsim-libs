@@ -27,6 +27,6 @@ import org.matsim.core.events.handler.EventHandler;
 
 public interface FreightTourStartEventHandler extends EventHandler {
 
-	public void handleEvent( FreightTourStartEvent event );
+	void handleEvent( FreightTourStartEvent event );
 
 }

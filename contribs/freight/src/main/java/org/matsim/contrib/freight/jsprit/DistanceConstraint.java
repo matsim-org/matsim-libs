@@ -37,12 +37,12 @@ import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author rewert
- * 
+ *
  *         Includes all classes and methods for the distance constraint of every
  *         vehicle with an energyCapacity. The base for calculating the
  *         consumption is only the driven distance and not the transported
  *         weight or other influences. But is possible to integrate it.
- * 
+ *
  *         !! No recharging or refueling is integrated. Vehicles are totally
  *         full at the beginning.
  *
@@ -102,7 +102,7 @@ import org.matsim.vehicles.VehicleUtils;
 				// calculates the additional distance for adding a pickup and checks the shortest possibility for adding the associated delivery
 				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
 						- getDistance(prevAct, nextAct, newVehicle)+ findMinimalAdditionalDistance(context, newAct, newAct);
-				
+
 			} else if (newAct instanceof DeliverShipment) {
 				// calculates the distance new for integrating the associated pickup
 				routeDistance = calculateRouteDistanceWithAssociatedPickup(context);
@@ -304,7 +304,7 @@ import org.matsim.vehicles.VehicleUtils;
 		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), from.getEndTime(),
 				vehicle);
 		if (!(distance >= 0.))
-			throw new AssertionError("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString()
+			throw new AssertionError("Distance must not be negativ! From, to" + from + ", " + to
 					+ " distance " + distance);
 		return distance;
 	}
@@ -313,7 +313,7 @@ import org.matsim.vehicles.VehicleUtils;
 		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), departureTime,
 				vehicle);
 		if (!(distance >= 0.))
-			throw new AssertionError("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString()
+			throw new AssertionError("Distance must not be negativ! From, to" + from + ", " + to
 					+ " distance " + distance);
 		return distance;
 	}

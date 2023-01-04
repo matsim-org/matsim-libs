@@ -77,9 +77,9 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	public interface InternalLeastCostPathCalculatorListener {
 
-		public void startCalculation(long routerId);
+		void startCalculation(long routerId);
 
-		public void endCalculation(long routerId);
+		void endCalculation(long routerId);
 
 	}
 

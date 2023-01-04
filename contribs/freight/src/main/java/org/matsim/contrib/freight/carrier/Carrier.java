@@ -30,75 +30,71 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * A carrier.
- * 
+ *
  * @author sschroeder
  *
  */
 public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier>, Attributable{
-	
-	public static int PLAN_MEMORY = 5;
+
+	int PLAN_MEMORY = 5;
 
 	/**
 	 * Gets the carrierId.
-	 * 
+	 *
 	 * @return id
 	 */
-	@Override
-	public abstract Id<Carrier> getId();
+	@Override Id<Carrier> getId();
 
 	/**
 	 * Gets a collection of carrierPlans.
-	 * 
+	 *
 	 * @return collection of {@link CarrierPlan}
 	 */
-	@Override
-	public abstract List<CarrierPlan> getPlans();
+	@Override List<CarrierPlan> getPlans();
 
 	/**
 	 * Gets a collection of carrierShipments
-	 * 
+	 *
 	 * @return collection of {@link CarrierShipment}
 	 */
-	public abstract Map<Id<CarrierShipment>, CarrierShipment> getShipments();
-	
+	Map<Id<CarrierShipment>, CarrierShipment> getShipments();
+
 	/**
 	 * Gets a collection of carrierServices
-	 * 
+	 *
 	 * @return collection of {@link CarrierService}
 	 */
-	public abstract Map<Id<CarrierService>, CarrierService> getServices();
+	Map<Id<CarrierService>, CarrierService> getServices();
 
 	/**
 	 * Gets the selected plan.
-	 * 
+	 *
 	 * @return {@link CarrierPlan}
 	 */
-	@Override
-	public abstract CarrierPlan getSelectedPlan();
+	@Override CarrierPlan getSelectedPlan();
 
 	/**
 	 * Sets a {@link CarrierPlan} as selected.
-	 * 
+	 *
 	 * <p>If selectePlan in not in plan-collection, it adds it.
-	 * 
+	 *
 	 * @param selectedPlan to be set
 	 */
-	@Override
-	public abstract void setSelectedPlan(CarrierPlan selectedPlan);
+	@Override void setSelectedPlan(CarrierPlan selectedPlan);
 
 	/**
 	 * Sets carrierCapabilities.
-	 * 
+	 *
 	 * @param carrierCapabilities to be set
 	 */
-	public abstract void setCarrierCapabilities(CarrierCapabilities carrierCapabilities);
+	void setCarrierCapabilities(CarrierCapabilities carrierCapabilities);
 
 	/**
 	 * Gets the carrierCapabilities.
-	 * 
+	 *
 	 * @return {@link CarrierCapabilities}
 	 */
-	public abstract CarrierCapabilities getCarrierCapabilities();
+	CarrierCapabilities getCarrierCapabilities();
 
 
 	void clearPlans();
