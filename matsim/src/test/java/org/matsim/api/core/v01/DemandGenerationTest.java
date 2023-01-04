@@ -37,6 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author dgrether
@@ -183,9 +184,9 @@ public class DemandGenerationTest extends MatsimTestCase {
 				PlanElement element = p.getPlanElements().get(i);
 				assertNotNull(element);
 			}
-			assertEquals(homeEndTime, ((Activity)p.getPlanElements().get(0)).getEndTime().seconds(), EPSILON);
+			assertEquals(homeEndTime, ((Activity)p.getPlanElements().get(0)).getEndTime().seconds(), MatsimTestUtils.EPSILON);
 			assertEquals(Id.create(1, Link.class), ((Activity)p.getPlanElements().get(0)).getLinkId());
-			assertEquals(workEndTime, ((Activity)p.getPlanElements().get(2)).getEndTime().seconds(), EPSILON);
+			assertEquals(workEndTime, ((Activity)p.getPlanElements().get(2)).getEndTime().seconds(), MatsimTestUtils.EPSILON);
 			assertEquals(Id.create(3, Link.class), ((Activity)p.getPlanElements().get(2)).getLinkId());
 			assertTrue(((Activity)p.getPlanElements().get(4)).getEndTime().isUndefined());
 			assertEquals(Id.create(1, Link.class), ((Activity)p.getPlanElements().get(4)).getLinkId());

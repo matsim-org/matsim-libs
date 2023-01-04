@@ -30,11 +30,18 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
+
+/**
+ * @Deprecated This is the "old" infrastructure for providing some standardized helper methods for junit-testing (until junit 3)
+ * Please use {@link MatsimTestUtils} instead (starting from junit 4)
+ * ((Deprecation was done after a mtg with KN))
+ */
 @Ignore
+@Deprecated (since = "Jan 23")
 public class MatsimTestCase extends TestCase {
 
 	/** A constant for the exactness when comparing doubles. */
-	public static final double EPSILON = 1e-10;
+	public static final double EPSILON = MatsimTestUtils.EPSILON;
 
 	/** The default output directory, where files of this test should be written to.
 	 * Includes the trailing '/' to denote a directory. */

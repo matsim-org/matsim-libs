@@ -21,7 +21,7 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 
 /**
@@ -46,8 +46,8 @@ public class TransitQueueVehicleTest extends AbstractTransitVehicleTest {
 		Vehicle car = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), carType );
 		Vehicle bus = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), busType );
 		TransitQVehicle veh = new TransitQVehicle(car);
-		assertEquals(1.0, veh.getSizeInEquivalents(), MatsimTestCase.EPSILON);
+		assertEquals(1.0, veh.getSizeInEquivalents(), MatsimTestUtils.EPSILON);
 		veh = new TransitQVehicle(bus);
-		assertEquals(2.5, veh.getSizeInEquivalents(), MatsimTestCase.EPSILON);
+		assertEquals(2.5, veh.getSizeInEquivalents(), MatsimTestUtils.EPSILON);
 	}
 }

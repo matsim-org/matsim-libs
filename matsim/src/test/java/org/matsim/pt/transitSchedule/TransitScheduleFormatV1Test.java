@@ -43,6 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.SAXException;
 
@@ -153,8 +154,8 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		for (TransitStopFacility stopE : expected.getFacilities().values()) {
 			TransitStopFacility stopA = actual.getFacilities().get(stopE.getId());
 			assertNotNull("stopFacility not found: " + stopE.getId().toString(), stopA);
-			assertEquals("different x coordinates.", stopE.getCoord().getX(), stopA.getCoord().getX(), EPSILON);
-			assertEquals("different y coordinates.", stopE.getCoord().getY(), stopA.getCoord().getY(), EPSILON);
+			assertEquals("different x coordinates.", stopE.getCoord().getX(), stopA.getCoord().getX(), MatsimTestUtils.EPSILON);
+			assertEquals("different y coordinates.", stopE.getCoord().getY(), stopA.getCoord().getY(), MatsimTestUtils.EPSILON);
 			assertEquals("different link information.", stopE.getLinkId(), stopA.getLinkId());
 			assertEquals("different isBlocking.", stopE.getIsBlockingLane(), stopA.getIsBlockingLane());
 			assertEquals("different names.", stopE.getName(), stopA.getName());
@@ -201,7 +202,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 				for (Departure departureE : routeE.getDepartures().values()) {
 					Departure departureA = routeA.getDepartures().get(departureE.getId());
 					assertNotNull("departure not found: " + departureE.getId().toString(), departureA);
-					assertEquals("different departure times.", departureE.getDepartureTime(), departureA.getDepartureTime(), EPSILON);
+					assertEquals("different departure times.", departureE.getDepartureTime(), departureA.getDepartureTime(), MatsimTestUtils.EPSILON);
 					assertEquals("different vehicle ids.", departureE.getVehicleId(), departureA.getVehicleId());
 				}
 			}

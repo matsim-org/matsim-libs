@@ -23,6 +23,7 @@ package org.matsim.counts;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsReaderHandlerImplV1Test extends MatsimTestCase {
 
@@ -56,6 +57,6 @@ public class CountsReaderHandlerImplV1Test extends MatsimTestCase {
 		reader.startTag("count", attributeFactory.createCountAttributes(), null);
 		reader.startTag("volume", attributeFactory.createVolumeAttributes(), null);
 
-		assertEquals("Volume attribute setting failed", 100.0, counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(), EPSILON);
+		assertEquals("Volume attribute setting failed", 100.0, counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(), MatsimTestUtils.EPSILON);
 	}
 }

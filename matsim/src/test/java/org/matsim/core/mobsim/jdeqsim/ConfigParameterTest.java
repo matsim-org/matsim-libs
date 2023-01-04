@@ -22,18 +22,19 @@ package org.matsim.core.mobsim.jdeqsim;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class ConfigParameterTest extends MatsimTestCase {
 
 	public void testParametersSetCorrectly() {
 		Config config = super.loadConfig(this.getPackageInputDirectory() + "config.xml");
 		JDEQSimConfigGroup jdeqSimConfigGroup = ConfigUtils.addOrGetModule(config, JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class);
-		assertEquals(360.0, jdeqSimConfigGroup.getSimulationEndTime().seconds(), EPSILON);
-		assertEquals(2.0, jdeqSimConfigGroup.getFlowCapacityFactor(), EPSILON);
-		assertEquals(3.0, jdeqSimConfigGroup.getStorageCapacityFactor(), EPSILON);
-		assertEquals(3600.0, jdeqSimConfigGroup.getMinimumInFlowCapacity(), EPSILON);
-		assertEquals(10.0, jdeqSimConfigGroup.getCarSize(), EPSILON);
-		assertEquals(20.0, jdeqSimConfigGroup.getGapTravelSpeed(), EPSILON);
-		assertEquals(9000.0, jdeqSimConfigGroup.getSqueezeTime(), EPSILON);
+		assertEquals(360.0, jdeqSimConfigGroup.getSimulationEndTime().seconds(), MatsimTestUtils.EPSILON);
+		assertEquals(2.0, jdeqSimConfigGroup.getFlowCapacityFactor(), MatsimTestUtils.EPSILON);
+		assertEquals(3.0, jdeqSimConfigGroup.getStorageCapacityFactor(), MatsimTestUtils.EPSILON);
+		assertEquals(3600.0, jdeqSimConfigGroup.getMinimumInFlowCapacity(), MatsimTestUtils.EPSILON);
+		assertEquals(10.0, jdeqSimConfigGroup.getCarSize(), MatsimTestUtils.EPSILON);
+		assertEquals(20.0, jdeqSimConfigGroup.getGapTravelSpeed(), MatsimTestUtils.EPSILON);
+		assertEquals(9000.0, jdeqSimConfigGroup.getSqueezeTime(), MatsimTestUtils.EPSILON);
 	}
 }
