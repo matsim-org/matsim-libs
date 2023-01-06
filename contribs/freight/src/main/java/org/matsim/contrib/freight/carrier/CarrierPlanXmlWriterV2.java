@@ -49,6 +49,7 @@ import org.matsim.vehicles.VehicleType;
  *
  * @deprecated Use {@link CarrierPlanWriter} instead which writes the newest format
  */
+@Deprecated
 public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
 	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV2.class);
