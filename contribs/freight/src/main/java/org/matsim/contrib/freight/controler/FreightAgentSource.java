@@ -19,11 +19,6 @@
  *  *                                                                         *
  *  * ***********************************************************************
  *
- * ${filecomment}
- * ${package_declaration}
- *
- * ${typecomment}
- * ${type_declaration}
  */
 
 package org.matsim.contrib.freight.controler;

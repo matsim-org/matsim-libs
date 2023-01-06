@@ -235,7 +235,7 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 	}
 
 	@Override
-	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
+	public void notifyShutdown(final ShutdownEvent controlerShutdownEvent) {
 		try {
 			this.out.close();
 		} catch (IOException e) {

@@ -137,7 +137,7 @@ public class CarrierVehicleType {
 		/**
 		 * Sets the capacity of vehicle-type.
 		 *
-		 * <p>By defaul the capacity is 0.
+		 * <p>By default, the capacity is 0.
 		 *
 		 * @param capacity
 		 * @return this builder

@@ -229,8 +229,8 @@ import org.matsim.vehicles.VehicleUtils;
 		if (context.getAssociatedActivities().get(1) instanceof DeliverShipment) {
 			TourActivity assignedDelivery = context.getAssociatedActivities().get(1);
 			minimalAdditionalDistance = 0;
-			int indexNextActicity = nextAct.getIndex();
-			int tourPositionOfAcitivityBehindNewPickup = 0;
+			int indexNextActivity = nextAct.getIndex();
+			int tourPositionOfActivityBehindNewPickup = 0;
 			int countIndex = 0;
 			Vehicle newVehicle = context.getNewVehicle();
 			VehicleRoute route = context.getRoute();
@@ -238,10 +238,10 @@ import org.matsim.vehicles.VehicleUtils;
 			// search the index of the activity behind the pickup activity which should be
 			// added to the tour
 			a: for (TourActivity tourActivity : route.getTourActivities().getActivities()) {
-				if (tourActivity.getIndex() == indexNextActicity) {
+				if (tourActivity.getIndex() == indexNextActivity) {
 					while (countIndex < route.getTourActivities().getActivities().size()) {
-						if (route.getTourActivities().getActivities().get(countIndex).getIndex() == indexNextActicity) {
-							tourPositionOfAcitivityBehindNewPickup = countIndex;
+						if (route.getTourActivities().getActivities().get(countIndex).getIndex() == indexNextActivity) {
+							tourPositionOfActivityBehindNewPickup = countIndex;
 							break a;
 						}
 						countIndex++;
@@ -249,17 +249,17 @@ import org.matsim.vehicles.VehicleUtils;
 				}
 			}
 
-			// search the minimal distance between every exiting TourAcitivity
-			while ((tourPositionOfAcitivityBehindNewPickup + 1) < route.getTourActivities().getActivities().size()) {
+			// search the minimal distance between every exiting TourActivity
+			while ((tourPositionOfActivityBehindNewPickup + 1) < route.getTourActivities().getActivities().size()) {
 				TourActivity activityBefore = route.getTourActivities().getActivities()
-						.get(tourPositionOfAcitivityBehindNewPickup);
+						.get(tourPositionOfActivityBehindNewPickup);
 				TourActivity activityAfter = route.getTourActivities().getActivities()
-						.get(tourPositionOfAcitivityBehindNewPickup + 1);
+						.get(tourPositionOfActivityBehindNewPickup + 1);
 				double possibleAdditionalDistance = getDistance(activityBefore, assignedDelivery, newVehicle)
 						+ getDistance(assignedDelivery, activityAfter, newVehicle)
 						- getDistance(activityBefore, activityAfter, newVehicle);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
-				tourPositionOfAcitivityBehindNewPickup++;
+				tourPositionOfActivityBehindNewPickup++;
 			}
 			// checks the distance if the delivery is the last activity before the end of
 			// the tour
@@ -274,7 +274,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 				// Checks the distance if the delivery will be added directly behind the pickup
 				TourActivity activityAfter = route.getTourActivities().getActivities()
-						.get(tourPositionOfAcitivityBehindNewPickup);
+						.get(tourPositionOfActivityBehindNewPickup);
 				possibleAdditionalDistance = getDistance(newInvestigatedPickup, assignedDelivery, newVehicle)
 						+ getDistance(assignedDelivery, activityAfter, newVehicle)
 						- getDistance(newInvestigatedPickup, activityAfter, newVehicle);
@@ -304,7 +304,7 @@ import org.matsim.vehicles.VehicleUtils;
 		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), from.getEndTime(),
 				vehicle);
 		if (!(distance >= 0.))
-			throw new AssertionError("Distance must not be negativ! From, to" + from + ", " + to
+			throw new AssertionError("Distance must not be negative! From, to" + from + ", " + to
 					+ " distance " + distance);
 		return distance;
 	}
@@ -313,7 +313,7 @@ import org.matsim.vehicles.VehicleUtils;
 		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), departureTime,
 				vehicle);
 		if (!(distance >= 0.))
-			throw new AssertionError("Distance must not be negativ! From, to" + from + ", " + to
+			throw new AssertionError("Distance must not be negative! From, to" + from + ", " + to
 					+ " distance " + distance);
 		return distance;
 	}

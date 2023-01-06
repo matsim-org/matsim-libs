@@ -72,7 +72,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
             private double penalty4missedTws = 0.01;
 
-            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Servie/WaitingTimeUnit ... but make sure that this where set correctly.
+            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Service/WaitingTimeUnit ... but make sure that this where set correctly.
             @Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
@@ -167,7 +167,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
         if(roadPricing != null) tpcostsBuilder.setRoadPricingCalculator(roadPricing);
 
-        //sets time-slice to build time-dependent tpcosts and traveltime matrices
+        //sets time-slice to build time-dependent tpcosts and travelTime matrices
         tpcostsBuilder.setTimeSliceWidth(900);
 //		tpcostsBuilder.setFIFO(true);
         //assign netBasedCosts to RoutingProblem
