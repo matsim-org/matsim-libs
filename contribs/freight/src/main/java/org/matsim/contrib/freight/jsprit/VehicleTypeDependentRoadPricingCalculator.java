@@ -123,8 +123,10 @@ public class VehicleTypeDependentRoadPricingCalculator {
 		else if(pricingScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE)){
 			calculators.put(pricingScheme.getType(), new DistanceCalc());
 		}
-        else throw new IllegalStateException("toll type specification missing. if you use xml add specification to root node like this\n"
-            + "<roadpricing type=\"cordon\" name=\"link\"> if it is a link toll and \n<roadpricing type=\"distance\" name=\"distance\"> if it is a distance toll");
+        else throw new IllegalStateException("""
+					toll type specification missing. if you use xml add specification to root node like this
+					<roadpricing type="cordon" name="link"> if it is a link toll and\s
+					<roadpricing type="distance" name="distance"> if it is a distance toll""");
 	}
 
 	/**

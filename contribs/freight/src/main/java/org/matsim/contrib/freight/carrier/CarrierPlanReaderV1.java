@@ -84,7 +84,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	private final CarrierVehicleTypes carrierVehicleTypes;
 
 	/**
-	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
+	 * Constructs a reader with an empty carriers-container for the carriers to be constructed.
 	 *
 	 * @param carriers which is a map that stores carriers
 	 * @param carrierVehicleTypes
@@ -206,34 +206,32 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 			}
 			case ACTIVITY:
 			{
-				switch( attributes.getValue( TYPE ) ){
-					case "start":
-						currentStartTime = getDouble( attributes.getValue( "end_time" ) );
+				switch (attributes.getValue(TYPE)) {
+					case "start" -> {
+						currentStartTime = getDouble(attributes.getValue("end_time"));
 						previousActLoc = currentVehicle.getLinkId();
-						currentTourBuilder.scheduleStart( currentVehicle.getLinkId(),
-							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
-						break;
-					case "pickup":{
+						currentTourBuilder.scheduleStart(currentVehicle.getLinkId(),
+								TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+					}
+					case "pickup" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
-						CarrierShipment s = currentShipments.get( id );
-						finishLeg( s.getFrom() );
-						currentTourBuilder.schedulePickup( s );
+						CarrierShipment s = currentShipments.get(id);
+						finishLeg(s.getFrom());
+						currentTourBuilder.schedulePickup(s);
 						previousActLoc = s.getFrom();
-						break;
 					}
-					case "delivery":{
+					case "delivery" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
-						CarrierShipment s = currentShipments.get( id );
-						finishLeg( s.getTo() );
-						currentTourBuilder.scheduleDelivery( s );
+						CarrierShipment s = currentShipments.get(id);
+						finishLeg(s.getTo());
+						currentTourBuilder.scheduleDelivery(s);
 						previousActLoc = s.getTo();
-						break;
 					}
-					case "end":
-						finishLeg( currentVehicle.getLinkId() );
-						currentTourBuilder.scheduleEnd( currentVehicle.getLinkId(),
-							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
-						break;
+					case "end" -> {
+						finishLeg(currentVehicle.getLinkId());
+						currentTourBuilder.scheduleEnd(currentVehicle.getLinkId(),
+								TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+					}
 				}
 				break ;
 			}

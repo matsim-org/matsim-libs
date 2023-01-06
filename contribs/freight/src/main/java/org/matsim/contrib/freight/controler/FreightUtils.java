@@ -198,7 +198,7 @@ public class FreightUtils {
 		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are
 		// not found. kai, oct'19
 		if ( scenario.getScenarioElement( CARRIERS ) == null ) {
-			throw new RuntimeException( "\n\ncannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
+			throw new RuntimeException( "cannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
 								    "FreightUtils.getOrCreateCarriers(...) or FreightUtils.loadCarriersAccordingToFreightConfig(...) early enough\n") ;
 		}
 		return (Carriers) scenario.getScenarioElement(CARRIERS);
