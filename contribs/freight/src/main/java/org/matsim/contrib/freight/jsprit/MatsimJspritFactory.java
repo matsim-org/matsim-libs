@@ -490,8 +490,13 @@ public final class MatsimJspritFactory {
 	public static VehicleRoutingProblem createRoutingProblem(Carrier carrier, Network network,
 			VehicleRoutingTransportCosts transportCosts, VehicleRoutingActivityCosts activityCosts) {
 		VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-		boolean serviceInVrp = false;
-		boolean shipmentInVrp = false;
+		boolean serviceInVrp = !carrier.getServices().isEmpty();
+		boolean shipmentInVrp = !carrier.getShipments().isEmpty();
+
+		if (shipmentInVrp && serviceInVrp) {
+			throw new UnsupportedOperationException(
+					"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+		}
 
 		FleetSize fleetSize;
 		CarrierCapabilities carrierCapabilities = carrier.getCarrierCapabilities();
@@ -523,47 +528,43 @@ public final class MatsimJspritFactory {
 			vrpBuilder.addVehicle(veh);
 		}
 
-		for (CarrierService service : carrier.getServices().values()) {
-			if (shipmentInVrp) {
-				throw new UnsupportedOperationException(
-						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+
+		if (serviceInVrp) {
+			for (CarrierService service : carrier.getServices().values()) {
+
+				Coord coordinate = null;
+				if (network != null) {
+					Link link = network.getLinks().get(service.getLocationLinkId());
+					if (link != null) {
+						coordinate = link.getCoord();
+					} else
+						log.warn("cannot find linkId " + service.getLocationLinkId());
+				}
+				vrpBuilder.addJob(createService(service, coordinate));
 			}
-			Coord coordinate = null;
-			if (network != null) {
-				Link link = network.getLinks().get(service.getLocationLinkId());
-				if (link != null) {
-					coordinate = link.getCoord();
-				} else
-					log.warn("cannot find linkId " + service.getLocationLinkId());
-			}
-			serviceInVrp = true;
-			vrpBuilder.addJob(createService(service, coordinate));
 		}
 
-		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
-			if (serviceInVrp) {
-				throw new UnsupportedOperationException(
-						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
-			}
-			Coord fromCoordinate = null;
-			Coord toCoordinate = null;
-			if (network != null) {
-				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
-				Link toLink = network.getLinks().get(carrierShipment.getTo());
+		if (shipmentInVrp) {
+			for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
+				Coord fromCoordinate = null;
+				Coord toCoordinate = null;
+				if (network != null) {
+					Link fromLink = network.getLinks().get(carrierShipment.getFrom());
+					Link toLink = network.getLinks().get(carrierShipment.getTo());
 
-				if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
-															// specified location
-					fromCoordinate = fromLink.getCoord();
-					toCoordinate = toLink.getCoord();
-					vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
-				} else
-					throw new IllegalStateException(
-							"cannot create shipment since neither fromLinkId " + carrierShipment.getTo()
-									+ " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
+					if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
+						// specified location
+						fromCoordinate = fromLink.getCoord();
+						toCoordinate = toLink.getCoord();
+						vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+					} else
+						throw new IllegalStateException(
+								"cannot create shipment since neither fromLinkId " + carrierShipment.getTo()
+										+ " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
 
+				}
+				vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 			}
-			shipmentInVrp = true;
-			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 		}
 
 		if (transportCosts != null)
@@ -593,8 +594,13 @@ public final class MatsimJspritFactory {
 	 */
 	public static VehicleRoutingProblem.Builder createRoutingProblemBuilder(Carrier carrier, Network network) {
 		VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-		boolean serviceInVrp = false;
-		boolean shipmentInVrp = false;
+		boolean serviceInVrp = !carrier.getServices().isEmpty();
+		boolean shipmentInVrp = !carrier.getShipments().isEmpty();
+
+		if (shipmentInVrp && serviceInVrp) {
+			throw new UnsupportedOperationException(
+					"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+		}
 
 		FleetSize fleetSize;
 		CarrierCapabilities carrierCapabilities = carrier.getCarrierCapabilities();
@@ -619,51 +625,44 @@ public final class MatsimJspritFactory {
 			vrpBuilder.addVehicle(createVehicle(carrierVehicle, coordinate));
 		}
 
-		for (CarrierService service : carrier.getServices().values()) {
-			log.debug("Handle CarrierService: " + service.toString());
-			if (shipmentInVrp) {
-				throw new UnsupportedOperationException(
-						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+		if (serviceInVrp) {
+			for (CarrierService service : carrier.getServices().values()) {
+				log.debug("Handle CarrierService: " + service.toString());
+				Coord coordinate = null;
+				if (network != null) {
+					Link link = network.getLinks().get(service.getLocationLinkId());
+					if (link == null) {
+						throw new IllegalStateException("cannot create service since linkId " + service.getLocationLinkId()
+								+ " does not exists in network.");
+					} else
+						coordinate = link.getCoord();
+				}
+				vrpBuilder.addJob(createService(service, coordinate));
 			}
-			Coord coordinate = null;
-			if (network != null) {
-				Link link = network.getLinks().get(service.getLocationLinkId());
-				if (link == null) {
-					throw new IllegalStateException("cannot create service since linkId " + service.getLocationLinkId()
-							+ " does not exists in network.");
-				} else
-					coordinate = link.getCoord();
-			}
-			serviceInVrp = true;
-			vrpBuilder.addJob(createService(service, coordinate));
 		}
 
-		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
-			log.debug("Handle CarrierShipment: " + carrierShipment.toString());
-			if (serviceInVrp) {
-				throw new UnsupportedOperationException(
-						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+		if (shipmentInVrp) {
+			for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
+				log.debug("Handle CarrierShipment: " + carrierShipment.toString());
+				Coord fromCoordinate = null;
+				Coord toCoordinate = null;
+				if (network != null) {
+					Link fromLink = network.getLinks().get(carrierShipment.getFrom());
+					Link toLink = network.getLinks().get(carrierShipment.getTo());
+
+					if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
+						// specified location
+						log.debug("Shipment identified as Shipment: " + carrierShipment.getId().toString());
+						fromCoordinate = fromLink.getCoord();
+						toCoordinate = toLink.getCoord();
+					} else
+						throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString()
+								+ " since either fromLinkId " + carrierShipment.getFrom() + " or toLinkId "
+								+ carrierShipment.getTo() + " exists in network.");
+
+				}
+				vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 			}
-
-			Coord fromCoordinate = null;
-			Coord toCoordinate = null;
-			if (network != null) {
-				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
-				Link toLink = network.getLinks().get(carrierShipment.getTo());
-
-				if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
-															// specified location
-					log.debug("Shipment identified as Shipment: " + carrierShipment.getId().toString());
-					fromCoordinate = fromLink.getCoord();
-					toCoordinate = toLink.getCoord();
-				} else
-					throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString()
-							+ " since either fromLinkId " + carrierShipment.getFrom() + " or toLinkId "
-							+ carrierShipment.getTo() + " exists in network.");
-
-			}
-			shipmentInVrp = true;
-			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 		}
 
 		return vrpBuilder;
