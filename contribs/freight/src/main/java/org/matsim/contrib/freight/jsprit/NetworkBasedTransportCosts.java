@@ -623,7 +623,6 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			for (Link link : path.links) {
 				travelDistance = travelDistance + link.getLength();
 			}
-			transportTime = path.travelTime;
 			TransportData newData = new TransportData(path.travelCost + additionalCostTo,
 					path.travelTime + additionalTimeTo, travelDistance);
 			TransportData existingData = costCache.putIfAbsent(transportDataKey, newData);
