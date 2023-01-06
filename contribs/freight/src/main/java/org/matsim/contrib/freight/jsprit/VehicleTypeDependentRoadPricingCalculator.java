@@ -56,9 +56,9 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	}
 
 
-	private Map<Id<org.matsim.vehicles.VehicleType>, Collection<RoadPricingScheme>> schemes = new HashMap<>();
+	private final Map<Id<org.matsim.vehicles.VehicleType>, Collection<RoadPricingScheme>> schemes = new HashMap<>();
 
-	private Map<String,TollCalculator> calculators = new HashMap<>();
+	private final Map<String,TollCalculator> calculators = new HashMap<>();
 
 	/**
 	 * Gets an unmodifiable list of {@link RoadPricingScheme} for a {@link VehicleType} with input-id.

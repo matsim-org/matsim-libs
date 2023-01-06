@@ -59,11 +59,11 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 	@SuppressWarnings("unused")
 	private static final  Logger logger = LogManager.getLogger(WithinDayActivityReScheduling.class);
 
-	private FreightAgentSource freightAgentSource;
+	private final FreightAgentSource freightAgentSource;
 
-	private Set<Activity> encounteredActivities = new HashSet<>();
+	private final Set<Activity> encounteredActivities = new HashSet<>();
 
-	private CarrierAgentTracker carrierAgentTracker;
+	private final CarrierAgentTracker carrierAgentTracker;
 
 	@Inject
 	WithinDayActivityReScheduling(FreightAgentSource freightAgentSource, CarrierAgentTracker carrierAgentTracker) {

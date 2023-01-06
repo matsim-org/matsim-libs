@@ -54,11 +54,11 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 
 	final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
-	private Network network;
+	private final Network network;
 
-	private CarrierVehicleTypes vehicleTypes;
+	private final CarrierVehicleTypes vehicleTypes;
 
-	private TravelTime travelTimes;
+	private final TravelTime travelTimes;
 
 	public SelectBestPlanAndOptimizeItsVehicleRouteFactory(Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes) {
 		super();
@@ -104,7 +104,7 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 				//should be inline with activity-scoring
 				VehicleRoutingActivityCosts activitycosts = new VehicleRoutingActivityCosts() {
 
-					private double penalty4missedTws = 0.008;
+					private final double penalty4missedTws = 0.008;
 
 					//TODO: Why is here always returned 0.0? KMT jan/2018
 					@Override
