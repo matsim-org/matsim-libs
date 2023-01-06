@@ -286,21 +286,21 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	}
 
 	/**
-	 * @return number of departures per time-bin, for all legs
+	 * @return number(s) of departures per time-bin, for all legs
 	 */
 	public int[] getDepartures() {
 		return this.allModesData.countsDep.clone();
 	}
 
 	/**
-	 * @return number of all arrivals per time-bin, for all legs
+	 * @return number(s) of all arrivals per time-bin, for all legs
 	 */
 	public int[] getArrivals() {
 		return this.allModesData.countsArr.clone();
 	}
 
 	/**
-	 * @return number of all vehicles that got stuck in a time-bin, for all legs
+	 * @return number(s) of all vehicles that got stuck in a time-bin, for all legs
 	 */
 	public int[] getStuck() {
 		return this.allModesData.countsStuck.clone();
@@ -315,7 +315,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	/**
 	 * @param legMode transport mode
-	 * @return number of departures per time-bin, for all legs with the specified mode
+	 * @return number(s) of departures per time-bin, for all legs with the specified mode
 	 */
 	public int[] getDepartures(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
@@ -327,7 +327,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	/**
 	 * @param legMode transport mode
-	 * @return number of all arrivals per time-bin, for all legs with the specified mode
+	 * @return number(s) of all arrivals per time-bin, for all legs with the specified mode
 	 */
 	public int[] getArrivals(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
@@ -339,7 +339,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	/**
 	 * @param legMode transport mode
-	 * @return number of vehicles that got stuck in a time-bin, for all legs with the specified mode
+	 * @return number(s) of vehicles that got stuck in a time-bin, for all legs with the specified mode
 	 */
 	public int[] getStuck(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
