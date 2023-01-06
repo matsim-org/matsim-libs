@@ -126,6 +126,7 @@ public class CarrierTimeAndSpaceTourRouter{
 			}
 			if(e instanceof TourActivity act){
 				route(prevLeg, prevLink, act.getLocation(), null, matsimVehicle);
+				assert prevLeg != null;
 				double expectedArrival = currTime + prevLeg.getExpectedTransportTime();
 				act.setExpectedArrival(expectedArrival);
 				double startAct = Math.max(expectedArrival, act.getTimeWindow().getStart());

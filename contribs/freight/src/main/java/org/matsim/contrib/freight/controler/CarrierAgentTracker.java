@@ -39,7 +39,7 @@ import java.util.*;
 
 /**
  * This keeps track of all carrierAgents during simulation.
- * 
+ *
  * @author mzilske, sschroeder
  *
  */
@@ -87,6 +87,7 @@ public final class CarrierAgentTracker implements BasicEventHandler
 	void scoreSelectedPlans() {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			CarrierAgent agent = getCarrierAgentFromCarrier(carrier.getId() );
+			assert agent != null;
 			agent.scoreSelectedPlan();
 		}
 	}
