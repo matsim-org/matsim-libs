@@ -255,7 +255,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private TravelTime travelTime;
 
-		private Map<String, VehicleTypeVarCosts> typeSpecificCosts = new HashMap<>();
+		private Map<String, VehicleTypeVarCosts> typeSpecificCosts;
 
 		/**
 		 * Constructs travelDisutility according to the builder.
