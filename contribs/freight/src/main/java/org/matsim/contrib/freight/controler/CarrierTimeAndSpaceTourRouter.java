@@ -29,7 +29,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
@@ -125,7 +124,7 @@ public class CarrierTimeAndSpaceTourRouter{
 				prevLeg.setDepartureTime(currTime);
 			}
 			if(e instanceof TourActivity act){
-				route(prevLeg, prevLink, act.getLocation(), null, matsimVehicle);
+				route(prevLeg, prevLink, act.getLocation(), matsimVehicle);
 				assert prevLeg != null;
 				double expectedArrival = currTime + prevLeg.getExpectedTransportTime();
 				act.setExpectedArrival(expectedArrival);
@@ -135,10 +134,10 @@ public class CarrierTimeAndSpaceTourRouter{
 			}
 		}
 		Id<Link> endLink = tour.getTour().getEndLinkId();
-		route(prevLeg,prevLink,endLink, null, matsimVehicle);
+		route(prevLeg,prevLink,endLink, matsimVehicle);
 	}
 
-	private void route(Leg prevLeg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person, Vehicle vehicle) {
+	private void route(Leg prevLeg, Id<Link> fromLinkId, Id<Link> toLinkId, Vehicle vehicle) {
 		if(fromLinkId.equals(toLinkId)){
 			prevLeg.setExpectedTransportTime(0);
 			NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLinkId, toLinkId);
@@ -148,13 +147,13 @@ public class CarrierTimeAndSpaceTourRouter{
 			prevLeg.setRoute(route);
 			return;
 		}
-		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getExpectedDepartureTime(), person, vehicle);
+		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getExpectedDepartureTime(), null, vehicle);
 		double travelTime = path.travelTime;
 
 		/*
 		 *ACHTUNG. Konsistenz zu VRP
 		 */
-		double toLinkTravelTime = this.travelTime.getLinkTravelTime(network.getLinks().get(toLinkId),prevLeg.getExpectedDepartureTime()+travelTime, person, vehicle);
+		double toLinkTravelTime = this.travelTime.getLinkTravelTime(network.getLinks().get(toLinkId),prevLeg.getExpectedDepartureTime()+travelTime, null, vehicle);
 		travelTime += toLinkTravelTime;
 		prevLeg.setExpectedTransportTime(travelTime);
 		NetworkRoute route = createRoute(fromLinkId,path,toLinkId);
