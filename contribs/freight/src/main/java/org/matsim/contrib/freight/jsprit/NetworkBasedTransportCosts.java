@@ -92,20 +92,20 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 */
 	public static class MatsimVehicleWrapper implements org.matsim.vehicles.Vehicle {
 
-		private Id<org.matsim.vehicles.Vehicle> id;
+		private final Id<org.matsim.vehicles.Vehicle> vehicleId;
 
-		private org.matsim.vehicles.VehicleType type;
+		private final org.matsim.vehicles.VehicleType vehicleType;
 
-		private Attributes attributes = new AttributesImpl();
+		private final Attributes attributes = new AttributesImpl();
 
 		public MatsimVehicleWrapper(com.graphhopper.jsprit.core.problem.vehicle.Vehicle vehicle) {
-			this.id = Id.create(vehicle.getId(), org.matsim.vehicles.Vehicle.class);
-			this.type = makeType(vehicle.getType().getTypeId(), vehicle.getType().getMaxVelocity());
+			this.vehicleId = Id.create(vehicle.getId(), org.matsim.vehicles.Vehicle.class);
+			this.vehicleType = makeType(vehicle.getType().getTypeId(), vehicle.getType().getMaxVelocity());
 		}
 
 		public MatsimVehicleWrapper(CarrierVehicle vehicle) {
-			this.id = vehicle.getId();
-			this.type = vehicle.getType();
+			this.vehicleId = vehicle.getId();
+			this.vehicleType = vehicle.getType();
 		}
 
 		private org.matsim.vehicles.VehicleType makeType(String typeId, double maxVelocity) {
@@ -117,12 +117,12 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		@Override
 		public Id<org.matsim.vehicles.Vehicle> getId() {
-			return id;
+			return vehicleId;
 		}
 
 		@Override
 		public org.matsim.vehicles.VehicleType getType() {
-			return type;
+			return vehicleType;
 		}
 
 		@Override
@@ -253,9 +253,9 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 */
 	static class BaseVehicleTransportCosts implements TravelDisutility {
 
-		private TravelTime travelTime;
+		private final TravelTime travelTime;
 
-		private Map<String, VehicleTypeVarCosts> typeSpecificCosts;
+		private final Map<String, VehicleTypeVarCosts> typeSpecificCosts;
 
 		/**
 		 * Constructs travelDisutility according to the builder.
@@ -312,9 +312,9 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 //		private static Logger logger = LogManager.getLogger(VehicleTransportCostsIncludingToll.class);
 
-		private TravelDisutility baseTransportDisutility;
+		private final TravelDisutility baseTransportDisutility;
 
-		private VehicleTypeDependentRoadPricingCalculator vehicleTypeDependentPricingCalculator;
+		private final VehicleTypeDependentRoadPricingCalculator vehicleTypeDependentPricingCalculator;
 
 		public VehicleTransportCostsIncludingToll(TravelDisutility baseTransportDisutility,
 				VehicleTypeDependentRoadPricingCalculator vehicleTypeDependentPricingCalculator) {
@@ -375,13 +375,13 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private boolean withToll = false;
 
-		private Network network;
+		private final Network network;
 
-		private Map<String, VehicleTypeVarCosts> typeSpecificCosts = new HashMap<>();
+		private final Map<String, VehicleTypeVarCosts> typeSpecificCosts = new HashMap<>();
 
 		private boolean isFIFO = false;
 
-		private String defaultTypeId = UUID.randomUUID().toString();
+		private final String defaultTypeId = UUID.randomUUID().toString();
 
 		/**
 		 * Creates the builder requiring {@link Network} and a collection of
@@ -516,7 +516,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	}
 
-	private Network network;
+	private final Network network;
 
 	/**
 	 * cost-cache to cache transport-costs and transport-times (see
@@ -537,24 +537,24 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	/**
 	 * the width of the time-bin
 	 */
-	private int timeSliceWidth;
+	private final int timeSliceWidth;
 
 	public final Counter ttMemorizedCounter;
 
 	public final Counter ttRequestedCounter;
 
-	private Map<String, org.matsim.vehicles.Vehicle> matsimVehicles = new HashMap<>();
+	private final Map<String, org.matsim.vehicles.Vehicle> matsimVehicles = new HashMap<>();
 
-	private VehicleTypeDependentRoadPricingCalculator roadPricingCalc;
+	private final VehicleTypeDependentRoadPricingCalculator roadPricingCalc;
 
 	/**
 	 * by default sets the {@link FastDijkstraFactory}
 	 */
-	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
-	private Collection<InternalLeastCostPathCalculatorListener> listeners = new ArrayList<>();
+	private final Collection<InternalLeastCostPathCalculatorListener> listeners = new ArrayList<>();
 
-	private String defaultTypeId;
+	private final String defaultTypeId;
 
 	private NetworkBasedTransportCosts(Builder builder) {
 		super();
