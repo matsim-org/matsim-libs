@@ -169,13 +169,13 @@ final class FreightScenarioCreator {
     public static Id<Link> getOpposite(Id<Link> homeId) {
         if(homeId.toString().startsWith("i")){
             String opposite = "i(" + homeId.toString().substring(2,4);
-            if(homeId.toString().substring(4,5).equals("0")) opposite += "9)R";
+            if(homeId.toString().charAt(4) == '0') opposite += "9)R";
             else opposite += "0)";
             return Id.createLinkId(opposite);
         }
         else{
             String opposite = "j(";
-            if(homeId.toString().substring(2,3).equals("0")) {
+            if(homeId.toString().charAt(2) == '0') {
                 opposite += "9," + homeId.toString().substring(4,6);
             }
             else opposite += "0," + homeId.toString().substring(4,6) + "R";

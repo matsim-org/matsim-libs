@@ -183,7 +183,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	public void write(final String filename) {
 		PrintStream stream;
 		try {
-			stream = new PrintStream(new File(filename));
+			stream = new PrintStream(filename);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;

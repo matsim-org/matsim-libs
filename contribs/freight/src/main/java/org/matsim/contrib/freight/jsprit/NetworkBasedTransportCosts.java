@@ -348,7 +348,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 
 		public static Builder newInstance(Network network) {
-			return new Builder(network, Collections.<VehicleType>emptyList());
+			return new Builder(network, Collections.emptyList());
 		}
 
 		/**

@@ -90,7 +90,7 @@ final class PassengerScenarioCreator {
 	private static List<Person> createPersons(Id<Link> homeId, Id<Link> workId,Scenario scenario) {
 		LeastCostPathCalculator lcpa = new DijkstraFactory().createPathCalculator(scenario.getNetwork(),
 				new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0), new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0));
-        PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
+        PopulationFactory popFactory = scenario.getPopulation().getFactory();
 		List<Person> persons = new ArrayList<>();
 		for(int agent=0;agent<nuOfAgentsPerHomeLink;agent++){
 
