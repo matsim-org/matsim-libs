@@ -50,7 +50,8 @@ import org.matsim.vehicles.VehicleUtils;
  */
 /* package-private */ class DistanceConstraint implements HardActivityConstraint {
 
-	static final Logger log = LogManager.getLogger(DistanceConstraint.class);
+	@SuppressWarnings("unused")
+	private static final Logger log = LogManager.getLogger(DistanceConstraint.class);
 
 	private final CarrierVehicleTypes vehicleTypes;
 

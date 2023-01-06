@@ -52,6 +52,7 @@ public class CarrierControlerListener implements ScoringListener, ReplanningList
 	// It is done analogue to CarrierAgentTracker. kmt oct'22
 
 
+	@SuppressWarnings("unused")
 	private static final Logger log = LogManager.getLogger( CarrierControlerListener.class ) ;
 
 	private final CarrierStrategyManager strategyManager;

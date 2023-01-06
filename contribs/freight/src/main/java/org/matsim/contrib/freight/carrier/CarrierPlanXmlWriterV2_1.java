@@ -45,12 +45,13 @@ import java.util.Map;
 
 /**
  * A writer that writes carriers and their plans in a xml-file.
- * 
+ *
  * @author sschroeder
  *
  */
 /*package-private*/ class CarrierPlanXmlWriterV2_1 extends MatsimXmlWriter {
 
+	@SuppressWarnings("unused")
 	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV2_1.class);
 
 	private final Collection<Carrier> carriers;
@@ -79,7 +80,7 @@ import java.util.Map;
 
 	/**
 	 * Writes carriers and their plans into a xml-file.
-	 * 
+	 *
 	 * @param filename should be the target xml-file
 	 */
 	public void write(String filename) {
@@ -179,7 +180,7 @@ import java.util.Map;
 			writer.write("to=\"" + s.getLocationLinkId() + "\" ");
 			// capacity which must be available when vehicle services this service.
 			// i.e. this is a pick-up service.
-			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" "); 
+			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" ");
 			writer.write("earliestStart=\"" + getTime(s.getServiceStartTimeWindow().getStart()) + "\" ");
 			writer.write("latestEnd=\"" + getTime(s.getServiceStartTimeWindow().getEnd()) + "\" ");
 			writer.write("serviceDuration=\"" + getTime(s.getServiceDuration()));
@@ -193,7 +194,7 @@ import java.util.Map;
 
 		}
 		writer.write("\t\t\t</services>\n\n");
-		
+
 	}
 
 	private String getTime(double time) {
@@ -205,7 +206,7 @@ import java.util.Map;
 		if (carrier.getSelectedPlan() == null) {
 			return;
 		}
-		
+
 		for(CarrierPlan plan : carrier.getPlans()){
 			writer.write("\t\t\t<plan");
 			if(plan.getScore() != null){
@@ -223,7 +224,7 @@ import java.util.Map;
 				writer.write(" selected=\"false\"");
 			}
 			writer.write(">\n");
-					
+
 			for (ScheduledTour tour : plan.getScheduledTours()) {
 				writer.write("\t\t\t\t<tour ");
 				writer.write("vehicleId=\"" + tour.getVehicle().getId()
@@ -277,7 +278,7 @@ import java.util.Map;
 			}
 			writer.write("\t\t\t</plan>\n\n");
 		}
-		
+
 	}
 
 	private void endCarrier(BufferedWriter writer) throws IOException {

@@ -48,7 +48,9 @@ import org.matsim.vehicles.VehicleUtils;
 
 	public static final String COMPONENT_NAME=FreightAgentSource.class.getSimpleName();
 
+	@SuppressWarnings("unused")
 	private static final  Logger log = LogManager.getLogger(FreightAgentSource.class);
+
 	private final CarrierAgentTracker tracker;
 
 	private final Collection<MobsimAgent> mobSimAgents;

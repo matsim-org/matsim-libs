@@ -63,6 +63,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 	 */
 	public static class SimpleDriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
+		@SuppressWarnings("unused")
 		private static final  Logger log = LogManager.getLogger( SimpleDriversActivityScoring.class );
 
 		private double score;
@@ -149,6 +150,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 	 */
 	public static class SimpleDriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
+		@SuppressWarnings("unused")
 		private static final  Logger log = LogManager.getLogger( SimpleDriversLegScoring.class );
 
 		private double score = 0.0;
@@ -216,6 +218,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
 	public static class SimpleTollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
+		@SuppressWarnings("unused")
 		private static final  Logger log = LogManager.getLogger( SimpleTollScoring.class );
 
 		private double score = 0.;

@@ -69,6 +69,7 @@ import java.util.List;
  */
 public final class MatsimJspritFactory {
 
+	@SuppressWarnings("unused")
 	private static final  Logger log = LogManager.getLogger(MatsimJspritFactory.class);
 
 	// How to deal with a multi-depot VRP? Which depotLink should be used? kmt

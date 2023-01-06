@@ -50,7 +50,9 @@ import org.matsim.core.utils.misc.Time;
 @Deprecated
 public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 
+	@SuppressWarnings("unused")
 	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV1.class);
+
 	private final Collection<Carrier> carriers;
 	private int idCounter = 0;
 	private final Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<>();

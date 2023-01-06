@@ -52,6 +52,7 @@ import org.matsim.vehicles.VehicleType;
 @Deprecated
 public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
+	@SuppressWarnings("unused")
 	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV2.class);
 
 	private final Collection<Carrier> carriers;

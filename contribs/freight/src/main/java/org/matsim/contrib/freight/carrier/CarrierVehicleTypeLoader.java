@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 @Deprecated
 public class CarrierVehicleTypeLoader {
 
+	@SuppressWarnings("unused")
 	private static final  Logger logger = LogManager.getLogger(CarrierVehicleTypeLoader.class);
 
 	/**
