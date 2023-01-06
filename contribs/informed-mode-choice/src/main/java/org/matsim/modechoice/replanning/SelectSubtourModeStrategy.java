@@ -35,6 +35,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 	private final IdMap<Person, PlanModel> models;
 
 	private final Set<String> nonChainBasedModes;
+	private final Set<String> switchModes;
 
 	public SelectSubtourModeStrategy(Config config, Scenario scenario, Provider<GeneratorContext> generator) {
 		super(config.global());
@@ -47,6 +48,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				.filter(m -> !ArrayUtils.contains(smc.getChainBasedModes(), m))
 				.collect(Collectors.toSet());
 
+		this.switchModes = new HashSet<>(this.config.getModes());
 
 		this.models = new IdMap<>(Person.class, scenario.getPopulation().getPersons().size());
 
@@ -121,7 +123,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				TripStructureUtils.Subtour st = subtours.remove(rnd.nextInt(subtours.size()));
 				boolean[] mask = new boolean[model.trips()];
 				for (int i = 0; i < model.trips(); i++) {
-					if (st.getTrips().contains(model.getTrip(i)))
+					if (st.getTrips().contains(model.getTrip(i)) && switchModes.contains(model.getTripMode(i)))
 						mask[i] = true;
 				}
 

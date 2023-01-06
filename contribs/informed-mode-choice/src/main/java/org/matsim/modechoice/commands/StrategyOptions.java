@@ -20,6 +20,7 @@ import org.matsim.modechoice.estimators.ActivityEstimator;
 import picocli.CommandLine;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -128,10 +129,10 @@ public final class StrategyOptions {
 				ModeChoice.informedModeChoice.name
 		);
 
-		// Always collect all strategies (without the common MCs first)
+		// Always collect all strategies, these won't be removed
 		List<StrategyConfigGroup.StrategySettings> strategies = config.strategy().getStrategySettings().stream()
-				.filter(s -> !filtered.contains(s.getStrategyName())
-				).collect(Collectors.toList());
+				.filter(s -> !filtered.contains(s.getStrategyName()) || !Objects.equals(s.getSubpopulation(), defaultSubpopulation))
+				.collect(Collectors.toList());
 
 
 		//add time mutation

@@ -33,6 +33,7 @@ public class RandomSubtourModeStrategy extends AbstractMultithreadedModule {
 	private final SubtourModeChoiceConfigGroup smc;
 	private final Provider<PlanModelService> provider;
 	private final Set<String> nonChainBasedModes;
+	private final Set<String> switchModes;
 
 	public RandomSubtourModeStrategy(Config config, Provider<PlanModelService> provider) {
 		super(config.global());
@@ -45,6 +46,7 @@ public class RandomSubtourModeStrategy extends AbstractMultithreadedModule {
 				.filter(m -> !ArrayUtils.contains(smc.getChainBasedModes(), m))
 				.collect(Collectors.toSet());
 
+		this.switchModes = new HashSet<>(this.config.getModes());
 	}
 
 	@Override
@@ -116,7 +118,7 @@ public class RandomSubtourModeStrategy extends AbstractMultithreadedModule {
 				TripStructureUtils.Subtour st = subtours.remove(rnd.nextInt(subtours.size()));
 				boolean[] mask = new boolean[model.trips()];
 				for (int i = 0; i < model.trips(); i++) {
-					if (st.getTrips().contains(model.getTrip(i)))
+					if (st.getTrips().contains(model.getTrip(i)) && switchModes.contains(model.getTripMode(i)))
 						mask[i] = true;
 				}
 

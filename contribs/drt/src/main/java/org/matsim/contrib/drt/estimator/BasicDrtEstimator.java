@@ -10,7 +10,9 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.estimator.run.DrtEstimatorConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.speedup.DrtSpeedUp;
+import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.modal.ModalInjector;
@@ -29,6 +31,8 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	private final DrtEventSequenceCollector collector;
 	private final DrtEstimatorConfigGroup config;
 
+	private final DrtSpeedUpParams speedUpParams;
+
 	/**
 	 * Currently valid estimates.
 	 */
@@ -43,10 +47,19 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 		//zones = injector.getModal(DrtZonalSystem.class);
 		collector = injector.getModal(DrtEventSequenceCollector.class);
 		config = injector.getModal(DrtEstimatorConfigGroup.class);
+
+		DrtConfigGroup drtConfig = injector.get(DrtConfigGroup.class);
+		speedUpParams = drtConfig.getDrtSpeedUpParams().orElse(null);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+
+		// Speed-up iteration need to be ignored for the estimates
+		if (speedUpParams != null &&
+				DrtSpeedUp.isTeleportDrtUsers(speedUpParams, event.getServices().getConfig().controler(), event.getIteration())) {
+			return;
+		}
 
 		GlobalEstimate est = new GlobalEstimate();
 
