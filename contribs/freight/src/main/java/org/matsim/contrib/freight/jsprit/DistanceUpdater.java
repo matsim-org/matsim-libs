@@ -29,7 +29,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisit
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 
 /**
-	 * Given class for working with the a distance constraint
+	 * Given class for working with the distance constraint
 	 *
 	 */
 	/*package-privat*/ class DistanceUpdater implements StateUpdater, ActivityVisitor {

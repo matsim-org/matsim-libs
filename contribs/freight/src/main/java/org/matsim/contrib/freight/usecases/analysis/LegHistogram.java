@@ -74,7 +74,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	private Population population;
 
 	/**
-	 * If true, it observes persons of population. Otherwise it excludes them from observation.
+	 * If true, it observes persons of population. Otherwise, it excludes them from observation.
 	 *
 	 * @param inclPop
 	 */

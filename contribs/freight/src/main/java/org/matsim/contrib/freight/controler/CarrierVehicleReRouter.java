@@ -72,7 +72,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
             private double penalty4missedTws = 0.01;
 
-            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Servie/WaitingTimeUnit ... but make sure that this were set correctly.
+            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Servie/WaitingTimeUnit ... but make sure that this where set correctly.
             @Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
@@ -145,7 +145,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         //create carrierPlan from solution
         CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
 
-        //route plan (currently jsprit does not memorizes the routes, thus route the plan)
+        //route plan (currently jsprit does not memorize the routes, thus route the plan)
 //		NetworkRouter.routePlan(plan, networkBasedTransportCosts);
 
         //set new plan

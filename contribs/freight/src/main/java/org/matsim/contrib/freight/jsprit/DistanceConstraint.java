@@ -272,7 +272,7 @@ import org.matsim.vehicles.VehicleUtils;
 						- getDistance(activityLastDelivery, activityEnd, newVehicle);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 
-				// Checks the distance if the delivery will added directly behind the pickup
+				// Checks the distance if the delivery will be added directly behind the pickup
 				TourActivity activityAfter = route.getTourActivities().getActivities()
 						.get(tourPositionOfAcitivityBehindNewPickup);
 				possibleAdditionalDistance = getDistance(newInvestigatedPickup, assignedDelivery, newVehicle)

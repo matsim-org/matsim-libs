@@ -66,7 +66,7 @@ public class Tour {
 		 * Returns a new tour builder.
 		 *
 		 * @deprecated
-		 * Please use {@link #newInstance(Id)} instead. kmt' sep22
+		 * Please use {@link #newInstance(Id)} instead. kmt sep'22
 		 * <p>
 		 *
 		 *

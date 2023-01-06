@@ -29,7 +29,7 @@ import org.matsim.vehicles.VehicleUtils;
  * The carrier vehicle type.
  * <p>
  * I decided to put vehicle cost information into the type (which is indeed not a physical attribute of the type). Thus physical and
- * non physical attributes are used. This is likely to be changed in future.
+ * non-physical attributes are used. This is likely to be changed in the future.
  *
  * @author sschroeder
  *

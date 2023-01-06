@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>
  * It can be used with multiple threads. Note that each thread gets its own
- * leastCostPathCalculator. It is created only once and cached afterwards. Thus
+ * leastCostPathCalculator. It is created only once and cached afterwards. Thus,
  * it requires a threadSafe leastCostPathCalculatorFactory (the calculator
  * itself does not need to be thread-safe).
  *
@@ -352,7 +352,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 
 		/**
-		 * By default it takes <code>link.getFreespeed(time);</code> to calculate the
+		 * By default, it takes <code>link.getFreespeed(time);</code> to calculate the
 		 * travelTime over that link.
 		 */
 		private TravelTime travelTime = (link, time, person, vehicle) -> {
@@ -408,7 +408,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 
 		/**
-		 * Sets the travelTime. By default travelTime is based on
+		 * Sets the travelTime. By default, travelTime is based on
 		 * <code>link.getFreespeed();</code>.
 		 *
 		 * @param travelTime
@@ -430,7 +430,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 
 		/**
-		 * Sets the width of the time-bin. By default it is Integer.MAX_VALUE().
+		 * Sets the width of the time-bin. By default, it is Integer.MAX_VALUE().
 		 * <p>
 		 * </p>
 		 * <i>Note that this needs to be set to some plausible value to enable any kind
@@ -458,7 +458,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * each thread a new LCPA is created with the same LCPA-factory. That is,
 		 * memorizing data in the factory-obj might violate thread-safety.
 		 * <p>
-		 * By default it use {@link FastDijkstraFactory}
+		 * By default, it use {@link FastDijkstraFactory}
 		 *
 		 * @param {@link {@link LeastCostPathCalculatorFactory}
 		 * @return this builder

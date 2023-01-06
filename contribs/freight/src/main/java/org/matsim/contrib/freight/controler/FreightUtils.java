@@ -305,7 +305,8 @@ public class FreightUtils {
 									  // .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 									  // have now time for that. Maybe change it later, kmt sep18
 									  .setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
-									  .setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// Limited to end of delivery timeWindow (pickup later than latest delivery is not useful).
+										// Limited to end of delivery timeWindow (pickup later than the latest delivery is not useful).
+									  .setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))
 									  .build();
 			CarrierUtils.addShipment(carrierWS, carrierShipment);
 		}

@@ -147,7 +147,7 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 				//create carrierPlan from solution
 				CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
 
-				//route plan (currently jsprit does not memorizes the routes, thus route the plan)
+				//route plan (currently jsprit does not memorize the routes, thus route the plan)
 				NetworkRouter.routePlan(plan, netbasedTransportcosts);
 
 				//set new plan

@@ -43,7 +43,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
 import org.matsim.vehicles.VehicleType;
 
 /**
- * A writer that writes carriers and their plans in an xml-file.
+ * A writer that writes carriers and their plans in a xml-file.
  *
  * @author sschroeder
  *

@@ -476,7 +476,7 @@ public final class MatsimJspritFactory {
 	 * Creates an immutable {@link VehicleRoutingProblem} from {@link Carrier}.
 	 *
 	 * <p>
-	 * For creation it takes only the information needed to setup the problem (not
+	 * For creation, it takes only the information needed to set up the problem (not
 	 * the solution, i.e. predefined plans are ignored).
 	 * <p>
 	 * The network is required to retrieve coordinates of locations.
@@ -581,7 +581,7 @@ public final class MatsimJspritFactory {
 	 * from network and carrier such as {@link NetworkBasedTransportCosts}.
 	 *
 	 * <p>
-	 * For creation it takes only the information needed to setup the problem (not
+	 * For creation, it takes only the information needed to set up the problem (not
 	 * the solution, i.e. predefined plans are ignored).
 	 * <p>
 	 * The network is required to retrieve coordinates of locations.

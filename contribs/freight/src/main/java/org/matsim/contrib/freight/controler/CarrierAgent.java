@@ -125,7 +125,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 					//this returns TransportMode.car if the attribute is null
 					Leg leg = PopulationUtils.createLeg(CarrierUtils.getCarrierMode(carrier));
 
-					//TODO we might need to set the route to null if the the mode is a drt mode
+					//TODO we might need to set the route to null if the mode is a drt mode
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 

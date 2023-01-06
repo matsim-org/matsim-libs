@@ -44,7 +44,7 @@ import javax.inject.Inject;
  * <p></p>
  * <p>Processes the required actions during the matsim simulation workflow (replanning, scoring, sim). For example, it informs agents to
  * score their plans when it is scoring time, and it informs them to re-plan, or it injects carriers into the simulation when it is time
- * to inject them. Currently it is kept to minimum functions, i.e. injecting carrier plans into sim and the possibility
+ * to inject them. Currently, it is kept to minimum functions, i.e. injecting carrier plans into sim and the possibility
  * to set custom scoring- and replanning-functionalities.
  *
  * @author sschroeder, mzilske
