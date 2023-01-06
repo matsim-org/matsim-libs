@@ -74,7 +74,7 @@ public class FreightUtils {
 	 * 	- creating NetbasedCosts based on the network
 	 * 	- building and solving the VRP for all carriers using jsprit
 	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
-	 *
+	 * <p>
 	 *
 	 * @param scenario
 	 * @throws ExecutionException, InterruptedException

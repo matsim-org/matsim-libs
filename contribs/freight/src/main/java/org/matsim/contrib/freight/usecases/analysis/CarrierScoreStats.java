@@ -42,8 +42,8 @@ import java.util.Locale;
 /**
  * As you can see, it is basically a copy of {@link org.matsim.analysis.ScoreStatsControlerListener}. However, it is modified to score {@link Carrier}s
  * rather than Persons. (Oct'13, schroeder)
- * 
- * 
+ * <p>
+ *
  * <p>Calculates at the end of each iteration the following statistics:
  * <ul>
  * <li>average score of the selected plan</li>
@@ -66,11 +66,11 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 
 	private BufferedWriter out;
 	final private String fileName;
-	
+
 	private final boolean createPNG;
 	private double[][] history = null;
 	private int minIteration = 0;
-	
+
 	private Carriers carriers;
 
 	private final static Logger log = LogManager.getLogger(CarrierScoreStats.class);

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2011 Stefan Schroeder.
  * eMail: stefan.schroeder@kit.edu
- *
+ * <p>
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Public License v2.0
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
+ * <p>
  * Contributors:
  *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
@@ -60,7 +60,7 @@ import java.util.List;
 
 /**
  * A factory that creates matsim-object from jsprit
- * (https://github.com/jsprit/jsprit) and vice versa.
+ * (<a href="https://github.com/jsprit/jsprit">...</a>) and vice versa.
  *
  * @author sschroeder
  *         <p>

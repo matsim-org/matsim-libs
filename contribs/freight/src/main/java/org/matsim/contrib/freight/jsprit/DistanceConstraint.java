@@ -42,7 +42,7 @@ import org.matsim.vehicles.VehicleUtils;
  *         vehicle with an energyCapacity. The base for calculating the
  *         consumption is only the driven distance and not the transported
  *         weight or other influences. But is possible to integrate it.
- *
+ * <p>
  *         !! No recharging or refueling is integrated. Vehicles are totally
  *         full at the beginning.
  *

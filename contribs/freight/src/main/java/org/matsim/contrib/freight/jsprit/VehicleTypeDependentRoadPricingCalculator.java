@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2011 Stefan Schroeder.
  * eMail: stefan.schroeder@kit.edu
- *
+ * <p>
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Public License v2.0
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
+ * <p>
  * Contributors:
  *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
@@ -105,7 +105,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	 * <p>In case of <code>RoadPricingScheme.TOLL_TYPE_CORDON</code> the toll amount on a link is equivalent to <code>rps.getLinkCostInfo(...).amount</code>.
 	 *
 	 * <p>In case of <code>RoadPricingScheme.TOLL_TYPE_DISTANCE</code> the toll amount on a link is equivalent to <code>rps.getLinkCostInfo(...).amount*link.getLength()</code>.
-	 *
+	 * <p>
 	 *
 	 * @param vehicleTypeId vehicle type
 	 * @param pricingScheme the {@link RoadPricingScheme} the road pricing scheme
