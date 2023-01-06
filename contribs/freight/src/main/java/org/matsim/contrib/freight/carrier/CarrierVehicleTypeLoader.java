@@ -37,8 +37,6 @@ public class CarrierVehicleTypeLoader {
 
 	private static final  Logger logger = LogManager.getLogger(CarrierVehicleTypeLoader.class);
 
-	private final Carriers carriers;
-
 	/**
 	 * Constructs the loader with the carriers the types should be assigned to.
 	 *
@@ -49,7 +47,6 @@ public class CarrierVehicleTypeLoader {
 	@Deprecated
 	public CarrierVehicleTypeLoader(Carriers carriers) {
 		super();
-		this.carriers = carriers;
 	}
 
 	/**
