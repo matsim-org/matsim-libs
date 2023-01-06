@@ -63,9 +63,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     private final VehicleRoutingActivityCosts vehicleRoutingActivityCosts;
 
-    private VehicleTypeDependentRoadPricingCalculator roadPricing;
-
-    public CarrierVehicleReRouter( Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, String vrpAlgoConfigFile, VehicleTypeDependentRoadPricingCalculator roadPricing ) {
+	public CarrierVehicleReRouter( Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, String vrpAlgoConfigFile, VehicleTypeDependentRoadPricingCalculator roadPricing ) {
         this.network = network;
         vehicleRoutingTransportCosts = getNetworkBasedTransportCosts(network,vehicleTypes,travelTimes,roadPricing);
         vehicleRoutingActivityCosts = new VehicleRoutingActivityCosts() {

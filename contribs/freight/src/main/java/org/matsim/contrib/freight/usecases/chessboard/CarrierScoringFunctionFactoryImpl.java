@@ -191,7 +191,6 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 					employedVehicles.add(vehicle);
 				}
 				double distance = 0.0;
-				double toll = 0.;
 				if(leg.getRoute() instanceof NetworkRoute){
 					Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
 					distance += startLink.getLength();
