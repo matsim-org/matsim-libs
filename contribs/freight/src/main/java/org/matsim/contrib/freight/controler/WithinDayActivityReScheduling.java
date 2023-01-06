@@ -81,8 +81,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 		PlanAgent planAgent = (PlanAgent) mobsimAgent;
 		Id<Person> agentId = planAgent.getCurrentPlan().getPerson().getId();
 		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(mobsimAgent);
-		if (currentPlanElement instanceof Activity) {
-			Activity act = (Activity) currentPlanElement;
+		if (currentPlanElement instanceof Activity act) {
 			if (encounteredActivities.contains(act)) {
 				return;
 			}

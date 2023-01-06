@@ -290,8 +290,7 @@ public class FreightUtils {
 		for (ScheduledTour tour : tours) {
 			Id<Link> depotForTour = tour.getVehicle().getLinkId();
 			for (TourElement te : tour.getTour().getTourElements()) {
-				if (te instanceof ServiceActivity) {
-					ServiceActivity act = (ServiceActivity) te;
+				if (te instanceof ServiceActivity act) {
 					depotServiceIsDeliveredFrom.put(act.getService().getId(), depotForTour);
 				}
 			}

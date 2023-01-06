@@ -250,8 +250,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())
 						+ "\"/>\n");
 				for (TourElement tourElement : tour.getTour().getTourElements()) {
-					if (tourElement instanceof Leg) {
-						Leg leg = (Leg) tourElement;
+					if (tourElement instanceof Leg leg) {
 						writer.write("\t\t\t\t\t<leg expected_dep_time=\""
 								+ Time.writeTime(leg.getExpectedDepartureTime())
 								+ "\" expected_transp_time=\""
@@ -276,15 +275,13 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 							writer.write("</leg>\n");
 						}
 					}
-					else if (tourElement instanceof ShipmentBasedActivity) {
-						ShipmentBasedActivity act = (ShipmentBasedActivity) tourElement;
+					else if (tourElement instanceof ShipmentBasedActivity act) {
 						writer.write("\t\t\t\t\t<act ");
 						writer.write("type=\"" + act.getActivityType() + "\" ");
 						writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\" ");
 						writer.write("/>\n");
 					}
-					else if (tourElement instanceof ServiceActivity){
-						ServiceActivity act = (ServiceActivity) tourElement;
+					else if (tourElement instanceof ServiceActivity act){
 						writer.write("\t\t\t\t\t<act ");
 						writer.write("type=\"" + act.getActivityType() + "\" ");
 						writer.write("serviceId=\"" + serviceMap.get(act.getService()) + "\" ");
