@@ -494,6 +494,7 @@ public class Tour {
 		private End(End end) {
 			this.locationLinkId = end.getLocation();
 			this.timeWindow = end.getTimeWindow();
+			this.arrTime = end.getExpectedArrival();
 		}
 
 		@Override
