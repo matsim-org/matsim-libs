@@ -28,9 +28,9 @@ import org.matsim.vehicles.Vehicle;
 
 public class FiFoTravelTime implements TravelTime {
 
-	private TravelTime travelTime;
+	private final TravelTime travelTime;
 
-	private int binSize;
+	private final int binSize;
 
 	public FiFoTravelTime(TravelTime travelTime, int binSize) {
 		super();

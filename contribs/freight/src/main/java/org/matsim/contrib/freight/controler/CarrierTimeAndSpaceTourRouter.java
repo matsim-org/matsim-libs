@@ -54,9 +54,9 @@ public class CarrierTimeAndSpaceTourRouter{
 
 	static class MatsimVehicleAdapter implements Vehicle {
 
-		private CarrierVehicle carrierVehicle;
+		private final CarrierVehicle carrierVehicle;
 
-		private Attributes attributes = new AttributesImpl();
+		private final Attributes attributes = new AttributesImpl();
 
 		public MatsimVehicleAdapter(CarrierVehicle vehicle) {
 			this.carrierVehicle = vehicle;
@@ -86,11 +86,11 @@ public class CarrierTimeAndSpaceTourRouter{
 	@SuppressWarnings("unused")
 	private static final Logger logger = LogManager.getLogger( CarrierTimeAndSpaceTourRouter.class );
 
-	private LeastCostPathCalculator router;
+	private final LeastCostPathCalculator router;
 
-	private Network network;
+	private final Network network;
 
-	private TravelTime travelTime;
+	private final TravelTime travelTime;
 
 	/**
 	 * Constructs the timeAndSpaceRouter with a leastCostPathCalculator, network and travelTime.

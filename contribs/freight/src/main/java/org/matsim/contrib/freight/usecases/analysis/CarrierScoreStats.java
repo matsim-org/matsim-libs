@@ -71,7 +71,7 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 	private double[][] history = null;
 	private int minIteration = 0;
 
-	private Carriers carriers;
+	private final Carriers carriers;
 
 	private final static Logger log = LogManager.getLogger(CarrierScoreStats.class);
 

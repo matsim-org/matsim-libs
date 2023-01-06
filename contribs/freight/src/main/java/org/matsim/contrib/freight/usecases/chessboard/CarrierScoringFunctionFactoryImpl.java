@@ -67,8 +67,8 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 		private static final  Logger log = LogManager.getLogger( SimpleDriversActivityScoring.class );
 
 		private double score;
-		private double timeParameter = 0.008;
-		private double missedTimeWindowPenalty = 0.01;
+		private final double timeParameter = 0.008;
+		private final double missedTimeWindowPenalty = 0.01;
 
 		public SimpleDriversActivityScoring() {
 			super();
@@ -156,7 +156,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 		private double score = 0.0;
 		private final Network network;
 		private final Carrier carrier;
-		private Set<CarrierVehicle> employedVehicles;
+		private final Set<CarrierVehicle> employedVehicles;
 
 		public SimpleDriversLegScoring( Carrier carrier, Network network ) {
 			super();
@@ -221,9 +221,9 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 		private static final  Logger log = LogManager.getLogger( SimpleTollScoring.class );
 
 		private double score = 0.;
-		private Carrier carrier;
-		private Network network;
-		private VehicleTypeDependentRoadPricingCalculator roadPricing;
+		private final Carrier carrier;
+		private final Network network;
+		private final VehicleTypeDependentRoadPricingCalculator roadPricing;
 
 		public SimpleTollScoring( Carrier carrier, Network network, VehicleTypeDependentRoadPricingCalculator roadPricing ) {
 			this.carrier = carrier;

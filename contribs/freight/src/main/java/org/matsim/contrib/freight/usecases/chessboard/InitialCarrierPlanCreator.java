@@ -49,7 +49,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 final class InitialCarrierPlanCreator {
 
-    private Network network;
+    private final Network network;
 
     public InitialCarrierPlanCreator(Network network) {
         this.network = network;
@@ -96,7 +96,7 @@ final class InitialCarrierPlanCreator {
         //should be inline with activity-scoring
         VehicleRoutingActivityCosts activitycosts = new VehicleRoutingActivityCosts(){
 
-            private double penalty4missedTws = 0.01;
+            private final double penalty4missedTws = 0.01;
 
             @Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
