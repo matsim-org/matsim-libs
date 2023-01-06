@@ -48,7 +48,7 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 		collector = injector.getModal(DrtEventSequenceCollector.class);
 		config = injector.getModal(DrtEstimatorConfigGroup.class);
 
-		DrtConfigGroup drtConfig = injector.get(DrtConfigGroup.class);
+		DrtConfigGroup drtConfig = injector.getModal(DrtConfigGroup.class);
 		speedUpParams = drtConfig.getDrtSpeedUpParams().orElse(null);
 	}
 
