@@ -50,7 +50,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 	public static final  Logger logger = LogManager.getLogger(CarrierPlanXmlParserV2.class);
 
-	public static final String CARRIERS = "carriers";
 	public static final String CARRIER = "carrier";
 	public static final String LINKID = "linkId";
 	public static final String SHIPMENTS = "shipments";
@@ -64,7 +63,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	public static final String ACTIVITY = "act";
 	public static final String TYPE = "type";
 	public static final String SHIPMENTID = "shipmentId";
-	public static final String START = "start";
 	public static final String VEHICLE = "vehicle";
 	public static final String VEHICLES = "vehicles";
 	private static final String VEHICLE_EARLIEST_START = "earliestStart";
