@@ -123,17 +123,41 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
-		if(!agentToBeObserved(event.getPersonId())) return;
-		int index = getBinIndex(event.getTime());
-		this.allModesData.countsDep[index]++;
-		if (event.getLegMode() != null) {
-			ModeData modeData = getDataForMode(event.getLegMode());
-			modeData.countsDep[index]++;
+		if(personIsUnderObservation(event.getPersonId())) {
+			int index = getBinIndex(event.getTime());
+			this.allModesData.countsDep[index]++;
+			if (event.getLegMode() != null) {
+				ModeData modeData = getDataForMode(event.getLegMode());
+				modeData.countsDep[index]++;
+			}
 		}
-
 	}
 
-	private boolean agentToBeObserved(Id<Person> personId) {
+	@Override
+	public void handleEvent(final PersonArrivalEvent event) {
+		if(personIsUnderObservation(event.getPersonId())) {
+			int index = getBinIndex(event.getTime());
+			this.allModesData.countsArr[index]++;
+			if (event.getLegMode() != null) {
+				ModeData modeData = getDataForMode(event.getLegMode());
+				modeData.countsArr[index]++;
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(final PersonStuckEvent event) {
+		if(personIsUnderObservation(event.getPersonId())) {
+			int index = getBinIndex(event.getTime());
+			this.allModesData.countsStuck[index]++;
+			if (event.getLegMode() != null) {
+				ModeData modeData = getDataForMode(event.getLegMode());
+				modeData.countsStuck[index]++;
+			}
+		}
+	}
+
+	private boolean personIsUnderObservation(Id<Person> personId) {
 		if(inclPopulation){
 			if(population == null) return false;
 			return population.getPersons().containsKey(personId);
@@ -141,28 +165,6 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		else {
 			if(population == null) return true;
 			return !population.getPersons().containsKey(personId);
-		}
-	}
-
-	@Override
-	public void handleEvent(final PersonArrivalEvent event) {
-		if(!agentToBeObserved(event.getPersonId())) return;
-		int index = getBinIndex(event.getTime());
-		this.allModesData.countsArr[index]++;
-		if (event.getLegMode() != null) {
-			ModeData modeData = getDataForMode(event.getLegMode());
-			modeData.countsArr[index]++;
-		}
-	}
-
-	@Override
-	public void handleEvent(final PersonStuckEvent event) {
-		if(!agentToBeObserved(event.getPersonId())) return;
-		int index = getBinIndex(event.getTime());
-		this.allModesData.countsStuck[index]++;
-		if (event.getLegMode() != null) {
-			ModeData modeData = getDataForMode(event.getLegMode());
-			modeData.countsStuck[index]++;
 		}
 	}
 
@@ -260,14 +262,14 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		xyData.addSeries(onRouteSerie);
 
 		final JFreeChart chart = ChartFactory.createXYStepChart(
-        "Leg Histogram, " + modeName + ", it." + this.iteration,
-        "time", "# vehicles",
-        xyData,
-        PlotOrientation.VERTICAL,
-        true,   // legend
-        false,   // tooltips
-        false   // urls
-    );
+				"Leg Histogram, " + modeName + ", it." + this.iteration,
+				"time", "# vehicles",
+				xyData,
+				PlotOrientation.VERTICAL,
+				true,   // legend
+				false,   // tooltips
+				false   // urls
+		);
 
 		XYPlot plot = chart.getXYPlot();
 
