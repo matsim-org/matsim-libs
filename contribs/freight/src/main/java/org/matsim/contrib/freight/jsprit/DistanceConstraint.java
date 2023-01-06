@@ -133,7 +133,7 @@ import org.matsim.vehicles.VehicleUtils;
 	 * activities. The method also integrates the associated pickup in the tour.
 	 */
 	private double calculateRouteDistanceWithAssociatedPickup(JobInsertionContext context) {
-		double routeDistance = 0;
+		double routeDistance;
 		int positionOfRelatedPickup = context.getRelatedActivityContext().getInsertionIndex();
 		int nextRouteActivity = 0;
 
