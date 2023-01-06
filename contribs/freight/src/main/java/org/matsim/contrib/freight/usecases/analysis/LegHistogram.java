@@ -387,10 +387,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	private int getBinIndex(final double time) {
 		int bin = (int)(time / this.binSize);
-		if (bin >= this.nofBins) {
-			return this.nofBins;
-		}
-		return bin;
+		return Math.min(bin, this.nofBins);
 	}
 
 	private ModeData getDataForMode(final String legMode) {

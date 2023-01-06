@@ -356,13 +356,10 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * travelTime over that link.
 		 */
 		private TravelTime travelTime = (link, time, person, vehicle) -> {
-			double velocity;
-			if (vehicle.getType().getMaximumVelocity() < link.getFreespeed(time)) {
-				velocity = vehicle.getType().getMaximumVelocity();
-			} else
-				velocity = link.getFreespeed(time);
-			if (velocity <= 0.0)
+			double velocity = Math.min(vehicle.getType().getMaximumVelocity(), link.getFreespeed(time));
+			if (velocity <= 0.0) {
 				throw new IllegalStateException("velocity must be bigger than zero");
+			}
 			return link.getLength() / velocity;
 		};
 
