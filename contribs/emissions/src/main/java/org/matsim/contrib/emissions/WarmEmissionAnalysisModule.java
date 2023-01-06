@@ -37,8 +37,7 @@ import org.matsim.vehicles.VehicleType;
 import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
-import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed;
-import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction;
+import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.*;
 
 /**
  * @author benjamin
@@ -62,6 +61,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private int detailedFallbackTechAverageWarnCnt = 0;
 	private int detailedFallbackAverageTableWarnCnt = 0;
 	private int averageReadingInfoCnt = 0;
+	private int logicWarnCnt = 0;
 
 	// The following was tested to slow down significantly, therefore counters were commented out:
 //	Set<Id> vehAttributesNotSpecified = Collections.synchronizedSet(new HashSet<Id>());
@@ -297,9 +297,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			efkey.setComponent(warmPollutant);
 
 			double ef_gpkm;
-			if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
+			if (ecg.getEmissionsComputationMethod() == StopAndGoFraction || ecg.getEmissionsComputationMethod() == StopAndGo2Fraction) {
 
-				logger.warn( "----- using alternative logic with ecg.getEmissionsComputationMethod() == StopAndGoFraction" );
+				logicWarnCnt++;
+				if ( logicWarnCnt <= 1 ) { logger.warn( "----- using alternative logic with ecg.getEmissionsComputationMethod() == StopAndGoFraction || StopAndGo2Fraction" ); }
 
 				// compute faction.  This cannot be done earlier since efkey.component is needed.
 				fractionStopGo = getFractionStopAndGo(freeVelocity_ms * 3.6, averageSpeed_kmh, vehicleInformationTuple, efkey);
@@ -307,10 +308,13 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				double efStopGo_gpkm = 0.;
 				if (fractionStopGo > 0) {
 					// compute emissions from stop-go fraction:
-					efkey.setTrafficSituation(STOPANDGO_HEAVY);
+					if ( ecg.getEmissionsComputationMethod() == StopAndGoFraction ) {
+						efkey.setTrafficSituation(STOPANDGO);
+					} else if ( ecg.getEmissionsComputationMethod() == StopAndGo2Fraction ) {
+						efkey.setTrafficSituation(STOPANDGO_HEAVY);
+					}
 					efStopGo_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
 					logger.debug("pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm);
-
 				}
 
 				double efFreeFlow_gpkm = 0. ;
@@ -337,7 +341,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		// update counters:
 		// yy I don't now what this is good for; I would base downstream analysis rather on events.  kai, jan'20
-		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
+		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction || ecg.getEmissionsComputationMethod() == StopAndGo2Fraction) {
 			incrementCountersFractional( linkLength_m / 1000, fractionStopGo );
 		}
 		else if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
@@ -353,7 +357,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 										Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple,
 										HbefaWarmEmissionFactorKey efkey) {
 
-		efkey.setTrafficSituation(STOPANDGO_HEAVY);
+		if ( ecg.getEmissionsComputationMethod() == StopAndGoFraction ) {
+			efkey.setTrafficSituation(STOPANDGO);
+		} else if ( ecg.getEmissionsComputationMethod() == StopAndGo2Fraction ) {
+			efkey.setTrafficSituation(STOPANDGO_HEAVY);
+		}
 		double stopGoSpeedFromTable_kmh = getEf(vehicleInformationTuple, efkey).getSpeed();
 
 		double fractionStopGo;

@@ -95,7 +95,7 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String NON_SCENARIO_VEHICLES = "nonScenarioVehicles";
 	private NonScenarioVehicles nonScenarioVehicles = NonScenarioVehicles.abort;
 
-	public enum EmissionsComputationMethod {StopAndGoFraction,AverageSpeed}
+	public enum EmissionsComputationMethod {StopAndGoFraction,AverageSpeed,StopAndGo2Fraction}
 	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
 	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.AverageSpeed;
 
