@@ -148,13 +148,13 @@ public final class CarrierVehicle implements Vehicle {
 	/**
 	 * Used to be getLocation.  Can't say if this is meant to contain only the starting position, or if it is meant to be changed over the day.  kai, jul'22
 	 */
-	public final Id<Link> getLinkId() {
+	public Id<Link> getLinkId() {
 		return locationId;
 	}
 	/**
 	 * @deprecated -- please inline.  kai, jul'22
 	 */
-	@Deprecated public final Id<Link> getLocation() { return getLinkId(); }
+	@Deprecated public Id<Link> getLocation() { return getLinkId(); }
 	@Override
 	public Id<Vehicle> getId() {
 		return vehicleId;

@@ -61,17 +61,14 @@ final class RunPassengerAlongWithCarriers {
 
 	final static URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
-	private Config config ;
-	private Scenario scenario ;
-
 	public static void main(String[] args) {
 		new RunPassengerAlongWithCarriers().run();
 	}
 
 	public void run() {
-		prepareConfig();
+		Config config = prepareConfig();
 
-		prepareScenario();
+		Scenario scenario = prepareScenario(config);
 
 		Controler controler = new Controler(scenario);
 
@@ -104,18 +101,18 @@ final class RunPassengerAlongWithCarriers {
 
 
 	public final Config prepareConfig() {
-		config = ConfigUtils.loadConfig(IOUtils.extendUrl(url, "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(url, "config.xml"));
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		config.global().setRandomSeed(4177);
 		config.controler().setOutputDirectory("./output/");
 		return config;
 	}
 
-	public final Scenario prepareScenario() {
+	public final Scenario prepareScenario(Config config) {
 		Gbl.assertNotNull( config );
-		scenario = ScenarioUtils.loadScenario( config ) ;
-		FreightUtils.addOrGetCarriers( scenario );
-		return scenario ;
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		FreightUtils.addOrGetCarriers(scenario);
+		return scenario;
 	}
 
 
