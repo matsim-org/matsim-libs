@@ -55,6 +55,7 @@ import com.google.inject.Inject;
 class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener {
 	public static final String COMPONENT_NAME=WithinDayActivityReScheduling.class.getSimpleName() ;
 
+
 	@SuppressWarnings("unused")
 	private static final  Logger logger = LogManager.getLogger(WithinDayActivityReScheduling.class);
 
