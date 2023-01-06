@@ -230,27 +230,6 @@ public class FreightUtils {
 //		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
-	/**
-	 * NOT implemented yet due to missing CarrierDelivery in freight contrib, kmt
-	 * Sep18
-	 *
-	 * @param carrierWS
-	 * @param carrier
-	 */
-	private void copyDeliveries(Carrier carrierWS, Carrier carrier) {
-		throw new NotImplementedException("Coping of Deliveries is NOT implemented yet due to missing CarrierDelivery in freight contrib");
-	}
-
-	/**
-	 * NOT implemented yet due to missing CarrierPickup in freight contrib, kmt
-	 * Sep18
-	 *
-	 * @param carrierWS
-	 * @param carrier
-	 */
-	private void copyPickups(Carrier carrierWS, Carrier carrier) {
-		throw new NotImplementedException("Coping of Pickup is NOT implemented yet due to missing CarrierPickup in freight contrib");
-	}
 
 	/**
 	 * Copy all shipments from the existing carrier to the new carrier with
