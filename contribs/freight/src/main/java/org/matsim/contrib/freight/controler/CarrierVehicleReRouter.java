@@ -52,11 +52,7 @@ import org.matsim.core.router.util.TravelTime;
 class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     private final Network network;
-//
-//    private final CarrierVehicleTypes vehicleTypes;
-//
-//    private final TravelTime travelTimes;
-//
+
     private final String vrpAlgorithmConfig;
 
     private final VehicleRoutingTransportCosts vehicleRoutingTransportCosts;
@@ -98,7 +94,6 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     @Override
     public void handlePlan(CarrierPlan carrierPlan) {
-        //		System.out.println("REPLAN " + carrierPlan.getCarrier().getId());
         Carrier carrier = carrierPlan.getCarrier();
 
         //construct the routing problem - here the interface to jsprit comes into play

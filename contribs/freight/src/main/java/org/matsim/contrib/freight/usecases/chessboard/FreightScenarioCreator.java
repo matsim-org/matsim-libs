@@ -93,9 +93,6 @@ final class FreightScenarioCreator {
             carriers.addCarrier(carrier_);
         }
 
-//        CarrierVehicleTypes types = CarrierVehicleTypes.getVehicleTypes(carriers);
-//        new CarrierVehicleTypeWriter(types).write("input/usecases/chessboard/freight/vehicleTypes.xml");
-
         new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
     }
 

@@ -163,8 +163,6 @@ public class FreightUtils {
 			if (carrier.getShipments().size() > 0) {
 				copyShipments(carrierWS, carrier);
 			}
-			//			copyPickups(carrierWS, carrier);	//Not implemented yet due to missing CarrierPickup in freight contrib, kmt Sep18
-			//			copyDeliveries(carrierWS, carrier); //Not implemented yet due to missing CarrierDelivery in freight contrib, kmt Sep18
 			if (carrier.getServices().size() > 0) {
 				createShipmentsFromServices(carrierWS, carrier);
 			}

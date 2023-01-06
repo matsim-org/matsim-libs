@@ -141,17 +141,11 @@ import org.matsim.vehicles.VehicleUtils;
 		// checks if the associated pickup is on first position
 		if (positionOfRelatedPickup == 0 && context.getRoute().getActivities().isEmpty()) {
 			context.getRoute().getStart().setLocation(context.getNewVehicle().getStartLocation());
-			//This value is never used. it gets overwritten before usage. -- commenting it out. KMT, Jun'20
-//			routeDistance = getDistance(context.getRoute().getStart(), context.getAssociatedActivities().get(0),
-//					context.getNewVehicle(), context.getNewDepTime());
 			context.getRoute().getEnd().setLocation(context.getNewVehicle().getEndLocation());
 			routeDistance = getDistance(context.getAssociatedActivities().get(0), context.getRoute().getEnd(),
 					context.getNewVehicle(), context.getNewDepTime());
 			return routeDistance;
 		} else if (positionOfRelatedPickup == 0 && !context.getRoute().getActivities().isEmpty()) {
-			//This value is never used. it gets overwritten before usage. -- commenting it out. KMT, Jun'20
-//			routeDistance = getDistance(context.getRoute().getStart(), context.getAssociatedActivities().get(0),
-//					context.getNewVehicle(), context.getNewDepTime());
 			routeDistance = getDistance(context.getAssociatedActivities().get(0),
 					context.getRoute().getActivities().get(0), context.getNewVehicle(), context.getNewDepTime());
 		} else {

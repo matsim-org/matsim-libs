@@ -105,8 +105,6 @@ final class InitialCarrierPlanCreator {
                 //						double waiting = 0.;
                 double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perServiceTimeUnit;
                 return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
-                //						//				return penalty4missedTws*tooLate;
-                //						return 0.0;
             }
 
 			@Override

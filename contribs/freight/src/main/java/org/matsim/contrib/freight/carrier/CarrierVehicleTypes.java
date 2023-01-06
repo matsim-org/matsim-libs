@@ -53,8 +53,6 @@ public class CarrierVehicleTypes {
 	public CarrierVehicleTypes() {
 		super();
 		this.vehicleTypes = new HashMap<>();
-//		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType(Id.create("default", VehicleType.class ) );
-//		this.vehicleTypes.put( defaultVehicleType.getId(), defaultVehicleType );
 	}
 
 	public Map<Id<VehicleType>, VehicleType> getVehicleTypes() {

@@ -90,11 +90,6 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		try {
 			openFile(filename);
 			writeXmlHead();
-//			atts.clear();
-//			atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
-//			atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
-//			atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "carriersDefinitions_v2.0.xsd"));
-//			this.writeStartTag("carriers", atts);
 
 			startCarriers(this.writer);
 			for (Carrier carrier : carriers) {
@@ -127,17 +122,6 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
 	private void writeVehiclesAndTheirTypes(Carrier carrier, BufferedWriter writer)throws IOException {
 		writer.write("\t\t\t<capabilities fleetSize=\""+ carrier.getCarrierCapabilities().getFleetSize().toString() + "\">\n");
-//		writer.write("\t\t\t\t<vehicleTypes>\n");
-//		for(VehicleType type : carrier.getCarrierCapabilities().getVehicleTypes()){
-//			writer.write("\t\t\t\t\t<vehicleType id=\"" + type.getId() + "\">\n");
-//			writer.write("\t\t\t\t\t\t<description>" + type.getDescription() + "</description>\n");
-//			writer.write("\t\t\t\t\t\t<engineInformation fuelType=\"" + type.getEngineInformation().getFuelType().toString() + "\" gasConsumption=\"" + type.getEngineInformation().getFuelConsumption() + "\"/>\n");
-//			writer.write("\t\t\t\t\t\t<capacity>" + type.getCapacity() + "</capacity>\n");
-//			writer.write("\t\t\t\t\t\t<costInformation fix=\"" + type.getCostInformation().getFixedCosts() + "\" perMeter=\"" + type.getCostInformation().getCostsPerMeter() +
-//					"\" perSecond=\"" + type.getCostInformation().getCostsPerSecond() + "\"/>\n");
-//			writer.write("\t\t\t\t\t</vehicleType>\n");
-//		}
-//		writer.write("\t\t\t\t</vehicleTypes>\n\n");
 		//vehicles
 		writer.write("\t\t\t\t<vehicles>\n");
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
