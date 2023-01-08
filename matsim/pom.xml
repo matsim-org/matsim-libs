@@ -313,7 +313,7 @@
 									<packages>org.matsim.vis:org.matsim.vis.*</packages>
 								</group>
 							</groups>
-							<detectLinks>true</detectLinks>
+							<detectLinks>false</detectLinks>
 							<doclint>none</doclint>
 							<linksource>true</linksource>
 						</configuration>
