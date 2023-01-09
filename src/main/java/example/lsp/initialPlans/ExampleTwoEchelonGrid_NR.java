@@ -144,7 +144,6 @@ final class ExampleTwoEchelonGrid_NR {
 		} );
 
 		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
-
 		
 		log.info("Run MATSim");
 		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
@@ -176,7 +175,7 @@ final class ExampleTwoEchelonGrid_NR {
 		}
 
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setWriteEventsInterval(1);
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
