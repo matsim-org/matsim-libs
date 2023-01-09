@@ -56,7 +56,7 @@ import java.util.*;
  * It uses the 9x9-grid network from the matsim-examples.
  * <p>
  * The depot is located at the outer border of the network, while the jobs are located in the middle area.
- * The {@link lsp.LSP} has two different {@link lsp.LSPPlan}s:
+ * The {@link LSP} has two different {@link LSPPlan}s:
  * 1) direct delivery from the depot
  * 2) Using a TransshipmentHub: All goods were brought from the depot to the hub, reloaded and then brought from the hub to the customers
  * <p>
@@ -68,7 +68,7 @@ import java.util.*;
  *
  * @author Kai Martins-Turner (kturner)
  */
-final class ExampleTwoEchelonGrid {
+final class ExampleTwoEchelonGrid_NR {
 
 	//Run Settings
 	static final double HUBCOSTS_FIX = 100;
@@ -77,7 +77,7 @@ final class ExampleTwoEchelonGrid {
 	private static final double TOLL_VALUE = 1000;
 
 
-	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGrid.class);
+	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGrid_NR.class);
 
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
 	private static final Id<Link> HUB_LINK_ID = Id.createLinkId("j(5,3)");
@@ -103,7 +103,7 @@ final class ExampleTwoEchelonGrid {
 			.build();
 
 
-	private ExampleTwoEchelonGrid() {
+	private ExampleTwoEchelonGrid_NR() {
 	} // so it cannot be instantiated
 
 	public static void main(String[] args) {
@@ -143,6 +143,9 @@ final class ExampleTwoEchelonGrid {
 			}
 		} );
 
+		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
+
+		
 		log.info("Run MATSim");
 		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
 		controler.run();
