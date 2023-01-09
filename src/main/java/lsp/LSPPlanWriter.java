@@ -11,11 +11,11 @@ import java.util.Collection;
 public class LSPPlanWriter extends MatsimXmlWriter {
 
     private static final  Logger logger = LogManager.getLogger(LSPPlanWriter.class);
-    private final Collection<LSP> lsPs;
+    private final Collection<LSP> lsps;
 
     public LSPPlanWriter(LSPs lsPs) {
         super();
-        this.lsPs = lsPs.getLSPs().values();
+        this.lsps = lsPs.getLSPs().values();
     }
 
 
@@ -24,7 +24,13 @@ public class LSPPlanWriter extends MatsimXmlWriter {
         try {
             openFile(filename);
             writeXmlHead();
-            writeTypes(this.writer);
+			// Ich habe das mal hier "hoch gezogen". Ist dann etwas analoger zu dem CarrierWriter.
+			writer.write("\t<LSPs>\n");
+			for (LSP lsp : lsps) {
+				writeTypes(lsp, this.writer); //Übergibt dann nun den LSP mit und du kannst direkt drauf zugreifen.
+			}
+			writer.write("\t</LSPs>\n\n");
+			//Ende der Hochziehung
             close();
             logger.info("done");
         } catch ( IOException e) {
@@ -34,13 +40,12 @@ public class LSPPlanWriter extends MatsimXmlWriter {
         }
     }
 
-    private void writeTypes( BufferedWriter writer )throws IOException {
-        writer.write("\t<LSPs>\n");
-        for( LSPResource lsp : lsp.getResources()) {
-            writer.write("\t\t<clientElements id=\"" + lsp.getClientElements() + "\">\n");
-            writer.write("\t\t\t<tpString>" + lsp.toString() + "</tpString>\n");
-        }
-        writer.write("\t</LSPs>\n\n");
+    private void writeTypes(LSP lsp,  BufferedWriter writer )throws IOException {
+		//Leicht umsortiert und hier musst du dann schauen, was du ausgeben willst :)
+		writer.write("\t\t\t<tpString>" + lsp + "</tpString>\n");
+		for (LSPResource resource : lsp.getResources()) {
+			writer.write("\t\t<clientElements id=\"" + resource.getClientElements() + "\">\n");
+		}
     }
 
 }

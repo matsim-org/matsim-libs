@@ -143,7 +143,7 @@ final class ExampleTwoEchelonGrid {
 			}
 		} );
 
-		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()).write(controler.getControlerIO().getOutputPath());
+		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getControlerIO().getOutputPath());
 
 
 
