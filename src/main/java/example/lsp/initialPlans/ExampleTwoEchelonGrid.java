@@ -143,6 +143,12 @@ final class ExampleTwoEchelonGrid {
 			}
 		} );
 
+		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()).write(controler.getControlerIO().getOutputPath());
+
+
+
+
+
 		log.info("Run MATSim");
 		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
 		controler.run();
