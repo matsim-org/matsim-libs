@@ -143,6 +143,8 @@ final class ExampleTwoEchelonGrid_NR {
 			}
 		} );
 
+
+		//Ggf. muss der Ordner noch erstellt werden (?)
 		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
 		
 		log.info("Run MATSim");
