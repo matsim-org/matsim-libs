@@ -55,7 +55,7 @@ public class JDEQSimPluginTest extends MatsimTestCase {
     }
 
     @org.junit.Test public void testRunsEquil() {
-        Scenario scenario = ScenarioUtils.loadScenario(loadConfig("test/scenarios/equil/config.xml"));
+		Scenario scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();

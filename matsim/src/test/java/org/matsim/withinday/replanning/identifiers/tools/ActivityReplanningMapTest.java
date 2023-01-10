@@ -94,7 +94,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 	@org.junit.Test public void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
-		Config config = loadConfig("test/scenarios/equil/config.xml");
+		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		config.controler().setMobsim("qsim");

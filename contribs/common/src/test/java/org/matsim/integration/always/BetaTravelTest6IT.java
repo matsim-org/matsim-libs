@@ -125,7 +125,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 	 *  @author mrieser
 	 */
 	@org.junit.Test public void testBetaTravel_6() {
-		Config config = loadConfig("../../examples/scenarios/equil/config.xml"); // default config
+		Config config = utils.loadConfig("../../examples/scenarios/equil/config.xml"); // default config
 		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml"); // specific setting for this test
 		config.controler().setWritePlansInterval(0);
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );

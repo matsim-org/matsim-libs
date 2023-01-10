@@ -53,7 +53,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 	}
 
 	@org.junit.Test public void testCoreListenerExecutionOrder() {
-		Config config = loadConfig(getClassInputDirectory() + "config.xml");
+		Config config = utils.loadConfig(getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);
 		ControlerEventsTestListener firstListener = new ControlerEventsTestListener(1, this);
@@ -70,7 +70,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 	}
 
 	@org.junit.Test public void testEvents() {
-		Config config = loadConfig(getClassInputDirectory() + "config.xml");
+		Config config = utils.loadConfig(getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);

@@ -44,7 +44,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 
 	@org.junit.Test public void testTravelTimeCalculatorArray() {
         for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
-    		Config config = loadConfig(null);
+			Config config = utils.loadConfig((String)null);
 
     		// create a network
     		final Network network = new NetworkImpl(lf);
@@ -85,7 +85,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 
 	@org.junit.Test public void testTravelTimeCalculatorHashMap() {
         for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
-    		Config config = loadConfig(null);
+			Config config = utils.loadConfig((String)null);
 
     		// create a network
     		final Network network = new NetworkImpl(lf);

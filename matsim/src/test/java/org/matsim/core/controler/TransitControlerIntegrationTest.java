@@ -60,7 +60,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 	@org.junit.Test public void testTransitRouteCopy() {
-		Config config = super.loadConfig(null);
+		Config config = utils.loadConfig((String)null);
 		config.transit().setUseTransit(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 

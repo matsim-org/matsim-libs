@@ -42,7 +42,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	private Config config = null;
 
 	@org.junit.Before public void setUp() {
-		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
+		this.config = utils.loadConfig((String)null); // required for planCalcScore.beta to be defined
 	}
 
 	@org.junit.After public void tearDown() {

@@ -44,7 +44,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 		String outShp = getOutputDirectory() + "acts.shp";
 
-		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
+		Scenario scenario = ScenarioUtils.createScenario(utils.loadConfig((String)null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).parse(new GZIPInputStream(getClass().getResourceAsStream("/test/scenarios/berlin/network.xml.gz")));
 
@@ -68,7 +68,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 		String outShp = getOutputDirectory() + "legs.shp";
 
-		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
+		Scenario scenario = ScenarioUtils.createScenario(utils.loadConfig((String)null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).parse(new GZIPInputStream(getClass().getResourceAsStream("/test/scenarios/berlin/network.xml.gz")));
 

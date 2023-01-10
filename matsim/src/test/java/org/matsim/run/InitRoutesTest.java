@@ -56,7 +56,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class InitRoutesTest extends MatsimTestCase {
 
 	@org.junit.Test public void testMain() throws Exception {
-		Config config = loadConfig(null);
+		Config config = utils.loadConfig((String)null);
 		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
 		final String PLANS_FILE_TESTINPUT = getOutputDirectory() + "plans.in.xml";
 		final String PLANS_FILE_TESTOUTPUT = getOutputDirectory() + "plans.out.xml";

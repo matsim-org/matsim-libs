@@ -60,7 +60,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 	private Network network = null;
 
 	@org.junit.Before public void setUp() {
-		super.loadConfig(null);
+		utils.loadConfig((String)null);
 
 		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.population = s.getPopulation();

@@ -75,7 +75,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	private static final Logger log = LogManager.getLogger(UmlaufDriverTest.class);
 
 	@org.junit.Before public void setUp() {
-		super.loadConfig(null);
+		utils.loadConfig((String)null);
 	}
 
 	@org.junit.Test public void testInitializationNetworkRoute() {

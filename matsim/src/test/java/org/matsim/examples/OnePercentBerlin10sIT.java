@@ -45,7 +45,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 	private static final Logger log = LogManager.getLogger(OnePercentBerlin10sIT.class);
 
 	@org.junit.Test public void testOnePercent10sQSim() {
-		Config config = loadConfig(null);
+		Config config = utils.loadConfig((String)null);
 		// input files are in the main directory in the resource path!
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
@@ -91,7 +91,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 	}
 
 	@org.junit.Test public void testOnePercent10sQSimTryEndTimeThenDuration() {
-		Config config = loadConfig(null);
+		Config config = utils.loadConfig((String)null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		String eventsFileName = getOutputDirectory() + "events.xml.gz";

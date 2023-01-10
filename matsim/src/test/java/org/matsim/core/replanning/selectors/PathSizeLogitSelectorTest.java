@@ -56,7 +56,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	private Config config = null;
 
 	@org.junit.Before public void setUp() {
-		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
+		this.config = utils.loadConfig((String)null); // required for planCalcScore.beta to be defined
 		config.planCalcScore().setBrainExpBeta(2.0);
 		config.planCalcScore().setPathSizeLogitBeta(2.0);
 		this.network = null;

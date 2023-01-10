@@ -22,10 +22,6 @@ package org.matsim.testcases;
 
 import org.junit.Ignore;
 import org.junit.Rule;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.MatsimRandom;
-
-
 
 /**
  * @Deprecated This is the "old" infrastructure for providing some standardized helper methods for junit-testing (until junit 3)
@@ -38,17 +34,6 @@ public class MatsimTestCase {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	/**
-	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>).
-	 *
-	 * @param configfile The path/filename of a configuration file, or null to load the default configuration.
-	 * @return The loaded configuration.
-	 */
-	public Config loadConfig(final String configfile) {
-		var config = utils.loadConfig(configfile);
-		return config;
-	}
 
 	/**
 	 * Returns the path to the output directory for this test including a trailing slash as directory delimiter.

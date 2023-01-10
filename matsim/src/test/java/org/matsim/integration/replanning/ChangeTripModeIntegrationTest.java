@@ -70,7 +70,7 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 
 	@org.junit.Test public void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
-		final Config config = loadConfig(null);
+		final Config config = utils.loadConfig((String)null);
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeTripMode");

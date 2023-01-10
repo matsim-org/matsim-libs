@@ -75,7 +75,7 @@ import org.matsim.vehicles.Vehicle;
 public class QSimIntegrationTest extends MatsimTestCase {
 
 	@org.junit.Test public void testFreespeed() {
-		Config config = loadConfig(null);
+		Config config = utils.loadConfig((String)null);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -124,7 +124,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
-		Config config = loadConfig(null);
+		Config config = utils.loadConfig((String)null);
 		config.network().setTimeVariantNetwork(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -194,7 +194,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	@org.junit.Test public void testZeroCapacity() {
 		final double capacityFactor = 0.0;
 
-		Config config = loadConfig(null);
+		Config config = utils.loadConfig((String)null);
 		config.network().setTimeVariantNetwork(true);
 		config.qsim().setStartTime(0.0);
 		final double simEndTime = 7200.0;

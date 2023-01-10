@@ -49,7 +49,8 @@ import org.matsim.testcases.MatsimTestCase;
 public class RouteLinkFilterTest extends MatsimTestCase {
 
 	@org.junit.Test public void testRouteLinkFilter() {
-		loadConfig(null); // used to set the default dtd-location
+		// used to set the default dtd-location
+		utils.loadConfig((String)null);
 		Population population = getTestPopulation();
 
 		TestAlgorithm tester = new TestAlgorithm();

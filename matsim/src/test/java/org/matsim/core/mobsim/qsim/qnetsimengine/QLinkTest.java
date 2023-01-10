@@ -313,7 +313,7 @@ public final class QLinkTest extends MatsimTestCase {
 	 */
 
 	@org.junit.Test public void testBuffer() {
-		Config conf = super.loadConfig(null);
+		Config conf = utils.loadConfig((String)null);
 
 		conf.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
