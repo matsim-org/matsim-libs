@@ -44,7 +44,7 @@ public class GenericEventTest extends MatsimTestCase {
 		assertEquals(TYPE, readEvent.getAttributes().get("type"));
 		assertEquals(VALUE1, readEvent.getAttributes().get(KEY1));
 		assertEquals(String.valueOf(time), readEvent.getAttributes().get("time"));
-		assertEquals(time, readEvent.getTime());
+		assertEquals(time, readEvent.getTime(), 0);
 
 	}
 }

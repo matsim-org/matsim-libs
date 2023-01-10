@@ -83,7 +83,7 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehType), MatsimTestUtils.EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), MatsimTestUtils.EPSILON);
 		assertEquals(VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType));
-		assertEquals(2.0, vehType.getPcuEquivalents());
+		assertEquals(2.0, vehType.getPcuEquivalents(), 0);
 	}
 
 	@org.junit.Test public void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
@@ -93,7 +93,7 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 		assertEquals(1.0, vehType.getWidth(), MatsimTestUtils.EPSILON);
 		assertTrue(Double.isInfinite(vehType.getMaximumVelocity()));
 		assertNotNull(vehType.getCapacity());
-		assertEquals(1.0, vehType.getPcuEquivalents());
+		assertEquals(1.0, vehType.getPcuEquivalents(), 0);
 	}
 
 	@org.junit.Test public void test_NumberOfVehiclesIsReadCorrectly() {

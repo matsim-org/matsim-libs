@@ -22,6 +22,7 @@ package org.matsim.api.core.v01;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Assert;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -38,7 +39,6 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class NetworkCreationTest extends MatsimTestCase {
 
-
 	@org.junit.Test public void testCreateNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -48,7 +48,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 		Coord coord2 = new Coord(300.0, 400.0);
 		Network network = sc.getNetwork();
 		//test default capacity period
-		assertEquals(3600.0, network.getCapacityPeriod());
+		Assert.assertEquals(3600.0, network.getCapacityPeriod(), 0);
 		//have to cast to NetworkFactory because coord is needed otherwise null pointer exception
 		NetworkFactory nb = network.getFactory();
 		Node n1 = nb.createNode(nodeId1, coord1);
@@ -60,30 +60,31 @@ public class NetworkCreationTest extends MatsimTestCase {
 		network.addNode(n2);
 		Link l1 = nb.createLink(Id.create(1, Link.class), n1, n2);
 		//test defaults
-		assertEquals(500.0, l1.getLength()); // euclidean link length
-		assertEquals(1.0, l1.getCapacity());
-		assertEquals(1.0, l1.getFreespeed());
-		assertEquals(1.0, l1.getNumberOfLanes());
+		// euclidean link length
+		Assert.assertEquals(500.0, l1.getLength(), 0);
+		Assert.assertEquals(1.0, l1.getCapacity(), 0);
+		Assert.assertEquals(1.0, l1.getFreespeed(), 0);
+		Assert.assertEquals(1.0, l1.getNumberOfLanes(), 0);
 		assertEquals(1.0/3600.0, l1.getCapacity()/network.getCapacityPeriod(), MatsimTestUtils.EPSILON);
 		//the next lines are not obvious because only the references have been given to the builder
-		assertEquals(n1, l1.getFromNode());
-		assertEquals(n2, l1.getToNode());
+		Assert.assertEquals(n1, l1.getFromNode());
+		Assert.assertEquals(n2, l1.getToNode());
 		//change attributes
 		l1.setLength(1000.0);
-		assertEquals(1000.0, l1.getLength());
+		Assert.assertEquals(1000.0, l1.getLength(), 0);
 		l1.setFreespeed(100.0);
-		assertEquals(100.0, l1.getFreespeed());
+		Assert.assertEquals(100.0, l1.getFreespeed(), 0);
 		l1.setCapacity(3600.0);
-		assertEquals(3600.0, l1.getCapacity());
+		Assert.assertEquals(3600.0, l1.getCapacity(), 0);
 		//tests on LinkImpl
 		assertEquals(1.0, l1.getCapacity()/network.getCapacityPeriod(), MatsimTestUtils.EPSILON);
 
 		//add to network
 		network.addLink(l1);
 		//test for no side effects by adding to network
-		assertEquals(1000.0, l1.getLength());
-		assertEquals(100.0, l1.getFreespeed());
-		assertEquals(3600.0, l1.getCapacity());
+		Assert.assertEquals(1000.0, l1.getLength(), 0);
+		Assert.assertEquals(100.0, l1.getFreespeed(), 0);
+		Assert.assertEquals(3600.0, l1.getCapacity(), 0);
 		assertEquals(1.0, l1.getCapacity()/network.getCapacityPeriod(), MatsimTestUtils.EPSILON);
 	}
 }

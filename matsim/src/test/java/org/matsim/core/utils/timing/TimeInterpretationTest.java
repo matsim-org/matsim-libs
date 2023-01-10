@@ -60,9 +60,9 @@ public class TimeInterpretationTest extends MatsimTestCase {
 		Leg firstLeg = (Leg) elements.get(1);
 		Leg secondLeg = (Leg) elements.get(3);
 
-		assertEquals(15600.0, firstLeg.getTravelTime().seconds());
-		assertEquals(28800.0, firstLeg.getDepartureTime().seconds());
-		assertEquals(43200.0, secondLeg.getDepartureTime().seconds());
+		assertEquals(15600.0, firstLeg.getTravelTime().seconds(), 0);
+		assertEquals(28800.0, firstLeg.getDepartureTime().seconds(), 0);
+		assertEquals(43200.0, secondLeg.getDepartureTime().seconds(), 0);
 		// End time was NOT shifted (although arrival is later), second departure is assumed at 12:00
 	}
 
@@ -80,9 +80,9 @@ public class TimeInterpretationTest extends MatsimTestCase {
 		Leg firstLeg = (Leg) elements.get(1);
 		Leg secondLeg = (Leg) elements.get(3);
 
-		assertEquals(15600.0, firstLeg.getTravelTime().seconds());
-		assertEquals(28800.0, firstLeg.getDepartureTime().seconds());
-		assertEquals(44400.0, secondLeg.getDepartureTime().seconds());
+		assertEquals(15600.0, firstLeg.getTravelTime().seconds(), 0);
+		assertEquals(28800.0, firstLeg.getDepartureTime().seconds(), 0);
+		assertEquals(44400.0, secondLeg.getDepartureTime().seconds(), 0);
 		// End time WAS shifted (because arrival is later), second departure is assumed at 12:20
 	}
 

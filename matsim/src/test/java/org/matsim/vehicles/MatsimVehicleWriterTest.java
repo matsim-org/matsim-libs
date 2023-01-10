@@ -108,7 +108,7 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeDefaultCar), MatsimTestUtils.EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeDefaultCar), MatsimTestUtils.EPSILON);
 		assertEquals(VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar));
-		assertEquals(2.0, vehTypeDefaultCar.getPcuEquivalents());
+		assertEquals(2.0, vehTypeDefaultCar.getPcuEquivalents(), 0);
 
 		vehTypeDefaultCar = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehTypeDefaultCar);
@@ -121,7 +121,7 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter());
 		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond());
 		assertEquals(VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar));
-		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
+		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents(), 0);
 
 		assertNotNull(vehicles);
 		assertEquals(3, vehicles.size());

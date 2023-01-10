@@ -110,8 +110,8 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals("< 1,4L", VehicleUtils.getHbefaSizeClass(engineInformation));
 		assertEquals("EURO-5", VehicleUtils.getHbefaEmissionsConcept(engineInformation));
 
-		assertEquals(2.0, vehTypeNormalCar.getPcuEquivalents());
-		assertEquals(1.5, vehTypeNormalCar.getFlowEfficiencyFactor());
+		assertEquals(2.0, vehTypeNormalCar.getPcuEquivalents(), 0);
+		assertEquals(1.5, vehTypeNormalCar.getFlowEfficiencyFactor(), 0);
 		assertEquals("pt", vehTypeNormalCar.getNetworkMode());
 
 		assertEquals("abc", vehTypeNormalCar.getAttributes().getAttribute("Attribute1"));
@@ -135,8 +135,8 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter());
 		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond());
 		assertEquals(VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar));
-		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
-		assertEquals(1.0, vehTypeDefaultCar.getFlowEfficiencyFactor());
+		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents(), 0);
+		assertEquals(1.0, vehTypeDefaultCar.getFlowEfficiencyFactor(), 0);
 		assertEquals("def", vehTypeDefaultCar.getAttributes().getAttribute("Attribute1"));
 		assertEquals(2, vehTypeDefaultCar.getAttributes().getAttribute("Attribute2"));
 	}

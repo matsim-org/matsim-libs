@@ -63,20 +63,20 @@ public class GeneralLibTest extends MatsimTestCase {
 		matrix[0][0]=1.0;
 		matrix=GeneralLib.scaleMatrix(matrix, 2);
 
-		assertEquals(2.0, matrix[0][0]);
+		assertEquals(2.0, matrix[0][0], 0);
 	}
 
 
 	@org.junit.Test public void testProjectTimeWithin24Hours(){
-		assertEquals(10.0,GeneralLib.projectTimeWithin24Hours(10.0));
-		assertEquals(0.0,GeneralLib.projectTimeWithin24Hours(60*60*24.0));
+		assertEquals(10.0,GeneralLib.projectTimeWithin24Hours(10.0), 0);
+		assertEquals(0.0,GeneralLib.projectTimeWithin24Hours(60*60*24.0), 0);
 		assertEquals(1.0,GeneralLib.projectTimeWithin24Hours(60*60*24.0+1),0.1);
 		assertEquals(60*60*24.0-1,GeneralLib.projectTimeWithin24Hours(-1),0.1);
 	}
 
 	@org.junit.Test public void testGetIntervalDuration(){
-		assertEquals(10.0,GeneralLib.getIntervalDuration(0.0,10.0));
-		assertEquals(11.0,GeneralLib.getIntervalDuration(60*60*24.0-1.0,10.0));
+		assertEquals(10.0,GeneralLib.getIntervalDuration(0.0,10.0), 0);
+		assertEquals(11.0,GeneralLib.getIntervalDuration(60*60*24.0-1.0,10.0), 0);
 	}
 
 
