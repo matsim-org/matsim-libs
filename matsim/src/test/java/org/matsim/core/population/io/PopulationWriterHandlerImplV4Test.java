@@ -20,6 +20,8 @@
 
 package org.matsim.core.population.io;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +44,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 
-	public void testWriteGenericRoute() {
+	@org.junit.Test public void testWriteGenericRoute() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(super.loadConfig(null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");

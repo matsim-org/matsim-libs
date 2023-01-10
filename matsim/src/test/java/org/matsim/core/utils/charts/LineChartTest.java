@@ -20,6 +20,9 @@
 
 package org.matsim.core.utils.charts;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +42,7 @@ public class LineChartTest extends MatsimTestCase {
 	 * Test that a file was really generated, and that the image, when loaded, has the specified size.
 	 * @throws IOException possible exception when reading the image for validation
 	 */
-	public void testLineChartDemo() throws IOException {
+	@org.junit.Test public void testLineChartDemo() throws IOException {
 		String imageFilename = getOutputDirectory() + "linechart.png";
 		Demo demo = new Demo();
 		demo.createLineChart(imageFilename);

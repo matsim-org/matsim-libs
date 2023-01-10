@@ -20,6 +20,8 @@
 
 package org.matsim.run;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 
 import org.matsim.api.core.v01.Id;
@@ -53,7 +55,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class InitRoutesTest extends MatsimTestCase {
 
-	public void testMain() throws Exception {
+	@org.junit.Test public void testMain() throws Exception {
 		Config config = loadConfig(null);
 		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
 		final String PLANS_FILE_TESTINPUT = getOutputDirectory() + "plans.in.xml";

@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -33,7 +35,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PersonArrivalEventTest extends MatsimTestCase {
 
-	public void testWriteReadXml() {
+	@org.junit.Test public void testWriteReadXml() {
 		final PersonArrivalEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
 				new PersonArrivalEvent(68423.98, Id.create("443", Person.class), Id.create("78-3", Link.class), TransportMode.bike));
 		assertEquals(68423.98, event.getTime(), MatsimTestUtils.EPSILON);

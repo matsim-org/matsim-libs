@@ -20,13 +20,15 @@
 
 package org.matsim.pt.counts;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PtCountsLoadCurveGraphTest extends MatsimTestCase {
-	@Test
-	public void testCreateBoardChart() {
+
+	@org.junit.Test public void testCreateBoardChart() {
 		PtCountsFixture fixture = new PtBoardCountsFixture();
 		fixture.setUp();
 
@@ -35,8 +37,8 @@ public class PtCountsLoadCurveGraphTest extends MatsimTestCase {
 		assertNotNull("No graph is created", eg.createChart(0));
 	}
 
-	@Test
-	public void testCreateAlightChart() {
+
+	@org.junit.Test public void testCreateAlightChart() {
 		PtCountsFixture fixture = new PtAlightCountsFixture();
 		fixture.setUp();
 
@@ -45,8 +47,8 @@ public class PtCountsLoadCurveGraphTest extends MatsimTestCase {
 		assertNotNull("No graph is created", eg.createChart(0));
 	}
 
-	@Test
-	public void testCreateOccupancyChart() {
+
+	@org.junit.Test public void testCreateOccupancyChart() {
 		PtCountsFixture fixture = new PtOccupancyCountsFixture();
 		fixture.setUp();
 

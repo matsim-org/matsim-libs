@@ -20,6 +20,8 @@
 
 package org.matsim.core.controler;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -57,7 +59,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class TransitControlerIntegrationTest extends MatsimTestCase {
 
-	public void testTransitRouteCopy() {
+	@org.junit.Test public void testTransitRouteCopy() {
 		Config config = super.loadConfig(null);
 		config.transit().setUseTransit(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);

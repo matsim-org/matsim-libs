@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
 
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.testcases.MatsimTestCase;
@@ -29,21 +30,21 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class GenericEventTest extends MatsimTestCase {
 
-	public void testWriteReadXml() {
+	@org.junit.Test public void testWriteReadXml() {
 		final String TYPE = "GenericEvent";
 		final String KEY1 = "k1";
 		final String VALUE1 = "v1";
 		final double time = 3601;
-		
+
 		GenericEvent writeEvent = new GenericEvent(TYPE, time);
 		writeEvent.getAttributes().put(KEY1, VALUE1);
-		
+
 		GenericEvent readEvent = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", writeEvent);
-		
+
 		assertEquals(TYPE, readEvent.getAttributes().get("type"));
 		assertEquals(VALUE1, readEvent.getAttributes().get(KEY1));
 		assertEquals(String.valueOf(time), readEvent.getAttributes().get("time"));
 		assertEquals(time, readEvent.getTime());
-		
+
 	}
 }

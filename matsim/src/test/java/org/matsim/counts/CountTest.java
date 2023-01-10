@@ -20,6 +20,8 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
@@ -28,20 +30,20 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountTest extends MatsimTestCase {
 
-	public void testCreateVolume() {
+	@org.junit.Test public void testCreateVolume() {
 		Count count = new Count(Id.create(0, Link.class), "1");
 		Volume volume = count.createVolume(1, 100.0);
 		assertTrue("Creation and initialization of volume failed", volume.getHourOfDayStartingWithOne()==1);
 		assertTrue("Creation and initialization of volume failed", volume.getValue()==100.0);
 	}
 
-	public void testGetVolume() {
+	@org.junit.Test public void testGetVolume() {
 		Count count = new Count(Id.create(0, Link.class), "1");
 		count.createVolume(1, 100.0);
 		assertTrue("Getting volume failed", count.getVolume(1).getValue() == 100.0);
 	}
 
-	public void testGetVolumes() {
+	@org.junit.Test public void testGetVolumes() {
 		Count count = new Count(Id.create(0, Link.class), "1");
 		count.createVolume(1, 100.0);
 

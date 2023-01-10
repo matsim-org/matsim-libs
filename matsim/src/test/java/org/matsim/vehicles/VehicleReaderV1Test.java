@@ -19,10 +19,11 @@
 
 package org.matsim.vehicles;
 
+import static org.junit.Assert.*;
+
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
@@ -41,9 +42,7 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
+	@org.junit.Before public void setUp() {
 		Vehicles veh = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader = new MatsimVehicleReader(veh);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
@@ -59,14 +58,12 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 		id42_23 = Id.create(" 42  23", Vehicle.class);
 	}
 
-	@Test
-	public void test_NumberOfVehicleTypeisReadCorrectly() {
+	@org.junit.Test public void test_NumberOfVehicleTypeisReadCorrectly() {
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
 	}
 
-	@Test
-	public void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
+	@org.junit.Test public void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
 		VehicleType vehType = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
@@ -89,8 +86,7 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 		assertEquals(2.0, vehType.getPcuEquivalents());
 	}
 
-	@Test
-	public void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
+	@org.junit.Test public void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
 		VehicleType vehType = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehType);
 		assertEquals(7.5, vehType.getLength(), MatsimTestUtils.EPSILON);
@@ -100,14 +96,12 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 		assertEquals(1.0, vehType.getPcuEquivalents());
 	}
 
-	@Test
-	public void test_NumberOfVehiclesIsReadCorrectly() {
+	@org.junit.Test public void test_NumberOfVehiclesIsReadCorrectly() {
 		assertNotNull(vehicles);
 		assertEquals(3, vehicles.size());
 	}
 
-	@Test
-	public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly() {
+	@org.junit.Test public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly() {
 		assertNotNull(vehicles.get(id23));
 		assertEquals(id23, vehicles.get(id23).getId());
 		assertEquals(Id.create("normal&Car", VehicleType.class), vehicles.get(id23).getType().getId());

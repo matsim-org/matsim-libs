@@ -20,19 +20,21 @@
 
 package org.matsim.households;
 
+import static org.junit.Assert.*;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 
 public class HouseholdImplTest extends MatsimTestCase {
-	
+
 	/**
 	 * Test that households with the same {@link Id} are not accepted.
 	 */
-	public void testAddHousehold_DuplicateId(){
+	@org.junit.Test public void testAddHousehold_DuplicateId(){
 		HouseholdsImpl hhs = new HouseholdsImpl();
 		Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
 		Household hh2 = new HouseholdImpl(Id.create("1", Household.class));
-		
+
 		assertEquals("Shouldn't have a household.", 0, hhs.getHouseholds().size());
 		hhs.addHousehold(hh1);
 		assertEquals("Didn't add the household.", 1, hhs.getHouseholds().size());
@@ -43,16 +45,16 @@ public class HouseholdImplTest extends MatsimTestCase {
 		} catch (IllegalArgumentException e){
 		}
 	}
-	
+
 
 	/**
 	 * Test that households are accumulated if streaming is off.
 	 */
-	public void testAddHousehold_NoStreaming(){
+	@org.junit.Test public void testAddHousehold_NoStreaming(){
 		HouseholdsImpl hhs = new HouseholdsImpl();
 		Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
 		Household hh2 = new HouseholdImpl(Id.create("2", Household.class));
-		
+
 		hhs.addHousehold(hh1);
 		assertEquals("Should have the first household added.", 1, hhs.getHouseholds().size());
 		assertTrue("First household not present.", hhs.getHouseholds().containsValue(hh1));

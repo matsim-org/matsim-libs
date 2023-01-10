@@ -19,6 +19,12 @@
  * *********************************************************************** */
 package org.matsim.lanes.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,9 +40,6 @@ import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.LanesWriter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Tests the reader and writer for lanes
@@ -71,14 +74,14 @@ public class LanesReaderWriterTest extends MatsimTestCase {
 		}
 	}
 
-	public void testReader20() {
+	@org.junit.Test public void testReader20() {
 		Fixture f = new Fixture();
 		LanesReader reader = new LanesReader(f.scenario);
 		reader.readFile(this.getClassInputDirectory() + FILENAME);
 		checkContent(f.scenario.getLanes());
 	}
 
-	public void testWriter20() {
+	@org.junit.Test public void testWriter20() {
 		Fixture f = new Fixture();
 		String testoutput = this.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
 		log.debug("reading file...");

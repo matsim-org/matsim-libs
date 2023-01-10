@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -33,7 +35,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PersonStuckEventTest extends MatsimTestCase {
 
-	public void testWriteReadXml() {
+	@org.junit.Test public void testWriteReadXml() {
 		final PersonStuckEvent event1 = new PersonStuckEvent(81153.3, Id.create("a007", Person.class), Id.create("link1", Link.class), TransportMode.walk);
 		final PersonStuckEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
@@ -42,7 +44,7 @@ public class PersonStuckEventTest extends MatsimTestCase {
 		assertEquals(event1.getLegMode(), event2.getLegMode());
 	}
 
-	public void testWriteReadXmlWithLinkIdNull() {
+	@org.junit.Test public void testWriteReadXmlWithLinkIdNull() {
 		final PersonStuckEvent event1 = new PersonStuckEvent(81153.3, Id.create("a007", Person.class), null, TransportMode.walk);
 		final PersonStuckEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);

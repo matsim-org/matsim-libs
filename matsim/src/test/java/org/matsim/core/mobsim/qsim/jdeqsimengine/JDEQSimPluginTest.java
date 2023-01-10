@@ -44,22 +44,22 @@ public class JDEQSimPluginTest extends MatsimTestCase {
         	.build(scenario, eventsManager);
 	}
 
-    public void testRunsAtAll() {
+    @org.junit.Test public void testRunsAtAll() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        
+
         QSim qsim = prepareQSim(scenario, eventsManager);
         qsim.run();
     }
 
-    public void testRunsEquil() {
+    @org.junit.Test public void testRunsEquil() {
         Scenario scenario = ScenarioUtils.loadScenario(loadConfig("test/scenarios/equil/config.xml"));
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        
+
         QSim qsim = prepareQSim(scenario, eventsManager);
         qsim.run();
     }

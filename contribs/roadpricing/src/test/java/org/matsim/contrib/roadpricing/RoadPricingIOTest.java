@@ -20,6 +20,11 @@
 
 package org.matsim.contrib.roadpricing;
 
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.util.Iterator;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
@@ -27,9 +32,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.io.File;
-import java.util.Iterator;
 
 /**
  * Tests Parsers and Writers for RoadPricingSchemes.
@@ -41,7 +43,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 	/**
 	 * Tests reader and writer to ensure that reading and writing does not modify the schemes.
 	 */
-	public void testWriteReadWrite() {
+	@org.junit.Test public void testWriteReadWrite() {
 		final String origFile = this.getClassInputDirectory() + "roadpricing1.xml";
 		final String tmpFile1 = getOutputDirectory() + "roadpricing1.xml";
 		final String tmpFile2 = getOutputDirectory() + "roadpricing2.xml";

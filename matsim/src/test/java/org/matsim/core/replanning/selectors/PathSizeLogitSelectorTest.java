@@ -40,6 +40,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
+import static org.junit.Assert.*;
+
 /**
  * Tests for {@link PathSizeLogitSelector}.
  *
@@ -52,20 +54,16 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	private Network network = null;
 	private Config config = null;
 
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
+	@org.junit.Before public void setUp() {
 		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
 		config.planCalcScore().setBrainExpBeta(2.0);
 		config.planCalcScore().setPathSizeLogitBeta(2.0);
 		this.network = null;
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@org.junit.After public void tearDown() {
 		this.network = null;
 		this.config = null;
-		super.tearDown();
 	}
 
 	@Override
@@ -74,7 +72,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	public void testNegativeScore() {
+	@org.junit.Test public void testNegativeScore() {
 		this.network = createNetwork();
 		PlanSelector<Plan,Person> selector = getPlanSelector();
 
@@ -182,7 +180,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	public void testZeroScore() {
+	@org.junit.Test public void testZeroScore() {
 		this.network = createNetwork();
 		PlanSelector<Plan,Person> selector = getPlanSelector();
 		Link l1 = network.getLinks().get(Id.create("1", Link.class));
@@ -213,7 +211,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertNotNull(selector.selectPlan(person));
 	}
 
-	public void testPathSizeLogitSelector() {
+	@org.junit.Test public void testPathSizeLogitSelector() {
 		this.network = createNetwork();
 
 		Link l1 = network.getLinks().get(Id.create("1", Link.class));

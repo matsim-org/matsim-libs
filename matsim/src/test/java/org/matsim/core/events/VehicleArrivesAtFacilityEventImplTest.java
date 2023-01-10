@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.utils.misc.Time;
@@ -30,7 +32,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class VehicleArrivesAtFacilityEventImplTest extends MatsimTestCase {
 
-	public void testWriteReadXml() {
+	@org.junit.Test public void testWriteReadXml() {
 		VehicleArrivesAtFacilityEvent event = new VehicleArrivesAtFacilityEvent(Time.parseTime("10:55:00"),
 				Id.create(5, Vehicle.class),
 				Id.create(11, TransitStopFacility.class),

@@ -20,6 +20,8 @@
 
 package org.matsim.analysis;
 
+import static org.junit.Assert.*;
+
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -46,7 +48,7 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * accordingly.  Also tests that modes not defined as constants are
 	 * handled correctly.
 	 */
-	public void testDeparturesMiscModes() {
+	@org.junit.Test public void testDeparturesMiscModes() {
 		Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -99,7 +101,7 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * taken into account and that times larger than what is covered by the bins
 	 * do not lead to an exception.
 	 */
-	public void testNofBins() {
+	@org.junit.Test public void testNofBins() {
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -139,7 +141,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		assertEquals(2, histo.getArrivals()[10]);
 	}
 
-	public void testReset() {
+	@org.junit.Test public void testReset() {
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));

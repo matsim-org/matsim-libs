@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
+import static org.junit.Assert.*;
 
 /**
  * Test for {@link KeepSelected}
@@ -44,7 +45,7 @@ public class KeepSelectedTest extends AbstractPlanSelectorTest {
 	 *
 	 * @author mrieser
 	 */
-	public void testSelected() {
+	@org.junit.Test public void testSelected() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan1 = PersonUtils.createAndAddPlan(person, false);
 		Plan plan2 = PersonUtils.createAndAddPlan(person, true);

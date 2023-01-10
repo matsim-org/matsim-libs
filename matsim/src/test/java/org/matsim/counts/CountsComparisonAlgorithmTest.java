@@ -20,6 +20,8 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -27,7 +29,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsComparisonAlgorithmTest extends MatsimTestCase {
 
-	public void testCompare() {
+	@org.junit.Test public void testCompare() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 
@@ -44,7 +46,7 @@ public class CountsComparisonAlgorithmTest extends MatsimTestCase {
 		}//while
 	}
 
-	public void testDistanceFilter() {
+	@org.junit.Test public void testDistanceFilter() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 

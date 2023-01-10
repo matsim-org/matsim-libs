@@ -20,6 +20,9 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +57,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
 
-	public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
+	@org.junit.Test public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
 		final String inputDir = getClassInputDirectory();
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -89,7 +92,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		assertEquals("wrong number of links in route.", 4, route.getLinkIds().size());
 	}
 
-	public void testReadFile() throws IOException, SAXException, ParserConfigurationException {
+	@org.junit.Test public void testReadFile() throws IOException, SAXException, ParserConfigurationException {
 		final String inputDir = getClassInputDirectory();
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());

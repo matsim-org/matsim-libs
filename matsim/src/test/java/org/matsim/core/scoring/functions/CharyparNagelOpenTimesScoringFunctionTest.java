@@ -20,6 +20,8 @@
 
 package org.matsim.core.scoring.functions;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,9 +46,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 	private Person person = null;
 	private ActivityFacilities facilities = null;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@org.junit.Before public void setUp() {
 
 		final Config config = ConfigUtils.createConfig();
 		final Scenario scenario = ScenarioUtils.createScenario( config );
@@ -79,14 +79,12 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		act.setEndTime(16.0 * 3600);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@org.junit.After public void tearDown() {
 		this.person = null;
 		this.facilities = null;
-		super.tearDown();
 	}
 
-	public void testGetOpeningInterval() {
+	@org.junit.Test public void testGetOpeningInterval() {
 		Activity act =  (Activity) person.getSelectedPlan().getPlanElements().get(0) ;
 
 		FacilityOpeningIntervalCalculator testee =

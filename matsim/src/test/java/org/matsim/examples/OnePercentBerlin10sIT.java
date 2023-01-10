@@ -20,6 +20,8 @@
 
 package org.matsim.examples;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -42,12 +44,12 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 
 	private static final Logger log = LogManager.getLogger(OnePercentBerlin10sIT.class);
 
-	public void testOnePercent10sQSim() {
+	@org.junit.Test public void testOnePercent10sQSim() {
 		Config config = loadConfig(null);
 		// input files are in the main directory in the resource path!
-		String netFileName = "test/scenarios/berlin/network.xml"; 
+		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		
+
 		String eventsFileName = getOutputDirectory() + "events.xml.gz";
 		String referenceEventsFileName = getInputDirectory() + "events.xml.gz";
 
@@ -59,11 +61,11 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
-		
+
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		
+
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 		new PopulationReader(scenario).readFile(popFileName);
 
@@ -88,7 +90,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 
 	}
 
-	public void testOnePercent10sQSimTryEndTimeThenDuration() {
+	@org.junit.Test public void testOnePercent10sQSimTryEndTimeThenDuration() {
 		Config config = loadConfig(null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
@@ -103,11 +105,11 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
-		
+
 		config.controler().setOutputDirectory(this.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		
+
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 		new PopulationReader(scenario).readFile(popFileName);
 
@@ -119,7 +121,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		QSim qSim = new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.build(scenario, eventsManager);
-		
+
 		log.info("START testOnePercent10s SIM");
 		qSim.run();
 		log.info("STOP testOnePercent10s SIM");

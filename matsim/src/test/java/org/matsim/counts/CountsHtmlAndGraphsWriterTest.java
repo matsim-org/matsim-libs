@@ -20,6 +20,8 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.assertTrue;
+
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
@@ -34,7 +36,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class CountsHtmlAndGraphsWriterTest extends MatsimTestCase {
 
-	public void testGraphCreation() {
+	@org.junit.Test public void testGraphCreation() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 

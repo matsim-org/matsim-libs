@@ -20,6 +20,9 @@
 
 package org.matsim.core.gbl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Random;
 
 import org.matsim.testcases.MatsimTestCase;
@@ -33,7 +36,7 @@ public class MatsimRandomTest extends MatsimTestCase {
 	/**
 	 * Test that MatsimRandom returns different values.
 	 */
-	public void testRandomness() {
+	@org.junit.Test public void testRandomness() {
 		final double value1 = MatsimRandom.getRandom().nextDouble();
 		final double value2 = MatsimRandom.getRandom().nextDouble();
 		final double value3 = MatsimRandom.getRandom().nextDouble();
@@ -45,7 +48,7 @@ public class MatsimRandomTest extends MatsimTestCase {
 	/**
 	 * Tests that resetting the RandomObject creates the same random numbers again.
 	 */
-	public void testReset() {
+	@org.junit.Test public void testReset() {
 		MatsimRandom.reset();
 		int value1 = MatsimRandom.getRandom().nextInt();
 		MatsimRandom.reset();
@@ -57,7 +60,7 @@ public class MatsimRandomTest extends MatsimTestCase {
 	 * Tests that the same number of random numbers is generated if a custom seed
 	 * is used, and that these numbers are different with different seeds.
 	 */
-	public void testSeedReset() {
+	@org.junit.Test public void testSeedReset() {
 		final long seed1 = 123L;
 		final long seed2 = 234L;
 
@@ -76,7 +79,7 @@ public class MatsimRandomTest extends MatsimTestCase {
 	 * Tests that local instances can be recreated (=are deterministic) if the
 	 * same random seed is used to generate them.
 	 */
-	public void testLocalInstances_deterministic() {
+	@org.junit.Test public void testLocalInstances_deterministic() {
 		MatsimRandom.reset();
 		Random local1a = MatsimRandom.getLocalInstance();
 		Random local1b = MatsimRandom.getLocalInstance();
@@ -93,7 +96,7 @@ public class MatsimRandomTest extends MatsimTestCase {
 	 * Tests that multiple local instance return different random numbers,
 	 * and that they are more or less evenly distributed.
 	 */
-	public void testLocalInstances_distribution() {
+	@org.junit.Test public void testLocalInstances_distribution() {
 		MatsimRandom.reset(123L);
 		Random local1a = MatsimRandom.getLocalInstance();
 		double value1 = local1a.nextDouble();

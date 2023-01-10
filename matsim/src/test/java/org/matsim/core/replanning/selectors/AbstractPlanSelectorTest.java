@@ -20,10 +20,12 @@
 
 package org.matsim.core.replanning.selectors;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -49,7 +51,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 *
 	 *  @author mrieser
 	 */
-	public void testUndefinedScore() {
+	@org.junit.Test public void testUndefinedScore() {
 		Person person;
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Plan plan;
@@ -90,7 +92,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	public void testNoPlans() {
+	@org.junit.Test public void testNoPlans() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		assertNull(getPlanSelector().selectPlan(person));
 	}
@@ -101,7 +103,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	public void testNegativeScore() {
+	@org.junit.Test public void testNegativeScore() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Plan plan;
 		// test with only one plan...
@@ -139,7 +141,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * Test how a plan selector reacts when a plan has a score of zero (0.0).
 	 * This test only ensures that a plan is returned and no Exception occurred when selecting a plan.
 	 */
-	public void testZeroScore() {
+	@org.junit.Test public void testZeroScore() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Plan plan;
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -152,5 +154,5 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * @return A new instance of a specific implementation of {@link PlanSelector} for testing.
 	 */
 	protected abstract PlanSelector<Plan, Person> getPlanSelector();
-	
+
 }

@@ -20,6 +20,8 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.Assert.*;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -36,7 +38,7 @@ public class TransitRouteStopTest extends MatsimTestCase {
 		return new TransitRouteStopImpl.Builder().stop(stop).arrivalOffset(arrivalDelay).departureOffset(departureDelay).build();
 	}
 
-	public void testInitialization() {
+	@org.junit.Test public void testInitialization() {
 		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 		double arrivalDelay = 4;
 		double departureDelay = 5;
@@ -46,7 +48,7 @@ public class TransitRouteStopTest extends MatsimTestCase {
 		assertEquals(departureDelay, routeStop.getDepartureOffset().seconds(), MatsimTestUtils.EPSILON);
 	}
 
-	public void testStopFacility() {
+	@org.junit.Test public void testStopFacility() {
 		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
 		double arrivalDelay = 4;
@@ -57,7 +59,7 @@ public class TransitRouteStopTest extends MatsimTestCase {
 		assertEquals(stopFacility2, routeStop.getStopFacility());
 	}
 
-	public void testAwaitDepartureTime() {
+	@org.junit.Test public void testAwaitDepartureTime() {
 		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 		double arrivalDelay = 4;
 		double departureDelay = 5;
@@ -69,7 +71,7 @@ public class TransitRouteStopTest extends MatsimTestCase {
 		assertFalse(routeStop.isAwaitDepartureTime());
 	}
 
-	public void testEquals() {
+	@org.junit.Test public void testEquals() {
 		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
 		TransitRouteStop stop1 = createTransitRouteStop(stopFacility1, 10, 50);

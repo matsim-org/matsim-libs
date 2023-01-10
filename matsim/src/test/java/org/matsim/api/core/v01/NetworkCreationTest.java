@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package org.matsim.api.core.v01;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -36,7 +39,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class NetworkCreationTest extends MatsimTestCase {
 
 
-	public void testCreateNetwork() {
+	@org.junit.Test public void testCreateNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Id<Node> nodeId1 = Id.create("1", Node.class);

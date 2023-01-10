@@ -20,6 +20,8 @@
 
 package org.matsim.integration.timevariantnetworks;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +74,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class QSimIntegrationTest extends MatsimTestCase {
 
-	public void testFreespeed() {
+	@org.junit.Test public void testFreespeed() {
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -118,7 +120,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 *
 	 * @author illenberger
 	 */
-	public void testCapacity() {
+	@org.junit.Test public void testCapacity() {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
@@ -189,7 +191,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 *
 	 * @author dgrether
 	 */
-	public void testZeroCapacity() {
+	@org.junit.Test public void testZeroCapacity() {
 		final double capacityFactor = 0.0;
 
 		Config config = loadConfig(null);

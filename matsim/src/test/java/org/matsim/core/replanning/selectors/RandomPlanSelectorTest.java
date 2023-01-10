@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
+import static org.junit.Assert.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -46,7 +47,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	/**
 	 * Test that each of a person's plans is randomly selected.
 	 */
-	public void testRandom() {
+	@org.junit.Test public void testRandom() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan1 = PersonUtils.createAndAddPlan(person, false);
 		Plan plan2 = PersonUtils.createAndAddPlan(person, false);

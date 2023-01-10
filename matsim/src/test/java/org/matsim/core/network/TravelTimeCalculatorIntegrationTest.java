@@ -20,6 +20,8 @@
 
 package org.matsim.core.network;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +42,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 
-	public void testTravelTimeCalculatorArray() {
+	@org.junit.Test public void testTravelTimeCalculatorArray() {
         for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
     		Config config = loadConfig(null);
 
@@ -81,7 +83,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
         }
 	}
 
-	public void testTravelTimeCalculatorHashMap() {
+	@org.junit.Test public void testTravelTimeCalculatorHashMap() {
         for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
     		Config config = loadConfig(null);
 

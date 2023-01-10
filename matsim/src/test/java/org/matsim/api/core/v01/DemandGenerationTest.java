@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.api.core.v01;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 
 import org.matsim.api.core.v01.network.Link;
@@ -51,19 +53,15 @@ public class DemandGenerationTest extends MatsimTestCase {
 	private int personCount = 6;
 	private int linkCount = 6;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@org.junit.Before public void setUp() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@org.junit.After public void tearDown() {
 		this.sc = null;
-		super.tearDown();
 	}
 
-	public void testDemandGeneration(){
+	@org.junit.Test public void testDemandGeneration(){
 		Config conf = sc.getConfig();
 		assertNotNull(conf);
 

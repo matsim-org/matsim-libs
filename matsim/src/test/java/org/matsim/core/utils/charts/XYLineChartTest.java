@@ -20,6 +20,9 @@
 
 package org.matsim.core.utils.charts;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +42,7 @@ public class XYLineChartTest extends MatsimTestCase {
 	 * Test that a file was really generated, and that the image, when loaded, has the specified size.
 	 * @throws IOException possible exception when reading the image for validation
 	 */
-	public void testXYLineChartDemo() throws IOException {
+	@org.junit.Test public void testXYLineChartDemo() throws IOException {
 		String imageFilename = getOutputDirectory() + "xylinechart.png";
 		Demo demo = new Demo();
 		demo.createXYLineChart(imageFilename);

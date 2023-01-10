@@ -20,6 +20,8 @@
 
 package org.matsim.core.gbl;
 
+import static org.junit.Assert.assertEquals;
+
 import java.awt.Image;
 
 import org.matsim.testcases.MatsimTestCase;
@@ -29,7 +31,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class MatsimResourceTest extends MatsimTestCase {
 
-	public final void testGetAsImage() {
+	@org.junit.Test public final void testGetAsImage() {
 		final Image logo = MatsimResource.getAsImage("matsim_logo_transparent.png");
 
 		// verify that the correct image was correctly loaded by testing its dimension

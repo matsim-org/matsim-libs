@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.locationchoice.timegeography;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -30,7 +32,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class ManageSubchainsTest extends MatsimTestCase {
 
-	public void testPrimarySecondaryActivityFound() {
+	@org.junit.Test public void testPrimarySecondaryActivityFound() {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
 		ManageSubchains manager = new ManageSubchains();

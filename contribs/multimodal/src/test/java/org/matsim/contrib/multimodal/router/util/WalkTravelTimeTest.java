@@ -20,6 +20,12 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -37,14 +43,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class WalkTravelTimeTest extends MatsimTestCase {
 
 	private static final Logger log = LogManager.getLogger(WalkTravelTimeTest.class);
 
-	public void testLinkTravelTimeCalculation() {
+	@org.junit.Test public void testLinkTravelTimeCalculation() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
@@ -158,7 +161,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		log.info(sb.toString());
 	}
 
-	public void testThreadLocals() {
+	@org.junit.Test public void testThreadLocals() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

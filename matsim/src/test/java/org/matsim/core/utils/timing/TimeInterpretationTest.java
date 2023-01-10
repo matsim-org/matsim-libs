@@ -20,6 +20,8 @@
 
 package org.matsim.core.utils.timing;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.junit.Test;
@@ -44,8 +46,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TimeInterpretationTest extends MatsimTestCase {
-	@Test
-	public void testIgnoreDelays() {
+
+	@org.junit.Test public void testIgnoreDelays() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setTripDurationHandling(TripDurationHandling.ignoreDelays);
 
@@ -64,8 +66,8 @@ public class TimeInterpretationTest extends MatsimTestCase {
 		// End time was NOT shifted (although arrival is later), second departure is assumed at 12:00
 	}
 
-	@Test
-	public void testShiftActivityEndTime() {
+
+	@org.junit.Test public void testShiftActivityEndTime() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setTripDurationHandling(TripDurationHandling.shiftActivityEndTimes);
 

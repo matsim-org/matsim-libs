@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -31,7 +33,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class AgentMoneyEventTest extends MatsimTestCase {
 
-	public void testWriteReadXml() {
+	@org.junit.Test public void testWriteReadXml() {
 		final PersonMoneyEvent event1 = new PersonMoneyEvent(25560.23, Id.create("1", Person.class), 2.71828, "tollRefund", "motorwayOperator");
 		final PersonMoneyEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);

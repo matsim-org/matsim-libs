@@ -23,7 +23,6 @@ package org.matsim.utils.gis.matsim2esri.network;
 import java.util.Collection;
 
 import org.junit.Assert;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -37,7 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class Network2ESRIShapeTest extends MatsimTestCase  {
 
-	public void testPolygonCapacityShape() {
+	@org.junit.Test public void testPolygonCapacityShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 
@@ -59,7 +58,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
-	public void testPolygonLanesShape() {
+	@org.junit.Test public void testPolygonLanesShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 
@@ -76,12 +75,12 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
-		
+
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
-	public void testPolygonFreespeedShape() {
+	@org.junit.Test public void testPolygonFreespeedShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 
@@ -98,12 +97,12 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
-		
+
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
-	public void testLineStringShape() {
+	@org.junit.Test public void testLineStringShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileShp = getOutputDirectory() + "./network.shp";
 
@@ -120,12 +119,12 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileShp, builder).write();
-		
+
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
 	}
 
-	public void testNodesShape() {
+	@org.junit.Test public void testNodesShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileShp = getOutputDirectory() + "./network.shp";
 
@@ -135,7 +134,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
 		new Nodes2ESRIShape(network,outputFileShp, "DHDN_GK4").write();
-		
+
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
 		Assert.assertEquals(network.getNodes().size(), writtenFeatures.size());
 	}

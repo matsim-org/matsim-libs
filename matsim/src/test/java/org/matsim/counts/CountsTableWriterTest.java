@@ -20,6 +20,8 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Locale;
 
@@ -30,7 +32,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsTableWriterTest extends MatsimTestCase {
 
-	public void testTableCreation() {
+	@org.junit.Test public void testTableCreation() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 

@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -34,7 +36,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ActEndEventTest extends MatsimTestCase {
 
-	public void testWriteReadXml() {
+	@org.junit.Test public void testWriteReadXml() {
 		final ActivityEndEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
 				new ActivityEndEvent(7893.14, Id.create("143", Person.class), Id.create("293", Link.class), Id.create("f811", ActivityFacility.class),
 						"home", new Coord( 234., 5.67 )));

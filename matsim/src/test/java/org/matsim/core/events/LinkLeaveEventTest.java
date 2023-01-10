@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class LinkLeaveEventTest extends MatsimTestCase {
 
-	public void testWriteReadXml() {
+	@org.junit.Test public void testWriteReadXml() {
 		final LinkLeaveEvent event1 = new LinkLeaveEvent(68423.98, Id.create("veh", Vehicle.class),
 				Id.create(".235", Link.class));
 		final LinkLeaveEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);

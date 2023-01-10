@@ -20,6 +20,9 @@
 
 package org.matsim.integration.events;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 
@@ -40,7 +43,7 @@ import org.matsim.testcases.utils.EventsCollector;
  */
 public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 
-	public void testWriteReadXxml() {
+	@org.junit.Test public void testWriteReadXxml() {
 		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, Id.create(1, Person.class), 2.34, "tollRefund", "motorwayOperator");
 		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, Id.create(2, Person.class), -3.45, "toll", "motorwayOperator");
 
@@ -92,7 +95,7 @@ public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 	 * This test checks that old event files can still be parsed.
 	 * @throws IOException
 	 */
-	public void testWriteReadXml_oldName() throws IOException {
+	@org.junit.Test public void testWriteReadXml_oldName() throws IOException {
 
 		// write some events to file
 

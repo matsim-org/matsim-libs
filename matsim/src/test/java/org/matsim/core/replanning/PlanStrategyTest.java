@@ -20,6 +20,8 @@
 
 package org.matsim.core.replanning;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -30,7 +32,7 @@ public class PlanStrategyTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
-	public void testGetNumberOfStrategyModules() {
+	@org.junit.Test public void testGetNumberOfStrategyModules() {
 		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		assertEquals(0, strategy.getNumberOfStrategyModules());
 		strategy.addStrategyModule(new DummyStrategyModule());

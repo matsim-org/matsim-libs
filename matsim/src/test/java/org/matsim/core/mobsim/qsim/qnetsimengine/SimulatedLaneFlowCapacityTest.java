@@ -21,9 +21,12 @@
  */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,7 +36,11 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
@@ -42,7 +49,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -56,7 +62,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * test flow capacity of links with lanes in the simulation, i.e. the number of vehicles that leave the link or lane per hour
- * 
+ *
  * @author tthunig
  *
  */
@@ -64,8 +70,8 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 
 	/**
 	 * create this network:
-	 * 0 ----- 1 ----- 2 ----- 3	 
-	 * 
+	 * 0 ----- 1 ----- 2 ----- 3
+	 *
 	 */
 	private static void initNetwork(Network network) {
 		Node node0 = network.getFactory().createNode(Id.create("0", Node.class), new Coord(0, 0));
@@ -91,11 +97,11 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		l2.setFreespeed(250.0);
 		network.addLink(l2);
 	}
-	
+
 	/**
 	 * create a lane on link 1 representing the given number of lanes.
 	 * the lanes capacity is 900 times the number of represented lanes.
-	 *  
+	 *
 	 */
 	private static void createOneLane(Scenario scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().qsim().setUseLanes(true);
@@ -109,7 +115,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		link1FirstLane.setStartsAtMeterFromLinkEnd(25000.0);
 		link1FirstLane.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1FirstLane);
-		
+
 		Lane link1lane1 = builder.createLane(Id.create(1, Lane.class));
 		link1lane1.addToLinkId(Id.createLinkId(2));
 		link1lane1.setStartsAtMeterFromLinkEnd(10000.0);
@@ -118,12 +124,12 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		lanesForLink1.addLane(link1lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink1);
 	}
-  
+
 	/**
-	 * create three lanes on link 1. 
+	 * create three lanes on link 1.
 	 * the first and the third one represent 1 lane each, the second one represents 2 lanes.
 	 * lane 1 and 3 have a capacity of 900 each; lane 2 has a capacity of 2000, which is higher than the link capacity itself.
-	 * 
+	 *
 	 */
 	private static void createThreeLanes(Scenario scenario) {
 		scenario.getConfig().qsim().setUseLanes(true);
@@ -131,7 +137,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		LanesFactory builder = lanes.getFactory();
 		//lanes for link 1
 		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(Id.create("1", Link.class));
-		
+
 		Lane link1FirstLane = builder.createLane(Id.create("1.ol", Lane.class));
 		link1FirstLane.addToLaneId(Id.create("1", Lane.class));
 		link1FirstLane.addToLaneId(Id.create("2", Lane.class));
@@ -140,13 +146,13 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		link1FirstLane.setStartsAtMeterFromLinkEnd(25000.0);
 		link1FirstLane.setCapacityVehiclesPerHour(4000.0);
 		lanesForLink1.addLane(link1FirstLane);
-		
+
 		Lane link1lane1 = builder.createLane(Id.create(1, Lane.class));
 		link1lane1.addToLinkId(Id.createLinkId(2));
 		link1lane1.setStartsAtMeterFromLinkEnd(10000.0);
 		link1lane1.setCapacityVehiclesPerHour(900.0);
 		lanesForLink1.addLane(link1lane1);
-		
+
 		Lane link1lane2 = builder.createLane(Id.create(2, Lane.class));
 		link1lane2.addToLinkId(Id.createLinkId(2));
 		link1lane2.setNumberOfRepresentedLanes(2);
@@ -159,15 +165,15 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		link1lane3.setStartsAtMeterFromLinkEnd(10000.0);
 		link1lane3.setCapacityVehiclesPerHour(900.0);
 		lanesForLink1.addLane(link1lane3);
-		
+
 		lanes.addLanesToLinkAssignment(lanesForLink1);
 	}
-  	
+
 	/**
 	 * create a population of 5000 persons traveling from link 0 to link 2.
 	 * they all start 50 minutes after midnight and then queue on link 0 which lets one of them depart every second.
 	 * for analysis we then use flow values from the second hour.
-	 * 
+	 *
 	 */
 	private static void initPopulation(Population population) {
 		// create enough persons to be able to check simulated capacity of link 1
@@ -194,15 +200,15 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 	}
 
 	/**
-	 * test simulated capacity of link 1 in case without lanes. 
+	 * test simulated capacity of link 1 in case without lanes.
 	 * the capacity should correspond to the given flow capacity of the link
 	 */
-	public void testCapacityWoLanes() {
+	@org.junit.Test public void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
-		
+
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		initPopulation(scenario.getPopulation());
@@ -215,21 +221,21 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 			.useDefaults() //
 			.build(scenario, events) //
 			.run();
-		
+
 		// check simulated capacity values
 		assertEquals(1800, simulatedCapacity.getSimulatedLinkCapacity(), MatsimTestUtils.EPSILON);
 	}
-	
+
 	/**
 	 * test simulated capacities of link 1 in case of one lane representing one lane.
 	 * the capacity of the link should correspond to the capacity of the lane, also when it is less than the link capacity given in the network.
 	 */
-	public void testCapacityWithOneLaneOneLane() {
+	@org.junit.Test public void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
-		
+
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createOneLane(scenario, 1);
@@ -244,7 +250,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 			.useDefaults() //
 			.build(scenario, events) //
 			.run();
-				
+
 		// check simulated capacity values
 		assertEquals(simulatedCapacity.getSimulatedLaneCapacity(Id.create("1", Lane.class)), simulatedCapacity.getSimulatedLinkCapacity(), MatsimTestUtils.EPSILON);
 		assertEquals(1800, simulatedCapacity.getSimulatedLaneCapacity(Id.create("1.ol", Lane.class)), MatsimTestUtils.EPSILON);
@@ -255,17 +261,17 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 	 * test simulated capacities of link 1 in case of one lane representing two lanes.
 	 * the capacity of the link should correspond to the capacity of the lane, also when it is less than the link capacity given in the network.
 	 */
-	public void testCapacityWithOneLaneTwoLanes() {
+	@org.junit.Test public void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
-		
+
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createOneLane(scenario, 2);
 		initPopulation(scenario.getPopulation());
-		
+
 		EventsManager events = EventsUtils.createEventsManager();
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
@@ -274,7 +280,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 			.useDefaults() //
 			.build(scenario, events) //
 			.run();
-		
+
 		// check simulated capacity values
 		assertEquals(simulatedCapacity.getSimulatedLaneCapacity(Id.create("1", Lane.class)), simulatedCapacity.getSimulatedLinkCapacity(), MatsimTestUtils.EPSILON);
 		assertEquals(1800, simulatedCapacity.getSimulatedLaneCapacity(Id.create("1.ol", Lane.class)), MatsimTestUtils.EPSILON);
@@ -287,12 +293,12 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 	 * Interestingly, it also corresponds to this sum, if it is more than the link capacity given in the network.
 	 * And, finally, it still only uses the lane capacity given in the network, when it is higher than the link capacity (see lane 2 here).
 	 */
-	public void testCapacityWithThreeLanes() {
+	@org.junit.Test public void testCapacityWithThreeLanes() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
-		
+
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createThreeLanes(scenario);
@@ -306,7 +312,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 			.useDefaults() //
 			.build(scenario, events) //
 			.run();
-		
+
 		// check simulated capacity values
 		double lane1Cap = simulatedCapacity.getSimulatedLaneCapacity(Id.create("1", Lane.class));
 		double lane2Cap = simulatedCapacity.getSimulatedLaneCapacity(Id.create("2", Lane.class));
@@ -319,18 +325,18 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		assertEquals(2000, lane2Cap, MatsimTestUtils.EPSILON);
 		assertEquals(900, lane3Cap, MatsimTestUtils.EPSILON);
 	}
-	
-	
+
+
 	/**
 	 * event handler that counts vehicles that leave link 1 and lanes on link 1.
-	 * 
+	 *
 	 * @author tthunig
 	 */
 	class SimulatedCapacityHandler implements LinkLeaveEventHandler, LaneLeaveEventHandler{
 
 		private double linkCapacity;
 		private Map<Id<Lane>, Double> laneCapacities = new HashMap<>();
-		
+
 		@Override
 		public void reset(int iteration) {
 			linkCapacity = 0;
@@ -354,15 +360,15 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 			if (event.getLinkId().equals(Id.createLinkId(1)) && event.getTime() >= 3600 && event.getTime() < 2*3600){
 				linkCapacity++;
 			}
-			
+
 		}
-		
+
 		double getSimulatedLinkCapacity(){
 			return linkCapacity;
 		}
-		
+
 		double getSimulatedLaneCapacity(Id<Lane> laneId){
 			return laneCapacities.containsKey(laneId)? laneCapacities.get(laneId) : 0;
-		}	
-	}	
+		}
+	}
 }

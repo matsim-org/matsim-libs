@@ -39,7 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
-	public void testSelectedPlansActsShape() throws IOException {
+	@org.junit.Test public void testSelectedPlansActsShape() throws IOException {
 		String outputDir = getOutputDirectory();
 
 		String outShp = getOutputDirectory() + "acts.shp";
@@ -63,7 +63,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		Assert.assertEquals(2235, writtenFeatures.size());
 	}
 
-	public void testSelectedPlansLegsShape() throws IOException {
+	@org.junit.Test public void testSelectedPlansLegsShape() throws IOException {
 		String outputDir = getOutputDirectory();
 
 		String outShp = getOutputDirectory() + "legs.shp";

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
+import static org.junit.Assert.*;
 
 public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 
@@ -38,7 +39,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 *
 	 * @author mrieser
 	 */
-	public void testRemoveWorstPlans_nullType() {
+	@org.junit.Test public void testRemoveWorstPlans_nullType() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 
@@ -78,7 +79,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 *
 	 * @author mrieser
 	 */
-	public void testRemoveWorstPlans_withTypes() {
+	@org.junit.Test public void testRemoveWorstPlans_withTypes() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		/* The used plans, ordered by score:
 		 * plan2: b, 22.0

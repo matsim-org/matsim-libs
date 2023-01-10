@@ -20,6 +20,9 @@
 
 package org.matsim.analysis;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -46,8 +49,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 
 public class CalcLegTimesTest extends MatsimTestCase {
 
@@ -58,9 +59,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 	private Population population = null;
 	private Network network = null;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@org.junit.Before public void setUp() {
 		super.loadConfig(null);
 
 		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -90,14 +89,12 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.network.addLink(link);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@org.junit.After public void tearDown() {
 		this.population = null;
 		this.network = null;
 	}
 
-	public void testNoEvents() throws IOException {
+	@org.junit.Test public void testNoEvents() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
@@ -109,7 +106,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.runTest(testee);
 	}
 
-	public void testAveraging() throws IOException {
+	@org.junit.Test public void testAveraging() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
@@ -125,7 +122,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
 				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act2", null));
-		
+
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
 		leg.setTravelTime( Time.parseTime("07:10:00") - leg.getDepartureTime().seconds());
@@ -143,7 +140,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
 				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act4", null));
-		
+
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
 		leg.setTravelTime( Time.parseTime("30:12:01") - leg.getDepartureTime().seconds());

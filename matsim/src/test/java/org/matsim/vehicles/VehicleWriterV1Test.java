@@ -19,6 +19,8 @@
 
 package org.matsim.vehicles;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.util.Map;
 
@@ -42,9 +44,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 	private Id<Vehicle> id42;
 	private Id<Vehicle> id42_23;
 
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
+	@org.junit.Before public void setUp() {
 
 		id23 = Id.create("23", Vehicle.class);
 		id42 = Id.create("42", Vehicle.class);
@@ -54,7 +54,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		id42_23 = Id.create(" 42  23", Vehicle.class);
 	}
 
-	public void testWriter() {
+	@org.junit.Test public void testWriter() {
 
 		String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
 

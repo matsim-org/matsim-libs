@@ -20,6 +20,8 @@
 
 package org.matsim.pt.counts;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.junit.Test;
@@ -30,8 +32,8 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PtAlightCountsComparisonAlgorithmTest extends MatsimTestCase {
 
-	@Test
-	public void testCompare() {
+
+	@org.junit.Test public void testCompare() {
 		PtCountsFixture fixture = new PtAlightCountsFixture();
 		fixture.setUp();
 
@@ -53,8 +55,8 @@ public class PtAlightCountsComparisonAlgorithmTest extends MatsimTestCase {
 		}
 	}
 
-	@Test
-	public void testDistanceFilter() {
+
+	@org.junit.Test public void testDistanceFilter() {
 		final PtCountsFixture fixture = new PtAlightCountsFixture();
 		fixture.setUp();
 		CountsComparisonAlgorithm cca = fixture.getCCA();

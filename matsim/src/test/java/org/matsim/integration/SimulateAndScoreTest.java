@@ -20,6 +20,8 @@
 
 package org.matsim.integration;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.Coord;
@@ -79,7 +81,7 @@ import org.matsim.vehicles.Vehicles;
 
 public class SimulateAndScoreTest extends MatsimTestCase {
 
-	public void testRealPtScore() {
+	@org.junit.Test public void testRealPtScore() {
 		final Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 
@@ -230,7 +232,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 	}
 
-	public void testTeleportationScore() {
+	@org.junit.Test public void testTeleportationScore() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));

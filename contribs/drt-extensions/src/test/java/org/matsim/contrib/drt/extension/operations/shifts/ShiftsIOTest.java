@@ -1,17 +1,19 @@
 package org.matsim.contrib.drt.extension.operations.shifts;
 
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.util.Optional;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
 import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsWriter;
-import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.io.File;
-import java.util.Optional;
 
 /**
  * @author nkuehnel / MOIA
@@ -28,7 +30,7 @@ public class ShiftsIOTest extends MatsimTestCase {
 	private final Id<OperationFacility> oid2 = Id.create("op2", OperationFacility.class);
 
 
-	public void testBasicReaderWriter() {
+	@org.junit.Test public void testBasicReaderWriter() {
 
 		DrtShiftsSpecification shiftsSpecification = new DrtShiftsSpecificationImpl();
 

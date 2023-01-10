@@ -20,6 +20,8 @@
 
 package org.matsim.facilities.algorithms;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -28,7 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
 
-	public void testRunAlgorithms() {
+	@org.junit.Test public void testRunAlgorithms() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		// create 2 facilities
 		facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord(1.0, 1.0));

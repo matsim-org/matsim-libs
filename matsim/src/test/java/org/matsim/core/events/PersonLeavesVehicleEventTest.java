@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -35,7 +37,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class PersonLeavesVehicleEventTest extends MatsimTestCase {
 
-	public void testWriteReadXml() {
+	@org.junit.Test public void testWriteReadXml() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("testVehType", VehicleType.class ) );
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(80, Vehicle.class ), vehicleType );

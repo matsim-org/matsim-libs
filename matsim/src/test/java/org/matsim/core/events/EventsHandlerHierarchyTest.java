@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -59,7 +61,7 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 	@SuppressWarnings("unused")
 	class C extends A implements BasicEventHandler, LinkLeaveEventHandler {}
 
-	public final void testHandlerHierarchy() {
+	@org.junit.Test public final void testHandlerHierarchy() {
 		EventsManager events = EventsUtils.createEventsManager();
 		Id<Link> linkId = Id.create("1", Link.class);
 		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
@@ -75,7 +77,7 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 		assertEquals(this.eventHandled, 1);
 	}
 
-	public final void testHierarchicalReset() {
+	@org.junit.Test public final void testHierarchicalReset() {
 		EventsManager events = EventsUtils.createEventsManager();
 		Id<Link> linkId = Id.create("1", Link.class);
 		Id<Vehicle> vehId = Id.create("1", Vehicle.class);

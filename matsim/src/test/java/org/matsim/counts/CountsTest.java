@@ -20,13 +20,15 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.assertEquals;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.testcases.MatsimTestCase;
 
 public class CountsTest extends MatsimTestCase {
 
-	public void testGetCounts() {
+	@org.junit.Test public void testGetCounts() {
 		final Counts counts = new Counts();
 		counts.createAndAddCount(Id.create(0, Link.class), "1");
 		assertEquals("Getting counts failed", 1, counts.getCounts().size());

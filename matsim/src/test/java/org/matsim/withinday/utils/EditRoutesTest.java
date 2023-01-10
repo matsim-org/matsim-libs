@@ -20,6 +20,8 @@
 
 package org.matsim.withinday.utils;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -79,16 +81,16 @@ public class EditRoutesTest extends MatsimTestCase {
 	/**
 	 * @author cdobler
 	 */
-	public void testReplanFutureLegRoute() {
+	@org.junit.Test public void testReplanFutureLegRoute() {
 		// this is ok (we can still replan a single leg with the computer science router). kai, dec'15
 
 		createScenario();
 
 
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
@@ -136,14 +138,14 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(3, networkRouteWH.getLinkIds().size());	// l4, l5, l2
 	}
 
-	public void testRelocateFutureLegRoute() {
-		// yyyy this test is misleading.  "relocateFutureLegRoute"  is ok, but it does not look after the overall plan consistency, 
+	@org.junit.Test public void testRelocateFutureLegRoute() {
+		// yyyy this test is misleading.  "relocateFutureLegRoute"  is ok, but it does not look after the overall plan consistency,
 		// as this test implies.  kai, feb'16
 
 
 		createScenario();
 
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndAct = 2 ;
 		int scndCarLeg = 3 ; // 3-->9
 		int thrdAct = 4 ;
@@ -218,14 +220,14 @@ public class EditRoutesTest extends MatsimTestCase {
 	/**
 	 * @author cdobler
 	 */
-	public void testReplanCurrentLegRouteOne() 
+	@org.junit.Test public void testReplanCurrentLegRouteOne()
 	// this is ok (we can still replan a single leg with the computer science router). kai, dec'15
 	{
 		createScenario();
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
@@ -242,7 +244,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		// expect ArrayIndexOutOfBoundsException - using illegal indices for the current position in the route
 		try {
 			// yyyy probably testing only the first failure?  kai, nov'17
-			ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), -1, 8.0*3600 );  
+			ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), -1, 8.0*3600 );
 			ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 100, 8.0*3600 );
 			fail("expected IndexOutOfBoundsException.");
 		} catch (IndexOutOfBoundsException e) {
@@ -262,7 +264,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 4, 8.0*3600 )); // WH, end Link
 
 	}
-	public void testReplanCurrentLegRouteTwo() 
+	@org.junit.Test public void testReplanCurrentLegRouteTwo()
 	{
 		/*
 		 *  replace destinations and create new routes
@@ -270,17 +272,17 @@ public class EditRoutesTest extends MatsimTestCase {
 		// create new routes for HW-trip
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
 		Activity activityW1;
 
 		activityW1 = (Activity) plan.getPlanElements().get(2);
-		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location		
+		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
 		final boolean result = ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(),
 				0, 8.0 * 3600);
 		assertEquals(true, result); // HW, start Link
@@ -289,15 +291,15 @@ public class EditRoutesTest extends MatsimTestCase {
 		log.warn( route );
 		assertEquals(true, checkRouteValidity(route));
 	}
-	public void testReplanCurrentLegRouteThree() 
+	@org.junit.Test public void testReplanCurrentLegRouteThree()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
@@ -305,40 +307,40 @@ public class EditRoutesTest extends MatsimTestCase {
 		Activity activityW1;
 		activityW1 = (Activity) plan.getPlanElements().get(2);
 		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 1, 8.0*3600 ) );	// HW, en-route			
-		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
-		assertEquals(true, checkRouteValidity(route));
-	}	
-	public void testReplanCurrentLegRouteFour() 
-	{
-		createScenario();	// reset scenario
-		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
-
-		int firstCarLeg = 1 ; // 1-->3	
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
-			scndCarLeg = 9 ; // 3-->9
-		}
-
-
-		Activity activityW1;
-		activityW1 = (Activity) plan.getPlanElements().get(2);
-		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 2, 8.0*3600 ));	// HW, end Link			
+		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 1, 8.0*3600 ) );	// HW, en-route
 		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
 		assertEquals(true, checkRouteValidity(route));
 	}
-	public void testReplanCurrentLegRouteFive() 
+	@org.junit.Test public void testReplanCurrentLegRouteFour()
+	{
+		createScenario();	// reset scenario
+		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
+
+		int firstCarLeg = 1 ; // 1-->3
+		int scndCarLeg = 3 ; // 3-->9
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
+			firstCarLeg = 3 ; // 1-->3
+			scndCarLeg = 9 ; // 3-->9
+		}
+
+
+		Activity activityW1;
+		activityW1 = (Activity) plan.getPlanElements().get(2);
+		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
+		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 2, 8.0*3600 ));	// HW, end Link
+		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
+		assertEquals(true, checkRouteValidity(route));
+	}
+	@org.junit.Test public void testReplanCurrentLegRouteFive()
 	{
 		// create new routes for WH-trip
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
@@ -346,18 +348,18 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 0, 8.0*3600 ));	// WH, start Link			
+		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 0, 8.0*3600 ));	// WH, start Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 	}
-	public void testReplanCurrentLegRouteSix() 
+	@org.junit.Test public void testReplanCurrentLegRouteSix()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
@@ -368,15 +370,15 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 1, 8.0*3600 ));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 	}
-	public void testReplanCurrentLegRouteSeven() 
+	@org.junit.Test public void testReplanCurrentLegRouteSeven()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
@@ -384,18 +386,18 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 2, 8.0*3600 ));	// WH, en-route			
+		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 2, 8.0*3600 ));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 	}
-	public void testReplanCurrentLegRouteEight()
+	@org.junit.Test public void testReplanCurrentLegRouteEight()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
@@ -403,18 +405,18 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 3, 8.0*3600 ) );	// WH, en-route			
+		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 3, 8.0*3600 ) );	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 	}
-	public void testReplanCurrentLegRouteNine()
+	@org.junit.Test public void testReplanCurrentLegRouteNine()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
@@ -422,20 +424,20 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 4, 8.0*3600 ));	// WH, end Link			
+		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 4, 8.0*3600 ));	// WH, end Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 
 	}
-	public void testReplanCurrentLegRouteTen()
+	@org.junit.Test public void testReplanCurrentLegRouteTen()
 	{
 		// expect EditRoutes to return false if the Route in the leg is not a NetworkRoute
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3	
+		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3	
+			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
 
@@ -532,7 +534,7 @@ private void createSamplePlan() {
 	activityH1.setStartTime(0.0);
 	activityH1.setEndTime(8.0*3600);
 	activityW1.setStartTime(8.0*3600);
-	activityW1.setEndTime(16.0*3600);		
+	activityW1.setEndTime(16.0*3600);
 	activityH2.setStartTime(16.0*3600);
 	activityH2.setEndTime(24.0*3600);
 

@@ -20,6 +20,8 @@
 
 package org.matsim.integration.always;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -122,7 +124,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 	 *
 	 *  @author mrieser
 	 */
-	public void testBetaTravel_6() {
+	@org.junit.Test public void testBetaTravel_6() {
 		Config config = loadConfig("../../examples/scenarios/equil/config.xml"); // default config
 		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml"); // specific setting for this test
 		config.controler().setWritePlansInterval(0);
@@ -270,7 +272,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(config.global().getNumberOfThreads()));
-			
+
 			// Trying to replace this by the standard mutator ...
 //			double mutationRange = 1800. ;
 //			boolean affectingDuration = false ;
@@ -374,14 +376,14 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 					assertEquals(54, this.la.maxCarsOnLink);
 					assertEquals(19563.0, this.la.maxCarsOnLinkTime, 0.0);
 					System.out.println("all checks passed!");
-					
+
 					// The results changed after Michał's change of the QueueWithBuffer slow capacity update.  See 4dda004a8db98d9a2e757b1896cd3250d4e84ba5 .
 					// The old results were (only where we had changes):
 //					assertEquals(18710.0, this.la.firstCarEnter, 0.0);
 //					assertEquals(18890.0, this.la.firstCarLeave, 0.0);
 //					assertEquals(59, this.la.maxCarsOnLink);
 //					assertEquals(19589.0, this.la.maxCarsOnLinkTime, 0.0);
-					
+
 				} else if (beta_travel == -66.0) {
 					System.out.println("checking results for case `beta_travel = -66'...");
 					System.out.println("firstCarEnter=" + this.la.firstCarEnter + "; lastCarEnter=" + this.la.lastCarEnter + "; firstCarLeave=" + this.la.firstCarLeave +

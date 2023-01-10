@@ -19,6 +19,8 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -99,8 +101,8 @@ public final class QLinkTest extends MatsimTestCase {
 		return Arrays.asList(capacityUpdates);
 	}
 
-	@Test
-	public void testInit() {
+
+	@org.junit.Test public void testInit() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertNotNull(f.qlink1);
 		assertEquals(1.0, f.qlink1.getSimulatedFlowCapacityPerTimeStep(), MatsimTestUtils.EPSILON);
@@ -113,8 +115,8 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(f.queueNetwork.getNetsimNode(Id.create("2", Node.class)), f.qlink1.getToNode());
 	}
 
-	@Test
-	public void testAdd() {
+
+	@org.junit.Test public void testAdd() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
 		QVehicle v = new QVehicleImpl(f.basicVehicle);
@@ -144,8 +146,8 @@ public final class QLinkTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testGetVehicle_Driving() {
+
+	@org.junit.Test public void testGetVehicle_Driving() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -209,8 +211,8 @@ public final class QLinkTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testGetVehicle_Parking() {
+
+	@org.junit.Test public void testGetVehicle_Parking() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -246,8 +248,8 @@ public final class QLinkTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testGetVehicle_Departing() {
+
+	@org.junit.Test public void testGetVehicle_Departing() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -310,8 +312,8 @@ public final class QLinkTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	@Test
-	public void testBuffer() {
+
+	@org.junit.Test public void testBuffer() {
 		Config conf = super.loadConfig(null);
 
 		conf.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
@@ -433,8 +435,8 @@ public final class QLinkTest extends MatsimTestCase {
 		return p;
 	}
 
-	@Test
-	public void testStorageSpaceDifferentVehicleSizes() {
+
+	@org.junit.Test public void testStorageSpaceDifferentVehicleSizes() {
 
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -534,8 +536,8 @@ public final class QLinkTest extends MatsimTestCase {
 		return p;
 	}
 
-	@Test
-	public void testStuckEvents() {
+
+	@org.junit.Test public void testStuckEvents() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().qsim().setStuckTime(100);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);

@@ -20,6 +20,8 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.Assert.*;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +48,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		return new TransitStopFacilityImpl(id, coord, isBlockingLane);
 	}
 
-	public void testInitialization() {
+	@org.junit.Test public void testInitialization() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
@@ -56,7 +58,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		assertFalse(stop.getIsBlockingLane());
 	}
 
-	public void testBlockingStop() {
+	@org.junit.Test public void testBlockingStop() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
@@ -65,7 +67,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		assertTrue(stop.getIsBlockingLane());
 	}
 
-	public void testLink() {
+	@org.junit.Test public void testLink() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
@@ -77,7 +79,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		assertNull(stop.getLinkId());
 	}
 
-	public void testName() {
+	@org.junit.Test public void testName() {
 		Id<TransitStopFacility> id = Id.create(9791, TransitStopFacility.class);
 		Coord coord = new Coord((double) 10, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);

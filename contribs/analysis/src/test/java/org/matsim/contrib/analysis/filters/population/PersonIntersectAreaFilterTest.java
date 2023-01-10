@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.analysis.filters.population;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -46,7 +49,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
-	public void testFilter() throws Exception {
+	@org.junit.Test public void testFilter() throws Exception {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
 		Network network = NetworkUtils.createNetwork();

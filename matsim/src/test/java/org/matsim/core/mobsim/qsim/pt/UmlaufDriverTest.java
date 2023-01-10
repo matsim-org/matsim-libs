@@ -20,6 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,13 +74,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 
 	private static final Logger log = LogManager.getLogger(UmlaufDriverTest.class);
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@org.junit.Before public void setUp() {
 		super.loadConfig(null);
 	}
 
-	public void testInitializationNetworkRoute() {
+	@org.junit.Test public void testInitializationNetworkRoute() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
@@ -166,7 +166,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		return new SingletonUmlaufBuilderImpl(Collections.singletonList(tLine)).build().get(0);
 	}
 
-	public void testInitializationDeparture() {
+	@org.junit.Test public void testInitializationDeparture() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
@@ -191,7 +191,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestUtils.EPSILON);
 	}
 
-	public void testInitializationStops() {
+	@org.junit.Test public void testInitializationStops() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -242,7 +242,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		assertEquals(null, driver.getNextTransitStop());
 	}
 
-	public void testHandleStop_EnterPassengers() {
+	@org.junit.Test public void testHandleStop_EnterPassengers() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -318,7 +318,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 				0.0, driver.handleTransitStop(stop2, 170), MatsimTestUtils.EPSILON);
 	}
 
-	public void testHandleStop_ExitPassengers() {
+	@org.junit.Test public void testHandleStop_ExitPassengers() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -385,7 +385,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		assertEquals(0.0, driver.handleTransitStop(stop2, 160), MatsimTestUtils.EPSILON);
 	}
 
-	public void testReturnSensiblePlanElements() {
+	@org.junit.Test public void testReturnSensiblePlanElements() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -428,7 +428,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		assertTrue(driver.getCurrentPlanElement() instanceof Activity);
 	}
 
-	public void testHandleStop_CorrectIdentification() {
+	@org.junit.Test public void testHandleStop_CorrectIdentification() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -470,7 +470,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		assertEquals(tLine, agent.offeredLine);
 	}
 
-	public void testHandleStop_AwaitDepartureTime() {
+	@org.junit.Test public void testHandleStop_AwaitDepartureTime() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -529,7 +529,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		assertEquals(0.0, driver.handleTransitStop(stop3, departureTime + 210), MatsimTestUtils.EPSILON);
 	}
 
-	public void testExceptionWhenNotEmptyAfterLastStop() {
+	@org.junit.Test public void testExceptionWhenNotEmptyAfterLastStop() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));

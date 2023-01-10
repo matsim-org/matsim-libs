@@ -20,6 +20,8 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +60,7 @@ import org.xml.sax.SAXException;
  */
 public class TransitScheduleFormatV1Test extends MatsimTestCase {
 
-	public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
+	@org.junit.Test public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		Network network = NetworkUtils.createNetwork();
         Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -126,7 +128,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		new TransitScheduleReaderV1(schedule2, new RouteFactories()).readFile(filename);
 
 		// first test, without network-route
-		assertEquals(schedule1, schedule2);
+		assertEqualSchedules(schedule1, schedule2);
 
 		// now add route info to the schedule
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(l1.getId(), l4.getId());
@@ -145,10 +147,10 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		TransitSchedule schedule3 = builder3.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule3, new RouteFactories()).readFile(filename);
 
-		assertEquals(schedule1, schedule3);
+		assertEqualSchedules(schedule1, schedule3);
 	}
 
-	private static void assertEquals(final TransitSchedule expected, final TransitSchedule actual) {
+	private static void assertEqualSchedules(final TransitSchedule expected, final TransitSchedule actual) {
 
 		assertEquals("different number of stopFacilities.", expected.getFacilities().size(), actual.getFacilities().size());
 		for (TransitStopFacility stopE : expected.getFacilities().values()) {

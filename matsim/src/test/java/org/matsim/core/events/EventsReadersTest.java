@@ -20,10 +20,13 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -45,6 +48,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
+
 
 public class EventsReadersTest extends MatsimTestCase {
 
@@ -134,7 +138,7 @@ public class EventsReadersTest extends MatsimTestCase {
 
 	}
 
-	public final void testXmlReader() throws SAXException, ParserConfigurationException, IOException {
+	@org.junit.Test public final void testXmlReader() throws SAXException, ParserConfigurationException, IOException {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
@@ -145,7 +149,7 @@ public class EventsReadersTest extends MatsimTestCase {
 		assertEquals("number of read events", 8, handler.eventCounter);
 	}
 
-	public final void testAutoFormatReaderXml() {
+	@org.junit.Test public final void testAutoFormatReaderXml() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);

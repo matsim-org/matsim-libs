@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
+import static org.junit.Assert.*;
 
 /**
  * Tests for {@link ExpBetaPlanSelector}.
