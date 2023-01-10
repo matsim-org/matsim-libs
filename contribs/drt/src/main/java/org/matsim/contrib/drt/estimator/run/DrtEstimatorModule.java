@@ -23,15 +23,15 @@ public class DrtEstimatorModule extends AbstractModule {
 		MultiModeDrtEstimatorConfigGroup config = ConfigUtils.addOrGetModule(getConfig(), MultiModeDrtEstimatorConfigGroup.class);
 
 		for (DrtEstimatorConfigGroup group : config.getModalElements()) {
-			install(new ModeModul(group));
+			install(new ModeModule(group));
 		}
 	}
 
-	static final class ModeModul extends AbstractDvrpModeModule {
+	static final class ModeModule extends AbstractDvrpModeModule {
 
 		private final DrtEstimatorConfigGroup group;
 
-		public ModeModul(DrtEstimatorConfigGroup group) {
+		public ModeModule(DrtEstimatorConfigGroup group) {
 			super(group.mode);
 			this.group = group;
 		}
