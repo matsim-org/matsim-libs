@@ -39,9 +39,6 @@ public class MatsimTestCase {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/** A constant for the exactness when comparing doubles. */
-	public static final double EPSILON = MatsimTestUtils.EPSILON;
-
 	/**
 	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>).
 	 *
@@ -50,7 +47,6 @@ public class MatsimTestCase {
 	 */
 	public Config loadConfig(final String configfile) {
 		var config = utils.loadConfig(configfile);
-		MatsimRandom.reset(config.global().getRandomSeed());
 		return config;
 	}
 
