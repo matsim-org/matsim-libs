@@ -29,14 +29,13 @@ import org.matsim.core.replanning.GenericStrategyManager;
 /**
  * The current (jul'22) logic of this is: <ul>
  *         <li> There is a null binding of this interface in {@link CarrierModule}.  If one wants to use strategies, this needs to be overwritten. </li>
- *         <li> Normally, the strategy manager is fixed infrastructure, and should just be configured.  However, since it is not yet there before
+ *         <li> Normally, the strategy manager is fixed infrastructure, and should just be configured.  However, since it is not there before
  *         injection, it also cannot be configured before injection.  Core matsim solves that by writing the corresponding configuration into the
  *         config.  We could, in principle, do the same here.  Don't want to do this yet.</li>
- *         <li> So way to configure this "in code" is to bind {@link CarrierStrategyManager >} to a {@link Provider <CarrierStrategyManager>} and then
+ *         <li> So way to configure this "in code" is to bind {@link CarrierStrategyManager} to a {@link Provider<CarrierStrategyManager>} and then
  *         configure it in the provider. </li>
  * </ul>
  */
 public interface CarrierStrategyManager extends GenericStrategyManager<CarrierPlan, Carrier> {
 	// (this is mostly there so that it can be guice-bound.  kai, jul'22)
-
 }

@@ -31,7 +31,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-public final class TravelDisutilities {
+public final class CarrierTravelDisutilities{
 	
 	public static TravelDisutility createBaseDisutility(final CarrierVehicleTypes vehicleTypes, final TravelTime travelTime){
 

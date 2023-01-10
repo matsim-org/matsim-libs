@@ -1,122 +1,127 @@
 package org.matsim.contrib.freight.carrier;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
 
-public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
+public class CarrierPlanXmlReaderV2WithDtdTest  {
+
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Carrier testCarrier;
-	
-	@Override
+
+	@Before
 	public void setUp() throws Exception{
-		super.setUp();
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
 
 		Carriers carriers = new Carriers();
-		String classInputDirectory = getClassInputDirectory();
+		String classInputDirectory = utils.getClassInputDirectory();
 		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(classInputDirectory + "carrierPlansEquilsWithDtd.xml" );
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
-	
+
 	@Test @Ignore
 	public void test_whenReadingServices_nuOfServicesIsCorrect(){
-		assertEquals(3,testCarrier.getServices().size());
+		Assert.assertEquals(3,testCarrier.getServices().size());
 	}
-	
+
 	@Test
 	public void test_whenReadingCarrier_itReadsTypeIdsCorrectly(){
 
 		CarrierVehicle light = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("lightVehicle"));
-		assertEquals("light",light.getVehicleTypeId().toString());
+		Assert.assertEquals("light",light.getVehicleTypeId().toString());
 
 		CarrierVehicle medium = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("mediumVehicle"));
-		assertEquals("medium",medium.getVehicleTypeId().toString());
+		Assert.assertEquals("medium",medium.getVehicleTypeId().toString());
 
 		CarrierVehicle heavy = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("heavyVehicle"));
-		assertEquals("heavy",heavy.getVehicleTypeId().toString());
+		Assert.assertEquals("heavy",heavy.getVehicleTypeId().toString());
 	}
-	
+
 	@Test @Ignore
 	public void test_whenReadingCarrier_itReadsVehiclesCorrectly(){
 		Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = testCarrier.getCarrierCapabilities().getCarrierVehicles();
-		assertEquals(3,carrierVehicles.size());
-		assertTrue(exactlyTheseVehiclesAreInVehicleCollection(Arrays.asList(Id.create("lightVehicle", Vehicle.class),
+		Assert.assertEquals(3,carrierVehicles.size());
+		Assert.assertTrue(exactlyTheseVehiclesAreInVehicleCollection(Arrays.asList(Id.create("lightVehicle", Vehicle.class),
 				Id.create("mediumVehicle", Vehicle.class),Id.create("heavyVehicle", Vehicle.class)),carrierVehicles.values()));
 	}
-	
+
 	@Test @Ignore
 	public void test_whenReadingCarrier_itReadsFleetSizeCorrectly(){
-		assertEquals(FleetSize.INFINITE, testCarrier.getCarrierCapabilities().getFleetSize());
+		Assert.assertEquals(FleetSize.INFINITE, testCarrier.getCarrierCapabilities().getFleetSize());
 	}
-	
+
 	@Test @Ignore
 	public void test_whenReadingCarrier_itReadsShipmentsCorrectly(){
-		assertEquals(2, testCarrier.getShipments().size());
+		Assert.assertEquals(2, testCarrier.getShipments().size());
 	}
-	
+
 	@Test @Ignore
 	public void test_whenReadingCarrier_itReadsPlansCorrectly(){
-		assertEquals(3, testCarrier.getPlans().size());
+		Assert.assertEquals(3, testCarrier.getPlans().size());
 	}
-	
+
 	@Test @Ignore
 	public void test_whenReadingCarrier_itSelectsPlansCorrectly(){
-		assertNotNull(testCarrier.getSelectedPlan());
+		Assert.assertNotNull(testCarrier.getSelectedPlan());
 	}
-	
+
 	@Test
 	public void test_whenReadingCarrierWithFiniteFleet_itSetsFleetSizeCorrectly(){
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
 
 		Carriers carriers = new Carriers();
-		String classInputDirectory = getClassInputDirectory();
+		String classInputDirectory = utils.getClassInputDirectory();
 		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(classInputDirectory + "carrierPlansEquilsFiniteFleetWithDtd.xml" );
-		assertEquals(FleetSize.FINITE, carriers.getCarriers().get(Id.create("testCarrier", Carrier.class)).getCarrierCapabilities().getFleetSize());
+		Assert.assertEquals(FleetSize.FINITE, carriers.getCarriers().get(Id.create("testCarrier", Carrier.class)).getCarrierCapabilities().getFleetSize());
 	}
-	
+
 	@Test @Ignore
 	public void test_whenReadingPlans_nuOfToursIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
-		assertEquals(1, plans.get(0).getScheduledTours().size());
-		assertEquals(1, plans.get(1).getScheduledTours().size());
-		assertEquals(1, plans.get(2).getScheduledTours().size());
+		Assert.assertEquals(1, plans.get(0).getScheduledTours().size());
+		Assert.assertEquals(1, plans.get(1).getScheduledTours().size());
+		Assert.assertEquals(1, plans.get(2).getScheduledTours().size());
 	}
-	
+
 	@Test @Ignore
 	public void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
 		ScheduledTour tour1 = plan1.getScheduledTours().iterator().next();
-		assertEquals(5,tour1.getTour().getTourElements().size());
+		Assert.assertEquals(5,tour1.getTour().getTourElements().size());
 	}
-	
+
 	@Test
 	public void test_whenReadingToursOfPlan2_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		ScheduledTour tour1 = plan2.getScheduledTours().iterator().next();
-		assertEquals(9,tour1.getTour().getTourElements().size());
+		Assert.assertEquals(9,tour1.getTour().getTourElements().size());
 	}
-	
+
 	@Test @Ignore
 	public void test_whenReadingToursOfPlan3_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		ScheduledTour tour1 = plan3.getScheduledTours().iterator().next();
-		assertEquals(9,tour1.getTour().getTourElements().size());
+		Assert.assertEquals(9,tour1.getTour().getTourElements().size());
 	}
-	
-	
+
+
 	private boolean exactlyTheseVehiclesAreInVehicleCollection(List<Id<Vehicle>> asList, Collection<CarrierVehicle> carrierVehicles) {
 		List<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(carrierVehicles);
 		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getId() )) vehicles.remove(type );
@@ -131,5 +136,5 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 //		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
 //		return null;
 //	}
-	
+
 }

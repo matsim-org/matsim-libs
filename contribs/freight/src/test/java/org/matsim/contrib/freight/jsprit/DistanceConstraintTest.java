@@ -32,7 +32,7 @@ import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup.UseDistanceConstraintForTourPlanning;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;

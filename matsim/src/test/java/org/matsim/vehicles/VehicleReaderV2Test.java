@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author dgrether
@@ -92,22 +93,22 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 	public void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
 		VehicleType vehTypeNormalCar = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
 		assertNotNull(vehTypeNormalCar);
-		assertEquals(9.5, vehTypeNormalCar.getLength(), EPSILON);
-		assertEquals(3.0, vehTypeNormalCar.getWidth(), EPSILON);
-		assertEquals(42.0, vehTypeNormalCar.getMaximumVelocity(), EPSILON);
+		assertEquals(9.5, vehTypeNormalCar.getLength(), MatsimTestUtils.EPSILON);
+		assertEquals(3.0, vehTypeNormalCar.getWidth(), MatsimTestUtils.EPSILON);
+		assertEquals(42.0, vehTypeNormalCar.getMaximumVelocity(), MatsimTestUtils.EPSILON);
 
 		assertNotNull(vehTypeNormalCar.getCapacity());
 		assertEquals(Integer.valueOf(5), vehTypeNormalCar.getCapacity().getSeats());
 		assertEquals(Integer.valueOf(20), vehTypeNormalCar.getCapacity().getStandingRoom());
-		assertEquals(23.23, vehTypeNormalCar.getCapacity().getVolumeInCubicMeters(), EPSILON);
-		assertEquals(9.5, vehTypeNormalCar.getCapacity().getWeightInTons(), EPSILON);
-		assertEquals(200.0, vehTypeNormalCar.getCapacity().getOther(), EPSILON);
+		assertEquals(23.23, vehTypeNormalCar.getCapacity().getVolumeInCubicMeters(), MatsimTestUtils.EPSILON);
+		assertEquals(9.5, vehTypeNormalCar.getCapacity().getWeightInTons(), MatsimTestUtils.EPSILON);
+		assertEquals(200.0, vehTypeNormalCar.getCapacity().getOther(), MatsimTestUtils.EPSILON);
 
 		assertNotNull(vehTypeNormalCar.getCostInformation());
-		assertEquals(100, vehTypeNormalCar.getCostInformation().getFixedCosts(), EPSILON);
-		assertEquals(0.15, vehTypeNormalCar.getCostInformation().getCostsPerMeter(), EPSILON);
-		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(), EPSILON);
-		assertEquals(0.06, VehicleUtils.getCostsPerSecondWaiting(vehTypeNormalCar.getCostInformation()), EPSILON);
+		assertEquals(100, vehTypeNormalCar.getCostInformation().getFixedCosts(), MatsimTestUtils.EPSILON);
+		assertEquals(0.15, vehTypeNormalCar.getCostInformation().getCostsPerMeter(), MatsimTestUtils.EPSILON);
+		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(), MatsimTestUtils.EPSILON);
+		assertEquals(0.06, VehicleUtils.getCostsPerSecondWaiting(vehTypeNormalCar.getCostInformation()), MatsimTestUtils.EPSILON);
 
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
 		EngineInformation engineInformation = vehTypeNormalCar.getEngineInformation();
@@ -122,10 +123,10 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals("pt", vehTypeNormalCar.getNetworkMode());
 
 		assertEquals("abc", vehTypeNormalCar.getAttributes().getAttribute("Attribute1"));
-		assertEquals(1.3, (double) vehTypeNormalCar.getAttributes().getAttribute("Attribute2"), EPSILON);
-		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeNormalCar), EPSILON);
-		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeNormalCar), EPSILON);
-		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeNormalCar), EPSILON);
+		assertEquals(1.3, (double) vehTypeNormalCar.getAttributes().getAttribute("Attribute2"), MatsimTestUtils.EPSILON);
+		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeNormalCar), MatsimTestUtils.EPSILON);
+		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeNormalCar), MatsimTestUtils.EPSILON);
+		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeNormalCar), MatsimTestUtils.EPSILON);
 		assertEquals(VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeNormalCar));
 	}
 
@@ -133,8 +134,8 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 	public void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
 		VehicleType vehTypeDefaultCar = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehTypeDefaultCar);
-		assertEquals(7.5, vehTypeDefaultCar.getLength(), EPSILON);
-		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
+		assertEquals(7.5, vehTypeDefaultCar.getLength(), MatsimTestUtils.EPSILON);
+		assertEquals(1.0, vehTypeDefaultCar.getWidth(), MatsimTestUtils.EPSILON);
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getCapacity().getVolumeInCubicMeters())); // Default values
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getCapacity().getWeightInTons())); // Default values
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
@@ -158,15 +159,15 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertTrue(Double.isInfinite(vehTypeSmallTruck.getCapacity().getVolumeInCubicMeters()));
 		assertTrue(Double.isInfinite(vehTypeSmallTruck.getCapacity().getWeightInTons()));
 
-		assertEquals(7.5, vehTypeSmallTruck.getLength(), EPSILON);
-		assertEquals(1.0, vehTypeSmallTruck.getWidth(), EPSILON);
+		assertEquals(7.5, vehTypeSmallTruck.getLength(), MatsimTestUtils.EPSILON);
+		assertEquals(1.0, vehTypeSmallTruck.getWidth(), MatsimTestUtils.EPSILON);
 		assertEquals("diesel", VehicleUtils.getHbefaTechnology(vehTypeSmallTruck.getEngineInformation()));
 		assertEquals("EURO-6", VehicleUtils.getHbefaEmissionsConcept(vehTypeSmallTruck.getEngineInformation()));
-		assertEquals(100.0, vehTypeSmallTruck.getCostInformation().getFixedCosts(), EPSILON);
-		assertEquals(0.2, vehTypeSmallTruck.getCostInformation().getCostsPerMeter(), EPSILON);
-		assertEquals(0.10, vehTypeSmallTruck.getCostInformation().getCostsPerSecond(), EPSILON);
-		assertEquals(0.05, VehicleUtils.getCostsPerSecondWaiting(vehTypeSmallTruck.getCostInformation()), EPSILON);
-		assertEquals(0.15, VehicleUtils.getCostsPerSecondInService(vehTypeSmallTruck.getCostInformation()), EPSILON);
+		assertEquals(100.0, vehTypeSmallTruck.getCostInformation().getFixedCosts(), MatsimTestUtils.EPSILON);
+		assertEquals(0.2, vehTypeSmallTruck.getCostInformation().getCostsPerMeter(), MatsimTestUtils.EPSILON);
+		assertEquals(0.10, vehTypeSmallTruck.getCostInformation().getCostsPerSecond(), MatsimTestUtils.EPSILON);
+		assertEquals(0.05, VehicleUtils.getCostsPerSecondWaiting(vehTypeSmallTruck.getCostInformation()), MatsimTestUtils.EPSILON);
+		assertEquals(0.15, VehicleUtils.getCostsPerSecondInService(vehTypeSmallTruck.getCostInformation()), MatsimTestUtils.EPSILON);
 	}
 
 	@Test

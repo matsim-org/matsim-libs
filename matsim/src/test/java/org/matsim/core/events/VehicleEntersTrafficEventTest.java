@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -34,10 +35,10 @@ import org.matsim.vehicles.Vehicle;
 public class VehicleEntersTrafficEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final VehicleEntersTrafficEvent event1 = new VehicleEntersTrafficEvent(8463.7301, Id.create("483", Person.class), 
+		final VehicleEntersTrafficEvent event1 = new VehicleEntersTrafficEvent(8463.7301, Id.create("483", Person.class),
 				Id.create("783", Link.class), Id.create("veh7", Vehicle.class), TransportMode.car, 1.0);
 		final VehicleEntersTrafficEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
-		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
+		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getPersonId().toString(), event2.getPersonId().toString());
 		assertEquals(event1.getLinkId().toString(), event2.getLinkId().toString());
 		assertEquals(event1.getVehicleId(), event2.getVehicleId());

@@ -38,6 +38,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 
@@ -72,7 +73,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		Person person2 = pop2.getPersons().get(Id.create(1, Person.class));
 		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
 		Route route2 = leg2.getRoute();
-		assertEquals(123, route2.getTravelTime().seconds(), EPSILON); // if this succeeds, we know that writing/reading the data works
+		assertEquals(123, route2.getTravelTime().seconds(), MatsimTestUtils.EPSILON); // if this succeeds, we know that writing/reading the data works
 	}
 
 }

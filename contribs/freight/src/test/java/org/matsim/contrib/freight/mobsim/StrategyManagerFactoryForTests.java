@@ -8,10 +8,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.controler.CarrierReRouteVehicles;
 import org.matsim.contrib.freight.controler.CarrierStrategyManager;
-import org.matsim.contrib.freight.controler.CarrierStrategyManagerImpl;
-import org.matsim.contrib.freight.controler.ReRouteVehicles;
-import org.matsim.core.replanning.*;
+import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -60,9 +60,9 @@ public class StrategyManagerFactoryForTests implements Provider<CarrierStrategyM
         final LeastCostPathCalculator router = new FastDijkstraFactory().createPathCalculator(network, new MyTravelCosts(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
 
         GenericPlanStrategyImpl<CarrierPlan, Carrier> planStrat_reRoutePlan = new GenericPlanStrategyImpl<>( new BestPlanSelector<>() );
-        planStrat_reRoutePlan.addStrategyModule(new ReRouteVehicles(router, network, travelTimes.get(TransportMode.car)));
+        planStrat_reRoutePlan.addStrategyModule(new CarrierReRouteVehicles.Factory(router, network, travelTimes.get(TransportMode.car )).build() );
 
-        CarrierStrategyManager stratManager = new CarrierStrategyManagerImpl();
+        CarrierStrategyManager stratManager = FreightUtils.createDefaultCarrierStrategyManager();
 
         stratManager.addStrategy(planStrat_reRoutePlan, null, 1.0);
 

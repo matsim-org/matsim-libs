@@ -22,6 +22,8 @@ package org.matsim.contrib.ev.discharging;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -68,6 +70,8 @@ public class AuxDischargingHandler
 		}
 	}
 
+	private final static Logger log = LogManager.getLogger(AuxDischargingHandler.class );
+
 	private final VehicleProvider vehicleProvider;
 	private final int auxDischargeTimeStep;
 	private EventsManager eventsManager;
@@ -75,7 +79,7 @@ public class AuxDischargingHandler
 	private final ConcurrentMap<Id<Person>, VehicleAndLink> vehicles = new ConcurrentHashMap<>();
 
 	@Inject
-	public AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg, EventsManager eventsManager) {
+	AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg, EventsManager eventsManager) {
 		this.vehicleProvider = vehicleProvider;
 		this.auxDischargeTimeStep = evCfg.auxDischargeTimeStep;
 		this.eventsManager = eventsManager;

@@ -33,6 +33,7 @@ import org.matsim.lanes.LanesReader;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.LanesWriter;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class LanesReaderWriterTest extends MatsimTestCase {
 		reader.readFile(this.getClassInputDirectory() + FILENAME);
 		checkContent(f.scenario.getLanes());
 	}
-	
+
 	public void testWriter20() {
 		Fixture f = new Fixture();
 		String testoutput = this.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
@@ -112,14 +113,14 @@ public class LanesReaderWriterTest extends MatsimTestCase {
 		Lane lane = lanes.get(0);
 		assertEquals(laneId3, lane.getId());
 		assertEquals(linkId1, lane.getToLinkIds().get(0));
-		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
+		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), MatsimTestUtils.EPSILON);
 		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
-		assertEquals(0.725, lane.getCapacityVehiclesPerHour(), EPSILON);
+		assertEquals(0.725, lane.getCapacityVehiclesPerHour(), MatsimTestUtils.EPSILON);
 		lane = lanes.get(1);
 		assertEquals(laneId5, lane.getId());
-		assertEquals(60.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
+		assertEquals(60.0, lane.getStartsAtMeterFromLinkEnd(), MatsimTestUtils.EPSILON);
 		assertEquals(2.5, lane.getNumberOfRepresentedLanes());
-		assertEquals(2, lane.getCapacityVehiclesPerHour(), EPSILON);
+		assertEquals(2, lane.getCapacityVehiclesPerHour(), MatsimTestUtils.EPSILON);
 		//check a lanes2linkassignment using default values
 		l2la = assignments.get(1);
 		assertNotNull(l2la);
@@ -129,8 +130,8 @@ public class LanesReaderWriterTest extends MatsimTestCase {
 		lane = lanes.get(0);
 		assertEquals(laneId1, lane.getId());
 		assertEquals(linkId1, lane.getToLinkIds().get(0));
-		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
-		assertEquals(1900.0, lane.getCapacityVehiclesPerHour(), EPSILON);
+		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), MatsimTestUtils.EPSILON);
+		assertEquals(1900.0, lane.getCapacityVehiclesPerHour(), MatsimTestUtils.EPSILON);
 		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
 	}
 

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
@@ -37,7 +38,7 @@ public class ActEndEventTest extends MatsimTestCase {
 		final ActivityEndEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
 				new ActivityEndEvent(7893.14, Id.create("143", Person.class), Id.create("293", Link.class), Id.create("f811", ActivityFacility.class),
 						"home", new Coord( 234., 5.67 )));
-		assertEquals(7893.14, event.getTime(), EPSILON);
+		assertEquals(7893.14, event.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals("143", event.getPersonId().toString());
 		assertEquals("293", event.getLinkId().toString());
 		assertEquals("f811", event.getFacilityId().toString());

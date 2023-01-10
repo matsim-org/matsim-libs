@@ -67,8 +67,9 @@ public class EDrtControlerCreator {
 			}
 		});
 
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
-				multiModeDrtConfig.modes().collect(toList())));
+//		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
+//				multiModeDrtConfig.modes().collect(toList())));
+		controler.configureQSimComponents( DvrpQSimComponents.activateModes( multiModeDrtConfig.modes().toArray(String[]::new ) ) );
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

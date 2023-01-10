@@ -31,7 +31,6 @@ package org.matsim.contrib.freight.controler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ReplanningListener;

@@ -120,7 +120,7 @@ public class RunFissDrtScenarioIT {
 		stratSets.setStrategyName("ChangeExpBeta");
 		config.strategy().addStrategySettings(stratSets);
 
-		config.controler().setLastIteration(1);
+		config.controler().setLastIteration(2);
 		config.controler().setWriteEventsInterval(1);
 
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

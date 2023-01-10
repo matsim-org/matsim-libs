@@ -31,37 +31,58 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
  * @author nagel
  *
  */
-public class TimeAllocationMutator implements GenericPlanStrategyModule<CarrierPlan> {
-
-    private double probability = 1.;
-
-    /**
-     * max. departure time mutation: +/- 0.5 * mutationRange
-     */
-    private double mutationRange = 3600. * 3.;
-
-    public TimeAllocationMutator() {
-    }
-
-    public TimeAllocationMutator(double probability, double mutationRange) {
-        this.probability = probability;
-        this.mutationRange = mutationRange;
-    }
-
-    @Override
-	public void handlePlan(CarrierPlan carrierPlan) {
-		Collection<ScheduledTour> newTours = new ArrayList<ScheduledTour>() ;
-		for ( ScheduledTour tour : carrierPlan.getScheduledTours() ) {
-            if(MatsimRandom.getRandom().nextDouble() < probability) {
-                double departureTime = tour.getDeparture() + (MatsimRandom.getRandom().nextDouble() - 0.5) * mutationRange;
-                if ( departureTime < tour.getVehicle().getEarliestStartTime() ) {
-                    departureTime = tour.getVehicle().getEarliestStartTime();
-                }
-                newTours.add(ScheduledTour.newInstance(tour.getTour(), tour.getVehicle(), departureTime));
-            }
-            else newTours.add(tour);
+public class CarrierTimeAllocationMutator implements GenericPlanStrategyModule<CarrierPlan> {
+	public static final class Factory {
+		private double probability = 1.;
+		private double mutationRange = 3600.*3;
+		public CarrierTimeAllocationMutator build() {
+			return new CarrierTimeAllocationMutator( probability, mutationRange );
 		}
-		carrierPlan.getScheduledTours().clear(); 
+		public Factory setProbability( double probability ) {
+			this.probability = probability;
+			return this;
+		}
+		public Factory setMutationRange( double mutationRange ){
+			this.mutationRange = mutationRange;
+			return this;
+		}
+	}
+
+	private double probability = 1.;
+
+	/**
+	 * max. departure time mutation: +/- 0.5 * mutationRange
+	 */
+	private double mutationRange = 3600. * 3.;
+
+	/**
+	 * @deprecated -- use {@link Factory}
+	 */
+	public CarrierTimeAllocationMutator() {
+	}
+
+	/**
+	 * @deprecated -- use {@link Factory}
+	 */
+	public CarrierTimeAllocationMutator( double probability, double mutationRange ) {
+		this.probability = probability;
+		this.mutationRange = mutationRange;
+	}
+
+	@Override
+	public void handlePlan(CarrierPlan carrierPlan) {
+		Collection<ScheduledTour> newTours = new ArrayList<>() ;
+		for ( ScheduledTour tour : carrierPlan.getScheduledTours() ) {
+			if(MatsimRandom.getRandom().nextDouble() < probability) {
+				double departureTime = tour.getDeparture() + (MatsimRandom.getRandom().nextDouble() - 0.5) * mutationRange;
+				if ( departureTime < tour.getVehicle().getEarliestStartTime() ) {
+					departureTime = tour.getVehicle().getEarliestStartTime();
+				}
+				newTours.add(ScheduledTour.newInstance(tour.getTour(), tour.getVehicle(), departureTime));
+			}
+			else newTours.add(tour);
+		}
+		carrierPlan.getScheduledTours().clear();
 		carrierPlan.getScheduledTours().addAll( newTours ) ;
 	}
 

@@ -19,13 +19,12 @@
 
 package org.matsim.utils.eventsfilecomparison;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CyclicBarrier;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.events.Event;
 
 /**
  * This class checks if two events files are semantic equivalent. The order of the events does not matter as long as
@@ -37,19 +36,7 @@ import org.matsim.api.core.v01.events.Event;
 public final class EventsFileComparator {
 	private static final Logger log = LogManager.getLogger(EventsFileComparator.class);
 
-	@Deprecated // use Result enum
-	public static final int CODE_FILES_ARE_EQUAL = 0;
-	@Deprecated // use Result enum
-	public static final int CODE_DIFFERENT_NUMBER_OF_TIMESTEPS = -1;
-	@Deprecated // use Result enum
-	public static final int CODE_DIFFERENT_TIMESTEPS = -2;
-	@Deprecated // use Result enum
-	public static final int CODE_MISSING_EVENT = -3;
-	@Deprecated // use Result enum
-	public static final int CODE_WRONG_EVENT_COUNT = -4;
-	
-	public enum Result { FILES_ARE_EQUAL, DIFFERENT_NUMBER_OF_TIMESTEPS,
-		DIFFERENT_TIMESTEPS, MISSING_EVENT, WRONG_EVENT_COUNT }
+	public enum Result { FILES_ARE_EQUAL, DIFFERENT_NUMBER_OF_TIMESTEPS, DIFFERENT_TIMESTEPS, MISSING_EVENT, WRONG_EVENT_COUNT }
 
 	private boolean ignoringCoordinates = false;
 	public EventsFileComparator setIgnoringCoordinates( boolean ignoringCoordinates ){
@@ -64,37 +51,22 @@ public final class EventsFileComparator {
 		} else {
 			String filename1 = args[0];
 			String filename2 = args[1];
-			
+
 			EventsFileComparator.compare(filename1, filename2);
 		}
 	}
 
-
 	/**
 	 * Compares two Events files. This method is thread-safe.
 	 *
-	 * @param filename1
-	 * @param filename2
-	 * @return <code>0</code> if the events files are equal, or some error code (see constants) if not.
+	 * @param filename1 name of the first event file
+	 * @param filename2 name of the second event file
+	 * @return <code>Result.FILES_ARE_EQUAL</code> if the events files are equal, or some error code (see {@link Result}) if not.
 	 */
-	@Deprecated // prefer the variant returning a Result enum.  kai, nov'17
-	public static int compareAndReturnInt(final String filename1, final String filename2) {
-		Result result = compare( filename1, filename2 ) ;
-		switch ( result ) {
-		case DIFFERENT_NUMBER_OF_TIMESTEPS:
-			return -1 ; 
-		case DIFFERENT_TIMESTEPS:
-			return -2 ; 
-		case FILES_ARE_EQUAL:
-			return 0 ;
-		case MISSING_EVENT:
-			return -3 ; 
-		case WRONG_EVENT_COUNT:
-			return -4 ;
-		default:
-			throw new RuntimeException("unknown Result code") ; 
-		}
+	public static Result compare(final String filename1, final String filename2) {
+		return new EventsFileComparator().runComparison( filename1, filename2 );
 	}
+
 	public Result runComparison( final String filename1, final String filename2 ) {
 		// (need method name different from pre-existing static method.  kai, feb'20)
 
@@ -124,9 +96,6 @@ public final class EventsFileComparator {
 			log.warn("Event files differ.");
 		}
 		return retCode;
-	}
-	public static Result compare(final String filename1, final String filename2) {
-		return new EventsFileComparator().runComparison( filename1, filename2 );
 	}
 
 	private static class EventsComparator implements Runnable {

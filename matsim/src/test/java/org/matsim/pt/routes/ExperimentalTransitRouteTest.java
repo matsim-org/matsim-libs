@@ -31,7 +31,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.fakes.FakeLink;
 
 import junit.framework.TestCase;
@@ -87,7 +87,7 @@ public class ExperimentalTransitRouteTest extends TestCase {
 		assertTrue(route.getTravelTime().isUndefined());
 		double traveltime = 987.65;
 		route.setTravelTime(traveltime);
-		assertEquals(traveltime, route.getTravelTime().seconds(), MatsimTestCase.EPSILON);
+		assertEquals(traveltime, route.getTravelTime().seconds(), MatsimTestUtils.EPSILON);
 	}
 
 	public void testSetRouteDescription_PtRoute() {

@@ -51,7 +51,7 @@ import org.matsim.vehicles.VehicleType;
  * @author sschroeder
  *
  */
-class TimeAndSpaceTourRouter {
+public class CarrierTimeAndSpaceTourRouter{
 	
 	static class MatsimVehicleAdapter implements Vehicle {
 
@@ -85,7 +85,7 @@ class TimeAndSpaceTourRouter {
 	
 	
 	@SuppressWarnings("unused")
-	private static final Logger logger = LogManager.getLogger(TimeAndSpaceTourRouter.class);
+	private static final Logger logger = LogManager.getLogger( CarrierTimeAndSpaceTourRouter.class );
 	
 	private LeastCostPathCalculator router;
 	
@@ -100,7 +100,7 @@ class TimeAndSpaceTourRouter {
 	 * @param travelTime
 	 * @see LeastCostPathCalculator, Network, TravelTime
 	 */
-	public TimeAndSpaceTourRouter(LeastCostPathCalculator router, Network network, TravelTime travelTime) {
+	public CarrierTimeAndSpaceTourRouter( LeastCostPathCalculator router, Network network, TravelTime travelTime ) {
 		super();
 		this.router = router;
 		this.network = network;
@@ -169,7 +169,7 @@ class TimeAndSpaceTourRouter {
 	}
 	
 	private List<Id<Link>> getLinkIds(List<Link> links) {
-		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+		List<Id<Link>> linkIds = new ArrayList<>();
 		for(Link l : links){
 			linkIds.add(l.getId());
 		}

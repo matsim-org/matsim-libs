@@ -152,7 +152,7 @@
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
-			<version>1.5.3</version>
+			<version>1.5.4</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -313,7 +313,7 @@
 									<packages>org.matsim.vis:org.matsim.vis.*</packages>
 								</group>
 							</groups>
-							<detectLinks>true</detectLinks>
+							<detectLinks>false</detectLinks>
 							<doclint>none</doclint>
 							<linksource>true</linksource>
 						</configuration>

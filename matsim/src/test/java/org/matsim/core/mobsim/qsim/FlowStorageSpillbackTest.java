@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.core.mobsim.qsim;
 
@@ -48,78 +48,77 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * Tests the flow capacity for two vehicles that are leaving a link
  * when the storage capacity on the next link (downstream) is reached.
- * 
+ *
  * @author ikaddoura
  *
  */
 @RunWith(Parameterized.class)
 public class FlowStorageSpillbackTest {
-	
+
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private final boolean isUsingFastCapacityUpdate;
-	
+
 	public FlowStorageSpillbackTest(boolean isUsingFastCapacityUpdate) {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
 	}
-	
+
 	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
 	public static Collection<Object> parameterObjects () {
 		Object [] capacityUpdates = new Object [] { false, true };
 		return Arrays.asList(capacityUpdates);
 	}
-	
+
 	private EventsManager events;
-	
+
 	private Id<Person> testAgent1 = Id.create("testAgent1", Person.class);
 	private Id<Person> testAgent2 = Id.create("testAgent2", Person.class);
 	private Id<Person> testAgent3 = Id.create("testAgent3", Person.class);
 	private Id<Person> testAgent4 = Id.create("testAgent4", Person.class);
-	
+
 	private Id<Link> linkId1 = Id.create("link1", Link.class);
 	private Id<Link> linkId2 = Id.create("link2", Link.class);
 	private Id<Link> linkId3 = Id.create("link3", Link.class);
 	private Id<Link> linkId4 = Id.create("link4", Link.class);
-	
+
 	@Test
 	public final void testFlowCongestion(){
-		
+
 		Scenario sc = loadScenario();
 		setPopulation(sc);
-		
+
 		sc.getConfig().qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
-		
+
 		final List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
-							
+
 		events.addHandler( new LinkLeaveEventHandler() {
-			
+
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
 				linkLeaveEvents.add(event);
-			}			
+			}
 		});
-		
-		
+
+
 		final Map<Id<Person>, Id<Vehicle>> vehicleOfPerson = new HashMap<>();
-		
+
 		events.addHandler( new PersonEntersVehicleEventHandler() {
-			
+
 			@Override
 			public void reset(int iteration) {
 			}
-			
+
 			@Override
 			public void handleEvent(PersonEntersVehicleEvent event) {
 				vehicleOfPerson.put(event.getPersonId(), event.getVehicleId());
@@ -129,7 +128,7 @@ public class FlowStorageSpillbackTest {
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		new QSimBuilder(sc.getConfig()) //
 				.useDefaults() //
-				.build(sc, events) // 
+				.build(sc, events) //
 				.run();
 
 		for (LinkLeaveEvent event : linkLeaveEvents) {
@@ -137,30 +136,30 @@ public class FlowStorageSpillbackTest {
 
 			if (event.getVehicleId().equals(vehicleOfPerson.get(this.testAgent4)) && event.getLinkId().equals(this.linkId2)) {
 //				if(this.isUsingFastCapacityUpdate) {
-					Assert.assertEquals("wrong link leave time.", 169., event.getTime(), MatsimTestCase.EPSILON);
+					Assert.assertEquals("wrong link leave time.", 169., event.getTime(), MatsimTestUtils.EPSILON);
 //				} else {
 //					Assert.assertEquals("wrong link leave time.", 170., event.getTime(), MatsimTestCase.EPSILON);
 //				}
 			}
 		}
-		
+
 	}
 	private void setPopulation(Scenario scenario) {
-		
+
 		Population population = scenario.getPopulation();
         PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity lastActLink3 = popFactory.createActivityFromLinkId("work", linkId3);
 		Activity lastActLink4 = popFactory.createActivityFromLinkId("work", linkId4);
-		
+
 		// leg: 3,4
 		Leg leg_3_4 = popFactory.createLeg("car");
 		List<Id<Link>> linkIds1 = new ArrayList<Id<Link>>();
 		NetworkRoute route1 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route1.setLinkIds(linkId3, linkIds1, linkId4);
 		leg_3_4.setRoute(route1);
-		
+
 		// leg: 2,3,4
 		Leg leg_2_4 = popFactory.createLeg("car");
 		List<Id<Link>> linkIds2 = new ArrayList<Id<Link>>();
@@ -181,7 +180,7 @@ public class FlowStorageSpillbackTest {
 		// leg: 1,2,3: testAgent4
 		Leg leg_1_3_testAgent4 = popFactory.createLeg("car");
 		PopulationUtils.copyFromTo(leg_1_3, leg_1_3_testAgent4);
-		
+
 		// ################################################################
 		// first agent activating the flow capacity on link3 (3 --> 4)
 		Person person1 = popFactory.createPerson(testAgent1);
@@ -193,7 +192,7 @@ public class FlowStorageSpillbackTest {
 		plan1.addActivity(lastActLink4);
 		person1.addPlan(plan1);
 		population.addPerson(person1);
-		
+
 		// ################################################################
 		// second agent blocking link3 for 1 min (2 --> 4)
 		Person person2 = popFactory.createPerson(testAgent2);
@@ -208,8 +207,8 @@ public class FlowStorageSpillbackTest {
 
 		plan2.addActivity(lastActLink4_testAgent2);
 		person2.addPlan(plan2);
-		population.addPerson(person2);			
-		
+		population.addPerson(person2);
+
 		// ################################################################
 		// third agent: in buffer of link2 (1 --> 3)
 		Person person3 = popFactory.createPerson(testAgent3);
@@ -224,7 +223,7 @@ public class FlowStorageSpillbackTest {
 		population.addPerson(person3);
 
 		// ################################################################
-		// last agent causing the troubles... (1 --> 3)		
+		// last agent causing the troubles... (1 --> 3)
 		Person person4 = popFactory.createPerson(testAgent4);
 		Plan plan4 = popFactory.createPlan();
 		Activity act4 = popFactory.createActivityFromLinkId("home", linkId1);
@@ -243,12 +242,12 @@ public class FlowStorageSpillbackTest {
 	}
 
 	private Scenario loadScenario() {
-			
+
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
-		
+
 		Config config = testUtils.loadConfig((String) null);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
-	
+
 		Network network = (Network) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
@@ -258,7 +257,7 @@ public class FlowStorageSpillbackTest {
 		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(200., 0.));
 		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(300., 0.));
 		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord(400., 0.));
-		
+
 		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
 		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);
 		Link link3 = network.getFactory().createLink(this.linkId3, node2, node3);
@@ -266,35 +265,35 @@ public class FlowStorageSpillbackTest {
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
-		
+
 		// link without capacity restrictions
 		link1.setAllowedModes(modes);
 		link1.setCapacity(10800);
 		link1.setFreespeed(500);
 		link1.setNumberOfLanes(100);
 		link1.setLength(500);
-		
+
 		// link with low flow capacity: one car every 10 sec
 		link2.setAllowedModes(modes);
 		link2.setCapacity(360);
 		link2.setFreespeed(10);
 		link2.setNumberOfLanes(100);
 		link2.setLength(500);
-		
+
 		// link meant to reach storage capacity: space for one car, one car every 60 sec
 		link3.setAllowedModes(modes);
 		link3.setCapacity(60);
 		link3.setFreespeed(500);
 		link3.setNumberOfLanes(1);
 		link3.setLength(7.5);
-		
+
 		// link without capacity restrictions
 		link4.setAllowedModes(modes);
 		link4.setCapacity(10800);
 		link4.setFreespeed(500);
 		link4.setNumberOfLanes(100);
 		link4.setLength(500);
-		
+
 		network.addNode(node0);
 		network.addNode(node1);
 		network.addNode(node2);
@@ -309,5 +308,5 @@ public class FlowStorageSpillbackTest {
 		this.events = EventsUtils.createEventsManager();
 		return scenario;
 	}
-	
+
 }

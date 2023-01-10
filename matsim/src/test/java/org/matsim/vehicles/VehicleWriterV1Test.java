@@ -20,8 +20,6 @@
 package org.matsim.vehicles;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author dgrether
@@ -85,27 +84,27 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		assertEquals(2, vehicleTypes.size());
 		VehicleType vehType = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
 		assertNotNull(vehType);
-		assertEquals(9.5, vehType.getLength(), EPSILON);
-		assertEquals(3.0, vehType.getWidth(), EPSILON);
-		assertEquals(42.0, vehType.getMaximumVelocity(), EPSILON);
+		assertEquals(9.5, vehType.getLength(), MatsimTestUtils.EPSILON);
+		assertEquals(3.0, vehType.getWidth(), MatsimTestUtils.EPSILON);
+		assertEquals(42.0, vehType.getMaximumVelocity(), MatsimTestUtils.EPSILON);
 		assertNotNull(vehType.getCapacity());
 		assertEquals(Integer.valueOf(5), vehType.getCapacity().getSeats());
 		assertEquals(Integer.valueOf(20), vehType.getCapacity().getStandingRoom());
 //		assertNotNull(vehType.getCapacity().getFreightCapacity());
 //		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume(), EPSILON);
-		assertEquals(23.23, vehType.getCapacity().getVolumeInCubicMeters(), EPSILON);
+		assertEquals(23.23, vehType.getCapacity().getVolumeInCubicMeters(), MatsimTestUtils.EPSILON);
 		assertNotNull(vehType.getEngineInformation());
 		assertEquals(EngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType());
-		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), EPSILON);
-		assertEquals(23.23, VehicleUtils.getAccessTime(vehType), EPSILON);
-		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), EPSILON);
+		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), MatsimTestUtils.EPSILON);
+		assertEquals(23.23, VehicleUtils.getAccessTime(vehType), MatsimTestUtils.EPSILON);
+		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), MatsimTestUtils.EPSILON);
 		assertEquals(VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType));
 		assertEquals(2.0, vehType.getPcuEquivalents());
 
 		vehType = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehType);
-		assertEquals(7.5, vehType.getLength(), EPSILON);
-		assertEquals(1.0, vehType.getWidth(), EPSILON);
+		assertEquals(7.5, vehType.getLength(), MatsimTestUtils.EPSILON);
+		assertEquals(1.0, vehType.getWidth(), MatsimTestUtils.EPSILON);
 		assertTrue(Double.isInfinite(vehType.getMaximumVelocity()));
 		assertNotNull(vehType.getCapacity());
 		assertEquals(VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehType));
