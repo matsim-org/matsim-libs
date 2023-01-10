@@ -20,6 +20,8 @@
 
 package org.matsim.core.replanning.selectors;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -28,8 +30,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-
-import static org.junit.Assert.*;
 
 /**
  * Tests for {@link ExpBetaPlanSelector}.

@@ -23,7 +23,6 @@
 package org.matsim.contrib.accessibility.logsumComputations;
 
 import org.junit.Assert;
-import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

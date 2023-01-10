@@ -20,6 +20,9 @@
 
 package org.matsim.core.replanning.selectors;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
@@ -39,8 +42,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-
-import static org.junit.Assert.*;
 
 /**
  * Tests for {@link PathSizeLogitSelector}.

@@ -20,12 +20,12 @@
 
 package org.matsim.core.replanning.selectors;
 
+import static org.junit.Assert.*;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
-import static org.junit.Assert.*;
 
 public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 

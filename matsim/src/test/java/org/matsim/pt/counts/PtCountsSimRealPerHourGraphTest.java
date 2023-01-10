@@ -22,7 +22,6 @@ package org.matsim.pt.counts;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Test;
 import org.matsim.pt.counts.obsolete.PtCountSimComparisonWriter.PtCountsType;
 import org.matsim.pt.counts.obsolete.PtCountsSimRealPerHourGraph;
 import org.matsim.testcases.MatsimTestCase;

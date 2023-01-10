@@ -23,7 +23,6 @@ import static org.junit.Assert.*;
 
 import java.util.Map;
 
-import org.junit.Before;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;

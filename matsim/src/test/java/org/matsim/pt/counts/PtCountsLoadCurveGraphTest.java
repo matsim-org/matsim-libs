@@ -22,7 +22,6 @@ package org.matsim.pt.counts;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Test;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.testcases.MatsimTestCase;
 
