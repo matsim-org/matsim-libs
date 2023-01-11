@@ -74,7 +74,7 @@ public class FreightUtils {
 	 * 	- creating NetbasedCosts based on the network
 	 * 	- building and solving the VRP for all carriers using jsprit
 	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
-	 *
+	 * <p>
 	 *
 	 * @param scenario
 	 * @throws ExecutionException, InterruptedException
@@ -163,8 +163,6 @@ public class FreightUtils {
 			if (carrier.getShipments().size() > 0) {
 				copyShipments(carrierWS, carrier);
 			}
-			//			copyPickups(carrierWS, carrier);	//Not implemented yet due to missing CarrierPickup in freight contrib, kmt Sep18
-			//			copyDeliveries(carrierWS, carrier); //Not implemented yet due to missing CarrierDelivery in freight contrib, kmt Sep18
 			if (carrier.getServices().size() > 0) {
 				createShipmentsFromServices(carrierWS, carrier);
 			}
@@ -198,7 +196,7 @@ public class FreightUtils {
 		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are
 		// not found. kai, oct'19
 		if ( scenario.getScenarioElement( CARRIERS ) == null ) {
-			throw new RuntimeException( "\n\ncannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
+			throw new RuntimeException( "cannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
 								    "FreightUtils.getOrCreateCarriers(...) or FreightUtils.loadCarriersAccordingToFreightConfig(...) early enough\n") ;
 		}
 		return (Carriers) scenario.getScenarioElement(CARRIERS);
@@ -230,27 +228,6 @@ public class FreightUtils {
 //		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
-	/**
-	 * NOT implemented yet due to missing CarrierDelivery in freight contrib, kmt
-	 * Sep18
-	 *
-	 * @param carrierWS
-	 * @param carrier
-	 */
-	private void copyDeliveries(Carrier carrierWS, Carrier carrier) {
-		throw new NotImplementedException("Coping of Deliveries is NOT implemented yet due to missing CarrierDelivery in freight contrib");
-	}
-
-	/**
-	 * NOT implemented yet due to missing CarrierPickup in freight contrib, kmt
-	 * Sep18
-	 *
-	 * @param carrierWS
-	 * @param carrier
-	 */
-	private void copyPickups(Carrier carrierWS, Carrier carrier) {
-		throw new NotImplementedException("Coping of Pickup is NOT implemented yet due to missing CarrierPickup in freight contrib");
-	}
 
 	/**
 	 * Copy all shipments from the existing carrier to the new carrier with
@@ -290,8 +267,7 @@ public class FreightUtils {
 		for (ScheduledTour tour : tours) {
 			Id<Link> depotForTour = tour.getVehicle().getLinkId();
 			for (TourElement te : tour.getTour().getTourElements()) {
-				if (te instanceof ServiceActivity) {
-					ServiceActivity act = (ServiceActivity) te;
+				if (te instanceof ServiceActivity act) {
 					depotServiceIsDeliveredFrom.put(act.getService().getId(), depotForTour);
 				}
 			}
@@ -306,7 +282,8 @@ public class FreightUtils {
 									  // .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 									  // have now time for that. Maybe change it later, kmt sep18
 									  .setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
-									  .setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// Limited to end of delivery timeWindow (pickup later than latest delivery is not useful).
+										// Limited to end of delivery timeWindow (pickup later than the latest delivery is not useful).
+									  .setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))
 									  .build();
 			CarrierUtils.addShipment(carrierWS, carrierShipment);
 		}

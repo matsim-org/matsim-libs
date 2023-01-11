@@ -106,7 +106,7 @@ public final class CarrierModule extends AbstractModule {
 	// We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
 	// The freight QSim needs it (see below [[where?]]).
 	// yyyy this feels rather scary.  kai, oct'19
-	// Since we are exporting it anyways, we could as well also inject it.  kai, sep'20
+	// Since we are exporting it anyway, we could as well also inject it.  kai, sep'20
 	// Is this maybe already resolved now?  kai, jul'22
 //	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
 //		return carrierControlerListener.getCarrierAgentTracker();

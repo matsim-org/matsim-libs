@@ -32,8 +32,8 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
- * 
- *  
+ * <p>
+ *
  * @author sschroeder, mzilske
  *
  */
@@ -83,9 +83,9 @@ public final class CarrierImpl implements Carrier {
 
 	/**
 	 * Selects the selectedPlan.
-	 * 
+	 *
 	 * <p> If the plan-collection does not contain the selectedPlan, it is added to that collection.
-	 * 
+	 *
 	 * @param selectedPlan to be selected
 	 */
 	@Override

@@ -52,27 +52,21 @@ import org.matsim.core.router.util.TravelTime;
 class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     private final Network network;
-//
-//    private final CarrierVehicleTypes vehicleTypes;
-//
-//    private final TravelTime travelTimes;
-//
+
     private final String vrpAlgorithmConfig;
 
     private final VehicleRoutingTransportCosts vehicleRoutingTransportCosts;
 
     private final VehicleRoutingActivityCosts vehicleRoutingActivityCosts;
 
-    private VehicleTypeDependentRoadPricingCalculator roadPricing;
-
-    public CarrierVehicleReRouter( Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, String vrpAlgoConfigFile, VehicleTypeDependentRoadPricingCalculator roadPricing ) {
+	public CarrierVehicleReRouter( Network network, CarrierVehicleTypes vehicleTypes, TravelTime travelTimes, String vrpAlgoConfigFile, VehicleTypeDependentRoadPricingCalculator roadPricing ) {
         this.network = network;
         vehicleRoutingTransportCosts = getNetworkBasedTransportCosts(network,vehicleTypes,travelTimes,roadPricing);
         vehicleRoutingActivityCosts = new VehicleRoutingActivityCosts() {
 
-            private double penalty4missedTws = 0.01;
+            private final double penalty4missedTws = 0.01;
 
-            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Servie/WaitingTimeUnit ... but make sure that this were set correctly. 
+            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Service/WaitingTimeUnit ... but make sure that this where set correctly.
             @Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
@@ -84,8 +78,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 			@Override
 			public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
 					Vehicle vehicle) {
-				double activityDuration = Math.max(0, tourAct.getEndTime() - tourAct.getArrTime()); //including waiting times
-				return activityDuration;
+				return Math.max(0, tourAct.getEndTime() - tourAct.getArrTime());
 			}
         };
         vrpAlgorithmConfig = vrpAlgoConfigFile;
@@ -101,7 +94,6 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     @Override
     public void handlePlan(CarrierPlan carrierPlan) {
-        //		System.out.println("REPLAN " + carrierPlan.getCarrier().getId());
         Carrier carrier = carrierPlan.getCarrier();
 
         //construct the routing problem - here the interface to jsprit comes into play
@@ -123,15 +115,15 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
-        
+
         boolean addDefaultCostCalculators = true;
-         
+
         VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 
         //get configures algorithm
 //		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vrpAlgorithmConfig);
 //		vra.addListener(new AlgorithmSearchProgressChartListener("output/"+carrierPlan.getCarrier().getId() + "_" + carrierPlan.hashCode() + ".png"));
-        
+
         //add initial-solution - which is the initialSolution for the vehicle-routing-algo
         vra.addInitialSolution(MatsimJspritFactory.createSolution(carrierPlan, vrp));
 
@@ -146,7 +138,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         //create carrierPlan from solution
         CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
 
-        //route plan (currently jsprit does not memorizes the routes, thus route the plan)
+        //route plan (currently jsprit does not memorize the routes, thus route the plan)
 //		NetworkRouter.routePlan(plan, networkBasedTransportCosts);
 
         //set new plan
@@ -168,7 +160,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
         if(roadPricing != null) tpcostsBuilder.setRoadPricingCalculator(roadPricing);
 
-        //sets time-slice to build time-dependent tpcosts and traveltime matrices
+        //sets time-slice to build time-dependent tpcosts and travelTime matrices
         tpcostsBuilder.setTimeSliceWidth(900);
 //		tpcostsBuilder.setFIFO(true);
         //assign netBasedCosts to RoutingProblem

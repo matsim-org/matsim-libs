@@ -70,8 +70,6 @@ final class CarrierDriverAgent{
 	void handleAnEvent(Event event){
 		// the event comes to here from CarrierAgent#handleEvent only for events concerning this driver
 
-		int previousPlanElementCounter = this.planElementCounter;
-
 		if( event instanceof PersonArrivalEvent ){
 			handleEvent( (PersonArrivalEvent) event);
 		} else if( event instanceof PersonDepartureEvent ){

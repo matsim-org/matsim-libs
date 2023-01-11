@@ -74,6 +74,23 @@
 			<version>15.0-SNAPSHOT</version>
 		</dependency>
 
+		<!-- This comes from jsprit, but is outdated there. Unclear, when the next release is coming.
+		 	Currently (Jan'23), there is a beta version which needs some code adaptions on our side -> will not use it directly...
+		 	So I (KMT) am fixing the security issue here by manually setting a more current version of the vulnerable dependencies -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<!-- This comes from jsprit, but is outdated there. Unclear, when the next release is coming.
+			 Currently (Jan'23), there is a beta version which needs some code adaptions on our side -> will not use it directly...
+			 So I (KMT) am fixing the security issue here by manually setting a more current version of the vulnerable dependencies -->
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.12.2</version>
+		</dependency>
+
 	</dependencies>
 
 	<repositories>

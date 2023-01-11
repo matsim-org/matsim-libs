@@ -39,6 +39,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -62,11 +63,12 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 	 */
 	public static class SimpleDriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
+		@SuppressWarnings("unused")
 		private static final  Logger log = LogManager.getLogger( SimpleDriversActivityScoring.class );
 
 		private double score;
-		private double timeParameter = 0.008;
-		private double missedTimeWindowPenalty = 0.01;
+		private final double timeParameter = 0.008;
+		private final double missedTimeWindowPenalty = 0.01;
 
 		public SimpleDriversActivityScoring() {
 			super();
@@ -148,12 +150,13 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 	 */
 	public static class SimpleDriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
+		@SuppressWarnings("unused")
 		private static final  Logger log = LogManager.getLogger( SimpleDriversLegScoring.class );
 
 		private double score = 0.0;
 		private final Network network;
 		private final Carrier carrier;
-		private Set<CarrierVehicle> employedVehicles;
+		private final Set<CarrierVehicle> employedVehicles;
 
 		public SimpleDriversLegScoring( Carrier carrier, Network network ) {
 			super();
@@ -180,20 +183,18 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
 		@Override
 		public void handleLeg(Leg leg) {
-			if(leg.getRoute() instanceof NetworkRoute){
-				NetworkRoute nRoute = (NetworkRoute) leg.getRoute();
-				Id vehicleId = nRoute.getVehicleId();
+			if(leg.getRoute() instanceof NetworkRoute nRoute){
+				Id<Vehicle> vehicleId = nRoute.getVehicleId();
 				CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
 				Gbl.assertNotNull(vehicle);
 				if(!employedVehicles.contains(vehicle)){
 					employedVehicles.add(vehicle);
 				}
 				double distance = 0.0;
-				double toll = 0.;
 				if(leg.getRoute() instanceof NetworkRoute){
 					Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
 					distance += startLink.getLength();
-					for(Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()){
+					for(Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()){
 						distance += network.getLinks().get(linkId).getLength();
 
 					}
@@ -216,12 +217,13 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
 	public static class SimpleTollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
+		@SuppressWarnings("unused")
 		private static final  Logger log = LogManager.getLogger( SimpleTollScoring.class );
 
 		private double score = 0.;
-		private Carrier carrier;
-		private Network network;
-		private VehicleTypeDependentRoadPricingCalculator roadPricing;
+		private final Carrier carrier;
+		private final Network network;
+		private final VehicleTypeDependentRoadPricingCalculator roadPricing;
 
 		public SimpleTollScoring( Carrier carrier, Network network, VehicleTypeDependentRoadPricingCalculator roadPricing ) {
 			this.carrier = carrier;

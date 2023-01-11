@@ -27,10 +27,10 @@ import org.matsim.vehicles.VehicleUtils;
 
 /**
  * The carrier vehicle type.
- * 
+ * <p>
  * I decided to put vehicle cost information into the type (which is indeed not a physical attribute of the type). Thus physical and
- * non physical attributes are used. This is likely to be changed in future.
- * 
+ * non-physical attributes are used. This is likely to be changed in the future.
+ *
  * @author sschroeder
  *
  */
@@ -45,49 +45,49 @@ public class CarrierVehicleType {
 
 	/**
 	 * A builder building the type.
-	 * 
+	 *
 	 * @author sschroeder
 	 *
 	 */
 	public static class Builder {
 		VehicleType delegate ;
-		
+
 		/**
 		 * Returns a new instance of builder initialized with the typeId.
-		 * 
+		 * <p>
 		 * The defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
-		 * 
+		 *
 		 * @param typeId
 		 * @return a type builder
 		 */
 		public static Builder newInstance(Id<VehicleType> typeId){
 			return new Builder(typeId);
 		}
-		
+
 		/**
 		 * Returns a new instance of builder initialized with the typeId and the values the given from existing CarrierVehicleType.
-		 * 
-		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one. 
+		 * <p>
+		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one.
 		 * Values can be changed within the builder afterwards.
-		 * 
+		 *
 		 * @param carrierVehicleType
 		 * @param typeId
 		 * @return a type builder
 		 *
-		 * @deprecated Use {@link #newInstance(Id<VehicleType>)} instead 
+		 * @deprecated Use {@link #newInstance(Id<VehicleType>)} instead
 		 */
 		@Deprecated(since = "sep'19", forRemoval = true)
 		public static Builder newInstance(Id<VehicleType> typeId, CarrierVehicleType carrierVehicleType){
 			throw new RuntimeException("not implemented") ;
 		}
-		
+
 		private Builder(Id<VehicleType> typeId){
 			this.delegate = VehicleUtils.getFactory().createVehicleType( typeId ) ;
 		}
-		
+
 		/**
 		 * Sets fixed costs of vehicle.
-		 * 
+		 *
 		 * <p>By default it is 0.
 		 * @param fix
 		 * @return
@@ -96,12 +96,12 @@ public class CarrierVehicleType {
 			this.delegate.getCostInformation().setFixedCost( fix ) ;
 			return this;
 		}
-		
+
 		/**
 		 * Sets costs per distance-unit.
-		 * 
+		 *
 		 * <p>By default it is 1.
-		 * 
+		 *
 		 * @param perDistanceUnit
 		 * @return
 		 */
@@ -112,9 +112,9 @@ public class CarrierVehicleType {
 
 		/**
 		 * Sets costs per time-unit.
-		 * 
+		 *
 		 * <p>By default it is 0.
-		 * 
+		 *
 		 * @param perTimeUnit
 		 * @return
 		 */
@@ -122,10 +122,10 @@ public class CarrierVehicleType {
 			this.delegate.getCostInformation().setCostsPerSecond( perTimeUnit ) ;
 			return this;
 		}
-		
+
 		/**
 		 * Sets description.
-		 * 
+		 *
 		 * @param description
 		 * @return this builder
 		 */
@@ -133,12 +133,12 @@ public class CarrierVehicleType {
 			this.delegate.setDescription( description ) ;
 			return this;
 		}
-		
+
 		/**
 		 * Sets the capacity of vehicle-type.
-		 * 
-		 * <p>By defaul the capacity is 0.
-		 * 
+		 *
+		 * <p>By default, the capacity is 0.
+		 *
 		 * @param capacity
 		 * @return this builder
 		 */
@@ -146,10 +146,10 @@ public class CarrierVehicleType {
 			this.delegate.getCapacity().setOther( capacity );
 			return this;
 		}
-		
+
 		/**
 		 * Builds the type.
-		 * 
+		 *
 		 * @return {@link CarrierVehicleType}
 		 */
 		public VehicleType build(){

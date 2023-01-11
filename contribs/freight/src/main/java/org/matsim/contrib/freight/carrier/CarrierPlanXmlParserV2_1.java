@@ -204,11 +204,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				break;
 
 			//vehicle-type
-			case "vehicleType":
-				throw new RuntimeException(VEHICLE_TYPES_MSG);
-			case "engineInformation":
-				throw new RuntimeException(VEHICLE_TYPES_MSG);
-			case "costInformation":
+			case "vehicleType", "engineInformation", "costInformation":
 				throw new RuntimeException(VEHICLE_TYPES_MSG);
 
 

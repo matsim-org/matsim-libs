@@ -58,13 +58,13 @@ public class CarrierTimeAllocationMutator implements GenericPlanStrategyModule<C
 	/**
 	 * @deprecated -- use {@link Factory}
 	 */
-	public CarrierTimeAllocationMutator() {
+	@Deprecated public CarrierTimeAllocationMutator() {
 	}
 
 	/**
 	 * @deprecated -- use {@link Factory}
 	 */
-	public CarrierTimeAllocationMutator( double probability, double mutationRange ) {
+	@Deprecated public CarrierTimeAllocationMutator(double probability, double mutationRange ) {
 		this.probability = probability;
 		this.mutationRange = mutationRange;
 	}

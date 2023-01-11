@@ -61,7 +61,7 @@ public class FixedCostsTest  {
 
 	@Before
 	public void setUp() throws Exception {
-//        Create carrier with services; service1 nearby the depot, service2 at the opposite side of the network
+		// Create carrier with services; service1 nearby the depot, service2 at the opposite side of the network
 		CarrierService service1 = createMatsimService("Service1", "i(3,0)", 1);
 		CarrierService service2 = createMatsimService("Service2", "i(9,9)R", 1);
 
@@ -83,7 +83,7 @@ public class FixedCostsTest  {
 
 		//only variable costs (per distance), no fixed costs
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType_A", VehicleType.class );
-		VehicleType carrierVehType_A = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );;
+		VehicleType carrierVehType_A = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
 		{
 			EngineInformation engineInformation1 = carrierVehType_A.getEngineInformation();
 			engineInformation1.setFuelType( EngineInformation.FuelType.diesel );
@@ -120,7 +120,7 @@ public class FixedCostsTest  {
 		carrier1.setCarrierCapabilities(cc1);
 		carriers.addCarrier(carrier1);
 
-		//carrier2: only vehicles of Type B (fixed costs of 10 EUR/verhicle, no variable costs)
+		//carrier2: only vehicles of Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 		CarrierCapabilities cc2 = CarrierCapabilities.Builder.newInstance()
 										     .addType(carrierVehType_B)
 										     .addVehicle(carrierVehicle_B)
@@ -129,7 +129,7 @@ public class FixedCostsTest  {
 		carrier2.setCarrierCapabilities(cc2);
 		carriers.addCarrier(carrier2);
 
-		//carrier3: has both vehicles of Type A (no fixed costs, variable costs: 1 EUR/km) and Type B (fixed costs of 10 EUR/verhicle, no variable costs)
+		//carrier3: has both vehicles of Type A (no fixed costs, variable costs: 1 EUR/km) and Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 		CarrierCapabilities cc3 = CarrierCapabilities.Builder.newInstance()
 										     .addType(carrierVehType_A)
 										     .addType(carrierVehType_B)
@@ -176,23 +176,30 @@ public class FixedCostsTest  {
 		}
 	}
 
+	/*
+	 * carrier1: only vehicles of Type A (no fixed costs, variable costs: 1 EUR/km)
+	 * nearby service1: 8km -> 8 EUR; service2: 36km -> 36 EUR  --> total 44EUR -> score = -44
+	 */
 	@Test
 	public final void test_carrier1CostsAreCorrectly() {
-		//carrier1: only vehicles of Type A (no fixed costs, variable costs: 1 EUR/km)
-		// nearby service1: 8km -> 8 EUR; service2: 36km -> 36 EUR  --> total 44EUR -> score = -44
+
 		Assert.assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
 	}
 
+	/*
+	 * carrier2: only vehicles of Type B (fixed costs of 10 EUR/vehicle, no variable costs)
+	 */
 	@Test
 	public final void test_carrier2CostsAreCorrectly() {
-		//carrier2: only vehicles of Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 		Assert.assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
 	}
 
+	/*
+	 * carrier3: has both vehicles of Type A (no fixed costs, variable costs: 1 EUR/km) and Type B (fixed costs of 10 EUR/vehicle, no variable costs)
+	 * should use A for short trip (8 EUR) and B for the long trip (10.36 EUR)
+	*/
 	@Test
 	public final void test_carrier3CostsAreCorrectly() {
-		//carrier3: has both vehicles of Type A (no fixed costs, variable costs: 1 EUR/km) and Type B (fixed costs of 10 EUR/verhicle, no variable costs)
-		//should use A for short trip (8 EUR) and B for the long trip (10.36 EUR)
 		Assert.assertEquals(-18.36, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier3", Carrier.class)).getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
 	}
 
