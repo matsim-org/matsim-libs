@@ -1,6 +1,7 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
+import lsp.usecase.TransshipmentHub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -58,14 +59,19 @@ public class LSPPlanWriter extends MatsimXmlWriter {
 
 
     private void writeResources(LSP lsp, BufferedWriter writer )throws IOException {
-        if(lsp.getResources().isEmpty()) return;
+        if (lsp.getResources().isEmpty()) return;
         writer.write("\t\t\t<resources>\n");
         for (LSPResource resource : lsp.getResources()) {
-            if (resource.getId().toString().equals("Hub")) {
-                writer.write("\t\t\t\t<hub location=\"" + resource.getStartLinkId() + "\"/>\n");
+            if (resource instanceof TransshipmentHub hub) {
+                writer.write("\t\t\t\t<transshipmentHub ");
+                writer.write("id=\"" + hub.getId() + "\" ");
+                writer.write("location=\"" + hub.getStartLinkId() + "\" ");
+                writer.write("fixedCost=\"" + hub.getAttributes().getAttribute("fixedCost") + "\"/>\n");
             }
-            if (resource.getId().toString().equals("directCarrierRes")) {
-                writer.write("\t\t\t\t<depot location=\"" + resource.getStartLinkId() + "\"/>\n");
+            if (resource instanceof LSPCarrierResource carrierResource) {
+                writer.write("\t\t\t\t<LspCarrierResource ");
+                writer.write("id=\"" + carrierResource.getCarrier().getId() + "\" ");
+                writer.write("startLink=\"" + carrierResource.getStartLinkId() + "\"/>\n");
             }
         }
         writer.write("\t\t\t</resources>\n");
