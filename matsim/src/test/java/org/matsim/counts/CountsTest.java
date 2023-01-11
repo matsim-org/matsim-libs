@@ -22,13 +22,19 @@ package org.matsim.counts;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class CountsTest extends MatsimTestCase {
+public class CountsTest {
 
-	@org.junit.Test public void testGetCounts() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testGetCounts() {
 		final Counts counts = new Counts();
 		counts.createAndAddCount(Id.create(0, Link.class), "1");
 		assertEquals("Getting counts failed", 1, counts.getCounts().size());

@@ -23,6 +23,8 @@ package org.matsim.integration.replanning;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -61,14 +63,18 @@ import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class ChangeTripModeIntegrationTest extends MatsimTestCase {
+public class ChangeTripModeIntegrationTest {
 
-	@org.junit.Test public void testStrategyManagerConfigLoaderIntegration() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = utils.loadConfig((String)null);
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);

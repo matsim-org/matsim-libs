@@ -27,6 +27,8 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -38,7 +40,6 @@ import org.matsim.lanes.Lanes;
 import org.matsim.lanes.LanesReader;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.LanesWriter;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -46,7 +47,11 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author dgrether
  *
  */
-public class LanesReaderWriterTest extends MatsimTestCase {
+public class LanesReaderWriterTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final Logger log = LogManager.getLogger(LanesReaderWriterTest.class);
 
@@ -74,14 +79,14 @@ public class LanesReaderWriterTest extends MatsimTestCase {
 		}
 	}
 
-	@org.junit.Test public void testReader20() {
+	@Test public void testReader20() {
 		Fixture f = new Fixture();
 		LanesReader reader = new LanesReader(f.scenario);
 		reader.readFile(utils.getClassInputDirectory() + FILENAME);
 		checkContent(f.scenario.getLanes());
 	}
 
-	@org.junit.Test public void testWriter20() {
+	@Test public void testWriter20() {
 		Fixture f = new Fixture();
 		String testoutput = utils.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
 		log.debug("reading file...");

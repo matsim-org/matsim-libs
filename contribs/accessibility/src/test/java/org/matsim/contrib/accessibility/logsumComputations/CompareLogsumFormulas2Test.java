@@ -23,16 +23,22 @@
 package org.matsim.contrib.accessibility.logsumComputations;
 
 import org.junit.Assert;
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thomas
  *
  */
-public class CompareLogsumFormulas2Test extends MatsimTestCase {
+public class CompareLogsumFormulas2Test {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@org.junit.Test public void testLogsumFormulas(){
+
+	@Test public void testLogsumFormulas(){
 
 		double walkTravelTime2Network = 2.; // 2min
 		double travelTimeOnNetwork = 6.;	// 6min

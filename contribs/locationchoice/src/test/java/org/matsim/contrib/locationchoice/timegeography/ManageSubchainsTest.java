@@ -21,6 +21,8 @@ package org.matsim.contrib.locationchoice.timegeography;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,13 +30,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.Initializer;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class ManageSubchainsTest extends MatsimTestCase {
+public class ManageSubchainsTest {
 
-	@org.junit.Test public void testPrimarySecondaryActivityFound() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testPrimarySecondaryActivityFound() {
 		Initializer initializer = new Initializer();
-		initializer.init(this);
+		initializer.init(utils);
 		ManageSubchains manager = new ManageSubchains();
 
         Plan plan = initializer.getControler().getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();

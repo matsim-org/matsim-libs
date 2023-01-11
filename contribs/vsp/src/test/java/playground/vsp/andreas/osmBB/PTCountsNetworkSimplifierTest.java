@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -31,18 +33,20 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 import junit.framework.Assert;
 
-public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
+public class PTCountsNetworkSimplifierTest {
 
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Test simple network
 	 */
 
-	@org.junit.Test public void testSimplifyEmptyNetwork(){
+	@Test public void testSimplifyEmptyNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -81,7 +85,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 * Test pt link
 	 */
 
-	@org.junit.Test public void testSimplifyPTNetwork(){
+	@Test public void testSimplifyPTNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -124,7 +128,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 * Test links with count stations
 	 */
 
-	@org.junit.Test public void testSimplifyCountsNetwork(){
+	@Test public void testSimplifyCountsNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -169,7 +173,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 * Test PT and Counts at once
 	 */
 
-	@org.junit.Test public void testSimplifyPTCountsNetwork(){
+	@Test public void testSimplifyPTCountsNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -217,7 +221,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 * Test additional links marked as blocked
 	 */
 
-	@org.junit.Test public void testSimplifyElseNetwork(){
+	@Test public void testSimplifyElseNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 
@@ -269,7 +273,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 * Test all at once
 	 */
 
-	@org.junit.Test public void testSimplifyAllNetwork(){
+	@Test public void testSimplifyAllNetwork(){
 		String inputPath = utils.getClassInputDirectory();
 		String outputPath = utils.getOutputDirectory();
 

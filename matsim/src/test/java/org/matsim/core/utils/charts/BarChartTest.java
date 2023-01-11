@@ -29,20 +29,26 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Test for {@link BarChart}
  *
  * @author mrieser
  */
-public class BarChartTest extends MatsimTestCase {
+public class BarChartTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Test that a file was really generated, and that the image, when loaded, has the specified size.
 	 * @throws IOException possible exception when reading the image for validation
 	 */
-	@org.junit.Test public void testBarChartDemo() throws IOException {
+	@Test public void testBarChartDemo() throws IOException {
 		System.setProperty("java.awt.headless", "true");
 
 		String imageFilename = utils.getOutputDirectory() + "barchart.png";

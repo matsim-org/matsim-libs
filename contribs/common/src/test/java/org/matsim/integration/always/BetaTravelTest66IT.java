@@ -32,6 +32,8 @@ import javax.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -69,7 +71,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * This TestCase should ensure the correct behavior of agents when different
@@ -86,7 +88,11 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class BetaTravelTest66IT extends MatsimTestCase {
+public class BetaTravelTest66IT {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/* This TestCase uses a custom Controler, named TestControler, to load
 	 * specific strategies. The strategies make use of a test-specific
@@ -124,7 +130,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	@org.junit.Test public void testBetaTravel_66() {
+	@Test public void testBetaTravel_66() {
 		Config config = utils.loadConfig("../../examples/scenarios/equil/config.xml");
 		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);

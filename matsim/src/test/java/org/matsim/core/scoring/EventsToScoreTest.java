@@ -21,6 +21,8 @@
 package org.matsim.core.scoring;
 
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -35,17 +37,21 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class EventsToScoreTest extends MatsimTestCase {
+public class EventsToScoreTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
 	 */
-	@org.junit.Test public void testAddMoney() {
+	@Test public void testAddMoney() {
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = scenario.getPopulation();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -61,7 +67,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		Assert.assertEquals(3.4, e2s.getAgentScore(person.getId()), 0);
 	}
 
-	@org.junit.Test public void testMsaAveraging() {
+	@Test public void testMsaAveraging() {
 		Config config = ConfigUtils.createConfig() ;
 
 		config.controler().setFirstIteration(10);

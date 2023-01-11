@@ -2,11 +2,17 @@ package org.matsim.contrib.locationchoice.timegeography;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class SubChainTest extends MatsimTestCase {
+public class SubChainTest {
 
-	@org.junit.Test public void testConstructorandGetSlActs() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testConstructorandGetSlActs() {
 		SubChain subchain = new SubChain();
 		assertNotNull(subchain.getSlActs());
 	}

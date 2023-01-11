@@ -28,6 +28,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,14 +42,17 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class WalkTravelTimeTest extends MatsimTestCase {
+public class WalkTravelTimeTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final Logger log = LogManager.getLogger(WalkTravelTimeTest.class);
 
-	@org.junit.Test public void testLinkTravelTimeCalculation() {
+	@Test public void testLinkTravelTimeCalculation() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
@@ -161,7 +166,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		log.info(sb.toString());
 	}
 
-	@org.junit.Test public void testThreadLocals() {
+	@Test public void testThreadLocals() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

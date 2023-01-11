@@ -28,6 +28,8 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +46,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.SAXException;
@@ -58,9 +59,13 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class TransitScheduleFormatV1Test extends MatsimTestCase {
+public class TransitScheduleFormatV1Test {
 
-	@org.junit.Test public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		Network network = NetworkUtils.createNetwork();
         Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));

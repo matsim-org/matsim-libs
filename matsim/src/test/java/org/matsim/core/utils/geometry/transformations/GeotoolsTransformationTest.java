@@ -20,17 +20,23 @@
 
 package org.matsim.core.utils.geometry.transformations;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author laemmel
  *
  */
-public class GeotoolsTransformationTest extends MatsimTestCase {
+public class GeotoolsTransformationTest {
 
-	@org.junit.Test public void testTransform(){
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testTransform(){
 		String toCRS = "WGS84";
 		String fromCRS = "WGS84_UTM47S";
 

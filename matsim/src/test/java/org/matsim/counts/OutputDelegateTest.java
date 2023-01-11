@@ -27,16 +27,22 @@ import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.counts.algorithms.graphs.helper.OutputDelegate;
 import org.matsim.counts.algorithms.graphs.helper.Section;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class OutputDelegateTest extends MatsimTestCase {
+public class OutputDelegateTest {
 
-	@org.junit.Test public void testOutputHtml() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testOutputHtml() {
 			CountsFixture fixture = new CountsFixture();
 			fixture.setUp();
 

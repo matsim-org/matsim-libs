@@ -20,13 +20,19 @@
 
 package playground.vsp.zzArchive.bvwpOld;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 
 
-public class BvwpTest extends MatsimTestCase {
+public class BvwpTest {
 
-	@org.junit.Test public void testOne() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testOne() {
 
 		Values economicValues = EconomicValues.createEconomicValuesForTest1();
 

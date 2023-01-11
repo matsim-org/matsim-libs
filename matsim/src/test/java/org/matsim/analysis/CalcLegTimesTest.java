@@ -23,7 +23,11 @@ package org.matsim.analysis;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -47,10 +51,14 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 
-public class CalcLegTimesTest extends MatsimTestCase {
+public class CalcLegTimesTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	public static final String BASE_FILE_NAME = "legdurations.txt";
 	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
@@ -59,7 +67,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 	private Population population = null;
 	private Network network = null;
 
-	@org.junit.Before public void setUp() {
+	@Before public void setUp() {
 		utils.loadConfig((String)null);
 
 		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -89,12 +97,12 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.network.addLink(link);
 	}
 
-	@org.junit.After public void tearDown() {
+	@After public void tearDown() {
 		this.population = null;
 		this.network = null;
 	}
 
-	@org.junit.Test public void testNoEvents() throws IOException {
+	@Test public void testNoEvents() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
@@ -106,7 +114,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.runTest(testee);
 	}
 
-	@org.junit.Test public void testAveraging() throws IOException {
+	@Test public void testAveraging() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 

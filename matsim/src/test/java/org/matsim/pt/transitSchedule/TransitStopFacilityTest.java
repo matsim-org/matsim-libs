@@ -22,18 +22,23 @@ package org.matsim.pt.transitSchedule;
 
 import static org.junit.Assert.*;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
  * @author mrieser
  */
-public class TransitStopFacilityTest extends MatsimTestCase {
+public class TransitStopFacilityTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * In case we once should have more than one implementation of
@@ -48,7 +53,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		return new TransitStopFacilityImpl(id, coord, isBlockingLane);
 	}
 
-	@org.junit.Test public void testInitialization() {
+	@Test public void testInitialization() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
@@ -58,7 +63,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		assertFalse(stop.getIsBlockingLane());
 	}
 
-	@org.junit.Test public void testBlockingStop() {
+	@Test public void testBlockingStop() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
@@ -67,7 +72,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		assertTrue(stop.getIsBlockingLane());
 	}
 
-	@org.junit.Test public void testLink() {
+	@Test public void testLink() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
@@ -79,7 +84,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		assertNull(stop.getLinkId());
 	}
 
-	@org.junit.Test public void testName() {
+	@Test public void testName() {
 		Id<TransitStopFacility> id = Id.create(9791, TransitStopFacility.class);
 		Coord coord = new Coord((double) 10, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);

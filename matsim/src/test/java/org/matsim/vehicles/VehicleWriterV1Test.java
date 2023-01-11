@@ -26,15 +26,21 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author dgrether
  * @author kturner
  */
-public class VehicleWriterV1Test extends MatsimTestCase {
+public class VehicleWriterV1Test {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	private static final Logger log = LogManager.getLogger(VehicleWriterV1Test.class);
 
 	private static final String TESTXML = "testVehicles_v1.xml";
@@ -43,7 +49,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 	private Id<Vehicle> id42;
 	private Id<Vehicle> id42_23;
 
-	@org.junit.Before public void setUp() {
+	@Before public void setUp() {
 
 		id23 = Id.create("23", Vehicle.class);
 		id42 = Id.create("42", Vehicle.class);
@@ -53,7 +59,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		id42_23 = Id.create(" 42  23", Vehicle.class);
 	}
 
-	@org.junit.Test public void testWriter() {
+	@Test public void testWriter() {
 
 		String outfileName = utils.getOutputDirectory() + "testOutputVehicles.xml";
 

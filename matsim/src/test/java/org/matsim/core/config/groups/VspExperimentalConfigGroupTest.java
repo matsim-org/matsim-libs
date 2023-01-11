@@ -22,13 +22,19 @@ package org.matsim.core.config.groups;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class VspExperimentalConfigGroupTest extends MatsimTestCase {
+public class VspExperimentalConfigGroupTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final Logger log = LogManager.getLogger(VspExperimentalConfigGroupTest.class);
 
-	@org.junit.Test public void testVspConfigGroup() {
+	@Test public void testVspConfigGroup() {
 
 //		VspExperimentalConfigGroup vspConfig = ConfigUtils.createConfig().vspExperimental() ;
 //

@@ -23,12 +23,18 @@
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 
-public class TestMessageQueue extends MatsimTestCase {
-	@org.junit.Test public void testPutMessage1(){
+public class TestMessageQueue {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test public void testPutMessage1(){
 		MessageQueue mq=new MessageQueue();
 		Message m1=new DummyMessage();
 		m1.setMessageArrivalTime(1);
@@ -42,7 +48,7 @@ public class TestMessageQueue extends MatsimTestCase {
 		assertEquals(true, mq.getNextMessage()==m1);
 	}
 
-	@org.junit.Test public void testPutMessage2(){
+	@Test public void testPutMessage2(){
 		MessageQueue mq=new MessageQueue();
 		Message m1=new DummyMessage();
 		m1.setMessageArrivalTime(2);
@@ -56,7 +62,7 @@ public class TestMessageQueue extends MatsimTestCase {
 		assertEquals(true, mq.getNextMessage()==m2);
 	}
 
-	@org.junit.Test public void testPutMessage3(){
+	@Test public void testPutMessage3(){
 		MessageQueue mq=new MessageQueue();
 		Message m1=new DummyMessage();
 		m1.setMessageArrivalTime(2);
@@ -74,7 +80,7 @@ public class TestMessageQueue extends MatsimTestCase {
 		assertEquals(true, mq.getNextMessage().getMessageArrivalTime()==1);
 	}
 
-	@org.junit.Test public void testRemoveMessage1(){
+	@Test public void testRemoveMessage1(){
 		MessageQueue mq=new MessageQueue();
 		Message m1=new DummyMessage();
 		m1.setMessageArrivalTime(1);
@@ -90,7 +96,7 @@ public class TestMessageQueue extends MatsimTestCase {
 		assertEquals(0, mq.getQueueSize());
 	}
 
-	@org.junit.Test public void testRemoveMessage2(){
+	@Test public void testRemoveMessage2(){
 		MessageQueue mq=new MessageQueue();
 		Message m1=new DummyMessage();
 		m1.setMessageArrivalTime(1);
@@ -106,7 +112,7 @@ public class TestMessageQueue extends MatsimTestCase {
 		assertEquals(0, mq.getQueueSize());
 	}
 
-	@org.junit.Test public void testRemoveMessage3(){
+	@Test public void testRemoveMessage3(){
 		MessageQueue mq=new MessageQueue();
 		Message m1=new DummyMessage();
 		m1.setMessageArrivalTime(1);
@@ -126,7 +132,7 @@ public class TestMessageQueue extends MatsimTestCase {
 
 	// a higher priority message will be at front of queue, if there are
 	// several messages with same time
-	@org.junit.Test public void testMessagePriority(){
+	@Test public void testMessagePriority(){
 		MessageQueue mq=new MessageQueue();
 		Message m1=new DummyMessage();
 		m1.setMessageArrivalTime(1);

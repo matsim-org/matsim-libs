@@ -29,6 +29,8 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -45,19 +47,23 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
 
 /**
  * @author mrieser
  */
-public class TransitScheduleReaderTest extends MatsimTestCase {
+public class TransitScheduleReaderTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
 
-	@org.junit.Test public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
+	@Test public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
 		final String inputDir = utils.getClassInputDirectory();
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -92,7 +98,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		assertEquals("wrong number of links in route.", 4, route.getLinkIds().size());
 	}
 
-	@org.junit.Test public void testReadFile() throws IOException, SAXException, ParserConfigurationException {
+	@Test public void testReadFile() throws IOException, SAXException, ParserConfigurationException {
 		final String inputDir = utils.getClassInputDirectory();
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());

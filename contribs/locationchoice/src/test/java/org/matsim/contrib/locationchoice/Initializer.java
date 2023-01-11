@@ -34,15 +34,15 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class Initializer {
 
 	private Controler controler;
 
-	public void init(MatsimTestCase testCase) {
+	public void init(MatsimTestUtils utils) {
 		// lnk does not work. get path to locationchcoice
-		String path = testCase.utils.getPackageInputDirectory() + "config.xml";
+		String path = utils.getPackageInputDirectory() + "config.xml";
 
 		Config config = ConfigUtils.loadConfig(path, new DestinationChoiceConfigGroup());
 

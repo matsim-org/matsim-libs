@@ -26,17 +26,25 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author dgrether
  */
-public class ControlerEventsTest extends MatsimTestCase {
+public class ControlerEventsTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private List<Integer> calledStartupListener = null;
 
@@ -44,15 +52,15 @@ public class ControlerEventsTest extends MatsimTestCase {
 		this.calledStartupListener.add(i);
 	}
 
-	@org.junit.Before public void setUp() {
+	@Before public void setUp() {
 		this.calledStartupListener = new ArrayList<>(3);
 	}
 
-	@org.junit.After public void tearDown() {
+	@After public void tearDown() {
 		this.calledStartupListener = null;
 	}
 
-	@org.junit.Test public void testCoreListenerExecutionOrder() {
+	@Test public void testCoreListenerExecutionOrder() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);
@@ -69,7 +77,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 		assertEquals(1, this.calledStartupListener.get(2).intValue());
 	}
 
-	@org.junit.Test public void testEvents() {
+	@Test public void testEvents() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);

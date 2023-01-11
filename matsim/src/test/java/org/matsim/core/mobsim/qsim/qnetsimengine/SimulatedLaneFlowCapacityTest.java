@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,7 +59,6 @@ import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 import org.matsim.lanes.LanesFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -66,7 +67,10 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author tthunig
  *
  */
-public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
+public class SimulatedLaneFlowCapacityTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * create this network:
@@ -203,7 +207,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 	 * test simulated capacity of link 1 in case without lanes.
 	 * the capacity should correspond to the given flow capacity of the link
 	 */
-	@org.junit.Test public void testCapacityWoLanes() {
+	@Test public void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
@@ -230,7 +234,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 	 * test simulated capacities of link 1 in case of one lane representing one lane.
 	 * the capacity of the link should correspond to the capacity of the lane, also when it is less than the link capacity given in the network.
 	 */
-	@org.junit.Test public void testCapacityWithOneLaneOneLane() {
+	@Test public void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
@@ -261,7 +265,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 	 * test simulated capacities of link 1 in case of one lane representing two lanes.
 	 * the capacity of the link should correspond to the capacity of the lane, also when it is less than the link capacity given in the network.
 	 */
-	@org.junit.Test public void testCapacityWithOneLaneTwoLanes() {
+	@Test public void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
@@ -293,7 +297,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 	 * Interestingly, it also corresponds to this sum, if it is more than the link capacity given in the network.
 	 * And, finally, it still only uses the lane capacity given in the network, when it is higher than the link capacity (see lane 2 here).
 	 */
-	@org.junit.Test public void testCapacityWithThreeLanes() {
+	@Test public void testCapacityWithThreeLanes() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);

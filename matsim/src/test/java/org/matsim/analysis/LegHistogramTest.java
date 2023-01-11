@@ -24,6 +24,8 @@ import static org.junit.Assert.*;
 
 import java.util.Set;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,19 +38,23 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class LegHistogramTest extends MatsimTestCase {
+public class LegHistogramTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Tests that different modes of transport are recognized and accounted
 	 * accordingly.  Also tests that modes not defined as constants are
 	 * handled correctly.
 	 */
-	@org.junit.Test public void testDeparturesMiscModes() {
+	@Test public void testDeparturesMiscModes() {
 		Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -101,7 +107,7 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * taken into account and that times larger than what is covered by the bins
 	 * do not lead to an exception.
 	 */
-	@org.junit.Test public void testNofBins() {
+	@Test public void testNofBins() {
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -141,7 +147,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		assertEquals(2, histo.getArrivals()[10]);
 	}
 
-	@org.junit.Test public void testReset() {
+	@Test public void testReset() {
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));

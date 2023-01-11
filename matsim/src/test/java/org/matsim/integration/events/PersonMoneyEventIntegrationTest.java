@@ -26,6 +26,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -34,16 +36,19 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
 /**
  * @author mrieser
  */
-public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
+public class PersonMoneyEventIntegrationTest {
 
-	@org.junit.Test public void testWriteReadXxml() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testWriteReadXxml() {
 		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, Id.create(1, Person.class), 2.34, "tollRefund", "motorwayOperator");
 		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, Id.create(2, Person.class), -3.45, "toll", "motorwayOperator");
 
@@ -95,7 +100,7 @@ public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 	 * This test checks that old event files can still be parsed.
 	 * @throws IOException
 	 */
-	@org.junit.Test public void testWriteReadXml_oldName() throws IOException {
+	@Test public void testWriteReadXml_oldName() throws IOException {
 
 		// write some events to file
 

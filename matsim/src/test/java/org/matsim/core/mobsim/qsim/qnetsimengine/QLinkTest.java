@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -64,7 +66,6 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
@@ -85,7 +86,11 @@ import org.matsim.vehicles.VehicleUtils;
  */
 
 @RunWith(Parameterized.class)
-public final class QLinkTest extends MatsimTestCase {
+public final class QLinkTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	private static final Logger logger = LogManager.getLogger( QLinkTest.class );
 
 	private final boolean isUsingFastCapacityUpdate;
@@ -101,7 +106,7 @@ public final class QLinkTest extends MatsimTestCase {
 	}
 
 
-	@org.junit.Test public void testInit() {
+	@Test public void testInit() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertNotNull(f.qlink1);
 		assertEquals(1.0, f.qlink1.getSimulatedFlowCapacityPerTimeStep(), MatsimTestUtils.EPSILON);
@@ -115,7 +120,7 @@ public final class QLinkTest extends MatsimTestCase {
 	}
 
 
-	@org.junit.Test public void testAdd() {
+	@Test public void testAdd() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
 		QVehicle v = new QVehicleImpl(f.basicVehicle);
@@ -146,7 +151,7 @@ public final class QLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 
-	@org.junit.Test public void testGetVehicle_Driving() {
+	@Test public void testGetVehicle_Driving() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -211,7 +216,7 @@ public final class QLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 
-	@org.junit.Test public void testGetVehicle_Parking() {
+	@Test public void testGetVehicle_Parking() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -248,7 +253,7 @@ public final class QLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 
-	@org.junit.Test public void testGetVehicle_Departing() {
+	@Test public void testGetVehicle_Departing() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
@@ -312,7 +317,7 @@ public final class QLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 
-	@org.junit.Test public void testBuffer() {
+	@Test public void testBuffer() {
 		Config conf = utils.loadConfig((String)null);
 
 		conf.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
@@ -435,7 +440,7 @@ public final class QLinkTest extends MatsimTestCase {
 	}
 
 
-	@org.junit.Test public void testStorageSpaceDifferentVehicleSizes() {
+	@Test public void testStorageSpaceDifferentVehicleSizes() {
 
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -536,7 +541,7 @@ public final class QLinkTest extends MatsimTestCase {
 	}
 
 
-	@org.junit.Test public void testStuckEvents() {
+	@Test public void testStuckEvents() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().qsim().setStuckTime(100);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);

@@ -21,14 +21,19 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class ConfigParameterTest extends MatsimTestCase {
+public class ConfigParameterTest {
 
-	@org.junit.Test public void testParametersSetCorrectly() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testParametersSetCorrectly() {
 		Config config = utils.loadConfig(utils.getPackageInputDirectory() + "config.xml");
 		JDEQSimConfigGroup jdeqSimConfigGroup = ConfigUtils.addOrGetModule(config, JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class);
 		assertEquals(360.0, jdeqSimConfigGroup.getSimulationEndTime().seconds(), MatsimTestUtils.EPSILON);

@@ -24,6 +24,8 @@ import static org.junit.Assert.assertTrue;
 
 import javax.inject.Provider;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -49,7 +51,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Tests the functionality of {@link TimeAllocationMutatorModule}, mainly that the
@@ -57,28 +59,32 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
+public class TimeAllocationMutatorModuleTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Tests that the mutation range given in the constructor is respected.
 	 *
 	 * @author mrieser
 	 */
-	@org.junit.Test public void testMutationRangeParam() {
+	@Test public void testMutationRangeParam() {
 		boolean affectingDuration = true ;
 
 		runMutationRangeTest(new TripPlanMutateTimeAllocation(750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
 		runMutationRangeTest(new TripPlanMutateTimeAllocation(7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
-	@org.junit.Test public void testSimplifiedMutation() {
+	@Test public void testSimplifiedMutation() {
 		boolean affectingDuration = true ;
 
 		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
 		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
-	@org.junit.Test public void testSubpopulations() {
+	@Test public void testSubpopulations() {
 
 		String cbSubpopulation = "cb";
 		String freightSubpopulation = "freight";

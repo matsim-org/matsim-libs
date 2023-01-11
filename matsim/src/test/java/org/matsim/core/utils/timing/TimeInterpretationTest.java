@@ -24,6 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,11 +44,15 @@ import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class TimeInterpretationTest extends MatsimTestCase {
+public class TimeInterpretationTest {
 
-	@org.junit.Test public void testIgnoreDelays() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testIgnoreDelays() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setTripDurationHandling(TripDurationHandling.ignoreDelays);
 
@@ -66,7 +72,7 @@ public class TimeInterpretationTest extends MatsimTestCase {
 	}
 
 
-	@org.junit.Test public void testShiftActivityEndTime() {
+	@Test public void testShiftActivityEndTime() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setTripDurationHandling(TripDurationHandling.shiftActivityEndTimes);
 

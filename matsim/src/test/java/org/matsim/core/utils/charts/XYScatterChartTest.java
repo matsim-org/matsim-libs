@@ -29,20 +29,26 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Test for {@link XYScatterChart}
  *
  * @author mrieser
  */
-public class XYScatterChartTest extends MatsimTestCase {
+public class XYScatterChartTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Test that a file was really generated, and that the image, when loaded, has the specified size.
 	 * @throws IOException possible exception when reading the image for validation
 	 */
-	@org.junit.Test public void testXYScatterChartDemo() throws IOException {
+	@Test public void testXYScatterChartDemo() throws IOException {
 		String imageFilename = utils.getOutputDirectory() + "xyscatterchart.png";
 		Demo demo = new Demo();
 		demo.createXYScatterChart(imageFilename);

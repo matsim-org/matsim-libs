@@ -24,6 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import javax.inject.Inject;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -35,16 +37,20 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.withinday.controller.WithinDayModule;
 
 /**
  * @author cdobler
  */
-public class LinkReplanningMapTest extends MatsimTestCase {
+public class LinkReplanningMapTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@org.junit.Test public void testScenarioRun() {
+
+	@Test public void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");

@@ -22,6 +22,8 @@ package org.matsim.core.network;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +34,6 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -40,9 +41,13 @@ import org.matsim.testcases.MatsimTestUtils;
  * used with a time variant network.
  *
  */
-public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
+public class TravelTimeCalculatorIntegrationTest {
 
-	@org.junit.Test public void testTravelTimeCalculatorArray() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testTravelTimeCalculatorArray() {
         for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
 			Config config = utils.loadConfig((String)null);
 
@@ -83,7 +88,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
         }
 	}
 
-	@org.junit.Test public void testTravelTimeCalculatorHashMap() {
+	@Test public void testTravelTimeCalculatorHashMap() {
         for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
 			Config config = utils.loadConfig((String)null);
 

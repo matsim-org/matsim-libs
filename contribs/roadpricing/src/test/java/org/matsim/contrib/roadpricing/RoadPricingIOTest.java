@@ -25,12 +25,13 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.util.Iterator;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -38,12 +39,16 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  * @author mrieser
  */
-public class RoadPricingIOTest extends MatsimTestCase {
+public class RoadPricingIOTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Tests reader and writer to ensure that reading and writing does not modify the schemes.
 	 */
-	@org.junit.Test public void testWriteReadWrite() {
+	@Test public void testWriteReadWrite() {
 		final String origFile = utils.getClassInputDirectory() + "roadpricing1.xml";
 		final String tmpFile1 = utils.getOutputDirectory() + "roadpricing1.xml";
 		final String tmpFile2 = utils.getOutputDirectory() + "roadpricing2.xml";

@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -62,9 +64,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class EditRoutesTest extends MatsimTestCase {
+public class EditRoutesTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	// yyyy This test relies heavily on position counting in plans.  With the introduction of intermediate walk legs the positions changed.
 	// I tried to guess the correct indices, but it would be more honest to change this to TripStructureUtils.  kai, feb'16
 	// h--wlk--iact--car--iact--w  ==> car = 3
@@ -81,7 +87,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	/**
 	 * @author cdobler
 	 */
-	@org.junit.Test public void testReplanFutureLegRoute() {
+	@Test public void testReplanFutureLegRoute() {
 		// this is ok (we can still replan a single leg with the computer science router). kai, dec'15
 
 		createScenario();
@@ -138,7 +144,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(3, networkRouteWH.getLinkIds().size());	// l4, l5, l2
 	}
 
-	@org.junit.Test public void testRelocateFutureLegRoute() {
+	@Test public void testRelocateFutureLegRoute() {
 		// yyyy this test is misleading.  "relocateFutureLegRoute"  is ok, but it does not look after the overall plan consistency,
 		// as this test implies.  kai, feb'16
 
@@ -220,7 +226,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	/**
 	 * @author cdobler
 	 */
-	@org.junit.Test public void testReplanCurrentLegRouteOne()
+	@Test public void testReplanCurrentLegRouteOne()
 	// this is ok (we can still replan a single leg with the computer science router). kai, dec'15
 	{
 		createScenario();
@@ -264,7 +270,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 4, 8.0*3600 )); // WH, end Link
 
 	}
-	@org.junit.Test public void testReplanCurrentLegRouteTwo()
+	@Test public void testReplanCurrentLegRouteTwo()
 	{
 		/*
 		 *  replace destinations and create new routes
@@ -291,7 +297,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		log.warn( route );
 		assertEquals(true, checkRouteValidity(route));
 	}
-	@org.junit.Test public void testReplanCurrentLegRouteThree()
+	@Test public void testReplanCurrentLegRouteThree()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
@@ -311,7 +317,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
 		assertEquals(true, checkRouteValidity(route));
 	}
-	@org.junit.Test public void testReplanCurrentLegRouteFour()
+	@Test public void testReplanCurrentLegRouteFour()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
@@ -331,7 +337,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
 		assertEquals(true, checkRouteValidity(route));
 	}
-	@org.junit.Test public void testReplanCurrentLegRouteFive()
+	@Test public void testReplanCurrentLegRouteFive()
 	{
 		// create new routes for WH-trip
 		createScenario();	// reset scenario
@@ -351,7 +357,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 0, 8.0*3600 ));	// WH, start Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 	}
-	@org.junit.Test public void testReplanCurrentLegRouteSix()
+	@Test public void testReplanCurrentLegRouteSix()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
@@ -370,7 +376,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 1, 8.0*3600 ));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 	}
-	@org.junit.Test public void testReplanCurrentLegRouteSeven()
+	@Test public void testReplanCurrentLegRouteSeven()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
@@ -389,7 +395,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 2, 8.0*3600 ));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 	}
-	@org.junit.Test public void testReplanCurrentLegRouteEight()
+	@Test public void testReplanCurrentLegRouteEight()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
@@ -408,7 +414,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 3, 8.0*3600 ) );	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 	}
-	@org.junit.Test public void testReplanCurrentLegRouteNine()
+	@Test public void testReplanCurrentLegRouteNine()
 	{
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
@@ -428,7 +434,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 
 	}
-	@org.junit.Test public void testReplanCurrentLegRouteTen()
+	@Test public void testReplanCurrentLegRouteTen()
 	{
 		// expect EditRoutes to return false if the Route in the leg is not a NetworkRoute
 		createScenario();	// reset scenario

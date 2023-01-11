@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -47,7 +48,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	/**
 	 * Test that each of a person's plans is randomly selected.
 	 */
-	@org.junit.Test public void testRandom() {
+	@Test public void testRandom() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan1 = PersonUtils.createAndAddPlan(person, false);
 		Plan plan2 = PersonUtils.createAndAddPlan(person, false);

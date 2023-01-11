@@ -22,13 +22,14 @@ package org.matsim.api.core.v01;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -36,9 +37,13 @@ import org.matsim.testcases.MatsimTestUtils;
  * Test of api based network creation
  * @author dgrether
  */
-public class NetworkCreationTest extends MatsimTestCase {
+public class NetworkCreationTest {
 
-	@org.junit.Test public void testCreateNetwork() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testCreateNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Id<Node> nodeId1 = Id.create("1", Node.class);

@@ -23,13 +23,18 @@
 package org.matsim.contrib.accessibility.logsumComputations;
 
 import org.junit.Assert;
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thomas
  *
  */
-public class ComputeLogsumFormulas3Test extends MatsimTestCase{
+public class ComputeLogsumFormulas3Test {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * underlying network
@@ -43,7 +48,7 @@ public class ComputeLogsumFormulas3Test extends MatsimTestCase{
 	 */
 	@SuppressWarnings("static-method")
 
-	@org.junit.Test public void testLogsumFormulas(){
+	@Test public void testLogsumFormulas(){
 		double betaWalkTT = -10. / 3600.0;	// [util/sec]
 		double betaWalkTD = -10.;			// [util/meter]
 

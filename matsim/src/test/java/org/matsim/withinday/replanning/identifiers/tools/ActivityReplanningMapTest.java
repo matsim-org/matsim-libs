@@ -27,6 +27,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -45,14 +47,18 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.withinday.controller.WithinDayModule;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
-public class ActivityReplanningMapTest extends MatsimTestCase {
+public class ActivityReplanningMapTest {
 
-	@org.junit.Test public void testGetTimeBin() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testGetTimeBin() {
 		ActivityReplanningMap arp = new ActivityReplanningMap(null, EventsUtils.createEventsManager());
 
 		// test default setting with start time = 0.0 and time step size = 1.0
@@ -91,7 +97,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		assertEquals(2, arp.getTimeBin(12.1));
 	}
 
-	@org.junit.Test public void testScenarioRun() {
+	@Test public void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");

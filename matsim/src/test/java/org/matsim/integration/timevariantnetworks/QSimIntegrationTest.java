@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +63,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsLogger;
 import org.matsim.vehicles.Vehicle;
@@ -72,9 +73,13 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public class QSimIntegrationTest extends MatsimTestCase {
+public class QSimIntegrationTest {
 
-	@org.junit.Test public void testFreespeed() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testFreespeed() {
 		Config config = utils.loadConfig((String)null);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -120,7 +125,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 *
 	 * @author illenberger
 	 */
-	@org.junit.Test public void testCapacity() {
+	@Test public void testCapacity() {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
@@ -191,7 +196,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 *
 	 * @author dgrether
 	 */
-	@org.junit.Test public void testZeroCapacity() {
+	@Test public void testZeroCapacity() {
 		final double capacityFactor = 0.0;
 
 		Config config = utils.loadConfig((String)null);

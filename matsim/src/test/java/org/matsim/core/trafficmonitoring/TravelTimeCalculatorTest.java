@@ -33,6 +33,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -58,7 +60,6 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
@@ -67,11 +68,15 @@ import org.xml.sax.SAXException;
 /**
  * @author mrieser
  */
-public class TravelTimeCalculatorTest extends MatsimTestCase {
+public class TravelTimeCalculatorTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private final static Logger log = LogManager.getLogger(TravelTimeCalculatorTest.class);
 
-	@org.junit.Test public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
+	@Test public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 
 		int endTime = 30*3600;
 		int binSize = 15*60;
@@ -86,7 +91,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 				travelTimeAggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
-	@org.junit.Test public final void testTravelTimeCalculator_Array_Optimistic_LinearInterpolation() throws IOException {
+	@Test public final void testTravelTimeCalculator_Array_Optimistic_LinearInterpolation() throws IOException {
 
 		int endTime = 30*3600;
 		int binSize = 15*60;
@@ -101,7 +106,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 				aggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
-	@org.junit.Test public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
+	@Test public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
 
 		int endTime = 30*3600;
 		int binSize = 15*60;
@@ -116,7 +121,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 				travelTimeAggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
-	@org.junit.Test public final void testTravelTimeCalculator_HashMap_Optimistic_LinearInterpolation() throws IOException {
+	@Test public final void testTravelTimeCalculator_HashMap_Optimistic_LinearInterpolation() throws IOException {
 		String compareFile;
 		MutableScenario scenario;
 		TimeSlotComputation aggregator;
@@ -134,7 +139,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 				aggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
-//	@org.junit.Test public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
+//	@Test public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
 //		String compareFile;
 //		MutableScenario scenario;
 //		TravelTimeAggregator aggregator;
@@ -152,7 +157,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 //				aggregator, binSize, endTime, compareFile, false);
 //	}
 //
-//	@org.junit.Test public final void testTravelTimeCalculator_HashMap_Pessimistic_LinearInterpolation() throws IOException {
+//	@Test public final void testTravelTimeCalculator_HashMap_Pessimistic_LinearInterpolation() throws IOException {
 //		String compareFile;
 //		MutableScenario scenario;
 //		TravelTimeAggregator aggregator;
@@ -254,7 +259,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 *
 	 * @author mrieser, tthunig
 	 */
-	@org.junit.Test public void testLongTravelTimeInEmptySlot() {
+	@Test public void testLongTravelTimeInEmptySlot() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
@@ -290,7 +295,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 *
 	 * @author tthunig
 	 */
-	@org.junit.Test public void testInterpolatedTravelTimes() {
+	@Test public void testInterpolatedTravelTimes() {
 		Config config = ConfigUtils.createConfig();
 		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
 		int timeBinSize = 15*60;
@@ -337,7 +342,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 */
-	@org.junit.Test public void testReadFromFile_LargeScenarioCase() throws SAXException, ParserConfigurationException, IOException {
+	@Test public void testReadFromFile_LargeScenarioCase() throws SAXException, ParserConfigurationException, IOException {
 		/* Assume, you have a big events file from a huge scenario and you want to do data-mining...
 		 * Then you likely want to calculate link travel times. This requires the network, but NOT
 		 * the population. Thus, using "new Events(new EventsBuilderImpl(scenario))" is not appropriate
@@ -370,7 +375,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	/**
 	 * @author mrieser / senozon
 	 */
-	@org.junit.Test public void testGetLinkTravelTime_ignorePtVehiclesAtStop() {
+	@Test public void testGetLinkTravelTime_ignorePtVehiclesAtStop() {
 		Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -398,7 +403,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	/**
 	 * @author mrieser / senozon
 	 */
-	@org.junit.Test public void testGetLinkTravelTime_usePtVehiclesWithoutStop() {
+	@Test public void testGetLinkTravelTime_usePtVehiclesWithoutStop() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -428,7 +433,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * Expect that all link travel times are ignored.
 	 * @author cdobler
 	 */
-	@org.junit.Test public void testGetLinkTravelTime_NoAnalyzedModes() {
+	@Test public void testGetLinkTravelTime_NoAnalyzedModes() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -464,7 +469,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * Expect that walk legs are ignored.
 	 * @author cdobler
 	 */
-	@org.junit.Test public void testGetLinkTravelTime_CarAnalyzedModes() {
+	@Test public void testGetLinkTravelTime_CarAnalyzedModes() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -505,7 +510,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * Expect that still all modes are counted.
 	 * @author cdobler
 	 */
-	@org.junit.Test public void testGetLinkTravelTime_NoFilterModes() {
+	@Test public void testGetLinkTravelTime_NoFilterModes() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
@@ -546,7 +551,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * Expect that the default value (=car) will be used for the modes to be counted.
 	 * @author cdobler
 	 */
-	@org.junit.Test public void testGetLinkTravelTime_FilterDefaultModes() {
+	@Test public void testGetLinkTravelTime_FilterDefaultModes() {
         Network network = NetworkUtils.createNetwork();
         TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);

@@ -23,18 +23,23 @@
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class TestMessageFactory extends MatsimTestCase{
+public class TestMessageFactory {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	// check if gc turned on
-	@org.junit.Test public void testMessageFactory1(){
+	@Test public void testMessageFactory1(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(true);
 		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null, TimeInterpretation.create(ConfigUtils.createConfig())));
@@ -53,7 +58,7 @@ public class TestMessageFactory extends MatsimTestCase{
 	}
 
 	// check when gc turned off
-	@org.junit.Test public void testMessageFactory2(){
+	@Test public void testMessageFactory2(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
 		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null, TimeInterpretation.create(ConfigUtils.createConfig())));
@@ -72,7 +77,7 @@ public class TestMessageFactory extends MatsimTestCase{
 	}
 
 	// check check use of Message factory
-	@org.junit.Test public void testMessageFactory3(){
+	@Test public void testMessageFactory3(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
 		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null, TimeInterpretation.create(ConfigUtils.createConfig())));
@@ -98,7 +103,7 @@ public class TestMessageFactory extends MatsimTestCase{
 	}
 
 	// check initialization using constructer
-	@org.junit.Test public void testMessageFactory5(){
+	@Test public void testMessageFactory5(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(true);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
@@ -123,7 +128,7 @@ public class TestMessageFactory extends MatsimTestCase{
 	}
 
 	// check initialization using rest
-	@org.junit.Test public void testMessageFactory6(){
+	@Test public void testMessageFactory6(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
 		Scheduler scheduler=new Scheduler(new MessageQueue());

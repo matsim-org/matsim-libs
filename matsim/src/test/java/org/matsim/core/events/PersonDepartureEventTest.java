@@ -22,20 +22,25 @@ package org.matsim.core.events;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class PersonDepartureEventTest extends MatsimTestCase {
+public class PersonDepartureEventTest {
 
-	@org.junit.Test public void testWriteReadXml() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testWriteReadXml() {
 		final PersonDepartureEvent event = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml",
 				new PersonDepartureEvent(25669.05, Id.create("921", Person.class), Id.create("390", Link.class), TransportMode.bike, "bikeRoutingMode"));
 		assertEquals(25669.05, event.getTime(), MatsimTestUtils.EPSILON);

@@ -26,18 +26,24 @@ import static org.junit.Assert.assertFalse;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class ByteBufferUtilsTest extends MatsimTestCase {
+public class ByteBufferUtilsTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Tests {@link ByteBufferUtils#putString(java.nio.ByteBuffer, String)} and
 	 * {@link ByteBufferUtils#getString(java.nio.ByteBuffer)}.
 	 */
-	@org.junit.Test public void testPutGetString() {
+	@Test public void testPutGetString() {
 		final ByteBuffer buffer = ByteBuffer.allocate(100);
 		buffer.putInt(5);
 		ByteBufferUtils.putString(buffer, "foo bar");
@@ -59,7 +65,7 @@ public class ByteBufferUtilsTest extends MatsimTestCase {
 	 * Tests {@link ByteBufferUtils#putObject(java.nio.ByteBuffer, Serializable)} and
 	 * {@link ByteBufferUtils#getObject(java.nio.ByteBuffer)}.
 	 */
-	@org.junit.Test public void testPutGetObject() {
+	@Test public void testPutGetObject() {
 		final ByteBuffer buffer = ByteBuffer.allocate(100);
 		buffer.putInt(5);
 		ByteBufferUtils.putObject(buffer, "foo bar");

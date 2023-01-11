@@ -24,6 +24,8 @@ import static org.junit.Assert.*;
 
 import javax.inject.Provider;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -62,21 +64,25 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import com.google.inject.Inject;
 
-public class LocationChoiceIT extends MatsimTestCase {
+public class LocationChoiceIT {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 
 	/**
 	 * This is, as far as I can see, testing the {@link LocationChoicePlanStrategy}.  It will use the algo from the config, which is "random".  It is thus not using the frozen
 	 * epsilon approach.  kai, mar'19
 	 */
-	@org.junit.Test public void testLocationChoice() {
+	@Test public void testLocationChoice() {
 
 		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config2.xml");
 

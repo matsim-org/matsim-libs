@@ -22,17 +22,23 @@ package org.matsim.core.replanning;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class PlanStrategyTest extends MatsimTestCase {
+public class PlanStrategyTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * @author mrieser
 	 */
-	@org.junit.Test public void testGetNumberOfStrategyModules() {
+	@Test public void testGetNumberOfStrategyModules() {
 		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		assertEquals(0, strategy.getNumberOfStrategyModules());
 		strategy.addStrategyModule(new DummyStrategyModule());
