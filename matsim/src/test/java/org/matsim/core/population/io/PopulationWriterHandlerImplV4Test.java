@@ -67,7 +67,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		person.addPlan(plan);
 		pop.addPerson(person);
 
-		String filename = getOutputDirectory() + "population.xml";
+		String filename = utils.getOutputDirectory() + "population.xml";
 		new PopulationWriter(pop, network).writeV4(filename);
 
 		Population pop2 = scenario.getPopulation();

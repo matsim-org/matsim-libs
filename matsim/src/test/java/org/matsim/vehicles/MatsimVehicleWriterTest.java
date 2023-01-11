@@ -56,14 +56,14 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 
 	@org.junit.Test public void testWriter() throws FileNotFoundException, IOException {
 		{
-			String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
+			String outfileName = utils.getOutputDirectory() + "testOutputVehicles.xml";
 
 			// create empty vehicles container:
 			Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 			// read, which will be v1:
 			MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
-			reader.readFile(this.getPackageInputDirectory() + TESTXML);
+			reader.readFile(utils.getPackageInputDirectory() + TESTXML);
 
 			VehicleType vehType = vehicles.getVehicleTypes().get(Id.create("normal&Car", VehicleType.class));
 
@@ -76,7 +76,7 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 			// read, which will now be in the newest fmt:
 			Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 			MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
-			reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
+			reader.readFile(utils.getOutputDirectory() + "testOutputVehicles.xml");
 
 			VehicleType vehType = vehicles.getVehicleTypes().get(Id.create("normal&Car", VehicleType.class));
 

@@ -37,7 +37,7 @@ public class LinkLeaveEventTest extends MatsimTestCase {
 	@org.junit.Test public void testWriteReadXml() {
 		final LinkLeaveEvent event1 = new LinkLeaveEvent(68423.98, Id.create("veh", Vehicle.class),
 				Id.create(".235", Link.class));
-		final LinkLeaveEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
+		final LinkLeaveEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getLinkId(), event2.getLinkId());
 		assertEquals(event1.getVehicleId(), event2.getVehicleId());

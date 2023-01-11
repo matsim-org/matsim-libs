@@ -43,7 +43,7 @@ public class CountsHtmlAndGraphsWriterTest extends MatsimTestCase {
 		CountsComparisonAlgorithm cca = fixture.getCCA();
 		cca.run();
 
-		CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(this.getOutputDirectory(), cca.getComparison(),1);
+		CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(utils.getOutputDirectory(), cca.getComparison(),1);
 		cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));
 		cgw.addGraphsCreator(new CountsErrorGraphCreator("Error Plots"));
 		cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("Load curve graph"));

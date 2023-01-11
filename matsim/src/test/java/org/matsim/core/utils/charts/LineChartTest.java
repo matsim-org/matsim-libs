@@ -43,7 +43,7 @@ public class LineChartTest extends MatsimTestCase {
 	 * @throws IOException possible exception when reading the image for validation
 	 */
 	@org.junit.Test public void testLineChartDemo() throws IOException {
-		String imageFilename = getOutputDirectory() + "linechart.png";
+		String imageFilename = utils.getOutputDirectory() + "linechart.png";
 		Demo demo = new Demo();
 		demo.createLineChart(imageFilename);
 

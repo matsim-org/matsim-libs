@@ -78,7 +78,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 	 */
 	@org.junit.Test public void testLocationChoice() {
 
-		final Config config = localCreateConfig( this.getPackageInputDirectory() + "config2.xml");
+		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config2.xml");
 
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 

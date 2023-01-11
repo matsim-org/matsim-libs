@@ -38,7 +38,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 
 	@org.junit.Test public void testPolygonCapacityShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileP = getOutputDirectory() + "./network.shp";
+		String outputFileP = utils.getOutputDirectory() + "./network.shp";
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
@@ -60,7 +60,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 
 	@org.junit.Test public void testPolygonLanesShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileP = getOutputDirectory() + "./network.shp";
+		String outputFileP = utils.getOutputDirectory() + "./network.shp";
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
@@ -82,7 +82,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 
 	@org.junit.Test public void testPolygonFreespeedShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileP = getOutputDirectory() + "./network.shp";
+		String outputFileP = utils.getOutputDirectory() + "./network.shp";
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
@@ -104,7 +104,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 
 	@org.junit.Test public void testLineStringShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileShp = getOutputDirectory() + "./network.shp";
+		String outputFileShp = utils.getOutputDirectory() + "./network.shp";
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
@@ -126,7 +126,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 
 	@org.junit.Test public void testNodesShape() {
 		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileShp = getOutputDirectory() + "./network.shp";
+		String outputFileShp = utils.getOutputDirectory() + "./network.shp";
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 

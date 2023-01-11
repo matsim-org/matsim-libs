@@ -36,7 +36,7 @@ public class VehicleAbortsEventTest extends MatsimTestCase {
 
 	@org.junit.Test public void testWriteReadXml() {
 		final VehicleAbortsEvent event1 = new VehicleAbortsEvent(81153.3, Id.create("a007", Vehicle.class), Id.create("link1", Link.class));
-		final VehicleAbortsEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
+		final VehicleAbortsEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getVehicleId(), event2.getVehicleId());
 		assertEquals(event1.getLinkId(), event2.getLinkId());

@@ -155,10 +155,10 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	private void runTest( CalcLegTimes calcLegTimes ) throws IOException {
 
-		calcLegTimes.writeStats(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
+		calcLegTimes.writeStats(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
-		Assert.assertEquals(readResult(this.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
-				readResult(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME));
+		Assert.assertEquals(readResult(utils.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
+				readResult(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME));
 
 	}
 

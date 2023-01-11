@@ -44,9 +44,9 @@ public class RoadPricingIOTest extends MatsimTestCase {
 	 * Tests reader and writer to ensure that reading and writing does not modify the schemes.
 	 */
 	@org.junit.Test public void testWriteReadWrite() {
-		final String origFile = this.getClassInputDirectory() + "roadpricing1.xml";
-		final String tmpFile1 = getOutputDirectory() + "roadpricing1.xml";
-		final String tmpFile2 = getOutputDirectory() + "roadpricing2.xml";
+		final String origFile = utils.getClassInputDirectory() + "roadpricing1.xml";
+		final String tmpFile1 = utils.getOutputDirectory() + "roadpricing1.xml";
+		final String tmpFile2 = utils.getOutputDirectory() + "roadpricing2.xml";
 
 		final Id<Link> id1 = Id.create(1, Link.class);
 		final Id<Link> id2 = Id.create(2, Link.class);

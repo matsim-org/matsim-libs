@@ -78,12 +78,12 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int numSlots = (endTime / binSize) + 1;
 
 		// by default: averaging travel times
-		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
+		String compareFile = utils.getClassInputDirectory() + "link10_ttimes.txt";
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		TimeSlotComputation travelTimeAggregator = new TimeSlotComputation( numSlots, binSize );
 		TravelTimeGetter travelTimeGetter = new AveragingTravelTimeGetter( travelTimeAggregator ) ;
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
-				travelTimeAggregator, binSize, endTime, compareFile, false, this.getClassInputDirectory(), travelTimeGetter );
+				travelTimeAggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
 	@org.junit.Test public final void testTravelTimeCalculator_Array_Optimistic_LinearInterpolation() throws IOException {
@@ -93,12 +93,12 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int numSlots = (endTime / binSize) + 1;
 
 		// use linear interpolation
-		String compareFile = getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
+		String compareFile = utils.getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		TimeSlotComputation aggregator = new TimeSlotComputation( numSlots, binSize );
 		TravelTimeGetter travelTimeGetter = new LinearInterpolatingTravelTimeGetter( numSlots, binSize, aggregator );
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
-				aggregator, binSize, endTime, compareFile, false, this.getClassInputDirectory(), travelTimeGetter );
+				aggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
 	@org.junit.Test public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
@@ -108,12 +108,12 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int numSlots = (endTime / binSize) + 1;
 
 		// by default: averaging travel times
-		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
+		String compareFile = utils.getClassInputDirectory() + "link10_ttimes.txt";
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		TimeSlotComputation travelTimeAggregator = new TimeSlotComputation( numSlots, binSize );
 		TravelTimeGetter travelTimeGetter = new AveragingTravelTimeGetter( travelTimeAggregator ) ;
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-				travelTimeAggregator, binSize, endTime, compareFile, false, this.getClassInputDirectory(), travelTimeGetter );
+				travelTimeAggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
 	@org.junit.Test public final void testTravelTimeCalculator_HashMap_Optimistic_LinearInterpolation() throws IOException {
@@ -126,12 +126,12 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int numSlots = (endTime / binSize) + 1;
 
 		// use linear interpolation
-		compareFile = getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
+		compareFile = utils.getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
 		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new TimeSlotComputation(numSlots, binSize);
 		TravelTimeGetter travelTimeGetter = new LinearInterpolatingTravelTimeGetter( numSlots, binSize, aggregator );
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-				aggregator, binSize, endTime, compareFile, false, this.getClassInputDirectory(), travelTimeGetter );
+				aggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
 //	@org.junit.Test public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
@@ -345,7 +345,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		 * post-processing. So, it must be possible to only read the network an the events and still
 		 * calculate link travel times.
 		 */
-		String eventsFilename = getClassInputDirectory() + "link10_events.xml";
+		String eventsFilename = utils.getClassInputDirectory() + "link10_events.xml";
 		String networkFile = "test/scenarios/equil/network.xml";
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

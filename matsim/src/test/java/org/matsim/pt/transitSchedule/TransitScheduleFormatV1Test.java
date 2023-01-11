@@ -121,7 +121,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		schedule1.addTransitLine(line1);
 
 		// write and read it
-		String filename = getOutputDirectory() + "scheduleNoRoute.xml";
+		String filename = utils.getOutputDirectory() + "scheduleNoRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
@@ -141,7 +141,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		stop1.setLinkId(l1.getId());
 
 		// write and read version with network-route
-		filename = getOutputDirectory() + "scheduleWithRoute.xml";
+		filename = utils.getOutputDirectory() + "scheduleWithRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitScheduleFactory builder3 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule3 = builder3.createTransitSchedule();

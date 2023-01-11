@@ -42,7 +42,7 @@ public class PersonLeavesVehicleEventTest extends MatsimTestCase {
 		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("testVehType", VehicleType.class ) );
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(80, Vehicle.class ), vehicleType );
 		PersonLeavesVehicleEvent event = new PersonLeavesVehicleEvent(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId());
-		PersonLeavesVehicleEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
+		PersonLeavesVehicleEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event);
 		assertEquals("wrong time of event.", 5.0 * 3600 + 11.0 * 60, event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals("wrong vehicle id.", "80", event2.getVehicleId().toString());
 	}

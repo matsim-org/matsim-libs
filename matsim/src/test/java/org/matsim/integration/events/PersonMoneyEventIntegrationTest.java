@@ -49,7 +49,7 @@ public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 
 		// write some events to file
 
-		final String eventsFilename = getOutputDirectory() + "events.xml";
+		final String eventsFilename = utils.getOutputDirectory() + "events.xml";
 
 		EventsManager writeEvents = EventsUtils.createEventsManager();
 		EventWriterXML writer = new EventWriterXML(eventsFilename);
@@ -99,7 +99,7 @@ public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 
 		// write some events to file
 
-		final String eventsFilename = getOutputDirectory() + "events.xml";
+		final String eventsFilename = utils.getOutputDirectory() + "events.xml";
 		BufferedWriter writer = IOUtils.getBufferedWriter(eventsFilename);
 
 		writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");

@@ -45,7 +45,7 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 
 		Vehicles veh = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader = new MatsimVehicleReader(veh);
-		reader.readFile(this.getPackageInputDirectory() + TESTXML2);
+		reader.readFile(utils.getPackageInputDirectory() + TESTXML2);
 
 		vehicleTypes = veh.getVehicleTypes();
 		vehicles = veh.getVehicles();

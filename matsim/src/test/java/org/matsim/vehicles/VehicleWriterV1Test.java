@@ -55,12 +55,12 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 
 	@org.junit.Test public void testWriter() {
 
-		String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
+		String outfileName = utils.getOutputDirectory() + "testOutputVehicles.xml";
 
 		// read it
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
-		reader.readFile(this.getPackageInputDirectory() + TESTXML);
+		reader.readFile(utils.getPackageInputDirectory() + TESTXML);
 
 		// write it
 		VehicleWriterV1 writer = new VehicleWriterV1(vehicles);
@@ -69,7 +69,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		// read it again
 		vehicles = VehicleUtils.createVehiclesContainer();
 		reader = new MatsimVehicleReader(vehicles);
-		reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
+		reader.readFile(utils.getOutputDirectory() + "testOutputVehicles.xml");
 
 		// check it, check it, check it now!
 		this.checkContent(vehicles);

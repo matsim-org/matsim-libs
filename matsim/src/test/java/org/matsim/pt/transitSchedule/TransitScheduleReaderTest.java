@@ -58,7 +58,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
 
 	@org.junit.Test public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
-		final String inputDir = getClassInputDirectory();
+		final String inputDir = utils.getClassInputDirectory();
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
@@ -93,7 +93,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 	}
 
 	@org.junit.Test public void testReadFile() throws IOException, SAXException, ParserConfigurationException {
-		final String inputDir = getClassInputDirectory();
+		final String inputDir = utils.getClassInputDirectory();
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);

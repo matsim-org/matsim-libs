@@ -126,7 +126,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 	 */
 	@org.junit.Test public void testBetaTravel_66() {
 		Config config = utils.loadConfig("../../examples/scenarios/equil/config.xml");
-		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
+		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);

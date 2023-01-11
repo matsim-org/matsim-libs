@@ -143,7 +143,7 @@ public class EventsReadersTest extends MatsimTestCase {
 		events.addHandler(handler);
 		events.initProcessing();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.readFile(getClassInputDirectory() + "events.xml");
+		reader.readFile(utils.getClassInputDirectory() + "events.xml");
 		events.finishProcessing();
 		assertEquals("number of read events", 8, handler.eventCounter);
 	}
@@ -154,7 +154,7 @@ public class EventsReadersTest extends MatsimTestCase {
 		events.addHandler(handler);
 		events.initProcessing();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(getClassInputDirectory() + "events.xml");
+		reader.readFile(utils.getClassInputDirectory() + "events.xml");
 		events.finishProcessing();
 		assertEquals("number of read events", 8, handler.eventCounter);
 	}

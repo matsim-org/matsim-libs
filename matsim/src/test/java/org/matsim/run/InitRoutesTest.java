@@ -58,9 +58,9 @@ public class InitRoutesTest extends MatsimTestCase {
 	@org.junit.Test public void testMain() throws Exception {
 		Config config = utils.loadConfig((String)null);
 		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
-		final String PLANS_FILE_TESTINPUT = getOutputDirectory() + "plans.in.xml";
-		final String PLANS_FILE_TESTOUTPUT = getOutputDirectory() + "plans.out.xml";
-		final String CONFIG_FILE = getOutputDirectory() + "config.xml";
+		final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";
+		final String PLANS_FILE_TESTOUTPUT = utils.getOutputDirectory() + "plans.out.xml";
+		final String CONFIG_FILE = utils.getOutputDirectory() + "config.xml";
 
 		// prepare data like world and network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());

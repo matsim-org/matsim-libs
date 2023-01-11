@@ -37,11 +37,11 @@ public class GeneralLibTest extends MatsimTestCase {
 //	}
 
 	@org.junit.Test public void testReadWriteMatrix(){
-		double[][] hubPriceInfoOriginal=GeneralLib.readMatrix(96, 4, false, getClassInputDirectory() +  "tabTable.txt");
+		double[][] hubPriceInfoOriginal=GeneralLib.readMatrix(96, 4, false, utils.getClassInputDirectory() +  "tabTable.txt");
 
-		GeneralLib.writeMatrix(hubPriceInfoOriginal, getOutputDirectory() + "hubPriceInfo.txt", null);
+		GeneralLib.writeMatrix(hubPriceInfoOriginal, utils.getOutputDirectory() + "hubPriceInfo.txt", null);
 
-		double[][] hubPriceInfoRead=GeneralLib.readMatrix(96, 4, false, getOutputDirectory() + "hubPriceInfo.txt");
+		double[][] hubPriceInfoRead=GeneralLib.readMatrix(96, 4, false, utils.getOutputDirectory() + "hubPriceInfo.txt");
 
 		assertTrue(isEqual(hubPriceInfoOriginal, hubPriceInfoRead));
 	}
@@ -93,7 +93,7 @@ public class GeneralLibTest extends MatsimTestCase {
 
 	@org.junit.Test public void testReadStringMatrix(){
 		System.out.println();
-		Matrix matrix=GeneralLib.readStringMatrix(getClassInputDirectory() +  "tabTable.txt");
+		Matrix matrix=GeneralLib.readStringMatrix(utils.getClassInputDirectory() +  "tabTable.txt");
 
 		assertEquals(96, matrix.getNumberOfRows());
 		assertEquals(4, matrix.getNumberOfColumnsInRow(0));

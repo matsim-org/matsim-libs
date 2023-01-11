@@ -134,8 +134,8 @@ public class DemandGenerationTest extends MatsimTestCase {
 
 		//write created population
 		PopulationWriter writer = new PopulationWriter(pop, sc.getNetwork());
-		writer.write(this.getOutputDirectory() + populationFile);
-		File outfile = new File(this.getOutputDirectory() + populationFile);
+		writer.write(utils.getOutputDirectory() + populationFile);
+		File outfile = new File(utils.getOutputDirectory() + populationFile);
 		assertTrue(outfile.exists());
 
 

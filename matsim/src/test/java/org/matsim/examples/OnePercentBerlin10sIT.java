@@ -50,8 +50,8 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 
-		String eventsFileName = getOutputDirectory() + "events.xml.gz";
-		String referenceEventsFileName = getInputDirectory() + "events.xml.gz";
+		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
+		String referenceEventsFileName = utils.getInputDirectory() + "events.xml.gz";
 
 		MatsimRandom.reset(7411L);
 
@@ -94,8 +94,8 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		Config config = utils.loadConfig((String)null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		String eventsFileName = getOutputDirectory() + "events.xml.gz";
-		String referenceEventsFileName = getInputDirectory() + "events.xml.gz";
+		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
+		String referenceEventsFileName = utils.getInputDirectory() + "events.xml.gz";
 
 		MatsimRandom.reset(7411L);
 
@@ -106,7 +106,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
 
-		config.controler().setOutputDirectory(this.getOutputDirectory());
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

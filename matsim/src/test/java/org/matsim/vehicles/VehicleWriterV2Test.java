@@ -47,12 +47,12 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
 	@org.junit.Before public void setUp() throws IOException {
-		String outfileName = this.getOutputDirectory() + "../testOutputVehicles.xml";
+		String outfileName = utils.getOutputDirectory() + "../testOutputVehicles.xml";
 
 		// read it
 		Vehicles vehicles1 = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles1);
-		reader.readFile(this.getPackageInputDirectory() + TESTXML);
+		reader.readFile(utils.getPackageInputDirectory() + TESTXML);
 
 		// write it
 		VehicleWriterV2 writer = new VehicleWriterV2(vehicles1);
@@ -61,7 +61,7 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 //		//read it again
 		Vehicles vehicles2 = VehicleUtils.createVehiclesContainer();
 		reader = new MatsimVehicleReader(vehicles2);
-		reader.readFile(this.getOutputDirectory() + "../testOutputVehicles.xml");
+		reader.readFile(utils.getOutputDirectory() + "../testOutputVehicles.xml");
 
 		vehicleTypes = vehicles2.getVehicleTypes();
 		vehicles = vehicles2.getVehicles();

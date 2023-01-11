@@ -47,14 +47,14 @@ public class OutputDelegateTest extends MatsimTestCase {
 			}
 			sg = new CountsSimRealPerHourGraph(countSimCompList, 1, "testOutPutAll");
 
-			new File(getOutputDirectory() + "graphs").mkdir();
-			OutputDelegate outputDelegate=new OutputDelegate(getOutputDirectory() + "graphs/");
+		new File(utils.getOutputDirectory() + "graphs").mkdir();
+		OutputDelegate outputDelegate=new OutputDelegate(utils.getOutputDirectory() + "graphs/");
 			outputDelegate.addSection(new Section("testOutPutAll"));
 			assertNotNull("No graph was created", sg.createChart(0));
 			outputDelegate.addCountsGraph(sg);
 			outputDelegate.outputHtml();
 
-			String filename = getOutputDirectory() + "graphs/png/" + sg.getFilename() +".png";
+		String filename = utils.getOutputDirectory() + "graphs/png/" + sg.getFilename() +".png";
 			File fPng = new File(filename);
 			assertTrue("The png output file " + filename + " doesn't exist", fPng.exists());
 			assertTrue("The png output file " + filename + " is empty", fPng.length()>0.0);

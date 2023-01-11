@@ -35,37 +35,4 @@ public class MatsimTestCase {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/**
-	 * Returns the path to the output directory for this test including a trailing slash as directory delimiter.
-	 *
-	 * @return path to the output directory for this test
-	 */
-	public String getOutputDirectory() {
-		return utils.getOutputDirectory();
-	}
-
-	/**
-	 * Returns the path to the input directory for this test including a trailing slash as directory delimiter.
-	 *
-	 * @return path to the input directory for this test
-	 */
-	public String getInputDirectory() {
-		return utils.getInputDirectory();
-	}
-	/**
-	 * Returns the path to the input directory one level above the default input directory for this test including a trailing slash as directory delimiter.
-	 *
-	 * @return path to the input directory for this test
-	 */
-	public String getClassInputDirectory() {
-		return utils.getClassInputDirectory();
-	}
-	/**
-	 * Returns the path to the input directory two levels above the default input directory for this test including a trailing slash as directory delimiter.
-	 *
-	 * @return path to the input directory for this test
-	 */
-	public String getPackageInputDirectory() {
-		return utils.getPackageInputDirectory();
-	}
 }

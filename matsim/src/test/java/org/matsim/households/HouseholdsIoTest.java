@@ -57,11 +57,11 @@ public class HouseholdsIoTest extends MatsimTestCase {
 	@org.junit.Test public void testBasicReaderWriter() throws IOException {
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
-		reader.readFile(this.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
+		reader.readFile(utils.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
 		checkContent(households);
 
 		HouseholdsWriterV10 writer = new HouseholdsWriterV10(households);
-		String outfilename = this.getOutputDirectory() +  TESTXMLOUTPUT;
+		String outfilename = utils.getOutputDirectory() +  TESTXMLOUTPUT;
 		writer.writeFile(outfilename);
 
 		File outFile = new File(outfilename);

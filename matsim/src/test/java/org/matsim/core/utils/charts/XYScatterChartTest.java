@@ -43,7 +43,7 @@ public class XYScatterChartTest extends MatsimTestCase {
 	 * @throws IOException possible exception when reading the image for validation
 	 */
 	@org.junit.Test public void testXYScatterChartDemo() throws IOException {
-		String imageFilename = getOutputDirectory() + "xyscatterchart.png";
+		String imageFilename = utils.getOutputDirectory() + "xyscatterchart.png";
 		Demo demo = new Demo();
 		demo.createXYScatterChart(imageFilename);
 

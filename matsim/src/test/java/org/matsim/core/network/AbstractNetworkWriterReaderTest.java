@@ -88,15 +88,15 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	protected abstract void readNetwork(final Scenario scenario, final InputStream stream);
 
 	@org.junit.Test public void testAllowedModes_multipleModes() {
-		doTestAllowedModes(createHashSet("bus", "train"), getOutputDirectory() + "network.xml");
+		doTestAllowedModes(createHashSet("bus", "train"), utils.getOutputDirectory() + "network.xml");
 	}
 
 	@org.junit.Test public void testAllowedModes_singleMode() {
-		doTestAllowedModes(createHashSet("miv"), getOutputDirectory() + "network.xml");
+		doTestAllowedModes(createHashSet("miv"), utils.getOutputDirectory() + "network.xml");
 	}
 
 	@org.junit.Test public void testAllowedModes_noMode() {
-		doTestAllowedModes(new HashSet<String>(), getOutputDirectory() + "network.xml");
+		doTestAllowedModes(new HashSet<String>(), utils.getOutputDirectory() + "network.xml");
 	}
 
 	@org.junit.Test public void testNodes_withoutElevation(){
@@ -109,7 +109,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 				new Coord((double) 1000, (double) 0));
 		nodes.add(n1);
 		nodes.add(n2);
-		doTestNodes(nodes, getOutputDirectory() + "network.xml");
+		doTestNodes(nodes, utils.getOutputDirectory() + "network.xml");
 	}
 
 	@org.junit.Test public void testNodes_withElevation(){
@@ -122,7 +122,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 				new Coord((double) 1000, (double) 0, (double) 0));
 		nodes.add(n1);
 		nodes.add(n2);
-		doTestNodes(nodes, getOutputDirectory() + "network.xml");
+		doTestNodes(nodes, utils.getOutputDirectory() + "network.xml");
 	}
 
 	@org.junit.Test public void testNodes_withAndWithoutElevation(){
@@ -135,7 +135,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 				new Coord((double) 1000, (double) 0, (double) 0));
 		nodes.add(n1);
 		nodes.add(n2);
-		doTestNodes(nodes, getOutputDirectory() + "network.xml");
+		doTestNodes(nodes, utils.getOutputDirectory() + "network.xml");
 	}
 
 	@org.junit.Test public void testNodes_IdSpecialCharacters() {

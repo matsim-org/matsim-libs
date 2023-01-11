@@ -29,7 +29,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class ConfigParameterTest extends MatsimTestCase {
 
 	@org.junit.Test public void testParametersSetCorrectly() {
-		Config config = utils.loadConfig(this.getPackageInputDirectory() + "config.xml");
+		Config config = utils.loadConfig(utils.getPackageInputDirectory() + "config.xml");
 		JDEQSimConfigGroup jdeqSimConfigGroup = ConfigUtils.addOrGetModule(config, JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class);
 		assertEquals(360.0, jdeqSimConfigGroup.getSimulationEndTime().seconds(), MatsimTestUtils.EPSILON);
 		assertEquals(2.0, jdeqSimConfigGroup.getFlowCapacityFactor(), MatsimTestUtils.EPSILON);

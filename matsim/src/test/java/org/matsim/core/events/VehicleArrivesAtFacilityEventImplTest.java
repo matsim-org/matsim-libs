@@ -37,7 +37,7 @@ public class VehicleArrivesAtFacilityEventImplTest extends MatsimTestCase {
 				Id.create(5, Vehicle.class),
 				Id.create(11, TransitStopFacility.class),
 				-1.2);
-		VehicleArrivesAtFacilityEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
+		VehicleArrivesAtFacilityEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event);
 		assertEquals(Time.parseTime("10:55:00"), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(Id.create(5, Vehicle.class), event2.getVehicleId());
 		assertEquals(Id.create(11, TransitStopFacility.class), event2.getFacilityId());

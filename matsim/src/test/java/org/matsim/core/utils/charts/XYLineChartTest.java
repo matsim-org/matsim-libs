@@ -43,7 +43,7 @@ public class XYLineChartTest extends MatsimTestCase {
 	 * @throws IOException possible exception when reading the image for validation
 	 */
 	@org.junit.Test public void testXYLineChartDemo() throws IOException {
-		String imageFilename = getOutputDirectory() + "xylinechart.png";
+		String imageFilename = utils.getOutputDirectory() + "xylinechart.png";
 		Demo demo = new Demo();
 		demo.createXYLineChart(imageFilename);
 

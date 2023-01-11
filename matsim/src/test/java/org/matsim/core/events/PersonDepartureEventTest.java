@@ -36,7 +36,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class PersonDepartureEventTest extends MatsimTestCase {
 
 	@org.junit.Test public void testWriteReadXml() {
-		final PersonDepartureEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
+		final PersonDepartureEvent event = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml",
 				new PersonDepartureEvent(25669.05, Id.create("921", Person.class), Id.create("390", Link.class), TransportMode.bike, "bikeRoutingMode"));
 		assertEquals(25669.05, event.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals("921", event.getPersonId().toString());

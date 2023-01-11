@@ -42,7 +42,7 @@ public class Initializer {
 
 	public void init(MatsimTestCase testCase) {
 		// lnk does not work. get path to locationchcoice
-		String path = testCase.getPackageInputDirectory() + "config.xml";
+		String path = testCase.utils.getPackageInputDirectory() + "config.xml";
 
 		Config config = ConfigUtils.loadConfig(path, new DestinationChoiceConfigGroup());
 

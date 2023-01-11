@@ -77,18 +77,18 @@ public class LanesReaderWriterTest extends MatsimTestCase {
 	@org.junit.Test public void testReader20() {
 		Fixture f = new Fixture();
 		LanesReader reader = new LanesReader(f.scenario);
-		reader.readFile(this.getClassInputDirectory() + FILENAME);
+		reader.readFile(utils.getClassInputDirectory() + FILENAME);
 		checkContent(f.scenario.getLanes());
 	}
 
 	@org.junit.Test public void testWriter20() {
 		Fixture f = new Fixture();
-		String testoutput = this.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
+		String testoutput = utils.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
 		log.debug("reading file...");
 		// read the test file
 		LanesReader reader = new LanesReader(
 				f.scenario);
-		reader.readFile(this.getClassInputDirectory() + FILENAME);
+		reader.readFile(utils.getClassInputDirectory() + FILENAME);
 
 		// write the test file
 		log.debug("write the test file...");

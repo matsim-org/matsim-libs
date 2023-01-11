@@ -35,11 +35,11 @@ public class ShiftsIOTest extends MatsimTestCase {
 		DrtShiftsSpecification shiftsSpecification = new DrtShiftsSpecificationImpl();
 
 		DrtShiftsReader reader = new DrtShiftsReader(shiftsSpecification);
-		reader.readFile(this.getPackageInputDirectory() + TESTSHIFTSINPUT);
+		reader.readFile(utils.getPackageInputDirectory() + TESTSHIFTSINPUT);
 		checkContent(shiftsSpecification);
 
 		DrtShiftsWriter writer = new DrtShiftsWriter(shiftsSpecification);
-		String outfilename = this.getOutputDirectory() +  TESTXMLOUTPUT;
+		String outfilename = utils.getOutputDirectory() +  TESTXMLOUTPUT;
 		writer.writeFile(outfilename);
 
 		File outFile = new File(outfilename);

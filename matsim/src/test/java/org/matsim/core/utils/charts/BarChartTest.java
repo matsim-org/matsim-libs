@@ -45,7 +45,7 @@ public class BarChartTest extends MatsimTestCase {
 	@org.junit.Test public void testBarChartDemo() throws IOException {
 		System.setProperty("java.awt.headless", "true");
 
-		String imageFilename = getOutputDirectory() + "barchart.png";
+		String imageFilename = utils.getOutputDirectory() + "barchart.png";
 		Demo demo = new Demo();
 		demo.createBarChart(imageFilename);
 

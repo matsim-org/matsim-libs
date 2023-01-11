@@ -40,9 +40,9 @@ public class CountsTableWriterTest extends MatsimTestCase {
 		cca.run();
 
 		CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
-		ctw.writeFile(this.getOutputDirectory() + "/countTable.txt");
+		ctw.writeFile(utils.getOutputDirectory() + "/countTable.txt");
 
-		File f = new File(this.getOutputDirectory() + "/countTable.txt");
+		File f = new File(utils.getOutputDirectory() + "/countTable.txt");
 		assertTrue(f.length() > 0.0);
 	}
 }

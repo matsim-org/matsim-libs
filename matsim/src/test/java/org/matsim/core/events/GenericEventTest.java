@@ -39,7 +39,7 @@ public class GenericEventTest extends MatsimTestCase {
 		GenericEvent writeEvent = new GenericEvent(TYPE, time);
 		writeEvent.getAttributes().put(KEY1, VALUE1);
 
-		GenericEvent readEvent = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", writeEvent);
+		GenericEvent readEvent = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", writeEvent);
 
 		assertEquals(TYPE, readEvent.getAttributes().get("type"));
 		assertEquals(VALUE1, readEvent.getAttributes().get(KEY1));

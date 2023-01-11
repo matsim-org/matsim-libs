@@ -43,8 +43,8 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 
 	@org.junit.Test public void testSimplifyEmptyNetwork(){
-		String inputPath = getClassInputDirectory();
-		String outputPath = getOutputDirectory();
+		String inputPath = utils.getClassInputDirectory();
+		String outputPath = utils.getOutputDirectory();
 
 		String inNetwork = inputPath + "net.xml.gz";
 		String inSchedule = null;
@@ -82,8 +82,8 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 
 	@org.junit.Test public void testSimplifyPTNetwork(){
-		String inputPath = getClassInputDirectory();
-		String outputPath = getOutputDirectory();
+		String inputPath = utils.getClassInputDirectory();
+		String outputPath = utils.getOutputDirectory();
 
 		String inNetwork = inputPath + "net.xml.gz";
 		String inSchedule = inputPath + "schedule.xml.gz";
@@ -125,8 +125,8 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 
 	@org.junit.Test public void testSimplifyCountsNetwork(){
-		String inputPath = getClassInputDirectory();
-		String outputPath = getOutputDirectory();
+		String inputPath = utils.getClassInputDirectory();
+		String outputPath = utils.getOutputDirectory();
 
 		String inNetwork = inputPath + "net.xml.gz";
 		String inSchedule = null;
@@ -170,8 +170,8 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 
 	@org.junit.Test public void testSimplifyPTCountsNetwork(){
-		String inputPath = getClassInputDirectory();
-		String outputPath = getOutputDirectory();
+		String inputPath = utils.getClassInputDirectory();
+		String outputPath = utils.getOutputDirectory();
 
 		String inNetwork = inputPath + "net.xml.gz";
 		String inSchedule = inputPath + "schedule.xml.gz";
@@ -218,8 +218,8 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 
 	@org.junit.Test public void testSimplifyElseNetwork(){
-		String inputPath = getClassInputDirectory();
-		String outputPath = getOutputDirectory();
+		String inputPath = utils.getClassInputDirectory();
+		String outputPath = utils.getOutputDirectory();
 
 		String inNetwork = inputPath + "net.xml.gz";
 		String inSchedule = null;
@@ -270,8 +270,8 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 
 	@org.junit.Test public void testSimplifyAllNetwork(){
-		String inputPath = getClassInputDirectory();
-		String outputPath = getOutputDirectory();
+		String inputPath = utils.getClassInputDirectory();
+		String outputPath = utils.getOutputDirectory();
 
 		String inNetwork = inputPath + "net.xml.gz";
 		String inSchedule = inputPath + "schedule.xml.gz";

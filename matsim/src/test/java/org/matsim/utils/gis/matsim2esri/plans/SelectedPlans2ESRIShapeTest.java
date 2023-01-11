@@ -40,9 +40,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 	@org.junit.Test public void testSelectedPlansActsShape() throws IOException {
-		String outputDir = getOutputDirectory();
+		String outputDir = utils.getOutputDirectory();
 
-		String outShp = getOutputDirectory() + "acts.shp";
+		String outShp = utils.getOutputDirectory() + "acts.shp";
 
 		Scenario scenario = ScenarioUtils.createScenario(utils.loadConfig((String)null));
 		Network network = scenario.getNetwork();
@@ -64,9 +64,9 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 	}
 
 	@org.junit.Test public void testSelectedPlansLegsShape() throws IOException {
-		String outputDir = getOutputDirectory();
+		String outputDir = utils.getOutputDirectory();
 
-		String outShp = getOutputDirectory() + "legs.shp";
+		String outShp = utils.getOutputDirectory() + "legs.shp";
 
 		Scenario scenario = ScenarioUtils.createScenario(utils.loadConfig((String)null));
 		Network network = scenario.getNetwork();
