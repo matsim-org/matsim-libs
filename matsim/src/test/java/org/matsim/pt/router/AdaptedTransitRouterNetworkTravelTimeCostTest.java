@@ -20,8 +20,9 @@
 
 package org.matsim.pt.router;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -36,9 +37,9 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author manuel after mrieser
  */
 
-public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
+public class AdaptedTransitRouterNetworkTravelTimeCostTest {
 
-	public void testTravelTime() {
+	@Test public void testTravelTime() {
 		//create the scenario test
 		Fixture f = new Fixture();
 		f.init();
@@ -64,7 +65,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals(9.0*60, tc.getLinkTravelTime(testLink, 6.0*3600, null, null), MatsimTestUtils.EPSILON);
 	}
 
-	public void testVehArrivalTime() {
+	@Test public void testVehArrivalTime() {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
@@ -109,7 +110,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals((6.0*3600) + (18*60)  , tc.getVehArrivalTime(testLink, (6.0*3600) + (3*60)), MatsimTestUtils.EPSILON);
 	}
 
-	public void testTravelTimeAfterMidnight() {
+	@Test public void testTravelTimeAfterMidnight() {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
@@ -147,7 +148,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals((53.0*3600) + (18*60.0), tc.getVehArrivalTime(testLink, 49.0*3600), MatsimTestUtils.EPSILON);
 	}
 
-	public void testTravelCostLineSwitch() {
+	@Test public void testTravelCostLineSwitch() {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
@@ -178,7 +179,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 	}
 
 
-	public void testTravelCostLineSwitch_AdditionalTransferTime() {
+	@Test public void testTravelCostLineSwitch_AdditionalTransferTime() {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),

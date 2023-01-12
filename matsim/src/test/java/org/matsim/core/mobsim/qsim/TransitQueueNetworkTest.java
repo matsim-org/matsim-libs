@@ -20,12 +20,15 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -72,10 +75,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import junit.framework.TestCase;
 
-
-public class TransitQueueNetworkTest extends TestCase {
+public class TransitQueueNetworkTest {
 
     /**
      * Tests that a non-blocking stops on the first link of a transit vehicle's network
@@ -86,7 +87,7 @@ public class TransitQueueNetworkTest extends TestCase {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    public void testNonBlockingStop_FirstLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    @Test public void testNonBlockingStop_FirstLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Fixture f = new Fixture(1, false, 0, false);
 
         f.simEngine.doSimStep(100);
@@ -134,7 +135,7 @@ public class TransitQueueNetworkTest extends TestCase {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    public void testBlockingStop_FirstLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    @Test public void testBlockingStop_FirstLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Fixture f = new Fixture(1, true, 0, false);
 
         f.qsim.getSimTimer().setTime(100);
@@ -175,7 +176,7 @@ public class TransitQueueNetworkTest extends TestCase {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    public void testNonBlockingStop_MiddleLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    @Test public void testNonBlockingStop_MiddleLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Fixture f = new Fixture(2, false, 0, false);
 
         // time 100: agents start, transitVeh is moved to qlink1.buffer
@@ -258,7 +259,7 @@ public class TransitQueueNetworkTest extends TestCase {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    public void testBlockingStop_MiddleLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    @Test public void testBlockingStop_MiddleLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Fixture f = new Fixture(2, true, 0, false);
 
         // time 100: agents start, transitVeh is moved to qlink1.buffer
@@ -338,7 +339,7 @@ public class TransitQueueNetworkTest extends TestCase {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    public void testNonBlockingStop_LastLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    @Test public void testNonBlockingStop_LastLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Fixture f = new Fixture(3, false, 0, false);
 
         // time 100: agents start, transitVeh is moved to qlink1.buffer
@@ -420,7 +421,7 @@ public class TransitQueueNetworkTest extends TestCase {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    public void testBlockingStop_LastLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    @Test public void testBlockingStop_LastLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Fixture f = new Fixture(3, true, 0, false);
 
         // time 100: agents start, transitVeh is moved to qlink1.buffer
@@ -486,7 +487,7 @@ public class TransitQueueNetworkTest extends TestCase {
         assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
     }
 
-    public void testTwoStopsOnOneLink_FirstLink() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    @Test public void testTwoStopsOnOneLink_FirstLink() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Fixture f = new Fixture(1, true, 1, true); // first stop at the first link is non-blocking by definition!
 
         // time 100: agents start, transitVeh is moved to qlink1.transitStopQueue (delay 19, exit-time 119), normalVeh is moved to qlink1.buffer
@@ -535,7 +536,7 @@ public class TransitQueueNetworkTest extends TestCase {
         assertEquals(f.transitVehicle, vehicles[2]);
     }
 
-    public void testTwoStopsOnOneLink_MiddleLink_FirstBlockThenNonBlock() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    @Test public void testTwoStopsOnOneLink_MiddleLink_FirstBlockThenNonBlock() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Fixture f = new Fixture(2, true, 2, false);
 
         // time 100: agents start, transitVeh is moved to qlink1.buffer
@@ -637,7 +638,7 @@ public class TransitQueueNetworkTest extends TestCase {
         assertEquals(f.normalVehicle2, vehicles[2]);
     }
 
-    public void testTwoStopsOnOneLink_MiddleLink_FirstNonBlockThenBlock() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    @Test public void testTwoStopsOnOneLink_MiddleLink_FirstNonBlockThenBlock() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Fixture f = new Fixture(2, false, 2, true);
 
         // time 100: agents start, transitVeh is moved to qlink1.buffer
@@ -751,7 +752,7 @@ public class TransitQueueNetworkTest extends TestCase {
         assertEquals(f.normalVehicle2, vehicles[2]);
     }
 
-    public void testTwoStopsOnOneLink_LastLink_FirstBlockThenNonBlock() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    @Test public void testTwoStopsOnOneLink_LastLink_FirstBlockThenNonBlock() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Fixture f = new Fixture(3, true, 3, false);
 
         // time 100: agents start, transitVeh is moved to qlink1.buffer
@@ -864,7 +865,7 @@ public class TransitQueueNetworkTest extends TestCase {
         assertEquals(0, f.qlink3.getAllNonParkedVehicles().size());
     }
 
-    public void testTwoStopsOnOneLink_LastLink_FirstNonBlockThenBlock() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    @Test public void testTwoStopsOnOneLink_LastLink_FirstNonBlockThenBlock() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Fixture f = new Fixture(3, false, 3, true);
 
         // time 100: agents start, transitVeh is moved to qlink1.buffer
@@ -1068,13 +1069,13 @@ public class TransitQueueNetworkTest extends TestCase {
             tRoute.addDeparture(dep);
             tLine.addRoute(tRoute);
             EventsManager eventsManager = EventsUtils.createEventsManager();
-            
+
             this.qsim = new QSimBuilder(scenario.getConfig()) //
 					.useDefaults() //
 					.build(scenario, eventsManager);
             TransitQSimEngine transitEngine = qsim.getChildInjector().getInstance(TransitQSimEngine.class);
             this.simEngine = qsim.getChildInjector().getInstance(QNetsimEngineI.class);
-            
+
             NetsimNetwork qnet = qsim.getNetsimNetwork();
             this.qlink1 = (QLinkImpl) qnet.getNetsimLink(linkId1);
             this.qlink2 = (QLinkImpl) qnet.getNetsimLink(linkId2);
@@ -1149,13 +1150,13 @@ public class TransitQueueNetworkTest extends TestCase {
                 this.normalVehicle2 = null;
             }
         }
-        
+
 		private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person person) {
 			PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person.getSelectedPlan(), qsim, qsim.getChildInjector().getInstance(TimeInterpretation.class));
-			qsim.insertAgentIntoMobsim(agent); 
+			qsim.insertAgentIntoMobsim(agent);
 			return agent;
 		}
-		
+
     }
 
     /**
