@@ -21,7 +21,6 @@ package org.matsim.contrib.parking.parkingchoice.PC2.analysis;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -31,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingArrivalEvent;
 import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
-import org.matsim.contrib.parking.parkingchoice.lib.obj.list.Lists;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
@@ -60,29 +58,19 @@ public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 				Id<PC2Parking> parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
 
 				Coord destCoord = ParkingArrivalEvent.getDestCoord(event.getAttributes());
-				
+
 				double walkDistance = GeneralLib.getDistance(parking.get(parkingId).getCoordinate(),
 						destCoord);
-				
+
 				if (!walkDistances.containsKey(getGroupName(parkingId))){
 					walkDistances.put(getGroupName(parkingId), new LinkedList<Double>());
 				}
-				
+
 				walkDistances.get(getGroupName(parkingId)).add(walkDistance);
-				
+
 			}
 		}
 	}
 
-	public void printStatistics() {
-		for (String groupName : walkDistances.keySet()) {
-			DescriptiveStatistics dd = new DescriptiveStatistics(Lists.getArray(walkDistances.get(groupName)));
-			long mean = Math.round(dd.getMean());
-			long stdev = Math.round(dd.getStandardDeviation());
-			log.info("groupName: " + groupName + "; mean: " + mean + "[m]; standardDeviation: " + stdev + "[m]");
-		}
-	}
-
 	public abstract String getGroupName(Id<PC2Parking> parkingId);
-
 }
