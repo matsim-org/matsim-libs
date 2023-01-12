@@ -337,30 +337,6 @@ public final class MatsimTestUtils extends TestWatcher {
 		this.testMethodName = null;
 	}
 
-	public static class ExitTrappedException extends SecurityException {
-		private static final long serialVersionUID = 1L;
-	}
-
-  public static void forbidSystemExitCall() {
-    final SecurityManager securityManager = new SecurityManager() {
-      @Override
-			public void checkPermission(Permission permission) {
-      	if (permission.getName().startsWith("exitVM")) {
-          throw new ExitTrappedException();
-        }
-      }
-    };
-    System.setSecurityManager(securityManager);
-  }
-
-  public static void enableSystemExitCall() {
-    System.setSecurityManager(null);
-  }
-
-  public static EventsFileComparator.Result compareEventsFiles( String filename1, String filename2 ) {
-	  return EventsFileComparator.compare(filename1, filename2) ;
-  }
-
   public static void assertEqualEventsFiles( String filename1, String filename2 ) {
 		Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
 	}
@@ -370,8 +346,4 @@ public final class MatsimTestUtils extends TestWatcher {
 	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
 	  Assert.assertEquals( "different file checksums", checksum1, checksum2 );
   }
-  public static boolean comparePopulations( Population pop1, Population pop2 ) {
-	  return PopulationUtils.equalPopulation(pop1, pop2) ;
-  }
-
 }

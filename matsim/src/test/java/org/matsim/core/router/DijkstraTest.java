@@ -29,11 +29,11 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
  * @author mrieser
  */
 public class DijkstraTest extends AbstractLeastCostPathCalculatorTest {
-	
+
 	@Override
 	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
 		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
 		return new Dijkstra(network, travelTimeCostCalculator, travelTimeCostCalculator);
 	}
-	
+
 }

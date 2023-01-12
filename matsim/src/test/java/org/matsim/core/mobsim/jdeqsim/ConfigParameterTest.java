@@ -19,15 +19,22 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class ConfigParameterTest extends MatsimTestCase {
+public class ConfigParameterTest {
 
-	public void testParametersSetCorrectly() {
-		Config config = super.loadConfig(this.getPackageInputDirectory() + "config.xml");
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testParametersSetCorrectly() {
+		Config config = utils.loadConfig(utils.getPackageInputDirectory() + "config.xml");
 		JDEQSimConfigGroup jdeqSimConfigGroup = ConfigUtils.addOrGetModule(config, JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class);
 		assertEquals(360.0, jdeqSimConfigGroup.getSimulationEndTime().seconds(), MatsimTestUtils.EPSILON);
 		assertEquals(2.0, jdeqSimConfigGroup.getFlowCapacityFactor(), MatsimTestUtils.EPSILON);

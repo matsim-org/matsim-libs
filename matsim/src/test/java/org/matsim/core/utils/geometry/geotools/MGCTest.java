@@ -21,19 +21,25 @@
 
  package org.matsim.core.utils.geometry.geotools;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * 
+ *
  * @author laemmel
  *
  */
-public class MGCTest extends MatsimTestCase {
+public class MGCTest {
 
-	public void testCoord2CoordinateAndViceVersa(){
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testCoord2CoordinateAndViceVersa(){
 		double x = 123.456789;
 		double y = 987.654321;
 		double delta = 0.0000001;
@@ -46,7 +52,7 @@ public class MGCTest extends MatsimTestCase {
 		junit.framework.Assert.assertEquals(y,y1,delta);
 	}
 
-	public void testCoord2PointAndViceVersa(){
+	@Test public void testCoord2PointAndViceVersa(){
 		double x = 123.456789;
 		double y = 987.654321;
 		double delta = 0.0000001;
@@ -60,7 +66,7 @@ public class MGCTest extends MatsimTestCase {
 
 	}
 
-	public void testGetUTMEPSGCodeForWGS84Coordinate() {
+	@Test public void testGetUTMEPSGCodeForWGS84Coordinate() {
 		{
 			//Hamburg - should be UTM 32 North --> EPSG:32632
 			double lat = 53.562021;
@@ -80,11 +86,11 @@ public class MGCTest extends MatsimTestCase {
 			double lat = -0.959484;
 			double lon  =  100.354052;
 			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
-			junit.framework.Assert.assertEquals("EPSG:32747", epsg);			
+			junit.framework.Assert.assertEquals("EPSG:32747", epsg);
 		}
 	}
 
-	public void testGetCRS(){
+	@Test public void testGetCRS(){
 		// CH1903_LV03 Id
 		junit.framework.Assert.assertNotNull(MGC.getCRS("EPSG:21781"));
 

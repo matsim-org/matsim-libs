@@ -20,8 +20,12 @@
 
 package org.matsim.integration;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -70,16 +74,19 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-public class SimulateAndScoreTest extends MatsimTestCase {
+public class SimulateAndScoreTest {
 
-	public void testRealPtScore() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testRealPtScore() {
 		final Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 
@@ -230,7 +237,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 	}
 
-	public void testTeleportationScore() {
+	@Test public void testTeleportationScore() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));

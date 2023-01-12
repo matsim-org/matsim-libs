@@ -20,31 +20,38 @@
 
 package org.matsim.contrib.roadpricing;
 
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.util.Iterator;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.io.File;
-import java.util.Iterator;
 
 /**
  * Tests Parsers and Writers for RoadPricingSchemes.
  *
  * @author mrieser
  */
-public class RoadPricingIOTest extends MatsimTestCase {
+public class RoadPricingIOTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Tests reader and writer to ensure that reading and writing does not modify the schemes.
 	 */
-	public void testWriteReadWrite() {
-		final String origFile = this.getClassInputDirectory() + "roadpricing1.xml";
-		final String tmpFile1 = getOutputDirectory() + "roadpricing1.xml";
-		final String tmpFile2 = getOutputDirectory() + "roadpricing2.xml";
+	@Test public void testWriteReadWrite() {
+		final String origFile = utils.getClassInputDirectory() + "roadpricing1.xml";
+		final String tmpFile1 = utils.getOutputDirectory() + "roadpricing1.xml";
+		final String tmpFile2 = utils.getOutputDirectory() + "roadpricing2.xml";
 
 		final Id<Link> id1 = Id.create(1, Link.class);
 		final Id<Link> id2 = Id.create(2, Link.class);

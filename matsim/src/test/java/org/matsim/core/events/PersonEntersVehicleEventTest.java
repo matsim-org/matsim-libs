@@ -20,11 +20,14 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -33,14 +36,18 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * @author mrieser
  */
-public class PersonEntersVehicleEventTest extends MatsimTestCase {
+public class PersonEntersVehicleEventTest {
 
-	public void testReadWriteXml() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testReadWriteXml() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("testVehType", VehicleType.class ) );
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(80, Vehicle.class ), vehicleType );
 		PersonEntersVehicleEvent event = new PersonEntersVehicleEvent(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId());
-		PersonEntersVehicleEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
+		PersonEntersVehicleEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event);
 		assertEquals("wrong time of event.", 5.0 * 3600 + 11.0 * 60, event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals("wrong vehicle id.", "80", event2.getVehicleId().toString());
 	}

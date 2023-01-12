@@ -20,6 +20,12 @@
 
 package org.matsim.core.scoring.functions;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,17 +42,18 @@ import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
+public class CharyparNagelOpenTimesScoringFunctionTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private Person person = null;
 	private ActivityFacilities facilities = null;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before public void setUp() {
 
 		final Config config = ConfigUtils.createConfig();
 		final Scenario scenario = ScenarioUtils.createScenario( config );
@@ -79,14 +86,12 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		act.setEndTime(16.0 * 3600);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After public void tearDown() {
 		this.person = null;
 		this.facilities = null;
-		super.tearDown();
 	}
 
-	public void testGetOpeningInterval() {
+	@Test public void testGetOpeningInterval() {
 		Activity act =  (Activity) person.getSelectedPlan().getPlanElements().get(0) ;
 
 		FacilityOpeningIntervalCalculator testee =

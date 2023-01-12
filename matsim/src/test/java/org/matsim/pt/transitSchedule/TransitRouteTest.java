@@ -20,11 +20,15 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,13 +38,17 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
  * @author mrieser
  */
-public class TransitRouteTest extends MatsimTestCase {
+public class TransitRouteTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final Logger log = LogManager.getLogger(TransitRouteTest.class);
 
@@ -59,7 +67,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		return new TransitRouteImpl(id, route, stops, mode);
 	}
 
-	public void testInitialization() {
+	@Test public void testInitialization() {
 		Id<TransitRoute> id = Id.create(9791, TransitRoute.class);
 		Link fromLink = new FakeLink(Id.create(10, Link.class), null, null);
 		Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
@@ -76,7 +84,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		assertEquals("train", tRoute.getTransportMode());
 	}
 
-	public void testDescription() {
+	@Test public void testDescription() {
 		Fixture f = new Fixture();
 		assertNull(f.tRoute.getDescription());
 		String desc = "some random description string.";
@@ -87,7 +95,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		assertEquals(desc, f.tRoute.getDescription());
 	}
 
-	public void testTransportMode() {
+	@Test public void testTransportMode() {
 		Fixture f = new Fixture();
 		// test default of Fixture
 		assertEquals("train", f.tRoute.getTransportMode());
@@ -96,7 +104,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		assertEquals("tram", f.tRoute.getTransportMode());
 	}
 
-	public void testAddDepartures() {
+	@Test public void testAddDepartures() {
 		Fixture f = new Fixture();
 		Departure dep1 = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
 		Departure dep2 = new DepartureImpl(Id.create(2, Departure.class), 8.0*3600);
@@ -115,7 +123,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		assertEquals(dep3, f.tRoute.getDepartures().get(dep3.getId()));
 	}
 
-	public void testAddDeparturesException() {
+	@Test public void testAddDeparturesException() {
 		Fixture f = new Fixture();
 		Departure dep1a = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
 		Departure dep1b = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
@@ -131,7 +139,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		}
 	}
 
-	public void testRemoveDepartures() {
+	@Test public void testRemoveDepartures() {
 		Fixture f = new Fixture();
 		Departure dep1 = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
 		Departure dep2 = new DepartureImpl(Id.create(2, Departure.class), 8.0*3600);
@@ -157,7 +165,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		assertNotNull(f.tRoute.getDepartures().get(dep1.getId()));
 	}
 
-	public void testGetDeparturesImmutable() {
+	@Test public void testGetDeparturesImmutable() {
 		Fixture f = new Fixture();
 		Departure dep1 = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
 		assertEquals(0, f.tRoute.getDepartures().size());
@@ -170,7 +178,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		}
 	}
 
-	public void testRoute() {
+	@Test public void testRoute() {
 		Fixture f = new Fixture();
 		Link link1 = new FakeLink(Id.create(1, Link.class), null, null);
 		Link link2 = new FakeLink(Id.create(2, Link.class), null, null);
@@ -184,7 +192,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		assertEquals(route2, f.tRoute.getRoute());
 	}
 
-	public void testStops() {
+	@Test public void testStops() {
 		Id<TransitRoute> id = Id.create(9791, TransitRoute.class);
 		Link fromLink = new FakeLink(Id.create(10, Link.class), null, null);
 		Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
@@ -216,7 +224,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		assertNull(tRoute.getStop(stopFacility4));
 	}
 
-	public void testGetStopsImmutable() {
+	@Test public void testGetStopsImmutable() {
 		Fixture f = new Fixture();
 		// test default of Fixture
 		assertEquals(1, f.tRoute.getStops().size());
