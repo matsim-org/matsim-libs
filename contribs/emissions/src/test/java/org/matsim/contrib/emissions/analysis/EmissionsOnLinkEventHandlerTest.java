@@ -115,7 +115,7 @@ public class EmissionsOnLinkEventHandlerTest {
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> secondBin = summedEmissions.getTimeBin(20);
         assertTrue(secondBin.hasValue());
-        assertEquals(numberOfEvents * emissionValue, secondBin.getValue().get(linkId).getEmission(HC));
+        assertEquals(numberOfEvents * emissionValue, secondBin.getValue().get(linkId).getEmission(HC), 0);
 
         link2pollutantsMap.get(linkId).forEach((pollutant, value) ->
                 assertEquals(3 * numberOfEvents * emissionValue, value, 0.0001));

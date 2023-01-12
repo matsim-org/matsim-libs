@@ -22,7 +22,7 @@ public class DoubleValueHashMapTest {
 
 		assertEquals(3.2, dhm.get(0),0.0001);
 
-		assertEquals(0.0, dhm.get(1));
+		assertEquals(0.0, dhm.get(1), 0);
 
 	}
 

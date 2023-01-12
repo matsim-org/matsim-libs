@@ -137,7 +137,7 @@ public class TestParser {
 	private static void expect(double expected, Parser parser) {
 		try {
 			double result = parser.parse();
-			assertEquals(expected, result);
+			assertEquals(expected, result, 0);
 		} catch (SyntaxException e) {
 			throw new Error(e.explain());
 		}
@@ -147,7 +147,7 @@ public class TestParser {
 	private static void expect(double expected, String input) {
 		try {
 			double result = new Parser(input).parse();
-			assertEquals(expected, result);
+			assertEquals(expected, result, 0);
 		} catch (SyntaxException e) {
 			throw new Error(e.explain());
 		}

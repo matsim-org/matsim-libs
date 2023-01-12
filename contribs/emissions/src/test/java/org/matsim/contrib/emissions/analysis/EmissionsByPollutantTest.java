@@ -54,8 +54,8 @@ public class EmissionsByPollutantTest {
         double result = emissionsByPollutant.addEmission(pollutant, valueToAdd);
         double retrievedResult = emissionsByPollutant.getEmission(pollutant);
 
-        assertEquals(expectedValue, result);
-        assertEquals(expectedValue, retrievedResult);
+        assertEquals(expectedValue, result, 0);
+        assertEquals(expectedValue, retrievedResult, 0);
     }
 
     @Test
@@ -70,8 +70,8 @@ public class EmissionsByPollutantTest {
         double result = emissionsByPollutant.addEmission(pollutantToAdd, valueToAdd);
         double retrievedResult = emissionsByPollutant.getEmission(pollutantToAdd);
 
-        assertEquals(valueToAdd, result);
-        assertEquals(valueToAdd, retrievedResult);
+        assertEquals(valueToAdd, result, 0);
+        assertEquals(valueToAdd, retrievedResult, 0);
     }
 
     @Test
