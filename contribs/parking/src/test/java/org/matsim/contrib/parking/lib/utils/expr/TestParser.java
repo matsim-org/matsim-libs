@@ -1,13 +1,14 @@
 package org.matsim.contrib.parking.lib.utils.expr;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 import org.matsim.contrib.parking.parkingchoice.lib.utils.expr.Parser;
 import org.matsim.contrib.parking.parkingchoice.lib.utils.expr.SyntaxException;
 
-import junit.framework.TestCase;
+public class TestParser {
 
-public class TestParser extends TestCase {
-
-	public void testNoVarialbe() {
+	@Test public void testNoVarialbe() {
 		expect(9, "3^2");
 		expect(256, "2^2^3");
 		expect(6, "3*2");
@@ -55,7 +56,7 @@ public class TestParser extends TestCase {
 		expect(4, "round(3.5)");
 		expect(-4, "round(-3.5)");
 		expect(3, "sqrt(9)");
-		
+
 		expect(3, "max(2, 3)");
 		expect(2, "min(2, 3)");
 		expect(137, "if(0, 42, 137)");
@@ -64,27 +65,27 @@ public class TestParser extends TestCase {
 
 		expect(-3.0 * Math.pow(1.01, 100.1), "  -3 * 1.01^100.1  ");
 	}
-	
-	public void testsBuiltinConstants(){
+
+	@Test public void testsBuiltinConstants(){
 		Parser parser = new Parser("sin(pi/2)");
 		expect(1, parser);
-		
+
 		parser = new Parser("tan(pi/4)");
 		expect(0.99999999999999989, parser);
 	}
-	
+
 	private Parser prepareParserSingleVariable(String expression,double xValue){
 		Parser parser = new Parser(expression);
 		parser.setVariable("x", xValue);
 		return parser;
 	}
-	
-	public void testSingleVariable(){
-		
+
+	@Test public void testSingleVariable(){
+
 		expect(1.1, prepareParserSingleVariable("x",1.1));
-		
+
 		expect(-171.375208, prepareParserSingleVariable("-0.00504238 * x^2 + 2.34528 * x - 69.4962",-40.0));
-		
+
 		expect(3.8013239000000003, prepareParserSingleVariable("3.14159 * x^2",1.1));
 		expect(-1.457526100326025, prepareParserSingleVariable("sin(10*x) + sin(9*x)",1.1));
 		expect(0.8907649332805846, prepareParserSingleVariable("sin(x) + sin(100*x)/100",1.1));
@@ -102,33 +103,33 @@ public class TestParser extends TestCase {
 		expect(1.2000000000000002, prepareParserSingleVariable("2*abs(x+1)-3",1.1));
 		expect(2.7910571473905725, prepareParserSingleVariable("sqrt(9-x^2)",1.1));
 	}
-	
-	public void testForStaticDependencyOfParsers(){
+
+	@Test public void testForStaticDependencyOfParsers(){
 		Parser parser1=new Parser("x");
 		Parser parser2=new Parser("x");
-		
+
 		parser1.setVariable("x", 1);
 		parser2.setVariable("x", 2);
-		
+
 		expect(1.0, parser1);
 		expect(2.0, parser2);
 	}
-	
-	public void testMultipleVariables(){
+
+	@Test public void testMultipleVariables(){
 		Parser parser=new Parser("x+y");
-		
+
 		parser.setVariable("x", 1);
 		parser.setVariable("y", 2);
-		
+
 		expect(3.0, parser);
 	}
-	
-	public void testVariableValueChange(){
+
+	@Test public void testVariableValueChange(){
 		Parser parser=new Parser("x");
-		
+
 		parser.setVariable("x", 1);
 		expect(1.0, parser);
-		
+
 		parser.setVariable("x", 2);
 		expect(2.0, parser);
 	}
@@ -136,17 +137,17 @@ public class TestParser extends TestCase {
 	private static void expect(double expected, Parser parser) {
 		try {
 			double result = parser.parse();
-			assertEquals(expected, result);
+			assertEquals(expected, result, 0);
 		} catch (SyntaxException e) {
 			throw new Error(e.explain());
 		}
 
 	}
-	
+
 	private static void expect(double expected, String input) {
 		try {
 			double result = new Parser(input).parse();
-			assertEquals(expected, result);
+			assertEquals(expected, result, 0);
 		} catch (SyntaxException e) {
 			throw new Error(e.explain());
 		}

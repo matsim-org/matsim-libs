@@ -21,6 +21,7 @@
 package org.matsim.core.utils.misc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -28,8 +29,6 @@ import java.util.NoSuchElementException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
-
-import junit.framework.AssertionFailedError;
 
 /**
  * Tests the functionality of the class org.matsim.utils.misc.ArgumentParser.
@@ -163,11 +162,11 @@ public class ArgumentParserTest {
 	private void assertIteratorAtEnd(final Iterator<?> iter) {
 		try {
 			iter.next();
-			throw new AssertionFailedError("expected NoSuchElementException, didn't receive one.");
+			fail("expected NoSuchElementException, didn't receive one.");
 		} catch (NoSuchElementException e) {
 			// everything is great! just as we expected
 		} catch (Exception e) {
-			throw new AssertionFailedError("expected NoSuchElementException, got " + e.getClass().getName());
+			fail("expected NoSuchElementException, got " + e.getClass().getName());
 		}
 	}
 

@@ -20,17 +20,18 @@
 
 package org.matsim.pt.router;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
+public class TransitRouterNetworkTravelTimeCostTest {
 
-	public void testTravelTime() {
+	@Test public void testTravelTime() {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
@@ -51,7 +52,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals(9.0*60, tc.getLinkTravelTime(testLink, 6.0*3600, null, null), MatsimTestUtils.EPSILON);
 	}
 
-	public void testWaitingTime() {
+	@Test public void testWaitingTime() {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
@@ -75,7 +76,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals(20.0*60 -1 + 7.0*60, tc.getLinkTravelTime(testLink, 6.0*3600 + 121, null, null), MatsimTestUtils.EPSILON);
 	}
 
-	public void testTravelTimeAfterMidnight() {
+	@Test public void testTravelTimeAfterMidnight() {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
@@ -101,7 +102,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals(22.0*60 + 4.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 49.0*3600, null, null), MatsimTestUtils.EPSILON);
 	}
 
-	public void testTravelCostLineSwitch() {
+	@Test public void testTravelCostLineSwitch() {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
@@ -130,7 +131,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals(40.125, cost3 - cost2, MatsimTestUtils.EPSILON);
 	}
 
-	public void testTravelCostLineSwitch_AdditionalTransferTime() {
+	@Test public void testTravelCostLineSwitch_AdditionalTransferTime() {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),

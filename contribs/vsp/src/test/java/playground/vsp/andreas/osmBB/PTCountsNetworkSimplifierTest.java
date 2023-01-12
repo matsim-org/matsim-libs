@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -34,8 +35,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import junit.framework.Assert;
 
 public class PTCountsNetworkSimplifierTest {
 
