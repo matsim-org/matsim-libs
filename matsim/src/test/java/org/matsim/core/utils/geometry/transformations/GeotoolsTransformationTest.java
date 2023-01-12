@@ -55,8 +55,8 @@ public class GeotoolsTransformationTest {
 		double yWGS84 = coordWGS84.getY();
 
 
-		junit.framework.Assert.assertEquals(targetX, xWGS84, delta);
-		junit.framework.Assert.assertEquals(targetY, yWGS84, delta);
+		org.junit.Assert.assertEquals(targetX, xWGS84, delta);
+		org.junit.Assert.assertEquals(targetY, yWGS84, delta);
 
 	}
 

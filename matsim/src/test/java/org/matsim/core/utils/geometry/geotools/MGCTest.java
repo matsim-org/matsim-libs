@@ -48,8 +48,8 @@ public class MGCTest {
 		Coord coord3 = MGC.coordinate2Coord(coord2);
 		double x1 = coord3.getX();
 		double y1 = coord3.getY();
-		junit.framework.Assert.assertEquals(x,x1,delta);
-		junit.framework.Assert.assertEquals(y,y1,delta);
+		org.junit.Assert.assertEquals(x,x1,delta);
+		org.junit.Assert.assertEquals(y,y1,delta);
 	}
 
 	@Test public void testCoord2PointAndViceVersa(){
@@ -61,8 +61,8 @@ public class MGCTest {
 		Coord coord2 = MGC.point2Coord(p);
 		double x1 = coord2.getX();
 		double y1 = coord2.getY();
-		junit.framework.Assert.assertEquals(x,x1,delta);
-		junit.framework.Assert.assertEquals(y,y1,delta);
+		org.junit.Assert.assertEquals(x,x1,delta);
+		org.junit.Assert.assertEquals(y,y1,delta);
 
 	}
 
@@ -72,37 +72,37 @@ public class MGCTest {
 			double lat = 53.562021;
 			double lon = 9.961533;
 			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
-			junit.framework.Assert.assertEquals("EPSG:32632", epsg);
+			org.junit.Assert.assertEquals("EPSG:32632", epsg);
 		}
 		{
 			//Cupertino - should be UTM 10 North --> EPSG:32610
 			double lat = 37.333488;
 			double lon  = -122.029710;
 			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
-			junit.framework.Assert.assertEquals("EPSG:32610", epsg);
+			org.junit.Assert.assertEquals("EPSG:32610", epsg);
 		}
 		{
 			//Padang - should be UTM 47 South --> EPSG:32747
 			double lat = -0.959484;
 			double lon  =  100.354052;
 			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
-			junit.framework.Assert.assertEquals("EPSG:32747", epsg);
+			org.junit.Assert.assertEquals("EPSG:32747", epsg);
 		}
 	}
 
 	@Test public void testGetCRS(){
 		// CH1903_LV03 Id
-		junit.framework.Assert.assertNotNull(MGC.getCRS("EPSG:21781"));
+		org.junit.Assert.assertNotNull(MGC.getCRS("EPSG:21781"));
 
 		try {
 			MGC.getCRS("");
-			junit.framework.Assert.fail("IllegalArgumentException expected");
+			org.junit.Assert.fail("IllegalArgumentException expected");
 		} catch (IllegalArgumentException expected) { }
 
 		// unknown EPSG Id
 		try {
 			MGC.getCRS("EPSG:MATSim");
-			junit.framework.Assert.fail("IllegalArgumentException expected");
+			org.junit.Assert.fail("IllegalArgumentException expected");
 		} catch (IllegalArgumentException expected) { }
 
 	}
