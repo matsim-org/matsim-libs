@@ -1,5 +1,15 @@
 package org.matsim.contrib.emissions.analysis;
 
+import static org.junit.Assert.*;
+import static org.matsim.contrib.emissions.Pollutant.HC;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -9,12 +19,6 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionUtilsTest;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static junit.framework.TestCase.*;
-import static org.matsim.contrib.emissions.Pollutant.HC;
 
 public class EmissionsOnLinkEventHandlerTest {
 

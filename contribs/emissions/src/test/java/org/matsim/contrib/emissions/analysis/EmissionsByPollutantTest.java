@@ -1,17 +1,17 @@
 package org.matsim.contrib.emissions.analysis;
 
-import org.junit.Test;
-import org.matsim.contrib.emissions.Pollutant;
-import org.matsim.contrib.emissions.utils.EmissionUtilsTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.matsim.contrib.emissions.Pollutant.CO;
+import static org.matsim.contrib.emissions.Pollutant.NO2;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.matsim.contrib.emissions.Pollutant.CO;
-import static org.matsim.contrib.emissions.Pollutant.NO2;
+import org.junit.Test;
+import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.contrib.emissions.utils.EmissionUtilsTest;
 
 public class EmissionsByPollutantTest {
 
