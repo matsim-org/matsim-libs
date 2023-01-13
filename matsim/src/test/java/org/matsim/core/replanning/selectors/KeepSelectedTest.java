@@ -20,9 +20,11 @@
 
 package org.matsim.core.replanning.selectors;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -44,7 +46,7 @@ public class KeepSelectedTest extends AbstractPlanSelectorTest {
 	 *
 	 * @author mrieser
 	 */
-	public void testSelected() {
+	@Test public void testSelected() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan1 = PersonUtils.createAndAddPlan(person, false);
 		Plan plan2 = PersonUtils.createAndAddPlan(person, true);

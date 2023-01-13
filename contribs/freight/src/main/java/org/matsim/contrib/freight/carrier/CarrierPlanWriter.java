@@ -64,7 +64,7 @@ public class CarrierPlanWriter {
 	 *
 	 * @param filename Name of the file that should be written.
 	 */
-	public void writeV2(String filename) {
+	@Deprecated public void writeV2(String filename) {
 		CarrierPlanXmlWriterV2 writer = new CarrierPlanXmlWriterV2(this.carriers);
 		if (this.attributeConverters != null) {
 			writer.putAttributeConverters(this.attributeConverters);

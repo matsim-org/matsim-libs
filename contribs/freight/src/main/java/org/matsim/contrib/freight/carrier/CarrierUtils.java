@@ -32,6 +32,7 @@ import java.util.List;
 
 public class CarrierUtils{
 
+	@SuppressWarnings("unused")
 	private static final  Logger log = LogManager.getLogger(CarrierUtils.class);
 
 	public static Carrier createCarrier( Id<Carrier> id ){
@@ -91,8 +92,8 @@ public class CarrierUtils{
 		log.error("Shipment with Id does not exists", new IllegalStateException("Shipment with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
-	
-	
+
+
 
 	public static CarrierPlan copyPlan( CarrierPlan plan2copy ) {
 		List<ScheduledTour> tours = new ArrayList<>();
@@ -136,5 +137,6 @@ public class CarrierUtils{
 	public static void setJspritIterations( Carrier carrier, int jspritIterations ) {
 		carrier.getAttributes().putAttribute( JSPRIT_ITERATIONS , jspritIterations ) ;
 	}
+
 
 }

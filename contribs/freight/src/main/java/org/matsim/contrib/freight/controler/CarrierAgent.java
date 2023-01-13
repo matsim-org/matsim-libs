@@ -42,7 +42,6 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.events.FreightEventCreator;
-import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -52,7 +51,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This keeps track of the carrier during simulation.
- * 
+ *
  * @author mzilske, sschroeder
  *
  */
@@ -88,9 +87,9 @@ final class CarrierAgent implements Identifiable<Carrier>
 
 	/**
 	 * Returns a list of plans created on the basis of the carrier's plan.
-	 * 
+	 *
 	 * <p>A carrier plan consists usually of many tours (activity chains). Each plan in the returned list represents a carrier tour.
-	 *  
+	 *
 	 * @return list of plans
 	 * @see Plan, CarrierPlan
 	 */
@@ -114,7 +113,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLinkId() );
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
-			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {				
+			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
 				if ( tourElement instanceof Tour.Leg tourLeg ) {
 					Route route = tourLeg.getRoute();
 
@@ -126,7 +125,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 					//this returns TransportMode.car if the attribute is null
 					Leg leg = PopulationUtils.createLeg(CarrierUtils.getCarrierMode(carrier));
 
-					//TODO we might need to set the route to null if the the mode is a drt mode
+					//TODO we might need to set the route to null if the mode is a drt mode
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 
@@ -135,9 +134,8 @@ final class CarrierAgent implements Identifiable<Carrier>
 					// yy why is it setting travel time twice?  kai, jul'22
 
 					plan.addLeg(leg);
-				} else if (tourElement instanceof TourActivity) {
-					TourActivity act = (TourActivity) tourElement;
-					Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());					
+				} else if (tourElement instanceof TourActivity act) {
+					Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());
 					double duration = act.getDuration() ;
 					tourElementActivity.setMaximumDuration(duration); // "maximum" has become a bit of a misnomer ...
 					plan.addActivity(tourElementActivity);

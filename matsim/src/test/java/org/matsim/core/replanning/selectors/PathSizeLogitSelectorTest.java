@@ -20,10 +20,16 @@
 
 package org.matsim.core.replanning.selectors;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -52,20 +58,16 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	private Network network = null;
 	private Config config = null;
 
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
+	@Before public void setUp() {
+		this.config = utils.loadConfig((String)null); // required for planCalcScore.beta to be defined
 		config.planCalcScore().setBrainExpBeta(2.0);
 		config.planCalcScore().setPathSizeLogitBeta(2.0);
 		this.network = null;
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After public void tearDown() {
 		this.network = null;
 		this.config = null;
-		super.tearDown();
 	}
 
 	@Override
@@ -74,7 +76,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	public void testNegativeScore() {
+	@Test public void testNegativeScore() {
 		this.network = createNetwork();
 		PlanSelector<Plan,Person> selector = getPlanSelector();
 
@@ -182,7 +184,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	public void testZeroScore() {
+	@Test public void testZeroScore() {
 		this.network = createNetwork();
 		PlanSelector<Plan,Person> selector = getPlanSelector();
 		Link l1 = network.getLinks().get(Id.create("1", Link.class));
@@ -213,7 +215,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertNotNull(selector.selectPlan(person));
 	}
 
-	public void testPathSizeLogitSelector() {
+	@Test public void testPathSizeLogitSelector() {
 		this.network = createNetwork();
 
 		Link l1 = network.getLinks().get(Id.create("1", Link.class));

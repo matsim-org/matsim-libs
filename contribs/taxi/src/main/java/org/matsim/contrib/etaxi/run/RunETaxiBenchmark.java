@@ -107,8 +107,9 @@ public class RunETaxiBenchmark {
 			}
 		});
 
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+//		controler.configureQSimComponents(
+//				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+		controler.configureQSimComponents( DvrpQSimComponents.activateModes( mode ) );
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

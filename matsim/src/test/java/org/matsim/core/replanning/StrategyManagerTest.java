@@ -267,7 +267,7 @@ public class StrategyManagerTest {
 
 		// run with default settings
 		manager.setMaxPlansPerAgent(plans.length - 2);
-		manager.run(pop, null);
+		manager.run(pop, -1,null);
 
 		assertEquals("wrong number of plans.", 5, p.getPlans().size());
 		// default of StrategyManager is to remove worst plans:
@@ -278,7 +278,7 @@ public class StrategyManagerTest {
 		// change plan selector for removal and run again
 		manager.setPlanSelectorForRemoval(new BestPlanSelector<Plan, Person>());
 		manager.setMaxPlansPerAgent(plans.length - 4);
-		manager.run(pop, null);
+		manager.run(pop, -1,null);
 
 		assertEquals("wrong number of plans.", 3, p.getPlans().size());
 		// default of StrategyManager is to remove worst plans:

@@ -19,6 +19,13 @@
 
 package org.matsim.contrib.locationchoice.timegeography;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+import java.util.Random;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -26,38 +33,39 @@ import org.matsim.contrib.locationchoice.Initializer;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.List;
-import java.util.Random;
+public class LocationMutatorwChoiceSetTest  {
 
-public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private MutableScenario scenario;
 
 	private RecursiveLocationMutator initialize() {
 		Initializer initializer = new Initializer();
-		initializer.init(this);
+		initializer.init(utils);
 		scenario = (MutableScenario) initializer.getControler().getScenario();
 		return new RecursiveLocationMutator(scenario, initializer.getControler().getTripRouterProvider().get(), TimeInterpretation.create(initializer.getControler().getScenario().getConfig()), new Random(4711));
 	}
 
-	public void testConstructor() {
+	@Test public void testConstructor() {
 		RecursiveLocationMutator locationmutator = this.initialize();
 		assertEquals(locationmutator.getMaxRecursions(), 10);
-		assertEquals(locationmutator.getRecursionTravelSpeedChange(), 0.1, EPSILON);
+		assertEquals(locationmutator.getRecursionTravelSpeedChange(), 0.1, MatsimTestUtils.EPSILON);
 	}
 
 
-	public void testHandlePlan() {
+	@Test public void testHandlePlan() {
 		RecursiveLocationMutator locationmutator = this.initialize();
 		Plan plan = scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
 		locationmutator.run(plan);
-		assertEquals(PopulationUtils.getFirstActivity( ((Plan) plan) ).getCoord().getX(), -25000.0, EPSILON);
+		assertEquals(PopulationUtils.getFirstActivity( ((Plan) plan) ).getCoord().getX(), -25000.0, MatsimTestUtils.EPSILON);
 		assertEquals(PopulationUtils.getNextLeg(((Plan) plan), PopulationUtils.getFirstActivity( ((Plan) plan) )).getRoute(), null);
 	}
 
-	public void testCalcActChains() {
+	@Test public void testCalcActChains() {
 		RecursiveLocationMutator locationmutator = this.initialize();
 		Plan plan = scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
 		List<SubChain> list = locationmutator.calcActChains(plan);

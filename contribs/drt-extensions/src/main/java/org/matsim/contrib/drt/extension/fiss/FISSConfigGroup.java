@@ -34,6 +34,10 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
     @NotNull
     public Set<String> sampledModes = Collections.singleton(TransportMode.car);
 
+	@Parameter
+	@Comment("Disable FISS in the last iteration to get events of all agents. May be required for post-processing")
+	public boolean switchOffFISSLastIteration = true;
+
     public FISSConfigGroup() {
         super(GROUP_NAME);
     }

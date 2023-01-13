@@ -70,8 +70,6 @@ final class CarrierDriverAgent{
 	void handleAnEvent(Event event){
 		// the event comes to here from CarrierAgent#handleEvent only for events concerning this driver
 
-		int previousPlanElementCounter = this.planElementCounter;
-
 		if( event instanceof PersonArrivalEvent ){
 			handleEvent( (PersonArrivalEvent) event);
 		} else if( event instanceof PersonDepartureEvent ){
@@ -125,7 +123,7 @@ final class CarrierDriverAgent{
 
 	private void handleEvent( LinkEnterEvent event ){
 		if( scoringFunction != null ){
-			scoringFunction.handleEvent( new LinkEnterEvent( event.getTime(), getVehicle().getId(), event.getLinkId() ) );
+			scoringFunction.handleEvent( event );
 		}
 		currentRoute.add( event.getLinkId() );
 		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );

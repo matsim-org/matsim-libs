@@ -19,6 +19,8 @@
 
 package org.matsim.vehicles;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,13 +29,19 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author dgrether
  */
-public class MatsimVehicleWriterTest extends MatsimTestCase {
+public class MatsimVehicleWriterTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	private static final Logger log = LogManager.getLogger(MatsimVehicleWriterTest.class);
 
 	private static final String TESTXML = "testVehicles_v1.xml";
@@ -42,9 +50,7 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 	private Id<Vehicle> id42;
 	private Id<Vehicle> id42_23;
 
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
+	@Before public void setUp() {
 
 		id23 = Id.create("23", Vehicle.class);
 		id42 = Id.create("42", Vehicle.class);
@@ -54,16 +60,16 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 		id42_23 = Id.create(" 42  23", Vehicle.class);
 	}
 
-	public void testWriter() throws FileNotFoundException, IOException {
+	@Test public void testWriter() throws FileNotFoundException, IOException {
 		{
-			String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
+			String outfileName = utils.getOutputDirectory() + "testOutputVehicles.xml";
 
 			// create empty vehicles container:
 			Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 			// read, which will be v1:
 			MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
-			reader.readFile(this.getPackageInputDirectory() + TESTXML);
+			reader.readFile(utils.getPackageInputDirectory() + TESTXML);
 
 			VehicleType vehType = vehicles.getVehicleTypes().get(Id.create("normal&Car", VehicleType.class));
 
@@ -76,7 +82,7 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 			// read, which will now be in the newest fmt:
 			Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 			MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
-			reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
+			reader.readFile(utils.getOutputDirectory() + "testOutputVehicles.xml");
 
 			VehicleType vehType = vehicles.getVehicleTypes().get(Id.create("normal&Car", VehicleType.class));
 
@@ -93,26 +99,26 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 		assertEquals(2, vehicleTypes.size());
 		VehicleType vehTypeDefaultCar = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
 		assertNotNull(vehTypeDefaultCar);
-		assertEquals(9.5, vehTypeDefaultCar.getLength(), EPSILON);
-		assertEquals(3.0, vehTypeDefaultCar.getWidth(), EPSILON);
-		assertEquals(42.0, vehTypeDefaultCar.getMaximumVelocity(), EPSILON);
+		assertEquals(9.5, vehTypeDefaultCar.getLength(), MatsimTestUtils.EPSILON);
+		assertEquals(3.0, vehTypeDefaultCar.getWidth(), MatsimTestUtils.EPSILON);
+		assertEquals(42.0, vehTypeDefaultCar.getMaximumVelocity(), MatsimTestUtils.EPSILON);
 		assertNotNull(vehTypeDefaultCar.getCapacity());
 		assertEquals(Integer.valueOf(5), vehTypeDefaultCar.getCapacity().getSeats());
 		assertEquals(Integer.valueOf(20), vehTypeDefaultCar.getCapacity().getStandingRoom());
-		assertEquals(23.23, vehTypeDefaultCar.getCapacity().getVolumeInCubicMeters(), EPSILON);
+		assertEquals(23.23, vehTypeDefaultCar.getCapacity().getVolumeInCubicMeters(), MatsimTestUtils.EPSILON);
 		assertNotNull(vehTypeDefaultCar.getEngineInformation());
 		assertEquals(EngineInformation.FuelType.diesel,
 				VehicleUtils.getFuelType(vehTypeDefaultCar.getEngineInformation()));
-		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeDefaultCar), EPSILON);
-		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeDefaultCar), EPSILON);
-		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeDefaultCar), EPSILON);
+		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeDefaultCar), MatsimTestUtils.EPSILON);
+		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeDefaultCar), MatsimTestUtils.EPSILON);
+		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeDefaultCar), MatsimTestUtils.EPSILON);
 		assertEquals(VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar));
-		assertEquals(2.0, vehTypeDefaultCar.getPcuEquivalents());
+		assertEquals(2.0, vehTypeDefaultCar.getPcuEquivalents(), 0);
 
 		vehTypeDefaultCar = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehTypeDefaultCar);
-		assertEquals(7.5, vehTypeDefaultCar.getLength(), EPSILON);
-		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
+		assertEquals(7.5, vehTypeDefaultCar.getLength(), MatsimTestUtils.EPSILON);
+		assertEquals(1.0, vehTypeDefaultCar.getWidth(), MatsimTestUtils.EPSILON);
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
 		assertNotNull(vehTypeDefaultCar.getCapacity());
 		assertNotNull(vehTypeDefaultCar.getCostInformation());
@@ -120,7 +126,7 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter());
 		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond());
 		assertEquals(VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar));
-		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
+		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents(), 0);
 
 		assertNotNull(vehicles);
 		assertEquals(3, vehicles.size());
