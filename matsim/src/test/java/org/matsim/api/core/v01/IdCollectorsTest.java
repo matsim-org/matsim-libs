@@ -65,6 +65,23 @@ public class IdCollectorsTest {
 	}
 
 	@Test
+	public void testToIdMap_withMerge() {
+		record Entry(Id<Vehicle> id, int value) {
+		}
+
+		// all entries with the same key, so we need to merge them
+		var e1 = new Entry(Id.createVehicleId("v"), 1);
+		var e2 = new Entry(Id.createVehicleId("v"), 2);
+		var e3 = new Entry(Id.createVehicleId("v"), 3);
+
+		var entries = List.of(e1, e2, e3);
+		Map<Id<Vehicle>, Integer> map = entries.stream().collect(IdCollectors.toIdMap(Vehicle.class, Entry::id, Entry::value, Integer::sum));
+
+		assertThat(map).hasSize(1);
+		assertThat(map).containsEntry(e1.id, e1.value + e2.value + e3.value);
+	}
+
+	@Test
 	public void testToIdSet() {
 		var id1 = Id.createVehicleId("v1");
 		var id2 = Id.createVehicleId("v2");
