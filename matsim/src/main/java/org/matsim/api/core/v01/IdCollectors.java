@@ -22,6 +22,7 @@ package org.matsim.api.core.v01;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
@@ -52,6 +53,23 @@ public class IdCollectors {
 						V u = m1.putIfAbsent(k, v);
 						Preconditions.checkState(u == null, "Duplicate key %s (attempted merging values %s and %s)", k, u, v);
 					}
+					return m1;
+				},
+				// characteristics
+				Characteristics.IDENTITY_FINISH);
+	}
+
+	public static <T, K, V> Collector<T, ?, IdMap<K, V>> toIdMap(Class<K> idClass, Function<? super T, ? extends Id<K>> keyMapper,
+			Function<? super T, ? extends V> valueMapper, BinaryOperator<V> mergeFunction) {
+		return Collector.of(
+				// supplier
+				() -> new IdMap<>(idClass),
+				// accumulator
+				(map, element) -> map.merge(keyMapper.apply(element), valueMapper.apply(element), mergeFunction),
+				// combiner
+				(m1, m2) -> {
+					for (Map.Entry<Id<K>, V> e : m2.entrySet())
+						m1.merge(e.getKey(), e.getValue(), mergeFunction);
 					return m1;
 				},
 				// characteristics
