@@ -34,31 +34,47 @@ import com.google.common.base.Preconditions;
 public class IdCollectors {
 	public static <T, K, V> Collector<T, ?, IdMap<K, V>> toIdMap(Class<K> idClass, Function<? super T, ? extends Id<K>> keyMapper,
 			Function<? super T, ? extends V> valueMapper) {
-		return Collector.of(() -> new IdMap<>(idClass), (map, element) -> {
-			Id<K> k = keyMapper.apply(element);
-			V v = Objects.requireNonNull(valueMapper.apply(element));
-			V u = map.putIfAbsent(k, v);
-			Preconditions.checkState(u == null, "Duplicate key %s (attempted merging values %s and %s)", k, u, v);
-		}, (m1, m2) -> {
-			for (Map.Entry<Id<K>, V> e : m2.entrySet()) {
-				Id<K> k = e.getKey();
-				V v = Objects.requireNonNull(e.getValue());
-				V u = m1.putIfAbsent(k, v);
-				Preconditions.checkState(u == null, "Duplicate key %s (attempted merging values %s and %s)", k, u, v);
-			}
-			return m1;
-		}, Characteristics.IDENTITY_FINISH);
+		return Collector.of(
+				// supplier
+				() -> new IdMap<>(idClass),
+				// accumulator
+				(map, element) -> {
+					Id<K> k = keyMapper.apply(element);
+					V v = Objects.requireNonNull(valueMapper.apply(element));
+					V u = map.putIfAbsent(k, v);
+					Preconditions.checkState(u == null, "Duplicate key %s (attempted merging values %s and %s)", k, u, v);
+				},
+				// combiner
+				(m1, m2) -> {
+					for (Map.Entry<Id<K>, V> e : m2.entrySet()) {
+						Id<K> k = e.getKey();
+						V v = Objects.requireNonNull(e.getValue());
+						V u = m1.putIfAbsent(k, v);
+						Preconditions.checkState(u == null, "Duplicate key %s (attempted merging values %s and %s)", k, u, v);
+					}
+					return m1;
+				},
+				// characteristics
+				Characteristics.IDENTITY_FINISH);
 	}
 
 	public static <T> Collector<Id<T>, ?, IdSet<T>> toIdSet(Class<T> idClass) {
-		return Collector.of(() -> new IdSet<>(idClass), IdSet::add, (left, right) -> {
-			if (left.size() < right.size()) {
-				right.addAll(left);
-				return right;
-			} else {
-				left.addAll(right);
-				return left;
-			}
-		}, Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
+		return Collector.of(
+				// supplier
+				() -> new IdSet<>(idClass),
+				// accumulator
+				IdSet::add,
+				// combiner
+				(left, right) -> {
+					if (left.size() < right.size()) {
+						right.addAll(left);
+						return right;
+					} else {
+						left.addAll(right);
+						return left;
+					}
+				},
+				// characteristics
+				Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
 	}
 }
