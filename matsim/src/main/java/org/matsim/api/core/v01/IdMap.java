@@ -17,7 +17,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 
 	private static final int INCREMENT = 100;
 	private static final float INCREMENT_FACTOR = 1.5f;
-	private Class<T> idClass;
+	private final Class<T> idClass;
 	private int size = 0;
 	private Object[] data;
 
@@ -242,9 +242,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 							return false;
 					}
 				}
-			} catch (ClassCastException noIdAsKey) {
-				return false;
-			} catch (NullPointerException unused) {
+			} catch (ClassCastException | NullPointerException noIdAsKey) {
 				return false;
 			}
 			return true;
@@ -619,9 +617,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 					return false;
 				try {
 					return containsAll(c);
-				} catch (ClassCastException unused) {
-					return false;
-				} catch (NullPointerException unused) {
+				} catch (ClassCastException | NullPointerException unused) {
 					return false;
 				}
 			}
@@ -759,9 +755,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 					return false;
 				try {
 					return containsAll(c);
-				} catch (ClassCastException unused) {
-					return false;
-				} catch (NullPointerException unused) {
+				} catch (ClassCastException | NullPointerException unused) {
 					return false;
 				}
 			}
