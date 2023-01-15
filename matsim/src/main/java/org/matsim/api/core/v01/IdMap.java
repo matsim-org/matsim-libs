@@ -118,6 +118,10 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		return idx < this.data.length && this.data[idx] != null;
 	}
 
+	public boolean containsKey(int index) {
+		return index < this.data.length && this.data[index] != null;
+	}
+
 	public V get(Id<T> key) {
 		int idx = key.index();
 		if (idx < this.data.length) {

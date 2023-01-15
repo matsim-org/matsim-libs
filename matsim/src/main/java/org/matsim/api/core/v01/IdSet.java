@@ -42,6 +42,10 @@ public class IdSet<T> implements Set<Id<T>> {
 		return this.data.get(id.index());
 	}
 
+	public boolean contains(int index) {
+		return this.data.get(index);
+	}
+
 	@Override
 	public Iterator<Id<T>> iterator() {
 		return new IdSetIterator<>(this);
