@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import static java.lang.Math.min;
+
 
 /**
  * @author dgrether
@@ -210,8 +212,9 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 			final double vehicleSpacing = mveh.getSizeInEquivalents() * spacingOfOnePCE;
 			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(
-					now, curvedLength, freeSpeed, vehicleSpacing, distanceFromFromNode, remainingTravelTime
+					now, curvedLength, min( freeSpeed, veh.getMaximumVelocity()), vehicleSpacing, distanceFromFromNode, remainingTravelTime
 			);
+			// yyyy if the LinkSpeedCalculator says something that is not free speed, we are out of luck here.  kai, jan'23
 
 			int lane = VisUtils.guessLane(veh, numberOfLanesAsInt);
 			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh, inverseFlowCapPerTS, now, freeSpeed);
