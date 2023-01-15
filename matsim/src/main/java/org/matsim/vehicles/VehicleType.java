@@ -116,8 +116,9 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 	public final String getNetworkMode() {
 		return networkMode;
 	}
-	public final void setNetworkMode( String networkMode ) {
+	public final VehicleType setNetworkMode( String networkMode ) {
 		this.networkMode = networkMode;
+		return this;
 	}
 
 	// the following are attributes that did not seem universal enough and thus were relegated to free-form Attributes for the time being.  kai/kai, sep'19
