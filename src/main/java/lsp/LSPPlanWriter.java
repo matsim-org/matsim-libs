@@ -35,6 +35,7 @@ public class LSPPlanWriter extends MatsimXmlWriter {
                 startLSP(lsp, this.writer);
 				writeResources(lsp, this.writer);
                 writeShipments(lsp, this.writer);
+                writePlans(lsp, this.writer);
                 endLSP(this.writer);
 			}
             endLSPs(this.writer);
@@ -63,17 +64,17 @@ public class LSPPlanWriter extends MatsimXmlWriter {
         writer.write("\t\t\t<resources>\n");
         for (LSPResource resource : lsp.getResources()) {
             if (resource instanceof TransshipmentHub hub) {
-                writer.write("\t\t\t\t<transshipmentHub ");
+                writer.write("\t\t\t\t<hub ");
                 writer.write("id=\"" + hub.getId() + "\" ");
                 writer.write("location=\"" + hub.getStartLinkId() + "\" ");
                 writer.write("fixedCost=\"" + hub.getAttributes().getAttribute("fixedCost") + "\"/>\n");
             }
             if (resource instanceof LSPCarrierResource carrierResource) {
-                writer.write("\t\t\t\t<LspCarrierResource ");
-                writer.write("id=\"" + carrierResource.getCarrier().getId() + "\" ");
-                writer.write("startLink=\"" + carrierResource.getStartLinkId() + "\"/>\n");
+                writer.write("\t\t\t\t<carrier ");
+                writer.write("id=\"" + carrierResource.getId() + "\" ");
+                writer.write("type=\"" + carrierResource.getCarrier().getAttributes().getAsMap().values() + "\"/>\n");
+                }
             }
-        }
         writer.write("\t\t\t</resources>\n");
     }
 
@@ -101,6 +102,22 @@ public class LSPPlanWriter extends MatsimXmlWriter {
             }
         }
         writer.write("\t\t\t</shipments>\n");
+    }
+
+    private void writePlans(LSP lsp, BufferedWriter writer)throws IOException {
+        if(lsp.getPlans().isEmpty()) return;
+        writer.write("\t\t\t<plans>\n");
+        for (LSPPlan lspPlan : lsp.getPlans()) {
+            writer.write("\t\t\t\t<plan ");
+            writer.write("score=\"" + lspPlan.getScore() + "\"/>\n");
+            for (var lspLogisticChain : lspPlan.getLogisticChain()) {
+                for (var shipments : lspLogisticChain.getShipments()) {
+                    writer.write("shipment=\"" + shipments.getId() + "\"/>\n"));
+                }
+            }
+
+        }
+        writer.write("\t\t\t</plans>\n");
     }
 
     private void endLSP(BufferedWriter writer) throws IOException {
