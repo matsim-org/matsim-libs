@@ -257,6 +257,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		HbefaWarmEmissionFactorKey efkey = new HbefaWarmEmissionFactorKey();
 		efkey.setVehicleCategory(vehicleInformationTuple.getFirst());
 		efkey.setRoadCategory(roadType);
+		//efkey.setRoadGradient(roadGradient); //TODO how to add the args roadGradient to the function() above?!
 		if (this.detailedHbefaWarmTable != null) {
 			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
