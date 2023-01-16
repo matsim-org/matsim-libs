@@ -29,10 +29,15 @@ abstract class HbefaEmissionFactorKey {
 	private HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
 	private Pollutant component;
 
+
+
+	private HbefaRoadGradient roadGradient;
+
 	HbefaEmissionFactorKey(HbefaEmissionFactorKey copyFrom) {
 		this.vehicleCategory = copyFrom.getVehicleCategory();
 		this.vehicleAttributes = copyFrom.getVehicleAttributes();
 		this.component = copyFrom.getComponent();
+		this.roadGradient = copyFrom.getRoadGradient();
 	}
 
 	HbefaEmissionFactorKey() {
@@ -61,6 +66,14 @@ abstract class HbefaEmissionFactorKey {
 
 	public void setComponent(Pollutant component) {
 		this.component = component;
+	}
+
+	public HbefaRoadGradient getRoadGradient() {
+		return roadGradient;
+	}
+
+	public void setRoadGradient(HbefaRoadGradient roadGradient) {
+		this.roadGradient = roadGradient;
 	}
 
 	@Override
