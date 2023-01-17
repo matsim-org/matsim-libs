@@ -161,25 +161,21 @@ public class LSPPlanWriter extends MatsimXmlWriter {
         if (lsp.getPlans().isEmpty()) return;
         writer.write("\t\t\t<shipmentPlans>\n");
 
-        for (LSPPlan plan : lsp.getPlans()) {
-            for (LogisticChain logisticChain : plan.getLogisticChain()) {
-                for (LSPShipment shipment : logisticChain.getShipments()) {
-                    writer.write("\t\t\t\t<plan shipmentId=\"" + shipment.getId() + "\">\n");
-                    for (ShipmentPlanElement element : shipment.getShipmentPlan().getPlanElements().values()) {
-                        writer.write("\t\t\t\t\t<element type=\"" + element.getElementType() + "\" ");
-                        writer.write("startTime=\"" + element.getStartTime() + "\" ");
-                        writer.write("endTime=\"" + element.getEndTime() + "\" ");
-                        writer.write("resource=\"" + element.getResourceId() + "\"/>\n");
-
-                    }
-                    writer.write("\t\t\t\t</plan>\n");
+        LSPPlan plan = lsp.getPlans().iterator().next();
+        for (LogisticChain logisticChain : plan.getLogisticChain()) {
+            for (LSPShipment shipment : logisticChain.getShipments()) {
+                writer.write("\t\t\t\t<plan shipmentId=\"" + shipment.getId() + "\">\n");
+                for (ShipmentPlanElement element : shipment.getShipmentPlan().getPlanElements().values()) {
+                    writer.write("\t\t\t\t\t<element type=\"" + element.getElementType() + "\" ");
+                    writer.write("startTime=\"" + element.getStartTime() + "\" ");
+                    writer.write("endTime=\"" + element.getEndTime() + "\" ");
+                    writer.write("resource=\"" + element.getResourceId() + "\"/>\n");
                 }
-                writer.write("\t\t\t</plan>\n");
+                writer.write("\t\t\t\t</plan>\n");
             }
         }
         writer.write("\t\t\t</shipmentPlans>\n");
     }
-
 
     private String getTime(double time) {
         return Time.writeTime(time);
