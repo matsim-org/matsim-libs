@@ -34,7 +34,6 @@ public class IntegrationTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	@SuppressWarnings("static-method")
 	@Test
 	public final void test() {
 		
