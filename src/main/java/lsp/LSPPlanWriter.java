@@ -90,7 +90,7 @@ public class LSPPlanWriter extends MatsimXmlWriter {
                             + "\"/>\n");
                 }
                 writer.write("\t\t\t\t\t\t</vehicles>\n");
-                writer.write("\t\t\t\t\t</capabilities>\n\n");
+                writer.write("\t\t\t\t\t</capabilities>\n");
                 }
             }
         writer.write("\t\t\t</resources>\n\n");
@@ -129,7 +129,7 @@ public class LSPPlanWriter extends MatsimXmlWriter {
         for (LSPPlan plan : lsp.getPlans()) {
             writer.write("\t\t\t\t<plan");
             if (plan.getScore() != null) {
-                writer.write(" score=\"" + plan.getScore().toString() + "\"");
+                writer.write(" score=\"" + plan.getScore() + "\"");
             }
             if (lsp.getSelectedPlan() != null) {
                 if (plan == lsp.getSelectedPlan()) {
@@ -142,23 +142,23 @@ public class LSPPlanWriter extends MatsimXmlWriter {
             }
             writer.write(">\n");
 
-            for (var chain : plan.getLogisticChain()) {
-                for (var shipment : chain.getShipments()) {
-                    for (var element : shipment.getShipmentPlan().getPlanElements().values()) {
-                        writer.write("\t\t\t\t\t<shipmentPlan ");
-                        writer.write("resourceIid=\"" + element.getResourceId() + "\" ");
-                        writer.write("elementId=\"" + element.getLogisticChainElement().getId() + "\" ");
-                        writer.write("startTime=\"" + element.getStartTime() + "\" ");
-                        writer.write("endTime=\"" + element.getEndTime() +  "\" ");
-                        writer.write("elementType=\"" + element.getElementType() + "\"/>\n");
+            for (var logisticChain : plan.getLogisticChain()) {
+                for (var chainElement : logisticChain.getLogisticChainElements()) {
+                    writer.write("\t\t\t\t\t<resource id=\"" +  chainElement.getResource().getId() + "\"/>\n");
+                    writer.write("\t\t\t\t\t\t<shipmentPlans>\n");
+                    for (var shipment : logisticChain.getShipments()) {
+                        writer.write("\t\t\t\t\t\t\t<shipmentPlan shipmentId=\"" +  shipment.getId() + "\">\n");
+                        for (var element : shipment.getShipmentPlan().getPlanElements().values()) {
+                            writer.write("\t\t\t\t\t\t\t\telementType=\"" + element.getElementType() + "\" ");
+                            writer.write("startTime=\"" + element.getStartTime() + "\" ");
+                            writer.write("endTime=\"" + element.getEndTime() +  "\"/>\n");
+                        }
+                        writer.write("\t\t\t\t\t\t\t</shipmentPlan>\n");
                     }
+                    writer.write("\t\t\t\t\t\t</shipmentPlans>\n");
                 }
-                for (var chainElements : chain.getLogisticChainElements()) {
-                    writer.write("\t\t\t\t\t<logisticChainElement ");
-                    writer.write("resource=\"" +  chainElements.getResource() + "\"/>\n");
-                }
-                writer.write("\t\t\t\t</plan>\n\n");
             }
+            writer.write("\t\t\t\t</plan>\n");
         }
         writer.write("\t\t\t</plans>\n\n");
     }
