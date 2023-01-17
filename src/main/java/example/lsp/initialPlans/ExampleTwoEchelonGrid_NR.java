@@ -142,14 +142,13 @@ final class ExampleTwoEchelonGrid_NR {
 				bind( LSPScorerFactory.class ).toInstance( () -> new MyLSPScorer() );
 			}
 		} );
-
-
-		//Ggf. muss der Ordner noch erstellt werden (?)
-		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
 		
 		log.info("Run MATSim");
 		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
 		controler.run();
+
+		//Ggf. muss der Ordner noch erstellt werden (?)
+		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
 
 		log.info("Some results ....");
 

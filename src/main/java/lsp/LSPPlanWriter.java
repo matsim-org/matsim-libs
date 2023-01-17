@@ -1,6 +1,7 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlanElement;
 import lsp.usecase.TransshipmentHub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -142,21 +143,21 @@ public class LSPPlanWriter extends MatsimXmlWriter {
             }
             writer.write(">\n");
 
-            for (var logisticChain : plan.getLogisticChain()) {
-                for (var chainElement : logisticChain.getLogisticChainElements()) {
-                    writer.write("\t\t\t\t\t<resource id=\"" +  chainElement.getResource().getId() + "\"/>\n");
-                    writer.write("\t\t\t\t\t\t<shipmentPlans>\n");
-                    for (var shipment : logisticChain.getShipments()) {
-                        writer.write("\t\t\t\t\t\t\t<shipmentPlan shipmentId=\"" +  shipment.getId() + "\">\n");
-                        for (var element : shipment.getShipmentPlan().getPlanElements().values()) {
-                            writer.write("\t\t\t\t\t\t\t\telementType=\"" + element.getElementType() + "\" ");
-                            writer.write("startTime=\"" + element.getStartTime() + "\" ");
-                            writer.write("endTime=\"" + element.getEndTime() +  "\"/>\n");
-                        }
-                        writer.write("\t\t\t\t\t\t\t</shipmentPlan>\n");
-                    }
-                    writer.write("\t\t\t\t\t\t</shipmentPlans>\n");
+            for (LogisticChain logisticChain : plan.getLogisticChain()) {
+                for (LogisticChainElement chainElement : logisticChain.getLogisticChainElements()) {
+                    writer.write("\t\t\t\t\t<resource id=\"" + chainElement.getResource().getId() + "\"/>\n");
                 }
+                writer.write("\t\t\t\t\t<shipmentPlans>\n");
+                for (LSPShipment shipment : logisticChain.getShipments()) {
+                    writer.write("\t\t\t\t\t\t<shipmentPlan shipmentId=\"" +  shipment.getId() + "\">\n");
+                    for (ShipmentPlanElement element : shipment.getShipmentPlan().getPlanElements().values()) {
+                        writer.write("\t\t\t\t\t\t\telementType=\"" + element.getElementType() + "\" ");
+                        writer.write("startTime=\"" + element.getStartTime() + "\" ");
+                        writer.write("endTime=\"" + element.getEndTime() +  "\"/>\n");
+                    }
+                    writer.write("\t\t\t\t\t\t</shipmentPlan>\n");
+                }
+                writer.write("\t\t\t\t\t</shipmentPlans>\n");
             }
             writer.write("\t\t\t\t</plan>\n");
         }
