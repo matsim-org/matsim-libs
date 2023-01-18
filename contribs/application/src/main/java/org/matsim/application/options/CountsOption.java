@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.counts;
+package org.matsim.application.options;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -65,8 +65,9 @@ public final class CountsOption {
 		}
 
 		try (var reader = Files.newBufferedReader(manual)) {
-			List<CSVRecord> records = CSVFormat.newFormat(';')
-					.withAllowMissingColumnNames()
+			List<CSVRecord> records = CSVFormat.Builder.create()
+					.setAllowMissingColumnNames(true)
+					.build()
 					.parse(reader)
 					.getRecords();
 
