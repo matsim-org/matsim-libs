@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CountsOption;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -238,7 +239,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		try{
 			CSVParser records = CSVFormat
 					.Builder.create()
-					.setAllowMissingColumnNames(false)
+					.setAllowMissingColumnNames(true)
 					.setDelimiter(';')
 					.setHeader()
 					.build()
@@ -478,7 +479,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 			CSVParser records = CSVFormat
 					.Builder.create()
-					.setAllowMissingColumnNames(false)
+					.setAllowMissingColumnNames(true)
 					.setDelimiter(';')
 					.setHeader()
 					.build()
