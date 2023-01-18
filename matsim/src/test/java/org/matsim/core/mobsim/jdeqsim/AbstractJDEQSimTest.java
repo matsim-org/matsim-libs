@@ -21,6 +21,8 @@
 
  package org.matsim.core.mobsim.jdeqsim;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -62,13 +64,8 @@ import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public abstract class AbstractJDEQSimTest {
 
@@ -252,7 +249,7 @@ public abstract class AbstractJDEQSimTest {
 	}
 
 
-	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, 
+	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler,
 			LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler {
 
 		@Override
@@ -263,7 +260,7 @@ public abstract class AbstractJDEQSimTest {
 		public void handleEvent(VehicleEntersTrafficEvent event) {
 			// save drivers
 			vehicleToDriver.put(event.getVehicleId(), event.getPersonId());
-			
+
 			if (!eventsByPerson.containsKey(event.getPersonId())) {
 				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
 			}
@@ -296,7 +293,7 @@ public abstract class AbstractJDEQSimTest {
 				eventsByPerson.put(driverId, new LinkedList<Event>());
 			}
 			eventsByPerson.get(driverId).add(event);
-			
+
 			allEvents.add(event);
 		}
 
@@ -307,7 +304,7 @@ public abstract class AbstractJDEQSimTest {
 				eventsByPerson.put(driverId, new LinkedList<Event>());
 			}
 			eventsByPerson.get(driverId).add(event);
-			
+
 			allEvents.add(event);
 		}
 

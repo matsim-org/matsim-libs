@@ -20,24 +20,31 @@
 
 package org.matsim.core.utils.misc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import junit.framework.AssertionFailedError;
-
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Tests the functionality of the class org.matsim.utils.misc.ArgumentParser.
  *
  * @author mrieser
  */
-public class ArgumentParserTest extends MatsimTestCase {
+public class ArgumentParserTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Test if regular arguments (no options) are correctly recognized.
 	 */
-	public void testArguments() {
+	@Test public void testArguments() {
 		ArgumentParser parser = new ArgumentParser(
 				new String[] {"a", "bc", "def=g", "hjk=lmn opq"});
 		Iterator<String> iter = parser.iterator();
@@ -51,7 +58,7 @@ public class ArgumentParserTest extends MatsimTestCase {
 	/**
 	 * Test if short options (beginning with '-'), which can be written in a collapsed form, are correctly recognized.
 	 */
-	public void testShortOptions() {
+	@Test public void testShortOptions() {
 		ArgumentParser parser = new ArgumentParser(
 				new String[] {"-a", "-b", "-cd", "-efg", "-h=j", "-kl=m", "-nop=qrs", "-tu=vw xyz", "=", "-", "-=", "-1", "-2=", "-=3", "-=4=5"}, true);
 		Iterator<String> iter = parser.iterator();
@@ -89,7 +96,7 @@ public class ArgumentParserTest extends MatsimTestCase {
 	/**
 	 * Test if long options (beginning with '--') are correctly recognized.
 	 */
-	public void testLongOptions() {
+	@Test public void testLongOptions() {
 		ArgumentParser parser = new ArgumentParser(
 				new String[] {"--a", "--bc", "--def=ghj", "--kl=mn op", "=", "--qr=", "--=", "--=st", "--=uv=wxy z"}, true);
 		Iterator<String> iter = parser.iterator();
@@ -111,7 +118,7 @@ public class ArgumentParserTest extends MatsimTestCase {
 	/**
 	 * Test if a mix of arguments and options are correctly recognized.
 	 */
-	public void testMixed() {
+	@Test public void testMixed() {
 		// first test it with short arguments enabled
 		ArgumentParser parser = new ArgumentParser(
 				new String[] {"-xcf", "myfile.tgz", "file1", "file2", "--verbose"}, true);
@@ -155,11 +162,11 @@ public class ArgumentParserTest extends MatsimTestCase {
 	private void assertIteratorAtEnd(final Iterator<?> iter) {
 		try {
 			iter.next();
-			throw new AssertionFailedError("expected NoSuchElementException, didn't receive one.");
+			fail("expected NoSuchElementException, didn't receive one.");
 		} catch (NoSuchElementException e) {
 			// everything is great! just as we expected
 		} catch (Exception e) {
-			throw new AssertionFailedError("expected NoSuchElementException, got " + e.getClass().getName());
+			fail("expected NoSuchElementException, got " + e.getClass().getName());
 		}
 	}
 

@@ -20,6 +20,10 @@
 
 package org.matsim.core.trafficmonitoring;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -31,17 +35,20 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
+public class LinkToLinkTravelTimeCalculatorTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * @author mrieser
 	 */
-	public void testLongTravelTimeInEmptySlot() {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(loadConfig(null));
+	@Test public void testLongTravelTimeInEmptySlot() {
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(utils.loadConfig((String)null));
     scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);

@@ -20,8 +20,16 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,17 +42,17 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+public class WalkTravelTimeTest {
 
-public class WalkTravelTimeTest extends MatsimTestCase {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final Logger log = LogManager.getLogger(WalkTravelTimeTest.class);
 
-	public void testLinkTravelTimeCalculation() {
+	@Test public void testLinkTravelTimeCalculation() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
@@ -83,7 +91,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		assertEquals(calculatedTravelTime - 0.42018055124753945, 0.0);
+		Assert.assertEquals(calculatedTravelTime - 0.42018055124753945, 0.0, 0);
 
 		// increase age
 		PersonUtils.setAge(person, 80);
@@ -93,7 +101,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		assertEquals(calculatedTravelTime - 0.9896153709417187, 0.0);
+		Assert.assertEquals(calculatedTravelTime - 0.9896153709417187, 0.0, 0);
 
 		// change gender
 		PersonUtils.setSex(person, "f");
@@ -103,7 +111,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		assertEquals(calculatedTravelTime - 1.0987068291557665, 0.0);
+		Assert.assertEquals(calculatedTravelTime - 1.0987068291557665, 0.0, 0);
 
 		// change slope from 0% to -10%
 		h2 = -0.1;
@@ -117,7 +125,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		assertEquals(calculatedTravelTime - 1.0489849428640121, 0.0);
+		Assert.assertEquals(calculatedTravelTime - 1.0489849428640121, 0.0, 0);
 
 		// change slope from -10% to 10%
 		h2 = 0.1;
@@ -130,7 +138,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		expectedTravelTime = link.getLength() / speed;
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < MatsimTestUtils.EPSILON);
-		assertEquals(calculatedTravelTime - 1.2397955643824945, 0.0);
+		Assert.assertEquals(calculatedTravelTime - 1.2397955643824945, 0.0, 0);
 	}
 
 	private void printInfo(Person p, double expected, double calculated, double slope) {
@@ -158,7 +166,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		log.info(sb.toString());
 	}
 
-	public void testThreadLocals() {
+	@Test public void testThreadLocals() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

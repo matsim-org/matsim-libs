@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * ${file_name}
+ *  * CarrierPlanReaderV1Test.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -19,11 +19,6 @@
  *  *                                                                         *
  *  * ***********************************************************************
  *
- * ${filecomment}
- * ${package_declaration}
- *
- * ${typecomment}
- * ${type_declaration}
  */
 
 package org.matsim.contrib.freight.carrier;

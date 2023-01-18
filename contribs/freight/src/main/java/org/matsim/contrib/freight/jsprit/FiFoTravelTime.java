@@ -28,10 +28,10 @@ import org.matsim.vehicles.Vehicle;
 
 public class FiFoTravelTime implements TravelTime {
 
-	private TravelTime travelTime;
-	
-	private int binSize;
-	
+	private final TravelTime travelTime;
+
+	private final int binSize;
+
 	public FiFoTravelTime(TravelTime travelTime, int binSize) {
 		super();
 		this.travelTime = travelTime;
@@ -69,10 +69,9 @@ public class FiFoTravelTime implements TravelTime {
 	}
 
 	private double getTravelTime(Link link, double time, Vehicle vehicle) {
-		double linkTravelTime = travelTime.getLinkTravelTime(link, time, null, vehicle);
-		return linkTravelTime;
+		return travelTime.getLinkTravelTime(link, time, null, vehicle);
 	}
-		
+
 	private double calculateCurrentSpeed(Link link, double time, Vehicle vehicle) {
 		double speed = link.getLength()/getTravelTime(link, time, vehicle);
 		if(speed > vehicle.getType().getMaximumVelocity()){
@@ -80,7 +79,7 @@ public class FiFoTravelTime implements TravelTime {
 		}
 		return speed;
 	}
-	
+
 	private int getTimeBin(double currentTime){
 		return (int)currentTime/binSize;
 	}

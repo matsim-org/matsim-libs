@@ -20,15 +20,22 @@
 
 package org.matsim.pt.counts;
 
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.pt.counts.obsolete.PtCountsSimRealPerHourGraph;
 import org.matsim.pt.counts.obsolete.PtCountSimComparisonWriter.PtCountsType;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.pt.counts.obsolete.PtCountsSimRealPerHourGraph;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class PtCountsSimRealPerHourGraphTest extends MatsimTestCase {
+public class PtCountsSimRealPerHourGraphTest {
 
-	@Test
-	public void testCreatBoardChart() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+
+	@Test public void testCreatBoardChart() {
 		PtCountsFixture fixture = new PtBoardCountsFixture();
 		fixture.setUp();
 
@@ -36,8 +43,8 @@ public class PtCountsSimRealPerHourGraphTest extends MatsimTestCase {
 		assertNotNull("No graph is created", eg.createChart(0));
 	}
 
-	@Test
-	public void testCreatAlightChart() {
+
+	@Test public void testCreatAlightChart() {
 		PtCountsFixture fixture = new PtAlightCountsFixture();
 		fixture.setUp();
 
@@ -45,8 +52,8 @@ public class PtCountsSimRealPerHourGraphTest extends MatsimTestCase {
 		assertNotNull("No graph is created", eg.createChart(0));
 	}
 
-	@Test
-	public void testCreatOccupancyChart() {
+
+	@Test public void testCreatOccupancyChart() {
 		PtCountsFixture fixture = new PtOccupancyCountsFixture();
 		fixture.setUp();
 

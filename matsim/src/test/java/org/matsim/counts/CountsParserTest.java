@@ -20,15 +20,22 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.*;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
-public class CountsParserTest extends MatsimTestCase {
+public class CountsParserTest {
 
-	public void testSEElementCounts() throws SAXException {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testSEElementCounts() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -46,7 +53,7 @@ public class CountsParserTest extends MatsimTestCase {
 		}
 	}
 
-	public void testSEElementCountWithoutCoords() throws SAXException {
+	@Test public void testSEElementCountWithoutCoords() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -63,7 +70,7 @@ public class CountsParserTest extends MatsimTestCase {
 		reader.endElement("", "counts", "counts");
 	}
 
-	public void testSEElementCountWithCoords() throws SAXException {
+	@Test public void testSEElementCountWithCoords() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -81,7 +88,7 @@ public class CountsParserTest extends MatsimTestCase {
 		reader.endElement("", "counts", "counts");
 	}
 
-	public void testSEElementVolume() throws SAXException {
+	@Test public void testSEElementVolume() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);

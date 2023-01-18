@@ -20,6 +20,12 @@
 
 package org.matsim.contrib.locationchoice;
 
+import static org.junit.Assert.*;
+
+import javax.inject.Provider;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -58,25 +64,27 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import com.google.inject.Inject;
 
-import javax.inject.Provider;
+public class LocationChoiceIT {
 
-public class LocationChoiceIT extends MatsimTestCase {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 
 	/**
 	 * This is, as far as I can see, testing the {@link LocationChoicePlanStrategy}.  It will use the algo from the config, which is "random".  It is thus not using the frozen
 	 * epsilon approach.  kai, mar'19
 	 */
-	public void testLocationChoice() {
+	@Test public void testLocationChoice() {
 
-		final Config config = localCreateConfig( this.getPackageInputDirectory() + "config2.xml");
+		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config2.xml");
 
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -105,7 +113,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
 					@Inject TimeInterpretation timeInterpretation;
-					
+
 					@Override
 					public PlanStrategy get() {
 						return new LocationChoicePlanStrategy(scenario, tripRouterProvider, timeInterpretation);

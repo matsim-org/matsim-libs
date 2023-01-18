@@ -100,40 +100,23 @@ public class NetworkBasedTransportCostsTest {
 		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
 
-//		CarrierVehicleType vtype1 = mock(CarrierVehicleType.class);
-		final Id<VehicleType> type11 = Id.create( "type1", VehicleType.class );
-		VehicleType vtype1 = VehicleUtils.getFactory().createVehicleType( type11 );;
+		VehicleType vehType1 = VehicleUtils.getFactory().createVehicleType(Id.create( "type1", VehicleType.class ));
 
-		CostInformation costInformation1 = vtype1.getCostInformation() ;
+		CostInformation costInformation1 = vehType1.getCostInformation() ;
 		costInformation1.setFixedCost( 0.0 );
 		costInformation1.setCostsPerMeter( 2.0 );
 		costInformation1.setCostsPerSecond( 0.0 );
-//		when(vtype1.getCostInformation()).thenReturn(param1);
-//		when(vtype1.getId()).thenReturn(Id.create("type1", org.matsim.vehicles.VehicleType.class));
-		// one cannot mock final methods!!
 
-//		VehicleType vtype1 =
-//			  CarrierUtils.CarrierVehicleTypeBuilder.newInstance( type11 ).setVehicleCostInformation( param1 ).build() ;
+		VehicleType vehType2 = VehicleUtils.getFactory().createVehicleType(Id.create( "type2", VehicleType.class ));
 
-
-//		CarrierVehicleType vtype2 = mock(CarrierVehicleType.class);
-		final Id<VehicleType> type21 = Id.create( "type2", VehicleType.class );
-		VehicleType vtype2 = VehicleUtils.getFactory().createVehicleType( type21 );;
-
-		CostInformation costInformation = vtype2.getCostInformation() ;
+		CostInformation costInformation = vehType2.getCostInformation() ;
 		costInformation.setFixedCost( 0.0 );
 		costInformation.setCostsPerMeter( 4.0 );
 		costInformation.setCostsPerSecond( 0.0 );
-//		when(vtype2.getCostInformation()).thenReturn(param2);
-//		when(vtype2.getId()).thenReturn(Id.create("type2", org.matsim.vehicles.VehicleType.class));
-		// one cannot mock final methods!!
-
-//		VehicleType vtype2 =
-//			  CarrierUtils.CarrierVehicleTypeBuilder.newInstance( type21 ).setVehicleCostInformation( param2 ).build() ;
 
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder =
-				NetworkBasedTransportCosts.Builder.newInstance(network,Arrays.asList(vtype1,vtype2));
+				NetworkBasedTransportCosts.Builder.newInstance(network,Arrays.asList(vehType1,vehType2));
 		NetworkBasedTransportCosts networkBasedTransportCosts = builder.build();
 
 		Vehicle vehicle1 = mock(Vehicle.class);

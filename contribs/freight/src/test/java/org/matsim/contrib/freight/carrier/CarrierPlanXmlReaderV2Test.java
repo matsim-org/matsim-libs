@@ -13,6 +13,7 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -44,12 +45,15 @@ public class CarrierPlanXmlReaderV2Test {
 	public void test_whenReadingCarrier_itReadsTypeIdsCorrectly(){
 
 		CarrierVehicle light = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("lightVehicle"));
+		Gbl.assertNotNull(light);
 		Assert.assertEquals("light",light.getVehicleTypeId().toString());
 
 		CarrierVehicle medium = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("mediumVehicle"));
+		Gbl.assertNotNull(medium);
 		Assert.assertEquals("medium",medium.getVehicleTypeId().toString());
 
 		CarrierVehicle heavy = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("heavyVehicle"));
+		Gbl.assertNotNull(heavy);
 		Assert.assertEquals("heavy",heavy.getVehicleTypeId().toString());
 	}
 
@@ -95,7 +99,7 @@ public class CarrierPlanXmlReaderV2Test {
 
 	@Test
 	public void test_whenReadingPlans_nuOfToursIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		Assert.assertEquals(1, plans.get(0).getScheduledTours().size());
 		Assert.assertEquals(1, plans.get(1).getScheduledTours().size());
 		Assert.assertEquals(1, plans.get(2).getScheduledTours().size());
@@ -103,7 +107,7 @@ public class CarrierPlanXmlReaderV2Test {
 
 	@Test
 	public void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
 		ScheduledTour tour1 = plan1.getScheduledTours().iterator().next();
 		Assert.assertEquals(5,tour1.getTour().getTourElements().size());
@@ -111,7 +115,7 @@ public class CarrierPlanXmlReaderV2Test {
 
 	@Test
 	public void test_whenReadingToursOfPlan2_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		ScheduledTour tour1 = plan2.getScheduledTours().iterator().next();
 		Assert.assertEquals(9,tour1.getTour().getTourElements().size());
@@ -119,7 +123,7 @@ public class CarrierPlanXmlReaderV2Test {
 
 	@Test
 	public void test_whenReadingToursOfPlan3_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		ScheduledTour tour1 = plan3.getScheduledTours().iterator().next();
 		Assert.assertEquals(9,tour1.getTour().getTourElements().size());
@@ -127,19 +131,11 @@ public class CarrierPlanXmlReaderV2Test {
 
 
 	private boolean exactlyTheseVehiclesAreInVehicleCollection(List<Id<Vehicle>> asList, Collection<CarrierVehicle> carrierVehicles) {
-		List<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(carrierVehicles);
+		List<CarrierVehicle> vehicles = new ArrayList<>(carrierVehicles);
 		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getId() )) vehicles.remove(type );
 		return vehicles.isEmpty();
 	}
 
-//	private CarrierVehicle getVehicle(String vehicleName) {
-//		Id<Vehicle> vehicleId = Id.create(vehicleName, Vehicle.class);
-//		if(testCarrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-//			return testCarrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-//		}
-//		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-//		return null;
-//	}
 
 	@Test
 	public void test_CarrierHasAttributes(){
@@ -151,10 +147,10 @@ public class CarrierPlanXmlReaderV2Test {
 	public void test_ServicesAndShipmentsHaveAttributes(){
 		Object serviceCustomerAtt = testCarrier.getServices().get(Id.create("serv1",CarrierService.class)).getAttributes().getAttribute("customer");
 		Assert.assertNotNull(serviceCustomerAtt);
-		Assert.assertEquals("someRandomCustomer", (String) serviceCustomerAtt);
+		Assert.assertEquals("someRandomCustomer", serviceCustomerAtt);
 		Object shipmentCustomerAtt = testCarrier.getShipments().get(Id.create("s1",CarrierShipment.class)).getAttributes().getAttribute("customer");
 		Assert.assertNotNull(shipmentCustomerAtt);
-		Assert.assertEquals("someRandomCustomer", (String) shipmentCustomerAtt);
+		Assert.assertEquals("someRandomCustomer", shipmentCustomerAtt);
 	}
 
 	@Test
@@ -163,22 +159,24 @@ public class CarrierPlanXmlReaderV2Test {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Carriers carriers = FreightUtils.addOrGetCarriers(scenario);
 
-		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-				"<carriers>\n" +
-				"  <carrier id=\"1\">\n" +
-				"    <attributes>\n" +
-				"      <attribute name=\"jspritIterations\" class=\"java.lang.Integer\">50</attribute>\n" +
-				"    </attributes>\n" +
-				"    <capabilities fleetSize=\"INFINITE\">\n" +
-				"      <vehicles>\n" +
-				"        <vehicle id=\"carrier_1_heavyVehicle\" depotLinkId=\"12\" typeId=\"heavy-20t\" earliestStart=\"06:00:00\" latestEnd=\"16:00:00\"/>\n" +
-				"      </vehicles>\n" +
-				"    </capabilities>\n" +
-				"    <services>\n" +
-				"      <service id=\"1\" to=\"31\" capacityDemand=\"2500\" earliestStart=\"04:00:00\" latestEnd=\"10:00:00\" serviceDuration=\"00:45:00\"/>\n" +
-				"    </services>\n" +
-				"  </carrier>\n" +
-				"</carriers>\n";
+		String xml = """
+				<?xml version="1.0" encoding="UTF-8"?>
+				<carriers>
+				  <carrier id="1">
+				    <attributes>
+				      <attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+				    </attributes>
+				    <capabilities fleetSize="INFINITE">
+				      <vehicles>
+				        <vehicle id="carrier_1_heavyVehicle" depotLinkId="12" typeId="heavy-20t" earliestStart="06:00:00" latestEnd="16:00:00"/>
+				      </vehicles>
+				    </capabilities>
+				    <services>
+				      <service id="1" to="31" capacityDemand="2500" earliestStart="04:00:00" latestEnd="10:00:00" serviceDuration="00:45:00"/>
+				    </services>
+				  </carrier>
+				</carriers>
+				""";
 
 		InputStream is = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 

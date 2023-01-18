@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.Random;
 
@@ -144,7 +145,17 @@ public class FISS implements DepartureHandler, MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
+		if (switchOffFISS()) {
+			deflateVehicleTypes(matsimServices.getScenario(), this.fissConfigGroup);
+		}
 		teleport.onPrepareSim();
+	}
+
+	private void deflateVehicleTypes(Scenario scenario, FISSConfigGroup fissConfigGroup) {
+		for (String sampledQsimModes : fissConfigGroup.sampledModes) {
+			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create(sampledQsimModes,VehicleType.class));
+			vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.sampleFactor);
+		}
 	}
 
 	@Override

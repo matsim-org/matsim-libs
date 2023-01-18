@@ -42,8 +42,8 @@ import java.util.Locale;
 /**
  * As you can see, it is basically a copy of {@link org.matsim.analysis.ScoreStatsControlerListener}. However, it is modified to score {@link Carrier}s
  * rather than Persons. (Oct'13, schroeder)
- * 
- * 
+ * <p>
+ *
  * <p>Calculates at the end of each iteration the following statistics:
  * <ul>
  * <li>average score of the selected plan</li>
@@ -66,12 +66,12 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 
 	private BufferedWriter out;
 	final private String fileName;
-	
+
 	private final boolean createPNG;
 	private double[][] history = null;
 	private int minIteration = 0;
-	
-	private Carriers carriers;
+
+	private final Carriers carriers;
 
 	private final static Logger log = LogManager.getLogger(CarrierScoreStats.class);
 
@@ -161,12 +161,6 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 				if (carrier.getSelectedPlan().equals(plan)) {
 					sumExecutedScores += score;
 					nofExecutedScores++;
-//					if (plan.getType() == Plan.Type.CAR) {
-//						nofExecutedIvPlans ++;
-//					}
-//					else if (plan.getType() == Plan.Type.PT) {
-//						nofExecutedOevPlans++;
-//					}
 				}
 			}
 
@@ -184,11 +178,6 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 			}
 		}
 		log.info("-- avg. score of the executed plan of each agent: " + (sumExecutedScores / nofExecutedScores));
-//		log.info("-- number of executed plans: "  + nofExecutedScores);
-//		log.info("-- number of executed iv plans: "  + nofExecutedIvPlans);
-//		log.info("-- number of executed oev plans: "  + nofExecutedOevPlans);
-//		log.info("-- modal split iv: "  + ((nofExecutedScores == 0) ? 0 : ((double)nofExecutedIvPlans / (double)nofExecutedScores * 100d)) +
-//				" % oev: " + ((nofExecutedScores == 0) ? 0 : ((double)nofExecutedOevPlans / (double)nofExecutedScores * 100d)) + " %");
 		log.info("-- avg. score of the worst plan of each agent: " + (sumScoreWorst / nofScoreWorst));
 		log.info("-- avg. of the avg. plan score per agent: " + (sumAvgScores / nofAvgScores));
 		log.info("-- avg. score of the best plan of each agent: " + (sumScoreBest / nofScoreBest));
@@ -235,7 +224,7 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 	}
 
 	@Override
-	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
+	public void notifyShutdown(final ShutdownEvent controlerShutdownEvent) {
 		try {
 			this.out.close();
 		} catch (IOException e) {

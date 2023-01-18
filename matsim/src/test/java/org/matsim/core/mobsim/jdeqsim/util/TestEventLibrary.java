@@ -21,8 +21,12 @@
 
  package org.matsim.core.mobsim.jdeqsim.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.LinkedList;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
@@ -30,12 +34,15 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class TestEventLibrary extends MatsimTestCase {
+public class TestEventLibrary {
 
-	public void testGetTravelTime(){
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testGetTravelTime(){
 		LinkedList<Event> events=new LinkedList<Event>();
 		events.add(new PersonDepartureEvent(20, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
 		events.add(new PersonArrivalEvent(30, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));
@@ -45,7 +52,7 @@ public class TestEventLibrary extends MatsimTestCase {
 		assertEquals(20.0, EventLibrary.getTravelTime(events,1), MatsimTestUtils.EPSILON);
 	}
 
-	public void testGetAverageTravelTime(){
+	@Test public void testGetAverageTravelTime(){
 		LinkedList<Event> events=new LinkedList<Event>();
 		events.add(new PersonDepartureEvent(20, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
 		events.add(new PersonArrivalEvent(30, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));

@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,22 +15,14 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-package org.matsim.contrib.parking.parkingchoice.PC2;
+ * *********************************************************************** *
+ */
 
-import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
+package org.matsim.contrib.ev.discharging;
 
-public class ParkingConfig {
-
-	boolean factoryIsSetExternally=false;
-	boolean setupComplete=false;
-	boolean costModelSetExternally=false;
-	
-	
-	public void consistencyCheck_setupCompleteInvoked() {
-		if (!setupComplete){
-			DebugLib.stopSystemAndReportInconsistency("method setupComplete must be invoked before starting simulation");
-		}
-	}
-
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public interface MissingEnergyEventHandler {
+	void handleEvent(MissingEnergyEvent event);
 }

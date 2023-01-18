@@ -20,8 +20,12 @@
 
 package org.matsim.core.replanning.strategies;
 
+import static org.junit.Assert.assertTrue;
+
 import javax.inject.Provider;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,7 +51,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Tests the functionality of {@link TimeAllocationMutatorModule}, mainly that the
@@ -55,64 +59,68 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
+public class TimeAllocationMutatorModuleTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Tests that the mutation range given in the constructor is respected.
 	 *
 	 * @author mrieser
 	 */
-	public void testMutationRangeParam() {
+	@Test public void testMutationRangeParam() {
 		boolean affectingDuration = true ;
 
 		runMutationRangeTest(new TripPlanMutateTimeAllocation(750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
 		runMutationRangeTest(new TripPlanMutateTimeAllocation(7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
-	public void testSimplifiedMutation() {
+	@Test public void testSimplifiedMutation() {
 		boolean affectingDuration = true ;
 
 		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
 		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
-	public void testSubpopulations() {
-		
+	@Test public void testSubpopulations() {
+
 		String cbSubpopulation = "cb";
 		String freightSubpopulation = "freight";
-		
+
 		Config config  = ConfigUtils.createConfig();
 //		config.plans().setSubpopulationAttributeName("subpopulation");
 		config.timeAllocationMutator().setUseIndividualSettingsForSubpopulations(true);
 		config.timeAllocationMutator().setMutationRange(1800.0);
-		
+
 		TimeAllocationMutatorSubpopulationSettings cbSettings = (TimeAllocationMutatorSubpopulationSettings) config.timeAllocationMutator().createParameterSet(TimeAllocationMutatorSubpopulationSettings.SET_NAME);
 		cbSettings.setSubpopulation(cbSubpopulation);
 		cbSettings.setAffectingDuration(false);
 		cbSettings.setMutationRange(100.0);
 		config.timeAllocationMutator().addParameterSet(cbSettings);
-		
+
 		TimeAllocationMutatorSubpopulationSettings freightSettings = (TimeAllocationMutatorSubpopulationSettings) config.timeAllocationMutator().createParameterSet(TimeAllocationMutatorSubpopulationSettings.SET_NAME);
 		freightSettings.setSubpopulation(freightSubpopulation);
 		freightSettings.setAffectingDuration(true);
 		freightSettings.setMutationRange(7200.0);
 		config.timeAllocationMutator().addParameterSet(freightSettings);
-		
+
 		Provider<TripRouter> tripRouterProvider = null;
-		
+
 		TimeAllocationMutatorModule mutator = new TimeAllocationMutatorModule(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global());
-		
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		
+
 		TimeAllocationMutatorModule cbMutator = new TimeAllocationMutatorModule(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global(), scenario.getPopulation());
 //		assertEquals(false, cbMutator.affectingDuration);
 //		assertEquals(100.0, cbMutator.mutationRange);
-//		
+//
 //		TimeAllocationMutator freightMutator = new TimeAllocationMutator(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global(), scenario.getPopulation());
 //		assertEquals(true, freightMutator.affectingDuration);
 //		assertEquals(7200.0, freightMutator.mutationRange);
 	}
-	
+
 	/**
 	 * Internal helper method to run the real test, but with different setups.
 	 * Basically, it creates one plan and calls the given TimeAllocationMutator

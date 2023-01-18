@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -40,12 +41,15 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 	public void test_whenReadingCarrier_itReadsTypeIdsCorrectly(){
 
 		CarrierVehicle light = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("lightVehicle"));
+		Gbl.assertNotNull(light);
 		Assert.assertEquals("light",light.getVehicleTypeId().toString());
 
 		CarrierVehicle medium = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("mediumVehicle"));
+		Gbl.assertNotNull(medium);
 		Assert.assertEquals("medium",medium.getVehicleTypeId().toString());
 
 		CarrierVehicle heavy = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("heavyVehicle"));
+		Gbl.assertNotNull(heavy);
 		Assert.assertEquals("heavy",heavy.getVehicleTypeId().toString());
 	}
 
@@ -91,7 +95,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 
 	@Test @Ignore
 	public void test_whenReadingPlans_nuOfToursIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		Assert.assertEquals(1, plans.get(0).getScheduledTours().size());
 		Assert.assertEquals(1, plans.get(1).getScheduledTours().size());
 		Assert.assertEquals(1, plans.get(2).getScheduledTours().size());
@@ -99,7 +103,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 
 	@Test @Ignore
 	public void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
 		ScheduledTour tour1 = plan1.getScheduledTours().iterator().next();
 		Assert.assertEquals(5,tour1.getTour().getTourElements().size());
@@ -107,7 +111,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 
 	@Test
 	public void test_whenReadingToursOfPlan2_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		ScheduledTour tour1 = plan2.getScheduledTours().iterator().next();
 		Assert.assertEquals(9,tour1.getTour().getTourElements().size());
@@ -115,7 +119,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 
 	@Test @Ignore
 	public void test_whenReadingToursOfPlan3_nuOfActivitiesIsCorrect(){
-		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		ScheduledTour tour1 = plan3.getScheduledTours().iterator().next();
 		Assert.assertEquals(9,tour1.getTour().getTourElements().size());
@@ -123,18 +127,9 @@ public class CarrierPlanXmlReaderV2WithDtdTest  {
 
 
 	private boolean exactlyTheseVehiclesAreInVehicleCollection(List<Id<Vehicle>> asList, Collection<CarrierVehicle> carrierVehicles) {
-		List<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(carrierVehicles);
+		List<CarrierVehicle> vehicles = new ArrayList<>(carrierVehicles);
 		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getId() )) vehicles.remove(type );
 		return vehicles.isEmpty();
 	}
-
-//	private CarrierVehicle getVehicle(String vehicleName) {
-//		Id<Vehicle> vehicleId = Id.create(vehicleName, Vehicle.class);
-//		if(testCarrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-//			return testCarrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-//		}
-//		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-//		return null;
-//	}
 
 }

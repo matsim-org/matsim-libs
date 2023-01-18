@@ -26,12 +26,12 @@ import org.matsim.core.events.handler.EventHandler;
 
 /**
  * Interface to listen to shipmentDeliveredEvents.
- * 
+ *
  * @author sschroeder
  *
  */
 public interface FreightShipmentDeliveryEventHandler extends EventHandler {
 
-	public void handleEvent(FreightShipmentDeliveryEndEvent event);
+	void handleEvent(FreightShipmentDeliveryEndEvent event);
 
 }

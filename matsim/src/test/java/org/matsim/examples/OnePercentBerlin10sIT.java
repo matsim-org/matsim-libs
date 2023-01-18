@@ -20,8 +20,12 @@
 
 package org.matsim.examples;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -35,21 +39,25 @@ import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
-public class OnePercentBerlin10sIT extends MatsimTestCase {
+public class OnePercentBerlin10sIT {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final Logger log = LogManager.getLogger(OnePercentBerlin10sIT.class);
 
-	public void testOnePercent10sQSim() {
-		Config config = loadConfig(null);
+	@Test public void testOnePercent10sQSim() {
+		Config config = utils.loadConfig((String)null);
 		// input files are in the main directory in the resource path!
-		String netFileName = "test/scenarios/berlin/network.xml"; 
+		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		
-		String eventsFileName = getOutputDirectory() + "events.xml.gz";
-		String referenceEventsFileName = getInputDirectory() + "events.xml.gz";
+
+		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
+		String referenceEventsFileName = utils.getInputDirectory() + "events.xml.gz";
 
 		MatsimRandom.reset(7411L);
 
@@ -59,11 +67,11 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
-		
+
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		
+
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 		new PopulationReader(scenario).readFile(popFileName);
 
@@ -88,12 +96,12 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 
 	}
 
-	public void testOnePercent10sQSimTryEndTimeThenDuration() {
-		Config config = loadConfig(null);
+	@Test public void testOnePercent10sQSimTryEndTimeThenDuration() {
+		Config config = utils.loadConfig((String)null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		String eventsFileName = getOutputDirectory() + "events.xml.gz";
-		String referenceEventsFileName = getInputDirectory() + "events.xml.gz";
+		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
+		String referenceEventsFileName = utils.getInputDirectory() + "events.xml.gz";
 
 		MatsimRandom.reset(7411L);
 
@@ -103,11 +111,11 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
-		
-		config.controler().setOutputDirectory(this.getOutputDirectory());
+
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		
+
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 		new PopulationReader(scenario).readFile(popFileName);
 
@@ -119,7 +127,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		QSim qSim = new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.build(scenario, eventsManager);
-		
+
 		log.info("START testOnePercent10s SIM");
 		qSim.run();
 		log.info("STOP testOnePercent10s SIM");

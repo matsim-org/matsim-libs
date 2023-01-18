@@ -55,7 +55,7 @@ import javax.inject.Inject;
 
 /**
  * It is a copy of {@link org.matsim.analysis.LegHistogram}. It is modified to include or exclude persons.
- * 
+ *
  * @author mrieser
  *
  * Counts the number of vehicles departed, arrived or got stuck per time bin
@@ -66,28 +66,28 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	private int iteration = 0;
 	private final int binSize;
 	private final int nofBins;
-	private final Map<String, ModeData> data = new TreeMap<String, ModeData>();
+	private final Map<String, ModeData> data = new TreeMap<>();
 	private ModeData allModesData = null;
 
 	private boolean inclPopulation = true;
 
-	private Population population; 
-	
+	private Population population;
+
 	/**
-	 * If true, it observes persons of population. Otherwise it excludes them from observation.
-	 * 
+	 * If true, it observes persons of population. Otherwise, it excludes them from observation.
+	 *
 	 * @param inclPop
 	 */
 	public LegHistogram setInclPop(boolean inclPop) {
 		this.inclPopulation = inclPop;
 		return this;
 	}
-	
-	
+
+
 
 	/**
 	 * Sets the population.
-	 * 
+	 *
 	 * @param population the population to set
 	 */
 	@Inject
@@ -123,52 +123,48 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
-		if(!agentToBeObserved(event.getPersonId())) return; 
-		int index = getBinIndex(event.getTime());
-		this.allModesData.countsDep[index]++;
-		if (event.getLegMode() != null) {
-			ModeData modeData = getDataForMode(event.getLegMode());
-			modeData.countsDep[index]++;
-		}
-		
-	}
-
-	private boolean agentToBeObserved(Id<Person> personId) {
-		if(inclPopulation){
-			if(population == null) return false;
-			if(population.getPersons().containsKey(personId)){
-				return true;
+		if(personIsUnderObservation(event.getPersonId())) {
+			int index = getBinIndex(event.getTime());
+			this.allModesData.countsDep[index]++;
+			if (event.getLegMode() != null) {
+				ModeData modeData = getDataForMode(event.getLegMode());
+				modeData.countsDep[index]++;
 			}
-			else return false;
-		}
-		else {
-			if(population == null) return true;
-			if(population.getPersons().containsKey(personId)){
-				return false;
-			}
-			else return true;
 		}
 	}
 
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
-		if(!agentToBeObserved(event.getPersonId())) return;
-		int index = getBinIndex(event.getTime());
-		this.allModesData.countsArr[index]++;
-		if (event.getLegMode() != null) {
-			ModeData modeData = getDataForMode(event.getLegMode());
-			modeData.countsArr[index]++;
+		if(personIsUnderObservation(event.getPersonId())) {
+			int index = getBinIndex(event.getTime());
+			this.allModesData.countsArr[index]++;
+			if (event.getLegMode() != null) {
+				ModeData modeData = getDataForMode(event.getLegMode());
+				modeData.countsArr[index]++;
+			}
 		}
 	}
 
 	@Override
 	public void handleEvent(final PersonStuckEvent event) {
-		if(!agentToBeObserved(event.getPersonId())) return;
-		int index = getBinIndex(event.getTime());
-		this.allModesData.countsStuck[index]++;
-		if (event.getLegMode() != null) {
-			ModeData modeData = getDataForMode(event.getLegMode());
-			modeData.countsStuck[index]++;
+		if(personIsUnderObservation(event.getPersonId())) {
+			int index = getBinIndex(event.getTime());
+			this.allModesData.countsStuck[index]++;
+			if (event.getLegMode() != null) {
+				ModeData modeData = getDataForMode(event.getLegMode());
+				modeData.countsStuck[index]++;
+			}
+		}
+	}
+
+	private boolean personIsUnderObservation(Id<Person> personId) {
+		if(inclPopulation){
+			if(population == null) return false;
+			return population.getPersons().containsKey(personId);
+		}
+		else {
+			if(population == null) return true;
+			return !population.getPersons().containsKey(personId);
 		}
 	}
 
@@ -189,7 +185,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	public void write(final String filename) {
 		PrintStream stream;
 		try {
-			stream = new PrintStream(new File(filename));
+			stream = new PrintStream(filename);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
@@ -266,47 +262,47 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		xyData.addSeries(onRouteSerie);
 
 		final JFreeChart chart = ChartFactory.createXYStepChart(
-        "Leg Histogram, " + modeName + ", it." + this.iteration,
-        "time", "# vehicles",
-        xyData,
-        PlotOrientation.VERTICAL,
-        true,   // legend
-        false,   // tooltips
-        false   // urls
-    );
+				"Leg Histogram, " + modeName + ", it." + this.iteration,
+				"time", "# vehicles",
+				xyData,
+				PlotOrientation.VERTICAL,
+				true,   // legend
+				false,   // tooltips
+				false   // urls
+		);
 
 		XYPlot plot = chart.getXYPlot();
 
 		final CategoryAxis axis1 = new CategoryAxis("hour");
 		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
 		plot.setDomainAxis(new NumberAxis("time"));
-		
+
 		plot.getRenderer().setSeriesStroke(0, new BasicStroke(2.0f));
 		plot.getRenderer().setSeriesStroke(1, new BasicStroke(2.0f));
 		plot.getRenderer().setSeriesStroke(2, new BasicStroke(2.0f));
 		plot.setBackgroundPaint(Color.white);
-		plot.setRangeGridlinePaint(Color.gray);  
-		plot.setDomainGridlinePaint(Color.gray);  
-		
+		plot.setRangeGridlinePaint(Color.gray);
+		plot.setDomainGridlinePaint(Color.gray);
+
 		return chart;
 	}
 
 	/**
-	 * @return number of departures per time-bin, for all legs
+	 * @return number(s) of departures per time-bin, for all legs
 	 */
 	public int[] getDepartures() {
 		return this.allModesData.countsDep.clone();
 	}
 
 	/**
-	 * @return number of all arrivals per time-bin, for all legs
+	 * @return number(s) of all arrivals per time-bin, for all legs
 	 */
 	public int[] getArrivals() {
 		return this.allModesData.countsArr.clone();
 	}
 
 	/**
-	 * @return number of all vehicles that got stuck in a time-bin, for all legs
+	 * @return number(s) of all vehicles that got stuck in a time-bin, for all legs
 	 */
 	public int[] getStuck() {
 		return this.allModesData.countsStuck.clone();
@@ -321,7 +317,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	/**
 	 * @param legMode transport mode
-	 * @return number of departures per time-bin, for all legs with the specified mode
+	 * @return number(s) of departures per time-bin, for all legs with the specified mode
 	 */
 	public int[] getDepartures(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
@@ -333,7 +329,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	/**
 	 * @param legMode transport mode
-	 * @return number of all arrivals per time-bin, for all legs with the specified mode
+	 * @return number(s) of all arrivals per time-bin, for all legs with the specified mode
 	 */
 	public int[] getArrivals(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
@@ -345,7 +341,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	/**
 	 * @param legMode transport mode
-	 * @return number of vehicles that got stuck in a time-bin, for all legs with the specified mode
+	 * @return number(s) of vehicles that got stuck in a time-bin, for all legs with the specified mode
 	 */
 	public int[] getStuck(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
@@ -393,10 +389,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	private int getBinIndex(final double time) {
 		int bin = (int)(time / this.binSize);
-		if (bin >= this.nofBins) {
-			return this.nofBins;
-		}
-		return bin;
+		return Math.min(bin, this.nofBins);
 	}
 
 	private ModeData getDataForMode(final String legMode) {

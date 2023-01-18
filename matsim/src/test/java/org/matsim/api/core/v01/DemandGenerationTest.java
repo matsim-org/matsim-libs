@@ -19,8 +19,14 @@
  * *********************************************************************** */
 package org.matsim.api.core.v01;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -36,13 +42,16 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author dgrether
  */
-public class DemandGenerationTest extends MatsimTestCase {
+public class DemandGenerationTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final String populationFile = "population.xml";
 	private static final double homeEndTime = 9*3600.0;
@@ -51,19 +60,15 @@ public class DemandGenerationTest extends MatsimTestCase {
 	private int personCount = 6;
 	private int linkCount = 6;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before public void setUp() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After public void tearDown() {
 		this.sc = null;
-		super.tearDown();
 	}
 
-	public void testDemandGeneration(){
+	@Test public void testDemandGeneration(){
 		Config conf = sc.getConfig();
 		assertNotNull(conf);
 
@@ -136,8 +141,8 @@ public class DemandGenerationTest extends MatsimTestCase {
 
 		//write created population
 		PopulationWriter writer = new PopulationWriter(pop, sc.getNetwork());
-		writer.write(this.getOutputDirectory() + populationFile);
-		File outfile = new File(this.getOutputDirectory() + populationFile);
+		writer.write(utils.getOutputDirectory() + populationFile);
+		File outfile = new File(utils.getOutputDirectory() + populationFile);
 		assertTrue(outfile.exists());
 
 
