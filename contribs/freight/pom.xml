@@ -46,13 +46,6 @@
 			<version>${jsprit.version}</version>
 		</dependency>
 
-		<!-- Needs specific xerces version -->
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.12.2</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
