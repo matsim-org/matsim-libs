@@ -67,6 +67,7 @@ public final class CountsOption {
 		try (var reader = Files.newBufferedReader(manual)) {
 			List<CSVRecord> records = CSVFormat.Builder.create()
 					.setAllowMissingColumnNames(true)
+					.setDelimiter(';')
 					.build()
 					.parse(reader)
 					.getRecords();
