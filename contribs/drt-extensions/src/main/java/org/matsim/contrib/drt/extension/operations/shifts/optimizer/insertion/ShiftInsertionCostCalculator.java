@@ -1,35 +1,33 @@
 package org.matsim.contrib.drt.extension.operations.shifts.optimizer.insertion;
 
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-
-import java.util.List;
-
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+import java.util.List;
+
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+
 /**
  * @author nkuehnel / MOIA
  */
 public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 
-	private final InsertionCostCalculator defaultInsertionCostCalculator;
+	private final InsertionCostCalculator delegate;
 	private final MobsimTimer timer;
 
 	public ShiftInsertionCostCalculator(MobsimTimer timer,
-			CostCalculationStrategy costCalculationStrategy) {
+			InsertionCostCalculator delegate) {
 		this.timer = timer;
-		defaultInsertionCostCalculator = new DefaultInsertionCostCalculator(costCalculationStrategy);
+		this.delegate = delegate;
 	}
 
 	@Override
@@ -38,7 +36,7 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				detourTimeInfo.pickupDetourInfo.pickupTimeLoss, detourTimeInfo.getTotalTimeLoss())) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
-		return defaultInsertionCostCalculator.calculate(drtRequest, insertion, detourTimeInfo);
+		return delegate.calculate(drtRequest, insertion, detourTimeInfo);
 	}
 
 	boolean checkShiftTimeConstraintsForScheduledRequests(Insertion insertion, double pickupDetourTimeLoss,
