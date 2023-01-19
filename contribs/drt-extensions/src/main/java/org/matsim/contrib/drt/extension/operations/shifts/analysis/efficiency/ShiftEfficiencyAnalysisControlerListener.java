@@ -91,10 +91,12 @@ final class ShiftEfficiencyAnalysisControlerListener implements IterationEndsLis
                 double ridesPerVRH = nRequests / vehicleRevenueHour;
                 double revenuePerVRH = revenuePerShiftEntry.getValue() / vehicleRevenueHour;
                 Id<DvrpVehicle> dvrpVehicleId = finishedShifts.get(drtShift.getId());
-                bw.append(line(drtShift.getId().toString(), drtShift.getStartTime(), drtShift.getEndTime(),
-                        dvrpVehicleId.toString(), nRequests, revenuePerShiftEntry.getValue(), ridesPerVRH, revenuePerVRH));
-                ridesPerVRHList.add(ridesPerVRH);
-                revenuePerVRHList.add(revenuePerVRH);
+				if(dvrpVehicleId != null) {
+					bw.append(line(drtShift.getId().toString(), drtShift.getStartTime(), drtShift.getEndTime(),
+							dvrpVehicleId.toString(), nRequests, revenuePerShiftEntry.getValue(), ridesPerVRH, revenuePerVRH));
+					ridesPerVRHList.add(ridesPerVRH);
+					revenuePerVRHList.add(revenuePerVRH);
+				}
             }
             bw.flush();
 
