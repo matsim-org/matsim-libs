@@ -6,7 +6,6 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.EDrtOperationsControlerCreator;
-import org.matsim.contrib.drt.extension.operations.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -14,7 +13,6 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.*;
@@ -163,16 +161,6 @@ public class RunEShiftDrtScenarioIT {
 		config.vehicles().setVehiclesFile(evsFile);
 
 		final Controler run = EDrtOperationsControlerCreator.createControler(config, false);
-
-		for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
-			run.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
-				@Override
-				public void install() {
-					bind(ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider(drtCfg, MIN_RELATIVE_SOC));
-				}
-			});
-		}
 
 		run.addOverridingModule(new AbstractModule() {
 			@Override

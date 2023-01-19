@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.run;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -8,7 +9,6 @@ import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtAssignShiftToVehicleLogic;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtShiftDispatcherImpl;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtShiftStartLogic;
-import org.matsim.contrib.drt.extension.operations.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtActionCreator;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.operations.eshifts.scheduler.EShiftTaskScheduler;
@@ -19,6 +19,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultAssi
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftStartLogic;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcherImpl;
+import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShifts;
@@ -42,10 +43,12 @@ import org.matsim.core.router.util.TravelTime;
 public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 	private final DrtOperationsParams drtOperationsParams;
+	private DrtConfigGroup drtCfg;
 
 	public ShiftEDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtOperationsParams = ((DrtWithOperationsConfigGroup) drtCfg).getDrtOperationsParams();
+		this.drtCfg = drtCfg;
 	}
 
 	@Override
@@ -66,9 +69,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						new EDrtAssignShiftToVehicleLogic(new DefaultAssignShiftToVehicleLogic(drtShiftParams), drtShiftParams)),
 						getter.getModal(Fleet.class)))).asEagerSingleton();
 
-		bindModal(VehicleEntry.EntryFactory.class).toProvider(
-				ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider.class
-		).asEagerSingleton();
+		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(drtCfg, 0)))).asEagerSingleton();
 
 		final ShiftEDrtTaskFactoryImpl taskFactory = new ShiftEDrtTaskFactoryImpl(new EDrtTaskFactoryImpl());
 		bindModal(DrtTaskFactory.class).toInstance(taskFactory);
