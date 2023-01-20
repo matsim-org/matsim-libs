@@ -31,6 +31,8 @@ public class IdSetTest {
 		Assert.assertFalse(set.isEmpty());
 		Assert.assertTrue(set.contains(id1));
 		Assert.assertFalse(set.contains(id2));
+		Assert.assertTrue(set.contains(id1.index()));
+		Assert.assertFalse(set.contains(id2.index()));
 
 		Assert.assertFalse(set.add(id1));
 		Assert.assertEquals(1, set.size());
@@ -40,6 +42,9 @@ public class IdSetTest {
 		Assert.assertTrue(set.contains(id1));
 		Assert.assertFalse(set.contains(id2));
 		Assert.assertTrue(set.contains(id3));
+		Assert.assertTrue(set.contains(id1.index()));
+		Assert.assertFalse(set.contains(id2.index()));
+		Assert.assertTrue(set.contains(id3.index()));
 
 		Assert.assertFalse(set.remove(id4));
 		Assert.assertEquals(2, set.size());

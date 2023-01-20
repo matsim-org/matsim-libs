@@ -84,9 +84,9 @@ class BicycleTravelDisutility implements TravelDisutility {
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
-		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
+		String surface = BicycleUtils.getSurface( link );
 		String type = NetworkUtils.getType( link ) ;
-		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
+		String cyclewaytype = BicycleUtils.getCyclewaytype( link );
 
 		double distance = link.getLength();
 		

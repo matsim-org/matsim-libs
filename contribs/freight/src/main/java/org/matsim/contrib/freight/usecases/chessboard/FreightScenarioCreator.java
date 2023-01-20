@@ -93,9 +93,6 @@ final class FreightScenarioCreator {
             carriers.addCarrier(carrier_);
         }
 
-//        CarrierVehicleTypes types = CarrierVehicleTypes.getVehicleTypes(carriers);
-//        new CarrierVehicleTypeWriter(types).write("input/usecases/chessboard/freight/vehicleTypes.xml");
-        
         new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
     }
 
@@ -128,7 +125,7 @@ final class FreightScenarioCreator {
 
     private static List<Id<Link>> createOuterCityLinks(Network network) {
         List<Id<Link>> inner = new InnerOuterCityScenarioCreator().getInnerCityLinks();
-        List<Id<Link>> outer = new ArrayList<Id<Link>>();
+        List<Id<Link>> outer = new ArrayList<>();
         for(Id<Link> id : network.getLinks().keySet()){
             if(!inner.contains(id)){
                 outer.add(id);
@@ -139,7 +136,7 @@ final class FreightScenarioCreator {
 
     private static List<Id<Link>> createInnerCityLinks(Network network) {
         List<Id<Link>> inner = new InnerOuterCityScenarioCreator().getInnerCityLinks();
-        List<Id<Link>> innerCityLinkIds = new ArrayList<Id<Link>>();
+        List<Id<Link>> innerCityLinkIds = new ArrayList<>();
         for(Id<Link> id : inner){
             if(network.getLinks().containsKey(id)){
                 innerCityLinkIds.add(id);
@@ -169,13 +166,13 @@ final class FreightScenarioCreator {
     public static Id<Link> getOpposite(Id<Link> homeId) {
         if(homeId.toString().startsWith("i")){
             String opposite = "i(" + homeId.toString().substring(2,4);
-            if(homeId.toString().substring(4,5).equals("0")) opposite += "9)R";
+            if(homeId.toString().charAt(4) == '0') opposite += "9)R";
             else opposite += "0)";
             return Id.createLinkId(opposite);
         }
         else{
             String opposite = "j(";
-            if(homeId.toString().substring(2,3).equals("0")) {
+            if(homeId.toString().charAt(2) == '0') {
                 opposite += "9," + homeId.toString().substring(4,6);
             }
             else opposite += "0," + homeId.toString().substring(4,6) + "R";

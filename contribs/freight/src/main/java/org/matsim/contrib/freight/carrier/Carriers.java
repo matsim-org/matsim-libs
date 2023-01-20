@@ -32,13 +32,15 @@ import org.matsim.api.core.v01.Id;
 
 /**
  * A container that maps carriers.
- * 
+ *
  * @author sschroeder
  *
  */
 public class Carriers {
 
+	@SuppressWarnings("unused")
 	private static final  Logger log = LogManager.getLogger(Carriers.class);
+
 	private final Map<Id<Carrier>, Carrier> carriers = new HashMap<>();
 
 	public Carriers(Collection<Carrier> carriers) {

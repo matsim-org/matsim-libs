@@ -23,7 +23,6 @@ package org.matsim.core.router.speedy;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.AbstractLeastCostPathCalculatorTest;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -31,12 +30,12 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
  * @author mrieser
  */
 public class SpeedyDijkstraTest extends AbstractLeastCostPathCalculatorTest {
-	
+
 	@Override
 	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
 		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
 		SpeedyGraph g = new SpeedyGraph(network);
 		return new SpeedyDijkstra(g, travelTimeCostCalculator, travelTimeCostCalculator);
 	}
-	
+
 }

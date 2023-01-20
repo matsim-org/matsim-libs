@@ -145,6 +145,23 @@ public class VehicleOccupancyProfileCalculator
 		return vehicleOccupancyProfiles;
 	}
 
+	public double[] getNumberOfVehiclesInServiceProfile() {
+		double[] numberOfVehiclesInServiceProfile = new double[timeDiscretizer.getIntervalCount()];
+		Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles = getNonPassengerServingTaskProfiles();
+		List<double[]> vehicleOccupancyProfiles = getVehicleOccupancyProfiles();
+		for (int i = 0; i < timeDiscretizer.getIntervalCount(); i++) {
+			double total = 0.0;
+			for (double[] profile : nonPassengerServingTaskProfiles.values()) {
+				total += profile[i];
+			}
+			for (double[] profile : vehicleOccupancyProfiles) {
+				total += profile[i];
+			}
+			numberOfVehiclesInServiceProfile[i] = total;
+		}
+		return numberOfVehiclesInServiceProfile;
+	}
+
 	public TimeDiscretizer getTimeDiscretizer() {
 		return timeDiscretizer;
 	}

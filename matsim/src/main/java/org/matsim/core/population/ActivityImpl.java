@@ -28,6 +28,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 /**
  * Some comments:<ul>
@@ -46,72 +47,78 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	// Case (X): facilityId inconsistent with linkId, coord.  Idea: mobsim takes the facilityId and (a) checks the other
 	// attribs or (b) ignores them.
 
-	private OptionalTime endTime = OptionalTime.undefined();
+	private static final double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
+	private double endTime = UNDEFINED_TIME;
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
-	private OptionalTime startTime = OptionalTime.undefined();
+	private double startTime = UNDEFINED_TIME;
 
-	private OptionalTime dur = OptionalTime.undefined();
+	private double dur = UNDEFINED_TIME;
 
 	private String type;
 	private Coord coord = null;
 	private Id<Link> linkId = null;
 	private Id<ActivityFacility> facilityId = null;
 
-	private final Attributes attributes = new Attributes();
+	private Attributes attributes = null;
 	
 	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();
 	}
 
-	@Override
-	public final OptionalTime getEndTime() {
-		return this.endTime;
+	private static OptionalTime asOptionalTime(double seconds) {
+		return Double.isInfinite(seconds) ? OptionalTime.undefined() : OptionalTime.defined(seconds);
 	}
 
 	@Override
-	public final void setEndTime(final double endTime) {
-		this.endTime = OptionalTime.defined(endTime);
+	public OptionalTime getEndTime() {
+		return asOptionalTime(this.endTime);
 	}
 
-	public final void setEndTimeUndefined() {
-		this.endTime = OptionalTime.undefined();
+	@Override
+	public void setEndTime(final double endTime) {
+		this.endTime = endTime;
+	}
+
+	@Override
+	public void setEndTimeUndefined() {
+		this.endTime = UNDEFINED_TIME;
 	}
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
 	@Override
-	public final OptionalTime getStartTime() {
-		return this.startTime;
+	public OptionalTime getStartTime() {
+		return asOptionalTime(this.startTime);
 	}
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
 	@Override
-	public final void setStartTime(final double startTime) {
-		this.startTime = OptionalTime.defined(startTime);
+	public void setStartTime(final double startTime) {
+		this.startTime = startTime;
 	}
 
-	public final void setStartTimeUndefined() {
-		this.startTime = OptionalTime.undefined();
+	public void setStartTimeUndefined() {
+		this.startTime = UNDEFINED_TIME;
 	}
 
 	@Override
-	public final String getType() {
+	public String getType() {
 		return this.type;
 	}
 
 	@Override
-	public final void setType(final String type) {
+	public void setType(final String type) {
 		this.type = type.intern();
 	}
 
 	@Override
-	public final Coord getCoord() {
+	public Coord getCoord() {
 		return this.coord;
 	}
 	@Override
@@ -121,30 +128,30 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.coord = coord;
 	}
 	@Override
-	public final Id<Link> getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
 	@Override
-	public final Id<ActivityFacility> getFacilityId() {
+	public Id<ActivityFacility> getFacilityId() {
 		return this.facilityId;
 	}
 
 	@Override
-	public final void setFacilityId(final Id<ActivityFacility> facilityId) {
+	public void setFacilityId(final Id<ActivityFacility> facilityId) {
 //		testForLocked();
 		this.facilityId = facilityId;
 	}
 
 	@Override
-	public final void setLinkId(final Id<Link> linkId) {
+	public void setLinkId(final Id<Link> linkId) {
 //		testForLocked();
 		// I currently think that rather than enforcing data consistency we should just walk them from coordinate to link. kai, dec'15
 		this.linkId = linkId;
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return "act [type="
 				+ this.getType()
 				+ "]"
@@ -158,7 +165,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ Time.writeTime(getStartTime())
 				+ "]"
 				+ "[endTime="
-				+ Time.writeTime(endTime)
+				+ Time.writeTime(this.endTime)
 				+ "]"
 				+ "[duration="
 				+ Time.writeTime(getMaximumDuration())
@@ -169,22 +176,25 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public OptionalTime getMaximumDuration() {
-		return this.dur;
+		return asOptionalTime(this.dur);
 	}
 
 	@Override
 	public void setMaximumDuration(final double dur) {
-		this.dur = OptionalTime.defined(dur);
+		this.dur = dur;
 	}
 
 	@Override
 	public void setMaximumDurationUndefined() {
-		this.dur = OptionalTime.undefined();
+		this.dur = UNDEFINED_TIME;
 	}
 
 	@Override
 	public Attributes getAttributes() {
-		return attributes;
+		if (this.attributes != null) {
+			return this.attributes;
+		}
+		return new LazyAllocationAttributes(attributes -> this.attributes = attributes, () -> this.attributes);
 	}
 
 //	private boolean locked = false ;

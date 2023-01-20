@@ -65,7 +65,7 @@ import org.matsim.vehicles.Vehicle;
  * @author jfbischoff
  */
 
-public final class EvNetworkRoutingModule implements RoutingModule {
+final class EvNetworkRoutingModule implements RoutingModule {
 
 	private final String mode;
 
@@ -81,7 +81,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	private final String vehicleSuffix;
 	private final EvConfigGroup evConfigGroup;
 
-	public EvNetworkRoutingModule(final String mode, final Network network, RoutingModule delegate,
+	EvNetworkRoutingModule(final String mode, final Network network, RoutingModule delegate,
 			ElectricFleetSpecification electricFleet,
 			ChargingInfrastructureSpecification chargingInfrastructureSpecification, TravelTime travelTime,
 			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
@@ -159,6 +159,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
 							selectedChargerLink.getId(), stageActivityModePrefix);
+					chargeAct = PopulationUtils.createActivity(chargeAct); // createStageActivity... creates a InteractionActivity where duration cannot be set.
 					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
 					chargeAct.setMaximumDuration(Math.max(evConfigGroup.minimumChargeTime, estimatedChargingTime));
@@ -185,19 +186,15 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 				});
 		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
-		double lastSoc = pseudoVehicle.getBattery().getSoc();
+		double lastCharge = pseudoVehicle.getBattery().getCharge();
 		double linkEnterTime = basicLeg.getDepartureTime().seconds();
 		for (Link l : links) {
 			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime().seconds(), null, null);
 
 			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
 					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime().seconds(), travelT, l.getId());
-			pseudoVehicle.getBattery().changeSoc(-consumption);
-			double currentSoc = pseudoVehicle.getBattery().getSoc();
 			// to accomodate for ERS, where energy charge is directly implemented in the consumption model
-			double consumptionDiff = (lastSoc - currentSoc);
-			lastSoc = currentSoc;
-			consumptions.put(l, consumptionDiff);
+			consumptions.put(l, consumption);
 			linkEnterTime += travelT;
 		}
 		return consumptions;

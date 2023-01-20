@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -360,5 +359,9 @@ public final class VehicleUtils {
 			log.info( "unable to find vehicle for vehicleId=" + vehicleId + "; will return null") ;
 		}
 		return vehicle ;
+	}
+	public static void writeVehicles( Vehicles vehicles, String filename ) {
+		new MatsimVehicleWriter( vehicles ).writeFile( filename );
+
 	}
 }

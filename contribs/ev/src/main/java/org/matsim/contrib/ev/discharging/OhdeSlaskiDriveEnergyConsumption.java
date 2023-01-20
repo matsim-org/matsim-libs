@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
  * Ohde, B., Ślaski, G., Maciejewski, M. (2016). Statistical analysis of real-world urban driving cycles for modelling
  * energy consumption of electric vehicles. Journal of Mechanical and Transport Engineering, 68.
  * <p>
- * http://fwmt.put.poznan.pl/imgWYSIWYG/agill/File/2_68_2016/jmte_2016_68_2_03_ohde_b_slaski_g.pdf
+ * https://www.researchgate.net/profile/Michal-Maciejewski-3/publication/312393169_Statistical_analysis_of_real-world_urban_driving_cycles_for_modelling_energy_consumption_of_electric_vehicles/links/59b7a17faca2722453a5fc7f/Statistical-analysis-of-real-world-urban-driving-cycles-for-modelling-energy-consumption-of-electric-vehicles.pdf
  * TODO Add (dis-)charging efficiency relative to SOC, temperature, etc...
  */
 public class OhdeSlaskiDriveEnergyConsumption implements DriveEnergyConsumption {

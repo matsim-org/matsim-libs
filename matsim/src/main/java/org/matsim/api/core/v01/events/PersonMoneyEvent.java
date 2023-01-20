@@ -20,10 +20,10 @@
 
 package org.matsim.api.core.v01.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+
+import java.util.Map;
 
 /**
  * This event specifies that an agent has gained (or paid) some money.
@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 public final class PersonMoneyEvent extends Event implements HasPersonId {
 
 	public static final String EVENT_TYPE = "personMoney";
-	
+
 	public static final String ATTRIBUTE_AMOUNT = "amount";
 	public static final String ATTRIBUTE_PURPOSE = "purpose";
 	public static final String ATTRIBUTE_TRANSACTION_PARTNER = "transactionPartner";
@@ -53,17 +53,18 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	 * some money at the specified <tt>time</tt>. Positive values for <tt>amount</tt>
 	 * mean the agent has gained money, negative values that the agent has paid money.
 	 * <br>
-	 * There are two optional fields: <tt>purpose</tt> and <tt>transactionPartner</tt>.
-	 * Those are currently not read by any core MATSim code, but can be useful for 
-	 * analysis, e.g. calculate the drt fare revenue (purpose = "drtFare") by 
-	 * drt operator (transactionPartner = "Greedy Shared Taxis Inc.").
+	 * There are three optional fields: <tt>purpose</tt> and <tt>transactionPartner</tt>.
+	 * Those are currently not read by any core MATSim code, but can be useful for
+	 * analysis, e.g. calculate the drt fare revenue (purpose = "drtFare") by
+	 * drt operator (transactionPartner = "Greedy Shared Taxis Inc."). Finally, there is a <tt>reference</tt>,
+	 * for example to specify a link or any other information one might find useful.
 	 *
 	 * @param time
 	 * @param agentId
 	 * @param amount
-	 * @param purpose (not required by dtd)
+	 * @param purpose            (not required by dtd)
 	 * @param transactionPartner (not required by dtd)
-	 * @param reference (not required by dtd)
+	 * @param reference          (not required by dtd)
 	 */
 	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose,
 				final String transactionPartner, final String reference) {
@@ -88,21 +89,22 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	@Deprecated // add "reference"
 	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose,
 							final String transactionPartner) {
-		this( time, agentId, amount, purpose, transactionPartner, null);
+		this(time, agentId, amount, purpose, transactionPartner, null);
 	}
 
+	@Override
 	public Id<Person> getPersonId() {
 		return this.personId;
 	}
-	
+
 	public double getAmount() {
 		return this.amount;
 	}
-	
+
 	public String getPurpose() {
 		return this.purpose;
 	}
-	
+
 	public String getTransactionPartner() {
 		return this.transactionPartner;
 	}
@@ -115,7 +117,7 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();

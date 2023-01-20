@@ -113,8 +113,8 @@ public final class CreateEmissionConfig {
 	        controler.getConfig().addModule(ecg);
 
 			// one can now directly set the hbefa road types as link attributes
-	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-			ecg.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromFile);
+//	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+//			ecg.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromFile);
 
 	        // emission vehicles are now set in the default vehicle container
 	        config.vehicles().setVehiclesFile(emissionVehicleFile);
@@ -134,8 +134,8 @@ public final class CreateEmissionConfig {
 	        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 
 	        ecg.setWritingEmissionsEvents(false);
-	        ecg.setEmissionCostMultiplicationFactor(1.0);
-	        ecg.setConsideringCO2Costs(true);
+//	        ecg.setEmissionCostMultiplicationFactor(1.0);
+//	        ecg.setConsideringCO2Costs(true);
 //	        ecg.setEmissionEfficiencyFactor(1.0);
 	        
 	   // write config     

@@ -20,12 +20,16 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +46,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.SAXException;
 
@@ -55,9 +59,13 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class TransitScheduleFormatV1Test extends MatsimTestCase {
+public class TransitScheduleFormatV1Test {
 
-	public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		Network network = NetworkUtils.createNetwork();
         Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -118,14 +126,14 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		schedule1.addTransitLine(line1);
 
 		// write and read it
-		String filename = getOutputDirectory() + "scheduleNoRoute.xml";
+		String filename = utils.getOutputDirectory() + "scheduleNoRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule2, new RouteFactories()).readFile(filename);
 
 		// first test, without network-route
-		assertEquals(schedule1, schedule2);
+		assertEqualSchedules(schedule1, schedule2);
 
 		// now add route info to the schedule
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(l1.getId(), l4.getId());
@@ -138,23 +146,23 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		stop1.setLinkId(l1.getId());
 
 		// write and read version with network-route
-		filename = getOutputDirectory() + "scheduleWithRoute.xml";
+		filename = utils.getOutputDirectory() + "scheduleWithRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitScheduleFactory builder3 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule3 = builder3.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule3, new RouteFactories()).readFile(filename);
 
-		assertEquals(schedule1, schedule3);
+		assertEqualSchedules(schedule1, schedule3);
 	}
 
-	private static void assertEquals(final TransitSchedule expected, final TransitSchedule actual) {
+	private static void assertEqualSchedules(final TransitSchedule expected, final TransitSchedule actual) {
 
 		assertEquals("different number of stopFacilities.", expected.getFacilities().size(), actual.getFacilities().size());
 		for (TransitStopFacility stopE : expected.getFacilities().values()) {
 			TransitStopFacility stopA = actual.getFacilities().get(stopE.getId());
 			assertNotNull("stopFacility not found: " + stopE.getId().toString(), stopA);
-			assertEquals("different x coordinates.", stopE.getCoord().getX(), stopA.getCoord().getX(), EPSILON);
-			assertEquals("different y coordinates.", stopE.getCoord().getY(), stopA.getCoord().getY(), EPSILON);
+			assertEquals("different x coordinates.", stopE.getCoord().getX(), stopA.getCoord().getX(), MatsimTestUtils.EPSILON);
+			assertEquals("different y coordinates.", stopE.getCoord().getY(), stopA.getCoord().getY(), MatsimTestUtils.EPSILON);
 			assertEquals("different link information.", stopE.getLinkId(), stopA.getLinkId());
 			assertEquals("different isBlocking.", stopE.getIsBlockingLane(), stopA.getIsBlockingLane());
 			assertEquals("different names.", stopE.getName(), stopA.getName());
@@ -201,7 +209,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 				for (Departure departureE : routeE.getDepartures().values()) {
 					Departure departureA = routeA.getDepartures().get(departureE.getId());
 					assertNotNull("departure not found: " + departureE.getId().toString(), departureA);
-					assertEquals("different departure times.", departureE.getDepartureTime(), departureA.getDepartureTime(), EPSILON);
+					assertEquals("different departure times.", departureE.getDepartureTime(), departureA.getDepartureTime(), MatsimTestUtils.EPSILON);
 					assertEquals("different vehicle ids.", departureE.getVehicleId(), departureA.getVehicleId());
 				}
 			}

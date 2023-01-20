@@ -29,7 +29,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 @Deprecated
 final class RunPassengerPlansFromScratch {
-	// yyyy this does not work any more.  Not secured by a testcase.  I think that it is only there to have an example to run
+	// yyyy this does not work anymore.  Not secured by a testcase.  I think that it is only there to have an example to run
 	// matsim _without_ freight.  --> imo, remove.  kai, jan'19
 
 	public static void main(String[] args) {

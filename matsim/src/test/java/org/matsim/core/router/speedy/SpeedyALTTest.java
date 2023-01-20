@@ -30,7 +30,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
  * @author mrieser
  */
 public class SpeedyALTTest extends AbstractLeastCostPathCalculatorTest {
-	
+
 	@Override
 	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
 		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
@@ -38,5 +38,5 @@ public class SpeedyALTTest extends AbstractLeastCostPathCalculatorTest {
 		SpeedyALTData altData = new SpeedyALTData(g, 16, travelTimeCostCalculator);
 		return new SpeedyALT(altData, travelTimeCostCalculator, travelTimeCostCalculator);
 	}
-	
+
 }

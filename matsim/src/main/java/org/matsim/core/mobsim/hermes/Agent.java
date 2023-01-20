@@ -247,7 +247,7 @@ class Agent {
     public static int getLinkPCEEntry       (long plan) {
         return (int) ((plan >> 56) & 0x000000000000000FL);
     }
-    public static int getVelocityPlanEntry  (long plan) { return (int) (plan & 0x00000000000000FFL); }
+    public static double getVelocityPlanEntry  (long plan) { return decodeVelocityFromLinkEntry((int) (plan & 0x00000000000000FFL)); }
     public static int getRoutePlanEntry     (long plan) { return (int)((plan >> 16) & 0x000000000000FFFFL); }
     public static int getStopPlanEntry      (long plan) { return (int)( plan        & 0x000000000000FFFFL); }
     public static int getSleepPlanEntry     (long plan) { return (int)( plan        & 0x00000000FFFFFFFFL); }
@@ -278,20 +278,45 @@ class Agent {
         return preparePlanEventEntry(type, (eventid << 40) | element);
     }
 
-    private static long prepareLinkEntryElement(long linkid, long velocity, long pcecategory) {
+    private static long prepareLinkEntryElement(long linkid, double velocity, long pcecategory) {
         if (linkid > HermesConfigGroup.MAX_LINK_ID) {
             throw new RuntimeException("exceeded maximum number of links");
         }
+        int encodedVelocity = prepareVelocityForLinkEntry(velocity);
 
-        // Checking for velocities that are too high.
-        velocity = Math.min(velocity, HermesConfigGroup.MAX_VEHICLE_VELOCITY);
-
-        // Checking for velocities that are too low.
-        velocity = velocity < 0 ? HermesConfigGroup.MAX_VEHICLE_VELOCITY : velocity;
-        return (pcecategory << 56) | (linkid << 8) | velocity;
+        return (pcecategory << 56) | (linkid << 8) | encodedVelocity;
     }
 
-    public static long prepareStopDelay(long type, long departure, long element) {
+    public static int prepareVelocityForLinkEntry(double velocity) {
+        // Checking for velocities that are too high.
+        velocity = Math.min(velocity, HermesConfigGroup.MAX_VEHICLE_VELOCITY);
+        // Checking for velocities that are too low.
+        velocity = velocity < 0 ? HermesConfigGroup.MAX_VEHICLE_VELOCITY : velocity;
+        // Encode velocity to 8-bit unsigned integer
+        if (velocity < 10) {
+            // Speeds 0.0 - 9.9 -> 0 - 99
+            velocity = velocity * 10;
+        } else {
+            // Speeds 10 - 165 -> 100 - 255
+            velocity = velocity + 90;
+        }
+        return (int) Math.round(velocity);
+    }
+
+    public static double decodeVelocityFromLinkEntry(int encodedVelocity) {
+        double velocity;
+        if (encodedVelocity < 100) {
+            // 0 - 99 -> 0.0 - 9.9 m/s
+            velocity = ((double) encodedVelocity) / 10.0;
+        } else {
+            // 100 - 255 -> 10 - 165 m/s
+            velocity = ((double) encodedVelocity) - 90;
+        }
+        return velocity;
+    }
+
+
+	public static long prepareStopDelay(long type, long departure, long element) {
         return preparePlanEventEntry(type, (departure << 40) | element);
     }
 
@@ -317,7 +342,7 @@ class Agent {
         }
     }
 
-    public static long prepareLinkEntry(int eventid, int linkid, int velocity, int pcecategory) {
+    public static long prepareLinkEntry(int eventid, int linkid, double velocity, int pcecategory) {
         long l = preparePlanEventEntry(LinkType, eventid, prepareLinkEntryElement(linkid, velocity, pcecategory));
         return l;
     }

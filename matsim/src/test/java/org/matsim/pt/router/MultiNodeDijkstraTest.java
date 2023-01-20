@@ -20,9 +20,12 @@
 
 package org.matsim.pt.router;
 
+import static org.junit.Assert.*;
+
 import java.util.HashMap;
 import java.util.Map;
-import junit.framework.TestCase;
+
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,9 +41,9 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author mrieser
  */
-public class MultiNodeDijkstraTest extends TestCase {
+public class MultiNodeDijkstraTest {
 
-	public void testMultipleStarts() {
+	@Test public void testMultipleStarts() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -86,7 +89,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("5", p.links.get(2).getId().toString());
 	}
 
-	public void testMultipleEnds() {
+	@Test public void testMultipleEnds() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -132,7 +135,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("6", p.links.get(2).getId().toString());
 	}
 
-	public void testMultipleStartsAndEnds() {
+	@Test public void testMultipleStartsAndEnds() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -187,7 +190,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 	 * Test that the route does not cut at node 4 as the first node backwards from
 	 * the start set.
 	 */
-	public void testStartViaFaster() {
+	@Test public void testStartViaFaster() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -212,7 +215,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("5", p.links.get(2).getId().toString());
 	}
 
-	public void testEndViaFaster() {
+	@Test public void testEndViaFaster() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -237,7 +240,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("5", p.links.get(2).getId().toString());
 	}
 
-	public void testOnlyFromToSameNode() {
+	@Test public void testOnlyFromToSameNode() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -265,7 +268,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 	 * as well as in the set of end nodes and the path only containing
 	 * of this node is the cheapest.
 	 */
-	public void testSameNodeInFromToSetCheapest() {
+	@Test public void testSameNodeInFromToSetCheapest() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -295,7 +298,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 	 * as well as in the set of end nodes, but the path only containing
 	 * of this node is the not the cheapest.
 	 */
-	public void testSameNodeInFromToSetNotCheapest() {
+	@Test public void testSameNodeInFromToSetNotCheapest() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -324,7 +327,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 	/**
 	 * Tests that a route is found even if not all given end nodes are reachable
 	 */
-	public void testSomeEndNodesNotReachable() {
+	@Test public void testSomeEndNodesNotReachable() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -353,7 +356,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 	/**
 	 * Tests that a route is found even if not all given start nodes lead to an end node
 	 */
-	public void testSomeStartNodesNotUseable() {
+	@Test public void testSomeStartNodesNotUseable() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -379,7 +382,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("5", p.links.get(2).getId().toString());
 	}
 
-	public void testImpossibleRoute() {
+	@Test public void testImpossibleRoute() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
 		tc.setData(Id.create(1, Link.class), 2.0, 2.0);
@@ -482,9 +485,9 @@ public class MultiNodeDijkstraTest extends TestCase {
 		public double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord) {
 			return 0;
 		}
-		
-		
-		
+
+
+
 	}
 
 }

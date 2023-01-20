@@ -20,8 +20,9 @@
 
 package org.matsim.core.network.algorithms;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,9 +37,9 @@ import org.matsim.core.network.NetworkUtils;
  *
  * @author mrieser
  */
-public class NetworkCleanerTest extends TestCase {
+public class NetworkCleanerTest {
 
-	public void testSink() {
+	@Test public void testSink() {
 		// create a simple network
 		Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -73,7 +74,7 @@ public class NetworkCleanerTest extends TestCase {
 		assertEquals("# links", 4, network.getLinks().size());
 	}
 
-	public void testDoubleSink() {
+	@Test public void testDoubleSink() {
 		// create a simple network
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -111,7 +112,7 @@ public class NetworkCleanerTest extends TestCase {
 		assertEquals("# links", 4, network.getLinks().size());
 	}
 
-	public void testSource() {
+	@Test public void testSource() {
 		// create a simple network
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -146,7 +147,7 @@ public class NetworkCleanerTest extends TestCase {
 		assertEquals("# links", 4, network.getLinks().size());
 	}
 
-	public void testDoubleSource() {
+	@Test public void testDoubleSource() {
 		// create a simple network
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));

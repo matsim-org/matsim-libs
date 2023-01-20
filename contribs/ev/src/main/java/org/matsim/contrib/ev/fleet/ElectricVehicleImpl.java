@@ -51,7 +51,7 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 
 	private ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification) {
 		this.vehicleSpecification = vehicleSpecification;
-		battery = new BatteryImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialSoc());
+		battery = new BatteryImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialCharge());
 	}
 
 	@Override
@@ -65,8 +65,8 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 	}
 
 	@Override
-	public String getVehicleType() {
-		return vehicleSpecification.getVehicleType();
+	public ElectricVehicleSpecification getVehicleSpecification() {
+		return vehicleSpecification;
 	}
 
 	@Override

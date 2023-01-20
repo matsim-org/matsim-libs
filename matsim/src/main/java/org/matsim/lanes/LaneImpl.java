@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * @author dgrether
@@ -48,7 +49,7 @@ final class LaneImpl implements Lane {
 	 */
 	private double capacity = 3600.0;
 
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	public LaneImpl(Id<Lane> id) {
 		this.id = id;

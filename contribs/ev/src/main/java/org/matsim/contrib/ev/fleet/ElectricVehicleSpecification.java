@@ -31,12 +31,13 @@ import com.google.common.collect.ImmutableList;
 public interface ElectricVehicleSpecification extends Identifiable<Vehicle> {
 	Vehicle getMatsimVehicle();
 
-	String getVehicleType();
-
 	ImmutableList<String> getChargerTypes();
 
-	//FIXME consider renaming to getInitialCharge -- SOC suggest [%] not [J]
-	double getInitialSoc();//[J]
+	double getInitialSoc(); //in [0, 1]
+
+	default double getInitialCharge() {
+		return getInitialSoc() * getBatteryCapacity();
+	}
 
 	double getBatteryCapacity();//[J]
 }

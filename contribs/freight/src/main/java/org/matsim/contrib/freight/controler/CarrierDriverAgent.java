@@ -70,8 +70,6 @@ final class CarrierDriverAgent{
 	void handleAnEvent(Event event){
 		// the event comes to here from CarrierAgent#handleEvent only for events concerning this driver
 
-		int previousPlanElementCounter = this.planElementCounter;
-
 		if( event instanceof PersonArrivalEvent ){
 			handleEvent( (PersonArrivalEvent) event);
 		} else if( event instanceof PersonDepartureEvent ){
@@ -125,7 +123,7 @@ final class CarrierDriverAgent{
 
 	private void handleEvent( LinkEnterEvent event ){
 		if( scoringFunction != null ){
-			scoringFunction.handleEvent( new LinkEnterEvent( event.getTime(), getVehicle().getId(), event.getLinkId() ) );
+			scoringFunction.handleEvent( event );
 		}
 		currentRoute.add( event.getLinkId() );
 		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
@@ -188,9 +186,12 @@ final class CarrierDriverAgent{
 			// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
 			// filled from just listening to events.  kai, jul'22
 			for( FreightEventCreator freightEventCreator : freightEventCreators) {
-				Event customEvent = freightEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter, vehicleId );
-				if(customEvent != null) {
-					this.events.processEvent(customEvent );
+				Event freightEvent = freightEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter, vehicleId );
+				if(freightEvent != null) {
+					this.events.processEvent( freightEvent );
+					if( scoringFunction != null ){
+						scoringFunction.handleEvent( freightEvent );
+					}
 				}
 			}
 //		}

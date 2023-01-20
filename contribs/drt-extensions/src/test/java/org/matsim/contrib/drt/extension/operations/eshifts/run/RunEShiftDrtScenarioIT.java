@@ -162,10 +162,10 @@ public class RunEShiftDrtScenarioIT {
 
 		config.vehicles().setVehiclesFile(evsFile);
 
-		final Controler run = EDrtOperationsControlerCreator.createControler(config, false);
+		final Controler controler = EDrtOperationsControlerCreator.createControler(config, false);
 
 		for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
-			run.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
+			controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
 				@Override
 				public void install() {
 					bind(ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider.class).toInstance(
@@ -174,7 +174,7 @@ public class RunEShiftDrtScenarioIT {
 			});
 		}
 
-		run.addOverridingModule(new AbstractModule() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
@@ -183,6 +183,6 @@ public class RunEShiftDrtScenarioIT {
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
-		run.run();
+		controler.run();
 	}
 }

@@ -20,8 +20,11 @@
 
 package org.matsim.core.utils.timing;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -41,11 +44,15 @@ import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class TimeInterpretationTest extends MatsimTestCase {
-	@Test
-	public void testIgnoreDelays() {
+public class TimeInterpretationTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testIgnoreDelays() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setTripDurationHandling(TripDurationHandling.ignoreDelays);
 
@@ -58,14 +65,14 @@ public class TimeInterpretationTest extends MatsimTestCase {
 		Leg firstLeg = (Leg) elements.get(1);
 		Leg secondLeg = (Leg) elements.get(3);
 
-		assertEquals(15600.0, firstLeg.getTravelTime().seconds());
-		assertEquals(28800.0, firstLeg.getDepartureTime().seconds());
-		assertEquals(43200.0, secondLeg.getDepartureTime().seconds());
+		assertEquals(15600.0, firstLeg.getTravelTime().seconds(), 0);
+		assertEquals(28800.0, firstLeg.getDepartureTime().seconds(), 0);
+		assertEquals(43200.0, secondLeg.getDepartureTime().seconds(), 0);
 		// End time was NOT shifted (although arrival is later), second departure is assumed at 12:00
 	}
 
-	@Test
-	public void testShiftActivityEndTime() {
+
+	@Test public void testShiftActivityEndTime() {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setTripDurationHandling(TripDurationHandling.shiftActivityEndTimes);
 
@@ -78,9 +85,9 @@ public class TimeInterpretationTest extends MatsimTestCase {
 		Leg firstLeg = (Leg) elements.get(1);
 		Leg secondLeg = (Leg) elements.get(3);
 
-		assertEquals(15600.0, firstLeg.getTravelTime().seconds());
-		assertEquals(28800.0, firstLeg.getDepartureTime().seconds());
-		assertEquals(44400.0, secondLeg.getDepartureTime().seconds());
+		assertEquals(15600.0, firstLeg.getTravelTime().seconds(), 0);
+		assertEquals(28800.0, firstLeg.getDepartureTime().seconds(), 0);
+		assertEquals(44400.0, secondLeg.getDepartureTime().seconds(), 0);
 		// End time WAS shifted (because arrival is later), second departure is assumed at 12:20
 	}
 
