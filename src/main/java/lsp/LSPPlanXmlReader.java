@@ -1,0 +1,98 @@
+package lsp;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Stack;
+
+public class LSPPlanXmlReader implements MatsimReader {
+    private static final Logger log = LogManager.getLogger(LSPPlanXmlReader.class);
+    private static final String LSPS = "lsPs";
+    private final LSPsPlanReader reader;
+
+
+    public LSPPlanXmlReader(LSPs lsPs, CarrierVehicleTypes carrierVehicleTypes) {
+        System.setProperty("matsim.preferLocalDtds", "true");
+        this.reader = new LSPsPlanReader(lsPs, carrierVehicleTypes);
+    }
+
+    public void readFile(String filename) {
+        try {
+            this.reader.readFile(filename);
+        } catch (Exception var3) {
+            Logger var10000 = log;
+            String var10001 = var3.getMessage();
+            var10000.warn("### Exception found while trying to read LSPPlan: Message: " + var10001 + " ; cause: " + var3.getCause() + " ; class " + var3.getClass());
+            if (!var3.getCause().getMessage().contains("cvc-elt1")) {
+                throw var3;
+            }
+
+            log.warn("read with validation = true failed. Try it again without validation... filename: " + filename);
+            this.reader.setValidating(false);
+            this.reader.readFile(filename);
+        }
+    }
+
+    public void readURL(URL url) {
+        try {
+            this.reader.readURL(url);
+        } catch (Exception var3) {
+            Logger var10000 = log;
+            String var10001 = var3.getMessage();
+            var10000.warn("### Exception found while trying to read LSPPlan: Message: " + var10001 + " ; cause: " + var3.getCause() + " ; class " + var3.getClass());
+            if (!var3.getCause().getMessage().contains("cvc-elt.1")) {
+                throw var3;
+            }
+
+            log.warn("read with validation = true failed. Try it again without validation... url: " + url.toString());
+            this.reader.setValidating(false);
+            this.reader.readURL(url);
+        }
+    }
+
+    public void readStream(InputStream inputStream) {
+        try {
+            this.reader.setValidating(false);
+            this.reader.parse(inputStream);
+        } catch (Exception var3) {
+            Logger var10000 = log;
+            String var10001 = var3.getMessage();
+            var10000.warn("### Exception found while trying to read LSPPlan: Message: " + var10001 + " ; cause: " + var3.getCause() + " ; class " + var3.getClass());
+            throw var3;
+        }
+    }
+
+    private static final class LSPsPlanReader extends MatsimXmlParser {
+        private final LSPs lsPs;
+        private final CarrierVehicleTypes carrierVehicleTypes;
+        private MatsimXmlParser delegate = null;
+
+        LSPsPlanReader (LSPs lsPs, CarrierVehicleTypes carrierVehicleTypes) {
+            this.lsPs = lsPs;
+            this.carrierVehicleTypes = carrierVehicleTypes;
+        }
+
+        public void startTag(String name, Attributes attributes, Stack<String> context) {
+            this.delegate = new LSPPlanXmlParser(this.lsPs, this.carrierVehicleTypes);
+        }
+
+        public void endTag(String name, String content, Stack<String> context) {
+            this.delegate.endTag(name, content, context);
+        }
+
+        public void endDocument() {
+            try {
+                this.delegate.endDocument();
+            } catch (SAXException var2) {
+                throw new RuntimeException(var2);
+            }
+        }
+    }
+}
