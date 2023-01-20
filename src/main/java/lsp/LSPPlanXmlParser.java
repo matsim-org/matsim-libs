@@ -62,6 +62,19 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 break;
             }
 
+            case HUB: {
+                String hubId = atts.getValue(ID);
+                Gbl.assertNotNull(hubId);
+                String location = atts.getValue(LOCATION);
+                Gbl.assertNotNull(location);
+                String fixedCost = atts.getValue(FIXED_COST);
+                Gbl.assertNotNull(fixedCost);
+                LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create(hubId, LSPResource.class), Id.createLinkId(location), null)
+                        .build();
+                LSPUtils.setFixedCost(hubResource, Double.valueOf(fixedCost));
+                break;
+            }
+
             case CARRIER: {
                 String carrierId = atts.getValue(ID);
                 Gbl.assertNotNull(carrierId);
@@ -74,6 +87,18 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 Gbl.assertNotNull(currAttributes);
                 attributesReader.startTag(name, atts, context, currAttributes);
                 break;
+            }
+
+            case CAPABILITIES: {
+                String fleetSize = atts.getValue(FLEET_SIZE);
+                Gbl.assertNotNull(fleetSize);
+                this.capabilityBuilder = CarrierCapabilities.Builder.newInstance();
+                if (fleetSize.toUpperCase().equals(CarrierCapabilities.FleetSize.FINITE.toString())) {
+                    this.capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.FINITE);
+                } else {
+                    this.capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+                }
+//                currentCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.valueOf(fleetSize));
             }
 
             case VEHICLE: {
@@ -97,32 +122,6 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 CarrierVehicle vehicle = vehicleBuilder.build();
                 capabilityBuilder.addVehicle(vehicle);
                 break;
-            }
-
-            case HUB: {
-                String hubId = atts.getValue(ID);
-                Gbl.assertNotNull(hubId);
-                String location = atts.getValue(LOCATION);
-                Gbl.assertNotNull(location);
-                String fixedCost = atts.getValue(FIXED_COST);
-                Gbl.assertNotNull(fixedCost);
-                LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(id, locationLinkId, scenario)
-                        .build();
-                LSPUtils.setFixedCost(hubResource, Double.valueOf(fixedCost));
-                break;
-            }
-
-
-            case CAPABILITIES: {
-                String fleetSize = atts.getValue(FLEET_SIZE);
-                Gbl.assertNotNull(fleetSize);
-                this.capabilityBuilder = CarrierCapabilities.Builder.newInstance();
-                if (fleetSize.toUpperCase().equals(CarrierCapabilities.FleetSize.FINITE.toString())) {
-                    this.capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.FINITE);
-                } else {
-                    this.capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-                }
-//                currentCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.valueOf(fleetSize));
             }
 
 
