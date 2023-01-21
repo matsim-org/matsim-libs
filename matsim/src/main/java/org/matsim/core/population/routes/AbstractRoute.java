@@ -52,7 +52,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	}
 
 	protected static OptionalTime asOptionalTime(double seconds) {
-		return Double.isInfinite(seconds) ? OptionalTime.undefined() : OptionalTime.defined(seconds);
+		return seconds == UNDEFINED_TIME ? OptionalTime.undefined() : OptionalTime.defined(seconds);
 	}
 
 	@Override
