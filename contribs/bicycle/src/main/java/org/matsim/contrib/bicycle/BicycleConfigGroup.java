@@ -65,31 +65,35 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return map;
 	}
 	@StringSetter( INPUT_COMFORT )
-	public void setMarginalUtilityOfComfort_m(final double value) {
+	public BicycleConfigGroup setMarginalUtilityOfComfort_m( final double value ) {
 		this.marginalUtilityOfComfort = value;
+		return this;
 	}
 	@StringGetter( INPUT_COMFORT )
 	public double getMarginalUtilityOfComfort_m() {
 		return this.marginalUtilityOfComfort;
 	}
 	@StringSetter( INPUT_INFRASTRUCTURE )
-	public void setMarginalUtilityOfInfrastructure_m(final double value) {
+	public BicycleConfigGroup setMarginalUtilityOfInfrastructure_m( final double value ) {
 		this.marginalUtilityOfInfrastructure = value;
+		return this;
 	}
 	@StringGetter( INPUT_INFRASTRUCTURE )
 	public double getMarginalUtilityOfInfrastructure_m() {
 		return this.marginalUtilityOfInfrastructure;
 	}
 	@StringSetter( INPUT_GRADIENT )
-	public void setMarginalUtilityOfGradient_m_100m(final double value) {
+	public BicycleConfigGroup setMarginalUtilityOfGradient_m_100m( final double value ) {
 		this.marginalUtilityOfGradient = value;
+		return this;
 	}
 	@StringGetter( INPUT_GRADIENT )
 	public double getMarginalUtilityOfGradient_m_100m() {
 		return this.marginalUtilityOfGradient;
 	}
-	public void setBicycleScoringType(final BicycleScoringType value) {
+	public BicycleConfigGroup setBicycleScoringType( final BicycleScoringType value ) {
 		this.bicycleScoringType = value;
+		return this;
 	}
 	public BicycleScoringType getBicycleScoringType() {
 		return this.bicycleScoringType;
@@ -97,8 +101,9 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( MAX_BICYCLE_SPEED_FOR_ROUTING )
 	@Deprecated
-	public void setMaxBicycleSpeedForRouting(final double value) {
+	public BicycleConfigGroup setMaxBicycleSpeedForRouting( final double value ) {
 		this.maxBicycleSpeedForRouting = value;
+		return this;
 	}
 
 	public enum BicycleScoringType {legBased, linkBased}
@@ -107,15 +112,17 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return this.bicycleMode;
 	}
 	@StringSetter( BICYCLE_MODE )
-	public void setBicycleMode(String bicycleMode) {
+	public BicycleConfigGroup setBicycleMode( String bicycleMode ) {
 		this.bicycleMode = bicycleMode;
+		return this;
 	}
 	@StringGetter( MOTORIZED_INTERACTION )
 	public boolean isMotorizedInteraction() {
 		return motorizedInteraction;
 	}
 	@StringSetter( MOTORIZED_INTERACTION )
-	public void setMotorizedInteraction(boolean motorizedInteraction) {
+	public BicycleConfigGroup setMotorizedInteraction( boolean motorizedInteraction ) {
 		this.motorizedInteraction = motorizedInteraction;
+		return this;
 	}
 }
