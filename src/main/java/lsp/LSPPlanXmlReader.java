@@ -14,13 +14,12 @@ import java.util.Stack;
 
 public class LSPPlanXmlReader implements MatsimReader {
     private static final Logger log = LogManager.getLogger(LSPPlanXmlReader.class);
-    private static final String LSPS = "lsPs";
     private final LSPsPlanReader reader;
 
 
-    public LSPPlanXmlReader(LSPs lsPs, CarrierVehicleTypes carrierVehicleTypes) {
+    public LSPPlanXmlReader(LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
         System.setProperty("matsim.preferLocalDtds", "true");
-        this.reader = new LSPsPlanReader(lsPs, carrierVehicleTypes);
+        this.reader = new LSPsPlanReader(lsPs, carriers, carrierVehicleTypes);
     }
 
     public void readFile(String filename) {
@@ -71,16 +70,18 @@ public class LSPPlanXmlReader implements MatsimReader {
 
     private static final class LSPsPlanReader extends MatsimXmlParser {
         private final LSPs lsPs;
+        private final Carriers carriers;
         private final CarrierVehicleTypes carrierVehicleTypes;
         private MatsimXmlParser delegate = null;
 
-        LSPsPlanReader (LSPs lsPs, CarrierVehicleTypes carrierVehicleTypes) {
+        LSPsPlanReader (LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
             this.lsPs = lsPs;
+            this.carriers = carriers;
             this.carrierVehicleTypes = carrierVehicleTypes;
         }
 
         public void startTag(String name, Attributes attributes, Stack<String> context) {
-            this.delegate = new LSPPlanXmlParser(this.lsPs, this.carrierVehicleTypes);
+            this.delegate = new LSPPlanXmlParser(this.lsPs, this.carriers, this.carrierVehicleTypes);
         }
 
         public void endTag(String name, String content, Stack<String> context) {

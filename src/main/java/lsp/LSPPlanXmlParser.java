@@ -1,6 +1,5 @@
 package lsp;
 
-import com.google.inject.Inject;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
@@ -12,12 +11,11 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.xml.sax.Attributes;
 
-import java.util.Map;
 import java.util.Stack;
 
 import static lsp.LSPConstants.*;
@@ -30,6 +28,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
     private Carrier currentCarrier = null;
     private LSPShipment currentShipment = null;
     private final LSPs lsPs;
+    private final Carriers carriers;
     private final CarrierVehicleTypes carrierVehicleTypes;
     private CarrierCapabilities.Builder capabilityBuilder;
 
@@ -37,23 +36,15 @@ class LSPPlanXmlParser extends MatsimXmlParser {
     private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
             new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 
-    public LSPPlanXmlParser(LSPs lsPs, CarrierVehicleTypes carrierVehicleTypes) {
+    public LSPPlanXmlParser(LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
         super();
         this.lsPs = lsPs;
+        this.carriers = carriers;
         this.carrierVehicleTypes = carrierVehicleTypes;
     }
 
-    public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
-        this.attributesReader.putAttributeConverter(clazz, converter);
-    }
-
-    @Inject
-    public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
-        this.attributesReader.putAttributeConverters(converters);
-    }
-
     @Override
-    public void startTag(String name, org.xml.sax.Attributes atts, Stack<String> context) {
+    public void startTag(String name, Attributes atts, Stack<String> context) {
         switch (name) {
             case LSP: {
                 String lspId = atts.getValue(ID);
@@ -98,7 +89,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 } else {
                     this.capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
                 }
-//                currentCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.valueOf(fleetSize));
+                break;
             }
 
             case VEHICLE: {
@@ -163,22 +154,77 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 currentLsp.assignShipmentToLSP(currentShipment);
                 break;
             }
-        }
-    }
 
+            case PLAN: {
+                String score = atts.getValue(SCORE);
+                Gbl.assertNotNull(score);
+                String chainId = atts.getValue(CHAIN_ID);
+                Gbl.assertNotNull(chainId);
+                String selected = atts.getValue(SELECTED);
+                Gbl.assertNotNull(selected);
+            }
 
-        private double parseTimeToDouble (String timeString){
-            if (timeString.contains(":")) {
-                return Time.parseTime(timeString);
-            } else {
-                return Double.parseDouble(timeString);
+            case RESOURCE: {
+                String resourceId = atts.getValue(ID);
+                Gbl.assertNotNull(resourceId);
+            }
+
+            case SHIPMENT_PLAN: {
+                String shipmentId = atts.getValue(ID);
+                Gbl.assertNotNull(shipmentId);
+            }
+
+            case ELEMENT: {
+                String type = atts.getValue(TYPE);
+                Gbl.assertNotNull(type);
+
+                String startTime = atts.getValue(START_TIME);
+                Gbl.assertNotNull(startTime);
+
+                String endTime = atts.getValue(END_TIME);
+                Gbl.assertNotNull(endTime);
+
+                String resource = atts.getValue(RESOURCE);
+                Gbl.assertNotNull(resource);
             }
         }
-
-        private int getInt (String value){
-            return Integer.parseInt(value);
-        }
-
-
     }
+
+    @Override
+    public void endTag(String name, String content, Stack<String> context) {
+        switch (name) {
+            case LSP -> {
+                Gbl.assertNotNull(currentLsp);
+                Gbl.assertNotNull(lsPs);
+                Gbl.assertNotNull(lsPs.getLSPs());
+                lsPs.getLSPs().put(currentLsp.getId(), currentLsp);
+                currentLsp = null;
+            }
+            case CARRIER -> {
+                Gbl.assertNotNull(currentCarrier);
+                Gbl.assertNotNull(carriers);
+                Gbl.assertNotNull(carriers.getCarriers());
+                carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
+                currentCarrier = null;
+            }
+            case CAPABILITIES -> currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
+            case ATTRIBUTE -> this.currAttributes = null;
+            case SHIPMENT -> this.currentShipment = null;
+
+        }
+    }
+
+    private double parseTimeToDouble (String timeString){
+        if (timeString.contains(":")) {
+            return Time.parseTime(timeString);
+        } else {
+            return Double.parseDouble(timeString);
+        }
+    }
+
+    private int getInt (String value){
+        return Integer.parseInt(value);
+    }
+
+
 }

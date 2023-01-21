@@ -35,6 +35,7 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.CarrierStrategyManagerImpl;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -149,6 +150,7 @@ final class ExampleTwoEchelonGrid_NR {
 
 		//Ggf. muss der Ordner noch erstellt werden (?)
 		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
+		new LSPPlanXmlReader(LSPUtils.getLSPs(controler.getScenario()), FreightUtils.getCarriers(controler.getScenario()), FreightUtils.getCarrierVehicleTypes(controler.getScenario()));
 
 		log.info("Some results ....");
 
