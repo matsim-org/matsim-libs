@@ -72,6 +72,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	@Override
 	public final void setTravelTime(final double travTime) {
+		OptionalTime.assertDefined(travTime);
 		this.travTime = travTime;
 	}
 

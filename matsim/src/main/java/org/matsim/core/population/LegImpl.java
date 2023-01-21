@@ -80,6 +80,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public void setDepartureTime(final double depTime) {
+		OptionalTime.assertDefined(depTime);
 		this.depTime = depTime;
 	}
 
@@ -95,6 +96,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public void setTravelTime(final double travTime) {
+		OptionalTime.assertDefined(travTime);
 		this.travTime = travTime;
 	}
 

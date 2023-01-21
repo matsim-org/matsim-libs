@@ -37,7 +37,15 @@ public final class OptionalTime {
 	//cached values:
 	private static final OptionalTime UNDEFINED = new OptionalTime(Time.UNDEFINED_TIME);
 	private static final OptionalTime TIME_0 = new OptionalTime(0);
-	
+
+	public static void assertDefined(double seconds) {
+		if (seconds == Time.UNDEFINED_TIME) {
+			throw new IllegalArgumentException("Undefined time is not allowed");
+		} else if (Double.isNaN(seconds)) {
+			throw new IllegalArgumentException("NaN time is not allowed");
+		}
+	}
+
 	/**
 	 * Creates OptionalTime that wraps only a defined time
 	 *
@@ -46,18 +54,15 @@ public final class OptionalTime {
 	public static OptionalTime defined(double seconds) {
 		if (seconds == 0) {
 			return TIME_0;
-		} else if (seconds == Time.UNDEFINED_TIME) {
-			throw new IllegalArgumentException("Undefined time is not allowed");
-		} else if (Double.isNaN(seconds)) {
-			throw new IllegalArgumentException("NaN time is not allowed");
 		}
+		assertDefined(seconds);
 		return new OptionalTime(seconds);
 	}
 
 	public static OptionalTime undefined() {
 		return UNDEFINED;
 	}
-	
+
 	public static OptionalTime zeroSeconds() {
 		return TIME_0;
 	}

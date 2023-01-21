@@ -79,6 +79,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public void setEndTime(final double endTime) {
+		OptionalTime.assertDefined(endTime);
 		this.endTime = endTime;
 	}
 
@@ -100,6 +101,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 	 */
 	@Override
 	public void setStartTime(final double startTime) {
+		OptionalTime.assertDefined(startTime);
 		this.startTime = startTime;
 	}
 
@@ -181,6 +183,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public void setMaximumDuration(final double dur) {
+		OptionalTime.assertDefined(dur);
 		this.dur = dur;
 	}
 
