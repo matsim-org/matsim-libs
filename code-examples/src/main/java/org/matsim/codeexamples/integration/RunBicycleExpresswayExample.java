@@ -67,11 +67,8 @@ public final class RunBicycleExpresswayExample{
 		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.kinematicWaves );
 		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.kinematicWaves );
 
-		// run only the zeroth iteration so that we do not have to worry about strategies:
+		// run only the zeroth iteration so that we do not have to worry about replanning strategies:
 		config.controler().setLastIteration( 0 );
-
-		// remove the teleported bike routing:
-		config.plansCalcRoute().removeTeleportedModeParams( BICYCLE );
 
 		// add bike routing as network routing:
 		config.plansCalcRoute().setNetworkModes( Arrays.asList( TransportMode.car, BICYCLE ) );
@@ -113,17 +110,15 @@ public final class RunBicycleExpresswayExample{
 
 		// now put hte mode vehicles into the vehicles data:
 		final VehiclesFactory vf = VehicleUtils.getFactory();
-		scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.create(TransportMode.car, VehicleType.class) ).setMaximumVelocity( 100./3.6 ) );
-		scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.create(BICYCLE, VehicleType.class) ).setNetworkMode( BICYCLE ).setMaximumVelocity(10./3.6 ) );
+		scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.create(TransportMode.car, VehicleType.class) ).setMaximumVelocity( 100./3.6 ).setPcuEquivalents( 1. ) );
+		scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.create(BICYCLE, VehicleType.class) ).setNetworkMode( BICYCLE ).setMaximumVelocity(10./3.6 ).setPcuEquivalents( 0.25 ) );
 
 		// ---
 
 		Controler controler = new Controler( scenario );
 
 		controler.addOverridingModule( new OTFVisLiveModule() );
-		OTFVisConfigGroup otfConfig = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
-		otfConfig.setDrawNonMovingItems( true );
-		otfConfig.setAgentSize( 200 );
+		ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class ).setDrawNonMovingItems( true ).setAgentSize( 100 );
 
 		controler.addOverridingModule( new AbstractModule(){
 			// preparation: compute max speed given link speed limit and vehicle maximum speed:
