@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.misc.Counter;
 
-/** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
+/** See <a href="https://doi.org/10.3929/ethz-b-000023532">https://doi.org/10.3929/ethz-b-000023532</a>
  * for a description of node types. It's the graph matching paper.
  *
  * @author balmermi
