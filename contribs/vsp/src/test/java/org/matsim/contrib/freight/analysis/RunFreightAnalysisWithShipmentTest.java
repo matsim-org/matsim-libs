@@ -30,10 +30,10 @@ public class RunFreightAnalysisWithShipmentTest {
     @Test
     public void runShipmentTrackerTest(){
         final String inputPath = testUtils.getClassInputDirectory();
-        File networkFile = new File(inputPath + "/shipment/output_network.xml.gz");
-        File carrierFile = new File(inputPath + "/shipment/output_carriers.xml");
-        File vehiclesFile = new File(inputPath + "/shipment/output_allVehicles.xml.gz");
-        File eventsFile = new File(inputPath + "/shipment/output_events.xml.gz");
+        File networkFile = new File(inputPath + "/output_network.xml.gz");
+        File carrierFile = new File(inputPath + "/output_carriers.xml");
+        File vehiclesFile = new File(inputPath + "/output_allVehicles.xml.gz");
+        File eventsFile = new File(inputPath + "/output_events.xml.gz");
 
         Network network = NetworkUtils.readNetwork(networkFile.getAbsolutePath());
 
