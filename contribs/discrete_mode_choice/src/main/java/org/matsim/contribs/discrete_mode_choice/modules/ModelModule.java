@@ -57,14 +57,11 @@ public class ModelModule extends AbstractModule {
 	@Provides
 	public DiscreteModeChoiceModel provideDiscreteModeChoiceModel(DiscreteModeChoiceConfigGroup dmcConfig,
 			Provider<TourBasedModel> tourBasedProvider, Provider<TripBasedModel> tripBasedProvider) {
-		switch (dmcConfig.getModelType()) {
-		case Tour:
-			return tourBasedProvider.get();
-		case Trip:
-			return tripBasedProvider.get();
-		default:
-			throw new IllegalStateException();
-		}
+		return switch( dmcConfig.getModelType() ){
+			case Tour -> tourBasedProvider.get();
+			case Trip -> tripBasedProvider.get();
+			default -> throw new IllegalStateException();
+		};
 	}
 
 	@Provides

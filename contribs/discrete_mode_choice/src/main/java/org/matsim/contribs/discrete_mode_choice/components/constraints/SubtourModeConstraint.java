@@ -87,9 +87,9 @@ public class SubtourModeConstraint extends AbstractTourConstraint {
 			List<Id<? extends BasicLocation>> originLocations = new ArrayList<>(trips.size());
 			List<Id<? extends BasicLocation>> destinationLocations = new ArrayList<>(trips.size());
 
-			for (int index = 0; index < trips.size(); index++) {
-				originLocations.add(LocationUtils.getLocationId(trips.get(index).getOriginActivity()));
-				destinationLocations.add(LocationUtils.getLocationId(trips.get(index).getDestinationActivity()));
+			for( DiscreteModeChoiceTrip trip : trips ){
+				originLocations.add( LocationUtils.getLocationId( trip.getOriginActivity() ) );
+				destinationLocations.add( LocationUtils.getLocationId( trip.getDestinationActivity() ) );
 			}
 
 			return new SubtourModeConstraint(constrainedModes, originLocations, destinationLocations);
