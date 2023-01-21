@@ -72,11 +72,11 @@ public class RunFreightAnalysisIT {
 
 	@Test
 	public void runVehicleTrackerTest(){
-		final String inputPath = testUtils.getClassInputDirectory();
-		File networkFile = new File(inputPath + "/output_network.xml.gz");
-		File carrierFile = new File(inputPath + "/output_carriers.xml");
-		File vehiclesFile = new File(inputPath + "/output_allVehicles.xml.gz");
-		File eventsFile = new File(inputPath + "/output_events.xml.gz");
+		final String inputDir = testUtils.getClassInputDirectory();
+		File networkFile = new File(inputDir + "/output_network.xml.gz");
+		File carrierFile = new File(inputDir + "/output_carriers.xml");
+		File vehiclesFile = new File(inputDir + "/output_allVehicles.xml.gz");
+		File eventsFile = new File(inputDir + "/output_events.xml.gz");
 
 		Network network = NetworkUtils.readNetwork(networkFile.getAbsolutePath());
 

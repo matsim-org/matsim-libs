@@ -71,8 +71,8 @@ public class RunFreightAnalysis {
 		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(carrierFile.getAbsolutePath() );
 
 	   EventsManager eventsManager = EventsUtils.createEventsManager();
-	   FreightAnalysisEventHandler freightEventHandler = new FreightAnalysisEventHandler(network, vehicles,  carriers);
-	   eventsManager.addHandler(freightEventHandler);
+	   FreightAnalysisEventHandler freightAnalysisEventHandler = new FreightAnalysisEventHandler(network, vehicles,  carriers);
+	   eventsManager.addHandler(freightAnalysisEventHandler);
 
 	   eventsManager.initProcessing();
 	   MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
@@ -80,10 +80,10 @@ public class RunFreightAnalysis {
 	   eventsReader.readFile(eventsFile.getAbsolutePath());
 	   eventsManager.finishProcessing();
 
-	   freightEventHandler.exportVehicleInfo(outputPath, true);
-	   freightEventHandler.exportVehicleTripInfo(outputPath, true);
-	   freightEventHandler.exportVehicleTypeStats(outputPath, true);
-	   freightEventHandler.exportServiceInfo(outputPath, true);
-	   freightEventHandler.exportShipmentInfo(outputPath, true);
+	   freightAnalysisEventHandler.exportVehicleInfo(outputPath, true);
+	   freightAnalysisEventHandler.exportVehicleTripInfo(outputPath, true);
+	   freightAnalysisEventHandler.exportVehicleTypeStats(outputPath, true);
+	   freightAnalysisEventHandler.exportServiceInfo(outputPath, true);
+	   freightAnalysisEventHandler.exportShipmentInfo(outputPath, true);
 	}
 }
