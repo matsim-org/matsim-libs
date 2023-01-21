@@ -31,7 +31,7 @@
         <argLine></argLine>
 
         <log4j.version>2.19.0</log4j.version>
-        <geotools.version>28.0</geotools.version>
+        <geotools.version>28.1</geotools.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>5.1.0</guice.version>
         <jackson.version>2.14.1</jackson.version>
@@ -197,7 +197,7 @@
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
                 <artifactId>woodstox-core</artifactId>
-                <version>6.4.0</version>
+                <version>6.5.0</version>
             </dependency>
 
             <dependency>
@@ -270,14 +270,14 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.24.1</version>
+                <version>3.24.2</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>4.11.0</version>
+                <version>5.0.0</version>
                 <scope>test</scope>
             </dependency>
 
