@@ -52,24 +52,22 @@ public class RunFreightAnalysisIT {
 	@Test
 	public void compareResults() {
 		//some generale stats
-		checkFile("carrierStats.tsv");
-		checkFile("freightVehicleStats.tsv");
-		checkFile("freightVehicleTripStats.tsv");
-		checkFile("serviceStats.tsv");
-		checkFile("shipmentStats.tsv");
+		final String inputDir = testUtils.getInputDirectory();
+		final String outputDir = testUtils.getOutputDirectory();
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "carrierStats.tsv", outputDir + "carrierStats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "freightVehicleStats.tsv", outputDir + "freightVehicleStats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "freightVehicleTripStats.tsv", outputDir + "freightVehicleTripStats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "serviceStats.tsv", outputDir + "serviceStats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "shipmentStats.tsv", outputDir + "shipmentStats.tsv");
 
 		//Carrier specific stats
-		checkFile("carrier_carrier1_ServiceStats.tsv");
-		checkFile("carrier_carrier1_ShipmentStats.tsv");
-		checkFile("carrier_carrier1_VehicleTypeStats.tsv");
-		checkFile("carrier_##carrier1_tripStats.tsv");  //Note: The "?" is here, because the carrierId was guessed depending on the vehicleId.
-		checkFile("carrier_##carrier1_vehicleStats.tsv"); //Note: The "?" is here, because the carrierId was guessed depending on the vehicleId.
-	}
-
-	private void checkFile(String filename) {
-		final String inputFilename = testUtils.getInputDirectory() + filename;
-		final String outputFilename = testUtils.getOutputDirectory() + filename;
-		MatsimTestUtils.assertEqualFilesLineByLine(inputFilename, outputFilename);
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "carrier_carrier1_ServiceStats.tsv", outputDir + "carrier_carrier1_ServiceStats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "carrier_carrier1_ShipmentStats.tsv", outputDir + "carrier_carrier1_ShipmentStats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "carrier_carrier1_VehicleTypeStats.tsv", outputDir + "carrier_carrier1_VehicleTypeStats.tsv");
+		//Note: The "?" is here, because the carrierId was guessed depending on the vehicleId.
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "carrier_##carrier1_tripStats.tsv", outputDir + "carrier_##carrier1_tripStats.tsv");
+		//Note: The "?" is here, because the carrierId was guessed depending on the vehicleId.
+		MatsimTestUtils.assertEqualFilesLineByLine(inputDir + "carrier_##carrier1_vehicleStats.tsv", outputDir + "carrier_##carrier1_vehicleStats.tsv");
 	}
 
 	@Test
