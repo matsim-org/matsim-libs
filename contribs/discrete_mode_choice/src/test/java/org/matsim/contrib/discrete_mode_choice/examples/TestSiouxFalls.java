@@ -33,6 +33,9 @@ public class TestSiouxFalls {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(1);
+		config.controler().setCreateGraphs( false );
+		config.controler().setWritePlansInterval( 0 );
+		config.controler().setWriteEventsInterval( 0 );
 
 		config.qsim().setFlowCapFactor(10000.0);
 		config.qsim().setStorageCapFactor(10000.0);
