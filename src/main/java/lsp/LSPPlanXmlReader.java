@@ -80,7 +80,12 @@ public class LSPPlanXmlReader implements MatsimReader {
         }
 
         public void startTag(String name, Attributes attributes, Stack<String> context) {
-            this.delegate = new LSPPlanXmlParser(this.lsPs, this.carriers, this.carrierVehicleTypes);
+			//Set the correct parser, when start reading the file (== first <LSPS> -Tag :)
+			if ( (LSPConstants.LSPS).equalsIgnoreCase( name ) ) {
+				this.delegate = new LSPPlanXmlParser(this.lsPs, this.carriers, this.carrierVehicleTypes);
+			}
+			//Read starting tag //TODO: @Niclas: Das fehlte hier, weshalb er die Objekte nie erstellt hat, die er dann beim (endTag) haben wollte und die deshalb "null" waren.
+			this.delegate.startTag( name, attributes, context );
         }
 
         public void endTag(String name, String content, Stack<String> context) {
