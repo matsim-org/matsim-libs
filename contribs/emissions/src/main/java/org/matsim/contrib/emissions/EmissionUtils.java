@@ -49,6 +49,8 @@ public abstract class EmissionUtils {
 
 	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 
+	public static final String HBEFA_ROAD_GRADIENT = "hbefa_road_gradient";
+
 	public static void setHbefaRoadType(Link link, String type) {
 		link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 	}
@@ -56,6 +58,10 @@ public abstract class EmissionUtils {
 	public static String getHbefaRoadType(Link link) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
+
+	public static void setHbefaRoadGradient(Link link, String type) { link.getAttributes().putAttribute(HBEFA_ROAD_GRADIENT, type); } // implement the setHbefaRoadGradient-Method here but it is not callable in the exmaple project then...
+
+	public static String getHbefaRoadGradient(Link link) { return (String) link.getAttributes().getAttribute(HBEFA_ROAD_GRADIENT); }
 
 	public static Map<Pollutant, Double> sumUpEmissions(Map<Pollutant, Double> warmEmissions, Map<Pollutant, Double> coldEmissions) {
 
@@ -97,7 +103,7 @@ public abstract class EmissionUtils {
 				for (Pollutant pollutant : pollutants) {
 					emissionType2Value.put(pollutant, 0.0);
 				}
-			} else { // person in map, but some emissions are not set; setting these to 0.0 
+			} else { // person in map, but some emissions are not set; setting these to 0.0
 				emissionType2Value = totalEmissions.get(personId);
 				for (Pollutant pollutant : emissionType2Value.keySet()) {
 					// else do nothing

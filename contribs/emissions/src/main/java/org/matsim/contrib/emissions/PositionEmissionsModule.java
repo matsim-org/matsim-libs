@@ -100,7 +100,8 @@ public class PositionEmissionsModule extends AbstractModule {
 
 			var vehicleAttributes = getVehicleAttributes(vehicle);
 			var roadType = EmissionUtils.getHbefaRoadType(link);
-			return emissionModule.getWarmEmissionAnalysisModule().calculateWarmEmissions(time, roadType, link.getFreespeed(), distance, vehicleAttributes);
+			String roadGradient = EmissionUtils.getHbefaRoadGradient(link);
+			return emissionModule.getWarmEmissionAnalysisModule().calculateWarmEmissions(time, roadType, roadGradient,link.getFreespeed(), distance, vehicleAttributes);
 		}
 
 		Map<Pollutant, Double> calculateColdEmissions(Vehicle vehicle, double parkingDuration, int distance) {

@@ -31,7 +31,7 @@ abstract class HbefaEmissionFactorKey {
 
 
 
-	private HbefaRoadGradient roadGradient;
+	private String roadGradient;
 
 	HbefaEmissionFactorKey(HbefaEmissionFactorKey copyFrom) {
 		this.vehicleCategory = copyFrom.getVehicleCategory();
@@ -68,11 +68,11 @@ abstract class HbefaEmissionFactorKey {
 		this.component = component;
 	}
 
-	public HbefaRoadGradient getRoadGradient() {
+	public String getRoadGradient() {
 		return roadGradient;
 	}
 
-	public void setRoadGradient(HbefaRoadGradient roadGradient) {
+	public void setRoadGradient(String roadGradient) {
 		this.roadGradient = roadGradient;
 	}
 

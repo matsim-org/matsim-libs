@@ -228,10 +228,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		double freeVelocity = link.getFreespeed(); //TODO: what about time dependence
 
-		return calculateWarmEmissions(travelTime, EmissionUtils.getHbefaRoadType(link), freeVelocity, link.getLength(), vehicleInformationTuple);
+		return calculateWarmEmissions(travelTime, EmissionUtils.getHbefaRoadType(link),EmissionUtils.getHbefaRoadGradient(link),freeVelocity, link.getLength(), vehicleInformationTuple);
 	}
 
-	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, double freeVelocity_ms,
+	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, String roadGradient, double freeVelocity_ms,
 												  double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
 		Map<Pollutant, Double> warmEmissionsOfEvent = new EnumMap<>(Pollutant.class);
@@ -257,7 +257,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		HbefaWarmEmissionFactorKey efkey = new HbefaWarmEmissionFactorKey();
 		efkey.setVehicleCategory(vehicleInformationTuple.getFirst());
 		efkey.setRoadCategory(roadType);
-		//efkey.setRoadGradient(roadGradient); //TODO how to add the args roadGradient to the function() above?!
+		efkey.setRoadGradient(roadGradient); //TODO how to add the args roadGradient to the function() above?!
 		if (this.detailedHbefaWarmTable != null) {
 			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
@@ -333,6 +333,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			double generatedEmissions = (linkLength_m / 1000) * ef_gpkm;
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
+		System.out.println("you are correct");
 
 		// update counters:
 		// yy I don't now what this is good for; I would base downstream analysis rather on events.  kai, jan'20

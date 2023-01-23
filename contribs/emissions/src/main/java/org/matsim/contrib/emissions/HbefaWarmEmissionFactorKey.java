@@ -26,7 +26,7 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 
 	private String roadCategory;
 	private HbefaTrafficSituation trafficSituation;
-	private HbefaRoadGradient roadGradient; // added var roadGradient
+	private String roadGradient; // added var roadGradient
 
 	/*package-private*/ HbefaWarmEmissionFactorKey() {
 	}
