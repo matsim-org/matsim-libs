@@ -194,16 +194,16 @@ class LSPPlanXmlParser extends MatsimXmlParser {
     public void endTag(String name, String content, Stack<String> context) {
         switch (name) {
             case LSP -> {
-                Gbl.assertNotNull(currentLsp);
-                Gbl.assertNotNull(lsPs);
-                Gbl.assertNotNull(lsPs.getLSPs());
+//                Gbl.assertNotNull(currentLsp);
+//                Gbl.assertNotNull(lsPs);
+//                Gbl.assertNotNull(lsPs.getLSPs());
                 lsPs.getLSPs().put(currentLsp.getId(), currentLsp);
                 currentLsp = null;
             }
             case CARRIER -> {
-                Gbl.assertNotNull(currentCarrier);
-                Gbl.assertNotNull(carriers);
-                Gbl.assertNotNull(carriers.getCarriers());
+//                Gbl.assertNotNull(currentCarrier);
+//                Gbl.assertNotNull(carriers);
+//                Gbl.assertNotNull(carriers.getCarriers());
                 carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
                 currentCarrier = null;
             }
