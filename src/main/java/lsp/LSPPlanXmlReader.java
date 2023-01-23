@@ -24,18 +24,16 @@ public class LSPPlanXmlReader implements MatsimReader {
 
     public void readFile(String filename) {
         try {
-            this.reader.readFile(filename);
-        } catch (Exception var3) {
-            Logger var10000 = log;
-            String var10001 = var3.getMessage();
-            var10000.warn("### Exception found while trying to read LSPPlan: Message: " + var10001 + " ; cause: " + var3.getCause() + " ; class " + var3.getClass());
-            if (!var3.getCause().getMessage().contains("cvc-elt1")) {
-                throw var3;
-            }
-
-            log.warn("read with validation = true failed. Try it again without validation... filename: " + filename);
             this.reader.setValidating(false);
             this.reader.readFile(filename);
+        } catch (Exception e) {
+            log.warn("### Exception found while trying to read CarrierPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
+            if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
+                log.warn("read with validation = true failed. Try it again without validation... filename: " + filename);
+                reader.setValidating(false);
+                reader.readFile(filename);
+            } else { //other problem: e.g. validation does not work, because of missing validation file.
+                throw  e;}
         }
     }
 
