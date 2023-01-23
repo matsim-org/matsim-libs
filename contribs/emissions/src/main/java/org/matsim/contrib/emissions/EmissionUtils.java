@@ -59,9 +59,9 @@ public abstract class EmissionUtils {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
-	public static void setHbefaRoadGradient(Link link, String type) { link.getAttributes().putAttribute(HBEFA_ROAD_GRADIENT, type); } // implement the setHbefaRoadGradient-Method here but it is not callable in the exmaple project then...
+	public static void setHbefaRoadGradient(Link link, String gradient) { link.getAttributes().putAttribute(String.valueOf(HBEFA_ROAD_GRADIENT), gradient); } // implement the setHbefaRoadGradient-Method here but it is not callable in the exmaple project then...
 
-	public static String getHbefaRoadGradient(Link link) { return (String) link.getAttributes().getAttribute(HBEFA_ROAD_GRADIENT); }
+	public static String getHbefaRoadGradient(Link link) { return (String) link.getAttributes().getAttribute(String.valueOf(HBEFA_ROAD_GRADIENT)); }
 
 	public static Map<Pollutant, Double> sumUpEmissions(Map<Pollutant, Double> warmEmissions, Map<Pollutant, Double> coldEmissions) {
 

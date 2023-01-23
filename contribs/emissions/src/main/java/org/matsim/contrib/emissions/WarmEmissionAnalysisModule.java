@@ -333,7 +333,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			double generatedEmissions = (linkLength_m / 1000) * ef_gpkm;
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
-		System.out.println("you are correct");
 
 		// update counters:
 		// yy I don't now what this is good for; I would base downstream analysis rather on events.  kai, jan'20

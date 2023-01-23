@@ -35,7 +35,7 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 		super(key);
 		this.roadCategory = key.roadCategory;
 		this.trafficSituation = key.trafficSituation;
-		this.roadGradient = key.roadGradient; // roadGradient in constructor
+		this.roadGradient = key.roadGradient;
 	}
 
 	String getRoadCategory() {

@@ -100,7 +100,7 @@ public class PositionEmissionsModule extends AbstractModule {
 
 			var vehicleAttributes = getVehicleAttributes(vehicle);
 			var roadType = EmissionUtils.getHbefaRoadType(link);
-			String roadGradient = EmissionUtils.getHbefaRoadGradient(link);
+			var roadGradient = EmissionUtils.getHbefaRoadGradient(link);
 			return emissionModule.getWarmEmissionAnalysisModule().calculateWarmEmissions(time, roadType, roadGradient,link.getFreespeed(), distance, vehicleAttributes);
 		}
 
