@@ -432,23 +432,6 @@
             </build>
         </profile>
         <profile>
-            <id>hudson</id>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <configuration>
-                                <doclint>none</doclint>
-                                <quiet>true</quiet>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
             <id>jacoco</id>
             <build>
                 <plugins>
