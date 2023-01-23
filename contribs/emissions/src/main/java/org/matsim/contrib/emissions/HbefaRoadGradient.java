@@ -5,9 +5,9 @@ package org.matsim.contrib.emissions;
  * */
 public enum HbefaRoadGradient {
 	ZERO,
-	PLUS_TWO,
-	PLUS_FOUR,
-	PLUS_SIX,
+	PLUS_2,
+	PLUS_4,
+	PLUS_6,
 	MINUS_2,
 	MINUS_4,
 	MINUS_6,
