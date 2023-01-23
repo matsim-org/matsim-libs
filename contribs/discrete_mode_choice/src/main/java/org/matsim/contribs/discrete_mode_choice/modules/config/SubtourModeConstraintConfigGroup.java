@@ -1,5 +1,7 @@
 package org.matsim.contribs.discrete_mode_choice.modules.config;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contribs.discrete_mode_choice.components.constraints.SubtourModeConstraint;
 
 import java.util.Arrays;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
  *
  */
 public class SubtourModeConstraintConfigGroup extends ComponentConfigGroup {
+	private final Logger log = LogManager.getLogger(SubtourModeConstraintConfigGroup.class );
 	private Collection<String> constrainedModes = new HashSet<>();
 
 	public final static String CONSTRAINED_MODES = "constrainedModes";
@@ -38,8 +41,14 @@ public class SubtourModeConstraintConfigGroup extends ComponentConfigGroup {
 	 * @param constrainedModes -- {@value CONSTRAINED_MODES_CMT}
 	 */
 	public void setConstrainedModes(Collection<String> constrainedModes) {
+		log.warn( "setContrainedModes had a typo in its implementation and in consequence ignored its arguments.  This has now been corrected, but presumably changes one or " +
+					  "the other result.  You need comment out your setting of this if you want to obtain your old results.  They will, however, not be consistent with what you intended.  kai, jan'23");
 		this.constrainedModes = new HashSet<>(constrainedModes);
 	}
+	// What I found is in comments below; note the typo in contrainedModes.  I think that (only) the above version is correct.  This fails the sioux falls test; changing it therefore.  kai, jan'23
+//	public void setConstrainedModes(Collection<String> contrainedModes) {
+//		this.constrainedModes = new HashSet<>(constrainedModes);
+//	}
 
 	public Collection<String> getConstrainedModes() {
 		return constrainedModes;

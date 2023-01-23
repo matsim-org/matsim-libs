@@ -33,9 +33,11 @@ public class TestSiouxFalls {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(1);
+		// save some bandwidth/time:
 		config.controler().setCreateGraphs( false );
 		config.controler().setWritePlansInterval( 0 );
 		config.controler().setWriteEventsInterval( 0 );
+		config.controler().setDumpDataAtEnd( false );
 
 		config.qsim().setFlowCapFactor(10000.0);
 		config.qsim().setStorageCapFactor(10000.0);
@@ -55,9 +57,15 @@ public class TestSiouxFalls {
 
 		controller.run();
 
-		assertEquals(42520, (int) listener.counts.get("pt"));
-		assertEquals(132100, (int) listener.counts.get("car"));
-		assertEquals(79106, (int) listener.counts.get("walk"));
+		assertEquals(42395, (int) listener.counts.get("pt"));
+		assertEquals(132284, (int) listener.counts.get("car"));
+		assertEquals(78809, (int) listener.counts.get("walk"));
+//		assertEquals(42520, (int) listener.counts.get("pt"));
+//		assertEquals(132100, (int) listener.counts.get("car"));
+//		assertEquals(79106, (int) listener.counts.get("walk"));
+		// ...setConstrainedModes(...) (inside configureAsSubtourModeChoiceReplacement(...)) used to ignore its arguments because of a typo.
+		// This is now corrected, but results are no longer backwards compatible.  kai, jan'23
+
 	}
 
 	static class ModeListener implements PersonArrivalEventHandler {
