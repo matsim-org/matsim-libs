@@ -16,6 +16,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
 
+import java.util.Collections;
 import java.util.Stack;
 
 import static lsp.LSPConstants.*;
@@ -49,7 +50,17 @@ class LSPPlanXmlParser extends MatsimXmlParser {
             case LSP: {
                 String lspId = atts.getValue(ID);
                 Gbl.assertNotNull(lspId);
-                currentLsp = LSPUtils.LSPBuilder.getInstance(Id.create(lspId, LSP.class)).build();
+                currentLsp = LSPUtils.LSPBuilder.getInstance(Id.create(lspId, LSP.class))
+						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.emptyList())) //TODO (KMT) Siehe Kommentar (##)
+						.build();
+				/*	Kommentar (##)
+				 * Ohne das hier knallt es beim Erstellen der LSP-Impl, weil er den Backpointer zum LSP hier in den Scheduler setzen will -->
+				 * Das heißt, dass
+				 * 1) dieser LogisticChainScheduler eigentlich zwingend im Konstruktor des Builders sein müsste bzw.
+				 * 2) man nochmal wegen der Backpointer nachdenken müsste.
+				 *
+				 * Versuche das nun mit dem Erstellen eines Schedulers mit einer leeren Collection als List<LSPResource>  zum "umgehen"
+				 */
                 break;
             }
 
