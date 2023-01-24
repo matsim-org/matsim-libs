@@ -48,8 +48,7 @@ public final class BicycleUtils {
 		return (String) link.getAttributes().getAttribute( SURFACE );
 	}
 
-	// TODO
-	//public static String getUserDefinedNetworkAttribute( Link link, String nameOfUserDefinedNetworkAttribute ) {
-	//	return (String) link.getAttributes().getAttribute( nameOfUserDefinedNetworkAttribute );
-	//}
+	public static String getUserDefinedNetworkAttribute( Link link, String nameOfUserDefinedNetworkAttribute ) {
+		return (String) link.getAttributes().getAttribute( nameOfUserDefinedNetworkAttribute );
+	}
 }

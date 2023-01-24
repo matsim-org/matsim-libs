@@ -31,26 +31,27 @@ class BicycleUtilityUtils {
 		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
 		String type = (String) link.getAttributes().getAttribute("type");
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
-		// TODO
-		//String userDefinedNetworkAttributeString = (String) link.getAttributes().getAttribute(nameOfUserDefinedNetworkAttribute);
 
 		double distance = link.getLength();
 
-		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface, type);
+		double comfortFactor = getComfortFactor(surface, type);
 		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
 
-		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype);
+		double infrastructureFactor = getInfrastructureFactor(type, cyclewaytype);
 		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
-		double gradient = BicycleUtilityUtils.getGradient(link);
+		double gradient = getGradient(link);
 		double gradientScore = marginalUtilityOfGradient_m_100m * gradient * distance;
 
-		// TODO
-//		double userDefinedNetworkAttributeFactor = BicycleUtilityUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString, userDefinedNetworkAttributeDefaultValue);
-//		double userDefinedNetworkAttributeScore = marginalUtilityOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
+		String userDefinedNetworkAttributeString;
+		double userDefinedNetworkAttributeScore = 0.;
+		if (nameOfUserDefinedNetworkAttribute != null) {
+			userDefinedNetworkAttributeString = BicycleUtils.getUserDefinedNetworkAttribute(link, nameOfUserDefinedNetworkAttribute);
+			double userDefinedNetworkAttributeFactor = getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString, userDefinedNetworkAttributeDefaultValue);
+			userDefinedNetworkAttributeScore = marginalUtilityOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
+		}
 
-		//return (infrastructureScore + comfortScore + gradientScore + userDefinedNetworkAttributeScore); // TODO
-		return (infrastructureScore + comfortScore + gradientScore);
+		return (infrastructureScore + comfortScore + gradientScore + userDefinedNetworkAttributeScore);
 	}
 
 	static double getGradient(Link link ) {
@@ -65,7 +66,6 @@ class BicycleUtilityUtils {
 				}
 			}
 		}
-
 		return gradient;
 	}
 
