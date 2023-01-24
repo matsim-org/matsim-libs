@@ -43,7 +43,13 @@ public final class BicycleUtils {
 	public static String getCyclewaytype( Link link ){
 		return (String) link.getAttributes().getAttribute( CYCLEWAY );
 	}
+
 	public static String getSurface( Link link ){
 		return (String) link.getAttributes().getAttribute( SURFACE );
 	}
+
+	// TODO
+	//public static String getUserDefinedNetworkAttribute( Link link, String nameOfUserDefinedNetworkAttribute ) {
+	//	return (String) link.getAttributes().getAttribute( nameOfUserDefinedNetworkAttribute );
+	//}
 }

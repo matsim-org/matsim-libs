@@ -24,29 +24,38 @@ import org.matsim.api.core.v01.network.Link;
  * @author dziemke
  */
 class BicycleUtilityUtils {
-	
-	static double computeLinkBasedScore( Link link, double marginalUtilityOfComfort_m,
-							 double marginalUtilityOfInfrastructure_m, double marginalUtilityOfGradient_m_100m ) {
+
+	static double computeLinkBasedScore( Link link, double marginalUtilityOfComfort_m, double marginalUtilityOfInfrastructure_m,
+										 double marginalUtilityOfGradient_m_100m, double marginalUtilityOfUserDefinedNetworkAttribute_m,
+										 String nameOfUserDefinedNetworkAttribute, double userDefinedNetworkAttributeDefaultValue) {
 		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
 		String type = (String) link.getAttributes().getAttribute("type");
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
+		// TODO
+		//String userDefinedNetworkAttributeString = (String) link.getAttributes().getAttribute(nameOfUserDefinedNetworkAttribute);
 
 		double distance = link.getLength();
-		
+
 		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface, type);
-		double comfortDisutility = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
-		
+		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
+
 		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype);
-		double infrastructureDisutility = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
-		
-		double gradientFactor = BicycleUtilityUtils.getGradientFactor(link);
-		double gradientDisutility = marginalUtilityOfGradient_m_100m * gradientFactor * distance;
-		return (infrastructureDisutility + comfortDisutility + gradientDisutility);
+		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
+
+		double gradient = BicycleUtilityUtils.getGradient(link);
+		double gradientScore = marginalUtilityOfGradient_m_100m * gradient * distance;
+
+		// TODO
+//		double userDefinedNetworkAttributeFactor = BicycleUtilityUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString, userDefinedNetworkAttributeDefaultValue);
+//		double userDefinedNetworkAttributeScore = marginalUtilityOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
+
+		//return (infrastructureScore + comfortScore + gradientScore + userDefinedNetworkAttributeScore); // TODO
+		return (infrastructureScore + comfortScore + gradientScore);
 	}
-	
-	static double getGradientFactor( Link link ) {
+
+	static double getGradient(Link link ) {
 		double gradient = 0.;
-		
+
 		if (link.getFromNode().getCoord().hasZ() && link.getToNode().getCoord().hasZ()) {
 			Double fromNodeZ = link.getFromNode().getCoord().getZ();
 			Double toNodeZ = link.getToNode().getCoord().getZ();
@@ -56,7 +65,7 @@ class BicycleUtilityUtils {
 				}
 			}
 		}
-		
+
 		return gradient;
 	}
 
@@ -157,5 +166,14 @@ class BicycleUtilityUtils {
 			infrastructureFactor = .85;
 		}
 		return infrastructureFactor;
+	}
+
+	static double getUserDefinedNetworkAttributeFactor( String userDefinedNetworkAttributeString, double userDefinedNetworkAttributeDefaultValue ) {
+		double userDefinedNetworkAttributeFactor = userDefinedNetworkAttributeDefaultValue;
+
+		if (userDefinedNetworkAttributeString != null) {
+			userDefinedNetworkAttributeFactor = Double.parseDouble(userDefinedNetworkAttributeString);
+		}
+		return userDefinedNetworkAttributeFactor;
 	}
 }
