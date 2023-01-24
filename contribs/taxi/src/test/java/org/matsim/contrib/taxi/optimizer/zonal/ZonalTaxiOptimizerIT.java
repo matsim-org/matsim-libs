@@ -39,7 +39,7 @@ public class ZonalTaxiOptimizerIT {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testZonal() {
+	public void testZonal_dse() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
@@ -56,6 +56,20 @@ public class ZonalTaxiOptimizerIT {
 		rbParams.nearestVehiclesLimit = 99999;
 		rbParams.cellSize = 99999.;
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_A");
+	}
+
+	@Test
+	public void testZonal_minWaitTime() {
+		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
+		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
+		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
+		ZonalSystemParams zsParams = new ZonalSystemParams();
+		zsParams.zonesShpFile = "zones/zones.shp";
+		zsParams.zonesXmlFile = "zones/zones.xml";
+		zsParams.expansionDistance = 3000;
+		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
+		params.addParameterSet(rbParams);
+		params.addParameterSet(zsParams);
 
 		rbParams.goal = Goal.MIN_WAIT_TIME;
 		rbParams.nearestRequestsLimit = 10;

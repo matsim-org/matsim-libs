@@ -75,7 +75,6 @@ public class AssignmentTaxiOptimizerIT {
 
 		params.mode = Mode.DSE;
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
-
 	}
 
 	@Test
