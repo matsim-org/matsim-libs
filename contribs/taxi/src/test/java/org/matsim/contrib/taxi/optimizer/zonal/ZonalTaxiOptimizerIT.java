@@ -36,36 +36,40 @@ public class ZonalTaxiOptimizerIT {
 	@Test
 	public void testZonal_dse() {
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
-		ZonalSystemParams zsParams = new ZonalSystemParams();
-		zsParams.zonesShpFile = "zones/zones.shp";
-		zsParams.zonesXmlFile = "zones/zones.xml";
-		zsParams.expansionDistance = 3000;
-		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
-		params.addParameterSet(rbParams);
-		params.addParameterSet(zsParams);
-
 		rbParams.goal = Goal.DEMAND_SUPPLY_EQUIL;
 		rbParams.nearestRequestsLimit = 99999;
 		rbParams.nearestVehiclesLimit = 99999;
 		rbParams.cellSize = 99999.;
-		runBenchmark(false, params, utils.getOutputDirectory());
+
+		ZonalSystemParams zsParams = new ZonalSystemParams();
+		zsParams.zonesShpFile = "zones/zones.shp";
+		zsParams.zonesXmlFile = "zones/zones.xml";
+		zsParams.expansionDistance = 3000;
+
+		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
+		params.addParameterSet(zsParams);
+		params.addParameterSet(rbParams);
+
+		runBenchmark(false, params, utils);
 	}
 
 	@Test
 	public void testZonal_minWaitTime() {
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
-		ZonalSystemParams zsParams = new ZonalSystemParams();
-		zsParams.zonesShpFile = "zones/zones.shp";
-		zsParams.zonesXmlFile = "zones/zones.xml";
-		zsParams.expansionDistance = 3000;
-		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
-		params.addParameterSet(rbParams);
-		params.addParameterSet(zsParams);
-
 		rbParams.goal = Goal.MIN_WAIT_TIME;
 		rbParams.nearestRequestsLimit = 10;
 		rbParams.nearestVehiclesLimit = 10;
 		rbParams.cellSize = 1000.;
-		runBenchmark(false, params, utils.getOutputDirectory());
+
+		ZonalSystemParams zsParams = new ZonalSystemParams();
+		zsParams.zonesShpFile = "zones/zones.shp";
+		zsParams.zonesXmlFile = "zones/zones.xml";
+		zsParams.expansionDistance = 3000;
+
+		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
+		params.addParameterSet(rbParams);
+		params.addParameterSet(zsParams);
+
+		runBenchmark(false, params, utils);
 	}
 }
