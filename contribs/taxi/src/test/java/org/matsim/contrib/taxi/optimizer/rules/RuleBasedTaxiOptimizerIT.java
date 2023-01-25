@@ -40,7 +40,7 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestVehiclesLimit = 99999;
 		params.cellSize = 99999.;
 		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
+		runBenchmark(variant, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -52,7 +52,7 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestVehiclesLimit = 10;
 		params.cellSize = 1000.;
 		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
+		runBenchmark(variant, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -64,6 +64,6 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestVehiclesLimit = 1;
 		params.cellSize = 100.;
 		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
+		runBenchmark(variant, params, utils.getOutputDirectory());
 	}
 }

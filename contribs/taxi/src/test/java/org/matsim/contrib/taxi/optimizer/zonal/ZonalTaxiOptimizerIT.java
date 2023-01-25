@@ -50,7 +50,7 @@ public class ZonalTaxiOptimizerIT {
 		rbParams.nearestVehiclesLimit = 99999;
 		rbParams.cellSize = 99999.;
 		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory() + "_A");
+		runBenchmark(variant, params, utils.getOutputDirectory() + "_A");
 	}
 
 	@Test
@@ -69,6 +69,6 @@ public class ZonalTaxiOptimizerIT {
 		rbParams.nearestVehiclesLimit = 10;
 		rbParams.cellSize = 1000.;
 		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory() + "_B");
+		runBenchmark(variant, params, utils.getOutputDirectory() + "_B");
 	}
 }

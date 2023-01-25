@@ -20,17 +20,13 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
@@ -46,15 +42,14 @@ public class TaxiOptimizerTests {
 		}
 	}
 
-	public static void runBenchmark(TaxiConfigVariant variant, AbstractTaxiOptimizerParams taxiOptimizerParams, String plansSuffix, String taxisSuffix,
-			String outputDir) {
+	public static void runBenchmark(TaxiConfigVariant variant, AbstractTaxiOptimizerParams taxiOptimizerParams, String outputDir) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
 		var config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
-		config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
+		config.plans().setInputFile("plans_only_taxi_mini_benchmark_3.0.xml.gz");
 		config.controler().setOutputDirectory(outputDir);
 
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
-		taxiCfg.taxisFile = "taxis_mini_benchmark-" + taxisSuffix + ".xml";
+		taxiCfg.taxisFile = "taxis_mini_benchmark-25.xml";
 
 		var controler = RunTaxiBenchmark.createControler(config, 1);
 		// RunTaxiBenchmark.createControler() overrides some config params, this is a moment to reset them

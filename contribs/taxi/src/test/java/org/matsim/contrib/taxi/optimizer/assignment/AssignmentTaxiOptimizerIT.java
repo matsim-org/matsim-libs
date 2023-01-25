@@ -40,7 +40,7 @@ public class AssignmentTaxiOptimizerIT {
 		params.nearestRequestsLimit = 99999;
 		params.nearestVehiclesLimit = 99999;
 		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
+		runBenchmark(variant, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -54,7 +54,7 @@ public class AssignmentTaxiOptimizerIT {
 		params.nearestVehiclesLimit = 10;
 		params.reoptimizationTimeStep = 10;
 		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
+		runBenchmark(variant, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -69,7 +69,7 @@ public class AssignmentTaxiOptimizerIT {
 
 		params.mode = Mode.DSE;
 		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
+		runBenchmark(variant, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -85,6 +85,6 @@ public class AssignmentTaxiOptimizerIT {
 		params.mode = Mode.TOTAL_WAIT_TIME;
 		params.nullPathCost = 300;
 		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
+		runBenchmark(variant, params, utils.getOutputDirectory());
 	}
 }
