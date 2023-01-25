@@ -32,20 +32,17 @@ import org.matsim.examples.ExamplesUtils;
 
 public class TaxiOptimizerTests {
 	public static void runBenchmark(boolean vehicleDiversion, AbstractTaxiOptimizerParams taxiOptimizerParams, String outputDir) {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
+		// mielec taxi mini benchmark contains only the morning peak (6:00 - 12:00) that is shifted by -6 hours (i.e. 0:00 - 6:00).
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_mini_benchmark_config.xml");
 		var config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
-		config.plans().setInputFile("plans_only_taxi_mini_benchmark_3.0.xml.gz");
 		config.controler().setOutputDirectory(outputDir);
-
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
-		taxiCfg.taxisFile = "taxis_mini_benchmark-25.xml";
 
 		var controler = RunTaxiBenchmark.createControler(config, 1);
 		// RunTaxiBenchmark.createControler() overrides some config params, this is a moment to reset them
 
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
 		taxiCfg.addParameterSet(taxiOptimizerParams);
-
 		taxiCfg.vehicleDiversion = vehicleDiversion;
 
 		controler.run();
