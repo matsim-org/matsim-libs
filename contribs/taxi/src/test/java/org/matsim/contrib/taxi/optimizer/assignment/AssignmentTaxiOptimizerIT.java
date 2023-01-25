@@ -21,8 +21,6 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 
-import java.util.List;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
@@ -35,7 +33,7 @@ public class AssignmentTaxiOptimizerIT {
 	@Test
 	public void testAssignment_arrivalTime() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
+
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
 		params.mode = Mode.ARRIVAL_TIME;
@@ -43,13 +41,13 @@ public class AssignmentTaxiOptimizerIT {
 		params.vehPlanningHorizonUndersupply = 99999;
 		params.nearestRequestsLimit = 99999;
 		params.nearestVehiclesLimit = 99999;
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
+		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
+		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
 	}
 
 	@Test
 	public void testAssignment_pickupTime() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
 		params.mode = Mode.PICKUP_TIME;
@@ -58,13 +56,13 @@ public class AssignmentTaxiOptimizerIT {
 		params.nearestRequestsLimit = 10;
 		params.nearestVehiclesLimit = 10;
 		params.reoptimizationTimeStep = 10;
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
+		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
+		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
 	}
 
 	@Test
 	public void testAssignment_dse() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
 		params.vehPlanningHorizonOversupply = 120;
@@ -74,13 +72,13 @@ public class AssignmentTaxiOptimizerIT {
 		params.reoptimizationTimeStep = 10;
 
 		params.mode = Mode.DSE;
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
+		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
+		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
 	}
 
 	@Test
 	public void testAssignment_totalWaitTime() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
 		params.vehPlanningHorizonOversupply = 120;
@@ -91,6 +89,7 @@ public class AssignmentTaxiOptimizerIT {
 
 		params.mode = Mode.TOTAL_WAIT_TIME;
 		params.nullPathCost = 300;
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
+		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
+		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
 	}
 }

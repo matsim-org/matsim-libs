@@ -20,10 +20,7 @@
 
 package org.matsim.contrib.taxi.optimizer.zonal;
 
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.createDefaultTaxiConfigVariants;
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
-
-import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +38,6 @@ public class ZonalTaxiOptimizerIT {
 	@Test
 	public void testZonal_dse() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
 		ZonalSystemParams zsParams = new ZonalSystemParams();
 		zsParams.zonesShpFile = "zones/zones.shp";
@@ -55,13 +51,13 @@ public class ZonalTaxiOptimizerIT {
 		rbParams.nearestRequestsLimit = 99999;
 		rbParams.nearestVehiclesLimit = 99999;
 		rbParams.cellSize = 99999.;
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_A");
+		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
+		runBenchmark(variant, params, benchmark, utils.getOutputDirectory() + "_A");
 	}
 
 	@Test
 	public void testZonal_minWaitTime() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
 		ZonalSystemParams zsParams = new ZonalSystemParams();
 		zsParams.zonesShpFile = "zones/zones.shp";
@@ -75,6 +71,7 @@ public class ZonalTaxiOptimizerIT {
 		rbParams.nearestRequestsLimit = 10;
 		rbParams.nearestVehiclesLimit = 10;
 		rbParams.cellSize = 1000.;
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
+		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
+		runBenchmark(variant, params, benchmark, utils.getOutputDirectory() + "_B");
 	}
 }

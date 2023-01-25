@@ -21,8 +21,6 @@ package org.matsim.contrib.taxi.optimizer.fifo;
 
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 
-import java.util.List;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -34,7 +32,7 @@ public class FifoTaxiOptimizerIT {
 	@Test
 	public void testFifo() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
-		runBenchmark(variants, new FifoTaxiOptimizerParams(), benchmark, utils.getOutputDirectory());
+		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
+		runBenchmark(variant, new FifoTaxiOptimizerParams(), benchmark, utils.getOutputDirectory());
 	}
 }

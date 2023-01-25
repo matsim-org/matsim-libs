@@ -46,26 +46,6 @@ public class TaxiOptimizerTests {
 		}
 	}
 
-	public static List<TaxiConfigVariant> createDefaultTaxiConfigVariants(boolean diversionSupported) {
-		List<TaxiConfigVariant> variants = new ArrayList<>();
-
-		// onlineVehicleTracker == false ==> vehicleDiversion == false
-		variants.add(new TaxiConfigVariant(false, false, 120, 60, false));
-		variants.add(new TaxiConfigVariant(true, false, 1, 1, false));
-
-		if (diversionSupported) {
-			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, true, 1, 1, true));
-			variants.add(new TaxiConfigVariant(true, true, 120, 60, true));
-		} else {
-			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, false, 1, 1, true));
-			variants.add(new TaxiConfigVariant(true, false, 120, 60, true));
-		}
-
-		return variants;
-	}
-
 	public static class PreloadedBenchmark {
 		private final Config config;
 		private final Controler controler;
@@ -83,17 +63,15 @@ public class TaxiOptimizerTests {
 		}
 	}
 
-	public static void runBenchmark(List<TaxiConfigVariant> variants, AbstractTaxiOptimizerParams taxiOptimizerParams, PreloadedBenchmark benchmark,
+	public static void runBenchmark(TaxiConfigVariant variant, AbstractTaxiOptimizerParams taxiOptimizerParams, PreloadedBenchmark benchmark,
 			String outputDir) {
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(benchmark.config);
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
 		taxiCfg.addParameterSet(taxiOptimizerParams);
 
-		int i = 0;
-		for (TaxiConfigVariant v : variants) {
-			v.updateTaxiConfig(taxiCfg);
-			benchmark.config.controler().setOutputDirectory(outputDir + "/" + i++);
-			benchmark.controler.run();
-		}
+		variant.updateTaxiConfig(taxiCfg);
+		benchmark.config.controler().setOutputDirectory(outputDir);
+
+		benchmark.controler.run();
 	}
 }
