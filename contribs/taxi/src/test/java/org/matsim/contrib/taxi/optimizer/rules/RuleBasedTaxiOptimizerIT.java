@@ -33,33 +33,30 @@ public class RuleBasedTaxiOptimizerIT {
 	@Test
 	public void testRuleBased_dse() {
 		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
-
 		params.goal = Goal.DEMAND_SUPPLY_EQUIL;
 		params.nearestRequestsLimit = 99999;
 		params.nearestVehiclesLimit = 99999;
 		params.cellSize = 99999.;
-		runBenchmark(false, params, utils.getOutputDirectory());
+		runBenchmark(false, params, utils);
 	}
 
 	@Test
 	public void testRuleBased_minWaitTime() {
 		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
-
 		params.goal = Goal.MIN_WAIT_TIME;
 		params.nearestRequestsLimit = 10;
 		params.nearestVehiclesLimit = 10;
 		params.cellSize = 1000.;
-		runBenchmark(false, params, utils.getOutputDirectory());
+		runBenchmark(false, params, utils);
 	}
 
 	@Test
 	public void testRuleBased_minPickupTime() {
 		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
-
 		params.goal = Goal.MIN_PICKUP_TIME;
 		params.nearestRequestsLimit = 1;
 		params.nearestVehiclesLimit = 1;
 		params.cellSize = 100.;
-		runBenchmark(false, params, utils.getOutputDirectory());
+		runBenchmark(false, params, utils);
 	}
 }

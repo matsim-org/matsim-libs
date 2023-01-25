@@ -31,6 +31,6 @@ public class FifoTaxiOptimizerIT {
 
 	@Test
 	public void testFifo() {
-		runBenchmark(true, new FifoTaxiOptimizerParams(), utils.getOutputDirectory());
+		runBenchmark(true, new FifoTaxiOptimizerParams(), utils);
 	}
 }
