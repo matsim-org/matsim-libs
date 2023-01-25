@@ -31,8 +31,7 @@ public class FifoTaxiOptimizerIT {
 
 	@Test
 	public void testFifo() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, new FifoTaxiOptimizerParams(), benchmark, utils.getOutputDirectory());
+		runBenchmark(variant, new FifoTaxiOptimizerParams(), "3.0", "25", utils.getOutputDirectory());
 	}
 }

@@ -32,8 +32,6 @@ public class AssignmentTaxiOptimizerIT {
 
 	@Test
 	public void testAssignment_arrivalTime() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
 		params.mode = Mode.ARRIVAL_TIME;
@@ -42,12 +40,11 @@ public class AssignmentTaxiOptimizerIT {
 		params.nearestRequestsLimit = 99999;
 		params.nearestVehiclesLimit = 99999;
 		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
+		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
 	}
 
 	@Test
 	public void testAssignment_pickupTime() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
 		params.mode = Mode.PICKUP_TIME;
@@ -57,12 +54,11 @@ public class AssignmentTaxiOptimizerIT {
 		params.nearestVehiclesLimit = 10;
 		params.reoptimizationTimeStep = 10;
 		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
+		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
 	}
 
 	@Test
 	public void testAssignment_dse() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
 		params.vehPlanningHorizonOversupply = 120;
@@ -73,12 +69,11 @@ public class AssignmentTaxiOptimizerIT {
 
 		params.mode = Mode.DSE;
 		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
+		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
 	}
 
 	@Test
 	public void testAssignment_totalWaitTime() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
 		params.vehPlanningHorizonOversupply = 120;
@@ -90,6 +85,6 @@ public class AssignmentTaxiOptimizerIT {
 		params.mode = Mode.TOTAL_WAIT_TIME;
 		params.nullPathCost = 300;
 		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
+		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
 	}
 }

@@ -23,7 +23,6 @@ import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.PreloadedBenchmark;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.TaxiConfigVariant;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 import org.matsim.testcases.MatsimTestUtils;
@@ -34,7 +33,6 @@ public class RuleBasedTaxiOptimizerIT {
 
 	@Test
 	public void testRuleBased_dse() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
 
 		params.goal = Goal.DEMAND_SUPPLY_EQUIL;
@@ -42,12 +40,11 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestVehiclesLimit = 99999;
 		params.cellSize = 99999.;
 		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
+		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
 	}
 
 	@Test
 	public void testRuleBased_minWaitTime() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
 
 		params.goal = Goal.MIN_WAIT_TIME;
@@ -55,12 +52,11 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestVehiclesLimit = 10;
 		params.cellSize = 1000.;
 		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
+		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
 	}
 
 	@Test
 	public void testRuleBased_minPickupTime() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
 
 		params.goal = Goal.MIN_PICKUP_TIME;
@@ -68,6 +64,6 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestVehiclesLimit = 1;
 		params.cellSize = 100.;
 		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, benchmark, utils.getOutputDirectory());
+		runBenchmark(variant, params, "3.0", "25", utils.getOutputDirectory());
 	}
 }

@@ -46,32 +46,24 @@ public class TaxiOptimizerTests {
 		}
 	}
 
-	public static class PreloadedBenchmark {
-		private final Config config;
-		private final Controler controler;
-
-		public PreloadedBenchmark(String plansSuffix, String taxisSuffix) {
-			URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
-
-			config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
-			TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
-
-			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
-			taxiCfg.taxisFile = "taxis_mini_benchmark-" + taxisSuffix + ".xml";
-
-			controler = RunTaxiBenchmark.createControler(config, 1);
-		}
-	}
-
-	public static void runBenchmark(TaxiConfigVariant variant, AbstractTaxiOptimizerParams taxiOptimizerParams, PreloadedBenchmark benchmark,
+	public static void runBenchmark(TaxiConfigVariant variant, AbstractTaxiOptimizerParams taxiOptimizerParams, String plansSuffix, String taxisSuffix,
 			String outputDir) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(benchmark.config);
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
+		var config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
+		config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
+		config.controler().setOutputDirectory(outputDir);
+
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
+		taxiCfg.taxisFile = "taxis_mini_benchmark-" + taxisSuffix + ".xml";
+
+		var controler = RunTaxiBenchmark.createControler(config, 1);
+		// RunTaxiBenchmark.createControler() overrides some config params, this is a moment to reset them
+
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
 		taxiCfg.addParameterSet(taxiOptimizerParams);
 
 		variant.updateTaxiConfig(taxiCfg);
-		benchmark.config.controler().setOutputDirectory(outputDir);
 
-		benchmark.controler.run();
+		controler.run();
 	}
 }
