@@ -23,7 +23,6 @@ import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.TaxiConfigVariant;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -39,8 +38,7 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestRequestsLimit = 99999;
 		params.nearestVehiclesLimit = 99999;
 		params.cellSize = 99999.;
-		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, utils.getOutputDirectory());
+		runBenchmark(false, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -51,8 +49,7 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestRequestsLimit = 10;
 		params.nearestVehiclesLimit = 10;
 		params.cellSize = 1000.;
-		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, utils.getOutputDirectory());
+		runBenchmark(false, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -63,7 +60,6 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestRequestsLimit = 1;
 		params.nearestVehiclesLimit = 1;
 		params.cellSize = 100.;
-		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, utils.getOutputDirectory());
+		runBenchmark(false, params, utils.getOutputDirectory());
 	}
 }

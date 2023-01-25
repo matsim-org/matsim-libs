@@ -24,7 +24,6 @@ import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.TaxiConfigVariant;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.zone.ZonalSystemParams;
@@ -49,8 +48,7 @@ public class ZonalTaxiOptimizerIT {
 		rbParams.nearestRequestsLimit = 99999;
 		rbParams.nearestVehiclesLimit = 99999;
 		rbParams.cellSize = 99999.;
-		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, utils.getOutputDirectory());
+		runBenchmark(false, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -68,7 +66,6 @@ public class ZonalTaxiOptimizerIT {
 		rbParams.nearestRequestsLimit = 10;
 		rbParams.nearestVehiclesLimit = 10;
 		rbParams.cellSize = 1000.;
-		var variant = new TaxiConfigVariant(true, false, 120, 60, true);
-		runBenchmark(variant, params, utils.getOutputDirectory());
+		runBenchmark(false, params, utils.getOutputDirectory());
 	}
 }

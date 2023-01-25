@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
+import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,8 +39,7 @@ public class AssignmentTaxiOptimizerIT {
 		params.vehPlanningHorizonUndersupply = 99999;
 		params.nearestRequestsLimit = 99999;
 		params.nearestVehiclesLimit = 99999;
-		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, utils.getOutputDirectory());
+		runBenchmark(true, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -53,8 +52,7 @@ public class AssignmentTaxiOptimizerIT {
 		params.nearestRequestsLimit = 10;
 		params.nearestVehiclesLimit = 10;
 		params.reoptimizationTimeStep = 10;
-		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, utils.getOutputDirectory());
+		runBenchmark(true, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -68,8 +66,7 @@ public class AssignmentTaxiOptimizerIT {
 		params.reoptimizationTimeStep = 10;
 
 		params.mode = Mode.DSE;
-		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, utils.getOutputDirectory());
+		runBenchmark(true, params, utils.getOutputDirectory());
 	}
 
 	@Test
@@ -84,7 +81,6 @@ public class AssignmentTaxiOptimizerIT {
 
 		params.mode = Mode.TOTAL_WAIT_TIME;
 		params.nullPathCost = 300;
-		var variant = new TaxiConfigVariant(true, true, 120, 60, true);
-		runBenchmark(variant, params, utils.getOutputDirectory());
+		runBenchmark(true, params, utils.getOutputDirectory());
 	}
 }

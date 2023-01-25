@@ -31,18 +31,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 public class TaxiOptimizerTests {
-	public record TaxiConfigVariant
-			(boolean destinationKnown, boolean vehicleDiversion, double pickupDuration, double dropoffDuration, boolean onlineVehicleTracker) {
-		void updateTaxiConfig(TaxiConfigGroup taxiCfg) {
-			taxiCfg.destinationKnown = destinationKnown;
-			taxiCfg.vehicleDiversion = vehicleDiversion;
-			taxiCfg.pickupDuration = pickupDuration;
-			taxiCfg.dropoffDuration = dropoffDuration;
-			taxiCfg.onlineVehicleTracker = onlineVehicleTracker;
-		}
-	}
-
-	public static void runBenchmark(TaxiConfigVariant variant, AbstractTaxiOptimizerParams taxiOptimizerParams, String outputDir) {
+	public static void runBenchmark(boolean vehicleDiversion, AbstractTaxiOptimizerParams taxiOptimizerParams, String outputDir) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
 		var config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
 		config.plans().setInputFile("plans_only_taxi_mini_benchmark_3.0.xml.gz");
@@ -57,7 +46,7 @@ public class TaxiOptimizerTests {
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
 		taxiCfg.addParameterSet(taxiOptimizerParams);
 
-		variant.updateTaxiConfig(taxiCfg);
+		taxiCfg.vehicleDiversion = vehicleDiversion;
 
 		controler.run();
 	}
