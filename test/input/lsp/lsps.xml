@@ -1,253 +1,248 @@
 <?xml version="1.0" encoding="UTF-8"?>
+	<LSPs>
+		<lsp id="myLSP">
+			<resources>
+				<carrier id="directCarrierRes"/>
+					<attributes>
+						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+					</attributes>
+					<capabilities fleetSize="INFINITE">
+						<vehicles>
+							<vehicle id="directTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+						</vehicles>
+					</capabilities>
+				<carrier id="mainCarrierRes"/>
+					<attributes>
+						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">mainRunCarrier</attribute>
+					</attributes>
+					<capabilities fleetSize="INFINITE">
+						<vehicles>
+							<vehicle id="mainTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+						</vehicles>
+					</capabilities>
+				<hub id="Hub" location="j(5,3)" fixedCost="100.0"/>
+				<carrier id="distributionCarrierRes"/>
+					<attributes>
+						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+					</attributes>
+					<capabilities fleetSize="INFINITE">
+						<vehicles>
+							<vehicle id="distributionTruck" depotLinkId="j(5,3)" typeId="small05" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+						</vehicles>
+					</capabilities>
+			</resources>
 
+			<shipments>
+				<shipment id="Shipment_1" from="i(5,0)" to="j(4,6)R" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
+				<shipment id="Shipment_2" from="i(5,0)" to="i(4,5)R" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
+				<shipment id="Shipment_3" from="i(5,0)" to="i(5,6)" size="3" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="180.0"/>
+				<shipment id="Shipment_4" from="i(5,0)" to="j(5,5)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
+				<shipment id="Shipment_5" from="i(5,0)" to="j(3,6)" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
+				<shipment id="Shipment_6" from="i(5,0)" to="j(6,5)R" size="3" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="180.0"/>
+				<shipment id="Shipment_7" from="i(5,0)" to="i(5,5)R" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
+				<shipment id="Shipment_8" from="i(5,0)" to="i(5,6)" size="5" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="300.0"/>
+				<shipment id="Shipment_9" from="i(5,0)" to="j(3,6)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
+				<shipment id="Shipment_10" from="i(5,0)" to="i(6,6)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
+			</shipments>
 
-<LSPs>
-	<lsp id="myLSP">
-		<resources>
-			<carrier id="directCarrierRes">
-				<attributes>
-					<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
-				</attributes>
-				<capabilities fleetSize="INFINITE">
-					<vehicles>
-						<vehicle id="directTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
-					</vehicles>
-				</capabilities>
-            </carrier>
-			<carrier id="mainCarrierRes">
-				<attributes>
-					<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">mainRunCarrier</attribute>
-				</attributes>
-				<capabilities fleetSize="INFINITE">
-					<vehicles>
-						<vehicle id="mainTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
-					</vehicles>
-				</capabilities>
-            </carrier>
-			<hub id="Hub" location="j(5,3)" fixedCost="100.0"/>
-			<carrier id="distributionCarrierRes">
-				<attributes>
-					<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
-				</attributes>
-				<capabilities fleetSize="INFINITE">
-					<vehicles>
-						<vehicle id="distributionTruck" depotLinkId="j(5,3)" typeId="small05" earliestStart="00:00:00" latestEnd="596523:14:07"/>
-					</vehicles>
-				</capabilities>
-            </carrier>
-		</resources>
+			<LSPPlans>
+				<plan score="-1476.2" chainId="directSolution" selected="false">
+					<resources>
+						<resource id="directCarrierRes"/>
+					</resources>
+					<shipmentPlans>
+						<shipmentPlan id="Shipment_1">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
+							<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3131.0" endTime="4151.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="4151.0" endTime="4211.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_2">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
+							<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3131.0" endTime="3671.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3671.0" endTime="3731.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_3">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2893.0" resource="Hub"/>
+							<element type="LOAD" startTime="2893.0" endTime="3193.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3193.0" endTime="4033.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="4033.0" endTime="4213.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_4">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
+							<element type="LOAD" startTime="2892.0" endTime="3132.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3132.0" endTime="3372.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3372.0" endTime="3492.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_5">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
+							<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3131.0" endTime="3851.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3851.0" endTime="3911.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_6">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2893.0" resource="Hub"/>
+							<element type="LOAD" startTime="2893.0" endTime="3073.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3073.0" endTime="3793.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3793.0" endTime="3973.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_7">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
+							<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3131.0" endTime="3491.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3491.0" endTime="3551.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_8">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2895.0" resource="Hub"/>
+							<element type="LOAD" startTime="2895.0" endTime="3195.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3195.0" endTime="4035.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="4035.0" endTime="4335.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_9">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
+							<element type="LOAD" startTime="2892.0" endTime="3132.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3132.0" endTime="3852.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3852.0" endTime="3972.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_10">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
+							<element type="LOAD" startTime="2893.0" endTime="3193.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3193.0" endTime="4333.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="4333.0" endTime="4453.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+					</shipmentPlans>
+				</plan>
+				<plan score="-492.33" chainId="hubSolution" selected="true">
+					<resources>
+						<resource id="mainCarrierRes"/>
+						<resource id="Hub"/>
+						<resource id="distributionCarrierRes"/>
+					</resources>
+					<shipmentPlans>
+						<shipmentPlan id="Shipment_1">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
+							<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3131.0" endTime="4151.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="4151.0" endTime="4211.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_2">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
+							<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3131.0" endTime="3671.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3671.0" endTime="3731.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_3">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2893.0" resource="Hub"/>
+							<element type="LOAD" startTime="2893.0" endTime="3193.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3193.0" endTime="4033.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="4033.0" endTime="4213.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_4">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
+							<element type="LOAD" startTime="2892.0" endTime="3132.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3132.0" endTime="3372.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3372.0" endTime="3492.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_5">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
+							<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3131.0" endTime="3851.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3851.0" endTime="3911.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_6">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2893.0" resource="Hub"/>
+							<element type="LOAD" startTime="2893.0" endTime="3073.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3073.0" endTime="3793.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3793.0" endTime="3973.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_7">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
+							<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3131.0" endTime="3491.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3491.0" endTime="3551.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_8">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2895.0" resource="Hub"/>
+							<element type="LOAD" startTime="2895.0" endTime="3195.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3195.0" endTime="4035.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="4035.0" endTime="4335.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_9">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
+							<element type="LOAD" startTime="2892.0" endTime="3132.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3132.0" endTime="3852.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="3852.0" endTime="3972.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan id="Shipment_10">
+							<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
+							<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
+							<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
+							<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
+							<element type="LOAD" startTime="2893.0" endTime="3193.0" resource="distributionCarrierRes"/>
+							<element type="TRANSPORT" startTime="3193.0" endTime="4333.0" resource="distributionCarrierRes"/>
+							<element type="UNLOAD" startTime="4333.0" endTime="4453.0" resource="distributionCarrierRes"/>
+						</shipmentPlan>
+					</shipmentPlans>
+				</plan>
+			</LSPPlans>
 
-		<shipments>
-			<shipment id="Shipment_1" from="i(5,0)" to="j(4,6)R" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
-			<shipment id="Shipment_2" from="i(5,0)" to="i(4,5)R" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
-			<shipment id="Shipment_3" from="i(5,0)" to="i(5,6)" size="3" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="180.0"/>
-			<shipment id="Shipment_4" from="i(5,0)" to="j(5,5)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
-			<shipment id="Shipment_5" from="i(5,0)" to="j(3,6)" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
-			<shipment id="Shipment_6" from="i(5,0)" to="j(6,5)R" size="3" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="180.0"/>
-			<shipment id="Shipment_7" from="i(5,0)" to="i(5,5)R" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
-			<shipment id="Shipment_8" from="i(5,0)" to="i(5,6)" size="5" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="300.0"/>
-			<shipment id="Shipment_9" from="i(5,0)" to="j(3,6)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
-			<shipment id="Shipment_10" from="i(5,0)" to="i(6,6)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
-		</shipments>
-
-		<LSPPlans>
-			<plan score="-1476.2" chainId="directSolution" selected="false">
-				<resources>
-					<resource id="directCarrierRes"/>
-				</resources>
-				<shipmentPlans>
-					<shipmentPlan id="Shipment_1">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
-						<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3131.0" endTime="4151.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="4151.0" endTime="4211.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_2">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
-						<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3131.0" endTime="3671.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3671.0" endTime="3731.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_3">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2893.0" resource="Hub"/>
-						<element type="LOAD" startTime="2893.0" endTime="3193.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3193.0" endTime="4033.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="4033.0" endTime="4213.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_4">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
-						<element type="LOAD" startTime="2892.0" endTime="3132.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3132.0" endTime="3372.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3372.0" endTime="3492.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_5">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
-						<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3131.0" endTime="3851.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3851.0" endTime="3911.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_6">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2893.0" resource="Hub"/>
-						<element type="LOAD" startTime="2893.0" endTime="3073.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3073.0" endTime="3793.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3793.0" endTime="3973.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_7">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
-						<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3131.0" endTime="3491.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3491.0" endTime="3551.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_8">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2895.0" resource="Hub"/>
-						<element type="LOAD" startTime="2895.0" endTime="3195.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3195.0" endTime="4035.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="4035.0" endTime="4335.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_9">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
-						<element type="LOAD" startTime="2892.0" endTime="3132.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3132.0" endTime="3852.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3852.0" endTime="3972.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_10">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
-						<element type="LOAD" startTime="2893.0" endTime="3193.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3193.0" endTime="4333.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="4333.0" endTime="4453.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-				</shipmentPlans>
-			</plan>
-			<plan score="-492.33" chainId="hubSolution" selected="true">
-				<resources>
-					<resource id="mainCarrierRes"/>
-					<resource id="Hub"/>
-					<resource id="distributionCarrierRes"/>
-				</resources>
-				<shipmentPlans>
-					<shipmentPlan id="Shipment_1">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
-						<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3131.0" endTime="4151.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="4151.0" endTime="4211.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_2">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
-						<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3131.0" endTime="3671.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3671.0" endTime="3731.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_3">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2893.0" resource="Hub"/>
-						<element type="LOAD" startTime="2893.0" endTime="3193.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3193.0" endTime="4033.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="4033.0" endTime="4213.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_4">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
-						<element type="LOAD" startTime="2892.0" endTime="3132.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3132.0" endTime="3372.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3372.0" endTime="3492.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_5">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
-						<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3131.0" endTime="3851.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3851.0" endTime="3911.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_6">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2893.0" resource="Hub"/>
-						<element type="LOAD" startTime="2893.0" endTime="3073.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3073.0" endTime="3793.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3793.0" endTime="3973.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_7">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2891.0" resource="Hub"/>
-						<element type="LOAD" startTime="2891.0" endTime="3131.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3131.0" endTime="3491.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3491.0" endTime="3551.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_8">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2895.0" resource="Hub"/>
-						<element type="LOAD" startTime="2895.0" endTime="3195.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3195.0" endTime="4035.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="4035.0" endTime="4335.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_9">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
-						<element type="LOAD" startTime="2892.0" endTime="3132.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3132.0" endTime="3852.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="3852.0" endTime="3972.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-					<shipmentPlan id="Shipment_10">
-						<element type="LOAD" startTime="0.0" endTime="1260.0" resource="mainCarrierRes"/>
-						<element type="TRANSPORT" startTime="1260.0" endTime="1620.0" resource="mainCarrierRes"/>
-						<element type="UNLOAD" startTime="1620.0" endTime="2880.0" resource="mainCarrierRes"/>
-						<element type="HANDLE" startTime="2880.0" endTime="2892.0" resource="Hub"/>
-						<element type="LOAD" startTime="2893.0" endTime="3193.0" resource="distributionCarrierRes"/>
-						<element type="TRANSPORT" startTime="3193.0" endTime="4333.0" resource="distributionCarrierRes"/>
-						<element type="UNLOAD" startTime="4333.0" endTime="4453.0" resource="distributionCarrierRes"/>
-					</shipmentPlan>
-				</shipmentPlans>
-			</plan>
-		</LSPPlans>
-
-	</lsp>
-</LSPs>
+		</lsp>
+	</LSPs>

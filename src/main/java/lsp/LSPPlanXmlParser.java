@@ -181,11 +181,10 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 break;
             }
 
-            case SHIPMENT_PLAN: {
+            case SHIPMENT_PLAN:
                 String shipmentId = atts.getValue(ID);
                 Gbl.assertNotNull(shipmentId);
                 break;
-            }
 
             case ELEMENT: {
                 String type = atts.getValue(TYPE);
