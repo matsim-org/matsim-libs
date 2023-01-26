@@ -33,6 +33,8 @@ class LSPPlanXmlParser extends MatsimXmlParser {
     private final Carriers carriers;
     private final CarrierVehicleTypes carrierVehicleTypes;
     private CarrierCapabilities.Builder capabilityBuilder;
+    private double capacityNeedFixed;
+    private double capacityNeedLinear;
 
     private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
     private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
@@ -67,13 +69,19 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 Gbl.assertNotNull(fixedCost);
                 LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create(hubId, LSPResource.class), Id.createLinkId(location), null)
                         .setTransshipmentHubScheduler(UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
-                                .setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
-                                .setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
+                                .setCapacityNeedFixed(capacityNeedFixed) //Time needed, fixed (for Scheduler)
+                                .setCapacityNeedLinear(capacityNeedLinear) //additional time needed per shipmentSize (for Scheduler)
                                 .build())
                         .build();
                 LSPUtils.setFixedCost(hubResource, Double.valueOf(fixedCost));
                 break;
             }
+
+            case CAPACITY_NEED: {
+                capacityNeedFixed = Double.parseDouble(atts.getValue(FIXED));
+                capacityNeedLinear = Double.parseDouble(atts.getValue(LINEAR));
+            }
+
 
             case CARRIER: {
                 String carrierId = atts.getValue(ID);

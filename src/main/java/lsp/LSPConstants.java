@@ -7,6 +7,9 @@ public abstract class LSPConstants {
         static final String HUB = "hub";
             static final String LOCATION = "location";
             static final String FIXED_COST = "fixedCost";
+            static final String CAPACITY_NEED = "capacityNeed";
+                static final String FIXED = "fixed";
+                static final String LINEAR = "linear";
         static final String CARRIER = "carrier";
             static final String ATTRIBUTE = "attribute";
             static final String CAPABILITIES = "capabilities";
