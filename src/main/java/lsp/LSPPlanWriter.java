@@ -71,13 +71,17 @@ public class LSPPlanWriter extends MatsimXmlWriter {
                 writer.write("\t\t\t\t<hub ");
                 writer.write("id=\"" + hub.getId() + "\" ");
                 writer.write("location=\"" + hub.getStartLinkId() + "\" ");
-                writer.write("fixedCost=\"" + hub.getAttributes().getAttribute("fixedCost") + "\"/>\n");
+                writer.write("fixedCost=\"" + hub.getAttributes().getAttribute("fixedCost") + "\">\n");
+                writer.write("\t\t\t\t\t<scheduler>\n");
+                writer.write("\t\t\t\t\t\t<capacityNeed fixed=\"" + hub.getCapacityNeedFixed() +  "\"/>\n");
+                writer.write("\t\t\t\t\t\t<capacityNeed linear=\"" + hub.getCapacityNeedLinear() +  "\"/>\n");
+                writer.write("\t\t\t\t\t</scheduler>\n");
             }
             if (resource instanceof LSPCarrierResource carrierResource) {
                 writer.write("\t\t\t\t<carrier ");
                 writer.write("id=\"" + carrierResource.getId() + "\"/>\n");
                 attributesWriter.writeAttributes("\t\t\t\t\t", writer, carrierResource.getCarrier().getAttributes());
-                writer.write("\t\t\t\t\t<capabilities fleetSize=\""+ carrierResource.getCarrier().getCarrierCapabilities().getFleetSize() + "\">\n");
+                writer.write("\t\t\t\t\t<capabilities fleetSize=\"" + carrierResource.getCarrier().getCarrierCapabilities().getFleetSize() + "\">\n");
                 writer.write("\t\t\t\t\t\t<vehicles>\n");
                 for (CarrierVehicle v : carrierResource.getCarrier().getCarrierCapabilities().getCarrierVehicles().values()) {
                     Id<VehicleType> vehicleTypeId = v.getVehicleTypeId();
