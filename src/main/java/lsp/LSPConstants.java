@@ -31,6 +31,7 @@ public abstract class LSPConstants {
             static final String SCORE = "score";
             static final String CHAIN_ID = "chainId";
             static final String SELECTED = "selected";
+            static final String RESOURCES = "resources";
             static final String RESOURCE = "resource";
             static final String SHIPMENT_PLAN = "shipmentPlan";
                 static final String ELEMENT = "element";

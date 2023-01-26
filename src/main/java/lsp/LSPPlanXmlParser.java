@@ -14,6 +14,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.xml.sax.Attributes;
 
 import java.util.Collections;
@@ -51,16 +52,9 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 String lspId = atts.getValue(ID);
                 Gbl.assertNotNull(lspId);
                 currentLsp = LSPUtils.LSPBuilder.getInstance(Id.create(lspId, LSP.class))
-						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.emptyList())) //TODO (KMT) Siehe Kommentar (##)
-						.build();
-				/*	Kommentar (##)
-				 * Ohne das hier knallt es beim Erstellen der LSP-Impl, weil er den Backpointer zum LSP hier in den Scheduler setzen will -->
-				 * Das heißt, dass
-				 * 1) dieser LogisticChainScheduler eigentlich zwingend im Konstruktor des Builders sein müsste bzw.
-				 * 2) man nochmal wegen der Backpointer nachdenken müsste.
-				 *
-				 * Versuche das nun mit dem Erstellen eines Schedulers mit einer leeren Collection als List<LSPResource>  zum "umgehen"
-				 */
+						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.emptyList()))
+                        .setInitialPlan(new LSPPlanImpl())
+                        .build();
                 break;
             }
 
@@ -72,6 +66,10 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 String fixedCost = atts.getValue(FIXED_COST);
                 Gbl.assertNotNull(fixedCost);
                 LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create(hubId, LSPResource.class), Id.createLinkId(location), null)
+                        .setTransshipmentHubScheduler(UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+                                .setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
+                                .setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
+                                .build())
                         .build();
                 LSPUtils.setFixedCost(hubResource, Double.valueOf(fixedCost));
                 break;
@@ -112,7 +110,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 
                 String typeId = atts.getValue(TYPE_ID);
                 Gbl.assertNotNull(typeId);
-                VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get(Id.create(typeId, VehicleType.class));
+                VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(typeId, VehicleType.class));
                 Gbl.assertNotNull(vehicleType);
 
                 CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vehicleId, Vehicle.class), Id.create(depotLinkId, Link.class), vehicleType);
@@ -162,7 +160,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                     shipmentBuilder.setDeliveryServiceTime(parseTimeToDouble(deliveryServiceTime));
 
                 currentShipment = shipmentBuilder.build();
-                currentLsp.assignShipmentToLSP(currentShipment);
+                currentLsp.getShipments().add(currentShipment);
                 break;
             }
 
@@ -173,16 +171,20 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 Gbl.assertNotNull(chainId);
                 String selected = atts.getValue(SELECTED);
                 Gbl.assertNotNull(selected);
+                break;
             }
+
 
             case RESOURCE: {
                 String resourceId = atts.getValue(ID);
                 Gbl.assertNotNull(resourceId);
+                break;
             }
 
             case SHIPMENT_PLAN: {
                 String shipmentId = atts.getValue(ID);
                 Gbl.assertNotNull(shipmentId);
+                break;
             }
 
             case ELEMENT: {
@@ -197,6 +199,8 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 
                 String resource = atts.getValue(RESOURCE);
                 Gbl.assertNotNull(resource);
+
+                break;
             }
         }
     }

@@ -14,10 +14,11 @@ import java.util.Stack;
 
 public class LSPPlanXmlReader implements MatsimReader {
     private static final Logger log = LogManager.getLogger(LSPPlanXmlReader.class);
+    private static final String MSG="With early carrier plans file formats, there will be an expected exception in the following." ;
     private final LSPsPlanReader reader;
 
 
-    public LSPPlanXmlReader(LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
+    public LSPPlanXmlReader( final LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
         System.setProperty("matsim.preferLocalDtds", "true");
         this.reader = new LSPsPlanReader(lsPs, carriers, carrierVehicleTypes);
     }
@@ -33,7 +34,7 @@ public class LSPPlanXmlReader implements MatsimReader {
 //                reader.setValidating(false);
 //                reader.readFile(filename);
 //            } else { //other problem: e.g. validation does not work, because of missing validation file.
-                throw  e;
+                throw e;
 //		}
         }
     }
@@ -41,29 +42,27 @@ public class LSPPlanXmlReader implements MatsimReader {
     public void readURL(URL url) {
         try {
             this.reader.readURL(url);
-        } catch (Exception var3) {
-            Logger var10000 = log;
-            String var10001 = var3.getMessage();
-            var10000.warn("### Exception found while trying to read LSPPlan: Message: " + var10001 + " ; cause: " + var3.getCause() + " ; class " + var3.getClass());
-            if (!var3.getCause().getMessage().contains("cvc-elt.1")) {
-                throw var3;
+        } catch (Exception e) {
+            log.warn("### Exception found while trying to read LSPPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
+            if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
+                log.warn("read with validation = true failed. Try it again without validation... url: " + url.toString());
+                reader.setValidating(false);
+                reader.readURL(url);
+            } else { //other problem: e.g. validation does not work, because of missing validation file.
+                throw e;
             }
-
-            log.warn("read with validation = true failed. Try it again without validation... url: " + url.toString());
-            this.reader.setValidating(false);
-            this.reader.readURL(url);
         }
     }
 
+
     public void readStream(InputStream inputStream) {
+        log.info(MSG) ;
         try {
-            this.reader.setValidating(false);
-            this.reader.parse(inputStream);
-        } catch (Exception var3) {
-            Logger var10000 = log;
-            String var10001 = var3.getMessage();
-            var10000.warn("### Exception found while trying to read LSPPlan: Message: " + var10001 + " ; cause: " + var3.getCause() + " ; class " + var3.getClass());
-            throw var3;
+            reader.setValidating(false);
+            reader.parse(inputStream);
+        } catch (Exception e) {
+            log.warn("### Exception found while trying to read LSPPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
+            throw e;
         }
     }
 
@@ -71,6 +70,7 @@ public class LSPPlanXmlReader implements MatsimReader {
         private final LSPs lsPs;
         private final Carriers carriers;
         private final CarrierVehicleTypes carrierVehicleTypes;
+
         private MatsimXmlParser delegate = null;
 
         LSPsPlanReader (LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
@@ -80,12 +80,18 @@ public class LSPPlanXmlReader implements MatsimReader {
         }
 
         public void startTag(String name, Attributes attributes, Stack<String> context) {
-			//Set the correct parser, when start reading the file (== first <LSPS> -Tag :)
-			if ( (LSPConstants.LSPS).equalsIgnoreCase( name ) ) {
-				this.delegate = new LSPPlanXmlParser(this.lsPs, this.carriers, this.carrierVehicleTypes);
-			}
-			//Read starting tag //TODO: @Niclas: Das fehlte hier, weshalb er die Objekte nie erstellt hat, die er dann beim (endTag) haben wollte und die deshalb "null" waren.
-			this.delegate.startTag( name, attributes, context );
+            if (LSPConstants.LSPS.equalsIgnoreCase(name)) {
+                String str = attributes.getValue("xsi:schemaLocation");
+                log.info("Found following schemeLocation in lsPs definition file: " + str);
+                if (str == null) {
+                    log.warn("LSP plans file does not contain a valid xsd header. Using LSPPlanXmlParser.");
+                    delegate = new LSPPlanXmlParser(lsPs, carriers, carrierVehicleTypes);
+                } else {
+                    throw new RuntimeException("no reader found for " + str);
+                }
+            } else {
+                this.delegate.startTag(name, attributes, context);
+            }
         }
 
         public void endTag(String name, String content, Stack<String> context) {
