@@ -80,6 +80,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
             case CAPACITY_NEED: {
                 capacityNeedFixed = Double.parseDouble(atts.getValue(FIXED));
                 capacityNeedLinear = Double.parseDouble(atts.getValue(LINEAR));
+				break;
             }
 
 
@@ -90,6 +91,17 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 break;
             }
 
+			case ATTRIBUTES:
+				switch (context.peek()) {
+					case CARRIER -> currAttributes = currentCarrier.getAttributes();
+//					case SERVICE -> currAttributes = currentService.getAttributes();
+					case SHIPMENT -> currAttributes = currentShipment.getAttributes();
+					//TODO: Welche Objekte sind noch "Attributable", können als Attribute haben? -> Diese hier einfügen.
+					default ->
+							throw new RuntimeException("could not derive context for attributes. context=" + context.peek());
+				}
+				attributesReader.startTag(name, atts, context, currAttributes);
+				break;
             case ATTRIBUTE: {
                 currAttributes = currentCarrier.getAttributes();
                 Gbl.assertNotNull(currAttributes);

@@ -11,6 +11,7 @@ public abstract class LSPConstants {
                 static final String FIXED = "fixed";
                 static final String LINEAR = "linear";
         static final String CARRIER = "carrier";
+			static final String ATTRIBUTES = "attributes";
             static final String ATTRIBUTE = "attribute";
             static final String CAPABILITIES = "capabilities";
                 static final String FLEET_SIZE = "fleetSize";
