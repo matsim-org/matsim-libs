@@ -2,7 +2,7 @@
 	<LSPs>
 		<lsp id="myLSP">
 			<resources>
-				<carrier id="directCarrierRes"/>
+				<carrier id="directCarrierRes">
 					<attributes>
 						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
 					</attributes>
@@ -11,7 +11,8 @@
 							<vehicle id="directTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
 						</vehicles>
 					</capabilities>
-				<carrier id="mainCarrierRes"/>
+				</carrier>
+				<carrier id="mainCarrierRes">
 					<attributes>
 						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">mainRunCarrier</attribute>
 					</attributes>
@@ -20,8 +21,14 @@
 							<vehicle id="mainTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
 						</vehicles>
 					</capabilities>
-				<hub id="Hub" location="j(5,3)" fixedCost="100.0"/>
-				<carrier id="distributionCarrierRes"/>
+				</carrier>
+				<hub id="Hub" location="j(5,3)" fixedCost="100.0">
+					<scheduler>
+						<capacityNeed fixed="10.0"/>
+						<capacityNeed linear="1.0"/>
+					</scheduler>
+				</hub>
+				<carrier id="distributionCarrierRes">
 					<attributes>
 						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
 					</attributes>
@@ -30,6 +37,7 @@
 							<vehicle id="distributionTruck" depotLinkId="j(5,3)" typeId="small05" earliestStart="00:00:00" latestEnd="596523:14:07"/>
 						</vehicles>
 					</capabilities>
+				</carrier>
 			</resources>
 
 			<shipments>
