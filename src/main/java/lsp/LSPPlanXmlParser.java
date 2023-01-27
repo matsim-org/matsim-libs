@@ -78,8 +78,8 @@ class LSPPlanXmlParser extends MatsimXmlParser {
             }
 
             case CAPACITY_NEED: {
-                capacityNeedFixed = Double.parseDouble(atts.getValue(FIXED));
-                capacityNeedLinear = Double.parseDouble(atts.getValue(LINEAR));
+                capacityNeedFixed = Double.parseDouble(atts.getValue(CAPACITY_NEED_FIXED));
+                capacityNeedLinear = Double.parseDouble(atts.getValue(CAPACITY_NEED_LINEAR));
 				break;
             }
 

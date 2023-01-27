@@ -72,10 +72,9 @@ public class LSPPlanWriter extends MatsimXmlWriter {
                 writer.write("id=\"" + hub.getId() + "\" ");
                 writer.write("location=\"" + hub.getStartLinkId() + "\" ");
                 writer.write("fixedCost=\"" + hub.getAttributes().getAttribute("fixedCost") + "\">\n");
-                writer.write("\t\t\t\t\t<scheduler>\n");
-                writer.write("\t\t\t\t\t\t<capacityNeed fixed=\"" + hub.getCapacityNeedFixed() +  "\"/>\n");
-                writer.write("\t\t\t\t\t\t<capacityNeed linear=\"" + hub.getCapacityNeedLinear() +  "\"/>\n");
-                writer.write("\t\t\t\t\t</scheduler>\n");
+                writer.write("\t\t\t\t\t<scheduler ");
+                writer.write("capacityNeedFixed=\"" + hub.getCapacityNeedFixed() +  "\" ");
+                writer.write("capacityNeedLinear=\"" + hub.getCapacityNeedLinear() +  "\"/>\n");
                 writer.write("\t\t\t\t</hub>\n");
             }
             if (resource instanceof LSPCarrierResource carrierResource) {

@@ -23,10 +23,7 @@
 					</capabilities>
 				</carrier>
 				<hub id="Hub" location="j(5,3)" fixedCost="100.0">
-					<scheduler>
-						<capacityNeed fixed="10.0"/>
-						<capacityNeed linear="1.0"/>
-					</scheduler>
+					<scheduler capacityNeedFixed="10.0" capacityNeedLinear="1.0"/>
 				</hub>
 				<carrier id="distributionCarrierRes">
 					<attributes>
