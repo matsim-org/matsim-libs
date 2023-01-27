@@ -76,10 +76,11 @@ public class LSPPlanWriter extends MatsimXmlWriter {
                 writer.write("\t\t\t\t\t\t<capacityNeed fixed=\"" + hub.getCapacityNeedFixed() +  "\"/>\n");
                 writer.write("\t\t\t\t\t\t<capacityNeed linear=\"" + hub.getCapacityNeedLinear() +  "\"/>\n");
                 writer.write("\t\t\t\t\t</scheduler>\n");
+                writer.write("\t\t\t\t</hub>\n");
             }
             if (resource instanceof LSPCarrierResource carrierResource) {
                 writer.write("\t\t\t\t<carrier ");
-                writer.write("id=\"" + carrierResource.getId() + "\"/>\n");
+                writer.write("id=\"" + carrierResource.getId() + "\">\n");
                 attributesWriter.writeAttributes("\t\t\t\t\t", writer, carrierResource.getCarrier().getAttributes());
                 writer.write("\t\t\t\t\t<capabilities fleetSize=\"" + carrierResource.getCarrier().getCarrierCapabilities().getFleetSize() + "\">\n");
                 writer.write("\t\t\t\t\t\t<vehicles>\n");
@@ -96,7 +97,9 @@ public class LSPPlanWriter extends MatsimXmlWriter {
                 }
                 writer.write("\t\t\t\t\t\t</vehicles>\n");
                 writer.write("\t\t\t\t\t</capabilities>\n");
+                writer.write("\t\t\t\t</carrier>\n");
                 }
+
             }
         writer.write("\t\t\t</resources>\n\n");
     }
