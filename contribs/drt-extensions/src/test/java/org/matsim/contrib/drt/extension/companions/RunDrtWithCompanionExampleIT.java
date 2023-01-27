@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -70,7 +70,7 @@ public class RunDrtWithCompanionExampleIT {
 		Controler controler = DrtCompanionControlerCreator.createControler(config);
 		controler.run();
 
-		verifyTotalNumberOfDrtRides(utils.getOutputDirectory(), 477);
+		verifyTotalNumberOfDrtRides(utils.getOutputDirectory(), 475);
 	}
 
 	private void verifyTotalNumberOfDrtRides(String outputDirectory, int expectedNumberOfTrips) {
@@ -94,6 +94,6 @@ public class RunDrtWithCompanionExampleIT {
 		}
 
 		int actualRides = Integer.parseInt(params.get("rides"));
-		assert(actualRides == expectedNumberOfTrips);
+		Assert.assertEquals(expectedNumberOfTrips, actualRides);
 	}
 }

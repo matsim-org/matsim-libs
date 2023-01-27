@@ -74,8 +74,8 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(0)
-				.waitAverage(296.95)
-				.inVehicleTravelTimeMean(387.02)
+				.waitAverage(297.19)
+				.inVehicleTravelTimeMean(386.78)
 				.totalTravelTimeMean(683.97)
 				.build();
 
@@ -108,9 +108,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(0)
-				.waitAverage(293.63)
-				.inVehicleTravelTimeMean(388.85)
-				.totalTravelTimeMean(682.48)
+				.waitAverage(286.81)
+				.inVehicleTravelTimeMean(389.64)
+				.totalTravelTimeMean(676.45)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -137,9 +137,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(1)
-				.waitAverage(305.97)
-				.inVehicleTravelTimeMean(378.18)
-				.totalTravelTimeMean(684.16)
+				.waitAverage(310.3)
+				.inVehicleTravelTimeMean(376.33)
+				.totalTravelTimeMean(686.63)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);

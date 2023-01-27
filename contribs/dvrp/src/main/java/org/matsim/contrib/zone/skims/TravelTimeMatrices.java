@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import org.matsim.api.core.v01.IdCollectors;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
@@ -56,12 +58,40 @@ public final class TravelTimeMatrices {
 		}
 	}
 
+	public static IdMap<Node, Zone> findOriginDestinationZones(RoutingParams params, Map<Zone, Node> centralNodes, double departureTime,
+			boolean origin) {
+		IdMap<Node, Zone> originZones = new IdMap<>(Node.class);
+		var nodes = params.routingNetwork.getNodes().values();
+		var endZones = centralNodes.entrySet().stream().collect(IdCollectors.toIdMap(Node.class, e -> e.getValue().getId(), Map.Entry::getKey));
+		// We concurrently put values into originZones, but never twice for the same key. Since we use IdMap, doing so is safe as long as the map
+		// does not need to get resized during this operation.
+		Calculation<Node> calculation = (lcpTree, n) -> findZoneForNode(n, endZones, departureTime, originZones, lcpTree, origin);
+		calculate(params, nodes, calculation, "DVRP free-speed " + (origin ? "origin" : "destination") + " zones: node ");
+		return originZones;
+	}
+
+	private static void findZoneForNode(Node fromNode, IdMap<Node, Zone> endZones, double departureTime, IdMap<Node, Zone> originZones,
+			LeastCostPathTree lcpTree, boolean origin) {
+		LeastCostPathTree.StopCriterion stopCriterion = (nodeIndex, arrivalTime, travelCost, distance, departureTime1) -> {
+			var stop = endZones.containsKey(nodeIndex);
+			if (stop) {
+				originZones.put(fromNode.getId(), endZones.get(nodeIndex));
+			}
+			return stop;
+		};
+
+		if (origin) {
+			lcpTree.calculate(fromNode.getId().index(), departureTime, null, null, stopCriterion);
+		} else {
+			lcpTree.calculateBackwards(fromNode.getId().index(), departureTime, null, null, stopCriterion);
+		}
+	}
+
 	public static SparseMatrix calculateTravelTimeSparseMatrix(RoutingParams params, double maxDistance, double departureTime) {
 		SparseMatrix travelTimeMatrix = new SparseMatrix();
 		var nodes = params.routingNetwork.getNodes().values();
-		var counter = "DVRP free-speed TT sparse matrix: node ";
 		Calculation<Node> calculation = (lcpTree, n) -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree, maxDistance);
-		calculate(params, nodes, calculation, counter);
+		calculate(params, nodes, calculation, "DVRP free-speed TT sparse matrix: node ");
 		return travelTimeMatrix;
 	}
 
