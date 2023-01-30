@@ -68,8 +68,8 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 			case HUB: {
 				currentHubId = atts.getValue(ID);
 				Gbl.assertNotNull(currentHubId);
-				String location = atts.getValue(LOCATION);
-				Gbl.assertNotNull(location);
+				currentHubLocation = atts.getValue(LOCATION);
+				Gbl.assertNotNull(currentHubLocation);
 				currentHubFixedCost = Double.parseDouble(atts.getValue(FIXED_COST));
 				Gbl.assertNotNull(currentHubFixedCost);
 				break;
@@ -285,6 +285,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 			case ATTRIBUTE -> attributesReader.endTag(name, content, context);
 			case SHIPMENT -> this.currentShipment = null;
 
+			case PLAN -> currentLsp.getPlans().add(currentPlan)
 		}
 	}
 
