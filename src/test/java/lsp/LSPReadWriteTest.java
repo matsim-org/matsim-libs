@@ -12,25 +12,25 @@ import java.util.Collections;
 
 public class LSPReadWriteTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void readWriteTest() throws FileNotFoundException, IOException {
+	@Test
+	public void readWriteTest() throws FileNotFoundException, IOException {
 
-        LSPs lsPs = new LSPs(Collections.emptyList());
-        Carriers carriers = new Carriers();
-        CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		LSPs lsPs = new LSPs(Collections.emptyList());
+		Carriers carriers = new Carriers();
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 
-        LSPPlanXmlReader reader = new LSPPlanXmlReader(lsPs, carriers, carrierVehicleTypes);
-        String inputFilename = utils.getPackageInputDirectory() + "lsps.xml";
-        reader.readFile(inputFilename);
+		LSPPlanXmlReader reader = new LSPPlanXmlReader(lsPs, carriers, carrierVehicleTypes);
+		String inputFilename = utils.getPackageInputDirectory() + "lsps.xml";
+		reader.readFile(inputFilename);
 
-        String outputFilename = utils.getOutputDirectory() + "/outputLsps.xml";
-        new LSPPlanWriter(lsPs).write(outputFilename);
+		String outputFilename = utils.getOutputDirectory() + "/outputLsps.xml";
+		new LSPPlanWriter(lsPs).write(outputFilename);
 
-        MatsimTestUtils.assertEqualFilesLineByLine(inputFilename, outputFilename);
-    }
+		MatsimTestUtils.assertEqualFilesLineByLine(inputFilename, outputFilename);
+	}
 
 
 }
