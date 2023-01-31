@@ -9,8 +9,7 @@
 			<param name="dropoffDuration" value="60"/>
 			<param name="onlineVehicleTracker" value="true"/>
 
-			<param name="taxisFile" value="taxis-25.xml"/>
-			<!-- param name="taxisFile" value="taxis-50.xml" / -->
+			<param name="taxisFile" value="taxis_mini_benchmark-25.xml"/>
 
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
@@ -21,13 +20,10 @@
 
 	<module name="network">
 		<param name="inputNetworkFile" value="network.xml"/>
-		<!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
-		<!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
 	</module>
 
 	<module name="plans">
-		<!-- param name="inputPlansFile" value="plans_only_taxi_1.0.xml.gz" / -->
-		<param name="inputPlansFile" value="plans_only_taxi_4.0.xml.gz"/>
+		<param name="inputPlansFile" value="plans_only_taxi_mini_benchmark_3.0.xml.gz"/>
 	</module>
 
 	<module name="qsim">

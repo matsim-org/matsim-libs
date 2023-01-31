@@ -139,7 +139,7 @@ public class MGC {
 	public static Point coordinate2Point(Coordinate coordinate) {
 		return geoFac.createPoint(coordinate);
 	}
-	
+
 	/**
 	 * Converts a Geotools <code>Point</code> into a MATSim {@link org.matsim.api.core.v01.Coord}
 	 * @param point Geotools point
@@ -186,8 +186,8 @@ public class MGC {
 	}
 
 	/**
-	 * Guesses the  Universal Transverse Mercator (UTM) zone for a given WGS 84 coordinate, returns the corresponding 
-	 * EPSG code  
+	 * Guesses the  Universal Transverse Mercator (UTM) zone for a given WGS 84 coordinate, returns the corresponding
+	 * EPSG code
 	 * @param lon the longitude of the WGS 84 coordinate
 	 * @param lat the latitude of the WGS 84 coordinate
 	 * @return EPSG code
@@ -195,10 +195,10 @@ public class MGC {
 	public static String getUTMEPSGCodeForWGS84Coordinate(final double lon, final double lat) {
 		int utmZone = (int) (Math.ceil((180+lon) / 6)+0.5);
 		String epsgCode = null;
-		if (lat > 0 ) { //northern hemisphere 
-		  epsgCode = "EPSG:326" + utmZone;
+		if (lat > 0 ) { //northern hemisphere
+		  epsgCode = "EPSG:" + (32600 + utmZone);
 		} else { //southern hemisphere
-		  epsgCode = "EPSG:327" + utmZone;
+		  epsgCode = "EPSG:" + (32700 + utmZone);
 		}
 		return epsgCode;
 	}

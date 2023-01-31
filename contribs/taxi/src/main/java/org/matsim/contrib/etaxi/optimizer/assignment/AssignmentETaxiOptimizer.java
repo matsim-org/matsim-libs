@@ -20,12 +20,10 @@
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -81,7 +79,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 	private final Fleet fleet;
 	private final MobsimTimer timer;
 
-	private final Map<Id<DvrpVehicle>, DvrpVehicle> scheduledForCharging = new HashMap<>();
+	private final IdMap<DvrpVehicle, DvrpVehicle> scheduledForCharging = new IdMap<>(DvrpVehicle.class);
 
 	public AssignmentETaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			MobsimTimer timer, Network network, TravelTime travelTime, TravelDisutility travelDisutility,

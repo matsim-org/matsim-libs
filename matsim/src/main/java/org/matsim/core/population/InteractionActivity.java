@@ -87,7 +87,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 	@Override
 	public void setMaximumDuration(final double dur) {
 		// For compatibility reasons: allow setting duration to 0 which is the default value anyway.
-		if (dur != OptionalTime.zeroSeconds().seconds()) throw new UnsupportedOperationException("Setting duration is not supported for InteractionActivity.");
+		if (dur != 0) throw new UnsupportedOperationException("Setting duration is not supported for InteractionActivity.");
 	}
 
 	@Override

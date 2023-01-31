@@ -47,7 +47,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 
 	private static OptionalTime asOptionalTime(double seconds) {
-		return Double.isInfinite(seconds) ? OptionalTime.undefined() : OptionalTime.defined(seconds);
+		return seconds == UNDEFINED_TIME ? OptionalTime.undefined() : OptionalTime.defined(seconds);
 	}
 
 	@Override
@@ -80,6 +80,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public void setDepartureTime(final double depTime) {
+		OptionalTime.assertDefined(depTime);
 		this.depTime = depTime;
 	}
 
@@ -95,6 +96,7 @@ import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 	@Override
 	public void setTravelTime(final double travTime) {
+		OptionalTime.assertDefined(travTime);
 		this.travTime = travTime;
 	}
 
