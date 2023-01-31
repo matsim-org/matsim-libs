@@ -18,8 +18,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.bicycle.run.RunBicycleExample;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
@@ -35,6 +38,7 @@ import java.util.Random;
  * based on RandomizingTimeDistanceTravelDisutility and adding more components
  */
 class BicycleTravelDisutility implements TravelDisutility {
+	private static final Logger LOG = LogManager.getLogger(BicycleTravelDisutility.class);
 
 	private final double marginalCostOfTime_s;
 	private final double marginalCostOfDistance_m;
@@ -138,7 +142,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 				logNormalRndInf = Math.exp(sigma * random.nextGaussian());
 				logNormalRndComf = Math.exp(sigma * random.nextGaussian());
 				logNormalRndGrad = Math.exp(sigma * random.nextGaussian());
-				//logNormalRndUserDef = Math.exp(sigma * random.nextGaussian()); // Adding/removing this changes test results, dz jan'23
+				logNormalRndUserDef = Math.exp(sigma * random.nextGaussian());
 				logNormalRndDist *= normalization;
 				logNormalRndInf *= normalization;
 				logNormalRndComf *= normalization;
