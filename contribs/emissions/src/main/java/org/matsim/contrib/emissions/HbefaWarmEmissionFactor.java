@@ -27,9 +27,16 @@ class HbefaWarmEmissionFactor extends HbefaEmissionFactor {
 
 	private final double speed;
 
-	/*package-private*/ HbefaWarmEmissionFactor(double factor, double speed) {
+	public String getRoadGradient() {
+		return roadGradient;
+	}
+
+	private final String roadGradient;
+
+	/*package-private*/ HbefaWarmEmissionFactor(double factor, double speed, String roadGradient) {
 		super(factor);
 		this.speed = speed;
+		this.roadGradient = roadGradient;
 	}
 
 	public double getSpeed() {
@@ -40,6 +47,7 @@ class HbefaWarmEmissionFactor extends HbefaEmissionFactor {
 	public String toString() {
 		return "HbefaWarmEmissionFactor{" +
 				"speed=" + speed +
+				", roadGradient=" + roadGradient +
 				", warmEmissionFactor=" + getFactor() +
 				'}';
 	}

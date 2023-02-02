@@ -37,7 +37,7 @@ abstract class HbefaEmissionFactorKey {
 		this.vehicleCategory = copyFrom.getVehicleCategory();
 		this.vehicleAttributes = copyFrom.getVehicleAttributes();
 		this.component = copyFrom.getComponent();
-		this.roadGradient = copyFrom.getRoadGradient();
+//		this.roadGradient = copyFrom.getRoadGradient();
 	}
 
 	HbefaEmissionFactorKey() {
@@ -72,7 +72,7 @@ abstract class HbefaEmissionFactorKey {
 		return roadGradient;
 	}
 
-	public void setRoadGradient(String roadGradient) { this.roadGradient = roadGradient; }
+//	public void setRoadGradient(String roadGradient) { this.roadGradient = roadGradient; }
 
 	@Override
 	public boolean equals(Object o) {

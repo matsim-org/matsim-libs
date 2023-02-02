@@ -44,7 +44,8 @@ public abstract class HbefaTables {
         return load(file, HbefaTables::createWarmKey, record -> {
             var factor = Double.parseDouble(record.get("EFA_weighted"));
             var speed = Double.parseDouble(record.get("V_weighted"));
-            return new HbefaWarmEmissionFactor(factor, speed);
+			var roadGradient = record.get("Gradient");
+            return new HbefaWarmEmissionFactor(factor, speed, roadGradient);
         });
     }
 
@@ -53,7 +54,7 @@ public abstract class HbefaTables {
             var key = createWarmKey(record);
             setCommonDetailedParametersOnKey(key, record);
             return key;
-        }, record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA")), Double.parseDouble(record.get("V"))));
+        }, record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA")), Double.parseDouble(record.get("V")), record.get("Gradient")));
     }
 
     static Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> loadAverageCold(URL file) {
@@ -90,8 +91,10 @@ public abstract class HbefaTables {
         var key = new HbefaWarmEmissionFactorKey();
         setCommonParametersOnKey(key, record);
         var trafficSit = record.get("TrafficSit");
+		var roadGradient = record.get("Gradient");
         key.setRoadCategory(trafficSit.substring(0, trafficSit.lastIndexOf('/')));
         key.setTrafficSituation(mapString2HbefaTrafficSituation(trafficSit));
+		key.setRoadGradient(roadGradient);
         key.setVehicleAttributes(new HbefaVehicleAttributes());
         return key;
     }
@@ -129,6 +132,25 @@ public abstract class HbefaTables {
             throw new RuntimeException();
         }
     }
+//TODO	to use when enum functionality is implemented. also use it furtherup
+	private static HbefaRoadGradient mapString2HbefaRoadGradient(String string) {
+
+		if (string.equals("0%")) return HbefaRoadGradient.ZERO;
+		else if (string.equals("+2%")) return HbefaRoadGradient.PLUS_2;
+		else if (string.equals("+4%")) return HbefaRoadGradient.PLUS_4;
+		else if (string.equals("+6%")) return HbefaRoadGradient.PLUS_6;
+		else if (string.equals("-2%")) return HbefaRoadGradient.MINUS_2;
+		else if (string.equals("-4%")) return HbefaRoadGradient.MINUS_4;
+		else if (string.equals("-6%")) return HbefaRoadGradient.MINUS_6;
+		else if (string.equals("+/-2%")) return HbefaRoadGradient.PLUS_MINUS_2;
+		else if (string.equals("+/-4%")) return HbefaRoadGradient.PLUS_MINUS_4;
+		else if (string.equals("+/-6%")) return HbefaRoadGradient.PLUS_MINUS_6;
+
+		else {
+			logger.warn("Could not map String " + string + " to any HbefaRoadGradient; please check syntax in hbefa input file.");
+			throw new RuntimeException();
+		}
+	}
 
     private static int mapAmbientCondPattern2Distance(String string) {
         String distanceString = string.split(",")[2];

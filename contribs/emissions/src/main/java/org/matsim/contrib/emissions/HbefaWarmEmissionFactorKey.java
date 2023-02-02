@@ -56,6 +56,10 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 		this.trafficSituation = trafficSituation;
 	}
 
+	/*package-private*/ void setRoadGradient(String roadGradient) {
+		this.roadGradient = roadGradient;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -73,6 +77,7 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 		int result = super.hashCode();
 		result = 31 * result + trafficSituation.hashCode();
 		result = 31 * result + roadCategory.hashCode();
+		result = 31 * result + roadGradient.hashCode();
 		return result;
 	}
 
@@ -84,6 +89,7 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 						+ getComponent() + "; "
 						+ roadCategory + "; "
 						+ trafficSituation + "; "
+						+ roadGradient + "; "
 						+ getVehicleAttributes();
 	}
 }
