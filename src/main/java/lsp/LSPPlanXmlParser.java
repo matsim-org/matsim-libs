@@ -34,16 +34,19 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 	private final Carriers carriers;
 	private final CarrierVehicleTypes carrierVehicleTypes;
 	private CarrierCapabilities.Builder capabilityBuilder;
-	private Double capacityNeedFixed;
-	private Double capacityNeedLinear;
-
-	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
-	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
-			new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 	private TransshipmentHub hubResource;
 	private String currentHubId;
 	private Double currentHubFixedCost;
 	private String currentHubLocation;
+	private LSPPlan currentPlan;
+	private String chainId;
+	private Double score;
+
+	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
+	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
+			new org.matsim.utils.objectattributes.attributable.AttributesImpl();
+
+
 
 	public LSPPlanXmlParser(LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
 		super();
@@ -55,7 +58,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		switch (name) {
-			case LSP: {
+			case LSP -> {
 				String lspId = atts.getValue(ID);
 				Gbl.assertNotNull(lspId);
 				currentLsp = LSPUtils.LSPBuilder.getInstance(Id.create(lspId, LSP.class))
@@ -64,8 +67,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 						.build();
 				break;
 			}
-
-			case HUB: {
+			case HUB -> {
 				currentHubId = atts.getValue(ID);
 				Gbl.assertNotNull(currentHubId);
 				currentHubLocation = atts.getValue(LOCATION);
@@ -74,10 +76,9 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				Gbl.assertNotNull(currentHubFixedCost);
 				break;
 			}
-
-			case "scheduler": {
-				capacityNeedFixed = Double.parseDouble(atts.getValue(CAPACITY_NEED_FIXED));
-				capacityNeedLinear = Double.parseDouble(atts.getValue(CAPACITY_NEED_LINEAR));
+			case SCHEDULER -> {
+				Double capacityNeedFixed = Double.parseDouble(atts.getValue(CAPACITY_NEED_FIXED));
+				Double capacityNeedLinear = Double.parseDouble(atts.getValue(CAPACITY_NEED_LINEAR));
 				hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create(currentHubId, LSPResource.class), Id.createLinkId(currentHubLocation), null)
 						.setTransshipmentHubScheduler(UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
 								.setCapacityNeedFixed(capacityNeedFixed) //Time needed, fixed (for Scheduler)
@@ -86,34 +87,30 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 						.build();
 				break;
 			}
-
-
-			case CARRIER: {
+			case CARRIER -> {
 				String carrierId = atts.getValue(ID);
 				Gbl.assertNotNull(carrierId);
 				currentCarrier = CarrierUtils.createCarrier(Id.create(carrierId, Carrier.class));
 				break;
 			}
-
-			case ATTRIBUTES:
+			case ATTRIBUTES -> {
 				switch (context.peek()) {
 					case CARRIER -> currAttributes = currentCarrier.getAttributes();
 					case SHIPMENT -> currAttributes = currentShipment.getAttributes();
 					case LSP -> currAttributes = currentLsp.getAttributes();
-					//TODO: Welche Objekte sind noch "Attributable", können als Attribute haben? -> Diese hier einfügen.
 					default ->
 							throw new RuntimeException("could not derive context for attributes. context=" + context.peek());
 				}
 				attributesReader.startTag(name, atts, context, currAttributes);
 				break;
-			case ATTRIBUTE: {
+			}
+			case ATTRIBUTE -> {
 				currAttributes = currentCarrier.getAttributes();
 				Gbl.assertNotNull(currAttributes);
 				attributesReader.startTag(name, atts, context, currAttributes);
 				break;
 			}
-
-			case CAPABILITIES: {
+			case CAPABILITIES -> {
 				String fleetSize = atts.getValue(FLEET_SIZE);
 				Gbl.assertNotNull(fleetSize);
 				this.capabilityBuilder = CarrierCapabilities.Builder.newInstance();
@@ -124,8 +121,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				}
 				break;
 			}
-
-			case VEHICLE: {
+			case VEHICLE -> {
 				String vehicleId = atts.getValue(ID);
 				Gbl.assertNotNull(vehicleId);
 
@@ -147,9 +143,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				capabilityBuilder.addVehicle(vehicle);
 				break;
 			}
-
-
-			case SHIPMENT: {
+			case SHIPMENT -> {
 				String shipmentId = atts.getValue(ID);
 				Gbl.assertNotNull(shipmentId);
 				Id<LSPShipment> id = Id.create(shipmentId, LSPShipment.class);
@@ -188,29 +182,33 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				break;
 			}
 
-			case PLAN: {
-				String score = atts.getValue(SCORE);
+			case PLAN -> {
+				score = Double.valueOf(atts.getValue(SCORE));
 				Gbl.assertNotNull(score);
-				String chainId = atts.getValue(CHAIN_ID);
+				chainId = atts.getValue(CHAIN_ID);
 				Gbl.assertNotNull(chainId);
 				String selected = atts.getValue(SELECTED);
 				Gbl.assertNotNull(selected);
 				break;
 			}
 
+			case RESOURCES -> {
+				break;
+			}
 
-			case RESOURCE: {
+			case RESOURCE -> {
 				String resourceId = atts.getValue(ID);
 				Gbl.assertNotNull(resourceId);
 				break;
 			}
 
-			case SHIPMENT_PLAN:
+			case SHIPMENT_PLAN -> {
 				String shipmentId = atts.getValue(ID);
 				Gbl.assertNotNull(shipmentId);
 				break;
+			}
 
-			case ELEMENT: {
+			case ELEMENT -> {
 				String type = atts.getValue(TYPE);
 				Gbl.assertNotNull(type);
 
@@ -243,32 +241,53 @@ class LSPPlanXmlParser extends MatsimXmlParser {
                 Gbl.assertNotNull(carriers);
                 Gbl.assertNotNull(carriers.getCarriers());
 				carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
-				LSPResource carrierResource = null;
+				LSPResource lspResource = null;
 				switch (UsecaseUtils.getCarrierType(currentCarrier)) {
 
 					case collectionCarrier -> {
-						carrierResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
+						lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
 								.setCarrier(currentCarrier)
 								.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
 								.build();
 					}
 					case mainRunCarrier -> {
-						carrierResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
+						lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
 								.setCarrier(currentCarrier)
 								.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 								.build();
+
+
 					}
 					case distributionCarrier -> {
-						carrierResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
+						lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
 								.setCarrier(currentCarrier)
 								.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 								.build();
+
+						LogisticChainElement directCarrierLSE = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierLSE", LogisticChainElement.class))
+							.setResource(lspResource)
+							.build();
+
+						LogisticChain solution_direct = LSPUtils.LogisticChainBuilder.newInstance(Id.create("id", LogisticChain.class))
+								.addLogisticChainElement(directCarrierLSE)
+								.build();
+
+						final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+						currentPlan = LSPUtils.createLSPPlan()
+								.addLogisticChain(solution_direct)
+								.setAssigner(singleSolutionShipmentAssigner);
+
+						currentPlan.setScore(100.0);
+
+						//List<LSPPlan> lspPlans = new ArrayList<>();
+
+
 					}
 					default ->
 							throw new IllegalStateException("Unexpected value: " + currentCarrier.getAttributes().toString());
 				}
-				Gbl.assertNotNull(carrierResource);
-				currentLsp.getResources().add(carrierResource);
+				Gbl.assertNotNull(lspResource);
+				currentLsp.getResources().add(lspResource);
 				currentCarrier = null;
 			}
 
@@ -285,7 +304,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 			case ATTRIBUTE -> attributesReader.endTag(name, content, context);
 			case SHIPMENT -> this.currentShipment = null;
 
-			case PLAN -> currentLsp.getPlans().add(currentPlan)
+			case PLAN -> currentLsp.addPlan(currentPlan);
 		}
 	}
 
