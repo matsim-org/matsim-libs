@@ -137,7 +137,7 @@ public class LSPPlanWriter extends MatsimXmlWriter {
 			writer.write("\t\t\t\t<plan");
 			if (plan.getScore() != null) {
 				writer.write(" score=\"" + plan.getScore() + "\"");
-				for (var chain : plan.getLogisticChain()) {
+				for (LogisticChain chain : plan.getLogisticChain()) {
 					writer.write(" chainId=\"" + chain.getId() + "\"");
 				}
 			}
