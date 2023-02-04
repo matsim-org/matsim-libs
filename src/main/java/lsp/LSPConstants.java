@@ -7,7 +7,7 @@ public abstract class LSPConstants {
         static final String HUB = "hub";
             static final String LOCATION = "location";
             static final String FIXED_COST = "fixedCost";
-            static final String CAPACITY_NEED = "capacityNeed";
+            public static final String SCHEDULER = "scheduler";
                 static final String CAPACITY_NEED_FIXED = "capacityNeedFixed";
                 static final String CAPACITY_NEED_LINEAR = "capacityNeedLinear";
         static final String CARRIER = "carrier";
