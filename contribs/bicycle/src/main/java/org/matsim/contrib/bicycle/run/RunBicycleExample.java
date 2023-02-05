@@ -24,7 +24,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
+<<<<<<< Updated upstream
 import org.matsim.contrib.bicycle.BicycleModule;
+=======
+import org.matsim.contrib.bicycle.Bicycles;
+import org.matsim.contrib.bicycle.PsafeConfigGroup;
+>>>>>>> Stashed changes
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -59,6 +64,8 @@ public class RunBicycleExample {
 			// Setting the context like this works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
 			config = ConfigUtils.createConfig("bicycle_example/");
 			config.addModule(new BicycleConfigGroup());
+			config.addModule(new PsafeConfigGroup());
+			
 			fillConfigWithBicycleStandardValues(config);
 
 			config.network().setInputFile("network_lane.xml"); // Modify this
@@ -76,6 +83,7 @@ public class RunBicycleExample {
 	static void fillConfigWithBicycleStandardValues(Config config) {
 		config.controler().setWriteEventsInterval(1);
 
+<<<<<<< Updated upstream
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
@@ -86,6 +94,32 @@ public class RunBicycleExample {
 
 		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
 
+=======
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
+//      ziemke bicycle routing params
+//		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
+//		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
+//		bicycleConfigGroup.setMarginalUtilityOfGradient_m_100m(-0.02);
+//		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
+//  EDW PAIZEI TO NEO UTILITY FUNCTIONNNN
+	    PsafeConfigGroup psafeConfigGroup = (PsafeConfigGroup) config.getModules().get(PsafeConfigGroup.GROUP_NAME);
+	
+        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_car_m(0.1); // different beta psafes
+        
+        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_ebike_m(0.1);
+        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_escoot_m(0.1);
+        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_walk_m(0.1);
+        
+      	psafeConfigGroup.setDmax_car_m(1000); // in meters or kilometers???
+      	psafeConfigGroup.setDmax_ebike_m(1000); // in meters or kilometers???
+      	psafeConfigGroup.setDmax_escoot_m(1000); // in meters or kilometers???
+      	psafeConfigGroup.setDmax_walk_m(1000); // in meters or kilometers???
+      	
+      	
+		bicycleConfigGroup.setMarginalUtilityOfPerceivedSafety_m(2.12331); // from bicycle config group introduce a new parameter
+		// a new variable is introduced, it is related to safety perceptions instead of infrastructure factors
+		
+>>>>>>> Stashed changes
 		List<String> mainModeList = new ArrayList<>();
 		mainModeList.add("bicycle");
 		mainModeList.add(TransportMode.car);
