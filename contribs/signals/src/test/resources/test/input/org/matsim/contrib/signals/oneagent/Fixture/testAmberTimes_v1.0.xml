@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<amberTimes xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <signalSystem refId="2">
-        <signal refId="100">
-            <redAmber seconds="2"/>
-            <amber seconds="3"/>
-        </signal>
-    </signalSystem>
-</amberTimes>

@@ -1,3 +1,0 @@
-# Customizing the framework
-
-TODO
