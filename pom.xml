@@ -281,7 +281,14 @@
                 <scope>test</scope>
             </dependency>
 
-        </dependencies>
+			<dependency>
+				<groupId>net.bytebuddy</groupId>
+				<artifactId>byte-buddy</artifactId>
+				<version>1.12.22</version>
+				<scope>test</scope>
+			</dependency>
+
+		</dependencies>
     </dependencyManagement>
 
     <build>
