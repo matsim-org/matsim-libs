@@ -160,9 +160,9 @@ public class RunEShiftDrtScenarioIT {
 
 		config.vehicles().setVehiclesFile(evsFile);
 
-		final Controler run = EDrtOperationsControlerCreator.createControler(config, false);
+		final Controler controler = EDrtOperationsControlerCreator.createControler(config, false);
 
-		run.addOverridingModule(new AbstractModule() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
@@ -171,6 +171,6 @@ public class RunEShiftDrtScenarioIT {
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
-		run.run();
+		controler.run();
 	}
 }

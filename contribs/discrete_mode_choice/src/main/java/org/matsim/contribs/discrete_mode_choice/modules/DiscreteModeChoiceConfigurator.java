@@ -52,6 +52,7 @@ public final class DiscreteModeChoiceConfigurator {
 		} else {
 			dmcConfig.getSubtourConstraintConfig().setConstrainedModes(Arrays.asList(smcConfig.getModes()));
 		}
+		// ...setConstrainedModes used to ignore its arguments due to a typo.  This is now corrected, but results are no longer backwards compatible.  kai, jan'23
 
 		dmcConfig.setCachedModes(Arrays.asList(smcConfig.getModes()));
 

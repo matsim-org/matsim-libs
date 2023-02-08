@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -31,11 +29,15 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DrtStopFacilityImpl implements DrtStopFacility {
 	public static <F extends Identifiable<?> & Facility & Attributable> DrtStopFacility createFromFacility(F facility) {
+		Objects.requireNonNull(facility.getLinkId(), "Link ID at Facility " + facility.getId() + " must not be null.");
 		return new DrtStopFacilityImpl(Id.create(facility.getId(), DrtStopFacility.class), facility.getLinkId(),
 				facility.getCoord(), facility.getAttributes());
 	}

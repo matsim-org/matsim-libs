@@ -1,16 +1,14 @@
 package org.matsim.contrib.freight.carrier;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class CarrierVehicleTypeWriterTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils() ;
-	
+
 	@Test
 	public void testTypeWriter(){
 		CarrierVehicleTypes types = new CarrierVehicleTypes();

@@ -93,5 +93,12 @@ public final class ControlerUtils {
 		OutputDirectoryLogging.catchLogEntries();
 	}
 
-	
+	public static void catchLogEntries() {
+		OutputDirectoryLogging.catchLogEntries();
+	}
+
+	public Controler createControler( Scenario scenario ) {
+		return new Controler( scenario );
+	}
+
 }

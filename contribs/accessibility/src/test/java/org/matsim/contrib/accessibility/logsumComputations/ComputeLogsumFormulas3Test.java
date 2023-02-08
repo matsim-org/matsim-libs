@@ -18,47 +18,51 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.accessibility.logsumComputations;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thomas
  *
  */
-public class ComputeLogsumFormulas3Test extends MatsimTestCase{
-	
+public class ComputeLogsumFormulas3Test {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	/**
 	 * underlying network
-	 * 						  cjk1	
+	 * 						  cjk1
 	 * 	  origin_h			 /
 	 * 	   \				/
 	 * 		i--------------j--cjk2
 	 * 					    \
 	 * 						 \
-	 *						  cjk3	 
+	 *						  cjk3
 	 */
 	@SuppressWarnings("static-method")
-	@Test	
-	public void testLogsumFormulas(){
+
+	@Test public void testLogsumFormulas(){
 		double betaWalkTT = -10. / 3600.0;	// [util/sec]
 		double betaWalkTD = -10.;			// [util/meter]
-		
+
 		double betaCarTT  = -12 / 3600.0;	// [util/sec]
 		double betaCarTD  = -12;			// [util/meter]
 		double betaCarTMC = -1;				// [util/money]
-		
+
 		// travel time costs (h)
 		double cijTT = 1.5 / 60.; 		// time to reach j from i
 		double chiTT = 1.2 / 60.;		// time to reach network from origin
 //		double cjk1TT= 1.5 / 60.;		// time to reach cjk1 from j
 //		double cjk2TT= 1.2 / 60.;		// time to reach cjk2 from j
 //		double cjk3TT= 1.4 / 60.;		// time to reach cjk3 from j
-		
+
 		// travel distance (m)
 		double cijTD = 500.;	// distance to reach j from i
 		double chiTD = 20.;		// distance to reach network from origin
@@ -68,7 +72,7 @@ public class ComputeLogsumFormulas3Test extends MatsimTestCase{
 
 		// travel monetary cost / toll (money)
 		double cijTMC= 10;		// toll to get from i to j
-		
+
 		///////
 		// opportunities
 		///////
@@ -77,37 +81,37 @@ public class ComputeLogsumFormulas3Test extends MatsimTestCase{
 //		sumExpVjk 		+= Math.exp( (cjk3TT * betaWalkTT) + (cjk3TD * betaWalkTD) );
 
 		///////
-		// OLD 
+		// OLD
 		///////
 		double VhjOldTT = (cijTT * betaCarTT) + (chiTT * betaWalkTT);
 		double VhjOldTD = (cijTD * betaCarTD) + (chiTD * betaWalkTD);
 		double VhjOldTMC= cijTMC * betaCarTMC + 0;
-		
+
 		double VhjOld = VhjOldTT + VhjOldTD + VhjOldTMC;
 //		double expOldVhj = Math.exp( VhjOld );
 //		double expOldVhk = expOldVhj * sumExpVjk;
-		
+
 		///////
-		// NEW 
+		// NEW
 		///////
 		double VijCar = (cijTT * betaCarTT) + (cijTD * betaCarTD) + (cijTMC * betaCarTMC);
 		double VhiWalk= (chiTT * betaWalkTT) + (chiTD * betaWalkTD);
 		double VhjNew = VijCar + VhiWalk;
 //		double expNewVhj= Math.exp( VhjNew );
 //		double expNewVhk= expNewVhj * sumExpVjk;
-		
+
 		Assert.assertTrue(VhjOld == VhjNew);	// old accessibility computation == new accessibility computation
-	
+
 		///////
-		// NEW 
+		// NEW
 		///////
-		
+
 		double dummyVijCar = -0.9123;
 		double dummyVhiWalk= -0.023;
-		
+
 		double dummyExp1 = Math.exp( dummyVijCar + dummyVhiWalk );
 		double dummyExp2 = Math.exp( dummyVijCar ) * Math.exp( dummyVhiWalk );
-		
+
 		Assert.assertEquals(dummyExp1,dummyExp2,1.e-10);	// exp(VijCar + VijWalk) == exp(VijCar) * exp(VijWalk)
 	}
 

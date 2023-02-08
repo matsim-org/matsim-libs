@@ -33,12 +33,12 @@ import org.matsim.core.utils.misc.Time;
  * (un)loading operation can start (which does not mean that it has to be
  * finished by the end of the time window). This is - I guess - in line with
  * most OR literature dealing with time-windows. There are 3 options to deal
- * with late arrivals:<ol> 
+ * with late arrivals:<ol>
  * <li> agent does not (un)load and immediately goes to the
- * next activity. missed operation is then penalyzed in the scoring part (which
- * is - I think - far from reality) 
+ * next activity. missed operation is then penalized in the scoring part (which
+ * is - I think - far from reality)
  * <li> agent (un)loads at arr_time and late
- * arrTime is penalyzed in the scoring part 
+ * arrTime is penalyzed in the scoring part
  * <li> agent gets an extra waiting_time
  * before (un)loading. optionally, late arr_time is then penalyzed in the
  * scoring part additionally.
@@ -51,7 +51,7 @@ import org.matsim.core.utils.misc.Time;
  * might be 3hours later. I think both options (2,3) might be (easily)
  * incorporated with WithinDayReplanning(ReScheduling)-Module.
  * <p></p>
- * 
+ *
  * @author (of code) sschroeder (of docu) kai based on sschroeder
  */
 

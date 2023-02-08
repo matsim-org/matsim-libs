@@ -16,7 +16,7 @@ import java.util.Map;
  * 	- {@link Vehicle}
  * 	- the location (= {@link Link})
  * 	belonging to it.
- *
+ * <p>
  * 	Instead of adding it to all different freight events, this is consolidated in this abstract class
  *
  * @author Kai Martins-Turner (kturner)

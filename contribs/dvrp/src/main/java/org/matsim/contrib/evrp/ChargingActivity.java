@@ -25,6 +25,9 @@ import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class ChargingActivity implements DynActivity {
+	/**
+	 * String constant should have different value from {@link org.matsim.contrib.ev.charging.VehicleChargingHandler#CHARGING_INTERACTION}.
+	 */
 	public static final String ACTIVITY_TYPE = "Charging";
 
 	private final ChargingTask chargingTask;

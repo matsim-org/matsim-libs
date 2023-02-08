@@ -26,22 +26,21 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22
- *
+ * <p>
  * Loader that loads/assigns vehicleTypes to their vehicles and carriers respectively.
- * 
+ *
  * @author sschroeder
  *
  */
 @Deprecated
 public class CarrierVehicleTypeLoader {
-	
-	private static final  Logger logger = LogManager.getLogger(CarrierVehicleTypeLoader.class);
 
-	private final Carriers carriers;
+	@SuppressWarnings("unused")
+	private static final  Logger logger = LogManager.getLogger(CarrierVehicleTypeLoader.class);
 
 	/**
 	 * Constructs the loader with the carriers the types should be assigned to.
-	 * 
+	 *
 	 * @param carriers
 	 *
 	 *  * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22
@@ -49,12 +48,11 @@ public class CarrierVehicleTypeLoader {
 	@Deprecated
 	public CarrierVehicleTypeLoader(Carriers carriers) {
 		super();
-		this.carriers = carriers;
 	}
-	
+
 	/**
 	 * Assigns types to carriers and their vehicles.
-	 * 
+	 *
 	 * @param types
 	 *
 	 * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22

@@ -39,7 +39,7 @@ import java.util.*;
 
 /**
  * This keeps track of all carrierAgents during simulation.
- * 
+ *
  * @author mzilske, sschroeder
  *
  */
@@ -53,6 +53,7 @@ public final class CarrierAgentTracker implements BasicEventHandler
 	// tracker was destroyed and recreated in every iteration, to something that is persistent.  Indeed, original matsim design always was like
 	// that (so that observers could collect information over multiple iterations without additional programming).  kai, jul'22
 
+	@SuppressWarnings("unused")
 	private static final Logger log = LogManager.getLogger( CarrierAgentTracker.class ) ;
 
 	private final Carriers carriers;
@@ -87,6 +88,7 @@ public final class CarrierAgentTracker implements BasicEventHandler
 	void scoreSelectedPlans() {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			CarrierAgent agent = getCarrierAgentFromCarrier(carrier.getId() );
+			assert agent != null;
 			agent.scoreSelectedPlan();
 		}
 	}

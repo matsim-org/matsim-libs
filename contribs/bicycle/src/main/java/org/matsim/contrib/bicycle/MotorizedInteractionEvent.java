@@ -25,6 +25,7 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dziemke
+ * @deprecated -- it might be possible to use this, but as of now {@link MotorizedInteractionEngine} is not implemented in a meaningful way.  kai, dec'22
  */
 public final class MotorizedInteractionEvent extends Event {
 	// plausible to have this public
