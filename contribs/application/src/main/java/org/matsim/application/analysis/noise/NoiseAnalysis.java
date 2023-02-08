@@ -58,6 +58,12 @@ public class NoiseAnalysis implements MATSimAppCommand {
     @Override
     public Integer call() throws Exception {
         Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
+
+		if (crs.getInputCRS() == null || crs.getInputCRS().isBlank()) {
+			log.error("Input CRS must be set [--input-crs]");
+			return 2;
+		}
+
         config.global().setCoordinateSystem(crs.getInputCRS());
         config.controler().setRunId(runId);
         if (!runId.equals("")) {
