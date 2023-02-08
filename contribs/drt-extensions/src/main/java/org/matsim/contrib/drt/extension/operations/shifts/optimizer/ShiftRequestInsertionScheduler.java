@@ -259,9 +259,11 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
         } else {
             DrtStopTask stopTask = stops.get(dropoffIdx - 1).task;
             if (request.getToLink() == stopTask.getLink()) { // no detour; no new stop task
-                // add dropoff request to stop task
-                stopTask.addDropoffRequest(request);
-                return stopTask;
+				// add dropoff request to stop task, and extend the stop task (when incremental stop task duration is used)
+				stopTask.addDropoffRequest(request);
+				double updatedStopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle, stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
+				stopTask.setEndTime(stopTask.getBeginTime() + updatedStopDuration);
+				return stopTask;
             } else { // add drive task to dropoff location
 
                 // remove drive j->j+1 (if j is not the last stop)
