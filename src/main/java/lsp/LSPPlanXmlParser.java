@@ -273,7 +273,6 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				currentLsp.getResources().add(lspResource);
 				currentCarrier = null;
 			}
-
 			case HUB -> {
 				currentLsp.getResources().add(hubResource);
 				LSPUtils.setFixedCost(hubResource, currentHubFixedCost);
@@ -282,11 +281,9 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				currentHubLocation = null;
 				currentHubId = null;
 			}
-
 			case CAPABILITIES -> currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
 			case ATTRIBUTE -> attributesReader.endTag(name, content, context);
 			case SHIPMENT -> this.currentShipment = null;
-
 			case RESOURCES -> {
 				switch (context.peek()) {
 					case LSP -> {} //TODO ggf. füllen
@@ -296,8 +293,6 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 					default -> throw new IllegalStateException("Unexpected value: " + context.peek());
 				}
 			}
-
-
 			case PLAN -> {
 
 				LSPResource resource = null;
@@ -343,6 +338,8 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 					currentLsp.addPlan(currentPlan);
 				}
 
+				currentLsp.assignShipmentToLSP(currentShipment);
+				currentLsp.scheduleLogisticChains();
 
 				lspResourceIds.clear();
 				currentPlan = null;
