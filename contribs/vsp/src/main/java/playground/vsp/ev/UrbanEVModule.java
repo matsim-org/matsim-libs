@@ -30,6 +30,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
@@ -37,6 +38,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 public class UrbanEVModule extends AbstractModule {
+	static final String PLUGIN_IDENTIFIER = " plugin";
+	public static final String PLUGIN_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
+			PLUGIN_IDENTIFIER );
+	static final String PLUGOUT_IDENTIFIER = " plugout";
+	public static final String PLUGOUT_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
+			PLUGOUT_IDENTIFIER );
 	@Inject
 	private Config config;
 
