@@ -1,6 +1,8 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlan;
+import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.TransshipmentHub;
 import lsp.usecase.UsecaseUtils;
@@ -37,16 +39,20 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 	private String currentHubId;
 	private Double currentHubFixedCost;
 	private String currentHubLocation;
+	private String lceId;
 	private LSPPlan currentPlan;
 	private String chainId;
 	private Double score;
 	private String selected;
 	private List<String> lspResourceIds = new LinkedList<>();
+	private String shipmentPlanId;
+	private List<ShipmentPlanElement> planElements = new LinkedList<>();
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
 			new org.matsim.utils.objectattributes.attributable.AttributesImpl();
-	private String lceId;
+
+
 
 
 	public LSPPlanXmlParser(LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
@@ -182,7 +188,6 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				currentLsp.getShipments().add(currentShipment);
 				break;
 			}
-
 			case PLAN -> {
 				score = Double.valueOf(atts.getValue(SCORE));
 				Gbl.assertNotNull(score);
@@ -192,23 +197,19 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				Gbl.assertNotNull(selected);
 				break;
 			}
-
 			case RESOURCES -> {
 				break;
 			}
-
 			case RESOURCE -> {
 				String resourceId = atts.getValue(ID);
 				lspResourceIds.add(resourceId);
 				break;
 			}
-
 			case SHIPMENT_PLAN -> {
-				String shipmentId = atts.getValue(ID);
-				Gbl.assertNotNull(shipmentId);
+				shipmentPlanId = atts.getValue(SHIPMENT_ID);
+				Gbl.assertNotNull(shipmentPlanId);
 				break;
 			}
-
 			case ELEMENT -> {
 				String type = atts.getValue(TYPE);
 				Gbl.assertNotNull(type);
@@ -219,133 +220,179 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				String endTime = atts.getValue(END_TIME);
 				Gbl.assertNotNull(endTime);
 
-				String resource = atts.getValue(RESOURCE);
-				Gbl.assertNotNull(resource);
+				String resourceId = atts.getValue(RESOURCE_ID);
+				Gbl.assertNotNull(resourceId);
 
-				break;
+				ShipmentPlanElement planElement = null;
+
+				switch (type) {
+					case "LOAD" -> {
+						var planElementBuilder = ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
+						planElementBuilder.setStartTime(parseTimeToDouble(startTime));
+						planElementBuilder.setEndTime(parseTimeToDouble(endTime));
+						planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
+						planElement = planElementBuilder.build();
+					}
+					case "TRANSPORT" -> {
+						var planElementBuilder = ShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
+						planElementBuilder.setStartTime(parseTimeToDouble(startTime));
+						planElementBuilder.setEndTime(parseTimeToDouble(endTime));
+						planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
+						planElement = planElementBuilder.build();
+					}
+					case "UNLOAD" -> {
+						var planElementBuilder = ShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
+						planElementBuilder.setStartTime(parseTimeToDouble(startTime));
+						planElementBuilder.setEndTime(parseTimeToDouble(endTime));
+						planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
+						planElement = planElementBuilder.build();
+					}
+					case "HANDLE" -> {
+						var planElementBuilder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
+						planElementBuilder.setStartTime(parseTimeToDouble(startTime));
+						planElementBuilder.setEndTime(parseTimeToDouble(endTime));
+						planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
+						planElement = planElementBuilder.build();
+					}
+				}
+				planElements.add(planElement);
 			}
+
 		}
 	}
+
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		switch (name) {
-			case LSP -> {
-                Gbl.assertNotNull(currentLsp);
-                Gbl.assertNotNull(lsPs);
-                Gbl.assertNotNull(lsPs.getLSPs());
-				currentLsp.getPlans().remove(0); // hier wird initialer Plan gelöscht
-				lsPs.getLSPs().put(currentLsp.getId(), currentLsp);
-				currentLsp = null;
-			}
-			case CARRIER -> {
-                Gbl.assertNotNull(currentCarrier);
-                Gbl.assertNotNull(carriers);
-                Gbl.assertNotNull(carriers.getCarriers());
-				carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
-				LSPResource lspResource = null;
-				switch (UsecaseUtils.getCarrierType(currentCarrier)) {
-
-					case collectionCarrier -> {
-						lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-								.setCarrier(currentCarrier)
-								.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
-								.build();
-					}
-					case mainRunCarrier -> {
-						lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-								.setCarrier(currentCarrier)
-								.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
-								.build();
-
-
-					}
-					case distributionCarrier -> {
-						lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-								.setCarrier(currentCarrier)
-								.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-								.build();
-					}
-					default ->
-							throw new IllegalStateException("Unexpected value: " + currentCarrier.getAttributes().toString());
+			switch (name) {
+				case LSP -> {
+					Gbl.assertNotNull(currentLsp);
+					Gbl.assertNotNull(lsPs);
+					Gbl.assertNotNull(lsPs.getLSPs());
+					currentLsp.getPlans().remove(0); // hier wird initialer Plan gelöscht
+					lsPs.getLSPs().put(currentLsp.getId(), currentLsp);
+					currentLsp = null;
 				}
-				Gbl.assertNotNull(lspResource);
-				currentLsp.getResources().add(lspResource);
-				currentCarrier = null;
-			}
-			case HUB -> {
-				currentLsp.getResources().add(hubResource);
-				LSPUtils.setFixedCost(hubResource, currentHubFixedCost);
-				hubResource = null;
-				currentHubFixedCost = null;
-				currentHubLocation = null;
-				currentHubId = null;
-			}
-			case CAPABILITIES -> currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
-			case ATTRIBUTE -> attributesReader.endTag(name, content, context);
-			case SHIPMENT -> this.currentShipment = null;
-			case RESOURCES -> {
-				switch (context.peek()) {
-					case LSP -> {} //TODO ggf. füllen
-					case PLAN -> {
+				case CARRIER -> {
+					Gbl.assertNotNull(currentCarrier);
+					Gbl.assertNotNull(carriers);
+					Gbl.assertNotNull(carriers.getCarriers());
+					carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
+					LSPResource lspResource = null;
+					switch (UsecaseUtils.getCarrierType(currentCarrier)) {
 
-					}
-					default -> throw new IllegalStateException("Unexpected value: " + context.peek());
-				}
-			}
-			case PLAN -> {
-
-				LSPResource resource = null;
-
-				List<LogisticChainElement> logisticChainElements = new LinkedList<>();
-
-
-				for (String lspResourceId : lspResourceIds) {
-					for (LSPResource currentResource : currentLsp.getResources()) {
-						if (currentResource.getId().toString().equals(lspResourceId)) {
-							resource = currentResource;
-
-
-							Gbl.assertNotNull(resource);
-							LogisticChainElement logisticChainElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("lceId", LogisticChainElement.class))
-									.setResource(resource)
+						case collectionCarrier -> {
+							lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
+									.setCarrier(currentCarrier)
+									.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+									.build();
+						}
+						case mainRunCarrier -> {
+							lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
+									.setCarrier(currentCarrier)
+									.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 									.build();
 
-							logisticChainElements.add(logisticChainElement);
+
 						}
+						case distributionCarrier -> {
+							lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
+									.setCarrier(currentCarrier)
+									.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+									.build();
+						}
+						default -> throw new IllegalStateException("Unexpected value: " + currentCarrier.getAttributes().toString());
+					}
+					Gbl.assertNotNull(lspResource);
+					currentLsp.getResources().add(lspResource);
+					currentCarrier = null;
+				}
+				case HUB -> {
+					currentLsp.getResources().add(hubResource);
+					LSPUtils.setFixedCost(hubResource, currentHubFixedCost);
+					hubResource = null;
+					currentHubFixedCost = null;
+					currentHubLocation = null;
+					currentHubId = null;
+				}
+				case CAPABILITIES -> currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
+				case ATTRIBUTE -> attributesReader.endTag(name, content, context);
+				case SHIPMENT -> this.currentShipment = null;
+				case RESOURCES -> {
+					switch (context.peek()) {
+						case LSP -> {
+						} //TODO ggf. füllen
+						case PLAN -> {
+
+						}
+						default -> throw new IllegalStateException("Unexpected value: " + context.peek());
 					}
 				}
+				case PLAN -> {
 
-				LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
-						.addLogisticChainElement(logisticChainElements.get(0))
-						.build();
+					LSPResource resource = null;
 
-				for (int i = 1; i < logisticChainElements.size(); i++) { // bewusst bei 1 begonnen, Element 0 bereits oben hinzugefügt
-					logisticChainElements.get(i-1).connectWithNextElement(logisticChainElements.get(i));
-					logisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
+					List<LogisticChainElement> logisticChainElements = new LinkedList<>();
+
+
+					for (String lspResourceId : lspResourceIds) {
+						for (LSPResource currentResource : currentLsp.getResources()) {
+							if (currentResource.getId().toString().equals(lspResourceId)) {
+								resource = currentResource;
+
+
+								Gbl.assertNotNull(resource);
+								LogisticChainElement logisticChainElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("lceId", LogisticChainElement.class))
+										.setResource(resource)
+										.build();
+
+								logisticChainElements.add(logisticChainElement);
+							}
+						}
+					}
+
+					LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
+							.addLogisticChainElement(logisticChainElements.get(0))
+							.build();
+
+					for (int i = 1; i < logisticChainElements.size(); i++) { // bewusst bei 1 begonnen, Element 0 bereits oben hinzugefügt
+						logisticChainElements.get(i - 1).connectWithNextElement(logisticChainElements.get(i));
+						logisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
+					}
+
+					final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+					currentPlan = LSPUtils.createLSPPlan()
+							.addLogisticChain(logisticChain)
+							.setAssigner(singleSolutionShipmentAssigner);
+
+					currentPlan.setScore(score);
+					currentPlan.setLSP(currentLsp);
+
+					if (selected.equals("true")) {
+						currentLsp.setSelectedPlan(currentPlan);
+					} else {
+						currentLsp.addPlan(currentPlan);
+					}
+
+
+					lspResourceIds.clear();
+					currentPlan = null;
+				}
+				case SHIPMENT_PLAN -> {
+					for (LSPShipment shipment : currentLsp.getShipments()) {
+						if (shipment.getId().toString().equals(shipmentPlanId)) {
+							for (ShipmentPlanElement currentPlanElement : planElements) {
+								shipment.getShipmentPlan().addPlanElement(Id.create(currentPlanElement.getResourceId(), ShipmentPlanElement.class), currentPlanElement);
+							}
+						}
+					}
+					shipmentPlanId = null;
+					planElements.clear();
 				}
 
-				final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-				currentPlan = LSPUtils.createLSPPlan()
-						.addLogisticChain(logisticChain)
-						.setAssigner(singleSolutionShipmentAssigner);
-
-				currentPlan.setScore(score);
-
-				if (selected.equals("true")) {
-					currentLsp.setSelectedPlan(currentPlan);
-				} else {
-					currentLsp.addPlan(currentPlan);
-				}
-
-				currentLsp.assignShipmentToLSP(currentShipment);
-				currentLsp.scheduleLogisticChains();
-
-				lspResourceIds.clear();
-				currentPlan = null;
 			}
 		}
-	}
+
 
 	private double parseTimeToDouble (String timeString){
 		if (timeString.contains(":")) {
