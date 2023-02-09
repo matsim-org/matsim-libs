@@ -38,9 +38,11 @@ public abstract class LSPConstants {
             static final String RESOURCES = "resources";
             static final String RESOURCE = "resource";
             static final String SHIPMENT_PLAN = "shipmentPlan";
+                static final String SHIPMENT_ID = "shipmentId";
                 static final String ELEMENT = "element";
                     static final String TYPE = "type";
-                        static final String START_TIME = "startTime";
-                        static final String END_TIME = "endTime";
+                    static final String START_TIME = "startTime";
+                    static final String END_TIME = "endTime";
+                    static final String RESOURCE_ID = "resourceId";
 
 }
