@@ -40,6 +40,7 @@ public abstract class LSPConstants {
             static final String SHIPMENT_PLAN = "shipmentPlan";
                 static final String SHIPMENT_ID = "shipmentId";
                 static final String ELEMENT = "element";
+                    static final String ELEMENT_ID = "id";
                     static final String TYPE = "type";
                     static final String START_TIME = "startTime";
                     static final String END_TIME = "endTime";

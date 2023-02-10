@@ -85,7 +85,7 @@ public class LSPPlanXmlReader implements MatsimReader {
 				log.info("Found following schemeLocation in lsPs definition file: " + str);
 				if (str == null) {
 					log.warn("LSP plans file does not contain a valid xsd header. Using LSPPlanXmlParser.");
-					delegate = new LSPPlanXmlParser(lsPs, carriers, carrierVehicleTypes);
+					delegate = new LSPPlanXmlParser(lsPs, carriers);
 				} else {
 					throw new RuntimeException("no reader found for " + str);
 				}

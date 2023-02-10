@@ -1,7 +1,6 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentPlan;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.TransshipmentHub;
@@ -33,37 +32,31 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 	private LSPShipment currentShipment = null;
 	private final LSPs lsPs;
 	private final Carriers carriers;
-	private final CarrierVehicleTypes carrierVehicleTypes;
 	private CarrierCapabilities.Builder capabilityBuilder;
 	private TransshipmentHub hubResource;
 	private String currentHubId;
 	private Double currentHubFixedCost;
 	private String currentHubLocation;
-	private String lceId;
-	private LSPPlan currentPlan;
 	private String chainId;
 	private Double score;
 	private String selected;
-	private List<String> lspResourceIds = new LinkedList<>();
+	private final List<String> lspResourceIds = new LinkedList<>();
 	private String shipmentPlanId;
-	private List<ShipmentPlanElement> planElements = new LinkedList<>();
+	private final List<ShipmentPlanElement> planElements = new LinkedList<>();
+	private final List<String> elementIds = new LinkedList<>();
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
-	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
-			new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 
 
-
-
-	public LSPPlanXmlParser(LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
+	public LSPPlanXmlParser(LSPs lsPs, Carriers carriers) {
 		super();
 		this.lsPs = lsPs;
 		this.carriers = carriers;
-		this.carrierVehicleTypes = carrierVehicleTypes;
 	}
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
+		org.matsim.utils.objectattributes.attributable.Attributes currAttributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 		switch (name) {
 			case LSP -> {
 				String lspId = atts.getValue(ID);
@@ -211,6 +204,10 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				break;
 			}
 			case ELEMENT -> {
+				String elementId = atts.getValue(ELEMENT_ID);
+				Gbl.assertNotNull(elementId);
+				elementIds.add(elementId);
+
 				String type = atts.getValue(TYPE);
 				Gbl.assertNotNull(type);
 
@@ -256,6 +253,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 					}
 				}
 				planElements.add(planElement);
+				break;
 			}
 
 		}
@@ -286,13 +284,13 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 									.setCarrier(currentCarrier)
 									.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
 									.build();
+
 						}
 						case mainRunCarrier -> {
 							lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
 									.setCarrier(currentCarrier)
 									.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 									.build();
-
 
 						}
 						case distributionCarrier -> {
@@ -320,11 +318,8 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				case SHIPMENT -> this.currentShipment = null;
 				case RESOURCES -> {
 					switch (context.peek()) {
-						case LSP -> {
-						} //TODO ggf. füllen
-						case PLAN -> {
-
-						}
+						case LSP -> {}
+						case PLAN -> {}
 						default -> throw new IllegalStateException("Unexpected value: " + context.peek());
 					}
 				}
@@ -360,8 +355,12 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 						logisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
 					}
 
+					for (LSPShipment lspShipment : currentLsp.getShipments()) {
+						logisticChain.getShipments().add(lspShipment);
+					}
+
 					final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-					currentPlan = LSPUtils.createLSPPlan()
+					LSPPlan currentPlan = LSPUtils.createLSPPlan()
 							.addLogisticChain(logisticChain)
 							.setAssigner(singleSolutionShipmentAssigner);
 
@@ -379,17 +378,18 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 					currentPlan = null;
 				}
 				case SHIPMENT_PLAN -> {
+					Gbl.assertIf(planElements.size() == elementIds.size());
 					for (LSPShipment shipment : currentLsp.getShipments()) {
 						if (shipment.getId().toString().equals(shipmentPlanId)) {
-							for (ShipmentPlanElement currentPlanElement : planElements) {
-								shipment.getShipmentPlan().addPlanElement(Id.create(currentPlanElement.getResourceId(), ShipmentPlanElement.class), currentPlanElement);
+							for (int i = 0; i < planElements.size(); i++) {
+								shipment.getShipmentPlan().addPlanElement(Id.create(elementIds.get(i), ShipmentPlanElement.class), planElements.get(i));
 							}
 						}
 					}
 					shipmentPlanId = null;
 					planElements.clear();
+					elementIds.clear();
 				}
-
 			}
 		}
 
