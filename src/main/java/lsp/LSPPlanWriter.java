@@ -161,8 +161,10 @@ public class LSPPlanWriter extends MatsimXmlWriter {
 				writer.write("\t\t\t\t\t<shipmentPlans>\n");
 				for (LSPShipment shipment : logisticChain.getShipments()) {
 					writer.write("\t\t\t\t\t\t<shipmentPlan shipmentId=\"" + shipment.getId() + "\">\n");
-					for (ShipmentPlanElement element : shipment.getShipmentPlan().getPlanElements().values()) {
-						writer.write("\t\t\t\t\t\t\t<element type=\"" + element.getElementType() + "\" ");
+					for (var elementId : shipment.getShipmentPlan().getPlanElements().keySet()) {
+						writer.write("\t\t\t\t\t\t\t<element id=\"" + elementId.toString() + "\" ");
+						ShipmentPlanElement element = shipment.getShipmentPlan().getPlanElements().get(elementId);
+						writer.write("type=\"" + element.getElementType() + "\" ");
 						writer.write("startTime=\"" + element.getStartTime() + "\" ");
 						writer.write("endTime=\"" + element.getEndTime() + "\" ");
 						writer.write("resourceId=\"" + element.getResourceId() + "\"/>\n");
