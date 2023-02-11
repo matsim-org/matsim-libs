@@ -42,8 +42,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 	private String selected;
 	private final List<String> lspResourceIds = new LinkedList<>();
 	private String shipmentPlanId;
-	private final List<ShipmentPlanElement> planElements = new LinkedList<>();
-	private final List<String> elementIds = new LinkedList<>();
+	private final Map<String, ShipmentPlanElement> planElements = new LinkedHashMap<>();
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 
@@ -206,7 +205,6 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 			case ELEMENT -> {
 				String elementId = atts.getValue(ELEMENT_ID);
 				Gbl.assertNotNull(elementId);
-				elementIds.add(elementId);
 
 				String type = atts.getValue(TYPE);
 				Gbl.assertNotNull(type);
@@ -252,7 +250,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 						planElement = planElementBuilder.build();
 					}
 				}
-				planElements.add(planElement);
+				planElements.put(elementId, planElement);
 				break;
 			}
 
@@ -378,17 +376,15 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 					currentPlan = null;
 				}
 				case SHIPMENT_PLAN -> {
-					Gbl.assertIf(planElements.size() == elementIds.size());
 					for (LSPShipment shipment : currentLsp.getShipments()) {
 						if (shipment.getId().toString().equals(shipmentPlanId)) {
-							for (int i = 0; i < planElements.size(); i++) {
-								shipment.getShipmentPlan().addPlanElement(Id.create(elementIds.get(i), ShipmentPlanElement.class), planElements.get(i));
+							for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
+								shipment.getShipmentPlan().addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
 							}
 						}
 					}
 					shipmentPlanId = null;
 					planElements.clear();
-					elementIds.clear();
 				}
 			}
 		}
