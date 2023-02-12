@@ -22,12 +22,12 @@ public class LSPReadWriteTest {
 		Carriers carriers = new Carriers();
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 
-		LSPPlanXmlReader reader = new LSPPlanXmlReader(lsPs, carriers, carrierVehicleTypes);
+		LSPPlanXmlReader reader = new LSPPlanXmlReader(lsPs, carriers);
 		String inputFilename = utils.getPackageInputDirectory() + "lsps.xml";
 		reader.readFile(inputFilename);
 
 		String outputFilename = utils.getOutputDirectory() + "/outputLsps.xml";
-		new LSPPlanWriter(lsPs).write(outputFilename);
+		new LSPPlanXmlWriter(lsPs).write(outputFilename);
 
 		MatsimTestUtils.assertEqualFilesLineByLine(inputFilename, outputFilename);
 	}

@@ -149,8 +149,8 @@ final class ExampleTwoEchelonGrid_NR {
 		controler.run();
 
 		//Ggf. muss der Ordner noch erstellt werden (?)
-		new LSPPlanWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
-		new LSPPlanXmlReader(LSPUtils.getLSPs(controler.getScenario()), FreightUtils.getCarriers(controler.getScenario()), FreightUtils.getCarrierVehicleTypes(controler.getScenario()));
+		new LSPPlanXmlWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
+		new LSPPlanXmlReader(LSPUtils.getLSPs(controler.getScenario()), FreightUtils.getCarriers(controler.getScenario()));
 
 		log.info("Some results ....");
 

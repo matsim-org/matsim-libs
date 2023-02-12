@@ -62,7 +62,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 				Gbl.assertNotNull(lspId);
 				currentLsp = LSPUtils.LSPBuilder.getInstance(Id.create(lspId, LSP.class))
 						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.emptyList()))
-						.setInitialPlan(new LSPPlanImpl()) //TODO: warum wird ein initialier Plan benötigt?
+						.setInitialPlan(new LSPPlanImpl()) //TODO: warum wird ein initialer Plan benötigt?
 						.build();
 				break;
 			}

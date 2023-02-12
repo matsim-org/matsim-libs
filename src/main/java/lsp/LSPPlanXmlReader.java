@@ -8,19 +8,17 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Stack;
 
 public class LSPPlanXmlReader implements MatsimReader {
-	private static final Logger log = LogManager.getLogger(LSPPlanXmlReader.class);
-	private static final String MSG="With early carrier plans file formats, there will be an expected exception in the following." ;
+	private static final Logger log = LogManager.getLogger(LSPPlanXmlReader.class);;
 	private final LSPsPlanReader reader;
 
 
-	public LSPPlanXmlReader( final LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
+	public LSPPlanXmlReader( final LSPs lsPs, Carriers carriers) {
 		System.setProperty("matsim.preferLocalDtds", "true");
-		this.reader = new LSPsPlanReader(lsPs, carriers, carrierVehicleTypes);
+		this.reader = new LSPsPlanReader(lsPs, carriers);
 	}
 
 	public void readFile(String filename) {
@@ -55,28 +53,15 @@ public class LSPPlanXmlReader implements MatsimReader {
 	}
 
 
-	public void readStream(InputStream inputStream) {
-		log.info(MSG) ;
-		try {
-			reader.setValidating(false);
-			reader.parse(inputStream);
-		} catch (Exception e) {
-			log.warn("### Exception found while trying to read LSPPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
-			throw e;
-		}
-	}
-
 	private static final class LSPsPlanReader extends MatsimXmlParser {
 		private final LSPs lsPs;
 		private final Carriers carriers;
-		private final CarrierVehicleTypes carrierVehicleTypes;
 
 		private MatsimXmlParser delegate = null;
 
-		LSPsPlanReader (LSPs lsPs, Carriers carriers, CarrierVehicleTypes carrierVehicleTypes) {
+		LSPsPlanReader (LSPs lsPs, Carriers carriers) {
 			this.lsPs = lsPs;
 			this.carriers = carriers;
-			this.carrierVehicleTypes = carrierVehicleTypes;
 		}
 
 		public void startTag(String name, Attributes attributes, Stack<String> context) {
