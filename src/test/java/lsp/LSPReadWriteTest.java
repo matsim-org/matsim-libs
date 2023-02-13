@@ -20,7 +20,6 @@ public class LSPReadWriteTest {
 
 		LSPs lsPs = new LSPs(Collections.emptyList());
 		Carriers carriers = new Carriers();
-		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 
 		LSPPlanXmlReader reader = new LSPPlanXmlReader(lsPs, carriers);
 		String inputFilename = utils.getPackageInputDirectory() + "lsps.xml";
