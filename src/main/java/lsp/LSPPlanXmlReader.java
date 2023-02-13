@@ -11,20 +11,20 @@ import org.xml.sax.SAXException;
 import java.net.URL;
 import java.util.Stack;
 
-public class LSPPlanXmlReader implements MatsimReader {
+public final class LSPPlanXmlReader implements MatsimReader {
 	private static final Logger log = LogManager.getLogger(LSPPlanXmlReader.class);;
-	private final LSPsPlanReader reader;
+	private final LSPsPlanParser parser;
 
 
 	public LSPPlanXmlReader( final LSPs lsPs, Carriers carriers) {
 		System.setProperty("matsim.preferLocalDtds", "true");
-		this.reader = new LSPsPlanReader(lsPs, carriers);
+		this.parser = new LSPsPlanParser(lsPs, carriers);
 	}
 
 	public void readFile(String filename) {
 		try {
-			this.reader.setValidating(false);
-			this.reader.readFile(filename);
+			this.parser.setValidating(false );
+			this.parser.readFile(filename );
 		} catch (Exception e) {
 			log.warn("### Exception found while trying to read LSPPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
 //            if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
@@ -39,13 +39,13 @@ public class LSPPlanXmlReader implements MatsimReader {
 
 	public void readURL(URL url) {
 		try {
-			this.reader.readURL(url);
+			this.parser.readURL(url );
 		} catch (Exception e) {
 			log.warn("### Exception found while trying to read LSPPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation... url: " + url.toString());
-				reader.setValidating(false);
-				reader.readURL(url);
+				parser.setValidating(false );
+				parser.readURL(url );
 			} else { //other problem: e.g. validation does not work, because of missing validation file.
 				throw e;
 			}
@@ -53,13 +53,13 @@ public class LSPPlanXmlReader implements MatsimReader {
 	}
 
 
-	private static final class LSPsPlanReader extends MatsimXmlParser {
+	private static final class LSPsPlanParser extends MatsimXmlParser {
 		private final LSPs lsPs;
 		private final Carriers carriers;
 
 		private MatsimXmlParser delegate = null;
 
-		LSPsPlanReader (LSPs lsPs, Carriers carriers) {
+		LSPsPlanParser( LSPs lsPs, Carriers carriers ) {
 			this.lsPs = lsPs;
 			this.carriers = carriers;
 		}
@@ -70,17 +70,17 @@ public class LSPPlanXmlReader implements MatsimReader {
 				log.info("Found following schemeLocation in lsPs definition file: " + str);
 				if (str == null) {
 					log.warn("LSP plans file does not contain a valid xsd header. Using LSPPlanXmlParser.");
-					delegate = new LSPPlanXmlParser(lsPs, carriers);
+					delegate = new LSPPlanXmlParserV1(lsPs, carriers);
 				} else {
 					throw new RuntimeException("no reader found for " + str);
 				}
 			} else {
-				this.delegate.startTag(name, attributes, context);
+				this.delegate.startTag(name, attributes, context );
 			}
 		}
 
 		public void endTag(String name, String content, Stack<String> context) {
-			this.delegate.endTag(name, content, context);
+			this.delegate.endTag(name, content, context );
 		}
 
 		public void endDocument() {

@@ -23,9 +23,9 @@ import java.util.*;
 
 import static lsp.LSPConstants.*;
 
-class LSPPlanXmlParser extends MatsimXmlParser {
+class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
-	public static final Logger logger = LogManager.getLogger(LSPPlanXmlParser.class);
+	public static final Logger logger = LogManager.getLogger( LSPPlanXmlParserV1.class );
 
 	private LSP currentLsp = null;
 	private Carrier currentCarrier = null;
@@ -47,7 +47,7 @@ class LSPPlanXmlParser extends MatsimXmlParser {
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 
 
-	public LSPPlanXmlParser(LSPs lsPs, Carriers carriers) {
+	LSPPlanXmlParserV1( LSPs lsPs, Carriers carriers ) {
 		super();
 		this.lsPs = lsPs;
 		this.carriers = carriers;
