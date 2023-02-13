@@ -48,7 +48,16 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	protected Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
 	protected Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
 
-    protected Network network;
+
+	/**
+	 * @author  Talha
+	 *
+	 */
+	protected Map<Id<Link>, Set<Id<ActivityFacility>>> linksWithFreeSpaces = new HashMap<Id<Link>, Set<Id<ActivityFacility>>>();
+	protected Map<Id<Link>, Set<Id<ActivityFacility>>> CurrentlinksWithParking= new HashMap<Id<Link>, Set<Id<ActivityFacility>>>();
+
+
+	protected Network network;
 
 	@Inject
 	public FacilityBasedParkingManager(Scenario scenario) {
@@ -93,7 +102,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			// LogManager.getLogger(getClass()).info("link not listed as parking
 			// space, we will say yes "+linkId);
 
-			return true;
+			return false;
 		}
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
@@ -149,7 +158,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		if (!this.parkingLocations.containsKey(vehicleId)) {
 			this.parkingLocationsOutsideFacilities.remove(vehicleId);
 			return true;
-			
+
 			// we assume the person parks somewhere else
 		} else {
 			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
@@ -181,7 +190,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		}
 		return allSpaces;
 	}
-	
+
 	public double getNrOfFreeParkingSpacesOnLink (Id<Link> linkId){
 		double allFreeSpaces = 0;
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
@@ -196,10 +205,56 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		return allFreeSpaces;
 	}
 
+	/**
+	 * @author  Talha
+	 *
+	 */
 
-	@Override
+
+	public Map<Id<Link>, Set<Id<ActivityFacility>>> getLinkIdifParkingavailible (Id<Link>currentLinkId) {
+
+
+		for (ActivityFacility fac : this.parkingFacilities.values()) {
+			currentLinkId = fac.getLinkId();
+			Set<Id<ActivityFacility>>parkingOnLink = new HashSet<>();
+			if (this.facilitiesPerLink.containsKey(currentLinkId)) {
+				parkingOnLink = this.facilitiesPerLink.get(currentLinkId);
+			}
+			parkingOnLink.add(fac.getId());
+			this.CurrentlinksWithParking.put(currentLinkId, parkingOnLink);
+
+		}
+		return CurrentlinksWithParking;
+	}
+
+	/**
+	 * @author  Talha
+	 *
+	 */
+
+	public Map<Id<Link>, Set<Id<ActivityFacility>>> getFreeParkingSpacesLinks () {
+
+		for (ActivityFacility fac : this.parkingFacilities.values()) {
+			Id<Link> linkId = fac.getLinkId();
+			Set<Id<ActivityFacility>> parkingOnLink = new HashSet<>();
+			if (this.facilitiesPerLink.containsKey(linkId)) {
+				parkingOnLink = this.facilitiesPerLink.get(linkId);
+			}
+			parkingOnLink.add(fac.getId());
+			this.linksWithFreeSpaces.put(linkId, parkingOnLink);
+
+		}
+		return linksWithFreeSpaces;
+
+	}
+
+
+
+
+
+		@Override
 	public void reset(int iteration) {
 	}
 
-	
+
 }

@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.parking.parkingsearch;
 
@@ -45,10 +45,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunParkingSearchExample {
 
 	public static void main(String[] args) {
-		
+
 		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml", new ParkingSearchConfigGroup());
 		//all further input files are set in the config.
-		
+
 		//get the parking search config group to set some parameters, like agent's search strategy or average parking slot length
 		ParkingSearchConfigGroup configGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
 		configGroup.setParkingSearchStrategy(ParkingSearchStrategy.Benenson);
@@ -58,7 +58,7 @@ public class RunParkingSearchExample {
 		if (otfvis) {
 			config.controler().setLastIteration(0);
 		} else {
-			config.controler().setLastIteration(10);
+			config.controler().setLastIteration(0);
 		}
 		new RunParkingSearchExample().run(config,otfvis);
 
@@ -75,9 +75,9 @@ public class RunParkingSearchExample {
 		Controler controler = new Controler(scenario);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 
-		
+
 		controler.addOverridingModule(new AbstractModule() {
-			
+
 			@Override
 			public void install() {
 				ParkingSlotVisualiser visualiser = new ParkingSlotVisualiser(scenario);

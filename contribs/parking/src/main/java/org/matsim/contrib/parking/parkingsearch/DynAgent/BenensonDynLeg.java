@@ -139,17 +139,38 @@ public class BenensonDynLeg extends ParkingDynLeg{
 				}
 
 				Id<Link> nextLinkId;
-				if(this.legStage == ParkingMode.SEARCH_FOR_NEXT){
-					nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkRandomInAcceptableDistance(currentLinkId, this.route.getEndLinkId(),
-							vehicleId, firstDestinationLinkEnterTime, this.timer.getTimeOfDay(), mode);
-                }
-				else{
+				if(this.legStage == ParkingMode.SEARCH_FOR_NEXT) {
+
+
+					if ((((BenensonParkingSearchLogic) (this.logic)).getNextLinkAfterCommunication( route.getEndLinkId(),currentLinkId)) !=null )  {
+						Id<Link> ParkLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkAfterCommunication( route.getEndLinkId(),currentLinkId);
+						nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkBenensonRouting(currentLinkId, ParkLinkId, mode);
+					} else {
+						nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkRandomInAcceptableDistance(currentLinkId, this.route.getEndLinkId(),
+								vehicleId, firstDestinationLinkEnterTime, this.timer.getTimeOfDay(), mode);}
+
+
+         /*      if ((((BenensonParkingSearchLogic) (this.logic)).getNextLinkCommunicationCenterRouting( route.getEndLinkId())) !=null) {
+                  Id<Link> ParkLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkCommunicationCenterRouting(route.getEndLinkId());
+                  nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkBenensonRouting(currentLinkId, ParkLinkId, mode);
+               } else {
+                  nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkRandomInAcceptableDistance(currentLinkId, this.route.getEndLinkId(),
+                        vehicleId, firstDestinationLinkEnterTime, this.timer.getTimeOfDay(), mode);
+
+
+               }*/
+				}
+
+
+
+				else {
 					nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkBenensonRouting(currentLinkId, route.getEndLinkId(), mode);
-                }
-                currentAndNextParkLink = new Tuple<>(currentLinkId, nextLinkId);
-                return nextLinkId;
+				}
+				currentAndNextParkLink = new Tuple<>(currentLinkId, nextLinkId);
+				return nextLinkId;
 			}
 		}
 	}
 
 }
+
