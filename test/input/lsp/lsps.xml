@@ -2,39 +2,39 @@
 	<LSPs>
 		<lsp id="myLSP">
 			<resources>
-				<carrier id="directCarrierRes">
-					<attributes>
+				<carrier id="directCarrierRes"/> <!-- Nur noch auf Id verweisen und dann Rest aus CarrierFile ziehen.-->
+<!--					<attributes>
 						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
 					</attributes>
 					<capabilities fleetSize="INFINITE">
 						<vehicles>
 							<vehicle id="directTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
 						</vehicles>
-					</capabilities>
-				</carrier>
-				<carrier id="mainCarrierRes">
-					<attributes>
-						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">mainRunCarrier</attribute>
-					</attributes>
-					<capabilities fleetSize="INFINITE">
-						<vehicles>
-							<vehicle id="mainTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
-						</vehicles>
-					</capabilities>
-				</carrier>
+					</capabilities>-->
+<!--				</carrier>-->
+				<carrier id="mainCarrierRes"/>
+<!--					<attributes>-->
+<!--						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">mainRunCarrier</attribute>-->
+<!--					</attributes>-->
+<!--					<capabilities fleetSize="INFINITE">-->
+<!--						<vehicles>-->
+<!--							<vehicle id="mainTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>-->
+<!--						</vehicles>-->
+<!--					</capabilities>-->
+<!--				</carrier>-->
 				<hub id="Hub" location="j(5,3)" fixedCost="100.0">
-					<scheduler capacityNeedFixed="10.0" capacityNeedLinear="1.0"/>
+					<scheduler capacityNeedFixed="10.0" capacityNeedLinear="1.0"/><!-- Ist das nicht eher time statt capacity?-->
 				</hub>
-				<carrier id="distributionCarrierRes">
-					<attributes>
-						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
-					</attributes>
-					<capabilities fleetSize="INFINITE">
-						<vehicles>
-							<vehicle id="distributionTruck" depotLinkId="j(5,3)" typeId="small05" earliestStart="00:00:00" latestEnd="596523:14:07"/>
-						</vehicles>
-					</capabilities>
-				</carrier>
+				<carrier id="distributionCarrierRes"/>
+                <!--					<attributes>
+                                        <attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+                                    </attributes>
+                                    <capabilities fleetSize="INFINITE">
+                                        <vehicles>
+                                            <vehicle id="distributionTruck" depotLinkId="j(5,3)" typeId="small05" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+                                        </vehicles>
+                                    </capabilities>
+                                </carrier>-->
 			</resources>
 
 			<shipments>
@@ -59,12 +59,21 @@
 					</shipmentPlans>
 				</plan>
 				<plan score="-492.33" chainId="hubSolution" selected="true">
-					<resources>
+<!--					<resources>
 						<resource id="mainCarrierRes"/>
 						<resource id="Hub"/>
 						<resource id="distributionCarrierRes"/>
-					</resources>
-					<shipmentPlans>
+					</resources>-->
+                    <logisticChains> <!--Ersetzt dann die "Ressources" -->
+                        <chain id="1">
+                            <resource id="mainCarrierRes"/>
+                            <resource id="Hub"/>
+                            <resource id="distributionCarrierRes"/>
+                        </chain> <chain id="1">
+                         <!--  #Haben wir in dem Beispiel gerade nicht -->
+                        </chain>
+                    </logisticChains>
+                    <shipmentPlans>
 						<shipmentPlan shipmentId="Shipment_1">
 							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
 							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
