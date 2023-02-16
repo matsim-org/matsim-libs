@@ -26,6 +26,7 @@ public class LinkProperties {
 	 * @see #calculateSpeedIfSpeedTag(double)
 	 */
 	public static final double DEFAULT_FREESPEED_FACTOR = 0.9;
+	// This was calibrated by CR against OD travel times from here.com.  Probably during day excluding rush hour.
 
 	/**
 	 * Increase lane capacity for links shorter than this value, assuming they are crossing.

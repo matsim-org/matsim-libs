@@ -35,11 +35,17 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.AbortHandler;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.modal.AbstractModalQSimModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -135,12 +141,60 @@ public class RunDrtExampleIT {
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
-				.rejectionRate(0.0)
-				.rejections(1)
-				.waitAverage(305.97)
-				.inVehicleTravelTimeMean(378.18)
-				.totalTravelTimeMean(684.16)
-				.build();
+					 .rejectionRate(0.0)
+					 .rejections(1)
+					 .waitAverage(305.97)
+					 .inVehicleTravelTimeMean(378.18)
+					 .totalTravelTimeMean(684.16)
+					 .build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+	@Test
+	public void testAbortHandler() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+//		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			//relatively high max age to prevent rejections
+//			var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
+//			drtRequestInsertionRetryParams.maxRequestAge = 7200;
+//			drtCfg.addParameterSet(drtRequestInsertionRetryParams);
+//		}
+		// I don't know what the above does; might be useful to understand.
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		final Controler controler = DrtControlerCreator.createControler( config, false );
+
+		controler.addOverridingQSimModule( new AbstractModalQSimModule<>(){
+			@Override protected void configureQSim(){
+				this.addQSimComponentBinding( "send drt abort to teleportation" ).toInstance( new AbortHandler(){
+					@Override public boolean handleAbort( MobsimAgent agent ){
+						if ( agent.getMode().equals( "drt" ) ) {
+							agent.setMode("teleportedDrt");
+							// this needs to be inserted properly, i.e. using within-day replanning.  :-(
+							// for this, need to find out if we are IN the leg, or already AFTER it.  Maybe the clean way
+							// would be to insert an interaction activity?
+							WithinDayAgentUtils.???
+						}
+						return true;
+					}
+				} );
+			}
+		} );
+
+		controler.run();
+
+		var expectedStats = Stats.newBuilder()
+					 .rejectionRate(0.0)
+					 .rejections(1)
+					 .waitAverage(305.97)
+					 .inVehicleTravelTimeMean(378.18)
+					 .totalTravelTimeMean(684.16)
+					 .build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}

@@ -124,6 +124,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private final MobsimListenerManager listenerManager;
 	private final Scenario scenario;
 	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
+	private final List<AbortHandler> abortHandlers = new ArrayList<>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 	private final org.matsim.core.mobsim.qsim.AgentCounter agentCounter;
 	private final Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
@@ -464,6 +465,12 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 			this.arrangeAgentDeparture(agent);
 			break ;
 		case ABORT:
+			for( AbortHandler abortHandler : this.abortHandlers ) {
+				if ( abortHandler.handleAbort( agent ) ) {
+					return;
+				}
+			}
+
 			this.events.processEvent( new PersonStuckEvent(this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode()));
 
 			// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
@@ -657,6 +664,11 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 			Gbl.assertNotNull( activityHandler );
 			this.activityHandlers.add( activityHandler );
 		}
+	}
+
+	public void addAbortHandler(AbortHandler abortHandler ) {
+		Gbl.assertNotNull( abortHandler );
+		this.abortHandlers.add( abortHandler );
 	}
 
 	/**

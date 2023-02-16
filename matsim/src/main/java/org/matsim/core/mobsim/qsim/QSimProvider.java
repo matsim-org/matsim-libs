@@ -155,6 +155,11 @@ public class QSimProvider implements Provider<QSim> {
 					log.info("Added MobsimListener " + instance.getClass());
 				}
 
+				if ( qSimComponent instanceof AbortHandler ) {
+					AbortHandler instance = (AbortHandler) qSimComponent;
+					qSim.addAbortHandler( instance );
+				}
+
 			}
 		}
 
