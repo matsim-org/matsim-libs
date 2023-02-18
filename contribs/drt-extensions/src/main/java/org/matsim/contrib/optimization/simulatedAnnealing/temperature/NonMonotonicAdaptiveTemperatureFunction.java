@@ -1,7 +1,5 @@
 package org.matsim.contrib.optimization.simulatedAnnealing.temperature;
 
-import org.matsim.contrib.optimization.simulatedAnnealing.temperature.TemperatureFunction;
-
 /**
  * @author nkuehnel
  *

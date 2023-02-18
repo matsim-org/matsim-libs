@@ -1,6 +1,8 @@
-package org.matsim.contrib.optimization.simulatedAnnealing;
+package org.matsim.contrib.optimization.simulatedAnnealing.acceptor;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.matsim.contrib.optimization.simulatedAnnealing.SimulatedAnnealing;
+import org.matsim.contrib.optimization.simulatedAnnealing.SimulatedAnnealingConfigGroup;
 import org.matsim.contrib.optimization.simulatedAnnealing.temperature.TemperatureFunction;
 import org.matsim.contrib.util.random.RandomUtils;
 import org.matsim.core.controler.IterationCounter;
@@ -47,7 +49,8 @@ public final class DefaultAnnealingAcceptor<T> implements Acceptor<T> {
 		// If the new solution is worse, calculate an acceptance probability
 		double bestCost = bestSolution == null ? Double.POSITIVE_INFINITY : bestSolution.getCost().orElse(Double.POSITIVE_INFINITY);
 		double temperature = getCurrentTemperature(currentCost, bestCost);
-		double acceptanceProbability = Math.exp((acceptedCost - currentCost) / temperature);
+
+		double acceptanceProbability = Math.exp(-(simAnCfg.k * (currentCost - acceptedCost) / temperature));
 
 		return random.nextDouble() < acceptanceProbability;
 	}
@@ -60,9 +63,12 @@ public final class DefaultAnnealingAcceptor<T> implements Acceptor<T> {
 		final double finalTemperature = simAnCfg.finalTemperature;
 
 		final int cycles = simAnCfg.nCoolingCycles;
-		final int iteration = iterationCounter.getIterationNumber();
+		final int iteration = iterationCounter.getIterationNumber() / (simAnCfg.iterationsPerTemperature * simAnCfg.iterationRatio);
+
 
 		return temperatureFunction.getTemperature(alpha, initialTemperature, finalTemperature,
 				cycles, iteration, currentCost, bestCost);
 	}
+
+
 }

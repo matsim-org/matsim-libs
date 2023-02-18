@@ -4,11 +4,12 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.contrib.optimization.simulatedAnnealing.temperature.TemperatureFunction;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+/**
+ * @author nkuehnel
+ */
 public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 
 	private final static String NAME = "simulatedAnnealing";
-
-
 
 
 	public SimulatedAnnealingConfigGroup() {
@@ -39,5 +40,23 @@ public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Final temperature Tn of the system. Should >=0.")
 	@PositiveOrZero
 	public double finalTemperature = 0;
+
+	@Parameter
+	@Comment("Number of simulated annealing iterations (!= MATSim iterations, see iterationRatio) spent at each temperature.")
+	@PositiveOrZero
+	public int iterationsPerTemperature = 3;
+
+	@Parameter
+	@Comment("Number of MATSim iterations for each simulated annealing iteration. This can make sense if other components" +
+			"of MATSim have to react to a new solution first before evaluating it (e.g., DRT rebalancing)")
+	@PositiveOrZero
+	public int iterationRatio = 1;
+
+
+	@Parameter
+	@Comment("Tuning parameter k. See https://www.intechopen.com/chapters/4631. If in doubt, set to 1.")
+	@PositiveOrZero
+	public double k = 1;
+
 
 }
