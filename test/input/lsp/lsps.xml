@@ -2,7 +2,7 @@
 	<LSPs>
 		<lsp id="myLSP">
 			<resources>
-				<carrier id="directCarrierRes"/> <!-- Nur noch auf Id verweisen und dann Rest aus CarrierFile ziehen.-->
+				<carrier id="directCarrier"/> <!-- Nur noch auf Id verweisen und dann Rest aus CarrierFile ziehen.-->
 <!--					<attributes>
 						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
 					</attributes>
@@ -12,7 +12,7 @@
 						</vehicles>
 					</capabilities>-->
 <!--				</carrier>-->
-				<carrier id="mainCarrierRes"/>
+				<carrier id="mainCarrier"/>
 <!--					<attributes>-->
 <!--						<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">mainRunCarrier</attribute>-->
 <!--					</attributes>-->
@@ -25,7 +25,7 @@
 				<hub id="Hub" location="j(5,3)" fixedCost="100.0">
 					<scheduler capacityNeedFixed="10.0" capacityNeedLinear="1.0"/><!-- Ist das nicht eher time statt capacity?-->
 				</hub>
-				<carrier id="distributionCarrierRes"/>
+				<carrier id="distributionCarrier"/>
                 <!--					<attributes>
                                         <attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
                                     </attributes>
@@ -58,20 +58,19 @@
 					<shipmentPlans>
 					</shipmentPlans>
 				</plan>
-				<plan score="-492.33" chainId="hubSolution" selected="true">
+				<plan score="-492.33" selected="true">
 <!--					<resources>
 						<resource id="mainCarrierRes"/>
 						<resource id="Hub"/>
 						<resource id="distributionCarrierRes"/>
 					</resources>-->
                     <logisticChains> <!--Ersetzt dann die "Ressources" -->
-                        <chain id="1">
+                        <logisticChain id="hubSolution">
                             <resource id="mainCarrierRes"/>
                             <resource id="Hub"/>
                             <resource id="distributionCarrierRes"/>
-                        </chain> <chain id="1">
+                        </logisticChain>
                          <!--  #Haben wir in dem Beispiel gerade nicht -->
-                        </chain>
                     </logisticChains>
                     <shipmentPlans>
 						<shipmentPlan shipmentId="Shipment_1">
