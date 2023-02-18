@@ -2,9 +2,10 @@ package lsp;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.MatsimVehicleReader;
+import org.matsim.vehicles.Vehicles;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,12 +21,20 @@ public class LSPReadWriteTest {
 
 		LSPs lsPs = new LSPs(Collections.emptyList());
 		Carriers carriers = new Carriers();
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+
+		String inputFilename = utils.getPackageInputDirectory() + "lsps.xml";
+		String outputFilename = utils.getOutputDirectory() + "/outputLsps.xml";
 
 		LSPPlanXmlReader reader = new LSPPlanXmlReader(lsPs, carriers);
-		String inputFilename = utils.getPackageInputDirectory() + "lsps.xml";
 		reader.readFile(inputFilename);
 
-		String outputFilename = utils.getOutputDirectory() + "/outputLsps.xml";
+		CarrierVehicleTypeReader vehicleTypeReader = new CarrierVehicleTypeReader(carrierVehicleTypes);
+		vehicleTypeReader.readFile(utils.getPackageInputDirectory() + "vehicles.xml");
+
+		CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, carrierVehicleTypes);
+		carrierReader.readFile(utils.getPackageInputDirectory() + "carriers.xml");
+
 		new LSPPlanXmlWriter(lsPs).write(outputFilename);
 
 		MatsimTestUtils.assertEqualFilesLineByLine(inputFilename, outputFilename);
