@@ -79,26 +79,8 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 			}
 			if (resource instanceof LSPCarrierResource carrierResource) {
 				writer.write("\t\t\t\t<carrier ");
-				writer.write("id=\"" + carrierResource.getId() + "\">\n");
-				attributesWriter.writeAttributes("\t\t\t\t\t", writer, carrierResource.getCarrier().getAttributes());
-				writer.write("\t\t\t\t\t<capabilities fleetSize=\"" + carrierResource.getCarrier().getCarrierCapabilities().getFleetSize() + "\">\n");
-				writer.write("\t\t\t\t\t\t<vehicles>\n");
-				for (CarrierVehicle v : carrierResource.getCarrier().getCarrierCapabilities().getCarrierVehicles().values()) {
-					Id<VehicleType> vehicleTypeId = v.getVehicleTypeId();
-					if(vehicleTypeId == null) vehicleTypeId = v.getType() == null ? null : v.getType().getId();
-					if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-					writer.write("\t\t\t\t\t\t\t<vehicle id=\"" + v.getId()
-							+ "\" depotLinkId=\"" + v.getLinkId()
-							+ "\" typeId=\"" + vehicleTypeId
-							+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
-							+ "\" latestEnd=\"" + getTime(v.getLatestEndTime())
-							+ "\"/>\n");
+				writer.write("id=\"" + carrierResource.getId() + "\"/>\n");
 				}
-				writer.write("\t\t\t\t\t\t</vehicles>\n");
-				writer.write("\t\t\t\t\t</capabilities>\n");
-				writer.write("\t\t\t\t</carrier>\n");
-				}
-
 			}
 		writer.write("\t\t\t</resources>\n\n");
 	}
@@ -137,9 +119,6 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 			writer.write("\t\t\t\t<plan");
 			if (plan.getScore() != null) {
 				writer.write(" score=\"" + plan.getScore() + "\"");
-				for (LogisticChain chain : plan.getLogisticChain()) {
-					writer.write(" chainId=\"" + chain.getId() + "\"");
-				}
 			}
 			if (lsp.getSelectedPlan() != null) {
 				if (plan == lsp.getSelectedPlan()) {
@@ -152,14 +131,15 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 			}
 			writer.write(">\n");
 
+			writer.write("\t\t\t\t\t<logisticChains>\n");
 			for (LogisticChain logisticChain : plan.getLogisticChain()) {
-				writer.write("\t\t\t\t\t<resources>\n");
+				writer.write("\t\t\t\t\t\t<logisticChain id=\"" + logisticChain.getId() + "\">\n");
 				for (LogisticChainElement chainElement : logisticChain.getLogisticChainElements()) {
-					writer.write("\t\t\t\t\t\t<resource id=\"" + chainElement.getResource().getId() + "\"/>\n");
+					writer.write("\t\t\t\t\t\t\t<resource id=\"" + chainElement.getResource().getId() + "\"/>\n");
 				}
-				writer.write("\t\t\t\t\t</resources>\n");
+				writer.write("\t\t\t\t\t\t</logisticChain>\n");
+				writer.write("\t\t\t\t\t</logisticChains>\n");
 				writer.write("\t\t\t\t\t<shipmentPlans>\n");
-				if (plan == lsp.getSelectedPlan()) {
 					for (LSPShipment shipment : logisticChain.getShipments()) {
 						writer.write("\t\t\t\t\t\t<shipmentPlan shipmentId=\"" + shipment.getId() + "\">\n");
 						for (var elementId : shipment.getShipmentPlan().getPlanElements().keySet()) {
@@ -172,7 +152,6 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 						}
 						writer.write("\t\t\t\t\t\t</shipmentPlan>\n");
 					}
-				}
 				writer.write("\t\t\t\t\t</shipmentPlans>\n");
 			}
 			writer.write("\t\t\t\t</plan>\n");
