@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<carriers>
+		<carrier id="directCarrier">
+			<attributes>
+				<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+			</attributes>
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="directTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+				</vehicles>
+			</capabilities>
+		</carrier>
+
+		<carrier id="mainCarrier">
+			<attributes>
+				<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">mainRunCarrier</attribute>
+			</attributes>
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="mainTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+				</vehicles>
+			</capabilities>
+		</carrier>
+
+		<carrier id="distributionCarrier">
+			<attributes>
+				<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+			</attributes>
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="distributionTruck" depotLinkId="j(5,3)" typeId="small05" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+				</vehicles>
+			</capabilities>
+		</carrier>
+	</carriers>
