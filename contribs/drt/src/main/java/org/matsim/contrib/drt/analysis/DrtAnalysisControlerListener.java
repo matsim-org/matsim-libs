@@ -163,7 +163,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					"toY",//
 					"waitTime",//
 					"arrivalTime",//
-					"travelTime",//
+					"inVehicleTravelTime",//
 					"travelDistance_m",//
 					"directTravelDistance_m",//
 					"fareForLeg", //
