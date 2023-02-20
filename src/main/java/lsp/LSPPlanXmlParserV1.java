@@ -53,6 +53,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 		this.carriers = carriers;
 	}
 
+	// TODO: tags an neue lsp.xml Strukutr anpassen, es kann mehrere LogisticChains geben! - logisticChain = null setzen
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		org.matsim.utils.objectattributes.attributable.Attributes currAttributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
@@ -66,6 +68,12 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 						.build();
 				break;
 			}
+			case CARRIER -> {
+				String carrierId = atts.getValue(ID);
+				Gbl.assertNotNull(carrierId);
+				currentCarrier = carriers.getCarriers().get(Id.create(carrierId, Carrier.class));
+				break;
+			}
 			case HUB -> {
 				currentHubId = atts.getValue(ID);
 				Gbl.assertNotNull(currentHubId);
@@ -73,6 +81,17 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				Gbl.assertNotNull(currentHubLocation);
 				currentHubFixedCost = Double.parseDouble(atts.getValue(FIXED_COST));
 				Gbl.assertNotNull(currentHubFixedCost);
+				break;
+			}
+			case CAPABILITIES -> {
+				String fleetSize = atts.getValue(FLEET_SIZE);
+				Gbl.assertNotNull(fleetSize);
+				this.capabilityBuilder = CarrierCapabilities.Builder.newInstance();
+				if (fleetSize.toUpperCase().equals(CarrierCapabilities.FleetSize.FINITE.toString())) {
+					this.capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.FINITE);
+				} else {
+					this.capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+				}
 				break;
 			}
 			case SCHEDULER -> {
@@ -86,15 +105,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 						.build();
 				break;
 			}
-			case CARRIER -> {
-				String carrierId = atts.getValue(ID);
-				Gbl.assertNotNull(carrierId);
-				currentCarrier = CarrierUtils.createCarrier(Id.create(carrierId, Carrier.class));
-				break;
-			}
 			case ATTRIBUTES -> {
 				switch (context.peek()) {
-					case CARRIER -> currAttributes = currentCarrier.getAttributes();
 					case SHIPMENT -> currAttributes = currentShipment.getAttributes();
 					case LSP -> currAttributes = currentLsp.getAttributes();
 					default ->
@@ -107,17 +119,6 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				currAttributes = currentCarrier.getAttributes();
 				Gbl.assertNotNull(currAttributes);
 				attributesReader.startTag(name, atts, context, currAttributes);
-				break;
-			}
-			case CAPABILITIES -> {
-				String fleetSize = atts.getValue(FLEET_SIZE);
-				Gbl.assertNotNull(fleetSize);
-				this.capabilityBuilder = CarrierCapabilities.Builder.newInstance();
-				if (fleetSize.toUpperCase().equals(CarrierCapabilities.FleetSize.FINITE.toString())) {
-					this.capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.FINITE);
-				} else {
-					this.capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-				}
 				break;
 			}
 			case VEHICLE -> {
@@ -253,7 +254,6 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				planElements.put(elementId, planElement);
 				break;
 			}
-
 		}
 	}
 
@@ -273,7 +273,6 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 					Gbl.assertNotNull(currentCarrier);
 					Gbl.assertNotNull(carriers);
 					Gbl.assertNotNull(carriers.getCarriers());
-					carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 					LSPResource lspResource = null;
 					switch (UsecaseUtils.getCarrierType(currentCarrier)) {
 
