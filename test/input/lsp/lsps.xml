@@ -2,12 +2,12 @@
 	<LSPs>
 		<lsp id="myLSP">
 			<resources>
-				<carrier id="directCarrierRes"/>
-				<carrier id="mainCarrierRes"/>
+				<carrier id="directCarrier"/>
+				<carrier id="mainCarrier"/>
 				<hub id="Hub" location="j(5,3)" fixedCost="100.0">
 					<scheduler capacityNeedFixed="10.0" capacityNeedLinear="1.0"/>
 				</hub>
-				<carrier id="distributionCarrierRes"/>
+				<carrier id="distributionCarrier"/>
 			</resources>
 
 			<shipments>
@@ -27,7 +27,7 @@
 				<plan score="-1476.2" selected="false">
 					<logisticChains>
 						<logisticChain id="directSolution">
-							<resource id="directCarrierRes"/>
+							<resource id="directCarrier"/>
 						</logisticChain>
 					</logisticChains>
 					<shipmentPlans>
@@ -126,9 +126,9 @@
 				<plan score="-492.33" selected="true">
 					<logisticChains>
 						<logisticChain id="hubSolution">
-							<resource id="mainCarrierRes"/>
+							<resource id="mainCarrier"/>
 							<resource id="Hub"/>
-							<resource id="distributionCarrierRes"/>
+							<resource id="distributionCarrier"/>
 						</logisticChain>
 					</logisticChains>
 					<shipmentPlans>
