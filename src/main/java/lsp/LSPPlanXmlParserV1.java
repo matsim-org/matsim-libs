@@ -184,11 +184,13 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			case PLAN -> {
 				score = Double.valueOf(atts.getValue(SCORE));
 				Gbl.assertNotNull(score);
-				chainId = atts.getValue(CHAIN_ID);
-				Gbl.assertNotNull(chainId);
 				selected = atts.getValue(SELECTED);
 				Gbl.assertNotNull(selected);
 				break;
+			}
+			case LOGISTIC_CHAIN -> {
+				chainId = atts.getValue(ID);
+				Gbl.assertNotNull(chainId);
 			}
 			case RESOURCES -> {
 				break;
