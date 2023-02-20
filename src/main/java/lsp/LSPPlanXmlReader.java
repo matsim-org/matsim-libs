@@ -23,7 +23,7 @@ public final class LSPPlanXmlReader implements MatsimReader {
 
 	public void readFile(String filename) {
 		try {
-			this.parser.setValidating(false );
+			this.parser.setValidating(true );
 			this.parser.readFile(filename );
 		} catch (Exception e) {
 			log.warn("### Exception found while trying to read LSPPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
@@ -68,8 +68,7 @@ public final class LSPPlanXmlReader implements MatsimReader {
 			if (LSPConstants.LSPS.equalsIgnoreCase(name)) {
 				String str = attributes.getValue("xsi:schemaLocation");
 				log.info("Found following schemeLocation in lsPs definition file: " + str);
-				if (str == null) {
-					log.warn("LSP plans file does not contain a valid xsd header. Using LSPPlanXmlParser.");
+				if (str.contains( "lspsDefinitions_v1.0.xsd")) {
 					delegate = new LSPPlanXmlParserV1(lsPs, carriers);
 				} else {
 					throw new RuntimeException("no reader found for " + str);
