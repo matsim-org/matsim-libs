@@ -201,17 +201,15 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 
-		Id<LSPResource> distributionResourceId = Id.create("DistributionCarrierResource", LSPResource.class);
-		UsecaseUtils.DistributionCarrierResourceBuilder distributionResourceBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionResourceId, network);
-		distributionResourceBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		distributionResourceBuilder.setCarrier(distributionCarrier);
-		distributionResourceBuilder.setLocationLinkId(distributionLinkId);
-		distributionResource = distributionResourceBuilder.build();
+		distributionResource  = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+				.setLocationLinkId(distributionLinkId)
+				.build();
 
 		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder distributionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(distributionElementId);
-		distributionBuilder.setResource(distributionResource);
-		distributionElement = distributionBuilder.build();
+		distributionElement = LSPUtils.LogisticChainElementBuilder.newInstance(distributionElementId)
+				.setResource(distributionResource)
+				.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);
 		firstHubElement.connectWithNextElement(mainRunElement);
@@ -219,13 +217,13 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		secondHubElement.connectWithNextElement(distributionElement);
 
 		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
-		completeSolutionBuilder.addLogisticChainElement(collectionElement);
-		completeSolutionBuilder.addLogisticChainElement(firstHubElement);
-		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
-		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
-		completeSolutionBuilder.addLogisticChainElement(distributionElement);
-		LogisticChain completeSolution = completeSolutionBuilder.build();
+		LogisticChain completeSolution = LSPUtils.LogisticChainBuilder.newInstance(solutionId)
+				.addLogisticChainElement(collectionElement)
+				.addLogisticChainElement(firstHubElement)
+				.addLogisticChainElement(mainRunElement)
+				.addLogisticChainElement(secondHubElement)
+				.addLogisticChainElement(distributionElement)
+				.build();
 
 		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();

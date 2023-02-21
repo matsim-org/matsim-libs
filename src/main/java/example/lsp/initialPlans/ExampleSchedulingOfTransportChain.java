@@ -201,9 +201,7 @@ import java.util.Random;
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 		//The distribution adapter i.e. the Resource is created
-		Id<LSPResource> distributionResourceId = Id.create("DistributionCarrierResource", LSPResource.class);
-		UsecaseUtils.DistributionCarrierResourceBuilder distributionResourceBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionResourceId, network);
-		distributionResourceBuilder.setCarrier(distributionCarrier);
+		UsecaseUtils.DistributionCarrierResourceBuilder distributionResourceBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network);
 		distributionResourceBuilder.setLocationLinkId(distributionLinkId);
 
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.

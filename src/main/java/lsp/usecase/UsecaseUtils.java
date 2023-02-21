@@ -233,27 +233,22 @@ public class UsecaseUtils {
 		Id<Link> locationLinkId;
 		DistributionCarrierScheduler distributionHandler;
 
-		private DistributionCarrierResourceBuilder(Id<LSPResource> id, Network network) {
-			this.id = id;
+		private DistributionCarrierResourceBuilder(Carrier carrier, Network network) {
+			this.id = Id.create(carrier.getId().toString(), LSPResource.class);
+			setCarrierType(carrier, CARRIER_TYPE.distributionCarrier);
+			this.carrier = carrier;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
 		}
 
-		public static DistributionCarrierResourceBuilder newInstance(Id<LSPResource> id, Network network) {
-			return new DistributionCarrierResourceBuilder(id, network);
+		public static DistributionCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
+			return new DistributionCarrierResourceBuilder(carrier, network);
 		}
 
 		public DistributionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
 			this.locationLinkId = locationLinkId;
 			return this;
 		}
-
-		public DistributionCarrierResourceBuilder setCarrier(Carrier carrier) {
-			setCarrierType(carrier, CARRIER_TYPE.distributionCarrier);
-			this.carrier = carrier;
-			return this;
-		}
-
 
 		public DistributionCarrierResourceBuilder setDistributionScheduler(DistributionCarrierScheduler distributionCarrierScheduler) {
 			this.distributionHandler = distributionCarrierScheduler;

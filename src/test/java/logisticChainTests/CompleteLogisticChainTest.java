@@ -24,6 +24,7 @@ import lsp.LSPResource;
 import lsp.LSPUtils;
 import lsp.LogisticChain;
 import lsp.LogisticChainElement;
+
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,7 +71,7 @@ public class CompleteLogisticChainTest {
 		collectionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		collectionVehicleTypeBuilder.setFixCost(49);
 		collectionVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType collectionType = collectionVehicleTypeBuilder.build();
+		VehicleType collectionType = collectionVehicleTypeBuilder.build();
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
@@ -106,28 +107,25 @@ public class CompleteLogisticChainTest {
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
 
 		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId,
-				firstTransshipmentHub_LinkId, scenario);
-		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
+				firstTransshipmentHub_LinkId, scenario)
+				.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 
-		Id<LogisticChainElement> firstHubElementId = Id.create("FiretHubElement",
-				LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder firstHubElementBuilder = LSPUtils.LogisticChainElementBuilder
-				.newInstance(firstHubElementId);
-		firstHubElementBuilder.setResource(firstTransshipmentHubBuilder.build());
-		firstHubElement = firstHubElementBuilder.build();
+		Id<LogisticChainElement> firstHubElementId = Id.create("FirstHubElement", LogisticChainElement.class);
+		firstHubElement = LSPUtils.LogisticChainElementBuilder
+				.newInstance(firstHubElementId)
+				.setResource(firstTransshipmentHubBuilder.build())
+				.build();
 
-		CarrierVehicleType.Builder mainRunVehicleTypeBuilder = CarrierVehicleType.Builder
-				.newInstance(collectionVehicleTypeId);
-		mainRunVehicleTypeBuilder.setCapacity(30);
-		mainRunVehicleTypeBuilder.setCostPerDistanceUnit(0.0002);
-		mainRunVehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		mainRunVehicleTypeBuilder.setFixCost(120);
-		mainRunVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType mainRunType = collectionVehicleTypeBuilder.build();
+		VehicleType mainRunType  = CarrierVehicleType.Builder
+				.newInstance(collectionVehicleTypeId)
+				.setCapacity(30)
+				.setCostPerDistanceUnit(0.0002)
+				.setCostPerTimeUnit(0.38)
+				.setFixCost(120).setMaxVelocity(50 / 3.6)
+				.build();
 
-		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
-		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId, mainRunType);
+		final Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
+		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("MainRunVehicle"), fromLinkId, mainRunType);
 
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		mainRunCapabilitiesBuilder.addType(mainRunType);
@@ -178,7 +176,7 @@ public class CompleteLogisticChainTest {
 		dsitributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		dsitributionVehicleTypeBuilder.setFixCost(49);
 		dsitributionVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
+		VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
 
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
@@ -192,19 +190,17 @@ public class CompleteLogisticChainTest {
 		Carrier carrier = CarrierUtils.createCarrier(distributionCarrierId);
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
-		Id<LSPResource> distributionResourceId = Id.create("DistributionCarrierResource", LSPResource.class);
-		UsecaseUtils.DistributionCarrierResourceBuilder distributionResourceBuilder = UsecaseUtils.DistributionCarrierResourceBuilder
-				.newInstance(distributionResourceId, network);
-		distributionResourceBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		distributionResourceBuilder.setCarrier(carrier);
-		distributionResourceBuilder.setLocationLinkId(distributionLinkId);
+		final LSPResource distributionCarrierResource = UsecaseUtils.DistributionCarrierResourceBuilder
+				.newInstance(carrier, network)
+				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+				.setLocationLinkId(distributionLinkId)
+				.build();
 
-		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement",
-				LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder distributionBuilder = LSPUtils.LogisticChainElementBuilder
-				.newInstance(distributionElementId);
-		distributionBuilder.setResource(distributionResourceBuilder.build());
-		distributionElement = distributionBuilder.build();
+		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement", LogisticChainElement.class);
+		distributionElement = LSPUtils.LogisticChainElementBuilder
+				.newInstance(distributionElementId)
+				.setResource(distributionCarrierResource)
+				.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);
 		firstHubElement.connectWithNextElement(mainRunElement);
