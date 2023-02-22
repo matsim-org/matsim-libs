@@ -131,7 +131,7 @@ public class UsecaseUtils {
 	 * Maybe the log will get removed soon. kmt sep/oct'22
 	 *
 	 * @param outputDir path, defining the location for the results
-	 * @param lsp the LSP, for whcih the results should be written out.
+	 * @param lsp the LSP, for which the results should be written out.
 	 */
 	public static void printResults_shipmentLog(String outputDir, LSP lsp) {
 		System.out.println("Writing out shipmentLog for LSP");
