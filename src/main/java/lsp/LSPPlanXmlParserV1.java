@@ -144,7 +144,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				Gbl.assertNotNull(to);
 				String sizeString = atts.getValue(SIZE);
 				Gbl.assertNotNull(sizeString);
-				int size = getInt(sizeString);
+				int size = Integer.parseInt(sizeString);
 				ShipmentUtils.LSPShipmentBuilder shipmentBuilder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 
 				shipmentBuilder.setFromLinkId(Id.createLinkId(from));
@@ -361,7 +361,6 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			}
 		}
 
-
 	private double parseTimeToDouble (String timeString){
 		if (timeString.contains(":")) {
 			return Time.parseTime(timeString);
@@ -369,10 +368,5 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			return Double.parseDouble(timeString);
 		}
 	}
-
-	private int getInt (String value){
-		return Integer.parseInt(value);
-	}
-
 
 }
