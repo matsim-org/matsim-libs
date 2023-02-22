@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<lspsDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/lspsDefinitions_v1.xsd">
+
 	<LSPs>
 		<lsp id="myLSP">
 			<resources>
-				<carrier id="directCarrier"/>
-				<carrier id="mainCarrier"/>
+				<carrier id="directCarrierRes"/>
+				<carrier id="mainCarrierRes"/>
 				<hub id="Hub" location="j(5,3)" fixedCost="100.0">
 					<scheduler capacityNeedFixed="10.0" capacityNeedLinear="1.0"/>
 				</hub>
-				<carrier id="distributionCarrier"/>
+				<carrier id="distributionCarrierRes"/>
 			</resources>
 
 			<shipments>
@@ -27,7 +30,7 @@
 				<plan score="-1476.2" selected="false">
 					<logisticChains>
 						<logisticChain id="directSolution">
-							<resource id="directCarrier"/>
+							<resource id="directCarrierRes"/>
 						</logisticChain>
 					</logisticChains>
 					<shipmentPlans>
@@ -126,9 +129,9 @@
 				<plan score="-492.33" selected="true">
 					<logisticChains>
 						<logisticChain id="hubSolution">
-							<resource id="mainCarrier"/>
+							<resource id="mainCarrierRes"/>
 							<resource id="Hub"/>
-							<resource id="distributionCarrier"/>
+							<resource id="distributionCarrierRes"/>
 						</logisticChain>
 					</logisticChains>
 					<shipmentPlans>
@@ -228,3 +231,5 @@
 
 		</lsp>
 	</LSPs>
+
+</lspsDefinitions>
