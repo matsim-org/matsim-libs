@@ -106,20 +106,24 @@ public class UsecaseUtils {
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-				final String str1 = "Shipment: " + shipment ;
-				System.out.println(str1);
-				writer.write(str1 + "\n");
-				for (ShipmentPlanElement element : elementList) {
-					final String str2 = element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
-					System.out.println(str2);
-					writer.write(str2 + "\n");
-				}
-				System.out.println();
-				writer.write("\n");
+				writeShipmentWithPlanElements(writer, shipment, elementList);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void writeShipmentWithPlanElements(BufferedWriter writer, LSPShipment shipment, ArrayList<ShipmentPlanElement> elementList) throws IOException {
+		final String str1 = "Shipment: " + shipment ;
+		System.out.println(str1);
+		writer.write(str1 + "\n");
+		for (ShipmentPlanElement element : elementList) {
+			final String str2 = element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+			System.out.println(str2);
+			writer.write(str2 + "\n");
+		}
+		System.out.println();
+		writer.write("\n");
 	}
 
 	/**
@@ -138,16 +142,7 @@ public class UsecaseUtils {
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getLog().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-				final String str1 = "Shipment: " + shipment;
-				System.out.println(str1);
-				writer.write(str1 + "\n");
-				for (ShipmentPlanElement element : elementList) {
-					final String str2 = element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
-					System.out.println(str2);
-					writer.write(str2 + "\n");
-				}
-				System.out.println();
-				writer.write("\n");
+				writeShipmentWithPlanElements(writer, shipment, elementList);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
