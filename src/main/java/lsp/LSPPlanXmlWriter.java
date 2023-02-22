@@ -5,12 +5,8 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.usecase.TransshipmentHub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
-import org.matsim.vehicles.VehicleType;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -26,7 +22,6 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 		super();
 		this.lsPs = lsPs.getLSPs().values();
 	}
-
 
 	public void write(String filename) {
 		logger.info("write lsp");
@@ -157,10 +152,6 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 			writer.write("\t\t\t\t</plan>\n");
 		}
 		writer.write("\t\t\t</LSPPlans>\n\n");
-	}
-
-	private String getTime(double time) {
-		return Time.writeTime(time);
 	}
 
 	private void endLSP(BufferedWriter writer) throws IOException {
