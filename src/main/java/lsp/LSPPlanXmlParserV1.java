@@ -246,120 +246,120 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-			switch (name) {
-				case LSP -> {
-					Gbl.assertNotNull(currentLsp);
-					Gbl.assertNotNull(lsPs);
-					Gbl.assertNotNull(lsPs.getLSPs());
-					currentLsp.getPlans().remove(0); // hier wird initialer Plan gelöscht
-					lsPs.getLSPs().put(currentLsp.getId(), currentLsp);
-					currentLsp = null;
-				}
-				case CARRIER -> {
-					Gbl.assertNotNull(currentCarrier);
-					Gbl.assertNotNull(carriers);
-					Gbl.assertNotNull(carriers.getCarriers());
-					LSPResource lspResource;
+		switch (name) {
+			case LSP -> {
+				Gbl.assertNotNull(currentLsp);
+				Gbl.assertNotNull(lsPs);
+				Gbl.assertNotNull(lsPs.getLSPs());
+				currentLsp.getPlans().remove(0); // hier wird initialer Plan gelöscht
+				lsPs.getLSPs().put(currentLsp.getId(), currentLsp);
+				currentLsp = null;
+			}
+			case CARRIER -> {
+				Gbl.assertNotNull(currentCarrier);
+				Gbl.assertNotNull(carriers);
+				Gbl.assertNotNull(carriers.getCarriers());
+				LSPResource lspResource;
 
-					switch (UsecaseUtils.getCarrierType(currentCarrier)) {
-						case collectionCarrier -> lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-								.setCarrier(currentCarrier)
-								.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
-								.build();
-						case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-								.setCarrier(currentCarrier)
-								.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
-								.build();
-						case distributionCarrier -> lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-								.setCarrier(currentCarrier)
-								.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-								.build();
-						default -> throw new IllegalStateException("Unexpected value: " + currentCarrier.getAttributes().toString());
-					}
-					Gbl.assertNotNull(lspResource);
-					currentLsp.getResources().add(lspResource);
-					currentCarrier = null;
-				}
-				case HUB -> {
-					currentLsp.getResources().add(hubResource);
-					LSPUtils.setFixedCost(hubResource, currentHubFixedCost);
-					hubResource = null;
-					currentHubFixedCost = null;
-					currentHubLocation = null;
-					currentHubId = null;
-				}
-				case CAPABILITIES -> currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
-				case ATTRIBUTE -> attributesReader.endTag(name, content, context);
-				case SHIPMENT -> this.currentShipment = null;
-				case RESOURCES -> { //TODO: Brauchen wir das noch, wenn wir hier gar nichts machen? (22.02.23, KMT)
-					switch (context.peek()) {
-						case LSP -> {}
-						case PLAN -> {}
-						default -> throw new IllegalStateException("Unexpected value: " + context.peek());
-					}
-				}
-				case PLAN -> {
-					LSPResource resource;
-					List<LogisticChainElement> logisticChainElements = new LinkedList<>();
-
-					for (String lspResourceId : lspResourceIds) {
-						for (LSPResource currentResource : currentLsp.getResources()) {
-							if (currentResource.getId().toString().equals(lspResourceId)) {
-								resource = currentResource;
-								Gbl.assertNotNull(resource);
-								LogisticChainElement logisticChainElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("lceId", LogisticChainElement.class))
-										.setResource(resource)
-										.build();
-								logisticChainElements.add(logisticChainElement);
-							}
-						}
-					}
-
-					//create logisticChain
-					LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
-							.addLogisticChainElement(logisticChainElements.get(0))
+				switch (UsecaseUtils.getCarrierType(currentCarrier)) {
+					case collectionCarrier -> lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
+							.setCarrier(currentCarrier)
+							.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
 							.build();
-
-					for (int i = 1; i < logisticChainElements.size(); i++) { // element 0 was already added in Builder as first element.
-						logisticChainElements.get(i - 1).connectWithNextElement(logisticChainElements.get(i));
-						logisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
-					}
-
-					for (LSPShipment lspShipment : currentLsp.getShipments()) {
-						logisticChain.getShipments().add(lspShipment);
-					}
-
-					final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-
-					//create LspPlan
-					LSPPlan currentPlan = LSPUtils.createLSPPlan()
-							.addLogisticChain(logisticChain)
-							.setAssigner(singleSolutionShipmentAssigner);
-
-
-					currentPlan.setScore(score);
-					currentPlan.setLSP(currentLsp);
-					if (selected.equals("true")) {
-						currentLsp.setSelectedPlan(currentPlan);
-					} else {
-						currentLsp.addPlan(currentPlan);
-					}
-
-					lspResourceIds.clear();
+					case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
+							.setCarrier(currentCarrier)
+							.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+							.build();
+					case distributionCarrier -> lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
+							.setCarrier(currentCarrier)
+							.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+							.build();
+					default -> throw new IllegalStateException("Unexpected value: " + currentCarrier.getAttributes().toString());
 				}
-				case SHIPMENT_PLAN -> {
-					for (LSPShipment shipment : currentLsp.getShipments()) {
-						if (shipment.getId().toString().equals(shipmentPlanId)) {
-							for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
-								shipment.getShipmentPlan().addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
-							}
-						}
-					}
-					shipmentPlanId = null;
-					planElements.clear();
+				Gbl.assertNotNull(lspResource);
+				currentLsp.getResources().add(lspResource);
+				currentCarrier = null;
+			}
+			case HUB -> {
+				currentLsp.getResources().add(hubResource);
+				LSPUtils.setFixedCost(hubResource, currentHubFixedCost);
+				hubResource = null;
+				currentHubFixedCost = null;
+				currentHubLocation = null;
+				currentHubId = null;
+			}
+			case CAPABILITIES -> currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
+			case ATTRIBUTE -> attributesReader.endTag(name, content, context);
+			case SHIPMENT -> this.currentShipment = null;
+			case RESOURCES -> { //TODO: Brauchen wir das noch, wenn wir hier gar nichts machen? (22.02.23, KMT)
+				switch (context.peek()) {
+					case LSP -> {}
+					case PLAN -> {}
+					default -> throw new IllegalStateException("Unexpected value: " + context.peek());
 				}
 			}
+			case PLAN -> {
+				LSPResource resource;
+				List<LogisticChainElement> logisticChainElements = new LinkedList<>();
+
+				for (String lspResourceId : lspResourceIds) {
+					for (LSPResource currentResource : currentLsp.getResources()) {
+						if (currentResource.getId().toString().equals(lspResourceId)) {
+							resource = currentResource;
+							Gbl.assertNotNull(resource);
+							LogisticChainElement logisticChainElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("lceId", LogisticChainElement.class))
+									.setResource(resource)
+									.build();
+							logisticChainElements.add(logisticChainElement);
+						}
+					}
+				}
+
+				//create logisticChain
+				LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
+						.addLogisticChainElement(logisticChainElements.get(0))
+						.build();
+
+				for (int i = 1; i < logisticChainElements.size(); i++) { // element 0 was already added in Builder as first element.
+					logisticChainElements.get(i - 1).connectWithNextElement(logisticChainElements.get(i));
+					logisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
+				}
+
+				for (LSPShipment lspShipment : currentLsp.getShipments()) {
+					logisticChain.getShipments().add(lspShipment);
+				}
+
+				final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+
+				//create LspPlan
+				LSPPlan currentPlan = LSPUtils.createLSPPlan()
+						.addLogisticChain(logisticChain)
+						.setAssigner(singleSolutionShipmentAssigner);
+
+
+				currentPlan.setScore(score);
+				currentPlan.setLSP(currentLsp);
+				if (selected.equals("true")) {
+					currentLsp.setSelectedPlan(currentPlan);
+				} else {
+					currentLsp.addPlan(currentPlan);
+				}
+
+				lspResourceIds.clear();
+			}
+			case SHIPMENT_PLAN -> {
+				for (LSPShipment shipment : currentLsp.getShipments()) {
+					if (shipment.getId().toString().equals(shipmentPlanId)) {
+						for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
+							shipment.getShipmentPlan().addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
+						}
+					}
+				}
+				shipmentPlanId = null;
+				planElements.clear();
+			}
 		}
+	}
 
 	private double parseTimeToDouble (String timeString){
 		if (timeString.contains(":")) {

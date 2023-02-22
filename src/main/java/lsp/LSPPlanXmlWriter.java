@@ -80,8 +80,8 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 			if (resource instanceof LSPCarrierResource carrierResource) {
 				writer.write("\t\t\t\t<carrier ");
 				writer.write("id=\"" + carrierResource.getId() + "\"/>\n");
-				}
 			}
+		}
 		writer.write("\t\t\t</resources>\n\n");
 	}
 
@@ -140,18 +140,18 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 				writer.write("\t\t\t\t\t\t</logisticChain>\n");
 				writer.write("\t\t\t\t\t</logisticChains>\n");
 				writer.write("\t\t\t\t\t<shipmentPlans>\n");
-					for (LSPShipment shipment : logisticChain.getShipments()) {
-						writer.write("\t\t\t\t\t\t<shipmentPlan shipmentId=\"" + shipment.getId() + "\">\n");
-						for (var elementId : shipment.getShipmentPlan().getPlanElements().keySet()) {
-							writer.write("\t\t\t\t\t\t\t<element id=\"" + elementId.toString() + "\" ");
-							ShipmentPlanElement element = shipment.getShipmentPlan().getPlanElements().get(elementId);
-							writer.write("type=\"" + element.getElementType() + "\" ");
-							writer.write("startTime=\"" + element.getStartTime() + "\" ");
-							writer.write("endTime=\"" + element.getEndTime() + "\" ");
-							writer.write("resourceId=\"" + element.getResourceId() + "\"/>\n");
-						}
-						writer.write("\t\t\t\t\t\t</shipmentPlan>\n");
+				for (LSPShipment shipment : logisticChain.getShipments()) {
+					writer.write("\t\t\t\t\t\t<shipmentPlan shipmentId=\"" + shipment.getId() + "\">\n");
+					for (var elementId : shipment.getShipmentPlan().getPlanElements().keySet()) {
+						writer.write("\t\t\t\t\t\t\t<element id=\"" + elementId.toString() + "\" ");
+						ShipmentPlanElement element = shipment.getShipmentPlan().getPlanElements().get(elementId);
+						writer.write("type=\"" + element.getElementType() + "\" ");
+						writer.write("startTime=\"" + element.getStartTime() + "\" ");
+						writer.write("endTime=\"" + element.getEndTime() + "\" ");
+						writer.write("resourceId=\"" + element.getResourceId() + "\"/>\n");
 					}
+					writer.write("\t\t\t\t\t\t</shipmentPlan>\n");
+				}
 				writer.write("\t\t\t\t\t</shipmentPlans>\n");
 			}
 			writer.write("\t\t\t\t</plan>\n");
