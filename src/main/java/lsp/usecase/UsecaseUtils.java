@@ -185,27 +185,22 @@ public class UsecaseUtils {
 		Id<Link> locationLinkId;
 		CollectionCarrierScheduler collectionScheduler;
 
-		private CollectionCarrierResourceBuilder(Id<LSPResource> id, Network network) {
-			this.id = id;
+		private CollectionCarrierResourceBuilder(Carrier carrier, Network network) {
+			this.id = Id.create(this.carrier.getId().toString(), LSPResource.class);
+			setCarrierType(this.carrier, CARRIER_TYPE.collectionCarrier);
+			this.carrier = carrier;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
 		}
 
-		public static CollectionCarrierResourceBuilder newInstance(Id<LSPResource> id, Network network) {
-			return new CollectionCarrierResourceBuilder(id, network);
+		public static CollectionCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
+			return new CollectionCarrierResourceBuilder(carrier, network);
 		}
 
 		public CollectionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
 			this.locationLinkId = locationLinkId;
 			return this;
 		}
-
-		public CollectionCarrierResourceBuilder setCarrier(Carrier carrier) {
-			setCarrierType(carrier, CARRIER_TYPE.collectionCarrier);
-			this.carrier = carrier;
-			return this;
-		}
-
 
 		public CollectionCarrierResourceBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler) {
 			this.collectionScheduler = collectionCarrierScheduler;
@@ -215,7 +210,6 @@ public class UsecaseUtils {
 		public CollectionCarrierResource build() {
 			return new CollectionCarrierResource(this);
 		}
-
 	}
 
 

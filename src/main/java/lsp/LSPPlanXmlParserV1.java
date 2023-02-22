@@ -276,20 +276,16 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 					carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 					LSPResource lspResource = null;
 					switch (UsecaseUtils.getCarrierType(currentCarrier)) {
-
 						case collectionCarrier -> {
-							lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-									.setCarrier(currentCarrier)
+							lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(currentCarrier, null)
 									.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
 									.build();
-
 						}
 						case mainRunCarrier -> {
 							lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
 									.setCarrier(currentCarrier)
 									.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 									.build();
-
 						}
 						case distributionCarrier -> {
 							lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(currentCarrier, null)

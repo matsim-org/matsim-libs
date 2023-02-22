@@ -60,7 +60,7 @@ import java.util.Random;
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
 		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType collectionType = vehicleTypeBuilder.build();
+		VehicleType collectionType = vehicleTypeBuilder.build();
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
@@ -76,21 +76,15 @@ import java.util.Random;
 		collectionCarrier.setCarrierCapabilities(capabilities);
 
 		//The collection adapter i.e. the Resource is created
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
-
-		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
-		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(collectionCarrier);
-		adapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionResource = adapterBuilder.build();
+		LSPResource collectionResource  = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
-		collectionElementBuilder.setResource(collectionResource);
-		LogisticChainElement collectionElement = collectionElementBuilder.build();
-
+		LogisticChainElement collectionElement= LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(collectionResource)
+				.build();
 
 		//The first reloading adapter i.e. the Resource is created
 		Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
@@ -114,46 +108,42 @@ import java.util.Random;
 
 
 		//The Carrier for the main run Resource is created
-		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
-		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder mainRunVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(mainRunVehicleTypeId);
-		mainRunVehicleTypeBuilder.setCapacity(30);
-		mainRunVehicleTypeBuilder.setCostPerDistanceUnit(0.0002);
-		mainRunVehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		mainRunVehicleTypeBuilder.setFixCost(120);
-		mainRunVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType mainRunType = mainRunVehicleTypeBuilder.build();
-
+		final Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
+		final Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
+		final VehicleType mainRunType = CarrierVehicleType.Builder.newInstance(mainRunVehicleTypeId)
+				.setCapacity(30)
+				.setCostPerDistanceUnit(0.0002)
+				.setCostPerTimeUnit(0.38)
+				.setFixCost(120)
+				.setMaxVelocity(50 / 3.6)
+				.build();
 
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
 		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId, mainRunType);
 
-		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		mainRunCapabilitiesBuilder.addType(mainRunType);
-		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
-		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-		CarrierCapabilities mainRunCapabilities = mainRunCapabilitiesBuilder.build();
+		CarrierCapabilities mainRunCapabilities = CarrierCapabilities.Builder.newInstance()
+				.addType(mainRunType)
+				.addVehicle(mainRunCarrierVehicle)
+				.setFleetSize(FleetSize.INFINITE)
+				.build();
 		Carrier mainRunCarrier = CarrierUtils.createCarrier(mainRunCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		//The adapter i.e. the main run resource is created
 		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunResourceBuilder.setCarrier(mainRunCarrier);
-
-		//The scheduler for the main run Rescource is created and added to the Resource
-		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		LSPResource mainRunResource = mainRunResourceBuilder.build();
+		LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network)
+				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
+				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
+				.setCarrier(mainRunCarrier)
+				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.build();
 
 		//The LogisticsSolutionElement for the main run Resource is created
 		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunResource);
-		LogisticChainElement mainRunElement = mainRunBuilder.build();
-
+		LogisticChainElement mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId)
+				.setResource(mainRunResource)
+				.build();
 
 		//The second reloading adapter i.e. the Resource is created       
 		Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
@@ -185,7 +175,7 @@ import java.util.Random;
 		dsitributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		dsitributionVehicleTypeBuilder.setFixCost(49);
 		dsitributionVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
+		VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
 
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
