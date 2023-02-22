@@ -2,6 +2,7 @@ package lsp;
 
 public abstract class LSPConstants {
 
+    static final String LSPS_DEFINITIONS = "lspsDefinitions";
 	static final String LSPS = "LSPs";
     static final String LSP = "lsp";
         static final String HUB = "hub";
