@@ -70,7 +70,7 @@ public class UsecaseUtils {
 	 * <p>
 	 * KMT/Jul22
 	 *
-	 * @param carrier
+	 * @param carrier the carrier
 	 * @return Collection of VehicleTypes
 	 */
 	static Collection<VehicleType> getVehicleTypeCollection(Carrier carrier) {
@@ -126,8 +126,8 @@ public class UsecaseUtils {
 	 * Prints out the log of the shipment - this is not the shipment's plan
 	 * Maybe the log will get removed soon. kmt sep/oct'22
 	 *
-	 * @param outputDir
-	 * @param lsp
+	 * @param outputDir path, defining the location for the results
+	 * @param lsp the LSP, for whcih the results should be written out.
 	 */
 	public static void printResults_shipmentLog(String outputDir, LSP lsp) {
 		System.out.println("Writing out shipmentLog for LSP");
