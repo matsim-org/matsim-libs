@@ -25,12 +25,17 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.usecase.TransshipmentHub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -39,6 +44,7 @@ import java.util.Collection;
 public class LSPPlanXmlWriter extends MatsimXmlWriter {
 
 	private static final  Logger logger = LogManager.getLogger(LSPPlanXmlWriter.class);
+
 	private final Collection<LSP> lsPs;
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 
@@ -48,22 +54,22 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 	}
 
 	public void write(String filename) {
-		logger.info("write lsp");
+		logger.info(Gbl.aboutToWrite("lsps", filename));
 		try {
-			openFile(filename);
-			writeXmlHead();
-
-			startLSPs(this.writer);
+			this.openFile(filename);
+			this.writeXmlHead();
+			this.writeRootElement();
+			this.startLSPs(this.writer);
 			for (LSP lsp : lsPs) {
-				startLSP(lsp, this.writer);
-				writeResources(lsp, this.writer);
-				writeShipments(lsp, this.writer);
-				writePlans(lsp, this.writer);
-				endLSP(this.writer);
+				this.startLSP(lsp, this.writer);
+				this.writeResources(lsp, this.writer);
+				this.writeShipments(lsp, this.writer);
+				this.writePlans(lsp, this.writer);
+				this.endLSP(this.writer);
 			}
-			endLSPs(this.writer);
-
-			close();
+			this.endLSPs(this.writer);
+			this.writeEndTag(LSPConstants.LSPS_DEFINITIONS);
+			this.close();
 			logger.info("done");
 		} catch ( IOException e) {
 			e.printStackTrace();
@@ -72,15 +78,23 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 		}
 	}
 
+	private void writeRootElement() throws UncheckedIOException, IOException {
+		List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+		atts.add(createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
+		atts.add(createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
+		atts.add(createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "lspsDefinitions_v1.xsd"));
+		this.writeStartTag(LSPConstants.LSPS_DEFINITIONS, atts);
+		this.writer.write(NL);
+	}
+
 	private void startLSPs(BufferedWriter writer) throws IOException {
-		writer.write("\t<LSPs>\n");
+		writer.write("\n\t<LSPs>\n");
 	}
 
 	private void startLSP(LSP lsp, BufferedWriter writer)
 			throws IOException {
 		writer.write("\t\t<lsp id=\"" + lsp.getId() + "\">\n");
 	}
-
 
 	private void writeResources(LSP lsp, BufferedWriter writer )throws IOException {
 		if (lsp.getResources().isEmpty()) return;
