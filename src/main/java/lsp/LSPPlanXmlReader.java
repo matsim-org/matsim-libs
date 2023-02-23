@@ -85,7 +85,7 @@ public final class LSPPlanXmlReader implements MatsimReader {
 			if (LSPConstants.LSPS_DEFINITIONS.equalsIgnoreCase(name)) {
 				String str = attributes.getValue("xsi:schemaLocation");
 				log.info("Found following schemeLocation in lsPs definition file: " + str);
-				if (str.contains( "lspsDefinitions_v1.0.xsd")) {
+				if (str.contains( "lspsDefinitions_v1.xsd")) {
 					delegate = new LSPPlanXmlParserV1(lsPs, carriers);
 				} else {
 					throw new RuntimeException("no reader found for " + str);
