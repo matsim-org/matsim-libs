@@ -905,7 +905,7 @@ public class UrbanEVTests {
 
 		@Override
 		public void handleEvent(ActivityStartEvent event) {
-			if (event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)) {
+			if (event.getActType().contains( UrbanEVModule.PLUGIN_INTERACTION )) {
 				compute(plugInCntPerPerson, event);
 			} else if (!TripStructureUtils.isStageActivityType(event.getActType())) {
 				compute(normalActStarts, event);
@@ -914,7 +914,7 @@ public class UrbanEVTests {
 
 		@Override
 		public void handleEvent(ActivityEndEvent event) {
-			if (event.getActType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)) {
+			if (event.getActType().contains( UrbanEVModule.PLUGOUT_INTERACTION )) {
 				plugOutCntPerPerson.compute(event.getPersonId(), (person, list) -> {
 					if (list == null)
 						list = new ArrayList<>();

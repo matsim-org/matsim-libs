@@ -72,7 +72,9 @@ public final class FreightTourStartEvent extends AbstractFreightEvent {
 		Map<String, String> attributes = event.getAttributes();
 		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
 		Id<Carrier> carrierId = Id.create(attributes.get(ATTRIBUTE_CARRIER_ID), Carrier.class);
-		Id<Vehicle> vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), Vehicle.class);
+		Id<Vehicle> vehicleId = null;
+		if ( attributes.get(ATTRIBUTE_VEHICLE) != null ) {
+			vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), Vehicle.class);}
 		Id<Link> linkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
 		Id<Tour> tourId = Id.create(attributes.get(ATTRIBUTE_TOUR_ID), Tour.class);
 		return new FreightTourStartEvent(time, carrierId, linkId, vehicleId, tourId);
