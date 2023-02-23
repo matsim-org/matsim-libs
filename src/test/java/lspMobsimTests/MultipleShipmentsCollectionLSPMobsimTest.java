@@ -98,9 +98,8 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
+				UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
 

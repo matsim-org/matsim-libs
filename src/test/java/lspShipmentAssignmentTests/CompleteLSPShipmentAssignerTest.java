@@ -82,17 +82,14 @@ public class CompleteLSPShipmentAssignerTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionResourceId, network);
-		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionResourceBuilder.setCarrier(collectionCarrier);
-		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionResource = collectionResourceBuilder.build();
+		LSPResource collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
-		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(collectionElementId);
-		collectionBuilder.setResource(collectionResource);
-		LogisticChainElement collectionElement = collectionBuilder.build();
+		LogisticChainElement collectionElement  = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(collectionResource)
+				.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
@@ -106,7 +103,7 @@ public class CompleteLSPShipmentAssignerTest {
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 		LSPResource firstTranshipmentHubResource = firstTransshipmentHubBuilder.build();
 
-		Id<LogisticChainElement> firstHubElementId = Id.create("FiretHubElement", LogisticChainElement.class);
+		Id<LogisticChainElement> firstHubElementId = Id.create("FirstHubElement", LogisticChainElement.class);
 		LSPUtils.LogisticChainElementBuilder firstHubElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(firstHubElementId);
 		firstHubElementBuilder.setResource(firstTranshipmentHubResource);
 		LogisticChainElement firstHubElement = firstHubElementBuilder.build();
