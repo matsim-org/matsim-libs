@@ -37,6 +37,8 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 	@Positive
 	public double cellSize = 200; //[m]
 
+	// Satisfying only one criterion (max distance or travel time) is enough to be considered a neighbour.
+
 	@Parameter
 	@Comment("Max network distance from node A to node B for B to be considered a neighbor of A."
 			+ " In such cases, a network travel time from A to B is calculated and stored in the sparse travel time matrix."
@@ -46,6 +48,16 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 			+ " The unit is meters. Default value is 1000 m.")
 	@PositiveOrZero
 	public double maxNeighborDistance = 1000; //[m]
+
+	@Parameter
+	@Comment("Max network travel time from node A to node B for B to be considered a neighbor of A."
+			+ " In such cases, a network travel time from A to B is calculated and stored in the sparse travel time matrix."
+			+ " Typically, 'maxNeighborTravelTime' should correspond to a distance that are higher than 'cellSize' (e.g. 5-10 times)"
+			+ " in order to reduce the impact of imprecise zonal travel times for short distances."
+			+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
+			+ " The unit is seconds. Default value is 0 s (for backward compatibility).")
+	@PositiveOrZero
+	public double maxNeighborTravelTime = 0; //[s]
 
 	public DvrpTravelTimeMatrixParams() {
 		super(SET_NAME);
