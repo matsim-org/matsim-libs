@@ -35,7 +35,7 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("size of square cells (meters) used for computing travel time matrix." + " Default value is 200 m")
 	@Positive
-	public int cellSize = 200; //[m]
+	public double cellSize = 200; //[m]
 
 	@Parameter
 	@Comment("Max network distance from node A to node B for B to be considered a neighbor of A."
@@ -45,7 +45,7 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 			+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
 			+ " The unit is meters. Default value is 1000 m.")
 	@PositiveOrZero
-	public int maxNeighborDistance = 1000; //[m]
+	public double maxNeighborDistance = 1000; //[m]
 
 	public DvrpTravelTimeMatrixParams() {
 		super(SET_NAME);
