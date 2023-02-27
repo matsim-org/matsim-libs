@@ -24,6 +24,7 @@ package org.matsim.contrib.freight.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Tour;
@@ -63,5 +64,15 @@ public final class FreightTourEndEvent extends AbstractFreightEvent {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_TOUR_ID, this.tourId.toString());
 		return attr;
+	}
+
+	public static FreightTourEndEvent convert(GenericEvent event) {
+		Map<String, String> attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
+		Id<Carrier> carrierId = Id.create(attributes.get(ATTRIBUTE_CARRIER_ID), Carrier.class);
+		Id<Vehicle> vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), Vehicle.class);
+		Id<Link> linkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
+		Id<Tour> tourId = Id.create(attributes.get(ATTRIBUTE_TOUR_ID), Tour.class);
+		return new FreightTourEndEvent(time, carrierId, linkId, vehicleId, tourId);
 	}
 }

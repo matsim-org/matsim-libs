@@ -22,127 +22,137 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(
-        name = "noise-analysis",
-        description = "Noise analysis",
-        mixinStandardHelpOptions = true,
-        showDefaultValues = true
+		name = "noise-analysis",
+		description = "Noise analysis",
+		mixinStandardHelpOptions = true,
+		showDefaultValues = true
 )
-
 public class NoiseAnalysis implements MATSimAppCommand {
-    private static final Logger log = LogManager.getLogger(NoiseAnalysis.class);
+	private static final Logger log = LogManager.getLogger(NoiseAnalysis.class);
 
-    @CommandLine.Option(names = "--directory", description = "Path to run directory", required = true)
-    private String runDirectory;
+	@CommandLine.Option(names = "--directory", description = "Path to run directory", required = true)
+	private String runDirectory;
 
-    @CommandLine.Option(names = "--runId", description = "Pattern to match runId.", defaultValue = "")
-    private String runId;
+	@CommandLine.Option(names = "--runId", description = "Pattern to match runId.", defaultValue = "")
+	private String runId;
 
-    @CommandLine.Option(names = "--receiver-point-gap", description = "The gap between analysis points in meter",
-            defaultValue = "250")
-    private double receiverPointGap;
+	@CommandLine.Option(names = "--receiver-point-gap", description = "The gap between analysis points in meter",
+			defaultValue = "250")
+	private double receiverPointGap;
 
-    @CommandLine.Option(names = "--noise-barrier", description = "Path to the noise barrier File", defaultValue = "")
-    private String noiseBarrierFile;
+	@CommandLine.Option(names = "--noise-barrier", description = "Path to the noise barrier File", defaultValue = "")
+	private String noiseBarrierFile;
 
-    @CommandLine.Mixin
-    private CrsOptions crs = new CrsOptions();
+	@CommandLine.Mixin
+	private CrsOptions crs = new CrsOptions();
 
-    @CommandLine.Mixin
-    private ShpOptions shp = new ShpOptions();
+	@CommandLine.Mixin
+	private ShpOptions shp = new ShpOptions();
 
 
-    public static void main(String[] args) {
-        System.exit(new CommandLine(new NoiseAnalysis()).execute(args));
-    }
+	public static void main(String[] args) {
+		new NoiseAnalysis().execute(args);
+	}
 
-    @Override
-    public Integer call() throws Exception {
-        Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
-        config.global().setCoordinateSystem(crs.getInputCRS());
-        config.controler().setRunId(runId);
-        if (!runId.equals("")) {
-            config.network().setInputFile(runDirectory + "/" + runId + ".output_network.xml.gz");
-            config.plans().setInputFile(runDirectory + "/" + runId + ".output_plans.xml.gz");
-        } else {
-            config.network().setInputFile(runDirectory + "/" + runId + "output_network.xml.gz");
-            config.plans().setInputFile(runDirectory + "/" + runId + "output_plans.xml.gz");
-        }
-        config.controler().setOutputDirectory(runDirectory);
+	@Override
+	public Integer call() throws Exception {
+		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 
-        // adjust the default noise parameters
-        NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
-        noiseParameters.setReceiverPointGap(receiverPointGap);
-        noiseParameters.setConsideredActivitiesForReceiverPointGridArray(new String[]{"h", "w", "home", "work"});
-        noiseParameters.setConsideredActivitiesForDamageCalculationArray(new String[]{"h", "w", "home", "work"});
-        if (shp.getShapeFile() != null) {
-            CoordinateTransformation ct = shp.createInverseTransformation(crs.getInputCRS());
-            double maxX = Double.MIN_VALUE; // Initialization with the opposite min/max
-            double maxY = Double.MIN_VALUE;
-            double minX = Double.MAX_VALUE;
-            double minY = Double.MAX_VALUE;
-            List<Coord> coords = Arrays.stream(shp.getGeometry().getCoordinates()).
-                    map(c -> new Coord(c.x, c.y)).
-                    collect(Collectors.toList());
-            for (Coord coord : coords) {
-                ct.transform(coord);
-                double x = coord.getX();
-                double y = coord.getY();
-                if (x > maxX) {
-                    maxX = x;
-                }
+		if (crs.getInputCRS() == null || crs.getInputCRS().isBlank()) {
+			log.error("Input CRS must be set [--input-crs]");
+			return 2;
+		}
 
-                if (x < minX) {
-                    minX = x;
-                }
+		if (shp.getShapeFile() == null) {
+			log.error("Shp file is always required [--shp]");
+			return 2;
+		}
 
-                if (y > maxY) {
-                    maxY = y;
-                }
+		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 
-                if (y < minY) {
-                    minY = y;
-                }
-            }
-            noiseParameters.setReceiverPointsGridMinX(minX);
-            noiseParameters.setReceiverPointsGridMinY(minY);
-            noiseParameters.setReceiverPointsGridMaxX(maxX);
-            noiseParameters.setReceiverPointsGridMaxY(maxY);
-        }
+		config.global().setCoordinateSystem(crs.getInputCRS());
+		config.controler().setRunId(runId);
+		if (!runId.equals("")) {
+			config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
+			config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
+		} else {
+			config.network().setInputFile(runDirectory + "output_network.xml.gz");
+			config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+		}
+		config.controler().setOutputDirectory(runDirectory);
 
-        noiseParameters.setNoiseComputationMethod(NoiseConfigGroup.NoiseComputationMethod.RLS19);
+		// adjust the default noise parameters
+		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
+		noiseParameters.setReceiverPointGap(receiverPointGap);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(new String[]{"h", "w", "home", "work"});
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(new String[]{"h", "w", "home", "work"});
+		if (shp.getShapeFile() != null) {
+			CoordinateTransformation ct = shp.createInverseTransformation(crs.getInputCRS());
+			double maxX = Double.MIN_VALUE; // Initialization with the opposite min/max
+			double maxY = Double.MIN_VALUE;
+			double minX = Double.MAX_VALUE;
+			double minY = Double.MAX_VALUE;
+			List<Coord> coords = Arrays.stream(shp.getGeometry().getCoordinates()).
+					map(c -> new Coord(c.x, c.y)).
+					collect(Collectors.toList());
+			for (Coord coord : coords) {
+				ct.transform(coord);
+				double x = coord.getX();
+				double y = coord.getY();
+				if (x > maxX) {
+					maxX = x;
+				}
 
-        if (!noiseBarrierFile.equals("")){
-            noiseParameters.setNoiseBarriersSourceCRS(crs.getInputCRS());
-            noiseParameters.setConsiderNoiseBarriers(true);
-            noiseParameters.setNoiseBarriersFilePath(noiseBarrierFile);
-        }
+				if (x < minX) {
+					minX = x;
+				}
 
-        // ...
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+				if (y > maxY) {
+					maxY = y;
+				}
 
-        String outputDirectory = runDirectory + "/analysis/";
-        NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
-        noiseCalculation.run();
+				if (y < minY) {
+					minY = y;
+				}
+			}
+			noiseParameters.setReceiverPointsGridMinX(minX);
+			noiseParameters.setReceiverPointsGridMinY(minY);
+			noiseParameters.setReceiverPointsGridMaxX(maxX);
+			noiseParameters.setReceiverPointsGridMaxY(maxY);
+		}
 
-        // some processing of the output data
-        if (!outputDirectory.endsWith("/")) outputDirectory = outputDirectory + "/";
+		noiseParameters.setNoiseComputationMethod(NoiseConfigGroup.NoiseComputationMethod.RLS19);
 
-        String outputFilePath = outputDirectory + "noise-analysis/";
-        ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
-        process.run();
+		if (!noiseBarrierFile.equals("")) {
+			noiseParameters.setNoiseBarriersSourceCRS(crs.getInputCRS());
+			noiseParameters.setConsiderNoiseBarriers(true);
+			noiseParameters.setNoiseBarriersFilePath(noiseBarrierFile);
+		}
 
-        final String[] labels = {"immission", "consideredAgentUnits", "damages_receiverPoint"};
-        final String[] workingDirectories = {outputFilePath + "/immissions/", outputFilePath + "/consideredAgentUnits/", outputFilePath + "/damages_receiverPoint/"};
+		// ...
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        MergeNoiseCSVFile merger = new MergeNoiseCSVFile();
-        merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
-        merger.setOutputDirectory(outputFilePath);
-        merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
-        merger.setWorkingDirectory(workingDirectories);
-        merger.setLabel(labels);
-        merger.run();
+		String outputDirectory = runDirectory + "analysis/";
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
+		noiseCalculation.run();
 
-        return 0;
-    }
+
+		String outputFilePath = outputDirectory + "noise-analysis/";
+		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
+		process.run();
+
+		final String[] labels = {"immission", "consideredAgentUnits", "damages_receiverPoint"};
+		final String[] workingDirectories = {outputFilePath + "/immissions/", outputFilePath + "/consideredAgentUnits/", outputFilePath + "/damages_receiverPoint/"};
+
+		MergeNoiseCSVFile merger = new MergeNoiseCSVFile();
+		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
+		merger.setOutputDirectory(outputFilePath);
+		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
+		merger.setWorkingDirectory(workingDirectories);
+		merger.setLabel(labels);
+		merger.run();
+
+		return 0;
+	}
 
 }

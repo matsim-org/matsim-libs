@@ -90,6 +90,28 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		public TeleportedModeParams( String mode ){
 			super( mode );
 		}
+
+		// repeating the setters so that they return the right type with chaining.  kai, jan'23
+		@Override public TeleportedModeParams setMode( String mode ) {
+			super.setMode( mode );
+			return this;
+		}
+		@Override public TeleportedModeParams setTeleportedModeSpeed( Double teleportedModeSpeed ) {
+			super.setTeleportedModeSpeed( teleportedModeSpeed );
+			return this;
+		}
+		@Override public TeleportedModeParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
+			super.setTeleportedModeFreespeedLimit( teleportedModeFreespeedLimit );
+			return this;
+		}
+		@Override public TeleportedModeParams setTeleportedModeFreespeedFactor( Double teleportedModeFreespeedFactor ) {
+			super.setTeleportedModeFreespeedFactor( teleportedModeFreespeedFactor );
+			return this;
+		}
+		@Override public TeleportedModeParams setBeelineDistanceFactor( Double beelineDistanceFactor ) {
+			super.setBeelineDistanceFactor( beelineDistanceFactor );
+			return this;
+		}
 	}
 	/**
 	 * @deprecated -- try to use {@link TeleportedModeParams} to be consistent with xml config (not always possible).
@@ -166,7 +188,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		 * 
 		 * @param teleportedModeFreespeedLimit -- {@value #TELEPORTED_MODE_FREESPEED_LIMIT_CMT}
 		 */
-		public final ModeRoutingParams setTeleportedModeFreespeedLimit(Double teleportedModeFreespeedLimit) {
+		public ModeRoutingParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
 			this.teleportedModeFreespeedLimit = teleportedModeFreespeedLimit;
 			return this;
 		}
