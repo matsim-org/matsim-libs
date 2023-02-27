@@ -17,6 +17,12 @@
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>application</artifactId>
 			<version>15.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>xerces</groupId>
+					<artifactId>xercesImpl</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
