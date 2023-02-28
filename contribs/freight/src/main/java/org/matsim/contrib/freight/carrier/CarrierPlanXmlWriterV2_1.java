@@ -31,7 +31,9 @@ import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
@@ -39,9 +41,7 @@ import org.matsim.vehicles.VehicleType;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A writer that writes carriers and their plans in a xml-file.
@@ -88,8 +88,8 @@ import java.util.Map;
 		try {
 			openFile(filename);
 			writeXmlHead();
-
-			startCarriers(this.writer);
+			writeRootElement();
+//			startCarriers(this.writer);
 			for (Carrier carrier : carriers) {
 				startCarrier(carrier, this.writer);
 				writeVehiclesAndTheirTypes(carrier, this.writer);
@@ -98,7 +98,7 @@ import java.util.Map;
 				writePlans(carrier, this.writer);
 				endCarrier(this.writer);
 			}
-			endCarriers(this.writer);
+			writeEndElement(this.writer);
 			close();
 			logger.info("done");
 		} catch (IOException e) {
@@ -108,9 +108,18 @@ import java.util.Map;
 		}
 	}
 
-	private void startCarriers(BufferedWriter writer) throws IOException {
-		writer.write("\t<carriers>\n");
+	private void writeRootElement() throws UncheckedIOException, IOException {
+		List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+		atts.add(createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
+		atts.add(createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
+		atts.add(createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "carriersDefinitions_v2.1.xsd"));
+		this.writeStartTag("carriers", atts);
+		this.writer.write(NL);
 	}
+
+//	private void startCarriers(BufferedWriter writer) throws IOException {
+//		writer.write("\t<carriers>\n");
+//	}
 
 	private void startCarrier(Carrier carrier, BufferedWriter writer)
 			throws IOException {
@@ -286,7 +295,7 @@ import java.util.Map;
 		registeredShipments.clear();
 	}
 
-	private void endCarriers(BufferedWriter writer) throws IOException {
+	private void writeEndElement(BufferedWriter writer) throws IOException {
 		writer.write("\t</carriers>\n");
 
 	}
