@@ -89,7 +89,6 @@ import java.util.*;
 			openFile(filename);
 			writeXmlHead();
 			writeRootElement();
-//			startCarriers(this.writer);
 			for (Carrier carrier : carriers) {
 				startCarrier(carrier, this.writer);
 				writeVehiclesAndTheirTypes(carrier, this.writer);
@@ -116,10 +115,6 @@ import java.util.*;
 		this.writeStartTag("carriers", atts);
 		this.writer.write(NL);
 	}
-
-//	private void startCarriers(BufferedWriter writer) throws IOException {
-//		writer.write("\t<carriers>\n");
-//	}
 
 	private void startCarrier(Carrier carrier, BufferedWriter writer)
 			throws IOException {
