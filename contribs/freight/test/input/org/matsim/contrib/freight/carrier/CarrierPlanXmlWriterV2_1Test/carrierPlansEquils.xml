@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.0.xsd">		<carrier id="testCarrier">
+<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
+	<carrier id="testCarrier">
 			<attributes>
 				<attribute name="carrierMode" class="java.lang.String">drt</attribute>
 				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
@@ -14,15 +15,6 @@
 
 			</capabilities>
 
-			<shipments>
-				<shipment id="s1" from="15" to="22" size="30" startPickup="06:01:00" endPickup="07:46:40" startDelivery="00:00:00" endDelivery="20:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00">
-					<attributes>
-						<attribute name="customer" class="java.lang.String">someRandomCustomer</attribute>
-					</attributes>
-				</shipment>
-				<shipment id="s2" from="20" to="22" size="10" startPickup="06:01:00" endPickup="07:46:40" startDelivery="00:00:00" endDelivery="20:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
-			</shipments>
-
 			<services>
 				<service id="serv1" to="22" capacityDemand="30" earliestStart="00:00:00" latestEnd="20:00:00" serviceDuration="01:00:00">
 					<attributes>
@@ -33,9 +25,18 @@
 				<service id="serv3" to="22" capacityDemand="30" earliestStart="00:00:00" latestEnd="20:00:00" serviceDuration="01:00:00"/>
 			</services>
 
+			<shipments>
+				<shipment id="s1" from="15" to="22" size="30" startPickup="06:01:00" endPickup="07:46:40" startDelivery="00:00:00" endDelivery="20:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00">
+					<attributes>
+						<attribute name="customer" class="java.lang.String">someRandomCustomer</attribute>
+					</attributes>
+				</shipment>
+				<shipment id="s2" from="20" to="22" size="10" startPickup="06:01:00" endPickup="07:46:40" startDelivery="00:00:00" endDelivery="20:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
+			</shipments>
+
 			<plans>
 				<plan score="-100.0" selected="false">
-					<tour vehicleId="lightVehicle">
+					<tour tourId="1" vehicleId="lightVehicle">
 						<act type="start" end_time="07:00:00"/>
 						<leg expected_dep_time="07:00:00" expected_transp_time="00:30:00">
 							<route>2 3 4</route>
@@ -53,7 +54,7 @@
 				</plan>
 
 				<plan score="-100.0" selected="true">
-					<tour vehicleId="lightVehicle">
+					<tour tourId="42" vehicleId="lightVehicle">
 						<act type="start" end_time="07:00:00"/>
 						<leg expected_dep_time="07:00:00" expected_transp_time="00:30:00">
 							<route>2 3 4</route>
@@ -79,7 +80,7 @@
 				</plan>
 
 				<plan score="-1000.0" selected="false">
-					<tour vehicleId="mediumVehicle">
+					<tour tourId="tour42" vehicleId="mediumVehicle">
 						<act type="start" end_time="07:00:00"/>
 						<leg expected_dep_time="07:00:00" expected_transp_time="00:30:00">
 							<route>2 3 4</route>
