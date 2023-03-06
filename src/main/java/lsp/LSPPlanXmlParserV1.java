@@ -44,6 +44,7 @@ import java.util.*;
 import static lsp.LSPConstants.*;
 
 /**
+ * Reads data out of LSPPlans file and builds the LSPs with their according resources, shipments and plans
  * @author nrichter (Niclas Richter)
  */
 class LSPPlanXmlParserV1 extends MatsimXmlParser {
@@ -74,8 +75,6 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 		this.carriers = carriers;
 	}
 
-	// TODO: tags an neue lsp.xml Struktur anpassen, es kann mehrere LogisticChains geben! - logisticChain = null setzen
-
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		org.matsim.utils.objectattributes.attributable.Attributes currAttributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
@@ -85,7 +84,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				Gbl.assertNotNull(lspId);
 				currentLsp = LSPUtils.LSPBuilder.getInstance(Id.create(lspId, LSP.class))
 						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.emptyList()))
-						.setInitialPlan(new LSPPlanImpl()) //TODO: warum wird ein initialer Plan benötigt?
+						.setInitialPlan(new LSPPlanImpl())
 						.build();
 			}
 			case CARRIER -> {
@@ -274,7 +273,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				Gbl.assertNotNull(currentLsp);
 				Gbl.assertNotNull(lsPs);
 				Gbl.assertNotNull(lsPs.getLSPs());
-				currentLsp.getPlans().remove(0); // hier wird initialer Plan gelöscht
+				currentLsp.getPlans().remove(0); // empty plan zero was set for initialization of currentLSP
 				lsPs.getLSPs().put(currentLsp.getId(), currentLsp);
 				currentLsp = null;
 			}
@@ -314,13 +313,6 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			case CAPABILITIES -> currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
 			case ATTRIBUTE -> attributesReader.endTag(name, content, context);
 			case SHIPMENT -> this.currentShipment = null;
-			case RESOURCES -> { //TODO: Brauchen wir das noch, wenn wir hier gar nichts machen? (22.02.23, KMT)
-				switch (context.peek()) {
-					case LSP -> {}
-					case PLAN -> {}
-					default -> throw new IllegalStateException("Unexpected value: " + context.peek());
-				}
-			}
 			case PLAN -> {
 				LSPResource resource;
 				List<LogisticChainElement> logisticChainElements = new LinkedList<>();

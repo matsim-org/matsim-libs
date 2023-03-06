@@ -41,6 +41,7 @@ import static lsp.LSPConstants.*;
 
 
 /**
+ * Writes out resources, shipments and plans for each LSP
  * @author nrichter (Niclas Richter)
  */
 public class LSPPlanXmlWriter extends MatsimXmlWriter {
