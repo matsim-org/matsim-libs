@@ -30,7 +30,7 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	@CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds.")
 	private int maxTypicalDuration = 86400;
 
-	@CommandLine.Option(names = {"--end-time-to-duration"}, description = "Remove the end time and encode as duration for activities shorter shorter than this value.")
+	@CommandLine.Option(names = {"--end-time-to-duration"}, description = "Remove the end time and encode as duration for activities shorter than this value.")
 	private int endTimeToDuration = 1800;
 
 	@CommandLine.Option(names = "--subpopulation", description = "Only apply to certain subpopulation")
