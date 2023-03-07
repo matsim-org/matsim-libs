@@ -36,6 +36,21 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 		new SplitActivityTypesDuration().execute(args);
 	}
 
+	/**
+	 * Default Constructor needed for cli usage.
+	 */
+	public SplitActivityTypesDuration() {
+	}
+
+	/**
+	 * Create a new instance of this algorithm without cli usage.
+	 */
+	public SplitActivityTypesDuration(int activityBinSize, int maxTypicalDuration, int removeEndTime) {
+		this.activityBinSize = activityBinSize;
+		this.maxTypicalDuration = maxTypicalDuration;
+		this.removeEndTime = removeEndTime;
+	}
+
 	@Override
 	public Integer call() throws Exception {
 
