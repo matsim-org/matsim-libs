@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-		   targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
+		   targetNamespace="http://www.matsim.org/files/dtd"
+		   xmlns="http://www.matsim.org/files/dtd"
 		   elementFormDefault="qualified"
 		   xml:lang="en">
 
 	<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
-	<xs:element name="LSPs">
+	<xs:element name="lspsDefinitions">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="lsp" type="lspDefinition" maxOccurs="unbounded" />
+				<xs:element name="LSPs">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="lsp">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="resources" type="ResourceType" minOccurs="0" />
+										<xs:element name="shipments" type="ShipmentType" minOccurs="0" />
+										<xs:element name="LSPPlans" type="LSPPlanType" minOccurs="0" />
+									</xs:sequence>
+									<xs:attribute name="id" type="xs:string"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
-	<xs:complexType name="lspDefinition">
-		<xs:sequence>
-			<xs:element name="resources" type="ResourceType" minOccurs="0" />
-			<xs:element name="shipments" type="ShipmentType" minOccurs="0" />
-			<xs:element name="LSPPlans" type="LSPPlanType" minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-
 
 	<xs:complexType name="ResourceType">
 		<xs:choice maxOccurs="unbounded" minOccurs="0">
@@ -74,7 +81,6 @@
 			<xs:element name="plan" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:sequence>
-
 						<xs:element name="logisticChains" minOccurs="0">
 							<xs:complexType>
 								<xs:sequence>
@@ -87,6 +93,7 @@
 													</xs:complexType>
 												</xs:element>
 											</xs:sequence>
+											<xs:attribute name="id"/>
 										</xs:complexType>
 									</xs:element>
 								</xs:sequence>
@@ -96,10 +103,10 @@
 						<xs:element name="shipmentPlans" minOccurs="0">
 							<xs:complexType>
 								<xs:sequence>
-									<xs:element name="shipmentPlan" minOccurs="0">
+									<xs:element name="shipmentPlan" minOccurs="0" maxOccurs="unbounded">
 										<xs:complexType>
 											<xs:sequence>
-												<xs:element name="element" minOccurs="0">
+												<xs:element name="element" minOccurs="0" maxOccurs="unbounded">
 													<xs:complexType>
 														<xs:attribute name="id" type="xs:string" />
 														<xs:attribute name="type" type="xs:string" />
