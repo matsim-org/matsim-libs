@@ -8,6 +8,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 @CommandLine.Command(
 		name = "split-activity-types-duration",
@@ -29,8 +30,11 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	@CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds.")
 	private int maxTypicalDuration = 86400;
 
-	@CommandLine.Option(names = {"--remove-end-time"}, description = "Remove the end time and encode as duration for activities shorter shorter than this value.")
-	private int removeEndTime = 1800;
+	@CommandLine.Option(names = {"--end-time-to-duration"}, description = "Remove the end time and encode as duration for activities shorter shorter than this value.")
+	private int endTimeToDuration = 1800;
+
+	@CommandLine.Option(names = "--subpopulation", description = "Only apply to subpopulation")
+	private String subpopulation;
 
 	public static void main(String[] args) {
 		new SplitActivityTypesDuration().execute(args);
@@ -45,10 +49,10 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	/**
 	 * Create a new instance of this algorithm without cli usage.
 	 */
-	public SplitActivityTypesDuration(int activityBinSize, int maxTypicalDuration, int removeEndTime) {
+	public SplitActivityTypesDuration(int activityBinSize, int maxTypicalDuration, int endTimeToDuration) {
 		this.activityBinSize = activityBinSize;
 		this.maxTypicalDuration = maxTypicalDuration;
-		this.removeEndTime = removeEndTime;
+		this.endTimeToDuration = endTimeToDuration;
 	}
 
 	@Override
@@ -66,6 +70,9 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	@Override
 	public void run(Person person) {
 
+		if (subpopulation != null && !Objects.equals(PopulationUtils.getSubpopulation(person), subpopulation))
+			return;
+
 		for (Plan plan : person.getPlans()) {
 			for (PlanElement el : plan.getPlanElements()) {
 
@@ -81,7 +88,7 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 				String newType = String.format("%s_%d", act.getType(), roundDuration(duration));
 				act.setType(newType);
 
-				if (duration <= removeEndTime && act.getEndTime().isDefined()) {
+				if (duration <= endTimeToDuration && act.getEndTime().isDefined()) {
 					act.setEndTimeUndefined();
 					act.setMaximumDuration(duration);
 				}
