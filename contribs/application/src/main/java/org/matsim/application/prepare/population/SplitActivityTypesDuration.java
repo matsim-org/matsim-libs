@@ -21,7 +21,7 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
 	private Path input;
 
-	@CommandLine.Option(names = "--output", description = "Output population", required = false)
+	@CommandLine.Option(names = "--output", description = "Output population", required = true)
 	private Path output;
 
 	@CommandLine.Option(names = {"--activity-bin-size", "--abs"}, description = "Activity types are extended so that they belong to a typical duration. This parameter influences the number of typical duration classes.")
@@ -33,7 +33,7 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	@CommandLine.Option(names = {"--end-time-to-duration"}, description = "Remove the end time and encode as duration for activities shorter shorter than this value.")
 	private int endTimeToDuration = 1800;
 
-	@CommandLine.Option(names = "--subpopulation", description = "Only apply to subpopulation")
+	@CommandLine.Option(names = "--subpopulation", description = "Only apply to certain subpopulation")
 	private String subpopulation;
 
 	public static void main(String[] args) {
