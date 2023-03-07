@@ -34,7 +34,7 @@ public class RunChessboardIT {
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
 
 				PopulationComparison.Result result = new PopulationComparison().compare(expected, actual);
-				Assert.assertSame(result, PopulationComparison.Result.equal);
+				Assert.assertSame(PopulationComparison.Result.equal, result);
 			}
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
