@@ -52,7 +52,7 @@ import java.util.*;
  */
 class UrbanVehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
-		ChargingEndEventHandler, ChargingStartEventHandler, MobsimScopeEventHandler {
+		ChargingEndEventHandler, ChargingStartEventHandler, QueuedAtChargerEventHandler, MobsimScopeEventHandler {
 
 	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
@@ -142,5 +142,9 @@ class UrbanVehicleChargingHandler
 		//Charging has started
 	}
 
-
+	@Override
+	public void handleEvent(QueuedAtChargerEvent event) {
+		vehiclesAtChargers.put(event.getVehicleId(), event.getChargerId());
+		//Charging may start soon
+	}
 }
