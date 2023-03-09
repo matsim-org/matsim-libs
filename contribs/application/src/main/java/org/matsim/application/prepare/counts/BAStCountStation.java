@@ -1,7 +1,9 @@
 package org.matsim.application.prepare.counts;
 
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +12,7 @@ import java.util.Objects;
 /**
  * Holds data for one bast counting station.
  */
-class BAStCountStation {
+class BAStCountStation implements MatchingPoint{
 
 	private final String name;
 	private final String id;
@@ -125,6 +127,11 @@ class BAStCountStation {
 	private void matchDirection(Link link, String bastDirection) {
 		String direction = getLinkDirection(link);
 
+		/*
+		* TODO
+		*  fix direction matching -> map actual direction value as variable, not the column name!
+		* */
+
 		this.matchedDir = direction.contains(bastDirection) ? "R1": "R2";
 		this.oppDir = matchedDir.equals("R1") ? "R2": "R1";
 	}
@@ -141,6 +148,17 @@ class BAStCountStation {
 			this.oppDir = newOppDir.contains(this.dir1) ? "R1": "R2";
 	}
 
+	@Override
+	public String getDirection() {
+		return null;
+	}
+
+	@Override
+	public Geometry getGeometry() {
+		return MGC.coord2Point(this.coord);
+	}
+
+	@Override
 	public String getLinkDirection(Link link) {
 
 		Coord fromCoord = link.getFromNode().getCoord();
