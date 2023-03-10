@@ -75,7 +75,7 @@ final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		} else if (bicycleScoringType == BicycleScoringType.linkBased) {
 			BicycleLinkScoring bicycleLinkScoring = new BicycleLinkScoring(params, scenario, bicycleConfigGroup);
 			sumScoringFunction.addScoringFunction(bicycleLinkScoring);
-
+			
 			CarCounter carCounter = new CarCounter( bicycleLinkScoring );
 			eventsManager.addHandler(carCounter);
 		} else {

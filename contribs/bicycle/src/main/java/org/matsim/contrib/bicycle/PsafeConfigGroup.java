@@ -1,8 +1,6 @@
 package org.matsim.contrib.bicycle;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
-import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 
 import java.util.Map;
 
@@ -14,31 +12,25 @@ public final class PsafeConfigGroup extends ReflectiveConfigGroup{
 	private static final String INPUT_PERCEIVED_SAFETY_EBIKE = "marginalUtilityOfPerceivedSafety_ebike_m";
 	private static final String INPUT_PERCEIVED_SAFETY_ESCOOT = "marginalUtilityOfPerceivedSafety_escoot_m";
 	private static final String INPUT_PERCEIVED_SAFETY_WALK = "marginalUtilityOfPerceivedSafety_walk_m";
-	
-	private static final String INPUT_PSAFE_THRESHOLD = "inputPsafeThreshold_m";
-	
 	private static final String INPUT_DMAX_CAR = "Dmax_car_m";
 	private static final String INPUT_DMAX_EBIKE = "Dmax_ebike_m";
 	private static final String INPUT_DMAX_ESCOOT = "Dmax_escoot_m";
 	private static final String INPUT_DMAX_WALK = "Dmax_walk_m";
+    private static final String CAR_MODE = "carMode";
+    private static final String EBIKE_MODE = "ebikeMode";
+    private static final String ESCOOT_MODE = "escootMode";
+    private static final String WALK_MODE = "walkMode";
+	private static final String INPUT_PSAFE_THRESHOLD = "inputPsafeThreshold_m";
 	
 	private double marginalUtilityOfPerceivedSafety_car;
     private double marginalUtilityOfPerceivedSafety_ebike;
     private double marginalUtilityOfPerceivedSafety_escoot;
     private double marginalUtilityOfPerceivedSafety_walk;
-    
     private double Dmax_car;
     private double Dmax_ebike;
     private double Dmax_escoot;
     private double Dmax_walk;
-    
     private int inputPsafeThreshold;
-    
-    private static final String CAR_MODE = "carMode";
-    private static final String EBIKE_MODE = "ebikeMode";
-    private static final String ESCOOT_MODE = "escootMode";
-    private static final String WALK_MODE = "walkMode";
-    
     private String carMode = "car";
     private String ebikeMode = "ebike";
     private String escootMode = "escoot";
@@ -47,6 +39,21 @@ public final class PsafeConfigGroup extends ReflectiveConfigGroup{
 	public PsafeConfigGroup(){
 		super(GROUP_NAME);
 		}
+	
+	@Override
+	public final Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
+		map.put(INPUT_PERCEIVED_SAFETY_CAR, "marginalUtilityOfPerceivedSafety_car");
+		map.put(INPUT_PERCEIVED_SAFETY_EBIKE, "marginalUtilityOfPerceivedSafety_ebike");
+		map.put(INPUT_PERCEIVED_SAFETY_ESCOOT, "marginalUtilityOfPerceivedSafety_escoot");
+		map.put(INPUT_PERCEIVED_SAFETY_WALK, "marginalUtilityOfPerceivedSafety_walk");
+		map.put(INPUT_DMAX_CAR, "Dmax_car");
+		map.put(INPUT_DMAX_EBIKE, "Dmax_ebike");
+		map.put(INPUT_DMAX_ESCOOT, "Dmax_escoot");
+		map.put(INPUT_PSAFE_THRESHOLD, "inputPsafeThreshold");
+		return map;
+	}
+	
 	
 	@StringSetter(INPUT_PERCEIVED_SAFETY_CAR)
 	public void setMarginalUtilityOfPerceivedSafety_car_m(final double value) {
@@ -115,13 +122,11 @@ public final class PsafeConfigGroup extends ReflectiveConfigGroup{
 	public void setDmax_walk_m(final double value) {
 		this.Dmax_walk = value;
 	}
-	@StringGetter(INPUT_DMAX_ESCOOT)
+	@StringGetter(INPUT_DMAX_WALK)
 	public double getDmax_walk_m() {
 		return this.Dmax_walk;	
 	}
 
-	
-	
 	@StringGetter( CAR_MODE )
 	public String getCarMode() {
 		return this.carMode;
@@ -153,7 +158,7 @@ public final class PsafeConfigGroup extends ReflectiveConfigGroup{
 	public String getWalkMode() {
 		return this.walkMode;
 	}
-	@StringSetter( ESCOOT_MODE )
+	@StringSetter( WALK_MODE )
 	public void setWalkMode(String walkMode) {
 		this.walkMode = walkMode;
 	}

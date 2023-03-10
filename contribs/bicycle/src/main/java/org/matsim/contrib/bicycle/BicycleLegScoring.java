@@ -1,6 +1,6 @@
 package org.matsim.contrib.bicycle; //NTUA TEAM: mistake with the name of the package - I recommend org.matsim.contrib.Lmile
 
-import org.apache.log4j.Logger;
+// import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -18,10 +18,10 @@ import java.util.Set;
 class BicycleLegScoring implements SumScoringFunction.LegScoring, SumScoringFunction.ArbitraryEventScoring{
 	// NTUA TEAM: becomes EscootLegScoring - new function for other modes are developed by NTUA.
 	// NTUA TEAM: create a new class per mode
-	private static final Logger log = Logger.getLogger( BicycleLegScoring.class ) ; // 
+	// private static final Logger log = Logger.getLogger( BicycleLegScoring.class ) ; // 
 
 	private final CharyparNagelLegScoring delegate ; // default scoring function
-	private final double marginalUtilityOfPerceivedSafety_m; // beta parameter of perceived safety - different per mode
+	// private final double marginalUtilityOfPerceivedSafety_m; // beta parameter of perceived safety - different per mode
 	
 	private final double marginalUtilityOfPerceivedSafety_car;
 	private final double marginalUtilityOfPerceivedSafety_ebike;
@@ -52,10 +52,11 @@ class BicycleLegScoring implements SumScoringFunction.LegScoring, SumScoringFunc
 	private final Network network;
 	private double additionalScore = 0.; // this the additional score we get, set to zero per plan (not per leg !!)
 	
-	BicycleLegScoring( final ScoringParameters params, Network network, Set<String> ptModes, BicycleConfigGroup bicycleConfigGroup, PsafeConfigGroup psafeConfigGroup) {
+	BicycleLegScoring( final ScoringParameters params, Network network, Set<String> ptModes, PsafeConfigGroup psafeConfigGroup) {
 		// NTUA TEAM: BicycleConfigGroup becomes PsafeConfigGroup
 		delegate = new CharyparNagelLegScoring( params, network, ptModes ) ;
-		this.marginalUtilityOfPerceivedSafety_m = bicycleConfigGroup.getMarginalUtilityOfPerceivedSafety_m();
+		// this.marginalUtilityOfPerceivedSafety_m = bicycleConfigGroup.getMarginalUtilityOfPerceivedSafety_m();
+		// this.marginalUtilityOfPerceivedSafety_m = 0;
 		
 		// set new beta variables related to perceived safety
 		this.marginalUtilityOfPerceivedSafety_car = psafeConfigGroup.getMarginalUtilityOfPerceivedSafety_car_m();
@@ -121,6 +122,7 @@ class BicycleLegScoring implements SumScoringFunction.LegScoring, SumScoringFunc
 			}
 			
 			additionalScore = beta_psafe * sumPerceivedSafety;
+		System.out.print(additionalScore);
 		}
 	  }
   	    

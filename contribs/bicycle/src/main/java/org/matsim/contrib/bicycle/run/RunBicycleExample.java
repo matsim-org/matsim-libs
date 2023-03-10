@@ -23,13 +23,17 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.bicycle.BicycleConfigGroup;
-<<<<<<< Updated upstream
+
+// import org.matsim.contrib.bicycle.BicycleConfigGroup; // change the packages here
 import org.matsim.contrib.bicycle.BicycleModule;
-=======
+import org.matsim.contrib.bicycle.PsafeModule;
 import org.matsim.contrib.bicycle.Bicycles;
+
+//// new modules, new modules... PsafeChoices package.
 import org.matsim.contrib.bicycle.PsafeConfigGroup;
->>>>>>> Stashed changes
+import org.matsim.contrib.bicycle.PsafeInput;
+import org.matsim.contrib.bicycle.PsafeNewAttrib;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -57,13 +61,13 @@ public class RunBicycleExample {
 		Config config;
 		if (args.length == 1) {
 			LOG.info("A user-specified config.xml file was provided. Using it...");
-			config = ConfigUtils.loadConfig(args[0], new BicycleConfigGroup());
+			config = ConfigUtils.loadConfig(args[0], new PsafeConfigGroup());
 			fillConfigWithBicycleStandardValues(config);
 		} else if (args.length == 0) {
 			LOG.info("No config.xml file was provided. Using 'standard' example files given in this contrib's resources folder.");
 			// Setting the context like this works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
 			config = ConfigUtils.createConfig("bicycle_example/");
-			config.addModule(new BicycleConfigGroup());
+			// config.addModule(new BicycleConfigGroup());
 			config.addModule(new PsafeConfigGroup());
 			
 			fillConfigWithBicycleStandardValues(config);
@@ -75,27 +79,26 @@ public class RunBicycleExample {
 								     + " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
 		}
 		config.controler().setLastIteration(100); // Modify if motorized interaction is used
-		boolean considerMotorizedInteraction = false;
+		
+		// boolean considerMotorizedInteraction = false;
 
-		new RunBicycleExample().run(config, considerMotorizedInteraction);
+		new RunBicycleExample().run(config);
 	}
 
 	static void fillConfigWithBicycleStandardValues(Config config) {
 		config.controler().setWriteEventsInterval(1);
 
-<<<<<<< Updated upstream
-		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
-		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
-		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
-		bicycleConfigGroup.setMarginalUtilityOfGradient_m_100m(-0.02);
-		bicycleConfigGroup.setMarginalUtilityOfUserDefinedNetworkAttribute_m(-0.0000); // always needs to be negative
-		bicycleConfigGroup.setUserDefinedNetworkAttributeName("quietness"); // needs to be defined as a value from 0 to 1, 1 being best, 0 being worst
-		bicycleConfigGroup.setUserDefinedNetworkAttributeDefaultValue(0.1); // used for those links that do not have a value for the user-defined attribute
+		// BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
+		// bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
+		// bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
+		// bicycleConfigGroup.setMarginalUtilityOfGradient_m_100m(-0.02);
+		// bicycleConfigGroup.setMarginalUtilityOfUserDefinedNetworkAttribute_m(-0.0000); // always needs to be negative
+		// bicycleConfigGroup.setUserDefinedNetworkAttributeName("quietness"); // needs to be defined as a value from 0 to 1, 1 being best, 0 being worst
+		// bicycleConfigGroup.setUserDefinedNetworkAttributeDefaultValue(0.1); // used for those links that do not have a value for the user-defined attribute
 
-		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
+		// bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
 
-=======
-		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
+//		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
 //      ziemke bicycle routing params
 //		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
 //		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
@@ -105,8 +108,7 @@ public class RunBicycleExample {
 	    PsafeConfigGroup psafeConfigGroup = (PsafeConfigGroup) config.getModules().get(PsafeConfigGroup.GROUP_NAME);
 	
         psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_car_m(0.1); // different beta psafes
-        
-        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_ebike_m(0.1);
+        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_ebike_m(1000);
         psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_escoot_m(0.1);
         psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_walk_m(0.1);
         
@@ -116,14 +118,16 @@ public class RunBicycleExample {
       	psafeConfigGroup.setDmax_walk_m(1000); // in meters or kilometers???
       	
       	
-		bicycleConfigGroup.setMarginalUtilityOfPerceivedSafety_m(2.12331); // from bicycle config group introduce a new parameter
+//		bicycleConfigGroup.setMarginalUtilityOfPerceivedSafety_m(2.12331); // from bicycle config group introduce a new parameter
 		// a new variable is introduced, it is related to safety perceptions instead of infrastructure factors
 		
->>>>>>> Stashed changes
 		List<String> mainModeList = new ArrayList<>();
-		mainModeList.add("bicycle");
+		
 		mainModeList.add(TransportMode.car);
-
+		mainModeList.add("ebike");
+		mainModeList.add("escoot");
+		// mainModeList.add(TransportMode.walk);
+		
 		config.qsim().setMainModes(mainModeList);
 
 		config.strategy().setMaxAgentPlanMemorySize(5);
@@ -133,21 +137,19 @@ public class RunBicycleExample {
 		config.planCalcScore().addActivityParams( new ActivityParams("home").setTypicalDuration(12*60*60 ) );
 		config.planCalcScore().addActivityParams( new ActivityParams("work").setTypicalDuration(8*60*60 ) );
 
-		config.planCalcScore().addModeParams( new ModeParams("bicycle").setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(-6.0 ).setMonetaryDistanceRate(0. ) );
-
+		config.planCalcScore().addModeParams( new ModeParams(TransportMode.car).setConstant(0.).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(-6.0).setMonetaryDistanceRate(0.) );
+		config.planCalcScore().addModeParams( new ModeParams("ebike").setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(-6.0 ).setMonetaryDistanceRate(0. ) );
+		config.planCalcScore().addModeParams( new ModeParams("escoot").setConstant(0.).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(-6.0).setMonetaryDistanceRate(0.) );
+		// config.planCalcScore().addModeParams( new ModeParams(TransportMode.walk).setConstant(0.).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(-6.0).setMonetaryDistanceRate(0.) );
+		
 		config.plansCalcRoute().setNetworkModes(mainModeList);
 	}
 
-	public void run(Config config, boolean considerMotorizedInteraction) {
+	public void run(Config config) {
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		config.plansCalcRoute().setRoutingRandomness(3.);
-
-		if (considerMotorizedInteraction) {
-			BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
-			bicycleConfigGroup.setMotorizedInteraction(considerMotorizedInteraction);
-		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -157,10 +159,13 @@ public class RunBicycleExample {
 		// now put hte mode vehicles into the vehicles data:
 		final VehiclesFactory vf = VehicleUtils.getFactory();
 		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) ) );
-		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create("bicycle", VehicleType.class ) ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
-
+		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create("ebike", VehicleType.class ) ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
+		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create("escoot", VehicleType.class ) ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
+		
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new BicycleModule() );
+		// controler.addOverridingModule(new BicycleModule() );
+		
+		controler.addOverridingModule(new PsafeModule());
 
 		controler.run();
 	}
