@@ -459,7 +459,11 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private void arrangeNextAgentAction(final MobsimAgent agent) {
 		switch( agent.getState() ) {
 		case ACTIVITY:
-			arrangeAgentActivity(agent);
+			for (ActivityHandler activityHandler : this.activityHandlers) {
+				if (activityHandler.handleActivity( agent )) {
+					break;
+				}
+			}
 			break ;
 		case LEG:
 			this.arrangeAgentDeparture(agent);
@@ -482,14 +486,6 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 			break ;
 		default:
 			throw new RuntimeException("agent with unknown state (possibly null)") ;
-		}
-	}
-
-	private void arrangeAgentActivity(final MobsimAgent agent) {
-		for (ActivityHandler activityHandler : this.activityHandlers) {
-			if (activityHandler.handleActivity(agent)) {
-				return;
-			}
 		}
 	}
 

@@ -30,9 +30,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -42,21 +50,30 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.AbortHandler;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.modal.AbstractModalQSimModule;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.common.base.MoreObjects;
+import org.matsim.withinday.utils.EditPlans;
+import org.matsim.withinday.utils.EditTrips;
 
 /**
  * @author jbischoff
  */
 public class RunDrtExampleIT {
+	private static final Logger log = LogManager.getLogger(RunDrtExampleIT.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -172,13 +189,45 @@ public class RunDrtExampleIT {
 		controler.addOverridingQSimModule( new AbstractModalQSimModule<>(){
 			@Override protected void configureQSim(){
 				this.addQSimComponentBinding( "send drt abort to teleportation" ).toInstance( new AbortHandler(){
+
+
+					@Inject EditTrips editTrips ;
+					@Inject EditPlans editPlans;
+
+					@Inject Network network;
+
+					@Inject MobsimTimer mobsimTimer;
+
 					@Override public boolean handleAbort( MobsimAgent agent ){
+
+						log.warn("need to handle abort of agent=" + agent );
+
+
 						if ( agent.getMode().equals( "drt" ) ) {
-							agent.setMode("teleportedDrt");
-							// this needs to be inserted properly, i.e. using within-day replanning.  :-(
-							// for this, need to find out if we are IN the leg, or already AFTER it.  Maybe the clean way
-							// would be to insert an interaction activity?
-							WithinDayAgentUtils.???
+//							Gbl.assertIf( agent instanceof MobsimPassengerAgent );
+//							MobsimPassengerAgent passengerAgent = (MobsimPassengerAgent) agent;
+
+							//  pastAct -- LEG -- futureAct  BUT the LEG was rejected.  So we need something like pastAct -- LEG -- emergencyLeg -- futureAct.
+
+//							Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
+
+
+							Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );
+
+							String modePrefix = TripStructureUtils.createStageActivityType( "walkAfterReject" );
+
+							Id<Link> interactionLink = agent.getCurrentLinkId();
+							Coord interactionCoord = network.getLinks().get( interactionLink ).getCoord();
+							Activity activity = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix( interactionCoord, interactionLink, modePrefix );
+
+							editPlans.insertActivity( agent, index, activity );
+
+							double now = mobsimTimer.getTimeOfDay();
+							editTrips.replanCurrentTrip( agent, now, "walkAfterReject" );
+
+
+
+							WithinDayAgentUtils.resetCaches( agent );
 						}
 						return true;
 					}
