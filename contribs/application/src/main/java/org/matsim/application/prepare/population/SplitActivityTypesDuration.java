@@ -1,13 +1,18 @@
 package org.matsim.application.prepare.population;
 
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.router.TripStructureUtils;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
 @CommandLine.Command(
@@ -32,6 +37,9 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 
 	@CommandLine.Option(names = {"--end-time-to-duration"}, description = "Remove the end time and encode as duration for activities shorter than this value.")
 	private int endTimeToDuration = 1800;
+
+	@CommandLine.Option(names = "--stage-activity-handling", description = "Define how stage activities are handled", required = false, defaultValue = "ExcludeStageActivities")
+	private TripStructureUtils.StageActivityHandling stageActivityHandling = TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
 	@CommandLine.Option(names = "--subpopulation", description = "Only apply to certain subpopulation")
 	private String subpopulation;
@@ -74,10 +82,10 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 			return;
 
 		for (Plan plan : person.getPlans()) {
-			for (PlanElement el : plan.getPlanElements()) {
 
-				if (!(el instanceof Activity act))
-					continue;
+			List<Activity> activities = TripStructureUtils.getActivities(plan, stageActivityHandling);
+
+			for (Activity act : activities) {
 
 				double duration;
 				if (act.getMaximumDuration().isDefined())
@@ -94,7 +102,7 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 				}
 			}
 
-			mergeOvernightActivities(plan);
+			mergeOvernightActivities(activities);
 		}
 	}
 
@@ -118,11 +126,11 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 		return durationCategoryNr * activityBinSize;
 	}
 
-	private void mergeOvernightActivities(Plan plan) {
+	private void mergeOvernightActivities(List<Activity> plan) {
 
-		if (plan.getPlanElements().size() > 1) {
-			Activity firstActivity = (Activity) plan.getPlanElements().get(0);
-			Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+		if (plan.size() > 1) {
+			Activity firstActivity = plan.get(0);
+			Activity lastActivity = plan.get(plan.size() - 1);
 
 			String firstBaseActivity = firstActivity.getType().split("_")[0];
 			String lastBaseActivity = lastActivity.getType().split("_")[0];
