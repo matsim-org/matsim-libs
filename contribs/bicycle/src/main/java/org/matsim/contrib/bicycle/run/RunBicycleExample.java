@@ -51,6 +51,7 @@ import org.matsim.vehicles.VehiclesFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks;
 /**
  * @author dziemke
  */
@@ -72,7 +73,7 @@ public class RunBicycleExample {
 			
 			fillConfigWithBicycleStandardValues(config);
 
-			config.network().setInputFile("network_lane.xml"); // Modify this
+			config.network().setInputFile("sim4mtran_psafest_scenario_0_ATHENS.xml"); // Modify this
 			config.plans().setInputFile("population_1200.xml");
 		} else {
 			throw new RuntimeException("More than one argument was provided. There is no procedure for this situation. Thus aborting!"
@@ -108,8 +109,8 @@ public class RunBicycleExample {
 	    PsafeConfigGroup psafeConfigGroup = (PsafeConfigGroup) config.getModules().get(PsafeConfigGroup.GROUP_NAME);
 	
         psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_car_m(0.1); // different beta psafes
-        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_ebike_m(1000);
-        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_escoot_m(0.1);
+        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_ebike_m(0.5);
+        psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_escoot_m(0.5);
         psafeConfigGroup.setMarginalUtilityOfPerceivedSafety_walk_m(0.1);
         
       	psafeConfigGroup.setDmax_car_m(1000); // in meters or kilometers???
@@ -123,7 +124,8 @@ public class RunBicycleExample {
 		
 		List<String> mainModeList = new ArrayList<>();
 		
-		mainModeList.add(TransportMode.car);
+		// mainModeList.add(TransportMode.car);
+		mainModeList.add("car");
 		mainModeList.add("ebike");
 		mainModeList.add("escoot");
 		// mainModeList.add(TransportMode.walk);
@@ -131,15 +133,16 @@ public class RunBicycleExample {
 		config.qsim().setMainModes(mainModeList);
 
 		config.strategy().setMaxAgentPlanMemorySize(5);
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName("ChangeExpBeta" ).setWeight(0.8 ) );
+		config.strategy().addStrategySettings( new StrategySettings().setStrategyName("BestScore" ).setWeight(0.6 ) );
 		config.strategy().addStrategySettings( new StrategySettings().setStrategyName("ReRoute" ).setWeight(0.2 ) );
+		config.strategy().addStrategySettings( new StrategySettings().setStrategyName("ChangeTripMode" ).setWeight(0.2 ) );
 
 		config.planCalcScore().addActivityParams( new ActivityParams("home").setTypicalDuration(12*60*60 ) );
 		config.planCalcScore().addActivityParams( new ActivityParams("work").setTypicalDuration(8*60*60 ) );
 
-		config.planCalcScore().addModeParams( new ModeParams(TransportMode.car).setConstant(0.).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(-6.0).setMonetaryDistanceRate(0.) );
-		config.planCalcScore().addModeParams( new ModeParams("ebike").setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(-6.0 ).setMonetaryDistanceRate(0. ) );
-		config.planCalcScore().addModeParams( new ModeParams("escoot").setConstant(0.).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(-6.0).setMonetaryDistanceRate(0.) );
+		config.planCalcScore().addModeParams( new ModeParams("car").setConstant(0.).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(-6.0).setMonetaryDistanceRate(0.) );
+		config.planCalcScore().addModeParams( new ModeParams("ebike").setConstant(-100.0 ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(-6.0 ).setMonetaryDistanceRate(0. ) );
+		config.planCalcScore().addModeParams( new ModeParams("escoot").setConstant(-100.0).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(-6.0).setMonetaryDistanceRate(0.) );
 		// config.planCalcScore().addModeParams( new ModeParams(TransportMode.walk).setConstant(0.).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(-6.0).setMonetaryDistanceRate(0.) );
 		
 		config.plansCalcRoute().setNetworkModes(mainModeList);
@@ -147,7 +150,10 @@ public class RunBicycleExample {
 
 	public void run(Config config) {
 		config.global().setNumberOfThreads(1);
+		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		config.controler().setRoutingAlgorithmType( FastAStarLandmarks );
 
 		config.plansCalcRoute().setRoutingRandomness(3.);
 
@@ -158,14 +164,16 @@ public class RunBicycleExample {
 
 		// now put hte mode vehicles into the vehicles data:
 		final VehiclesFactory vf = VehicleUtils.getFactory();
-		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) ) );
+		
+		//scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) ) );
+		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create("car", VehicleType.class ) ).setMaximumVelocity(25 ).setPcuEquivalents(1.0 ) );
 		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create("ebike", VehicleType.class ) ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
 		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create("escoot", VehicleType.class ) ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
 		
 		Controler controler = new Controler(scenario);
 		// controler.addOverridingModule(new BicycleModule() );
 		
-		controler.addOverridingModule(new PsafeModule());
+		controler.addOverridingModule(new PsafeModule()); // without that the model is running with the classical algorithms
 
 		controler.run();
 	}

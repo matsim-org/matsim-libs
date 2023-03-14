@@ -1,7 +1,7 @@
 package org.matsim.contrib.bicycle;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-
+import org.matsim.api.core.v01.TransportMode;
 import java.util.Map;
 
 public final class PsafeConfigGroup extends ReflectiveConfigGroup{
