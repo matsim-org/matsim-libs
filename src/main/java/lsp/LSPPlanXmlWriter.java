@@ -41,7 +41,9 @@ import static lsp.LSPConstants.*;
 
 
 /**
- * Writes out resources, shipments and plans for each LSP
+ * Writes out resources, shipments and plans for each LSP in an XML-file including header for validating against
+ * respective XSD and setting up according writer.
+ * Uses variables defined in LSPConstants-class for the elements and attributes within the XML.
  * @author nrichter (Niclas Richter)
  */
 public class LSPPlanXmlWriter extends MatsimXmlWriter {

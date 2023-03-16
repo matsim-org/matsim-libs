@@ -44,7 +44,8 @@ import java.util.*;
 import static lsp.LSPConstants.*;
 
 /**
- * Reads data out of LSPPlans file and builds the LSPs with their according resources, shipments and plans
+ * Reads data out of LSPPlans file and builds the LSPs with their according resources, shipments and plans.
+ * StartTag mainly for parsing data, endTag for assigning data to according LSP.
  * @author nrichter (Niclas Richter)
  */
 class LSPPlanXmlParserV1 extends MatsimXmlParser {
