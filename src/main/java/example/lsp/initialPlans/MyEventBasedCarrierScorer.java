@@ -9,20 +9,17 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -40,7 +37,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		SumScoringFunction sf = new SumScoringFunction();
 		sf.addScoringFunction(new EventBasedScoring());
-		sf.addScoringFunction(new LinkBasedTollScoring(carrier, toll));
+		sf.addScoringFunction(new LinkBasedTollScoring(toll));
 		return sf;
 	}
 
@@ -125,45 +122,38 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 				}
 			}
 
-			// variable costs per Time
+			// variable costs per time
 			score = score - (tourDuration * vehicleType.getCostInformation().getCostsPerSecond());
 		}
 
 		private void handleEvent(LinkEnterEvent event) {
 			final double distance = network.getLinks().get(event.getLinkId()).getLength();
-			final VehicleType vehicleType = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
-			final double costPerMeter = vehicleType.getCostInformation().getCostsPerMeter();
+			final double costPerMeter = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getCostInformation().getCostsPerMeter();
+			// variable costs per distance
 			score = score - (distance * costPerMeter);
 		}
 
 	}
 
 	/**
-	 * Calculate some toll for drinving on a link
+	 * Calculate some toll for driving on a link
 	 * This a lazy implementation of a cordon toll.
+	 * A vehicle is only tolled once.
 	 */
 	class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
 
 		final Logger log = LogManager.getLogger(EventBasedScoring.class);
+
 		private final double toll;
 		private double score;
 
-		private double tollingCounter;
-		private double maxNumberOfTollings; //Begrenze Anzahl der Bemautungen
 		private final List<String> vehicleTypesToBeTolled = Arrays.asList("large50");
 
-		public LinkBasedTollScoring(Carrier carrier, double toll) {
+		private final List<Id<Vehicle>> tolledVehicles = new ArrayList<>();
+
+		public LinkBasedTollScoring(double toll) {
 			super();
 			this.toll = toll;
-			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-				//Das ist noch nicht Perfekt, weil es besser wäre, dass nur jedes Fahrzeuig wirklich einmal bemautet wird.
-				//Aber es begrenzt immerhin auf die Anzahl der Fahrzeuge des Types, die unterwegs sind.
-				//Siehe auch untern bei der Bemautung selbst
-				//kmt nov '22
-				if (vehicleTypesToBeTolled.contains(scheduledTour.getVehicle().getType().getId().toString())) {
-					this.maxNumberOfTollings++;
-				}
-			}
 		}
 
 		@Override public void finish() {}
@@ -182,17 +172,17 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 //			List<String> tolledLinkList = Arrays.asList("i(5,5)R");
 			List<String> tolledLinkList = Arrays.asList("i(3,4)", "i(3,6)", "i(7,5)R", "i(7,7)R", "j(4,8)R", "j(6,8)R", "j(3,4)", "j(5,4)");
 
-			final VehicleType vehicleType = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
+			final Id<VehicleType> vehicleTypeId = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getId();
 
-			if (tollingCounter < maxNumberOfTollings) {
-				if (vehicleTypesToBeTolled.contains(vehicleType.getId().toString())) {
+			//toll a vehicle only once.
+			if (!tolledVehicles.contains(event.getVehicleId()))
+				if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
 					if (tolledLinkList.contains(event.getLinkId().toString())) {
 						log.info("Tolling caused by event: " + event);
-						tollingCounter++;
+						tolledVehicles.add(event.getVehicleId());
 						score = score - toll;
 					}
 				}
-			}
 		}
 	}
 }
