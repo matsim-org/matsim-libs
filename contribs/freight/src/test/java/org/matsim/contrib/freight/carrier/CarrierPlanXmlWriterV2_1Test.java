@@ -13,7 +13,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class CarrierPlanXmlWriterV2Test {
+public class CarrierPlanXmlWriterV2_1Test {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -28,7 +28,7 @@ public class CarrierPlanXmlWriterV2Test {
 
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(this.testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
-		new CarrierPlanXmlWriterV2(carriers).write(this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
+		new CarrierPlanXmlWriterV2_1(carriers).write(this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
 		carriers.getCarriers().clear();
 		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml" );
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
@@ -134,5 +134,8 @@ public class CarrierPlanXmlWriterV2Test {
 		assertNotNull(shipmentCustomerAtt);
 		assertEquals("someRandomCustomer", (String) shipmentCustomerAtt);
 	}
-
+	@Test
+	public void test_ReadWriteFilesAreEqual(){
+		MatsimTestUtils.assertEqualFilesLineByLine(this.testUtils.getClassInputDirectory() + "carrierPlansEquils.xml", this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
+	}
 }
