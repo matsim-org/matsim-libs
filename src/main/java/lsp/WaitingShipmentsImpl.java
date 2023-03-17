@@ -29,7 +29,7 @@ import java.util.List;
 
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
-	private final List<ShipmentWithTime> shipments;
+	private final List<LspShipmentWithTime> shipments;
 
 	WaitingShipmentsImpl() {
 		this.shipments = new ArrayList<>();
@@ -38,14 +38,14 @@ import java.util.List;
 
 	@Override
 	public void addShipment(double time, LSPShipment shipment) {
-		ShipmentWithTime tuple = new ShipmentWithTime(time, shipment);
+		LspShipmentWithTime tuple = new LspShipmentWithTime(time, shipment);
 		this.shipments.add(tuple);
-		shipments.sort(Comparator.comparingDouble(ShipmentWithTime::getTime));
+		shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
 	}
 
 	@Override
-	public Collection<ShipmentWithTime> getSortedShipments() {
-		shipments.sort(Comparator.comparingDouble(ShipmentWithTime::getTime));
+	public Collection<LspShipmentWithTime> getSortedShipments() {
+		shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
 		return shipments;
 	}
 
@@ -54,7 +54,7 @@ import java.util.List;
 	}
 
 	@Override
-	public Collection<ShipmentWithTime> getShipments() {
+	public Collection<LspShipmentWithTime> getShipments() {
 		return shipments;
 	}
 
@@ -64,7 +64,7 @@ import java.util.List;
 				.append("No of Shipments= ").append(shipments.size());
 		if (shipments.size() >0 ){
 			strb.append("; ShipmentIds=");
-			for (ShipmentWithTime shipment : getSortedShipments()) {
+			for (LspShipmentWithTime shipment : getSortedShipments()) {
 				strb.append("[")
 						.append(shipment.getShipment().getId())
 						.append("]");

@@ -42,7 +42,7 @@ import java.util.Comparator;
 public abstract class LSPResourceScheduler {
 
 	protected LSPResource resource;
-	protected ArrayList<ShipmentWithTime> shipments;
+	protected ArrayList<LspShipmentWithTime> shipments;
 
 
 	public final void scheduleShipments(LSPResource resource, int bufferTime) {
@@ -86,14 +86,14 @@ public abstract class LSPResourceScheduler {
 		for (LogisticChainElement element : resource.getClientElements()) {
 			shipments.addAll(element.getIncomingShipments().getShipments());
 		}
-		shipments.sort(Comparator.comparingDouble(ShipmentWithTime::getTime));
+		shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
 	}
 
 
 	public final void switchHandeledShipments(int bufferTime) {
-		for (ShipmentWithTime shipment : shipments) {
+		for (LspShipmentWithTime shipment : shipments) {
 			double endOfTransportTime = shipment.getShipment().getShipmentPlan().getMostRecentEntry().getEndTime() + bufferTime;
-			ShipmentWithTime outgoingTuple = new ShipmentWithTime(endOfTransportTime, shipment.getShipment());
+			LspShipmentWithTime outgoingTuple = new LspShipmentWithTime(endOfTransportTime, shipment.getShipment());
 			for (LogisticChainElement element : resource.getClientElements()) {
 				if (element.getIncomingShipments().getShipments().contains(shipment)) {
 					element.getOutgoingShipments().getShipments().add(outgoingTuple);

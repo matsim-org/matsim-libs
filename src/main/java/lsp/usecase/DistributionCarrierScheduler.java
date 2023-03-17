@@ -68,11 +68,11 @@ import java.util.*;
 		int load = 0;
 		double cumulatedLoadingTime = 0;
 		double availiabilityTimeOfLastShipment = 0;
-		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
-		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
+		ArrayList<LspShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
+		ArrayList<LspShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
 		List<CarrierPlan> scheduledPlans = new LinkedList<>();
 
-		for (ShipmentWithTime tuple : copyOfAssignedShipments) {
+		for (LspShipmentWithTime tuple : copyOfAssignedShipments) {
 			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber was ist, wenn es mehrere gibt???
 			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if ((load + tuple.getShipment().getSize()) > vehicleType.getCapacity().getOther().intValue()) {
@@ -131,7 +131,7 @@ import java.util.*;
 		return scheduledToursUnified;
 	}
 
-	private CarrierService convertToCarrierService(ShipmentWithTime tuple) {
+	private CarrierService convertToCarrierService(LspShipmentWithTime tuple) {
 		Id<CarrierService> serviceId = Id.create(tuple.getShipment().getId().toString(), CarrierService.class);
 		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, tuple.getShipment().getTo());
 		builder.setCapacityDemand(tuple.getShipment().getSize());
@@ -143,7 +143,7 @@ import java.util.*;
 
 	@Override
 	protected void updateShipments() {
-		for (ShipmentWithTime tuple : shipments) {
+		for (LspShipmentWithTime tuple : shipments) {
 			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 				Tour tour = scheduledTour.getTour();
 				for (TourElement element : tour.getTourElements()) {
@@ -164,7 +164,7 @@ import java.util.*;
 		}
 	}
 
-	private void addShipmentLoadElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
+	private void addShipmentLoadElement(LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 		ShipmentUtils.ScheduledShipmentLoadBuilder builder = ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
 		builder.setResourceId(resource.getId());
 		for (LogisticChainElement element : resource.getClientElements()) {
@@ -193,7 +193,7 @@ import java.util.*;
 		tuple.getShipment().getShipmentPlan().addPlanElement(id, load);
 	}
 
-	private void addShipmentTransportElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
+	private void addShipmentTransportElement(LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 		ShipmentUtils.ScheduledShipmentTransportBuilder builder = ShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
 		builder.setResourceId(resource.getId());
 		for (LogisticChainElement element : resource.getClientElements()) {
@@ -218,7 +218,7 @@ import java.util.*;
 		tuple.getShipment().getShipmentPlan().addPlanElement(id, transport);
 	}
 
-	private void addShipmentUnloadElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
+	private void addShipmentUnloadElement(LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 		ShipmentUtils.ScheduledShipmentUnloadBuilder builder = ShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
 		builder.setResourceId(resource.getId());
 		for (LogisticChainElement element : resource.getClientElements()) {
@@ -240,7 +240,7 @@ import java.util.*;
 	}
 
 	private int carrierCnt = 1;
-	private Carrier createAuxiliaryCarrier(ArrayList<ShipmentWithTime> shipmentsInCurrentTour, double startTime) {
+	private Carrier createAuxiliaryCarrier(ArrayList<LspShipmentWithTime> shipmentsInCurrentTour, double startTime) {
 		final Id<Carrier> carrierId = Id.create(carrier.getId().toString() + carrierCnt, Carrier.class);
 		carrierCnt ++;
 		Carrier auxiliaryCarrier = CarrierUtils.createCarrier(carrierId);
@@ -254,7 +254,7 @@ import java.util.*;
 		auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().put(cv.getId(), cv);
 		auxiliaryCarrier.getCarrierCapabilities().setFleetSize(FleetSize.FINITE);
 
-		for (ShipmentWithTime tuple : shipmentsInCurrentTour) {
+		for (LspShipmentWithTime tuple : shipmentsInCurrentTour) {
 			CarrierService carrierService = convertToCarrierService(tuple);
 			auxiliaryCarrier.getServices().put(carrierService.getId(), carrierService);
 		}
@@ -262,7 +262,7 @@ import java.util.*;
 	}
 
 
-	private void addDistributionServiceEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
+	private void addDistributionServiceEventHandler(CarrierService carrierService, LspShipmentWithTime tuple, LSPCarrierResource resource) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				DistributionServiceStartEventHandler handler = new DistributionServiceStartEventHandler(carrierService, tuple.getShipment(), element, resource);
@@ -272,7 +272,7 @@ import java.util.*;
 		}
 	}
 
-	private void addDistributionTourStartEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
+	private void addDistributionTourStartEventHandler(CarrierService carrierService, LspShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				DistributionTourStartEventHandler handler = new DistributionTourStartEventHandler(carrierService, tuple.getShipment(), element, resource, tour);
@@ -283,10 +283,10 @@ import java.util.*;
 	}
 
 	static class LSPCarrierPair {
-		private final ShipmentWithTime tuple;
+		private final LspShipmentWithTime tuple;
 		private final CarrierService service;
 
-		public LSPCarrierPair(ShipmentWithTime tuple, CarrierService service) {
+		public LSPCarrierPair(LspShipmentWithTime tuple, CarrierService service) {
 			this.tuple = tuple;
 			this.service = service;
 		}
