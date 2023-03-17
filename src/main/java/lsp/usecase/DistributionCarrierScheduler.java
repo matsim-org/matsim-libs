@@ -74,10 +74,10 @@ import java.util.*;
 		List<CarrierPlan> scheduledPlans = new LinkedList<>();
 
 		for (ShipmentWithTime tuple : copyOfAssignedShipments) {
-			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber weas ist, wenn es mehrer gibt???
+			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber was ist, wenn es mehrere gibt???
 			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
 //					(carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next()).getType();
-			//.getVehicleTypes().iterator().next();  //Nutzen wir eingetlich nicht mehr in freight contrib -> vehTypes aus den Vehicles holen.
+			//.getVehicleTypes().iterator().next();  //Nutzen wir eigentlich nicht mehr in freight contrib → vehTypes aus den Vehicles holen.
 			if ((load + tuple.getShipment().getSize()) <= vehicleType.getCapacity().getOther().intValue()) {
 				shipmentsInCurrentTour.add(tuple);
 				load = load + tuple.getShipment().getSize();
@@ -113,13 +113,13 @@ import java.util.*;
 	/**
 	 * This method unifies the tourIds of the CollectionCarrier.
 	 * <p>
-	 * It is done because in the current setup, there is one (auxiliary) Carrier per Tour. ---> in each Carrier the Tour has the Id 1.
+	 * It is done because in the current setup, there is one (auxiliary) Carrier per Tour. ---> in each Carrier the Tour has the id 1.
 	 * In a second step all of that tours were put together in one single carrier {@link #scheduleResource()}
-	 * But now, this carrier can have several tours, all with the same Id (1)-
+	 * But now, this carrier can have several tours, all with the same id (1).
 	 * <p>
 	 * In this method all tours copied but with a new (unique) TourId.
 	 * <p>
-	 * This is a workaround. In my (KMT, sep'22) opinion it would be better to switch so {@link CarrierShipment}s insteaf of {@link CarrierService}
+	 * This is a workaround. In my (KMT, sep'22) opinion it would be better to switch so {@link CarrierShipment}s instead of {@link CarrierService}
 	 * and use only on DistributionCarrier with only one VRP and only one jsprit-Run. This would avoid this workaround and
 	 * also improve the solution, because than the DistributionCarrier can decide on it one which shipments will go into which tours
 	 *
@@ -128,13 +128,13 @@ import java.util.*;
 	 */
 //	private Collection<ScheduledTour> unifyTourIds(Collection<ScheduledTour> scheduledTours) {
 	private Collection<ScheduledTour> unifyTourIds(Collection<CarrierPlan> carrierPlans) {
-		int tourIdindex = 1;
+		int tourIdIndex = 1;
 		List<ScheduledTour> scheduledToursUnified = new LinkedList<>();
 
 		for (CarrierPlan carrierPlan : carrierPlans) {
 			for (ScheduledTour scheduledTour : carrierPlan.getScheduledTours()) {
-				var newTour = scheduledTour.getTour().duplicateWithNewId(Id.create("dist_" + tourIdindex, Tour.class));
-				tourIdindex++;
+				var newTour = scheduledTour.getTour().duplicateWithNewId(Id.create("dist_" + tourIdIndex, Tour.class));
+				tourIdIndex++;
 				var newScheduledTour = ScheduledTour.newInstance(newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture());
 				scheduledToursUnified.add(newScheduledTour);
 			}
