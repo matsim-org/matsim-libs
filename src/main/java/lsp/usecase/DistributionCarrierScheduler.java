@@ -144,23 +144,19 @@ import java.util.*;
 	@Override
 	protected void updateShipments() {
 		for (ShipmentWithTime tuple : shipments) {
-			updateSchedule(tuple);
-		}
-	}
-
-	private void updateSchedule(ShipmentWithTime tuple) {
-		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-			Tour tour = scheduledTour.getTour();
-			for (TourElement element : tour.getTourElements()) {
-				if (element instanceof ServiceActivity serviceActivity) {
-					LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
-					for (LSPCarrierPair pair : pairs) {
-						if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
-							addShipmentLoadElement(tuple, tour, serviceActivity);
-							addShipmentTransportElement(tuple, tour, serviceActivity);
-							addShipmentUnloadElement(tuple, tour, serviceActivity);
-							addDistributionTourStartEventHandler(pair.service, tuple, resource, tour);
-							addDistributionServiceEventHandler(pair.service, tuple, resource);
+			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				Tour tour = scheduledTour.getTour();
+				for (TourElement element : tour.getTourElements()) {
+					if (element instanceof ServiceActivity serviceActivity) {
+						LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
+						for (LSPCarrierPair pair : pairs) {
+							if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
+								addShipmentLoadElement(tuple, tour, serviceActivity);
+								addShipmentTransportElement(tuple, tour, serviceActivity);
+								addShipmentUnloadElement(tuple, tour, serviceActivity);
+								addDistributionTourStartEventHandler(pair.service, tuple, resource, tour);
+								addDistributionServiceEventHandler(pair.service, tuple, resource);
+							}
 						}
 					}
 				}
