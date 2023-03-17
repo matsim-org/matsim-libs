@@ -78,23 +78,18 @@ import java.util.*;
 			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
 //					(carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next()).getType();
 			//.getVehicleTypes().iterator().next();  //Nutzen wir eigentlich nicht mehr in freight contrib → vehTypes aus den Vehicles holen.
-			if ((load + tuple.getShipment().getSize()) <= vehicleType.getCapacity().getOther().intValue()) {
-				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getSize();
-				cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getDeliveryServiceTime();
-				availiabilityTimeOfLastShipment = tuple.getTime();
-			} else {
+			if ((load + tuple.getShipment().getSize()) > vehicleType.getCapacity().getOther().intValue()) {
 				load = 0;
-				Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime) , resource.getNetwork());
+				Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime), resource.getNetwork());
 //				scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
 				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 				cumulatedLoadingTime = 0;
 				shipmentsInCurrentTour.clear();
-				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getSize();
-				cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getDeliveryServiceTime();
-				availiabilityTimeOfLastShipment = tuple.getTime();
 			}
+			shipmentsInCurrentTour.add(tuple);
+			load = load + tuple.getShipment().getSize();
+			cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getDeliveryServiceTime();
+			availiabilityTimeOfLastShipment = tuple.getTime();
 		}
 
 		if (!shipmentsInCurrentTour.isEmpty()) {
