@@ -79,23 +79,18 @@ import java.util.*;
 		
 		for (ShipmentWithTime tuple : copyOfAssignedShipments) {
 			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
-			if ((load + tuple.getShipment().getSize()) <= vehicleType.getCapacity().getOther().intValue()) {
-				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getSize();
-			} else {
+			if ((load + tuple.getShipment().getSize()) > vehicleType.getCapacity().getOther().intValue()) {
 				load = 0;
 				CarrierPlan plan = createPlan(carrier, shipmentsInCurrentTour);
-//				scheduledTours.addAll(plan.getScheduledTours());
 				scheduledPlans.add(plan);
 				shipmentsInCurrentTour.clear();
-				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getSize();
 			}
+			shipmentsInCurrentTour.add(tuple);
+			load = load + tuple.getShipment().getSize();
 
 		}
 		if (!shipmentsInCurrentTour.isEmpty()) {
 			CarrierPlan plan = createPlan(carrier, shipmentsInCurrentTour);
-//			scheduledTours.addAll(plan.getScheduledTours());
 			scheduledPlans.add(plan);
 			shipmentsInCurrentTour.clear();
 		}
@@ -218,7 +213,6 @@ import java.util.*;
 	}
 
 	private void updateSchedule(ShipmentWithTime tuple) {
-		//outerLoop:
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Tour tour = scheduledTour.getTour();
 			for (TourElement element : tour.getTourElements()) {
@@ -231,7 +225,6 @@ import java.util.*;
 							addShipmentUnloadElement(tuple, tour, serviceActivity);
 							addMainTourRunStartEventHandler(pair.service, tuple, resource, tour);
 							addMainRunTourEndEventHandler(pair.service, tuple, resource, tour);
-							//break outerLoop;
 						}
 					}
 				}
