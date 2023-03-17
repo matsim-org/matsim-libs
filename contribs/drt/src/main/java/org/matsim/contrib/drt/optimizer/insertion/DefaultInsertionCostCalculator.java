@@ -21,17 +21,22 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 /**
  * @author michalm
  */
 public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	private final CostCalculationStrategy costCalculationStrategy;
+	private final DrtConfigGroup drtConfigGroup;
 
-	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy) {
+	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy,
+										  DrtConfigGroup drtConfigGroup) {
 		this.costCalculationStrategy = costCalculationStrategy;
+		this.drtConfigGroup = drtConfigGroup;
 	}
 
 	/**
@@ -53,6 +58,23 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 		if (vEntry.getSlackTime(insertion.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
 				|| vEntry.getSlackTime(insertion.dropoff.index) < detourTimeInfo.getTotalTimeLoss()) {
 			return INFEASIBLE_SOLUTION_COST;
+		}
+
+		// divert right now
+		if(insertion.pickup.index == 0) {
+			Waypoint nextWaypoint = insertion.pickup.nextWaypoint;
+			// there is an existing stop following the new insertion
+			if(nextWaypoint instanceof Waypoint.Stop && nextWaypoint != insertion.pickup.newWaypoint) {
+				// passengers are being dropped off == may be close to arrival
+				if(!((Waypoint.Stop) nextWaypoint).task.getDropoffRequests().isEmpty()) {
+					double nextArrival = nextWaypoint.getArrivalTime();
+					double departureTime = insertion.vehicleEntry.start.getDepartureTime();
+					//arrival is very soon
+					if (nextArrival - departureTime < drtConfigGroup.fixedApproachTime) {
+						return INFEASIBLE_SOLUTION_COST;
+					}
+				}
+			}
 		}
 
 		return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
