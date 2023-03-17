@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
@@ -64,7 +65,7 @@ public class InsertionCostCalculatorTest {
 
 	private void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var insertionCostCalculator = new DefaultInsertionCostCalculator(
-				new CostCalculationStrategy.RejectSoftConstraintViolations());
+				new CostCalculationStrategy.RejectSoftConstraintViolations(), new DrtConfigGroup());
 		var insertionWithDetourData = new InsertionWithDetourData(insertion, null, detourTimeInfo);
 		assertThat(insertionCostCalculator.calculate(drtRequest, insertionWithDetourData.insertion,
 				insertionWithDetourData.detourTimeInfo)).isEqualTo(expectedCost);

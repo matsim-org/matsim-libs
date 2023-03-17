@@ -132,7 +132,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
-				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))));
+				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class), drtCfg)));
 
 		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
 
