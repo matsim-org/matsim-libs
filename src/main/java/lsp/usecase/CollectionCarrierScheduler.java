@@ -88,8 +88,6 @@ import java.util.ArrayList;
 	}
 
 	private void updateSchedule(ShipmentWithTime tuple) {
-
-		//outerLoop:
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Tour tour = scheduledTour.getTour();
 			for (TourElement element : tour.getTourElements()) {
@@ -102,7 +100,6 @@ import java.util.ArrayList;
 							addShipmentUnloadElement(tuple, tour, serviceActivity);
 							addCollectionTourEndEventHandler(pair.service, tuple, resource, tour);
 							addCollectionServiceEventHandler(pair.service, tuple, resource);
-							//				break outerLoop;
 						}
 					}
 				}
@@ -140,7 +137,6 @@ import java.util.ArrayList;
 				break;
 			}
 		}
-
 	}
 
 	private void addCollectionTourEndEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
@@ -151,7 +147,6 @@ import java.util.ArrayList;
 				break;
 			}
 		}
-
 	}
 
 	private void addShipmentTransportElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
@@ -210,13 +205,6 @@ import java.util.ArrayList;
 		return unloadEndTime;
 	}
 
-	static class LSPCarrierPair {
-		private final ShipmentWithTime tuple;
-		private final CarrierService service;
-
-		public LSPCarrierPair(ShipmentWithTime tuple, CarrierService service) {
-			this.tuple = tuple;
-			this.service = service;
-		}
+	private record LSPCarrierPair(ShipmentWithTime tuple, CarrierService service) {
 	}
 }

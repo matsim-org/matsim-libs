@@ -70,18 +70,14 @@ import java.util.*;
 		double availiabilityTimeOfLastShipment = 0;
 		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
 		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
-//		List<ScheduledTour> scheduledTours = new LinkedList<>();
 		List<CarrierPlan> scheduledPlans = new LinkedList<>();
 
 		for (ShipmentWithTime tuple : copyOfAssignedShipments) {
 			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber was ist, wenn es mehrere gibt???
 			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
-//					(carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next()).getType();
-			//.getVehicleTypes().iterator().next();  //Nutzen wir eigentlich nicht mehr in freight contrib → vehTypes aus den Vehicles holen.
 			if ((load + tuple.getShipment().getSize()) > vehicleType.getCapacity().getOther().intValue()) {
 				load = 0;
 				Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime), resource.getNetwork());
-//				scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
 				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 				cumulatedLoadingTime = 0;
 				shipmentsInCurrentTour.clear();
@@ -94,7 +90,6 @@ import java.util.*;
 
 		if (!shipmentsInCurrentTour.isEmpty()) {
 			Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime), resource.getNetwork());
-//			scheduledTours.addAll(auxiliaryCarrier.getSelectedPlan().getScheduledTours());
 			scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 			shipmentsInCurrentTour.clear();
 		}
@@ -103,7 +98,6 @@ import java.util.*;
 		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
 		carrier.setSelectedPlan(plan);
 	}
-
 
 	/**
 	 * This method unifies the tourIds of the CollectionCarrier.
@@ -134,14 +128,12 @@ import java.util.*;
 				scheduledToursUnified.add(newScheduledTour);
 			}
 		}
-
 		return scheduledToursUnified;
 	}
 
 	private CarrierService convertToCarrierService(ShipmentWithTime tuple) {
 		Id<CarrierService> serviceId = Id.create(tuple.getShipment().getId().toString(), CarrierService.class);
 		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, tuple.getShipment().getTo());
-		//builder.setServiceStartTimeWindow(tuple.getShipment().getEndTimeWindow());
 		builder.setCapacityDemand(tuple.getShipment().getSize());
 		builder.setServiceDuration(tuple.getShipment().getDeliveryServiceTime());
 		CarrierService service = builder.build();
@@ -154,12 +146,9 @@ import java.util.*;
 		for (ShipmentWithTime tuple : shipments) {
 			updateSchedule(tuple);
 		}
-
 	}
 
 	private void updateSchedule(ShipmentWithTime tuple) {
-
-		//outerLoop:
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Tour tour = scheduledTour.getTour();
 			for (TourElement element : tour.getTourElements()) {
@@ -172,7 +161,6 @@ import java.util.*;
 							addShipmentUnloadElement(tuple, tour, serviceActivity);
 							addDistributionTourStartEventHandler(pair.service, tuple, resource, tour);
 							addDistributionServiceEventHandler(pair.service, tuple, resource);
-							//break outerLoop;
 						}
 					}
 				}
@@ -207,7 +195,6 @@ import java.util.*;
 		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + "" + load.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getShipmentPlan().addPlanElement(id, load);
-
 	}
 
 	private void addShipmentTransportElement(ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
@@ -268,7 +255,6 @@ import java.util.*;
 		vBuilder.setEarliestStart(startTime);
 		vBuilder.setLatestEnd(24 * 60 * 60);
 		CarrierVehicle cv = vBuilder.build();
-//	    auxiliaryCarrier.getCarrierCapabilities().getVehicleTypes().add(carrier.getCarrierCapabilities().getVehicleTypes().iterator().next());
 		auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().put(cv.getId(), cv);
 		auxiliaryCarrier.getCarrierCapabilities().setFleetSize(FleetSize.FINITE);
 
@@ -279,29 +265,6 @@ import java.util.*;
 		return auxiliaryCarrier;
 	}
 
-// --Commented out by Inspection START (09.12.22, 21:59):
-//	private double getLoadStartTime(ShipmentWithTime tuple, Tour tour) {
-//		double loadStartTime = 0;
-//		ListIterator<TourElement> iterator = tour.getTourElements().listIterator(tour.getTourElements().size() - 1);
-//
-//		outerLoop:
-//		while (iterator.hasPrevious()) {
-//			TourElement element = iterator.previous();
-//			if (element instanceof ServiceActivity serviceActivity) {
-//				LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
-//				for (LSPCarrierPair pair : pairs) {
-//					if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
-//						break outerLoop;
-//					} else {
-//						loadStartTime = loadStartTime + serviceActivity.getDuration();
-//					}
-//				}
-//			}
-//		}
-//
-//		return loadStartTime;
-//	}
-// --Commented out by Inspection STOP (09.12.22, 21:59)
 
 	private void addDistributionServiceEventHandler(CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {
@@ -321,7 +284,6 @@ import java.util.*;
 				break;
 			}
 		}
-
 	}
 
 	static class LSPCarrierPair {
@@ -332,7 +294,6 @@ import java.util.*;
 			this.tuple = tuple;
 			this.service = service;
 		}
-
 	}
 
 }

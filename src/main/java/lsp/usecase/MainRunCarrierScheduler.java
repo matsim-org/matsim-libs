@@ -337,13 +337,6 @@ import java.util.*;
 		}
 	}
 
-	static class LSPCarrierPair {
-		private final ShipmentWithTime tuple;
-		private final CarrierService service;
-
-		public LSPCarrierPair(ShipmentWithTime tuple, CarrierService service) {
-			this.tuple = tuple;
-			this.service = service;
-		}
+	private record LSPCarrierPair(ShipmentWithTime tuple, CarrierService service) {
 	}
 }
