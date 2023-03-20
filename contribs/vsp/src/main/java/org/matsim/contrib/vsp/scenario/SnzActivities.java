@@ -12,12 +12,12 @@ public enum SnzActivities {
 	other,
 	visit,
 
-	edu_kiga(7, 17),
-	edu_primary(7, 16),
-	edu_secondary(7, 17),
+	educ_kiga(7, 17),
+	educ_primary(7, 16),
+	educ_secondary(7, 17),
 	educ_tertiary(7, 22),
-	edu_higher(7, 19),
-	edu_other(7, 22),
+	educ_higher(7, 19),
+	educ_other(7, 22),
 
 	work(6, 20),
 	business(8, 20),
