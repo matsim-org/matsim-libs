@@ -53,7 +53,7 @@ import com.google.inject.Inject;
 */
 
 final class ParkingCostHandler implements TransitDriverStartsEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
-	
+
 	private final Map<Id<Person>, Double> personId2lastLeaveVehicleTime = new HashMap<>();
 	private final Map<Id<Person>, String> personId2previousActivity = new HashMap<>();
 	private final Map<Id<Person>, Id<Link>> personId2relevantModeLinkId = new HashMap<>();
@@ -61,13 +61,14 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 	private final Set<Id<Person>> ptDrivers = new HashSet<>();
 	private final Set<Id<Person>> hasAlreadyPaidDailyResidentialParkingCosts = new HashSet<>();
 	private double compensationTime = Double.NaN;
-	
+	private boolean isInRestrictedParkingPeriod;
+
 	@Inject
 	private ParkingCostConfigGroup parkingCostConfigGroup;
-	
+
 	@Inject
 	private EventsManager events;
-	
+
 	@Inject
 	private Scenario scenario;
 
@@ -84,6 +85,34 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
        this.ptDrivers.clear();
     }
 
+	private boolean checkTimeRestriction(double time) {
+		boolean isRelevant = true;
+
+		if(parkingCostConfigGroup.getParkingCostTimePeriodStart_s() > 0. && parkingCostConfigGroup.getParkingCostTimePeriodEnd_s() > 0.) {
+			//start + end of parking period are defined
+			if(!(parkingCostConfigGroup.getParkingCostTimePeriodStart_s() <= time
+					&& time <= parkingCostConfigGroup.getParkingCostTimePeriodEnd_s())) {
+				//event time is outside of parking period
+				isRelevant = false;
+			}
+		} else if(parkingCostConfigGroup.getParkingCostTimePeriodStart_s() == 0. && parkingCostConfigGroup.getParkingCostTimePeriodEnd_s() == 0.) {
+			//start + end of parking period are not defined = no time restriction for parking = parking cost is charged at any time -> default!
+		} else if(parkingCostConfigGroup.getParkingCostTimePeriodStart_s() == 0. && parkingCostConfigGroup.getParkingCostTimePeriodEnd_s() > 0.) {
+			//start of parking period is not defined, the end is defined
+			if(!(time <= parkingCostConfigGroup.getParkingCostTimePeriodEnd_s())) {
+				//parking period is already over
+				isRelevant = false;
+			}
+		} else if(parkingCostConfigGroup.getParkingCostTimePeriodStart_s() > 0. && parkingCostConfigGroup.getParkingCostTimePeriodEnd_s() == 0.) {
+			//start of parking period is defined, the end is not defined
+			if(!(parkingCostConfigGroup.getParkingCostTimePeriodStart_s() <= time)) {
+				//parking period has yet to begin
+				isRelevant = false;
+			}
+		}
+		return isRelevant;
+	}
+
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
@@ -92,28 +121,38 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 
 
 	@Override
-	public void handleEvent(ActivityEndEvent event) {		
-		if (ptDrivers.contains(event.getPersonId())) {
-			// skip pt drivers
-		} else {
-			if (!(StageActivityTypeIdentifier.isStageActivity(event.getActType()))) {
-				
-				personId2previousActivity.put(event.getPersonId(), event.getActType());
-				
-				if (personId2relevantModeLinkId.get(event.getPersonId()) != null) {
-					personId2relevantModeLinkId.remove(event.getPersonId());
+	public void handleEvent(ActivityEndEvent event) {
+
+		isInRestrictedParkingPeriod = checkTimeRestriction(event.getTime());
+
+		if(isInRestrictedParkingPeriod) {
+			if (ptDrivers.contains(event.getPersonId())) {
+				// skip pt drivers
+			} else {
+				if (!(StageActivityTypeIdentifier.isStageActivity(event.getActType()))) {
+
+					personId2previousActivity.put(event.getPersonId(), event.getActType());
+
+					if (personId2relevantModeLinkId.get(event.getPersonId()) != null) {
+						personId2relevantModeLinkId.remove(event.getPersonId());
+					}
 				}
 			}
-		}	
+		}
 	}
 
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (! ptDrivers.contains(event.getPersonId())) {
-			// There might be several departures during a single trip.
-			if (event.getLegMode().equals(parkingCostConfigGroup.getMode())) {
-				personId2relevantModeLinkId.put(event.getPersonId(), event.getLinkId());
+
+		isInRestrictedParkingPeriod = checkTimeRestriction(event.getTime());
+
+		if(isInRestrictedParkingPeriod) {
+			if (! ptDrivers.contains(event.getPersonId())) {
+				// There might be several departures during a single trip.
+				if (event.getLegMode().equals(parkingCostConfigGroup.getMode())) {
+					personId2relevantModeLinkId.put(event.getPersonId(), event.getLinkId());
+				}
 			}
 		}
 	}
@@ -121,104 +160,113 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (! ptDrivers.contains(event.getPersonId())) {
-			if (personId2relevantModeLinkId.get(event.getPersonId()) != null) {
 
-				Link link = scenario.getNetwork().getLinks().get(personId2relevantModeLinkId.get(event.getPersonId()));
+		isInRestrictedParkingPeriod = checkTimeRestriction(event.getTime());
 
-				if (parkingCostConfigGroup.getActivityPrefixesToBeExcludedFromParkingCost().stream()
-						.noneMatch(s -> personId2previousActivity.get(event.getPersonId()).startsWith(s))){
+		if(isInRestrictedParkingPeriod) {
+			if (!ptDrivers.contains(event.getPersonId())) {
+				if (personId2relevantModeLinkId.get(event.getPersonId()) != null) {
 
-					if (personId2previousActivity.get(event.getPersonId()).startsWith(parkingCostConfigGroup.getActivityPrefixForDailyParkingCosts())) {
-						// daily residential parking costs
+					Link link = scenario.getNetwork().getLinks().get(personId2relevantModeLinkId.get(event.getPersonId()));
 
-						if (! hasAlreadyPaidDailyResidentialParkingCosts.contains(event.getPersonId())){
-							hasAlreadyPaidDailyResidentialParkingCosts.add(event.getPersonId());
+					if (parkingCostConfigGroup.getActivityPrefixesToBeExcludedFromParkingCost().stream()
+							.noneMatch(s -> personId2previousActivity.get(event.getPersonId()).startsWith(s))) {
 
-							double residentialParkingFeePerDay = 0.;
-							if (link.getAttributes().getAttribute(parkingCostConfigGroup.getResidentialParkingFeeAttributeName()) != null) {
-								residentialParkingFeePerDay = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getResidentialParkingFeeAttributeName());
+						if (personId2previousActivity.get(event.getPersonId()).startsWith(parkingCostConfigGroup.getActivityPrefixForDailyParkingCosts())) {
+							// daily residential parking costs
+
+							if (!hasAlreadyPaidDailyResidentialParkingCosts.contains(event.getPersonId())) {
+								hasAlreadyPaidDailyResidentialParkingCosts.add(event.getPersonId());
+
+								double residentialParkingFeePerDay = 0.;
+								if (link.getAttributes().getAttribute(parkingCostConfigGroup.getResidentialParkingFeeAttributeName()) != null) {
+									residentialParkingFeePerDay = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getResidentialParkingFeeAttributeName());
+								}
+
+								if (residentialParkingFeePerDay > 0.) {
+									double amount = -1. * residentialParkingFeePerDay;
+									events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), amount, "residential parking", "city", "link " + link.getId().toString()));
+								}
 							}
 
-							if (residentialParkingFeePerDay > 0.) {
-								double amount = -1. * residentialParkingFeePerDay;
-								events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), amount, "residential parking", "city", "link " + link.getId().toString()));
+						} else {
+							// other parking cost types
+
+							double parkingStartTime = 0.;
+							if (personId2lastLeaveVehicleTime.get(event.getPersonId()) != null) {
+								parkingStartTime = personId2lastLeaveVehicleTime.get(event.getPersonId());
 							}
-						}
+							int parkingDurationHrs = (int) Math.ceil((event.getTime() - parkingStartTime) / 3600.);
 
-					} else {
-						// other parking cost types
+							double extraHourParkingCosts = 0.;
+							if (link.getAttributes().getAttribute(parkingCostConfigGroup.getExtraHourParkingCostLinkAttributeName()) != null) {
+								extraHourParkingCosts = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getExtraHourParkingCostLinkAttributeName());
+							}
 
-						double parkingStartTime = 0.;
-						if (personId2lastLeaveVehicleTime.get(event.getPersonId()) != null) {
-							parkingStartTime = personId2lastLeaveVehicleTime.get(event.getPersonId());
-						}
-						int parkingDurationHrs = (int) Math.ceil((event.getTime() - parkingStartTime) / 3600.);
+							double firstHourParkingCosts = 0.;
+							if (link.getAttributes().getAttribute(parkingCostConfigGroup.getFirstHourParkingCostLinkAttributeName()) != null) {
+								firstHourParkingCosts = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getFirstHourParkingCostLinkAttributeName());
+							}
 
-						double extraHourParkingCosts = 0.;
-						if (link.getAttributes().getAttribute(parkingCostConfigGroup.getExtraHourParkingCostLinkAttributeName()) != null) {
-							extraHourParkingCosts = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getExtraHourParkingCostLinkAttributeName());
-						}
+							double dailyParkingCosts = firstHourParkingCosts + 29 * extraHourParkingCosts;
+							if (link.getAttributes().getAttribute(parkingCostConfigGroup.getDailyParkingCostLinkAttributeName()) != null) {
+								dailyParkingCosts = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getDailyParkingCostLinkAttributeName());
+							}
 
-						double firstHourParkingCosts = 0.;
-						if (link.getAttributes().getAttribute(parkingCostConfigGroup.getFirstHourParkingCostLinkAttributeName()) != null) {
-							firstHourParkingCosts = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getFirstHourParkingCostLinkAttributeName());
-						}
+							double maxDailyParkingCosts = dailyParkingCosts;
+							if (link.getAttributes().getAttribute(parkingCostConfigGroup.getMaxDailyParkingCostLinkAttributeName()) != null) {
+								maxDailyParkingCosts = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getMaxDailyParkingCostLinkAttributeName());
+							}
 
-						double dailyParkingCosts = firstHourParkingCosts + 29 * extraHourParkingCosts;
-						if (link.getAttributes().getAttribute(parkingCostConfigGroup.getDailyParkingCostLinkAttributeName()) != null) {
-							dailyParkingCosts = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getDailyParkingCostLinkAttributeName());
-						}
+							double maxParkingDurationHrs = 30;
+							if (link.getAttributes().getAttribute(parkingCostConfigGroup.getMaxParkingDurationAttributeName()) != null) {
+								maxParkingDurationHrs = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getMaxParkingDurationAttributeName());
+							}
 
-						double maxDailyParkingCosts = dailyParkingCosts;
-						if (link.getAttributes().getAttribute(parkingCostConfigGroup.getMaxDailyParkingCostLinkAttributeName()) != null) {
-							maxDailyParkingCosts = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getMaxDailyParkingCostLinkAttributeName());
-						}
+							double parkingPenalty = 0.;
+							if (link.getAttributes().getAttribute(parkingCostConfigGroup.getParkingPenaltyAttributeName()) != null) {
+								parkingPenalty = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getParkingPenaltyAttributeName());
+							}
 
-						double maxParkingDurationHrs = 30;
-						if (link.getAttributes().getAttribute(parkingCostConfigGroup.getMaxParkingDurationAttributeName()) != null) {
-							maxParkingDurationHrs = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getMaxParkingDurationAttributeName());
-						}
+							double costs = 0.;
+							if (parkingDurationHrs > 0) {
+								costs += firstHourParkingCosts;
+								costs += (parkingDurationHrs - 1) * extraHourParkingCosts;
+							}
+							if (costs > dailyParkingCosts) {
+								costs = dailyParkingCosts;
+							}
+							if (costs > maxDailyParkingCosts) {
+								costs = maxDailyParkingCosts;
+							}
+							if ((parkingDurationHrs > maxParkingDurationHrs) & (costs < parkingPenalty)) {
+								costs = parkingPenalty;
+							}
 
-						double parkingPenalty = 0.;
-						if (link.getAttributes().getAttribute(parkingCostConfigGroup.getParkingPenaltyAttributeName()) != null) {
-							parkingPenalty = (double) link.getAttributes().getAttribute(parkingCostConfigGroup.getParkingPenaltyAttributeName());
-						}
+							if (costs > 0.) {
+								double amount = -1. * costs;
+								events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), amount, "non-residential parking", "city", "link " + link.getId().toString()));
+							}
 
-						double costs = 0.;
-						if (parkingDurationHrs > 0) {
-							costs += firstHourParkingCosts;
-							costs += (parkingDurationHrs - 1) * extraHourParkingCosts;
-						}
-						if (costs > dailyParkingCosts) {
-							costs = dailyParkingCosts;
-						}
-						if (costs > maxDailyParkingCosts) {
-							costs = maxDailyParkingCosts;
-						}
-						if ((parkingDurationHrs > maxParkingDurationHrs) & (costs < parkingPenalty)) {
-							costs = parkingPenalty;
-						}
-
-						if (costs > 0.) {
-							double amount = -1. * costs;
-							events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), amount, "non-residential parking", "city", "link " + link.getId().toString()));
 						}
 
 					}
 
 				}
-
 			}
 		}
-
 	}
 
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if (! ptDrivers.contains(event.getPersonId())) {
-			personId2lastLeaveVehicleTime.put(event.getPersonId(), event.getTime());
+
+		isInRestrictedParkingPeriod = checkTimeRestriction(event.getTime());
+
+		if(isInRestrictedParkingPeriod) {
+			if (!ptDrivers.contains(event.getPersonId())) {
+				personId2lastLeaveVehicleTime.put(event.getPersonId(), event.getTime());
+			}
 		}
 	}
 

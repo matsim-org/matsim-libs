@@ -19,6 +19,7 @@
 
 package playground.vsp.simpleParkingCostHandler;
 
+import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -26,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 
+ *
  * @author ikaddoura
  */
 
@@ -43,11 +44,13 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 	private static final String RESIDENTIAL_PARKING_FEE_PER_DAY = "residentialParkingFeePerDay";
 	private static final String ACTIVITY_PREFIXES_TO_BE_EXCLUDED_FROM_PARKING_COSTS = "activityPrefixesToBeExcludedFromParkingCosts";
 	private static final String ACTIVITY_PREFIX_FOR_DAILY_PARKING_COSTS = "activityPrefixForDailyParkingCosts";
-	
+	private static final String PARKING_COST_TIME_PERIOD_START = "parkingCostTimePeriodStart";
+	private static final String PARKING_COST_TIME_PERIOD_END = "parkingCostTimePeriodEnd";
+
 	public ParkingCostConfigGroup() {
 		super(GROUP_NAME);
 	}
-	
+
 	private String mode = "car";
 	private String dailyParkingCostLinkAttributeName = "dailyPCost";
 	private String firstHourParkingCostLinkAttributeName = "oneHourPCost";
@@ -59,11 +62,25 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 	private String activityPrefixForDailyParkingCosts = "home";
 	private final Set<String> activityPrefixToBeExcludedFromParkingCost = new HashSet<>();
 
+	@Parameter
+	@Comment("Parameter for restricting the charged parkingCost to a defined time period."
+			+ " This parameter defines the start of the time period."
+			+ " Unit is seconds, default = 0 = no time restriction.")
+	@PositiveOrZero
+	private double parkingCostTimePeriodStart;
+
+	@Parameter
+	@Comment("Parameter for restricting the charged parkingCost to a defined time period."
+			+ " This parameter defines the end of the time period."
+			+ " Unit is seconds, default = 0 = no time restriction.")
+	@PositiveOrZero
+	private double parkingCostTimePeriodEnd;
+
 	@StringGetter( MODE )
 	public String getMode() {
 		return mode;
 	}
-	
+
 	@StringSetter( MODE )
 	public void setMode(String mode) {
 		this.mode = mode;
@@ -166,6 +183,24 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( ACTIVITY_PREFIX_FOR_DAILY_PARKING_COSTS )
 	public void setActivityPrefixForDailyParkingCosts(String activityPrefixForDailyParkingCosts) {
 		this.activityPrefixForDailyParkingCosts = activityPrefixForDailyParkingCosts;
+	}
+
+	@StringGetter( PARKING_COST_TIME_PERIOD_START )
+	public double getParkingCostTimePeriodStart_s() { return this.parkingCostTimePeriodStart; }
+
+	@StringSetter( PARKING_COST_TIME_PERIOD_START )
+	public ParkingCostConfigGroup setParkingCostTimePeriodStart_s(final double value) {
+		this.parkingCostTimePeriodStart = value;
+		return this;
+	}
+
+	@StringGetter( PARKING_COST_TIME_PERIOD_END )
+	public double getParkingCostTimePeriodEnd_s() { return this.parkingCostTimePeriodEnd; }
+
+	@StringSetter( PARKING_COST_TIME_PERIOD_END )
+	public ParkingCostConfigGroup setParkingCostTimePeriodEnd_s(final double value) {
+		this.parkingCostTimePeriodEnd = value;
+		return this;
 	}
 
 }
