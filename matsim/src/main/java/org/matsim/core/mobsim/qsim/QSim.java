@@ -457,35 +457,32 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	}
 
 	private void arrangeNextAgentAction(final MobsimAgent agent) {
-		switch( agent.getState() ) {
-		case ACTIVITY:
-			for (ActivityHandler activityHandler : this.activityHandlers) {
-				if (activityHandler.handleActivity( agent )) {
-					break;
+		switch( agent.getState() ){
+			case ACTIVITY -> {
+				for( ActivityHandler activityHandler : this.activityHandlers ){
+					if( activityHandler.handleActivity( agent ) ){
+						break;
+					}
 				}
 			}
-			break ;
-		case LEG:
-			this.arrangeAgentDeparture(agent);
-			break ;
-		case ABORT:
-			for( AbortHandler abortHandler : this.abortHandlers ) {
-				if ( abortHandler.handleAbort( agent ) ) {
-					return;
+			case LEG -> this.arrangeAgentDeparture( agent );
+			case ABORT -> {
+				for( AbortHandler abortHandler : this.abortHandlers ){
+					if( abortHandler.handleAbort( agent ) ){
+						return;
+					}
 				}
+				this.events.processEvent( new PersonStuckEvent( this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode() ) );
+
+				// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
+				// register abort handlers.  If someone ever comes to this place here and needs this.  kai, nov'17
+				// The above comment has now been satisfied by the introduction of abort handlers.  kai, mar'22
+
+				this.agents.remove( agent.getId() );
+				this.agentCounter.decLiving();
+				this.agentCounter.incLost();
 			}
-
-			this.events.processEvent( new PersonStuckEvent(this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode()));
-
-			// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
-			// register abort handlers.  If someone ever comes to this place here and needs this.  kai, nov'17
-			
-			this.agents.remove(agent.getId()) ;
-			this.agentCounter.decLiving();
-			this.agentCounter.incLost();
-			break ;
-		default:
-			throw new RuntimeException("agent with unknown state (possibly null)") ;
+			default -> throw new RuntimeException( "agent with unknown state (possibly null)" );
 		}
 	}
 
