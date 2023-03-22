@@ -30,7 +30,7 @@
 				<plan score="-1476.2" selected="false">
 					<logisticChains>
 						<logisticChain id="directSolution">
-							<resource id="directCarrier"/>
+							<logisticChainElement id="directCarrierLSE" resourceId="directCarrier"/>
 						</logisticChain>
 					</logisticChains>
 					<shipmentPlans>
@@ -129,9 +129,9 @@
 				<plan score="-492.33" selected="true">
 					<logisticChains>
 						<logisticChain id="hubSolution">
-							<resource id="mainCarrier"/>
-							<resource id="Hub"/>
-							<resource id="distributionCarrier"/>
+							<logisticChainElement id="mainCarrierLSE" resourceId="mainCarrier"/>
+							<logisticChainElement id="HubLSE" resourceId="Hub"/>
+							<logisticChainElement id="distributionCarrierLSE" resourceId="distributionCarrier"/>
 						</logisticChain>
 					</logisticChains>
 					<shipmentPlans>
