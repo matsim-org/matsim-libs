@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd"
+<vehicleDefinitions xmlns="https://www.matsim.org/files/dtd"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+ xsi:schemaLocation="https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
 	<vehicleType id="car_average">
 		<description>
 			BEGIN_EMISSIONSPASSENGER_CAR;average;average;averageEND_EMISSIONS
 		</description>
 		<length meter="7.5"/>
 		<width meter="1.0"/>
-		
+
 		<accessTime secondsPerPerson="1.0"/>
 		<egressTime secondsPerPerson="1.0"/>
 		<doorOperation mode="serial"/>
@@ -20,7 +20,7 @@
 		</description>
 		<length meter="7.5"/>
 		<width meter="1.0"/>
-		
+
 		<accessTime secondsPerPerson="1.0"/>
 		<egressTime secondsPerPerson="1.0"/>
 		<doorOperation mode="serial"/>
@@ -31,7 +31,7 @@
 		</description>
 		<length meter="7.5"/>
 		<width meter="1.0"/>
-		
+
 		<accessTime secondsPerPerson="1.0"/>
 		<egressTime secondsPerPerson="1.0"/>
 		<doorOperation mode="serial"/>
@@ -42,7 +42,7 @@
 		</description>
 		<length meter="7.5"/>
 		<width meter="1.0"/>
-		
+
 		<accessTime secondsPerPerson="1.0"/>
 		<egressTime secondsPerPerson="1.0"/>
 		<doorOperation mode="serial"/>

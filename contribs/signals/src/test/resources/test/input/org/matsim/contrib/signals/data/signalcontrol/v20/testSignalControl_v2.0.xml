@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<signalControl xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalControl_v2.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+<signalControl xsi:schemaLocation="https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/signalControl_v2.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://www.matsim.org/files/dtd">
     <signalSystem refId="42">
         <signalSystemController>
 	          <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
@@ -15,7 +15,7 @@
             </signalPlan>
         </signalSystemController>
     </signalSystem>
-    
+
     <signalSystem refId="43">
       <signalSystemController>
           <controllerIdentifier>logicbasedActuatedController</controllerIdentifier>

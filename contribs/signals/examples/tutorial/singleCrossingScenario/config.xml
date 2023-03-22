@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 	<module name="controler" >
 		<!-- Sets whether graphs showing some analyses should automatically be generated during the simulation. The generation of graphs usually takes a small amount of time that does not have any weight in big simulations, but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested. -->
@@ -20,7 +20,7 @@
 		<param name="inputNetworkFile" value="network.xml" />
 		<param name="laneDefinitionsFile" value="lanes.xml" />
 	</module>
-	
+
 	<module name="plans" >
 		<param name="inputPlansFile" value="plans.xml" />
 	</module>

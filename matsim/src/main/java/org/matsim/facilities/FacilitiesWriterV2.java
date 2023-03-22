@@ -41,7 +41,7 @@ import java.util.SortedSet;
  */
 class FacilitiesWriterV2 extends MatsimXmlWriter implements MatsimWriter {
 
-    private static final String DTD = "http://www.matsim.org/files/dtd/facilities_v2.dtd";
+    private static final String DTD = "https://www.matsim.org/files/dtd/facilities_v2.dtd";
 
     private final ActivityFacilities facilities;
 

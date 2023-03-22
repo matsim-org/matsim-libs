@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
-<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+<!DOCTYPE network SYSTEM "https://www.matsim.org/files/dtd/network_v1.dtd">
 <network>
 	<nodes>
-		
+
 		<node id="2" x="-800" y="-1000"/>
 		<node id="3" x="-600" y="-1000"/>
 		<node id="4" x="-400" y="-1000"/>
@@ -12,7 +12,7 @@
 		<node id="8" x="400" y="-1000"/>
 		<node id="9" x="600" y="-1000"/>
 		<node id="10" x="800" y="-1000"/>
-	
+
 		<node id="12" x="-1000" y="-800"/>
 		<node id="13" x="-800" y="-800"/>
 		<node id="14" x="-600" y="-800"/>
@@ -57,7 +57,7 @@
 		<node id="53" x="600" y="-200"/>
 		<node id="54" x="800" y="-200"/>
 		<node id="55" x="1000" y="-200"/>
-		
+
 		<node id="57" x="-800" y="0"/>
 		<node id="58" x="-600" y="0"/>
 		<node id="59" x="-400" y="0"/>
@@ -70,7 +70,7 @@
 
 	</nodes>
 	<links capperiod="01:00:00">
-	
+
 <!--horizontal links-->
 
 <link id="111" from="12" to="13" length="640" freespeed="7" capacity="960" permlanes="2"/>

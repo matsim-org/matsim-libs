@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v5.dtd">
+<!DOCTYPE population SYSTEM "https://www.matsim.org/files/dtd/population_v5.dtd">
 
 <population>
 
@@ -45,9 +45,9 @@
 				</leg>
 				<act type="home" x="4500.0" y="5.0" />
 			</plan>
-	
+
 		</person>
-	
+
 	<!-- ====================================================================== -->
 
 </population>

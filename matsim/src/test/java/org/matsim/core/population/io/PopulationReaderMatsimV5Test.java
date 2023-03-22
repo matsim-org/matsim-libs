@@ -252,7 +252,7 @@ public class PopulationReaderMatsimV5Test {
 		final Population population = scenario.getPopulation();
 
 		String str = "<?xml version=\"1.0\" ?>"+
-		"<!DOCTYPE population SYSTEM \"http://www.matsim.org/files/dtd/population_v5.dtd\">"+
+		"<!DOCTYPE population SYSTEM \"https://www.matsim.org/files/dtd/population_v5.dtd\">"+
 		"<population>"+
 		"<person id=\"1\">"+
 		"	<plan>"+
@@ -288,20 +288,20 @@ public class PopulationReaderMatsimV5Test {
 		Assert.assertTrue(plan.getPlanElements().get(4) instanceof Activity);
 		Assert.assertTrue(plan.getPlanElements().get(5) instanceof Leg);
 		Assert.assertTrue(plan.getPlanElements().get(6) instanceof Activity);
-		
+
 		Leg leg1 = (Leg) plan.getPlanElements().get(1);
 		Route route1 = leg1.getRoute();
 		Leg leg2 = (Leg) plan.getPlanElements().get(3);
 		Route route2 = leg2.getRoute();
 		Leg leg3 = (Leg) plan.getPlanElements().get(5);
 		Route route3 = leg3.getRoute();
-		
+
 		Assert.assertTrue(route1 instanceof NetworkRoute);
 //		Assert.assertTrue(route2 instanceof GenericRouteImpl);
 		Assert.assertTrue(route3 instanceof TransitPassengerRoute);
 	}
 
-	
+
 	/**
 	 * @author mrieser
 	 */
@@ -339,7 +339,7 @@ public class PopulationReaderMatsimV5Test {
 		final Population population = scenario.getPopulation();
 
 		String str = "<?xml version=\"1.0\" ?>"+
-		"<!DOCTYPE population SYSTEM \"http://www.matsim.org/files/dtd/population_v5.dtd\">"+
+		"<!DOCTYPE population SYSTEM \"https://www.matsim.org/files/dtd/population_v5.dtd\">"+
 		"<population>"+
 		"<person id=\"1\">"+
 		"	<plan>"+
@@ -369,7 +369,7 @@ public class PopulationReaderMatsimV5Test {
 		final Population population = scenario.getPopulation();
 
 		String str = "<?xml version=\"1.0\" ?>"+
-		"<!DOCTYPE population SYSTEM \"http://www.matsim.org/files/dtd/population_v5.dtd\">"+
+		"<!DOCTYPE population SYSTEM \"https://www.matsim.org/files/dtd/population_v5.dtd\">"+
 		"<population>"+
 		"<person id=\"1\">"+
 		"	<plan>"+
@@ -397,14 +397,14 @@ public class PopulationReaderMatsimV5Test {
 		final Population population = scenario.getPopulation();
 
 		String str = "<?xml version=\"1.0\" ?>"+
-		"<!DOCTYPE population SYSTEM \"http://www.matsim.org/files/dtd/population_v5.dtd\">"+
+		"<!DOCTYPE population SYSTEM \"https://www.matsim.org/files/dtd/population_v5.dtd\">"+
 		"<population>"+
 		"<person id=\"1\">"+
 		"	<plan>"+
 		"		<act type=\"h\" x=\"-25000\" y=\"0\" end_time=\"06:00\" />"+
 		"		<leg mode=\"car\" >"+
 		"          <route type=\"links\" vehicleRefId=\"123\"/>" +
-		"       </leg>" + 
+		"       </leg>" +
 		"		<act type=\"w\" x=\"10000\" y=\"0\" end_time=\"12:00\" />"+
 		"	</plan>"+
 		"</person>"+

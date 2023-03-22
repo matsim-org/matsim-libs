@@ -35,7 +35,7 @@ public class FreightConfigGroupTest {
 		Config config = ConfigUtils.createConfig(freight);
 
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-				"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
+				"<!DOCTYPE config SYSTEM \"https://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
 				"<config>\n" +
 				"  <module name=\"freight\" >\t\n" +
 				"    <param name=\"carriersFile\" value=\"/path/to/carriers.xml\" />\n" +

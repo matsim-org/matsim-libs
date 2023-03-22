@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<networkChangeEvents xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd">
+<networkChangeEvents xmlns="https://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/networkChangeEvents.xsd">
 	<networkChangeEvent startTime="03:06:00">
 	    <link refId="1"/>
 	    <link refId="2"/>

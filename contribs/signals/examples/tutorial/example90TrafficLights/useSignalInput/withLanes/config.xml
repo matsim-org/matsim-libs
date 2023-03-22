@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 
 <!-- ====================================================================== -->
@@ -55,7 +55,7 @@
 		<!-- Default=1000;  -->
 		<param name="lastIteration" value="1000" />
 
-		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim 
+		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim
 		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
 		For 'qsim', add a module 'qsim' to the config. -->
 		<param name="mobsim" value="qsim" />
@@ -234,7 +234,7 @@
 				<!-- method to compute score at typical duration.  Options: | uniform | relative | Use uniform for backwards compatibility (all activities same score; higher proba to drop long acts). -->
 				<param name="typicalDurationScoreComputation" value="uniform" />
 			</parameterset>
-			
+
 			<parameterset type="activityParams" >
 				<param name="activityType" value="w" />
 				<param name="closingTime" value="undefined" />
@@ -650,7 +650,7 @@
 
 		<!-- strategyName of PlanSelector for plans removal.  Possible defaults: WorstPlanSelector SelectRandom SelectExpBetaForRemoval ChangeExpBetaForRemoval PathSizeLogitSelectorForRemoval . The current default, WorstPlanSelector is not a good choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically tested. kai, feb'12 -->
 		<param name="planSelectorForRemoval" value="WorstPlanSelector" />
-		
+
 		<parameterset type="strategysettings" >
 			<!-- iteration after which strategy will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...). Normally, better use fractionOfIterationsToDisableInnovation -->
 			<param name="disableAfterIteration" value="-1" />
@@ -663,7 +663,7 @@
 			<!-- weight of a strategy: for each agent, a strategy will be selected with a probability proportional to its weight -->
 			<param name="weight" value="0.9" />
 		</parameterset>
-		
+
 		<parameterset type="strategysettings" >
 			<!-- iteration after which strategy will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...). Normally, better use fractionOfIterationsToDisableInnovation -->
 			<param name="disableAfterIteration" value="-1" />

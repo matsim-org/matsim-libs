@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<!DOCTYPE plans SYSTEM "https://www.matsim.org/files/dtd/plans_v4.dtd">
 
 <plans name="Plans_Test1">
 
@@ -40,7 +40,7 @@
 			<activity type="work">
 				<location id="11" isPrimary="yes"/>
 			</activity>
-	
+
 		</knowledge>
 
 		<plan>
@@ -67,7 +67,7 @@
 			<activity type="work">
 				<location id="12" isPrimary="yes"/>
 			</activity>
-	
+
 
 		</knowledge>
 
@@ -177,7 +177,7 @@
 			<activity type="work">
 				<location id="16" isPrimary="yes"/>
 			</activity>
-	
+
 
 		</knowledge>
 

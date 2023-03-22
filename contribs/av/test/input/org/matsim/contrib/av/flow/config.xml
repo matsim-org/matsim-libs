@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
-	
+
 	<module name="network">
 		<param name="inputNetworkFile" value="grid_network.xml" />
 	</module>
@@ -12,7 +12,7 @@
 		<!-- Options: maxOfStarttimeAndEarliestActivityEnd onlyUseStarttime  -->
 		<param name="simStarttimeInterpretation" value="maxOfStarttimeAndEarliestActivityEnd" />
 	</module>
-	
+
 	<module name="otfvis">
 		<param name="drawNonMovingItems" value="true" />
 	</module>

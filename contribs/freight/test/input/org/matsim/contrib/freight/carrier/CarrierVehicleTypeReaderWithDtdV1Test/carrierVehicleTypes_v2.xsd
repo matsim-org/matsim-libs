@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
-           xmlns="http://www.matsim.org/files/dtd"
+<xs:schema targetNamespace="https://www.matsim.org/files/dtd"
+           xmlns="https://www.matsim.org/files/dtd"
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xml:lang="en">
-           
+
 <!-- Editor: Kai Martins-turner, VSP, Berlin Institute of Technology -->
 <!-- Description of the vehicleTypes to be used in the simulation of freight traffic -->
 <!-- Based on https://github.com/graphhopper/jsprit/blob/master/jsprit-io/src/main/resources/vrp_xml_schema.xsd by Graphhopper GmbH -->
@@ -53,13 +53,13 @@
 </xs:complexType>
 
   <!-- Ende copy from Graphhopper -->
-  
+
   <xs:element name="allowableWeight">
     <xs:complexType>
       <xs:attribute name="weight" use="required" type="xs:integer"/>
     </xs:complexType>
   </xs:element>
-  
+
   <xs:element name="capacity">
     <xs:complexType>
       <xs:simpleContent>
@@ -69,14 +69,14 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-  
+
   <xs:element name="engineInformation">
     <xs:complexType>
       <xs:attribute name="fuelType" use="required" type="xs:NCName"/>
       <xs:attribute name="gasConsumption" use="required" type="xs:decimal"/>
     </xs:complexType>
   </xs:element>
-  
+
   <xs:element name="costInformation">
     <xs:complexType>
       <xs:attribute name="fix" use="required" type="xs:integer"/>

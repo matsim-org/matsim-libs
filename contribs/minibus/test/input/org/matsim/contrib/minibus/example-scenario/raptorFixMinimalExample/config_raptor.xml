@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v1.dtd"
   [
    <!ENTITY INPUTBASE  "./input/">
    <!ENTITY OUTPUTBASE "./output/">
@@ -9,10 +9,10 @@
 >
 <config>
 <!-- ====================================================================== -->
-	
+
 	<module name="controler" >
 		<param name="enableLinkToLinkRouting" value="false" />
-		
+
 		<param name="mobsim" value="qsim" />
 
 		<!-- Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (','). -->
@@ -20,7 +20,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="400" />
 		<param name="outputDirectory" value="&OUTPUTBASE;&SCENARIO;_&SEED;" />
-        
+
 		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 
@@ -32,7 +32,7 @@
 
 		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
 		<param name="writeEventsInterval" value="400" />
-		
+
 		<!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written -->
 		<param name="writePlansInterval" value="400" />
 	</module>
@@ -69,7 +69,7 @@
 <!-- ====================================================================== -->
 
 	<module name="planCalcScore">
-	
+
 		<!-- [1/utils] conversion factor of utility model for use in logit-based choice model.  Set to 1 if your utl function is estimated -->
 		<param name="BrainExpBeta" value="2.0" />
 		<param name="PathSizeLogitBeta" value="1.0" />
@@ -94,7 +94,7 @@
 
 		<!-- [utils/hr] utility offset of traveling by foot.  normally negative.  this comes on top of the opportunity cost of time.  also see marginalUtlOfDistanceWalk -->
 		<param name="travelingWalk" value="-1.25" />
-		
+
 		<param name="utilityOfLineSwitch" value="-0.3" />
 
 		<param name="activityType_0"            value="h" />
@@ -118,7 +118,7 @@
 
 	<module name="qsim" >
 		<param name="endTime" value="30:00:00" />
-		
+
 		<param name="flowCapacityFactor" value="1.0" />
 
 		<!-- Use number of threads > 1 for parallel version using the specified number of threads -->
@@ -146,9 +146,9 @@
 
 		<param name="ModuleProbability_1" value="0.70" />
 		<param name="Module_1" value="ChangeExpBeta" />
-		
+
 		<param name="ModuleProbability_2" value="0.30" />
-		<param name="ModuleDisableAfterIteration_2" value="350" /> 
+		<param name="ModuleDisableAfterIteration_2" value="350" />
 		<param name="Module_2" value="org.matsim.contrib.minibus.performance.PReRoute" />
 	</module>
 

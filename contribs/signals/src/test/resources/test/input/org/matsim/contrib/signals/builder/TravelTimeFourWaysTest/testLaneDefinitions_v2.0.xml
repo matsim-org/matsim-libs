@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<laneDefinitions xsi:schemaLocation="https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd" xmlns="https://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <lanesToLinkAssignment linkIdRef="2">
         <lane id="2.ol">
             <leadsTo>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<intergreenTimes xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/intergreenTimes_v1.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+<intergreenTimes xsi:schemaLocation="https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/intergreenTimes_v1.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://www.matsim.org/files/dtd">
 		<signalSystem refId="23">
 				<endingSignalGroup refId="1">
 						<beginningSignalGroup refId="2" timeSeconds="5" />

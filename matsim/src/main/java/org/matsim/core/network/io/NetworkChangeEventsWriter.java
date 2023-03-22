@@ -38,60 +38,60 @@ import java.util.Collection;
  *
  */
 public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements MatsimSomeWriter {
-	// yy uses syntax 
-	//   write( filename, container ) 
+	// yy uses syntax
+	//   write( filename, container )
 	// rather than the matsim standard
-	//   ctor( container ) 
+	//   ctor( container )
 	//   write( filename )
 	// kai, apr'10
-	
+
 	private static final Logger log = LogManager.getLogger(NetworkChangeEventsWriter.class);
-	
+
 	private static final String TAB = "\t";
-	
+
 	private static final String WHITESPACE = " ";
-	
+
 	private static final String OPEN_TAG_1 = "<";
-	
+
 	private static final String OPEN_TAG_2 = "</";
-	
+
 	private static final String CLOSE_TAG_1 = ">";
-	
+
 	private static final String CLOSE_TAG_2 = "/>";
-	
+
 	private static final String QUOTE = "\"";
-	
+
 	private static final String EQUALS = "=";
-	
+
 	// DEFAULT_DTD_LOCATION does not work for _some_ reason...
-	private static final String DTD_LOCATION = "http://www.matsim.org/files/dtd";
-	
+	private static final String DTD_LOCATION = "https://www.matsim.org/files/dtd";
+
 	private static final String W3_URL = "http://www.w3.org/2001/XMLSchema-instance";
-	
-	private static final String XSD_LOCATION = "http://www.matsim.org/files/dtd/networkChangeEvents.xsd";
+
+	private static final String XSD_LOCATION = "https://www.matsim.org/files/dtd/networkChangeEvents.xsd";
 
 	public void write(String file, Collection<NetworkChangeEvent> events) {
 		try {
 			openFile(file);
 			super.writeXmlHead();
-			
+
 			this.writer.write(OPEN_TAG_1);
 			this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENTS_TAG);
-			
+
 			this.writer.write(WHITESPACE);
 			this.writer.write("xmlns");
 			this.writer.write(EQUALS);
 			this.writer.write(QUOTE);
 			this.writer.write(DTD_LOCATION);
 			this.writer.write(QUOTE);
-			
+
 			this.writer.write(WHITESPACE);
 			this.writer.write("xmlns:xsi");
 			this.writer.write(EQUALS);
 			this.writer.write(QUOTE);
 			this.writer.write(W3_URL);
 			this.writer.write(QUOTE);
-			
+
 			this.writer.write(WHITESPACE);
 			this.writer.write("xsi:schemaLocation");
 			this.writer.write(EQUALS);
@@ -103,28 +103,28 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 			this.writer.write(CLOSE_TAG_1);
 			this.writer.write(NL);
 			this.writer.write(NL);
-		
+
 			for (NetworkChangeEvent event : events) {
 				writeEvent(event);
 				this.writer.write(NL);
 				this.writer.write(NL);
 			}
-			
+
 			this.writer.write(OPEN_TAG_2);
 			this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENTS_TAG);
 			this.writer.write(CLOSE_TAG_1);
 			this.writer.write(NL);
-			
+
 			close();
 		} catch (IOException e) {
 			log.fatal("Error during writing network change events!", e);
 		}
 	}
-	
+
 	private void writeEvent(NetworkChangeEvent event) throws IOException {
 //		if ( event.getLinks().isEmpty() ) {
 //			return ;
-//			// yyyy is this a problem?  There is otherwise this condition (*) below ?? 
+//			// yyyy is this a problem?  There is otherwise this condition (*) below ??
 		// or is it a problem to just write the empty change event?  kai, nov'17
 //		}
 		this.writer.write(TAB);
@@ -157,7 +157,7 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 			this.writer.write(CLOSE_TAG_2);
 			this.writer.write(NL);
 		}
-		
+
 		if(event.getFlowCapacityChange() != null) {
 			writeChangeValue(NetworkChangeEventsParser.FLOW_CAPACITY_TAG, event.getFlowCapacityChange());
 		}
@@ -175,14 +175,14 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 		this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENT_TAG);
 		this.writer.write(CLOSE_TAG_1);
 	}
-	
+
 	private void writeChangeValue(String attName, ChangeValue value) throws IOException {
 		this.writer.write(TAB);
 		this.writer.write(TAB);
-		
+
 		this.writer.write(OPEN_TAG_1);
 		this.writer.write(attName);
-		
+
 		this.writer.write(WHITESPACE);
 		this.writer.write(NetworkChangeEventsParser.CHANGE_TYPE_TAG);
 		this.writer.write(EQUALS);
@@ -201,14 +201,14 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 			throw new RuntimeException("missing ChangeType") ;
 		}
 		this.writer.write(QUOTE);
-		
+
 		this.writer.write(WHITESPACE);
 		this.writer.write(NetworkChangeEventsParser.VALUE_TAG);
 		this.writer.write(EQUALS);
 		this.writer.write(QUOTE);
 		this.writer.write(String.valueOf(value.getValue()));
 		this.writer.write(QUOTE);
-		
+
 		this.writer.write(CLOSE_TAG_2);
 		this.writer.write(NL);
 	}

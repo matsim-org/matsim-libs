@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+<!DOCTYPE roadpricing SYSTEM "https://www.matsim.org/files/dtd/roadpricing_v1.dtd">
 
 <roadpricing type="distance" name="distance-toll-1">
 

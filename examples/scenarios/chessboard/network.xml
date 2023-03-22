@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+<!DOCTYPE network SYSTEM "https://www.matsim.org/files/dtd/network_v1.dtd">
 
 <network name="Network_Test1">
 

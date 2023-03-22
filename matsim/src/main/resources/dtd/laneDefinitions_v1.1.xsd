@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
-           xmlns="http://www.matsim.org/files/dtd"
+<xs:schema targetNamespace="https://www.matsim.org/files/dtd"
+           xmlns="https://www.matsim.org/files/dtd"
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
@@ -53,7 +53,7 @@ the simulation -->
             <xs:attribute name="meter" type="xs:double" use="optional" default="45.0"></xs:attribute>
           </xs:complexType>
         </xs:element>
-      </xs:sequence>    
+      </xs:sequence>
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>

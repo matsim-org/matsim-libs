@@ -98,7 +98,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Parameter
 	@Comment("Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-			+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
+			+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). " 
 			+ "Beta should not be smaller than 0.")
 	@PositiveOrZero
 	public double maxTravelTimeBeta = Double.NaN;// [s]

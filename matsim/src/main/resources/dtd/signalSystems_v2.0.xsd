@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
+<xs:schema targetNamespace="https://www.matsim.org/files/dtd" xmlns="https://www.matsim.org/files/dtd"
 		elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
 
 		<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
 		<!-- Description of the signal systems to be used in the simulation -->
 
 		<xs:include schemaLocation="matsimCommon.xsd" />
-		
+
 		<xs:annotation>
 				<xs:documentation>Description of the signal systems to be used in the simulation
 				</xs:documentation>
@@ -71,7 +71,7 @@
 														</xs:complexContent>
 												</xs:complexType>
 										</xs:element>
-										
+
 										<xs:element name="turningMoveRestrictions" minOccurs="0" maxOccurs="1">
 												<xs:annotation>
 														<xs:documentation>

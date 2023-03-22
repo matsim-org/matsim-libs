@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-		   targetNamespace="http://www.matsim.org/files/dtd"
-		   xmlns="http://www.matsim.org/files/dtd"
+		   targetNamespace="https://www.matsim.org/files/dtd"
+		   xmlns="https://www.matsim.org/files/dtd"
 		   elementFormDefault="qualified"
 		   xml:lang="en">
 
-	<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+	<xs:include schemaLocation="https://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
 	<xs:element name="lspsDefinitions">
 		<xs:complexType>

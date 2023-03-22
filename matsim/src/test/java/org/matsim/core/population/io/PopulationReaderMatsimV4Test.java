@@ -219,7 +219,7 @@ public class PopulationReaderMatsimV4Test {
 		Assert.assertEquals(link3.getId(), ((Activity) plan.getPlanElements().get(0)).getLinkId());
 		Assert.assertEquals(Id.create("2", Link.class), ((Activity) plan.getPlanElements().get(2)).getLinkId());
 	}
-	
+
 	@Test
 	public void testReadingRoutesWithoutType() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -227,7 +227,7 @@ public class PopulationReaderMatsimV4Test {
 		final Population population = scenario.getPopulation();
 
 		String str = "<?xml version=\"1.0\" ?>"+
-		"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">"+
+		"<!DOCTYPE plans SYSTEM \"https://www.matsim.org/files/dtd/plans_v4.dtd\">"+
 		"<plans>"+
 		"<person id=\"1\">"+
 		"	<plan>"+
@@ -262,14 +262,14 @@ public class PopulationReaderMatsimV4Test {
 		Assert.assertTrue(plan.getPlanElements().get(4) instanceof Activity);
 		Assert.assertTrue(plan.getPlanElements().get(5) instanceof Leg);
 		Assert.assertTrue(plan.getPlanElements().get(6) instanceof Activity);
-		
+
 		Leg leg1 = (Leg) plan.getPlanElements().get(1);
 		Route route1 = leg1.getRoute();
 		Leg leg2 = (Leg) plan.getPlanElements().get(3);
 		Route route2 = leg2.getRoute();
 		Leg leg3 = (Leg) plan.getPlanElements().get(5);
 		Route route3 = leg3.getRoute();
-		
+
 		Assert.assertTrue(route1 instanceof NetworkRoute);
 //		Assert.assertTrue(route2 instanceof GenericRouteImpl);
 		Assert.assertTrue(route3 instanceof TransitPassengerRoute);
@@ -282,7 +282,7 @@ public class PopulationReaderMatsimV4Test {
 		final Population population = scenario.getPopulation();
 
 		String str = "<?xml version=\"1.0\" ?>"+
-		"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">"+
+		"<!DOCTYPE plans SYSTEM \"https://www.matsim.org/files/dtd/plans_v4.dtd\">"+
 		"<plans>"+
 		"<person id=\"1\">"+
 		"	<plan>"+
@@ -312,7 +312,7 @@ public class PopulationReaderMatsimV4Test {
 		final Population population = scenario.getPopulation();
 
 		String str = "<?xml version=\"1.0\" ?>"+
-		"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">"+
+		"<!DOCTYPE plans SYSTEM \"https://www.matsim.org/files/dtd/plans_v4.dtd\">"+
 		"<plans>"+
 		"<person id=\"1\">"+
 		"	<plan>"+

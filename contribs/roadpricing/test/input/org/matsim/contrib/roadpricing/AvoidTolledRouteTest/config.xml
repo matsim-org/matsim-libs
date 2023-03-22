@@ -1,15 +1,15 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 
 	<module name="network" >
 		<param name="inputNetworkFile" value="network.xml" />
 	</module>
-	
+
 	<module name="plans" >
 		 <param name="inputPlansFile" value="population.xml" />
 	</module>
-	
+
 	<module name="roadpricing">
    		<param name="tollLinksFile" value="tollLinksFile_0.xml" />
 	</module>
@@ -19,7 +19,7 @@
 		<param name="lastIteration" value="0" />
 		<param name="overwriteFiles" value="overwriteExistingFiles" />
 	</module>
-	
+
 	<module name="strategy">
 
 		<parameterset type="strategysettings" >
@@ -41,11 +41,11 @@
 			<param name="subpopulation" value="null" />
 			<param name="weight" value="1.0" />
 		</parameterset>
-		
+
 	</module>
-	
+
 	<module name="planCalcScore">
-			
+
 			<parameterset type="activityParams" >
 				<param name="activityType" value="home" />
 				<param name="typicalDuration" value="16:00:00" />
@@ -58,5 +58,5 @@
 			</parameterset>
 
 	</module>
-	
+
 </config>

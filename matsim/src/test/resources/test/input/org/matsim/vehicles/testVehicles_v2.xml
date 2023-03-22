@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+<vehicleDefinitions xmlns="https://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
 
 	<vehicleType id="normal&amp;Car">
 		<attributes>
@@ -76,12 +76,12 @@
 		<attributes>
 			<attribute name="testAttributeDouble" class="java.lang.Double">1.234</attribute>
 		</attributes>
-	</vehicle>		
+	</vehicle>
 	<vehicle id="23" type="normal&amp;Car">
 		<attributes>
 			<attribute name="testAttributeString" class="java.lang.String">firstVehicle</attribute>
 		</attributes>
 	</vehicle>
-	<vehicle id="42" type="defaultValue&gt;Car"/>		
+	<vehicle id="42" type="defaultValue&gt;Car"/>
 
 </vehicleDefinitions>

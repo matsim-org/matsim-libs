@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<!DOCTYPE plans SYSTEM "https://www.matsim.org/files/dtd/plans_v4.dtd">
 <plans>
 <person id="1">
 	<plan>
@@ -10,7 +10,7 @@
 		<act type="dummy" x="10000" y="0" link="20" dur="00:10" />
 	</plan>
 </person>
- 
+
 <person id="2">
 	<plan>
 		<act type="dummy" x="-25000" y="0" link="1" end_time="05:59" />

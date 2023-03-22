@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v1.dtd"
   [
    <!ENTITY SEED	"4711">
   ]
@@ -8,7 +8,7 @@
 
 <module name="p" >
 		<param name="pIdentifier" value="para_" />
-		<param name="operatorType" value="CarefulMultiPlanOperator" />		
+		<param name="operatorType" value="CarefulMultiPlanOperator" />
 		<param name="numberOfOperators" value="10" />
 		<param name="numberOfIterationsForProspecting" value="10" />
 		<param name="initialBudget" value="200000.0" />
@@ -27,12 +27,12 @@
 		<param name="pricePerVehicleSold" value="500.0" />
 		<param name="startWith24Hours" value="false" />
 		<param name="minOperationTime" value="0.0" />
-		
+
 		<param name="minX" value="0.0" />
 		<param name="maxX" value="5000.0" />
 		<param name="minY" value="0.0" />
 		<param name="maxY" value="5000.0" />
-		
+
 		<param name="useFranchise" value="false" /> <!-- default: true -->
 		<param name="writeStatsInterval" value="1" />
 		<param name="logOperators" value="true" />
@@ -41,48 +41,48 @@
 		<param name="speedLimitForStops" value="10.0" />
 		<param name="planningSpeedFactor" value="1.0" />
 		<param name="gridSize" value="500.0" />
-		<param name="timeSlotSize" value="900.0" /> 
+		<param name="timeSlotSize" value="900.0" />
 		<param name="useAdaptiveNumberOfOperators" value="true" />
 		<param name="shareOfOperatorsWithProfit" value="0.90" />
 		<param name="disableCreationOfNewOperatorsInIteration" value="75" />
 		<param name="reRouteAgentsStuck" value="false" />
-		
+
 		<param name="Module_1" value="WeightedStartTimeExtension" />
 		<param name="ModuleProbability_1" value="0.10" />
 		<param name="ModuleDisableInIteration_1" value="25" />
 		<param name="ModuleParameter_1" value="" />
-		
+
 		<param name="Module_2" value="WeightedEndTimeExtension" />
 		<param name="ModuleProbability_2" value="0.10" />
 		<param name="ModuleDisableInIteration_2" value="25" />
 		<param name="ModuleParameter_2" value="" />
-		
+
 		<param name="Module_3" value="ReduceTimeServedRFare" />
 		<param name="ModuleProbability_3" value="0.30" />
 		<param name="ModuleDisableInIteration_3" value="25" />
 		<param name="ModuleParameter_3" value="1.0,900,false,true" />
-		
+
 		<param name="Module_4" value="EndRouteExtension" />
 		<param name="ModuleProbability_4" value="0.10" />
 		<param name="ModuleDisableInIteration_4" value="25" />
 		<param name="ModuleParameter_4" value="1500.0,0.2" />
-		
+
 		<param name="Module_5" value="SidewaysRouteExtension" />
 		<param name="ModuleProbability_5" value="0.10" />
 		<param name="ModuleDisableInIteration_5" value="25" />
 		<param name="ModuleParameter_5" value="1500.0,0.2,true" />
-		
+
 		<param name="Module_6" value="ReduceStopsToBeServedRFare" />
 		<param name="ModuleProbability_6" value="0.30" />
 		<param name="ModuleDisableInIteration_6" value="25" />
 		<param name="ModuleParameter_6" value="1.0,false" />
-	</module> 
+	</module>
 
 <!-- ====================================================================== -->
-	
+
 	<module name="controler" >
 		<param name="enableLinkToLinkRouting" value="false" />
-		
+
 		<param name="mobsim" value="qsim" />
 
 		<!-- Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (','). -->
@@ -95,7 +95,7 @@
 
 		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
 		<param name="writeEventsInterval" value="20" />
-		
+
 		<!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written -->
 		<param name="writePlansInterval" value="20" />
 	</module>
@@ -125,7 +125,7 @@
 <!-- ====================================================================== -->
 
 	<module name="planCalcScore">
-	
+
 		<!-- [1/utils] conversion factor of utility model for use in logit-based choice model.  Set to 1 if your utl function is estimated -->
 		<param name="BrainExpBeta" value="1.0" />
 		<param name="PathSizeLogitBeta" value="1.0" />
@@ -147,7 +147,7 @@
 
 		<!-- [utils/hr] utility offset of traveling by foot.  normally negative.  this comes on top of the opportunity cost of time.  also see marginalUtlOfDistanceWalk -->
 		<param name="travelingWalk" value="-1.25" />
-		
+
 		<param name="utilityOfLineSwitch" value="-0.3" />
 
 		<param name="activityType_0"            value="h" />
@@ -164,7 +164,7 @@
 
 	<module name="qsim" >
 		<param name="endTime" value="30:00:00" />
-		
+
 		<param name="flowCapacityFactor" value="1.0" />
 
 		<!-- Use number of threads > 1 for parallel version using the specified number of threads -->
@@ -191,7 +191,7 @@
 		<param name="maxAgentPlanMemorySize" value="1" />
 
 		<param name="ModuleProbability_1" value="1.0" />
-		<param name="ModuleDisableAfterIteration_1" value="100" /> 
+		<param name="ModuleDisableAfterIteration_1" value="100" />
 		<param name="Module_1" value="org.matsim.contrib.minibus.performance.PReRoute" />
 
 	</module>

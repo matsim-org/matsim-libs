@@ -45,7 +45,7 @@ public class MatsimFileTypeGuesserTest {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/network.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Network, g.getGuessedFileType());
 		assertNull(g.getPublicId());
-		assertEquals("http://www.matsim.org/files/dtd/network_v1.dtd", g.getSystemId());
+		assertEquals("https://www.matsim.org/files/dtd/network_v1.dtd", g.getSystemId());
 	}
 
 	@Test
@@ -53,7 +53,7 @@ public class MatsimFileTypeGuesserTest {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/config.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Config, g.getGuessedFileType());
 		assertNull(g.getPublicId());
-		assertEquals("http://www.matsim.org/files/dtd/config_v2.dtd", g.getSystemId());
+		assertEquals("https://www.matsim.org/files/dtd/config_v2.dtd", g.getSystemId());
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class MatsimFileTypeGuesserTest {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/plans100.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Population, g.getGuessedFileType());
 		assertNull(g.getPublicId());
-		assertEquals("http://www.matsim.org/files/dtd/plans_v4.dtd", g.getSystemId());
+		assertEquals("https://www.matsim.org/files/dtd/plans_v4.dtd", g.getSystemId());
 	}
 
 	@Test
@@ -69,7 +69,7 @@ public class MatsimFileTypeGuesserTest {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_example.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Population, g.getGuessedFileType());
 		assertNull(g.getPublicId());
-		assertEquals("http://www.matsim.org/files/dtd/population_v5.dtd", g.getSystemId());
+		assertEquals("https://www.matsim.org/files/dtd/population_v5.dtd", g.getSystemId());
 	}
 
 	@Test
@@ -77,7 +77,7 @@ public class MatsimFileTypeGuesserTest {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/facilities.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Facilities, g.getGuessedFileType());
 		assertNull(g.getPublicId());
-		assertEquals("http://www.matsim.org/files/dtd/facilities_v1.dtd", g.getSystemId());
+		assertEquals("https://www.matsim.org/files/dtd/facilities_v1.dtd", g.getSystemId());
 	}
 
 	@Test
@@ -119,7 +119,7 @@ public class MatsimFileTypeGuesserTest {
 		assertEquals(MatsimFileTypeGuesser.FileType.TransitSchedule, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNotNull(g.getSystemId());
-		assertEquals("http://www.matsim.org/files/dtd/transitSchedule_v1.dtd", g.getSystemId());
+		assertEquals("https://www.matsim.org/files/dtd/transitSchedule_v1.dtd", g.getSystemId());
 	}
 
 	@Test
@@ -128,7 +128,7 @@ public class MatsimFileTypeGuesserTest {
 		assertEquals(MatsimFileTypeGuesser.FileType.Vehicles, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNotNull(g.getSystemId());
-		assertEquals("http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd", g.getSystemId());
+		assertEquals("https://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd", g.getSystemId());
 	}
 
 	@Test

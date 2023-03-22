@@ -1,37 +1,37 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 
 	<!-- ====================================================================== -->
 	<!-- = Sample configuration for the Triangle sample scenario             == -->
 	<!-- ====================================================================== -->
-	
+
 	<module name="primary location choice">
-		
+
 		<!-- Describe the primary activity in term of trip purpose. -->
 		<!-- The activity at the origin is implicitly set to "home" -->
 		<!-- To take multiple trips per person or other type of origins into account (e.g. shop-leisure trips)
 			one must extends the methods "setupNumberHomesPerZone" and "setupNumberJobsPerZone"
-			of class "PrimlocModule" --> 				
+			of class "PrimlocModule" -->
 		<param name="primary activity" value="work" />
 
 		<!-- Optional layer on which to aggregate facilities and residents -->
-		<!-- Otherwise the user has to specify a layer with PrimlocModule.setLayer() --> 
+		<!-- Otherwise the user has to specify a layer with PrimlocModule.setLayer() -->
 		<param name="aggregation layer" value="municipality"/>
-		
+
 		<!-- Optional: use Euclidean crow-distance as a proxy for travel costs -->
 		<param name="euclidean distance costs" value="true" />
-		
+
 		<!-- calibrate the model or just simulate for a given mu -->
-		<param name="calibration" value="true"/>	
-				
+		<param name="calibration" value="true"/>
+
 		<!-- Optional: Default value for the logit scale parameter. Units are in $
 			compared to travel costs. If ommitted then mu is chosen equal to average cost -->
 		<param name="mu" value="5.0" />
-		
+
 		<!-- Module can be silent/verbose -->
 		<param name="verbose" value="false" />
-		
+
 		<!-- Knowledge of the agent can be increased or modified -->
 		<param name="overwrite knowledge" value="true" />
 

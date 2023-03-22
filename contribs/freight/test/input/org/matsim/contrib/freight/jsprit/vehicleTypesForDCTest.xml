@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+<vehicleDefinitions xmlns="https://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
 
 	<vehicleType id="LargeBattery_V1">
 
@@ -24,7 +24,7 @@
 		<networkMode networkMode="car"/>
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
-	
+
 	<vehicleType id="SmallBattery_V1">
 
 		<description>Carrier_Version1</description>
@@ -116,7 +116,7 @@
 		<networkMode networkMode="car"/>
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
-	
+
 	<vehicleType id="SmallBattery_V3">
 
 		<description>Carrier_Version3</description>
@@ -207,5 +207,5 @@
 		<networkMode networkMode="car"/>
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
-		
+
 </vehicleDefinitions>

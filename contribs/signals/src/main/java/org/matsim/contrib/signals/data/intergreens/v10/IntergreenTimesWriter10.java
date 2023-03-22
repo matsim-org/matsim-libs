@@ -46,21 +46,21 @@ import org.matsim.contrib.signals.model.SignalGroup;
  * @author dgrether
  */
 public final class IntergreenTimesWriter10 extends MatsimJaxbXmlWriter {
-	
+
 		private static final Logger log = LogManager.getLogger(IntergreenTimesWriter10.class);
-		
+
 		private IntergreenTimesData intergreensData;
-	
-		public static final String INTERGREENTIMES10 = "http://www.matsim.org/files/dtd/intergreenTimes_v1.0.xsd";
-		
+
+		public static final String INTERGREENTIMES10 = "https://www.matsim.org/files/dtd/intergreenTimes_v1.0.xsd";
+
 		public IntergreenTimesWriter10(IntergreenTimesData intergreensData){
 			this.intergreensData = intergreensData;
 		}
-		
+
 		private XMLIntergreenTimes convertDataToXml() {
 			ObjectFactory fac = new ObjectFactory();
 			XMLIntergreenTimes xmlContainer = fac.createXMLIntergreenTimes();
-			
+
 			for (IntergreensForSignalSystemData intergreens :  this.intergreensData.getIntergreensForSignalSystemDataMap().values()) {
 				XMLSignalSystem xmlss = fac.createXMLIntergreenTimesXMLSignalSystem();
 				xmlss.setRefId(intergreens.getSignalSystemId().toString());
@@ -89,7 +89,7 @@ public final class IntergreenTimesWriter10 extends MatsimJaxbXmlWriter {
 			}
 			return null;
 		}
-		
+
 		public void write(String filename, XMLIntergreenTimes xmlIntergreenTimes) {
 			log.info("writing file: " + filename);
 	  	JAXBContext jc;
@@ -107,16 +107,16 @@ public final class IntergreenTimesWriter10 extends MatsimJaxbXmlWriter {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 
-		
+
 		@Override
 		public void write(final String filename) {
 			XMLIntergreenTimes xmlIntergreenTimes = convertDataToXml();
 			this.write(filename, xmlIntergreenTimes);
 		}
 
-		
+
 	}
 

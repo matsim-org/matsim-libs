@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 
 	<module name="global">
@@ -80,7 +80,7 @@
 			</parameterset>
 		</parameterset>
 	</module>
-	
+
 	<module name="strategy">
 	<!--	<param name="maxAgentPlanMemorySize" value="5" /> -->
 
@@ -115,6 +115,6 @@
 		<!-- the radius in which stop locations are searched, given a start or target coordinate -->
 		<!--<param name="searchRadius" value="10000.0" />-->
 	<!--</module>-->
-	
+
 
 </config>
