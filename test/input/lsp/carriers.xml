@@ -2,7 +2,7 @@
 	<carriers>
 		<carrier id="directCarrier">
 			<attributes>
-				<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+				<attribute name="carrierType" class="java.lang.String">distributionCarrier</attribute>
 			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
@@ -13,7 +13,7 @@
 
 		<carrier id="mainCarrier">
 			<attributes>
-				<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">mainRunCarrier</attribute>
+				<attribute name="carrierType" class="java.lang.String">mainRunCarrier</attribute>
 			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
@@ -24,7 +24,7 @@
 
 		<carrier id="distributionCarrier">
 			<attributes>
-				<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+				<attribute name="carrierType" class="java.lang.String">distributionCarrier</attribute>
 			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
