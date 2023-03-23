@@ -208,10 +208,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			}
 			case LOGISTIC_CHAIN_ELEMENT -> {
 				String logisticChainElementId = atts.getValue(ID);
-//				logisticChainElementIds.add(logisticChainElementId);
-
 				String resourceId = atts.getValue(RESOURCE_ID);
-//				lspResourceIds.add(resourceId);
 
 				elementIdResourceIdMap.put(logisticChainElementId, resourceId);
 			}
@@ -336,6 +333,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 						}
 					}
 				}
+
+				elementIdResourceIdMap.clear();
 
 				//create logisticChain
 				LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
