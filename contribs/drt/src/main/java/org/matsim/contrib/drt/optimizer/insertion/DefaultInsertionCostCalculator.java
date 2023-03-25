@@ -73,6 +73,9 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 				if (nextArrival - departureTime < drtConfigGroup.allowDetourBeforeArrivalThreshold &&
 						detour > 0) {
 					return INFEASIBLE_SOLUTION_COST;
+				} else {
+					// all following stops are above the threshold
+					break;
 				}
 			}
 			if(s == insertion.dropoff.index) {
