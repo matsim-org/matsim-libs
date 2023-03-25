@@ -60,23 +60,26 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
-		// divert right now
-		if(insertion.pickup.index == 0) {
-			Waypoint nextWaypoint = insertion.pickup.nextWaypoint;
-			// there is an existing stop following the new insertion
-			if(nextWaypoint instanceof Waypoint.Stop && nextWaypoint != insertion.pickup.newWaypoint) {
-				// passengers are being dropped off == may be close to arrival
-				if(!((Waypoint.Stop) nextWaypoint).task.getDropoffRequests().isEmpty()) {
-					double nextArrival = nextWaypoint.getArrivalTime();
-					double departureTime = insertion.vehicleEntry.start.getDepartureTime();
-					//arrival is very soon
-					if (nextArrival - departureTime < drtConfigGroup.fixedApproachTime) {
-						return INFEASIBLE_SOLUTION_COST;
-					}
+		// all stops after the new (potential) pickup but before the new dropoff
+		// are delayed by pickupDetourTimeLoss
+		double detour = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
+		for (int s = insertion.pickup.index; s < vEntry.stops.size(); s++) {
+			Waypoint.Stop stop = vEntry.stops.get(s);
+			// passengers are being dropped off == may be close to arrival
+			if(!stop.task.getDropoffRequests().isEmpty()) {
+				double nextArrival = stop.getArrivalTime();
+				double departureTime = insertion.vehicleEntry.start.getDepartureTime();
+				//arrival is very soon
+				if (nextArrival - departureTime < drtConfigGroup.allowDetourBeforeArrivalThreshold &&
+						detour > 0) {
+					return INFEASIBLE_SOLUTION_COST;
 				}
 			}
+			if(s == insertion.dropoff.index) {
+				// all stops after the new (potential) dropoff are delayed by totalTimeLoss
+				detour = detourTimeInfo.getTotalTimeLoss();
+			}
 		}
-
 		return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
 	}
 }

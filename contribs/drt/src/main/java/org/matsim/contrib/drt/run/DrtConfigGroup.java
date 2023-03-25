@@ -187,11 +187,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Parameter
 	@Comment(
 			"Time before reaching a planned dropoff from which it is not allowed to insert new detours for new requests. I.e.," +
-					" if set to 180, then a vehicle will not divert to pickup a new passenger once a boarded passenger is only " +
+					" if set to 180, then a vehicle will not divert to pickup or dropoff a new passenger once a boarded passenger is only " +
 					"3 minutes away from her destination, even though her time window would allow it." +
-					" Delayed detour just before arrival are usually perceived very negatively.")
+					" Delayed detours just before arrival are usually perceived very negatively.")
 	@PositiveOrZero // used only for stopbased DRT scheme
-	public double fixedApproachTime = 0;// [m];
+	public double allowDetourBeforeArrivalThreshold = 0;// [m];
 
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
