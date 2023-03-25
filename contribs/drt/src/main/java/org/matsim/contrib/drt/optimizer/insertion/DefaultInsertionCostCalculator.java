@@ -63,7 +63,7 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 		// all stops after the new (potential) pickup but before the new dropoff
 		// are delayed by pickupDetourTimeLoss
 		double detour = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
-		if(!vEntry.stops.isEmpty()) {
+		if(vEntry.stops != null) {
 			for (int s = insertion.pickup.index; s < vEntry.stops.size(); s++) {
 				Waypoint.Stop stop = vEntry.stops.get(s);
 				// passengers are being dropped off == may be close to arrival
