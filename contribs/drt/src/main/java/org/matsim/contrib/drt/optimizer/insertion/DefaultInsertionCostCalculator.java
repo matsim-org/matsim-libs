@@ -63,26 +63,29 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 		// all stops after the new (potential) pickup but before the new dropoff
 		// are delayed by pickupDetourTimeLoss
 		double detour = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
-		for (int s = insertion.pickup.index; s < vEntry.stops.size(); s++) {
-			Waypoint.Stop stop = vEntry.stops.get(s);
-			// passengers are being dropped off == may be close to arrival
-			if(!stop.task.getDropoffRequests().isEmpty()) {
-				double nextArrival = stop.getArrivalTime();
-				double departureTime = insertion.vehicleEntry.start.getDepartureTime();
-				//arrival is very soon
-				if (nextArrival - departureTime < drtConfigGroup.allowDetourBeforeArrivalThreshold &&
-						detour > 0) {
-					return INFEASIBLE_SOLUTION_COST;
-				} else {
-					// all following stops are above the threshold
-					break;
+		if(!vEntry.stops.isEmpty()) {
+			for (int s = insertion.pickup.index; s < vEntry.stops.size(); s++) {
+				Waypoint.Stop stop = vEntry.stops.get(s);
+				// passengers are being dropped off == may be close to arrival
+				if (!stop.task.getDropoffRequests().isEmpty()) {
+					double nextArrival = stop.getArrivalTime();
+					double departureTime = insertion.vehicleEntry.start.getDepartureTime();
+					//arrival is very soon
+					if (nextArrival - departureTime < drtConfigGroup.allowDetourBeforeArrivalThreshold &&
+							detour > 0) {
+						return INFEASIBLE_SOLUTION_COST;
+					} else {
+						// all following stops are above the threshold
+						break;
+					}
+				}
+				if (s == insertion.dropoff.index) {
+					// all stops after the new (potential) dropoff are delayed by totalTimeLoss
+					detour = detourTimeInfo.getTotalTimeLoss();
 				}
 			}
-			if(s == insertion.dropoff.index) {
-				// all stops after the new (potential) dropoff are delayed by totalTimeLoss
-				detour = detourTimeInfo.getTotalTimeLoss();
-			}
 		}
+
 		return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
 	}
 }
