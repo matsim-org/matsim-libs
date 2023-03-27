@@ -47,7 +47,7 @@ import java.util.*;
  * This DemandReaderFromCSV reads all demand information given in the read CSV
  * file and creates the demand for the carriers. While the process of creating
  * the demand the consistency of the information will be checked.
- * 
+ *
  * @author Ricardo Ewert
  */
 public final class DemandReaderFromCSV {
@@ -315,7 +315,7 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Reads the csv with the demand information and adds this demand to the related
 	 * carriers.
-	 * 
+	 *
 	 * @param scenario
 	 * @param csvLocationDemand
 	 * @param polygonsInShape
@@ -401,7 +401,7 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Checks if the read demand information are useful to create the shipment or
 	 * service demands
-	 * 
+	 *
 	 * @param scenario
 	 * @param demandInformation
 	 * @param polygonsInShape
@@ -537,7 +537,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Creates for every demand information the services/shipments for the carriers
-	 * 
+	 *
 	 * @param scenario
 	 * @param polygonsInShape
 	 * @param demandInformation
@@ -562,7 +562,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Creates the services.
-	 * 
+	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
 	 * @param polygonsInShape
@@ -754,7 +754,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Creates the shipments of a carrier.
-	 * 
+	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
 	 * @param polygonsInShape
@@ -1092,7 +1092,7 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Creates a job Id for a new job. If a certain Id is already used a number will
 	 * be added at the end until no existing job was the same Id.
-	 * 
+	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
 	 * @param linkPickup
@@ -1131,7 +1131,7 @@ public final class DemandReaderFromCSV {
 	/**
 	 * If jobs of a carrier have the same characteristics (time window, location)
 	 * they will be combined to one job,
-	 * 
+	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
 	 */
@@ -1240,7 +1240,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Finds and returns all possible links for this job.
-	 * 
+	 *
 	 * @param scenario
 	 * @param polygonsInShape
 	 * @param crsTransformationNetworkAndShape
@@ -1279,7 +1279,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Finds the next link which can be used as a location.
-	 * 
+	 *
 	 * @param scenario
 	 * @param polygonsInShape
 	 * @param possibleLinks
@@ -1318,7 +1318,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Finds all persons which are possible for the demand.
-	 * 
+	 *
 	 * @param population
 	 * @param areasForServiceLocations
 	 * @param polygonsInShape
@@ -1349,7 +1349,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Finds the nearest link for one person.
-	 * 
+	 *
 	 * @param scenario
 	 * @param nearestLinkPerPerson
 	 * @param person
@@ -1375,7 +1375,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Searches a possible link for the demand.
-	 * 
+	 *
 	 * @param possibleLinks
 	 * @param possiblePersons
 	 * @param nearestLinkPerPerson

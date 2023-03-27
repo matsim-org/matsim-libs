@@ -45,7 +45,7 @@ import java.util.*;
  * This CarrierReaderFromCSV reads all carrier information given in the read CSV
  * file and creates the carriers. While the process of creating the carriers the
  * consistency of the information will be checked.
- * 
+ *
  * @author Ricardo Ewert
  *
  */
@@ -234,7 +234,7 @@ public final class CarrierReaderFromCSV {
 
 	/**
 	 * Reads and create the carriers with reading the information from the csv file.
-	 * 
+	 *
 	 * @param scenario
 	 * @param freightConfigGroup
 	 * @param csvLocationCarrier
@@ -304,7 +304,7 @@ public final class CarrierReaderFromCSV {
 
 	/**
 	 * Checks if the read carrier information are consistent.
-	 * 
+	 *
 	 * @param allNewCarrierInformation
 	 * @param freightConfigGroup
 	 * @param scenario
@@ -406,7 +406,7 @@ public final class CarrierReaderFromCSV {
 
 	/**
 	 * Read and creates the carrier and the vehicle types.
-	 * 
+	 *
 	 * @param scenario
 	 * @param allNewCarrierInformation
 	 * @param freightConfigGroup

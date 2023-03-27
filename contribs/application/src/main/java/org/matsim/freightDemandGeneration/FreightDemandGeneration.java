@@ -60,7 +60,7 @@ import java.util.concurrent.ExecutionException;
  * the read input files. The format and column titles of both input csv should
  * not be changed. The format of the files can be found in the test input of the
  * package.
- * 
+ *
  * @author: Ricardo Ewert
  */
 @CommandLine.Command(name = "generate-freight-demand", description = "The class generates a freight demand based on the "
@@ -221,7 +221,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	/**
 	 * Deletes the existing output file and sets the number of the last iteration
-	 * 
+	 *
 	 * @param lastMATSimIteration
 	 * @param coordinateSystem
 	 * @return
@@ -272,7 +272,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	/**
 	 * Reads the carrier vehicle file.
-	 * 
+	 *
 	 * @param config
 	 * @param vehicleTypesFileLocation
 	 */
@@ -289,7 +289,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	/**
 	 * Differs between the different options of creating the carrier.
-	 * 
+	 *
 	 * @param scenario
 	 * @param selectedCarrierInputOption
 	 * @param carriersFileLocation
@@ -339,7 +339,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	/**
 	 * Differs between the different options of creating the demand..
-	 * 
+	 *
 	 * @param selectedDemandGenerationOption
 	 * @param scenario
 	 * @param csvLocationDemand
@@ -428,7 +428,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	/**
 	 * Prepares the controller.
-	 * 
+	 *
 	 * @param scenario
 	 * @return
 	 */
@@ -446,7 +446,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	/**
 	 * Differs between the different options for solving the VRP problem.
-	 * 
+	 *
 	 * @param selectedSolution
 	 * @param config
 	 * @param controler
@@ -513,7 +513,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	/**
 	 * Runs jsprit.
-	 * 
+	 *
 	 * @param controler
 	 * @param usingRangeRestriction
 	 * @throws ExecutionException
