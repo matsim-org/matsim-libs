@@ -59,7 +59,7 @@ public class CarrierReaderFromCSVTest {
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
 				.readCarrierInformation(carrierCSVLocation);
 		CarrierReaderFromCSV.checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape);
-		CarrierReaderFromCSV.createNewCarrierAndAddVehilceTypes(scenario, allNewCarrierInformation, freightConfigGroup,
+		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightConfigGroup,
 				polygonsInShape, 1, null);
 		Assert.assertEquals(3, FreightUtils.getCarriers(scenario).getCarriers().size());
 		Assert.assertTrue(
@@ -169,8 +169,8 @@ public class CarrierReaderFromCSVTest {
 
 		for (CarrierInformationElement carrierInformationElement : allNewCarrierInformation) {
 			if (carrierInformationElement.getName().equals("testCarrier1")) {
-				Assert.assertNull(carrierInformationElement.getAreaOfAdditonalDepots());
-				Assert.assertEquals(0, carrierInformationElement.getFixedNumberOfVehilcePerTypeAndLocation());
+				Assert.assertNull(carrierInformationElement.getAreaOfAdditionalDepots());
+				Assert.assertEquals(0, carrierInformationElement.getFixedNumberOfVehiclePerTypeAndLocation());
 				Assert.assertEquals(FleetSize.INFINITE, carrierInformationElement.getFleetSize());
 				Assert.assertEquals(10, carrierInformationElement.getJspritIterations());
 				Assert.assertEquals(2, carrierInformationElement.getNumberOfDepotsPerType());
@@ -182,13 +182,12 @@ public class CarrierReaderFromCSVTest {
 				Assert.assertEquals(2, carrierInformationElement.getVehicleTypes().length);
 				Assert.assertTrue(carrierInformationElement.getVehicleTypes()[0].equals("testVehicle1")
 						|| carrierInformationElement.getVehicleTypes()[0].equals("testVehicle2"));
-				Assert.assertFalse(carrierInformationElement.getVehicleTypes()[0]
-						.equals(carrierInformationElement.getVehicleTypes()[1]));
+				Assert.assertNotEquals(carrierInformationElement.getVehicleTypes()[0], carrierInformationElement.getVehicleTypes()[1]);
 
 			} else if (carrierInformationElement.getName().equals("testCarrier3")) {
-				Assert.assertEquals(1, carrierInformationElement.getAreaOfAdditonalDepots().length);
-				Assert.assertEquals("area1", carrierInformationElement.getAreaOfAdditonalDepots()[0]);
-				Assert.assertEquals(0, carrierInformationElement.getFixedNumberOfVehilcePerTypeAndLocation());
+				Assert.assertEquals(1, carrierInformationElement.getAreaOfAdditionalDepots().length);
+				Assert.assertEquals("area1", carrierInformationElement.getAreaOfAdditionalDepots()[0]);
+				Assert.assertEquals(0, carrierInformationElement.getFixedNumberOfVehiclePerTypeAndLocation());
 				Assert.assertEquals(FleetSize.INFINITE, carrierInformationElement.getFleetSize());
 				Assert.assertEquals(0, carrierInformationElement.getJspritIterations());
 				Assert.assertEquals(2, carrierInformationElement.getNumberOfDepotsPerType());
@@ -200,8 +199,8 @@ public class CarrierReaderFromCSVTest {
 				Assert.assertEquals("testVehicle1", carrierInformationElement.getVehicleTypes()[0]);
 
 			} else if (carrierInformationElement.getName().equals("testCarrier2")) {
-				Assert.assertNull(carrierInformationElement.getAreaOfAdditonalDepots());
-				Assert.assertEquals(3, carrierInformationElement.getFixedNumberOfVehilcePerTypeAndLocation());
+				Assert.assertNull(carrierInformationElement.getAreaOfAdditionalDepots());
+				Assert.assertEquals(3, carrierInformationElement.getFixedNumberOfVehiclePerTypeAndLocation());
 				Assert.assertEquals(FleetSize.FINITE, carrierInformationElement.getFleetSize());
 				Assert.assertEquals(15, carrierInformationElement.getJspritIterations());
 				Assert.assertEquals(3, carrierInformationElement.getNumberOfDepotsPerType());

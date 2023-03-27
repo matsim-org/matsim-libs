@@ -60,14 +60,14 @@ public class FreightDemandGenerationUtils {
 	 * @param population
 	 * @param sampleSizeInputPopulation
 	 * @param sampleTo
-	 * @param samlingOption
+	 * @param samplingOption
 	 */
 	static void preparePopulation(Population population, double sampleSizeInputPopulation, double sampleTo,
-			String samlingOption) {
+			String samplingOption) {
 		List<Id<Person>> personsToRemove = new ArrayList<>();
 		population.getAttributes().putAttribute("sampleSize", sampleSizeInputPopulation);
 		population.getAttributes().putAttribute("samplingTo", sampleTo);
-		population.getAttributes().putAttribute("samplingOption", samlingOption);
+		population.getAttributes().putAttribute("samplingOption", samplingOption);
 
 		for (Person person : population.getPersons().values()) {
 			if (person.getAttributes().getAsMap().containsKey("subpopulation")
@@ -120,9 +120,9 @@ public class FreightDemandGenerationUtils {
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId().toString() + "	"
 							+ coordFrom.getX() + "	" + coordFrom.getY() + "	" + "Pickup" + "		"
 							+ thisShipment.getFrom().toString() + "	" + thisShipment.getTo().toString() + "\n");
-					writer.write(thisCarrier.getId().toString() + thisShipment.getId().toString() + "	"
+					writer.write(thisCarrier.getId().toString() + thisShipment.getId() + "	"
 							+ coordTo.getX() + "	" + coordTo.getY() + "	" + "Delivery" + "		"
-							+ thisShipment.getFrom().toString() + "	" + thisShipment.getTo().toString() + "\n");
+							+ thisShipment.getFrom() + "	" + thisShipment.getTo() + "\n");
 				}
 			}
 			writer.flush();
@@ -190,14 +190,12 @@ public class FreightDemandGenerationUtils {
 					if (area.equals(singlePolygon.getAttribute("Ortsteil"))
 							|| area.equals(singlePolygon.getAttribute("BEZNAME")))
 						if (((Geometry) singlePolygon.getDefaultGeometry()).contains(p)) {
-							isInShape = true;
-							return isInShape;
+							return true;
 						}
 				}
 			} else {
 				if (((Geometry) singlePolygon.getDefaultGeometry()).contains(p)) {
-					isInShape = true;
-					return isInShape;
+					return true;
 				}
 			}
 		}

@@ -67,10 +67,10 @@ public class DemandReaderFromCSVTest {
 		Assert.assertEquals("i(5,9)R",nearestLinkPerPerson.get(Id.createPersonId("person7")).values().iterator().next());
 		Assert.assertEquals("i(9,5)R",nearestLinkPerPerson.get(Id.createPersonId("person8")).values().iterator().next());
 
-			
-		
+
+
 	}
-	
+
 	@Test
 	public void demandCreation() throws IOException {
 		// read inputs
@@ -93,7 +93,7 @@ public class DemandReaderFromCSVTest {
 		// run methods
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
 				.readCarrierInformation(carrierCSVLocation);
-		CarrierReaderFromCSV.createNewCarrierAndAddVehilceTypes(scenario, allNewCarrierInformation, freightConfigGroup,
+		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightConfigGroup,
 				polygonsInShape, 1, null);
 		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);
 		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, polygonsInShape);
