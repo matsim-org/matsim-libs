@@ -20,14 +20,6 @@
 
 package org.matsim.freightDemandGeneration;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.concurrent.ExecutionException;
-
-import javax.management.InvalidAttributeValueException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -39,10 +31,13 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierModule;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -50,8 +45,14 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.opengis.feature.simple.SimpleFeature;
-
 import picocli.CommandLine;
+
+import javax.management.InvalidAttributeValueException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The class generates a freight demand based on the selected input options and
@@ -444,16 +445,12 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 */
 	private static Controler prepareControler(Scenario scenario) {
 		Controler controler = new Controler(scenario);
-
-//		((AllowsConfiguration) controler).addOverridingModule( new CarrierModule( ) ) ;
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				install(new CarrierModule());
-//			}
-//		});
-
-		controler.addOverridingModule( new CarrierModule() );
+		((AllowsConfiguration) controler).addOverridingModule(new CarrierModule(){
+			@Override
+			public void install() {
+				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
+			}
+		});
 
 		return controler;
 	}
