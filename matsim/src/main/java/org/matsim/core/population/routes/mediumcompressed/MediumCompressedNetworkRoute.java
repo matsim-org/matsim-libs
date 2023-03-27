@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.heavycompressed.VarIntUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +27,8 @@ import java.util.List;
  */
 public class MediumCompressedNetworkRoute extends AbstractNetworkRoute {
 
-	private int[] route = null;
+	private final static byte[] EMPTY_ROUTE = new byte[0];
+	private byte[] route = EMPTY_ROUTE;
 
 	public MediumCompressedNetworkRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
 		this.setStartLinkId(startLinkId);
@@ -46,16 +48,17 @@ public class MediumCompressedNetworkRoute extends AbstractNetworkRoute {
 				i++;
 			}
 		}
-		this.route = route;
+		this.route = VarIntUtils.encode(route, 0, route.length);
 	}
 
 	@Override
 	public List<Id<Link>> getLinkIds() {
-		if (this.route == null) {
+		if (this.route == null || this.route == EMPTY_ROUTE) {
 			return Collections.emptyList();
 		}
-		List<Id<Link>> linkIds = new ArrayList<>(this.route.length);
-		for (int linkIndex : this.route) {
+		int[] idxRoute = VarIntUtils.decode(this.route);
+		List<Id<Link>> linkIds = new ArrayList<>(idxRoute.length);
+		for (int linkIndex : idxRoute) {
 			linkIds.add(Id.get(linkIndex, Link.class));
 		}
 		return linkIds;
