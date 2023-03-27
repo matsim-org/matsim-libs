@@ -22,6 +22,7 @@
 
 package org.matsim.core.controler;
 
+import com.google.inject.Inject;
 import org.matsim.analysis.IterationTravelStatsModule;
 import org.matsim.analysis.LegHistogramModule;
 import org.matsim.analysis.LegTimesModule;
@@ -29,6 +30,8 @@ import org.matsim.analysis.LinkStatsModule;
 import org.matsim.analysis.ModeStatsModule;
 import org.matsim.analysis.ScoreStatsModule;
 import org.matsim.analysis.VolumesAnalyzerModule;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.population.VspPlansCleanerModule;
@@ -43,6 +46,9 @@ import org.matsim.counts.CountsModule;
 import org.matsim.guice.DependencyGraphModule;
 import org.matsim.pt.counts.PtCountsModule;
 import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
+
+import javax.imageio.ImageIO;
+import java.io.File;
 
 public final class ControlerDefaultsModule extends AbstractModule {
     @Override
@@ -73,7 +79,20 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new SnapshotWritersModule());
         install(new DependencyGraphModule());
 
-    	/* Comment by kai (mz thinks it is not helpful): The framework eventually calls the above method, which calls the include 
+		// Comment by Tarek Chouaki.
+		// To make sure the cache files used under ChartUtils are located in tmp folder in the output directory
+		// The ImageIO.setCacheDirectory method checks if the provided directory exists so it needs to be created first
+		// Maybe not the best place to but this but since ChartUtils is used by many modules, including default ones,
+		//  the cache needs to be always set correctly.
+		addControlerListenerBinding().toInstance(new StartupListener() {
+			@Inject
+			private OutputDirectoryHierarchy outputDirectoryHierarchy;
+			@Override   public void notifyStartup(StartupEvent event) {
+				ImageIO.setCacheDirectory(new File(outputDirectoryHierarchy.getTempPath()));
+			}
+		});
+
+    	/* Comment by kai (mz thinks it is not helpful): The framework eventually calls the above method, which calls the include
         * methods , which (fairly quickly) call their own install methods, etc.  Eventually, everything is resolved down to the
         * "bindTo..." methods, which are the leaves.
     	*/
