@@ -21,19 +21,30 @@ public final class Layout {
 
 	private final List<Holder> layouts = new ArrayList<>();
 
+
+	/**
+	 * Add a single element to row in the layout, using default context.
+	 *
+	 * @see #row(String, String, Class, RowElement)
+	 */
+	public <T extends Viz> void row(String name, Class<T> type, RowElement<T> el) {
+		row(name, "", type, el);
+	}
+
 	/**
 	 * Add a single element to row in the layout. Note that this only stores the specification. The actual code is executed later.
 	 * <p>
 	 * If a row with the same already exists, this element will be added to the same row.
 	 * The order how this function is called will determine the order in the layout.
 	 *
-	 * @param name name of the row
-	 * @param type class of the viz element
-	 * @param el   setup of the viz element
-	 * @param <T>  type of the element
+	 * @param name    name of the row
+	 * @param context content which can hold different parameters for the same dashboard.
+	 * @param type    class of the viz element
+	 * @param el      setup of the viz element
+	 * @param <T>     type of the element
 	 */
-	public <T extends Viz> void row(String name, Class<T> type, RowElement<T> el) {
-		layouts.add(new Holder(name, type, (RowElement<Viz>) el));
+	public <T extends Viz> void row(String name, String context, Class<T> type, RowElement<T> el) {
+		layouts.add(new Holder(name, context, type, (RowElement<Viz>) el));
 	}
 
 	/**
@@ -46,6 +57,8 @@ public final class Layout {
 		for (Holder layout : layouts) {
 
 			List<Viz> row = rows.computeIfAbsent(layout.name, (k) -> new ArrayList<>());
+
+			data.setCurrentContext(layout.context);
 
 			try {
 				Constructor<?> constructor = layout.type.getConstructor();
@@ -65,7 +78,7 @@ public final class Layout {
 	}
 
 
-	private record Holder(String name, Class<?> type, RowElement<Viz> el) {
+	private record Holder(String name, String context, Class<?> type, RowElement<Viz> el) {
 	}
 
 }

@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.simwrapper.viz.Viz;
 
 import java.io.IOException;
@@ -21,6 +24,8 @@ import java.util.Map;
  * Class to define and generate SimWrapper dashboards.
  */
 public final class SimWrapper {
+
+	private static final Logger log = LogManager.getLogger(SimWrapper.class);
 
 	public final Data data = new Data();
 	private final List<Dashboard> dashboards = new ArrayList<>();
@@ -77,6 +82,8 @@ public final class SimWrapper {
 		Path target = dir.resolve(".simwrapper");
 		Files.createDirectories(target);
 
+		data.setPath(dir);
+
 		// TODO: copy config, css, and other auxiliary files
 		// from resources
 
@@ -96,8 +103,17 @@ public final class SimWrapper {
 		}
 	}
 
-	public void run(Path dir) {
-
+	/**
+	 * Run data pipeline to create the necessary data for the dashboards.
+	 */
+	public void run() {
+		for (MATSimAppCommand command : data.getCommands()) {
+			try {
+				command.call();
+			} catch (Exception e) {
+				log.error("Could not execute command {}", command, e);
+			}
+		}
 	}
 
 	/**

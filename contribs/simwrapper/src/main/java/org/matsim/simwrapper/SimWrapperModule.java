@@ -6,14 +6,39 @@ import org.matsim.core.controler.AbstractModule;
  * Install the SimWrapper Extension into MATSim.
  */
 public final class SimWrapperModule extends AbstractModule {
-	@Override
-	public void install() {
+
+	private final SimWrapper simWrapper;
+
+	/**
+	 * Create module with existing simwrapper instance.
+	 */
+	public SimWrapperModule(SimWrapper simWrapper) {
+		this.simWrapper = simWrapper;
 	}
 
+	/**
+	 * Constructor with a newly initialized {@link SimWrapper} instance.
+	 */
+	public SimWrapperModule() {
+		this(SimWrapper.create());
+	}
 
-	// TODO: provide one simwrapper instance
-	// generate before sim starts
-	// run analysis on simulation end
-	// set binder for simwrapper consumers ?
+	/**
+	 * Get the {@link SimWrapper} instance.
+	 */
+	public SimWrapper getInstance() {
+		return simWrapper;
+	}
+
+	@Override
+	public void install() {
+		bind(SimWrapper.class).toInstance(simWrapper);
+
+		addControlerListenerBinding().to(SimWrapperListener.class);
+
+	}
+
+	// TODO: config group?
+	// param set of shape files
 
 }
