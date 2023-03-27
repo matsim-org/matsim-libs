@@ -47,7 +47,7 @@ import java.util.List;
 
 /**
  * Collection of different methods for the FreightDemandGeneration.
- * 
+ *
  * @author Ricardo Ewert
  *
  */
@@ -56,7 +56,7 @@ public class FreightDemandGenerationUtils {
 
 	/**
 	 * Adds the home coordinates to attributes and removes plans
-	 * 
+	 *
 	 * @param population
 	 * @param sampleSizeInputPopulation
 	 * @param sampleTo
@@ -93,7 +93,7 @@ public class FreightDemandGenerationUtils {
 
 	/**
 	 * Creates a tsv file with the locations of all created demand elements.
-	 * 
+	 *
 	 * @param controler
 	 */
 	static void createDemandLocationsFile(Controler controler) {
@@ -135,7 +135,7 @@ public class FreightDemandGenerationUtils {
 
 	/**
 	 * Reduces the population to all persons having their home in the shape
-	 * 
+	 *
 	 * @param population
 	 * @param index
 	 */
@@ -162,7 +162,7 @@ public class FreightDemandGenerationUtils {
 
 	/**
 	 * Checks if a link is one of the possible areas.
-	 * 
+	 *
 	 * @param link
 	 * @param point
 	 * @param polygonsInShape
@@ -204,7 +204,7 @@ public class FreightDemandGenerationUtils {
 
 	/**
 	 * Creates the middle coord of a link.
-	 * 
+	 *
 	 * @param link
 	 * @return Middle coord of the Link
 	 */

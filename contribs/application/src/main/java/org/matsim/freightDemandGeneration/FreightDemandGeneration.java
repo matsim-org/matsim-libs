@@ -37,7 +37,7 @@ import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFact
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.controler.AllowsConfiguration;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -434,12 +434,12 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 */
 	private static Controler prepareControler(Scenario scenario) {
 		Controler controler = new Controler(scenario);
-		((AllowsConfiguration) controler).addOverridingModule(new CarrierModule(){
+		controler.addOverridingModule(new CarrierModule());
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
-			}
-		});
+		}});
 
 		return controler;
 	}
