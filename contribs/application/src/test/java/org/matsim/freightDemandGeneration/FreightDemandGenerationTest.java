@@ -28,6 +28,7 @@ public class FreightDemandGenerationTest {
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+			String shapeCategory = "Ortsteil";
 			new FreightDemandGeneration().execute(
 					"--output", output.toString(),
 					"--carrierOption", "createCarriersFromCSV",
@@ -45,6 +46,7 @@ public class FreightDemandGenerationTest {
 					"--network", network,
 					"--networkCRS", "WGS84",
 					"--networkChangeEvents", "",
+					"--shapeCategory", shapeCategory,
 					"--inputCarrierCSV", carrierCSVLocation.toString(),
 					"--inputDemandCSV", demandCSVLocation.toString(),
 					"--populationSample", "0.5",

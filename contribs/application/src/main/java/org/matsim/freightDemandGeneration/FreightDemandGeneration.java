@@ -143,6 +143,9 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	@CommandLine.Option(names = "--networkChangeEvents", description = "Set path to desired networkChangeEvents file if you want to use network change Events", defaultValue = "")
 	private Path networkChangeEventsPath;
 
+	@CommandLine.Option(names = "--shapeCategory", description = "Column name in the shape file for the data connection in the csv files")
+	private String shapeCategory;
+
 	@CommandLine.Option(names = "--inputCarrierCSV", description = "Path to input carrier CSV, if you want to read it.")
 	private Path csvCarrierPath;
 
@@ -316,7 +319,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 					log.info("Load carriers from: " + carriersFileLocation);
 					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightConfigGroup, csvLocationCarrier,
-							polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape);
+							polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 				}
 			}
 			case readCarrierFile -> {
@@ -332,7 +335,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			case createCarriersFromCSV ->
 				// creates all carriers based on the given information in the read carrier csv
 					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightConfigGroup, csvLocationCarrier,
-							polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape);
+							polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 			default -> throw new RuntimeException("no method to create or read carrier selected.");
 		}
 	}
@@ -360,7 +363,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			case createDemandFromCSV ->
 				// creates the demand by using the information given in the read csv file
 					DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape, combineSimilarJobs,
-							crsTransformationNetworkAndShape, null);
+							crsTransformationNetworkAndShape, null, shapeCategory);
 			case createDemandFromCSVAndUsePopulation -> {
 				/*
 				 * Option creates the demand by using the information given in the read csv file
@@ -396,14 +399,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					case useHolePopulation:
 						// uses the hole population as possible demand locations
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
-								combineSimilarJobs, crsTransformationNetworkAndShape, population);
+								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
 						break;
 					case usePopulationInShape:
 						// uses only the population with home location in the given shape file
 						FreightDemandGenerationUtils.reducePopulationToShapeArea(population,
 								shp.createIndex(populationCRS, "_"));
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
-								combineSimilarJobs, crsTransformationNetworkAndShape, population);
+								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
 						break;
 					default:
 						throw new RuntimeException("No valid population option selected!");

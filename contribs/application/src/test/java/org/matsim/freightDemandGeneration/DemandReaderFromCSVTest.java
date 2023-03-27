@@ -83,6 +83,7 @@ public class DemandReaderFromCSVTest {
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
 		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
 		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
+		String shapeCategory = "Ortsteil";
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath, "WGS84", null);
 		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
@@ -96,7 +97,7 @@ public class DemandReaderFromCSVTest {
 		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightConfigGroup,
 				polygonsInShape, 1, null);
 		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);
-		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, polygonsInShape);
+		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, polygonsInShape, shapeCategory);
 		DemandReaderFromCSV.createDemandForCarriers(scenario, polygonsInShape, demandInformation, population, false,
 				null);
 		Assert.assertEquals(3, FreightUtils.getCarriers(scenario).getCarriers().size());

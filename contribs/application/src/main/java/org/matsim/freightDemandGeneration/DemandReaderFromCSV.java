@@ -322,14 +322,15 @@ public final class DemandReaderFromCSV {
 	 * @param combineSimilarJobs
 	 * @param crsTransformationNetworkAndShape
 	 * @param population
+	 * @param shapeCategory
 	 * @throws IOException
 	 */
 	static void readAndCreateDemand(Scenario scenario, Path csvLocationDemand,
-			Collection<SimpleFeature> polygonsInShape, boolean combineSimilarJobs,
-			CoordinateTransformation crsTransformationNetworkAndShape, Population population) throws IOException {
+									Collection<SimpleFeature> polygonsInShape, boolean combineSimilarJobs,
+									CoordinateTransformation crsTransformationNetworkAndShape, Population population, String shapeCategory) throws IOException {
 
 		Set<DemandInformationElement> demandInformation = readDemandInformation(csvLocationDemand);
-		checkNewDemand(scenario, demandInformation, polygonsInShape);
+		checkNewDemand(scenario, demandInformation, polygonsInShape, shapeCategory);
 		createDemandForCarriers(scenario, polygonsInShape, demandInformation, population, combineSimilarJobs,
 				crsTransformationNetworkAndShape);
 	}
@@ -405,9 +406,10 @@ public final class DemandReaderFromCSV {
 	 * @param scenario
 	 * @param demandInformation
 	 * @param polygonsInShape
+	 * @param shapeCategory
 	 */
 	static void checkNewDemand(Scenario scenario, Set<DemandInformationElement> demandInformation,
-			Collection<SimpleFeature> polygonsInShape) {
+							   Collection<SimpleFeature> polygonsInShape, String shapeCategory) {
 
 		for (DemandInformationElement newDemand : demandInformation) {
 			Carriers carriers = (Carriers) scenario.getScenarioElement("carriers");
@@ -445,16 +447,14 @@ public final class DemandReaderFromCSV {
 					boolean isInShape = false;
 
 					for (SimpleFeature singlePolygon : polygonsInShape)
-						if ((singlePolygon.getAttribute("Ortsteil") != null
-								&& singlePolygon.getAttribute("Ortsteil").equals(demandArea))
-								|| (singlePolygon.getAttribute("BEZNAME") != null
-										&& singlePolygon.getAttribute("BEZNAME").equals(demandArea))) {
+						if ((singlePolygon.getAttribute(shapeCategory) != null
+								&& singlePolygon.getAttribute(shapeCategory).equals(demandArea))) {
 							isInShape = true;
 							break;
 						}
 					if (!isInShape)
 						throw new RuntimeException("The area " + demandArea + " for the demand generation of carrier "
-								+ newDemand.getCarrierName() + " is not part of the given shapeFile");
+								+ newDemand.getCarrierName() + " is not part of the given shapeFile. The areas should be in the shape file column " + shapeCategory);
 				}
 			}
 			if (newDemand.getLocationsOfFirstJobElement() != null)
@@ -508,8 +508,7 @@ public final class DemandReaderFromCSV {
 					for (String demand : newDemand.getAreasSecondJobElement()) {
 						boolean isInShape = false;
 						for (SimpleFeature singlePolygon : polygonsInShape)
-							if (singlePolygon.getAttribute("Ortsteil").equals(demand)
-									|| singlePolygon.getAttribute("BEZNAME").equals(demand)) {
+							if (singlePolygon.getAttribute(shapeCategory).equals(demand)) {
 								isInShape = true;
 								break;
 							}

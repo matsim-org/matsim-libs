@@ -58,7 +58,8 @@ public class CarrierReaderFromCSVTest {
 		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
 				.readCarrierInformation(carrierCSVLocation);
-		CarrierReaderFromCSV.checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape);
+		String shapeCategory = "Ortsteil";
+		CarrierReaderFromCSV.checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape, shapeCategory);
 		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightConfigGroup,
 				polygonsInShape, 1, null);
 		Assert.assertEquals(3, FreightUtils.getCarriers(scenario).getCarriers().size());

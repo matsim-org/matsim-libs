@@ -241,14 +241,15 @@ public final class CarrierReaderFromCSV {
 	 * @param polygonsInShape
 	 * @param defaultJspritIterations
 	 * @param crsTransformationNetworkAndShape
+	 * @param shapeCategory
 	 * @throws IOException
 	 */
 	public static void readAndCreateCarrierFromCSV(Scenario scenario, FreightConfigGroup freightConfigGroup,
 												   Path csvLocationCarrier, Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
-												   CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
+												   CoordinateTransformation crsTransformationNetworkAndShape, String shapeCategory) throws IOException {
 
 		Set<CarrierInformationElement> allNewCarrierInformation = readCarrierInformation(csvLocationCarrier);
-		checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape);
+		checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape, shapeCategory);
 		log.info("The read carrier information from the csv are checked without errors.");
 		createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightConfigGroup, polygonsInShape,
 				defaultJspritIterations, crsTransformationNetworkAndShape);
@@ -309,9 +310,10 @@ public final class CarrierReaderFromCSV {
 	 * @param freightConfigGroup
 	 * @param scenario
 	 * @param polygonsInShape
+	 * @param shapeCategory
 	 */
 	static void checkNewCarrier(Set<CarrierInformationElement> allNewCarrierInformation,
-			FreightConfigGroup freightConfigGroup, Scenario scenario, Collection<SimpleFeature> polygonsInShape) {
+								FreightConfigGroup freightConfigGroup, Scenario scenario, Collection<SimpleFeature> polygonsInShape, String shapeCategory) {
 
 		FreightUtils.addOrGetCarriers(scenario);
 		for (CarrierInformationElement carrierElement : allNewCarrierInformation) {
@@ -361,15 +363,14 @@ public final class CarrierReaderFromCSV {
 				for (String depotArea : carrierElement.getAreaOfAdditionalDepots()) {
 					boolean isInShape = false;
 					for (SimpleFeature singlePolygon : polygonsInShape) {
-						if (singlePolygon.getAttribute("Ortsteil").equals(depotArea)
-								|| singlePolygon.getAttribute("BEZNAME").equals(depotArea)) {
+						if (singlePolygon.getAttribute(shapeCategory).equals(depotArea)) {
 							isInShape = true;
 							break;
 						}
 					}
 					if (!isInShape)
 						throw new RuntimeException("The area " + depotArea + " of the possible depots of carrier"
-								+ carrierElement.getName() + " is not part of the given shapeFile");
+								+ carrierElement.getName() + " is not part of the given shapeFile. The areas should be in the shape file column " + shapeCategory);
 				}
 			}
 			if (carrierElement.getFixedNumberOfVehiclePerTypeAndLocation() != 0)
