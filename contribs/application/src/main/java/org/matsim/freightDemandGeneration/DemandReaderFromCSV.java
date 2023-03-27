@@ -324,7 +324,7 @@ public final class DemandReaderFromCSV {
 	 * @param population
 	 * @throws IOException
 	 */
-	static void readAndCreateDemand(Scenario scenario, String csvLocationDemand,
+	static void readAndCreateDemand(Scenario scenario, Path csvLocationDemand,
 			Collection<SimpleFeature> polygonsInShape, boolean combineSimilarJobs,
 			CoordinateTransformation crsTransformationNetworkAndShape, Population population) throws IOException {
 
@@ -337,19 +337,16 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Reads the demand information from the csv file and checks if the information
 	 * are consistent
-	 * 
+	 *
 	 * @param csvLocationDemand
-	 * @param demandInformation
-	 * @param scenario
-	 * @param polygonsInShape
 	 * @return
 	 * @throws IOException
 	 */
-	static Set<DemandInformationElement> readDemandInformation(String csvLocationDemand) throws IOException {
+	static Set<DemandInformationElement> readDemandInformation(Path csvLocationDemand) throws IOException {
 
 		Set<DemandInformationElement> demandInformation = new HashSet<>();
-		CSVParser parse = CSVFormat.DEFAULT.withDelimiter('\t').withFirstRecordAsHeader()
-				.parse(IOUtils.getBufferedReader(csvLocationDemand));
+		CSVParser parse = new CSVParser(Files.newBufferedReader(csvLocationDemand),
+				CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build());
 
 		for (CSVRecord record : parse) {
 			DemandInformationElement.Builder builder;

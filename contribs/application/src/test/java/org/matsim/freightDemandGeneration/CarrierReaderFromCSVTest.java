@@ -52,7 +52,7 @@ public class CarrierReaderFromCSVTest {
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
 				FreightConfigGroup.class);
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
-		String carrierCSVLocation = utils.getPackageInputDirectory() + "testCarrierCSV.csv";
+		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath, "WGS84", null);
 		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
@@ -162,7 +162,7 @@ public class CarrierReaderFromCSVTest {
 	@Test
 	public void csvCarrierReader() throws IOException {
 
-		String carrierCSVLocation = utils.getPackageInputDirectory() + "testCarrierCSV.csv";
+		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
 				.readCarrierInformation(carrierCSVLocation);
 		Assert.assertEquals(3, allNewCarrierInformation.size());

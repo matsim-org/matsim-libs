@@ -28,7 +28,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
@@ -191,9 +191,6 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		// load or create carrier
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		String csvCarrierLocation = csvCarrierPath.toString();
-		String csvLocationDemand = csvDemandPath.toString();
-
 		Collection<SimpleFeature> polygonsInShape = null;
 		shp = new ShpOptions(shapeFilePath, shapeCRS, null);
 		if (shp.getShapeFile() != null && Files.exists(shp.getShapeFile())) {
@@ -202,12 +199,12 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			crsTransformationFromNetworkToShape = shp.createTransformation(networkCRS);
 		}
 		log.info("Start creating carriers. Selected option: " + selectedCarrierInputOption);
-		createCarrier(scenario, selectedCarrierInputOption, carriersFileLocation, csvCarrierLocation, polygonsInShape,
+		createCarrier(scenario, selectedCarrierInputOption, carriersFileLocation, csvCarrierPath, polygonsInShape,
 				defaultJspritIterations, crsTransformationFromNetworkToShape);
 
 		// create the demand
 		log.info("Start creating the demand. Selected option: " + selectedCarrierInputOption);
-		createDemand(selectedDemandGenerationOption, scenario, csvLocationDemand, polygonsInShape, populationFile,
+		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, polygonsInShape, populationFile,
 				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.getBoolean(combineSimilarJobs),
 				crsTransformationFromNetworkToShape);
 
@@ -303,7 +300,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws IOException
 	 */
 	private void createCarrier(Scenario scenario, CarrierInputOptions selectedCarrierInputOption,
-			String carriersFileLocation, String csvLocationCarrier, Collection<SimpleFeature> polygonsInShape,
+			String carriersFileLocation, Path csvLocationCarrier, Collection<SimpleFeature> polygonsInShape,
 			int defaultJspritIterations, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
@@ -355,7 +352,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws IOException
 	 */
 	private void createDemand(DemandGenerationOptions selectedDemandGenerationOption, Scenario scenario,
-			String csvLocationDemand, Collection<SimpleFeature> polygonsInShape, String populationFile,
+							  Path csvLocationDemand, Collection<SimpleFeature> polygonsInShape, String populationFile,
 			PopulationSamplingOption selectedSamplingOption, PopulationOptions selectedPopulationOption,
 			boolean combineSimilarJobs, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
@@ -453,7 +450,6 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @param selectedSolution
 	 * @param config
 	 * @param controler
-	 * @throws InvalidAttributeValueException
 	 * @throws ExecutionException
 	 * @throws InterruptedException
 	 */

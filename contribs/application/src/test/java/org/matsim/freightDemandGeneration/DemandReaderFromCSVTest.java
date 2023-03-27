@@ -81,8 +81,8 @@ public class DemandReaderFromCSVTest {
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
 				FreightConfigGroup.class);
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
-		String carrierCSVLocation = utils.getPackageInputDirectory() + "testCarrierCSV.csv";
-		String demandCSVLocation = utils.getPackageInputDirectory() + "testDemandCSV.csv";
+		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
+		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath, "WGS84", null);
 		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
@@ -245,7 +245,7 @@ public class DemandReaderFromCSVTest {
 	@Test
 	public void csvDemandReader() throws IOException {
 
-		String demandCSVLocation = utils.getPackageInputDirectory() + "testDemandCSV.csv";
+		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
 		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);
 		Assert.assertEquals(5, demandInformation.size());
 

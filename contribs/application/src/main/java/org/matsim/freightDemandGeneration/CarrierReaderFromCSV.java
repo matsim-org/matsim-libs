@@ -236,7 +236,6 @@ public final class CarrierReaderFromCSV {
 	 * Reads and create the carriers with reading the information from the csv file.
 	 * 
 	 * @param scenario
-	 * @param allNewCarrier
 	 * @param freightConfigGroup
 	 * @param csvLocationCarrier
 	 * @param polygonsInShape
@@ -245,13 +244,13 @@ public final class CarrierReaderFromCSV {
 	 * @throws IOException
 	 */
 	public static void readAndCreateCarrierFromCSV(Scenario scenario, FreightConfigGroup freightConfigGroup,
-			String csvLocationCarrier, Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
-			CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
+												   Path csvLocationCarrier, Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
+												   CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
 		Set<CarrierInformationElement> allNewCarrierInformation = readCarrierInformation(csvLocationCarrier);
 		checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape);
 		log.info("The read carrier information from the csv are checked without errors.");
-		createNewCarrierAndAddVehilceTypes(scenario, allNewCarrierInformation, freightConfigGroup, polygonsInShape,
+		createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightConfigGroup, polygonsInShape,
 				defaultJspritIterations, crsTransformationNetworkAndShape);
 	}
 
@@ -260,11 +259,11 @@ public final class CarrierReaderFromCSV {
 	 * @return
 	 * @throws IOException
 	 */
-	static Set<CarrierInformationElement> readCarrierInformation(String csvLocationCarrier) throws IOException {
+	static Set<CarrierInformationElement> readCarrierInformation(Path csvLocationCarrier) throws IOException {
 		log.info("Start reading carrier csv file: " + csvLocationCarrier);
 		Set<CarrierInformationElement> allNewCarrierInformation = new HashSet<>();
-		CSVParser parse = CSVFormat.DEFAULT.withDelimiter('\t').withFirstRecordAsHeader()
-				.parse(IOUtils.getBufferedReader(csvLocationCarrier));
+		CSVParser parse = new CSVParser(Files.newBufferedReader(csvLocationCarrier),
+				CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build());
 		for (CSVRecord record : parse) {
 			CarrierInformationElement.Builder builder;
 			if (!record.get("carrierName").isBlank())
