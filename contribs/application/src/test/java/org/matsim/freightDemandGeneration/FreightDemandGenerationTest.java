@@ -1,13 +1,12 @@
 package org.matsim.freightDemandGeneration;
 
-import java.nio.file.Path;
-
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.nio.file.Path;
 
 /**
  * @author Ricardo Ewert Easy test if the FreightDemandGeneration runs without
@@ -18,7 +17,7 @@ public class FreightDemandGenerationTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-	
+
 	@Test
 	public void testMain() {
 		try {
@@ -41,7 +40,7 @@ public class FreightDemandGenerationTest {
 					"--carrierVehicleFileLocation", vehicleFilePath.toString(),
 					"--shapeFileLocation", shapeFilePath.toString(),
 					"--shapeCRS", "WGS84",
-					"--populationFileLocation", populationLocation.toString(),
+					"--populationFileLocation", populationLocation,
 					"--populationCRS", "WGS84",
 					"--network", network,
 					"--networkCRS", "WGS84",
@@ -50,7 +49,7 @@ public class FreightDemandGenerationTest {
 					"--inputDemandCSV", demandCSVLocation.toString(),
 					"--populationSample", "0.5",
 					"--populationSamplingTo", "1.0",
-					"--defaultJspriIterations", "3"
+					"--defaultJspritIterations", "3"
 			);
 		} catch (Exception ee) {
 			LogManager.getLogger(this.getClass()).fatal("there was an exception: \n" + ee);
