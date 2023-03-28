@@ -7,19 +7,27 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-public class NetworkIndex {
+/**
+ * Wrapper class for an STRtree. Can be used to match objects, geometries for example, to an MATSim network.
+ */
+public class NetworkIndex<T> {
 
 	private final STRtree index = new STRtree();
 	private final double range;
 	private final GeometryFactory factory = new GeometryFactory();
+	private final GeometryGetter getter;
+	private final List<Predicate<Link>> linkOnlyFilter = new ArrayList<>();
+	private final List<BiPredicate<Link, T>> linkAndMatchingObjectFilter = new ArrayList<>();
 
-
-	public NetworkIndex(Network network, double range) {
+	public NetworkIndex(Network network, double range, GeometryGetter getter) {
 
 		this.range = range;
+		this.getter = getter;
 
 		for (Link link : network.getLinks().values()) {
 			Envelope env = getLinkEnvelope(link);
@@ -29,10 +37,14 @@ public class NetworkIndex {
 		index.build();
 	}
 
+	/**
+	 * Uses an STRtree to match an Object to a network link. Custom filters are applied to filter the query results.
+	 * The closest link to the object, based on the Geometry distance function is returned.
+	 * */
 	@SuppressWarnings("unchecked")
-	public Link query(MatchingPoint toMatch) {
+	public Link query(T toMatch) {
 
-		Geometry geometry = toMatch.getGeometry();
+		Geometry geometry = getter.getGeometry(toMatch);
 
 		Envelope searchArea = geometry.buffer(this.range).getEnvelopeInternal();
 
@@ -40,16 +52,19 @@ public class NetworkIndex {
 
 		if (result.isEmpty()) return null;
 
-		HashMap<Link, Geometry> resultMap = new HashMap<>();
+		Map<Link, Geometry> resultMap = new HashMap<>();
 		for (Link link : result) {
 
 			LineString ls = this.link2LineString(link);
 			resultMap.put(link, ls);
 		}
 
-		return toMatch.getClosestCandidate(resultMap);
+		return getClosestCandidate(resultMap, toMatch);
 	}
 
+	/**
+	 * Returns the envelope of an MATSim network link.
+	 */
 	public Envelope getLinkEnvelope(Link link) {
 		Coord from = link.getFromNode().getCoord();
 		Coord to = link.getToNode().getCoord();
@@ -58,6 +73,9 @@ public class NetworkIndex {
 		return factory.createLineString(coordinates).getEnvelopeInternal();
 	}
 
+	/**
+	 * Transforms a MATSim network link to a LineString Object.
+	 */
 	public LineString link2LineString(Link link) {
 
 		Coord from = link.getFromNode().getCoord();
@@ -67,9 +85,80 @@ public class NetworkIndex {
 		return factory.createLineString(coordinates);
 	}
 
+	/**
+	 * Removes a Link from the index.
+	 * */
 	public void remove(Link link) {
 		Envelope env = getLinkEnvelope(link);
 		index.remove(env, link);
+	}
+
+	private Link getClosestCandidate(Map<Link, Geometry> result, T toMatch) {
+
+		if (result.isEmpty()) return null;
+		if (result.size() == 1) return result.keySet().stream().findFirst().get();
+
+		applyAllFilter(result, toMatch);
+
+		Map<Link, Double> distances = result.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, r -> r.getValue().distance(getter.getGeometry(toMatch))));
+
+		Double min = Collections.min(distances.values());
+
+		for (Map.Entry<Link, Double> entry : distances.entrySet()) {
+			if (entry.getValue().doubleValue() == min.doubleValue()) {
+				return entry.getKey();
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Add a Predicate to filter query results.
+	 */
+	public void addLinkFilter(Predicate<Link> filter) {
+		this.linkOnlyFilter.add(filter);
+	}
+
+	/**
+	 * Add a BiPredicate to filter query results, based on the result link and the current matching object.
+	 */
+	public void addLinkAndMatchingObjectFilter(BiPredicate<Link, T> filter) {
+		this.linkAndMatchingObjectFilter.add(filter);
+	}
+
+	private void applyAllFilter(Map<Link, Geometry> result, T toMatch) {
+
+		for (var it = result.entrySet().iterator(); it.hasNext();) {
+
+			Map.Entry<Link, Geometry> next = it.next();
+			Link link = next.getKey();
+			if (applyLinkOnlyFilter(link) || applyLinkAndMatchingObjectFilter(link, toMatch)) it.remove();
+		}
+	}
+
+	private boolean applyLinkOnlyFilter(Link link) {
+		for (Predicate<Link> predicate : this.linkOnlyFilter) {
+			if (!predicate.test(link)) return false;
+		}
+		return true;
+	}
+
+	private boolean applyLinkAndMatchingObjectFilter(Link link, T toMatch) {
+		for (BiPredicate<Link, T> predicate : this.linkAndMatchingObjectFilter) {
+			if (!predicate.test(link, toMatch)) return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Set the logic to get a geometry from the matching object.
+	 */
+	@FunctionalInterface
+	public interface GeometryGetter<T> {
+
+		Geometry getGeometry(T toMatch);
 	}
 }
 
