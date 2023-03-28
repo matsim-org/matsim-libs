@@ -125,7 +125,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	private TrafficType usedTrafficType;
 
 	@CommandLine.Option(names = "--includeExistingModels", description = "If models for some segments exist they can be included.")
-	private String includeExistingModels_Input;
+	private boolean includeExistingModels;
 
 	@CommandLine.Option(names = "--zoneShapeFileName", description = "Path of the zone shape file.")
 	private Path zoneShapeFilePath;
@@ -153,7 +153,6 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		Configurator.setLevel("org.matsim.core.utils.geometry.geotools.MGC", Level.ERROR);
 
 		String modelName = inputDataDirectory.getFileName().toString();
-		boolean includeExistingModels = Boolean.parseBoolean(includeExistingModels_Input);
 
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 

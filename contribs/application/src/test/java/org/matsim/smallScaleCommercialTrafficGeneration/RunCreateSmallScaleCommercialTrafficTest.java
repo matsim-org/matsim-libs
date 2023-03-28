@@ -68,7 +68,7 @@ public class RunCreateSmallScaleCommercialTrafficTest {
 				"--creationOption", creationOption,
 				"--landuseConfiguration", landuseConfiguration,
 				"--trafficType", trafficType,
-				"--includeExistingModels", includeExistingModels,
+				"--includeExistingModels",
 				"--zoneShapeFileName", zoneShapeFileName,
 				"--buildingsShapeFileName", buildingsShapeFileName,
 				"--landuseShapeFileName", landuseShapeFileName,
