@@ -107,42 +107,42 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	}
 
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the freight data directory")
-	private static Path inputDataDirectory;
+	private Path inputDataDirectory;
 
 	@CommandLine.Option(names = "--sample", description = "Scaling factor of the freight traffic (0, 1)", required = true)
 	private double sample;
 
 	@CommandLine.Option(names = "--jspritIterations", description = "Set number of jsprit iterations", required = true)
-	private static int jspritIterations;
+	private int jspritIterations;
 
 	@CommandLine.Option(names = "--creationOption", description = "Set option of mode differentiation:  useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution")
-	private static CreationOption usedCreationOption;
+	private CreationOption usedCreationOption;
 
 	@CommandLine.Option(names = "--landuseConfiguration", description = "Set option of used OSM data. Options: useOnlyOSMLanduse, useOSMBuildingsAndLanduse, useExistingDataDistribution")
-	private static LanduseConfiguration usedLanduseConfiguration;
+	private LanduseConfiguration usedLanduseConfiguration;
 
 	@CommandLine.Option(names = "--trafficType", description = "Select traffic type. Options: businessTraffic, freightTraffic, commercialTraffic (contains both types)")
-	private static TrafficType usedTrafficType;
+	private TrafficType usedTrafficType;
 
 	@CommandLine.Option(names = "--includeExistingModels", description = "If models for some segments exist they can be included.")
-	private static String includeExistingModels_Input;
+	private boolean includeExistingModels;
 
 	@CommandLine.Option(names = "--zoneShapeFileName", description = "Path of the zone shape file.")
-	private static Path zoneShapeFilePath;
+	private Path zoneShapeFilePath;
 
 	@CommandLine.Option(names = "--buildingsShapeFileName", description = "Path of the buildings shape file")
-	private static Path buildingsShapeFilePath;
+	private Path buildingsShapeFilePath;
 
 	@CommandLine.Option(names = "--landuseShapeFileName", description = "Path of the landuse shape file")
-	private static Path landuseShapeFilePath;
+	private Path landuseShapeFilePath;
 
 	@CommandLine.Option(names = "--shapeCRS", description = "CRS of the three input shape files (zones, landuse, buildings")
-	private static String shapeCRS;
+	private String shapeCRS;
 
 	@CommandLine.Option(names = "--resistanceFactor", defaultValue = "0.005", description = "ResistanceFactor for the trip distribution")
-	private static double resistanceFactor;
+	private double resistanceFactor;
 
-	private static SplittableRandom rnd;
+	private SplittableRandom rnd;
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateSmallScaleCommercialTrafficDemand()).execute(args));
@@ -153,7 +153,6 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		Configurator.setLevel("org.matsim.core.utils.geometry.geotools.MGC", Level.ERROR);
 
 		String modelName = inputDataDirectory.getFileName().toString();
-		boolean includeExistingModels = Boolean.parseBoolean(includeExistingModels_Input);
 
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 
@@ -165,23 +164,21 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		FreightConfigGroup freightConfigGroup;
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution -> {
+				log.info("Existing carriers (including carrier vehicle types ) should be set in the freight config group");
 				if (includeExistingModels)
 					throw new Exception(
 							"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
-				carriersFileLocation = "scenarios/" + sampleName + "pct_" + usedTrafficType + "/output_carriers.xml";
 				freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-				freightConfigGroup.setCarriersFile(carriersFileLocation);
-				log.info("Load carriers from: " + carriersFileLocation);
+				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
 				FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 			}
 			case useExistingCarrierFileWithoutSolution -> {
+				log.info("Existing carriers (including carrier vehicle types ) should be set in the freight config group");
 				if (includeExistingModels)
 					throw new Exception(
 							"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
-				carriersFileLocation = "scenarios/" + sampleName + "pct_" + usedTrafficType + "/output_CarrierDemand.xml";
 				freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-				freightConfigGroup.setCarriersFile(carriersFileLocation);
-				log.info("Load carriers from: " + carriersFileLocation);
+				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
 				FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 				solveSeparatedVRPs(scenario, null);
 			}
@@ -464,12 +461,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 				* odMatrix.getListOfModesOrVehTypes().size();
 		int createdCarrier = 0;
 
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
-		CarrierVehicleTypes additionalCarrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(additionalCarrierVehicleTypes)
-				.readFile(freightConfigGroup.getCarriersVehicleTypesFile());
-		additionalCarrierVehicleTypes.getVehicleTypes().values().forEach(
+		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
+		additionalCarrierVehicleTypes.values().forEach(
 				vehicleType -> carrierVehicleTypes.getVehicleTypes().putIfAbsent(vehicleType.getId(), vehicleType));
 
 		for (VehicleType vehicleType : carrierVehicleTypes.getVehicleTypes().values()) {
@@ -906,7 +900,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 			strategyManager.setMaxPlansPerAgent(5);
 			{
 				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>(
-						new ExpBetaPlanChanger<>(1.));
+						new  ExpBetaPlanChanger.Factory<CarrierPlan,Carrier>().setBetaValue(1.0).build());
 
 				strategyManager.addStrategy(strategy, null, 1.0);
 
