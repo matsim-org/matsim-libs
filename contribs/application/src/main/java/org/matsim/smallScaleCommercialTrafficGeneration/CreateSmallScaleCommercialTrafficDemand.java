@@ -164,23 +164,21 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		FreightConfigGroup freightConfigGroup;
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution -> {
+				log.info("Existing carriers (including carrier vehicle types ) should be set in the freight config group");
 				if (includeExistingModels)
 					throw new Exception(
 							"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
-				carriersFileLocation = "scenarios/" + sampleName + "pct_" + usedTrafficType + "/output_carriers.xml";
 				freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-				freightConfigGroup.setCarriersFile(carriersFileLocation);
-				log.info("Load carriers from: " + carriersFileLocation);
+				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
 				FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 			}
 			case useExistingCarrierFileWithoutSolution -> {
+				log.info("Existing carriers (including carrier vehicle types ) should be set in the freight config group");
 				if (includeExistingModels)
 					throw new Exception(
 							"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
-				carriersFileLocation = "scenarios/" + sampleName + "pct_" + usedTrafficType + "/output_CarrierDemand.xml";
 				freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-				freightConfigGroup.setCarriersFile(carriersFileLocation);
-				log.info("Load carriers from: " + carriersFileLocation);
+				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
 				FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 				solveSeparatedVRPs(scenario, null);
 			}
@@ -463,12 +461,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 				* odMatrix.getListOfModesOrVehTypes().size();
 		int createdCarrier = 0;
 
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
-		CarrierVehicleTypes additionalCarrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(additionalCarrierVehicleTypes)
-				.readFile(freightConfigGroup.getCarriersVehicleTypesFile());
-		additionalCarrierVehicleTypes.getVehicleTypes().values().forEach(
+		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
+		additionalCarrierVehicleTypes.values().forEach(
 				vehicleType -> carrierVehicleTypes.getVehicleTypes().putIfAbsent(vehicleType.getId(), vehicleType));
 
 		for (VehicleType vehicleType : carrierVehicleTypes.getVehicleTypes().values()) {

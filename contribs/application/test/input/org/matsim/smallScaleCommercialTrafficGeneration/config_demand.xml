@@ -9,11 +9,14 @@
 		<param name="numberOfThreads" value="2" />
 		<param name="randomSeed" value="4177" />
 	</module>
+	<module name="vehicles" >
+		<param name="vehiclesFile" value="vehicleTypes.xml" />
+	</module>
 	<module name="freight" >
 		<!-- Freight Carriers File, according to MATSim freight contrib -->
 		<param name="carriersFile" value="null" />
 		<!-- Carrier Vehicle Types file, according to MATSim freight contrib -->
-		<param name="carriersVehicleTypeFile" value="test/input/org/matsim/smallScaleCommercialTrafficGeneration/vehicleTypes.xml" />
+		<param name="carriersVehicleTypeFile" value="null" />
 		<!-- time slice width used for calculation of travel times in seconds. The smaller the value, the more precise the calculation of routing costs but the longer the computation time. Default value is 1800 seconds. -->
 		<param name="travelTimeSliceWidth" value="1800" />
 		<!-- Use distance constraint within the tour planning phase. This does NOT ensure that the tours in MATSim will respect this limitation -->
@@ -562,9 +565,6 @@
 		<!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
 		<param name="travelTimeGetter" value="average" />
 	</module>
-	<module name="vehicles" >
-		<param name="vehiclesFile" value="null" />
-	</module>
 	<module name="vspExperimental" >
 		<!-- (do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, set the following to true. -->
 		<param name="isAbleToOverwritePtInteractionParams" value="false" />
@@ -573,7 +573,7 @@
 		<param name="isUsingOpportunityCostOfTimeForLocationChoice" value="true" />
 		<param name="logitScaleParamForPlansRemoval" value="1.0" />
 		<!-- Options: | ignore | info | warn | abort | .  When violating VSP defaults, this results in nothing, logfile infos, logfile warnings, or aborts.  Members of VSP should use `abort' or talk to kai. -->
-		<param name="vspDefaultsCheckingLevel" value="ignore" />
+		<param name="vspDefaultsCheckingLevel" value="abort" />
 		<!-- if true then writes output_events in output directory.  default is `false'. Will only work when lastIteration is multiple of events writing interval -->
 		<param name="writingOutputEvents" value="true" />
 	</module>
