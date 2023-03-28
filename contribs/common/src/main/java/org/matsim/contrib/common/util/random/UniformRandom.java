@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2022 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.extension.companions;
+package org.matsim.contrib.common.util.random;
 
-import java.util.List;
+import org.apache.commons.math3.random.RandomGenerator;
 
-import org.matsim.contrib.common.util.random.RandomUtils;
-import org.matsim.contrib.common.util.random.UniformRandom;
-import org.matsim.contrib.common.util.random.WeightedRandomSelection;
+public class UniformRandom {
+	private final RandomGenerator rg;
 
-/**
- *
- * @author Steffen Axer
- *
- */
-public class DrtCompanionUtils {
-
-	public static WeightedRandomSelection<Integer> createIntegerSampler(final List<Double> distribution) {
-		WeightedRandomSelection<Integer> wrs = new WeightedRandomSelection<>(
-				new UniformRandom(RandomUtils.getLocalGenerator()));
-		for (int i = 0; i < distribution.size(); ++i) {
-			wrs.add(i, distribution.get(i));
-		}
-		return wrs;
+	public UniformRandom(RandomGenerator rg) {
+		this.rg = rg;
 	}
 
+	public double nextDouble(double from, double to) {
+		return from == to ? from : from + (to - from) * rg.nextDouble();
+	}
+
+	/**
+	 * @param from
+	 *            (inclusive)
+	 * @param to
+	 *            (inclusive)
+	 */
+	public int nextInt(int from, int to) {
+		if (from == to) {
+			return from;
+		}
+
+		long delta = (long)((1L + (long)to - (long)from) * rg.nextDouble());
+		return (int)(from + delta);
+	}
+
+	public double floorOrCeil(double value) {
+		double floor = Math.floor(value);
+		boolean selectCeil = trueOrFalse(value - floor);
+		return selectCeil ? floor + 1 : floor;
+	}
+
+	public boolean trueOrFalse(double trueProbability) {
+		return rg.nextDouble() < trueProbability;
+	}
 }
