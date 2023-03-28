@@ -9,7 +9,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 
 import java.util.*;
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -21,8 +20,7 @@ public class NetworkIndex<T> {
 	private final double range;
 	private final GeometryFactory factory = new GeometryFactory();
 	private final GeometryGetter getter;
-	private final List<Predicate<Link>> linkOnlyFilter = new ArrayList<>();
-	private final List<BiPredicate<Link, T>> linkAndMatchingObjectFilter = new ArrayList<>();
+	private final List<BiPredicate<Link, T>> filter = new ArrayList<>();
 
 	public NetworkIndex(Network network, double range, GeometryGetter getter) {
 
@@ -40,7 +38,7 @@ public class NetworkIndex<T> {
 	/**
 	 * Uses an STRtree to match an Object to a network link. Custom filters are applied to filter the query results.
 	 * The closest link to the object, based on the Geometry distance function is returned.
-	 * */
+	 */
 	@SuppressWarnings("unchecked")
 	public Link query(T toMatch) {
 
@@ -87,7 +85,7 @@ public class NetworkIndex<T> {
 
 	/**
 	 * Removes a Link from the index.
-	 * */
+	 */
 	public void remove(Link link) {
 		Envelope env = getLinkEnvelope(link);
 		index.remove(env, link);
@@ -98,7 +96,10 @@ public class NetworkIndex<T> {
 		if (result.isEmpty()) return null;
 		if (result.size() == 1) return result.keySet().stream().findFirst().get();
 
-		applyAllFilter(result, toMatch);
+		applyFilter(result, toMatch);
+
+		if (result.isEmpty())
+			return null;
 
 		Map<Link, Double> distances = result.entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, r -> r.getValue().distance(getter.getGeometry(toMatch))));
@@ -115,41 +116,22 @@ public class NetworkIndex<T> {
 	}
 
 	/**
-	 * Add a Predicate to filter query results.
+	 * Add a Predicate to test if query results are a valid candidate. Should return false if element should NOT be returned.
 	 */
-	public void addLinkFilter(Predicate<Link> filter) {
-		this.linkOnlyFilter.add(filter);
+	public void addLinkFilter(BiPredicate<Link, T> filter) {
+		this.filter.add(filter);
 	}
 
-	/**
-	 * Add a BiPredicate to filter query results, based on the result link and the current matching object.
-	 */
-	public void addLinkAndMatchingObjectFilter(BiPredicate<Link, T> filter) {
-		this.linkAndMatchingObjectFilter.add(filter);
-	}
+	private void applyFilter(Map<Link, Geometry> result, T toMatch) {
 
-	private void applyAllFilter(Map<Link, Geometry> result, T toMatch) {
-
-		for (var it = result.entrySet().iterator(); it.hasNext();) {
+		for (var it = result.entrySet().iterator(); it.hasNext(); ) {
 
 			Map.Entry<Link, Geometry> next = it.next();
 			Link link = next.getKey();
-			if (applyLinkOnlyFilter(link) || applyLinkAndMatchingObjectFilter(link, toMatch)) it.remove();
+			for (BiPredicate<Link, T> predicate : this.filter) {
+				if (!predicate.test(link, toMatch)) it.remove();
+			}
 		}
-	}
-
-	private boolean applyLinkOnlyFilter(Link link) {
-		for (Predicate<Link> predicate : this.linkOnlyFilter) {
-			if (!predicate.test(link)) return false;
-		}
-		return true;
-	}
-
-	private boolean applyLinkAndMatchingObjectFilter(Link link, T toMatch) {
-		for (BiPredicate<Link, T> predicate : this.linkAndMatchingObjectFilter) {
-			if (!predicate.test(link, toMatch)) return false;
-		}
-		return true;
 	}
 
 	/**
