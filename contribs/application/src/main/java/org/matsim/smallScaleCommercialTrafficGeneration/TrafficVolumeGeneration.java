@@ -123,8 +123,9 @@ public class TrafficVolumeGeneration {
 
 		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_start, resultingDataPerZone, "start", sample, modesORvehTypes);
+		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 		Path outputFileStart = output.resolve("calculatedData")
-				.resolve("TrafficVolume_" + trafficType + "_" + "startPerZone_" + (int) (sample * 100) + "pt.csv");
+				.resolve("TrafficVolume_" + trafficType + "_" + "startPerZone_" + sampleName + "pt.csv");
 		writeCSVTrafficVolume(trafficVolume_start, outputFileStart);
 		log.info("Write traffic volume for start trips per zone in CSV: " + outputFileStart);
 		return trafficVolume_start;
