@@ -833,10 +833,11 @@ public class SwissRailRaptorCore {
                 // pes.size() == 2 && pes.get(0).isTransfer && pes.get(1).isTransfer
                 //
                 // in case of peCount < 2 there should be no effect, because peCount-2 < 0 and i will be 0, so i!=peCount - 2
-                if ((peCount > 2 || peCount == 2 && !pes.get(0).isTransfer) && i == peCount - 2 && !isIntermodal(pes.get(i+1).initialStop)) {
-                    // the second last element is a transfer, skip it so it gets merged into the egress_walk
-                    // but it can only be merged if it is not intermodal...
-                    continue;
+				if ((peCount > 2 || peCount == 2 && !pes.get(0).isTransfer) && i == peCount - 2 && pes.get(i + 1).isTransfer && (!isIntermodal(pes.get(i + 1).initialStop))) {
+					// the second last element and the last elements are transfers,
+					// in this case the we skip the second last element so there is only one walk leg attached
+					// This merge can only work if it is not intermodal...
+					continue;
                 }
                 String mode = TransportMode.walk;
                 raptorRoute.addNonPt(fromStop, toStop, time, travelTime, pe.distance, mode);

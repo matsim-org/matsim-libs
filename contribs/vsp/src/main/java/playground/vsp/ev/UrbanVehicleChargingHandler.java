@@ -31,7 +31,6 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -53,14 +52,8 @@ import java.util.*;
  */
 class UrbanVehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
-		ChargingEndEventHandler, ChargingStartEventHandler, MobsimScopeEventHandler {
+		ChargingEndEventHandler, ChargingStartEventHandler, QueuedAtChargerEventHandler, MobsimScopeEventHandler {
 
-	static final String PLUGIN_IDENTIFIER = " plugin";
-	public static final String PLUGIN_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
-			PLUGIN_IDENTIFIER);
-	static final String PLUGOUT_IDENTIFIER = " plugout";
-	public static final String PLUGOUT_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
-			PLUGOUT_IDENTIFIER);
 	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
 
@@ -84,7 +77,7 @@ class UrbanVehicleChargingHandler
 	 */
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (event.getActType().endsWith(PLUGIN_INTERACTION)) {
+		if (event.getActType().endsWith( UrbanEVModule.PLUGIN_INTERACTION )) {
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
 				Id<Vehicle> evId = Id.create(vehicleId, Vehicle.class);
@@ -117,7 +110,7 @@ class UrbanVehicleChargingHandler
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (event.getActType().endsWith(PLUGOUT_INTERACTION)) {
+		if (event.getActType().endsWith( UrbanEVModule.PLUGOUT_INTERACTION )) {
 			Tuple<Id<Vehicle>, Id<Charger>> tuple = chargingProcedures.get(event.getLinkId()).remove(event.getPersonId());
 			if (tuple != null) {
 				Id<Vehicle> evId = Id.create(tuple.getFirst(), Vehicle.class);
@@ -149,5 +142,9 @@ class UrbanVehicleChargingHandler
 		//Charging has started
 	}
 
-
+	@Override
+	public void handleEvent(QueuedAtChargerEvent event) {
+		vehiclesAtChargers.put(event.getVehicleId(), event.getChargerId());
+		//Charging may start soon
+	}
 }
