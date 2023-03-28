@@ -119,6 +119,52 @@ public class InsertionCostCalculatorTest {
 				60, drtConfigGroup, drtRequest);
 	}
 
+	@Test
+	public void testAllowDetourBeforeArrivalThreshold2() {
+
+		// start (0s) -----> new PU (60s) -----> existing PU (120s) -----> existing DO (200s) -----> new DO (300s)
+
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
+
+		DrtStopTask existingPickupTask = new DefaultDrtStopTask(120, 150, link("scheduledPU"));
+		DrtRequest scheduledRequest = DrtRequest.newBuilder().fromLink(link("scheduledFrom")).toLink(link("scheduledTo")).build();
+		AcceptedDrtRequest acceptedScheduledRequest = AcceptedDrtRequest.createFromOriginalRequest(scheduledRequest);
+		existingPickupTask.addPickupRequest(acceptedScheduledRequest);
+
+		DrtStopTask existingDropoffTask = new DefaultDrtStopTask(200, 230, link("boardedDO"));
+		DrtRequest boardedRequest = DrtRequest.newBuilder().fromLink(link("boardedFrom")).toLink(link("boardedTo")).build();
+		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest);
+		existingDropoffTask.addDropoffRequest(existingRequest);
+
+		Waypoint.Stop[] stops = new Waypoint.Stop[2];
+		stops[0] = new Waypoint.Stop(existingPickupTask, 2);
+		stops[1] = new Waypoint.Stop(existingDropoffTask, 1);
+
+		VehicleEntry entry = entry(new double[] {60, 60, 300}, ImmutableList.copyOf(stops), start);
+
+
+		var insertion = insertion(entry, 0, 2);
+
+		DrtRequest drtRequest = DrtRequest.newBuilder()
+				.fromLink(fromLink)
+				.toLink(toLink)
+				.latestStartTime(120)
+				.latestArrivalTime(300)
+				.build();
+
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+
+		// new insertion before dropoff of boarded passenger within threshold - infeasible solution
+		drtConfigGroup.allowDetourBeforeArrivalThreshold = 300;
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
+				INFEASIBLE_SOLUTION_COST, drtConfigGroup, drtRequest);
+
+		// new insertion before dropoff of boarded passenger outside of threshold - feasible solution
+		drtConfigGroup.allowDetourBeforeArrivalThreshold = 200;
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
+				120, drtConfigGroup, drtRequest);
+	}
+
 	private void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost, DrtConfigGroup drtConfigGroup, DrtRequest drtRequest) {
 		var insertionCostCalculator = new DefaultInsertionCostCalculator(
 				new CostCalculationStrategy.RejectSoftConstraintViolations(), drtConfigGroup);
