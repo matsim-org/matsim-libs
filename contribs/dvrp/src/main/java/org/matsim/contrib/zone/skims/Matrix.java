@@ -34,7 +34,7 @@ import org.matsim.contrib.zone.Zone;
  *
  * @author Michal Maciejewski (michalm)
  */
-final class Matrix {
+public final class Matrix {
 	//Range of unsigned short: 0-65535 (18:12:15)
 	//In case 18 hours is not enough, we can reduce the resolution from seconds to tens of seconds
 	private static final int MAX_UNSIGNED_SHORT = Short.MAX_VALUE - Short.MIN_VALUE;
@@ -43,7 +43,7 @@ final class Matrix {
 	private final int[] zoneIndex2matrixIndex = new int[Id.getNumberOfIds(Zone.class)];
 	private final short[][] matrix;
 
-	Matrix(Set<Zone> zones) {
+	public Matrix(Set<Zone> zones) {
 		//to make sure we do not refer to zones added later
 		Arrays.fill(zoneIndex2matrixIndex, -1);
 
@@ -59,7 +59,7 @@ final class Matrix {
 		}
 	}
 
-	int get(Zone fromZone, Zone toZone) {
+	public int get(Zone fromZone, Zone toZone) {
 		short shortValue = matrix[matrixIndex(fromZone)][matrixIndex(toZone)];
 		if (shortValue == -1) {
 			throw new NoSuchElementException("No value set for zones: " + fromZone.getId() + " -> " + toZone.getId());
