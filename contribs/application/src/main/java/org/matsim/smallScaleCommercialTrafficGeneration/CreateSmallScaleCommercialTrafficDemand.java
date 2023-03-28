@@ -900,7 +900,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 			strategyManager.setMaxPlansPerAgent(5);
 			{
 				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>(
-						new ExpBetaPlanChanger<>(1.));
+						new  ExpBetaPlanChanger.Factory<CarrierPlan,Carrier>().setBetaValue(1.0).build());
 
 				strategyManager.addStrategy(strategy, null, 1.0);
 
