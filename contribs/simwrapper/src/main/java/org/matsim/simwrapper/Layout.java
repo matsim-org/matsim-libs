@@ -72,6 +72,8 @@ public final class Layout {
 				log.error("Error occurred when constructing the viz object", e);
 			}
 
+			data.setCurrentContext("");
+
 		}
 
 		return rows;

@@ -1,5 +1,7 @@
 package org.matsim.simwrapper.viz;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * A single visualization element.
  */
@@ -7,6 +9,7 @@ public abstract class Viz {
 
 	protected final String type;
 
+	@JsonProperty(required = true)
 	public String title;
 	public String description;
 	public Double height;

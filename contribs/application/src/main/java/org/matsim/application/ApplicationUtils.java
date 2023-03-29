@@ -4,19 +4,29 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.options.CrsOptions;
+import org.matsim.application.options.InputOptions;
+import org.matsim.application.options.OutputOptions;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import picocli.CommandLine;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class ApplicationUtils {
 
 	private static final Logger log = LogManager.getLogger(ApplicationUtils.class);
+
+	private ApplicationUtils() {
+	}
 
 	/**
 	 * Helper function to glob for a required file.
@@ -104,5 +114,101 @@ public class ApplicationUtils {
 		config.facilities().setInputFile(facilitiesFile);
 
 		return ScenarioUtils.loadScenario(config);
+	}
+
+	/**
+	 * Check if a command can be used with {@link CommandRunner}.
+	 *
+	 * @throws IllegalArgumentException if a command is not suitable.
+	 */
+	public static void checkCommand(Class<? extends MATSimAppCommand> command) {
+
+		if (command.getAnnotation(CommandSpec.class) == null) {
+			throw new IllegalArgumentException(String.format("The command %s has no @CommandSpec annotation.", command));
+		}
+
+		Field[] fields = command.getDeclaredFields();
+
+		boolean input = false;
+		boolean output = false;
+		for (Field field : fields) {
+			if (field.getType().equals(InputOptions.class))
+				input = true;
+
+			if (field.getType().equals(OutputOptions.class))
+				output = true;
+		}
+
+		if (!input) {
+			throw new IllegalArgumentException(String.format("The command %s has no field with InputOptions.", command));
+		}
+
+		if (!output) {
+			throw new IllegalArgumentException(String.format("The command %s has no field with OutputOptions.", command));
+		}
+	}
+
+
+	/**
+	 * Whether this command accepts the {@link org.matsim.application.options.ShpOptions}.
+	 */
+	public static boolean acceptsShpFile(Class<? extends MATSimAppCommand> command) {
+		for (Field field : command.getDeclaredFields()) {
+			if (field.getType().equals(ShpOptions.class) && field.getAnnotation(CommandLine.Mixin.class) != null)
+				return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Tries to match input file {@code name} with files from the input directory {@code dir}.
+	 * Please check docs in the code for the conventions. Different naming conventions are tried in a specific order.
+	 *
+	 * @throws IllegalArgumentException if no file could be found.
+	 */
+	public static String matchInput(String name, Path dir) {
+
+		Path possibility = dir.resolve(name);
+		if (Files.exists(possibility))
+			return possibility.toString();
+
+		possibility = dir.resolve(name + ".gz");
+		if (Files.exists(possibility))
+			return possibility.toString();
+
+		// Match files that could be matsim output files
+		Optional<Path> path = matchSuffix("output_" + name, dir);
+		if (path.isPresent())
+			return path.get().toString();
+
+		path = matchSuffix("output_" + name + ".gz", dir);
+		if (path.isPresent())
+			return path.get().toString();
+
+		path = matchSuffix(name, dir);
+		if (path.isPresent())
+			return path.get().toString();
+
+		path = matchSuffix(name + ".gz", dir);
+		if (path.isPresent())
+			return path.get().toString();
+
+		throw new IllegalArgumentException("Could not match input file: " + name);
+	}
+
+	private static Optional<Path> matchSuffix(String suffix, Path dir) {
+		try (Stream<Path> stream = Files.list(dir)) {
+			return stream.filter(p -> p.toString().endsWith(suffix)).findFirst();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Get the {@link CommandSpec} of a {@link MATSimAppCommand}.
+	 */
+	public static CommandSpec getSpec(Class<? extends MATSimAppCommand> command) {
+		return command.getAnnotation(CommandSpec.class);
 	}
 }

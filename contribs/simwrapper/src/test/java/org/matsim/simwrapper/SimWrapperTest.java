@@ -36,7 +36,7 @@ public class SimWrapperTest {
 
 				viz.dataset = data.output("link-stats", "trips.csv");
 
-				viz.dataset = data.compute(LinkStats.class, "link-stats.csv");
+//				viz.dataset = data.compute(LinkStats.class, "link-stats.csv");
 
 			});
 

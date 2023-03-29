@@ -1,0 +1,262 @@
+package org.matsim.application;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedAcyclicGraph;
+import org.jgrapht.traverse.BreadthFirstIterator;
+import org.matsim.application.options.InputOptions;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+
+/**
+ * Automatically runs commands by using the {@link CommandSpec} and various Options classes.
+ */
+public final class CommandRunner {
+
+	private static final Logger log = LogManager.getLogger(CommandRunner.class);
+
+	/**
+	 * Name of the runner.
+	 */
+	private final String name;
+
+	private Path output;
+
+	private String defaultShp = null;
+	private final Map<Class<? extends MATSimAppCommand>, String> shpFiles = new HashMap<>();
+	private final Map<Class<? extends MATSimAppCommand>, String[]> args = new HashMap<>();
+
+	// TODO: Input and output path separated
+
+	/**
+	 * Construct a new runner.
+	 */
+	public CommandRunner() {
+		this("");
+	}
+
+	/**
+	 * Construct a new runner with a given name.
+	 */
+	public CommandRunner(String name) {
+		this(name, Path.of(".").toAbsolutePath());
+	}
+
+	/**
+	 * Construct a runner with specific name and path.
+	 */
+	private CommandRunner(String name, Path output) {
+		this.name = name;
+		this.output = output;
+	}
+
+	/**
+	 * Run the specified command. Required input files are searched on {@code input} path.
+	 *
+	 * @param input search path for input files not defined as output by any command.
+	 */
+	public void run(Path input) {
+
+		if (!Files.exists(input))
+			throw new IllegalArgumentException("Input path does not exists:" + input);
+
+		// Run graph with dependencies
+		Graph<Class<? extends MATSimAppCommand>, DefaultEdge> graph = new DirectedAcyclicGraph<>(DefaultEdge.class);
+
+		Set<Class<? extends MATSimAppCommand>> start = new HashSet<>();
+
+		for (Map.Entry<Class<? extends MATSimAppCommand>, String[]> e : args.entrySet()) {
+			Class<? extends MATSimAppCommand> clazz = e.getKey();
+			graph.addVertex(clazz);
+			Class<? extends MATSimAppCommand>[] depends = ApplicationUtils.getSpec(clazz).dependsOn();
+			for (Class<? extends MATSimAppCommand> d : depends) {
+				graph.addVertex(d);
+				graph.addEdge(d, clazz);
+			}
+			if (depends.length == 0)
+				start.add(clazz);
+		}
+
+		BreadthFirstIterator<Class<? extends MATSimAppCommand>, DefaultEdge> it = new BreadthFirstIterator<>(graph, start);
+		while (it.hasNext()) {
+			Class<? extends MATSimAppCommand> clazz = it.next();
+			try {
+				MATSimAppCommand command = clazz.getDeclaredConstructor().newInstance();
+				String[] args = this.args.get(clazz);
+				args = ArrayUtils.addAll(args, createArgs(clazz, args, input));
+				log.info("Running {} with arguments: {}", clazz, Arrays.toString(args));
+
+				command.execute(args);
+
+			} catch (ReflectiveOperationException ex) {
+				log.error("Command {} could not be crated.", clazz, ex);
+			} catch (RuntimeException e) {
+				log.error("Command {} threw an error.", clazz, e);
+			}
+		}
+	}
+
+	/**
+	 * Build the base path.
+	 */
+	private Path buildPath(CommandSpec spec) {
+		String context = "";
+		if (name != null && !name.isBlank())
+			context = "-" + name;
+		if (spec.group() != null)
+			return output.resolve(context);
+
+		return output;
+	}
+
+
+	private String[] createArgs(Class<? extends MATSimAppCommand> command, String[] existingArgs, Path input) {
+
+		List<String> args = new ArrayList<>();
+
+		CommandSpec spec = ApplicationUtils.getSpec(command);
+
+		for (String require : spec.requires()) {
+
+			// Whether this file is produced by a dependency
+			boolean depFile = false;
+			String arg = "--input-" + InputOptions.argName(require);
+
+			boolean present = ArrayUtils.contains(existingArgs, arg);
+			if (present)
+				continue;
+
+			for (Class<? extends MATSimAppCommand> depend : spec.dependsOn()) {
+				CommandSpec dependency = ApplicationUtils.getSpec(depend);
+				if (ArrayUtils.contains(dependency.produces(), require)) {
+
+					String path = getPath(depend, require);
+
+					args.add(arg);
+					args.add(path);
+
+					// Add arg for this file
+					depFile = true;
+				}
+			}
+
+			// Look for this file on the input
+			if (!depFile) {
+				String path = ApplicationUtils.matchInput(require, input);
+				args.add(arg);
+				args.add(path);
+			}
+		}
+
+		if (spec.requireEvents() && !ArrayUtils.contains(existingArgs, "--events")) {
+			args.add("--events");
+			args.add(ApplicationUtils.matchInput("events.xml", input));
+		}
+		if (spec.requireRunDirectory() && !ArrayUtils.contains(existingArgs, "--run-directory")) {
+			args.add("--run-directory");
+			args.add(input.toString());
+		}
+		if (spec.requirePopulation() && !ArrayUtils.contains(existingArgs, "--population")) {
+			args.add("--population");
+			args.add(ApplicationUtils.matchInput("plans.xml", input));
+		}
+		if (spec.requireNetwork() && !ArrayUtils.contains(existingArgs, "--network")) {
+			args.add("--network");
+			args.add(ApplicationUtils.matchInput("network.xml", input));
+		}
+
+		if (ApplicationUtils.acceptsShpFile(command) && !ArrayUtils.contains(existingArgs, "--shp")) {
+			if (shpFiles.containsKey(command)) {
+				args.add("--shp");
+				args.add(shpFiles.get(command));
+			} else if (defaultShp != null) {
+				args.add("--shp");
+				args.add(defaultShp);
+			}
+		}
+
+		// Adds output arguments for this class
+		for (String produce : spec.produces()) {
+			String arg = "--output-" + InputOptions.argName(produce);
+			String path = getPath(command, produce);
+			args.add(arg);
+			args.add(path);
+		}
+
+		return args.toArray(new String[0]);
+	}
+
+
+	/**
+	 * Get the path for a certain file produced by a command.
+	 */
+	public String getPath(Class<? extends MATSimAppCommand> command, String file) {
+		CommandSpec spec = ApplicationUtils.getSpec(command);
+		return buildPath(spec).resolve(file).toString();
+	}
+
+	/**
+	 * Base path for the runner.
+	 */
+	public Path getOutput() {
+		return output;
+	}
+
+	/**
+	 * Set output folder.
+	 *
+	 * @return same instance
+	 */
+	public CommandRunner setOutput(Path path) {
+		this.output = path;
+		return this;
+	}
+
+	/**
+	 * Add a command with certain arguments to the runner.
+	 */
+	public void add(Class<? extends MATSimAppCommand> command, String... args) {
+
+		if (args.length != 0) {
+			String[] existing = this.args.get(command);
+			if (existing != null && !Arrays.equals(existing, args)) {
+				throw new IllegalArgumentException(String.format("Command %s already registered with args %s, can not define different args as %s",
+						command.toString(), Arrays.toString(existing), Arrays.toString(args)));
+			}
+		}
+
+		ApplicationUtils.checkCommand(command);
+
+		if (!this.args.containsKey(command) || this.args.get(command).length == 0)
+			this.args.put(command, args);
+
+		CommandSpec spec = ApplicationUtils.getSpec(command);
+
+		// Add dependent classes
+		for (Class<? extends MATSimAppCommand> depends : spec.dependsOn()) {
+			if (!this.args.containsKey(depends))
+				add(depends);
+		}
+	}
+
+	/**
+	 * Set specific shape file for certain command.
+	 */
+	public void setShp(Class<? extends MATSimAppCommand> command, String path) {
+		shpFiles.put(command, path);
+	}
+
+	/**
+	 * Set the default shp file for all commands.
+	 */
+	public void setShp(String path) {
+		defaultShp = path;
+	}
+
+
+}

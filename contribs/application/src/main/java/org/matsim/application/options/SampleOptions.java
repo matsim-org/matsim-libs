@@ -50,7 +50,7 @@ public final class SampleOptions {
 	}
 
 	@CommandLine.Spec(CommandLine.Spec.Target.MIXEE)
-	public void setSpec(CommandLine.Model.CommandSpec spec) {
+	void setSpec(CommandLine.Model.CommandSpec spec) {
 
 		CommandLine.Model.ArgGroupSpec.Builder group = CommandLine.Model.ArgGroupSpec.builder()
 				.exclusive(true)
