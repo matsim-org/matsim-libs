@@ -40,9 +40,9 @@ import org.matsim.vehicles.Vehicle;
 import com.google.inject.Inject;
 
 /**
- * Because in QSim and JDEQSim vehicles enter and leave traffic at the end of links, we skip the first link when
+ * Because in QSim vehicles enter and leave traffic at the end of links, we skip the first link when
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
- * aux discharge process (see {@link AuxDischargingHandler}).
+ * idle discharge process (see {@link IdleDischargingHandler}).
  */
 public class DriveDischargingHandler
 		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler {

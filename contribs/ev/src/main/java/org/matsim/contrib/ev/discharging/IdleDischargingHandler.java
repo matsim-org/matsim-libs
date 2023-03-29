@@ -22,8 +22,6 @@ package org.matsim.contrib.ev.discharging;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -47,7 +45,7 @@ import com.google.inject.Inject;
  * VehicleProvider is responsible to decide if AUX discharging applies to a given vehicle based on information from
  * ActivityStartEvent.
  */
-public class AuxDischargingHandler
+public class IdleDischargingHandler
 		implements MobsimAfterSimStepListener, ActivityStartEventHandler, ActivityEndEventHandler, MobsimScopeEventHandler {
 	public interface VehicleProvider {
 		/**
@@ -60,17 +58,8 @@ public class AuxDischargingHandler
 		ElectricVehicle getVehicle(ActivityStartEvent event);
 	}
 
-	private static final class VehicleAndLink {
-		private final ElectricVehicle vehicle;
-		private final Id<Link> linkId;
-
-		private VehicleAndLink(ElectricVehicle vehicle, Id<Link> linkId) {
-			this.vehicle = vehicle;
-			this.linkId = linkId;
-		}
+	private record VehicleAndLink(ElectricVehicle vehicle, Id<Link> linkId) {
 	}
-
-	private final static Logger log = LogManager.getLogger(AuxDischargingHandler.class );
 
 	private final VehicleProvider vehicleProvider;
 	private final int auxDischargeTimeStep;
@@ -79,7 +68,7 @@ public class AuxDischargingHandler
 	private final ConcurrentMap<Id<Person>, VehicleAndLink> vehicles = new ConcurrentHashMap<>();
 
 	@Inject
-	AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg, EventsManager eventsManager) {
+	IdleDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg, EventsManager eventsManager) {
 		this.vehicleProvider = vehicleProvider;
 		this.auxDischargeTimeStep = evCfg.auxDischargeTimeStep;
 		this.eventsManager = eventsManager;
