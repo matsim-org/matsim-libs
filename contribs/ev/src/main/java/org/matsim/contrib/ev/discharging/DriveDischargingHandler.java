@@ -66,7 +66,6 @@ public class DriveDischargingHandler
 	private final EventsManager eventsManager;
 	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
-	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
 	@Inject
 	DriveDischargingHandler(ElectricFleet data, Network network, EventsManager eventsManager) {
@@ -113,20 +112,12 @@ public class DriveDischargingHandler
 			ElectricVehicle ev = evDrive.ev;
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt) + ev.getAuxEnergyConsumption()
 					.calcEnergyConsumption(eventTime - tt, tt, linkId);
-			//Energy consumption might be negative on links with negative slope
+			//Energy consumption may be negative on links with negative slope
 			ev.getBattery()
 					.dischargeEnergy(energy,
 							missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(eventTime, ev.getId(), link.getId(), missingEnergy)));
 			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(eventTime, vehicleId, linkId, energy, ev.getBattery().getCharge()));
-
-			//FIXME emit a DriveOnLinkEnergyConsumptionEvent instead of calculating it here...
-			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
-			energyConsumptionPerLink.put(linkId, linkConsumption);
 		}
 		return evDrive;
-	}
-
-	public Map<Id<Link>, Double> getEnergyConsumptionPerLink() {
-		return energyConsumptionPerLink;
 	}
 }
