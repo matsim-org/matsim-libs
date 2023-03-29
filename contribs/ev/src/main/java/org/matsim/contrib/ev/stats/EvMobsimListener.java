@@ -57,8 +57,8 @@ public class EvMobsimListener implements MobsimBeforeCleanupListener {
 			CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "chargingStats.csv"))), CSVFormat.DEFAULT.withDelimiter(';').
 					withHeader("ChargerId", "chargeStartTime", "chargeEndTime", "ChargingDuration", "xCoord", "yCoord", "energyTransmitted_kWh"));
 			for (ChargerPowerCollector.ChargingLogEntry e : chargerPowerCollector.getLogList()) {
-				double energyKWh = Math.round(EvUnits.J_to_kWh(e.getTransmitted_Energy()) * 10.) / 10.;
-				csvPrinter.printRecord(e.getCharger().getId(), Time.writeTime(e.getChargeStart()), Time.writeTime(e.getChargeEnd()), Time.writeTime(e.getChargeEnd() - e.getChargeStart()), e.getCharger().getCoord().getX(), e.getCharger().getCoord().getY(), energyKWh);
+				double energyKWh = Math.round(EvUnits.J_to_kWh(e.transmitted_Energy()) * 10.) / 10.;
+				csvPrinter.printRecord(e.charger().getId(), Time.writeTime(e.chargeStart()), Time.writeTime(e.chargeEnd()), Time.writeTime(e.chargeEnd() - e.chargeStart()), e.charger().getCoord().getX(), e.charger().getCoord().getY(), energyKWh);
 			}
 			csvPrinter.close();
 
