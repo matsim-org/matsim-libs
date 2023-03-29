@@ -169,12 +169,12 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
-			<version>19</version>
+			<version>20</version>
 		</dependency>
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>graphhopper-core</artifactId>
-			<version>6.0</version>
+			<version>6.2</version>
 		</dependency>
 	</dependencies>
 </project>

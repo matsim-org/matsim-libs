@@ -20,38 +20,47 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.counts.algorithms.graphs.helper.OutputDelegate;
 import org.matsim.counts.algorithms.graphs.helper.Section;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class OutputDelegateTest extends MatsimTestCase {
+public class OutputDelegateTest {
 
-	public void testOutputHtml() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testOutputHtml() {
 			CountsFixture fixture = new CountsFixture();
 			fixture.setUp();
-	
+
 			CountsSimRealPerHourGraph sg = null;
 			List<CountSimComparison> countSimCompList=new Vector<CountSimComparison>();
 			for (int i=0; i<24; i++) {
 				countSimCompList.add(new CountSimComparisonImpl(Id.create(i+1, Link.class), "", 1, 1.0, 1.0));
 			}
 			sg = new CountsSimRealPerHourGraph(countSimCompList, 1, "testOutPutAll");
-	
-			new File(getOutputDirectory() + "graphs").mkdir();
-			OutputDelegate outputDelegate=new OutputDelegate(getOutputDirectory() + "graphs/");
+
+		new File(utils.getOutputDirectory() + "graphs").mkdir();
+		OutputDelegate outputDelegate=new OutputDelegate(utils.getOutputDirectory() + "graphs/");
 			outputDelegate.addSection(new Section("testOutPutAll"));
 			assertNotNull("No graph was created", sg.createChart(0));
 			outputDelegate.addCountsGraph(sg);
 			outputDelegate.outputHtml();
-	
-			String filename = getOutputDirectory() + "graphs/png/" + sg.getFilename() +".png";
+
+		String filename = utils.getOutputDirectory() + "graphs/png/" + sg.getFilename() +".png";
 			File fPng = new File(filename);
 			assertTrue("The png output file " + filename + " doesn't exist", fPng.exists());
 			assertTrue("The png output file " + filename + " is empty", fPng.length()>0.0);

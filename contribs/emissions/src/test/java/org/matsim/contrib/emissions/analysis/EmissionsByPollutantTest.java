@@ -1,17 +1,17 @@
 package org.matsim.contrib.emissions.analysis;
 
-import org.junit.Test;
-import org.matsim.contrib.emissions.Pollutant;
-import org.matsim.contrib.emissions.utils.EmissionUtilsTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.matsim.contrib.emissions.Pollutant.CO;
+import static org.matsim.contrib.emissions.Pollutant.NO2;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.matsim.contrib.emissions.Pollutant.CO;
-import static org.matsim.contrib.emissions.Pollutant.NO2;
+import org.junit.Test;
+import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.contrib.emissions.utils.EmissionUtilsTest;
 
 public class EmissionsByPollutantTest {
 
@@ -54,8 +54,8 @@ public class EmissionsByPollutantTest {
         double result = emissionsByPollutant.addEmission(pollutant, valueToAdd);
         double retrievedResult = emissionsByPollutant.getEmission(pollutant);
 
-        assertEquals(expectedValue, result);
-        assertEquals(expectedValue, retrievedResult);
+        assertEquals(expectedValue, result, 0);
+        assertEquals(expectedValue, retrievedResult, 0);
     }
 
     @Test
@@ -70,8 +70,8 @@ public class EmissionsByPollutantTest {
         double result = emissionsByPollutant.addEmission(pollutantToAdd, valueToAdd);
         double retrievedResult = emissionsByPollutant.getEmission(pollutantToAdd);
 
-        assertEquals(valueToAdd, result);
-        assertEquals(valueToAdd, retrievedResult);
+        assertEquals(valueToAdd, result, 0);
+        assertEquals(valueToAdd, retrievedResult, 0);
     }
 
     @Test

@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * @author dgrether
@@ -47,7 +48,7 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 	private final VehicleCapacity capacity = new VehicleCapacity();
 	private String networkMode = TransportMode.car ;
 	private Id<VehicleType> id;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
@@ -115,8 +116,9 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 	public final String getNetworkMode() {
 		return networkMode;
 	}
-	public final void setNetworkMode( String networkMode ) {
+	public final VehicleType setNetworkMode( String networkMode ) {
 		this.networkMode = networkMode;
+		return this;
 	}
 
 	// the following are attributes that did not seem universal enough and thus were relegated to free-form Attributes for the time being.  kai/kai, sep'19

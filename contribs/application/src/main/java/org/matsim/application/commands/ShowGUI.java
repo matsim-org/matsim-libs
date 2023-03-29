@@ -7,7 +7,7 @@ import picocli.CommandLine;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-@CommandLine.Command(name = "gui", description = "Show the graphical user interface")
+@CommandLine.Command(name = "gui", description = "Run the scenario through the MATSim GUI")
 public class ShowGUI implements Callable<Integer> {
 
     @CommandLine.ParentCommand

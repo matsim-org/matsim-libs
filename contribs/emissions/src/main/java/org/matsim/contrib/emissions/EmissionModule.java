@@ -170,6 +170,11 @@ public final class EmissionModule {
 		if (shouldCreateAverageTables()) {
 			this.avgHbefaColdTable = HbefaTables.loadAverageCold(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(coldPollutants, avgHbefaColdTable.keySet());
+			// yy The naming and signature of the above should presumably be changed: (1) addPollutantsToX implies signature (pollutants,
+			// X).  But it is actually the other way round (even if it does not read that way.  (2) "coldPollutants" is not a Map.  Since
+			// this is a private method, maybe one could also have a method "memorizeColdPollutants" and then not have coldPollutants as
+			// field. kai, dec'22
+
 			this.avgHbefaWarmTable = HbefaTables.loadAverageWarm(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(warmPollutants, avgHbefaWarmTable.keySet());
 		}

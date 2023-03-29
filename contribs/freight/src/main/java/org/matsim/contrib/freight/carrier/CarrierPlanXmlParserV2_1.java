@@ -91,7 +91,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
-			new org.matsim.utils.objectattributes.attributable.Attributes();
+			new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 
 	/**
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed.
@@ -204,11 +204,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				break;
 
 			//vehicle-type
-			case "vehicleType":
-				throw new RuntimeException(VEHICLE_TYPES_MSG);
-			case "engineInformation":
-				throw new RuntimeException(VEHICLE_TYPES_MSG);
-			case "costInformation":
+			case "vehicleType", "engineInformation", "costInformation":
 				throw new RuntimeException(VEHICLE_TYPES_MSG);
 
 

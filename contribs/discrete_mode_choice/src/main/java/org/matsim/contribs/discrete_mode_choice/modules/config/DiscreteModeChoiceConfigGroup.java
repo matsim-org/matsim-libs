@@ -617,7 +617,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = new HashMap<>();
-		comments.put(MODEL_TYPE, MODEL_TYPE_CMT  + Arrays.asList(ModelType.values() ).stream().map(String::valueOf ).collect(Collectors.joining(", ")) );
+		comments.put(MODEL_TYPE, MODEL_TYPE_CMT  + Arrays.stream(ModelType.values() ).map(String::valueOf ).collect(Collectors.joining(", " ) ) );
 		comments.put(PERFORM_REROUTE, PERFORM_REROUTE_CMT );
 		comments.put(ENFORCE_SINGLE_PLAN, ENFORCE_SINGLE_PLAN_CMT );
 		comments.put(FALLBACK_BEHAVIOUR, FALLBACK_BEHAVIOR_CMT  + Arrays.asList(FallbackBehaviour.values() ).stream().map(String::valueOf ).collect(Collectors.joining(", " ) ) );

@@ -71,12 +71,12 @@ public class RunETaxiBenchmark {
 	private static final double MAX_SOC = 0.8; // charge up to 80% SOC
 	private static final double TEMPERATURE = 20; // oC
 
-	public static void run(URL configUrl, int runs) {
+	public static void run(String [] configUrl, int nIterations) {
 		Config config = ConfigUtils.loadConfig(configUrl,
 				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
 				new DvrpConfigGroup(), new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		createControler(config, runs).run();
+		createControler(config, nIterations).run();
 	}
 
 	public static Controler createControler(Config config, int runs) {
@@ -107,8 +107,9 @@ public class RunETaxiBenchmark {
 			}
 		});
 
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+//		controler.configureQSimComponents(
+//				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+		controler.configureQSimComponents( DvrpQSimComponents.activateModes( mode ) );
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

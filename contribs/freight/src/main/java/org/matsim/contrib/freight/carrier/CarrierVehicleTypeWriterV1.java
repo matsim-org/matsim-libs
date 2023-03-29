@@ -34,9 +34,10 @@ import java.io.IOException;
 @Deprecated // only there if someone insists on writing V1
 public final class CarrierVehicleTypeWriterV1 extends MatsimXmlWriter {
 
+	@SuppressWarnings("unused")
 	private static final  Logger logger = LogManager.getLogger(CarrierVehicleTypeWriter.class );
 
-	private CarrierVehicleTypes vehicleTypes;
+	private final CarrierVehicleTypes vehicleTypes;
 
 
 	public CarrierVehicleTypeWriterV1(CarrierVehicleTypes carrierVehicleTypes) {

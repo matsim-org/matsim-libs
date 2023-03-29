@@ -60,42 +60,4 @@ public class Zones {
 		shpReader.readZones(zonesShpUrl);
 		return zones;
 	}
-
-	public static void writeZones(Map<Id<Zone>, Zone> zones, String coordinateSystem, String zonesXmlFile,
-			String zonesShpFile) {
-		new ZoneXmlWriter(zones).write(zonesXmlFile);
-		new ZoneShpWriter(zones, coordinateSystem).write(zonesShpFile);
-	}
-
-	public static void transformZones(Map<Id<Zone>, Zone> zones, String fromCoordSystem, String toCoordSystem) {
-		MathTransform transform = getTransform(fromCoordSystem, toCoordSystem);
-
-		for (Zone z : zones.values()) {
-			z.setMultiPolygon(transformMultiPolygon(z.getMultiPolygon(), transform));
-		}
-	}
-
-	public static MathTransform getTransform(String fromCoordSystem, String toCoordSystem) {
-		CoordinateReferenceSystem fromCrs = MGC.getCRS(fromCoordSystem);
-		CoordinateReferenceSystem toCrs = MGC.getCRS(toCoordSystem);
-
-		try {
-			return CRS.findMathTransform(fromCrs, toCrs, true);
-		} catch (FactoryException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static MultiPolygon transformMultiPolygon(MultiPolygon multiPolygon, MathTransform transform) {
-		try {
-			return (MultiPolygon)JTS.transform(multiPolygon, transform);
-		} catch (TransformException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public static List<Polygon> getPolygons(Zone zone) {
-		return PolygonExtracter.getPolygons(zone.getMultiPolygon());
-	}
 }

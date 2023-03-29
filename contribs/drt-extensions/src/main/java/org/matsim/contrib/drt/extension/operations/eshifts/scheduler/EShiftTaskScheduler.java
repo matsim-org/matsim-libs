@@ -179,7 +179,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
 			final double waitTime = ChargingEstimations
 					.estimateMaxWaitTimeForNextVehicle(chargerImpl);
 
-			if (ev.getBattery().getCharge() / ev.getBattery().getCapacity() < shiftsParams.chargeDuringBreakThreshold ||
+			if (ev.getBattery().getCharge() / ev.getBattery().getCapacity() > shiftsParams.chargeDuringBreakThreshold ||
 			waitTime > 0) {
                 dropoffStopTask = taskFactory.createShiftBreakTask(vehicle, startTime,
                         endTime, link, shiftBreak, breakFacility);

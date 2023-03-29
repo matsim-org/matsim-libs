@@ -23,7 +23,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -67,10 +67,10 @@ public class DemandReaderFromCSVTest {
 		Assert.assertEquals("i(5,9)R",nearestLinkPerPerson.get(Id.createPersonId("person7")).values().iterator().next());
 		Assert.assertEquals("i(9,5)R",nearestLinkPerPerson.get(Id.createPersonId("person8")).values().iterator().next());
 
-			
-		
+
+
 	}
-	
+
 	@Test
 	public void demandCreation() throws IOException {
 		// read inputs
@@ -81,8 +81,9 @@ public class DemandReaderFromCSVTest {
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
 				FreightConfigGroup.class);
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
-		String carrierCSVLocation = utils.getPackageInputDirectory() + "testCarrierCSV.csv";
-		String demandCSVLocation = utils.getPackageInputDirectory() + "testDemandCSV.csv";
+		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
+		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
+		String shapeCategory = "Ortsteil";
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath, "WGS84", null);
 		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
@@ -93,10 +94,10 @@ public class DemandReaderFromCSVTest {
 		// run methods
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
 				.readCarrierInformation(carrierCSVLocation);
-		CarrierReaderFromCSV.createNewCarrierAndAddVehilceTypes(scenario, allNewCarrierInformation, freightConfigGroup,
+		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightConfigGroup,
 				polygonsInShape, 1, null);
 		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);
-		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, polygonsInShape);
+		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, polygonsInShape, shapeCategory);
 		DemandReaderFromCSV.createDemandForCarriers(scenario, polygonsInShape, demandInformation, population, false,
 				null);
 		Assert.assertEquals(3, FreightUtils.getCarriers(scenario).getCarriers().size());
@@ -245,7 +246,7 @@ public class DemandReaderFromCSVTest {
 	@Test
 	public void csvDemandReader() throws IOException {
 
-		String demandCSVLocation = utils.getPackageInputDirectory() + "testDemandCSV.csv";
+		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
 		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);
 		Assert.assertEquals(5, demandInformation.size());
 

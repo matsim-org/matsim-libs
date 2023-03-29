@@ -117,7 +117,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.0.0-M7</version>
+				<version>3.0.0</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -152,7 +152,7 @@
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
-			<version>1.5.3</version>
+			<version>1.5.4</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -203,7 +203,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.2-5</version>
+			<version>1.5.4-2</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -238,7 +238,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>1.9.0</version>
+			<version>1.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
@@ -313,7 +313,7 @@
 									<packages>org.matsim.vis:org.matsim.vis.*</packages>
 								</group>
 							</groups>
-							<detectLinks>true</detectLinks>
+							<detectLinks>false</detectLinks>
 							<doclint>none</doclint>
 							<linksource>true</linksource>
 						</configuration>
@@ -321,7 +321,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.4.2</version>
+						<version>3.5.0</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly-release.xml</descriptor>

@@ -19,7 +19,6 @@
 package org.matsim.contrib.bicycle;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -36,12 +35,12 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dziemke
- * 
+ *
  * This is an alternative to BicycleLegScoring. Currently yields slightly different scores than BicyleLegScoring.
  * This link-based scoring should be used when true times spent on an individual link are relevant
  * and for the scoring of the interaction with motorized traffic.
  */
-class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {	
+class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 
 	private final ScoringParameters params;
 	private final Scenario scenario;
@@ -53,7 +52,7 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 	private double previousLinkEnterTime;
 	private double score;
 	private int carCountOnLink;
-	
+
 	private static int ccc=0 ;
 
 	BicycleLinkScoring(ScoringParameters params, Scenario scenario, BicycleConfigGroup bicycleConfigGroup) {
@@ -63,35 +62,35 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 	}
 
 	@Override public void finish() {}
-	
+
 	@Override
 	public double getScore() {
 		return score;
 	}
-	
+
 	@Override
 	public void handleEvent(Event event) {
 		if (event instanceof VehicleEntersTrafficEvent) {
 			VehicleEntersTrafficEvent vehEvent = (VehicleEntersTrafficEvent) event;
-			
+
 			// Establish connection between driver and vehicle
 			vehicle2Driver.handleEvent(vehEvent);
-			
+
 			// No LinkEnterEvent on first link of a leg
 			previousLink = vehEvent.getLinkId();
 			carCountOnLink = 0;
 			previousLinkRelativePosition = vehEvent.getRelativePositionOnLink();
 			previousLinkEnterTime =vehEvent.getTime();
-			
+
 		}
 		if (event instanceof VehicleLeavesTrafficEvent) {
 			VehicleLeavesTrafficEvent vehEvent = (VehicleLeavesTrafficEvent) event;
-			
+
 			Id<Vehicle> vehId = vehEvent.getVehicleId();
 			double enterTime = previousLinkEnterTime;
 			double travelTime = vehEvent.getTime() - enterTime;
 			calculateScoreForPreviousLink(vehEvent.getLinkId(), enterTime, vehId, travelTime, previousLinkRelativePosition);
-			
+
 			// End connection between driver and vehicle
 			vehicle2Driver.handleEvent(vehEvent);
 		}
@@ -99,12 +98,12 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 			// This only works since ScoringFunctionsForPopulation passes link events to persons; quite new; dz, june'18
 			// Otherwise ArbitraryEventScoring only handles events that are instance of HasPersonId, which is not the case for LinkEnterEvents
 			LinkEnterEvent linkEnterEvent = (LinkEnterEvent) event;
-			
+
 			Id<Vehicle> vehId = linkEnterEvent.getVehicleId();
 			double enterTime = previousLinkEnterTime;
 			double travelTime = linkEnterEvent.getTime() - enterTime;
 			calculateScoreForPreviousLink(previousLink, enterTime, vehId, travelTime, previousLinkRelativePosition);
-			
+
 			previousLink = linkEnterEvent.getLinkId();
 			carCountOnLink = 0;
 			previousLinkRelativePosition = 0.;
@@ -117,24 +116,27 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 		}
 
 	}
-	
+
 	private void calculateScoreForPreviousLink(Id<Link> linkId, Double enterTime, Id<Vehicle> vehId, double travelTime, double relativeLinkEnterPosition) {
 		if (relativeLinkEnterPosition != 1.0) {
 			// Link link = scenario.getNetwork().getLinks().get(linkId);
 			// Person person = scenario.getPopulation().getPersons().get(vehicle2Driver.getDriverOfVehicle(vehId));
 			// Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehId);
-			
+
 			double carScoreOffset = -(this.carCountOnLink * 0.04);
 			this.score += carScoreOffset;
 			// LOG.warn("----- link = " + linkId + " -- car score offset = " + carScoreOffset);
-			
+
 			double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(scenario.getNetwork().getLinks().get(linkId),
 					bicycleConfigGroup.getMarginalUtilityOfComfort_m(),
 					bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m(),
-					bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m());
+					bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m(),
+					bicycleConfigGroup.getMarginalUtilityOfUserDefinedNetworkAttribute_m(),
+					bicycleConfigGroup.getUserDefinedNetworkAttributeName(),
+					bicycleConfigGroup.getUserDefinedNetworkAttributeDefaultValue());
 			// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
 			this.score += scoreOnLink;
-			
+
 			double timeDistanceBasedScoreComponent = computeTimeDistanceBasedScoreComponent(travelTime, scenario.getNetwork().getLinks().get(linkId).getLength());
 			// LOG.warn("----- link = " + linkId + " -- timeDistanceBasedScoreComponent = " + timeDistanceBasedScoreComponent);
 			this.score += timeDistanceBasedScoreComponent;
@@ -144,8 +146,8 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 			this.score += timeDistanceBasedScoreComponent;
 		}
 	}
-	
-	
+
+
 	// Copied and adapted from CharyparNagelLegScoring
 	private double computeTimeDistanceBasedScoreComponent( double travelTime, double dist ) {
 		double tmpScore = 0.0;
@@ -172,5 +174,5 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 		tmpScore += modeParams.constant;
 		return tmpScore;
 	}
-	
+
 }

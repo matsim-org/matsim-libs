@@ -21,7 +21,6 @@
 
 package org.matsim.contrib.freight.analysis;
 
-import javafx.collections.ArrayChangeListener;
 import org.junit.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -32,7 +31,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.*;
 
 import java.io.*;
@@ -71,7 +69,7 @@ public class RunFreightAnalysisIT {
 	private void checkFile(String filename) {
 		final String inputFilename = testUtils.getInputDirectory() + filename;
 		final String outputFilename = testUtils.getOutputDirectory() + filename;
-		MatsimTestUtils.compareFilesLineByLine(inputFilename, outputFilename);
+		MatsimTestUtils.assertEqualFilesLineByLine(inputFilename, outputFilename);
 	}
 
 	@Test
@@ -160,7 +158,7 @@ public class RunFreightAnalysisIT {
 				Assert.assertEquals("travelDistance is not as expected ",Double.valueOf(9000.0),history.get(5).travelDistance);
 				Assert.assertEquals("travelTime is not as expected ",Double.valueOf(-1507.0),history.get(5).travelTime);
 				Assert.assertEquals("driverId is not as expected ",driverId_0,history.get(5).driverId);
-				
+
 			} else if(key.equals(lightVehicle_1)){
 				Id<VehicleType> vehicleType = Id.create( "light", VehicleType.class );
 				Id<Person> driverId_1 = Id.create( "freight_carrier1_veh_carrier_19_lightVehicle_1", Person.class );

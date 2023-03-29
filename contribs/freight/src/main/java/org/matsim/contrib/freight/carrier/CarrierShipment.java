@@ -25,13 +25,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * A shipment from one location to another, with certain size and other constraints such as time-windows and service-times.
- * 
- * <p>Use the builder to build a shipment. 
- * @code CarrierShipment.Builder.newInstance(from,to,size) 
- * 
+ *
+ * <p>Use the builder to build a shipment.
+ * @code CarrierShipment.Builder.newInstance(from,to,size)
+ *
  * @author sschroeder
  *
  */
@@ -39,20 +40,20 @@ public final class CarrierShipment implements Attributable {
 
 	/**
 	 * A builder that builds shipments.
-	 * 
+	 *
 	 * @author sschroeder
 	 *
 	 */
 	public static class Builder {
-		
+
 		/**
 		 * @Deprecated Please use Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
-		 * 
+		 * <p>
 		 * Returns a new shipment builder.
-		 * 
+		 *
 		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
 		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
-		 * 
+		 *
 		 * @param from
 		 * @param to
 		 * @param size
@@ -62,13 +63,13 @@ public final class CarrierShipment implements Attributable {
 		public static Builder newInstance(Id<Link> from, Id<Link> to, int size){
 			return new Builder(from,to,size);
 		}
-		
+
 		/**
 		 * Returns a new shipment builder.
-		 * 
+		 *
 		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
 		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
-		 * 
+		 *
 		 * @param id
 		 * @param from
 		 * @param to
@@ -78,7 +79,7 @@ public final class CarrierShipment implements Attributable {
 		public static Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size){
 			return new Builder(id, from,to,size);
 		}
-		
+
 		Id<CarrierShipment> id;
 		Id<Link> from;
 		Id<Link> to;
@@ -87,18 +88,18 @@ public final class CarrierShipment implements Attributable {
 		TimeWindow delTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		double pickServiceTime = 0.0;
 		double delServiceTime = 0.0;
-		
+
 		/**
 		 * @Deprecated Please use Builder (Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
 		 */
-		@Deprecated 
+		@Deprecated
 		public Builder(Id<Link> from, Id<Link> to, int size) {
 			super();
 			this.from = from;
 			this.to = to;
 			this.size = size;
 		}
-		
+
 		public Builder(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) {
 			super();
 			this.id = id;
@@ -106,32 +107,32 @@ public final class CarrierShipment implements Attributable {
 			this.to = to;
 			this.size = size;
 		}
-		
+
 		public Builder setPickupTimeWindow(TimeWindow pickupTW){
 			this.pickTW = pickupTW;
 			return this;
 		}
-		
+
 		public Builder setDeliveryTimeWindow(TimeWindow deliveryTW){
 			this.delTW = deliveryTW;
 			return this;
 		}
-		
+
 		public Builder setPickupServiceTime(double pickupServiceTime){
 			this.pickServiceTime = pickupServiceTime;
 			return this;
 		}
-		
+
 		public Builder setDeliveryServiceTime(double deliveryServiceTime){
 			this.delServiceTime = deliveryServiceTime;
 			return this;
 		}
-		
+
 		public CarrierShipment build(){
 			return new CarrierShipment(this);
 		}
 	}
-	
+
 	private final Id<CarrierShipment> id;
 	private final Id<Link> from;
 	private final Id<Link> to;
@@ -140,7 +141,7 @@ public final class CarrierShipment implements Attributable {
 	private final TimeWindow deliveryTimeWindow;
 	private double pickupServiceTime;
 	private double deliveryServiceTime;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 
 	private CarrierShipment(Builder builder) {
@@ -214,7 +215,7 @@ public final class CarrierShipment implements Attributable {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */

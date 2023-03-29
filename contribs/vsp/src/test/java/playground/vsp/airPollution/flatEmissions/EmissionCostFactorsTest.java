@@ -1,9 +1,9 @@
 package playground.vsp.airPollution.flatEmissions;
 
-import org.junit.Test;
-
-import static junit.framework.TestCase.fail;
+import static org.junit.Assert.fail;
 import static playground.vsp.airPollution.flatEmissions.EmissionCostFactors.NOx;
+
+import org.junit.Test;
 
 public class EmissionCostFactorsTest{
 

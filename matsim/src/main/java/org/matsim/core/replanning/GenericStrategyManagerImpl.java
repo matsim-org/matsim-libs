@@ -52,8 +52,7 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlansAndId<? extends BasicPlan, AG>> implements GenericStrategyManager<PL, AG>{
 	// the "I extends ... <, I>" is correct, although it feels odd.  kai, nov'15
 	
-	private static final Logger log =
-			LogManager.getLogger( GenericStrategyManagerImpl.class );
+	private static final Logger log = LogManager.getLogger( GenericStrategyManagerImpl.class );
 
 
 	static class StrategyWeights<T extends BasicPlan, I> implements StrategyChooser.Weights<T, I> {
@@ -64,23 +63,19 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 		double totalWeights = 0.0;
 		final Map<Integer, Map<GenericPlanStrategy<T, I>, Double>> changeRequests = new TreeMap<>();
 
-		@Override
-		public int size() {
+		@Override public int size() {
 			return weights.size();
 		}
 
-		@Override
-		public double getWeight(int idx) {
+		@Override public double getWeight(int idx) {
 			return weights.get(idx);
 		}
 
-		@Override
-		public GenericPlanStrategy<T, I> getStrategy(int idx) {
+		@Override public GenericPlanStrategy<T, I> getStrategy(int idx) {
 			return strategies.get(idx);
 		}
 
-		@Override
-		public double getTotalWeights() {
+		@Override public double getTotalWeights() {
 			return totalWeights;
 		}
 	}

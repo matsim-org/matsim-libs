@@ -31,7 +31,9 @@ import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
@@ -39,18 +41,17 @@ import org.matsim.vehicles.VehicleType;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A writer that writes carriers and their plans in a xml-file.
- * 
+ *
  * @author sschroeder
  *
  */
 /*package-private*/ class CarrierPlanXmlWriterV2_1 extends MatsimXmlWriter {
 
+	@SuppressWarnings("unused")
 	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV2_1.class);
 
 	private final Collection<Carrier> carriers;
@@ -79,7 +80,7 @@ import java.util.Map;
 
 	/**
 	 * Writes carriers and their plans into a xml-file.
-	 * 
+	 *
 	 * @param filename should be the target xml-file
 	 */
 	public void write(String filename) {
@@ -87,17 +88,16 @@ import java.util.Map;
 		try {
 			openFile(filename);
 			writeXmlHead();
-
-			startCarriers(this.writer);
+			writeRootElement();
 			for (Carrier carrier : carriers) {
 				startCarrier(carrier, this.writer);
 				writeVehiclesAndTheirTypes(carrier, this.writer);
-				writeShipments(carrier, this.writer);
 				writeServices(carrier,this.writer);
+				writeShipments(carrier, this.writer);
 				writePlans(carrier, this.writer);
 				endCarrier(this.writer);
 			}
-			endCarriers(this.writer);
+			writeEndElement(this.writer);
 			close();
 			logger.info("done");
 		} catch (IOException e) {
@@ -107,42 +107,47 @@ import java.util.Map;
 		}
 	}
 
-	private void startCarriers(BufferedWriter writer) throws IOException {
-		writer.write("\t<carriers>\n");
+	private void writeRootElement() throws UncheckedIOException, IOException {
+		List<Tuple<String, String>> atts = new ArrayList<>();
+		atts.add(createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
+		atts.add(createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
+		atts.add(createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "carriersDefinitions_v2.1.xsd"));
+		this.writeStartTag("carriers", atts);
+		this.writer.write(NL);
 	}
 
 	private void startCarrier(Carrier carrier, BufferedWriter writer)
 			throws IOException {
-		writer.write("\t\t<carrier id=\"" + carrier.getId() + "\">\n");
-		attributesWriter.writeAttributes("\t\t\t", writer, carrier.getAttributes());
+		writer.write("\t<carrier id=\"" + carrier.getId() + "\">\n");
+		attributesWriter.writeAttributes("\t\t", writer, carrier.getAttributes());
 	}
 
 	private void writeVehiclesAndTheirTypes(Carrier carrier, BufferedWriter writer)throws IOException {
-		writer.write("\t\t\t<capabilities fleetSize=\""+ carrier.getCarrierCapabilities().getFleetSize().toString() + "\">\n");
+		writer.write("\t\t<capabilities fleetSize=\""+ carrier.getCarrierCapabilities().getFleetSize().toString() + "\">\n");
 		//vehicles
-		writer.write("\t\t\t\t<vehicles>\n");
+		writer.write("\t\t\t<vehicles>\n");
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			Id<VehicleType> vehicleTypeId = v.getVehicleTypeId();
 			if(vehicleTypeId == null) vehicleTypeId = v.getType() == null ? null : v.getType().getId();
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getId()
+			writer.write("\t\t\t\t<vehicle id=\"" + v.getId()
 					+ "\" depotLinkId=\"" + v.getLinkId()
 					+ "\" typeId=\"" + vehicleTypeId
 					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
 					+ "\" latestEnd=\"" + getTime(v.getLatestEndTime())
 					+ "\"/>\n");
 		}
-		writer.write("\t\t\t\t</vehicles>\n\n");
-		writer.write("\t\t\t</capabilities>\n\n");
+		writer.write("\t\t\t</vehicles>\n\n");
+		writer.write("\t\t</capabilities>\n\n");
 	}
 
 	private void writeShipments(Carrier carrier, BufferedWriter writer) throws IOException {
 		if(carrier.getShipments().isEmpty()) return;
-		writer.write("\t\t\t<shipments>\n");
+		writer.write("\t\t<shipments>\n");
 		for (CarrierShipment s : carrier.getShipments().values()) {
 			Id<CarrierShipment> shipmentId = s.getId();
 			registeredShipments.put(s, shipmentId);
-			writer.write("\t\t\t\t<shipment ");
+			writer.write("\t\t\t<shipment ");
 			writer.write("id=\"" + shipmentId + "\" ");
 			writer.write("from=\"" + s.getFrom() + "\" ");
 			writer.write("to=\"" + s.getTo() + "\" ");
@@ -163,23 +168,24 @@ import java.util.Map;
 				writer.write("\"/>\n");
 			} else {
 				writer.write("\">\n");
-				this.attributesWriter.writeAttributes("\t\t\t\t\t", writer, s.getAttributes());
-				writer.write("\t\t\t\t</shipment>\n");
+				this.attributesWriter.writeAttributes("\t\t\t\t", writer, s.getAttributes());
+				writer.write("\t\t\t</shipment>\n");
 			}
 		}
-		writer.write("\t\t\t</shipments>\n\n");
+		writer.write("\t\t</shipments>\n\n");
 	}
 
 	private void writeServices(Carrier carrier, BufferedWriter writer) throws IOException {
-		writer.write("\t\t\t<services>\n");
+		if(carrier.getServices().isEmpty()) return;
+		writer.write("\t\t<services>\n");
 		for (CarrierService s : carrier.getServices().values()) {
 			serviceMap.put(s, s.getId());
-			writer.write("\t\t\t\t<service ");
+			writer.write("\t\t\t<service ");
 			writer.write("id=\"" + s.getId().toString() + "\" ");
 			writer.write("to=\"" + s.getLocationLinkId() + "\" ");
 			// capacity which must be available when vehicle services this service.
 			// i.e. this is a pick-up service.
-			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" "); 
+			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" ");
 			writer.write("earliestStart=\"" + getTime(s.getServiceStartTimeWindow().getStart()) + "\" ");
 			writer.write("latestEnd=\"" + getTime(s.getServiceStartTimeWindow().getEnd()) + "\" ");
 			writer.write("serviceDuration=\"" + getTime(s.getServiceDuration()));
@@ -187,13 +193,13 @@ import java.util.Map;
 				writer.write("\"/>\n");
 			} else {
 				writer.write("\">\n");
-				this.attributesWriter.writeAttributes("\t\t\t\t\t", writer, s.getAttributes());
-				writer.write("\t\t\t\t</service>\n");
+				this.attributesWriter.writeAttributes("\t\t\t\t", writer, s.getAttributes());
+				writer.write("\t\t\t</service>\n");
 			}
 
 		}
-		writer.write("\t\t\t</services>\n\n");
-		
+		writer.write("\t\t</services>\n\n");
+
 	}
 
 	private String getTime(double time) {
@@ -205,7 +211,7 @@ import java.util.Map;
 		if (carrier.getSelectedPlan() == null) {
 			return;
 		}
-		
+		writer.write("\t\t<plans>\n");
 		for(CarrierPlan plan : carrier.getPlans()){
 			writer.write("\t\t\t<plan");
 			if(plan.getScore() != null){
@@ -223,11 +229,11 @@ import java.util.Map;
 				writer.write(" selected=\"false\"");
 			}
 			writer.write(">\n");
-					
+
 			for (ScheduledTour tour : plan.getScheduledTours()) {
 				writer.write("\t\t\t\t<tour ");
-				writer.write("vehicleId=\"" + tour.getVehicle().getId()
-						+ "\">\n");
+				writer.write("tourId=\"" + tour.getTour().getId() + "\" ");
+				writer.write("vehicleId=\"" + tour.getVehicle().getId() +"\">\n");
 				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START
 						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())
 						+ "\"/>\n");
@@ -260,13 +266,13 @@ import java.util.Map;
 					else if (tourElement instanceof ShipmentBasedActivity act) {
 						writer.write("\t\t\t\t\t<act ");
 						writer.write("type=\"" + act.getActivityType() + "\" ");
-						writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\" ");
+						writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\"");
 						writer.write("/>\n");
 					}
 					else if (tourElement instanceof ServiceActivity act){
 						writer.write("\t\t\t\t\t<act ");
 						writer.write("type=\"" + act.getActivityType() + "\" ");
-						writer.write("serviceId=\"" + serviceMap.get(act.getService()) + "\" ");
+						writer.write("serviceId=\"" + serviceMap.get(act.getService()) + "\"");
 						writer.write("/>\n");
 					}
 
@@ -277,16 +283,16 @@ import java.util.Map;
 			}
 			writer.write("\t\t\t</plan>\n\n");
 		}
-		
+		writer.write("\t\t</plans>\n\n");
 	}
 
 	private void endCarrier(BufferedWriter writer) throws IOException {
-		writer.write("\t\t</carrier>\n\n");
+		writer.write("\t</carrier>\n\n");
 		registeredShipments.clear();
 	}
 
-	private void endCarriers(BufferedWriter writer) throws IOException {
-		writer.write("\t</carriers>\n");
+	private void writeEndElement(BufferedWriter writer) throws IOException {
+		writer.write("</carriers>\n");
 
 	}
 }

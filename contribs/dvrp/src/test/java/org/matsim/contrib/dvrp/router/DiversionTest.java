@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -66,8 +67,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import com.google.inject.Singleton;
-
-import junit.framework.Assert;
 
 /**
  * @author Sebastian Hörl (sebhoerl)
@@ -222,22 +221,18 @@ public class DiversionTest {
 
 		// Took the fixed value from the simulation, to make sure this stays consistent
 		// over refactorings
-		Assert.assertEquals(testTracker.eventBasedArrivalTime, 657.0);
+		Assert.assertEquals(testTracker.eventBasedArrivalTime,  657.0, 0);
 
 		// Initially calculated arrival time should predict correctly the final arrival
 		// time
-		Assert.assertEquals(testTracker.initialArrivalTime, 657.0);
+		Assert.assertEquals(testTracker.initialArrivalTime,  657.0, 0);
 
 		// Along the route, when diverting to the same destination, arrival time should
 		// stay constant
-		testTracker.diversionArrivalTimes.forEach(t -> {
-			Assert.assertEquals(t, 657.0);
-		});
+		testTracker.diversionArrivalTimes.forEach(t -> Assert.assertEquals(t,  657.0, 0));
 
 		// Also ,the task end time should be consistent with the path
-		testTracker.taskEndTimes.forEach(t -> {
-			Assert.assertEquals(t, 657.0);
-		});
+		testTracker.taskEndTimes.forEach(t -> Assert.assertEquals(t,  657.0, 0));
 	}
 
 	static private class TestModeModule extends AbstractDvrpModeModule {
@@ -554,17 +549,15 @@ public class DiversionTest {
 
 		// Took the fixed value from the simulation, to make sure this stays consistent
 		// over refactorings - same as previous unit test
-		Assert.assertEquals(testTracker.eventBasedArrivalTime, 657.0);
+		Assert.assertEquals(testTracker.eventBasedArrivalTime,  657.0, 0);
 
 		// Initially calculated arrival time should predict correctly the final arrival
 		// time - as in the first unit test as we route to L8
-		Assert.assertEquals(testTracker.initialArrivalTime, 657.0);
+		Assert.assertEquals(testTracker.initialArrivalTime,  657.0, 0);
 
 		// Along the route, when diverting to the same destination, arrival time should
 		// stay constant
-		testTracker.diversionArrivalTimes.forEach(t -> {
-			Assert.assertEquals(t, 739.0);
-		});
+		testTracker.diversionArrivalTimes.forEach(t -> Assert.assertEquals(t,  739.0, 0));
 
 		// Without fix in OnlineDriveTaskTrackerImpl, the last test will lead to a
 		// difference of one second for the samples at late times

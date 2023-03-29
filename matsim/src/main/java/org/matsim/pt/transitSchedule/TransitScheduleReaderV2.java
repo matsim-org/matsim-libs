@@ -243,7 +243,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 
 	private static class TempTransitRoute {
 		protected final Id<TransitRoute> id;
-		protected final org.matsim.utils.objectattributes.attributable.Attributes attributes = new org.matsim.utils.objectattributes.attributable.Attributes();
+		protected final org.matsim.utils.objectattributes.attributable.Attributes attributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 		protected String description = null;
 		protected Map<Id<Departure>, Departure> departures = new LinkedHashMap<>();
 		/*package*/ List<TransitRouteStopImpl.Builder> stopBuilders = new ArrayList<>();

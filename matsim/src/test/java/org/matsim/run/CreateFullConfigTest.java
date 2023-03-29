@@ -27,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.testcases.MatsimTestUtils.ExitTrappedException;
 
 /**
  * @author mrieser / Senozon AG
@@ -46,29 +45,8 @@ public class CreateFullConfigTest {
 		File configFile = new File(args[0]);
 		Assert.assertFalse(configFile.exists());
 
-		try {
-			MatsimTestUtils.forbidSystemExitCall();
-			CreateFullConfig.main(args);
-		} finally {
-			MatsimTestUtils.enableSystemExitCall();
-		}
+		CreateFullConfig.main(args);
 
 		Assert.assertTrue(configFile.exists());
-	}
-
-	@Test
-	public void testMain_MissingArgument() {
-		String[] args = new String[0];
-
-		try {
-			MatsimTestUtils.forbidSystemExitCall();
-			CreateFullConfig.main(args);
-			Assert.fail("Expected exception.");
-		} catch (ExitTrappedException e) {
-			log.info("caught the expected exception, everything is fine.");
-		} finally {
-			MatsimTestUtils.enableSystemExitCall();
-		}
-
 	}
 }

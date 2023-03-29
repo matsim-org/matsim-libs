@@ -20,6 +20,10 @@
 
 package org.matsim.core.population.io;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -37,12 +41,16 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
+public class PopulationWriterHandlerImplV4Test {
 
-	public void testWriteGenericRoute() {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(super.loadConfig(null));
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testWriteGenericRoute() {
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(utils.loadConfig((String)null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 		Link link1 = network.getLinks().get(Id.create(1, Link.class));
@@ -64,7 +72,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		person.addPlan(plan);
 		pop.addPerson(person);
 
-		String filename = getOutputDirectory() + "population.xml";
+		String filename = utils.getOutputDirectory() + "population.xml";
 		new PopulationWriter(pop, network).writeV4(filename);
 
 		Population pop2 = scenario.getPopulation();
@@ -72,7 +80,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		Person person2 = pop2.getPersons().get(Id.create(1, Person.class));
 		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
 		Route route2 = leg2.getRoute();
-		assertEquals(123, route2.getTravelTime().seconds(), EPSILON); // if this succeeds, we know that writing/reading the data works
+		assertEquals(123, route2.getTravelTime().seconds(), MatsimTestUtils.EPSILON); // if this succeeds, we know that writing/reading the data works
 	}
 
 }

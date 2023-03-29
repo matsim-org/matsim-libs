@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /*deliberately package*/ class LinkImpl implements Link {
 
@@ -68,7 +69,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	private static final Set<String> DEFAULT_ALLOWED_MODES = HashSetCache.get(Set.of(TransportMode.car));
 
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	/*deliberately package*/ LinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		this.id = id;

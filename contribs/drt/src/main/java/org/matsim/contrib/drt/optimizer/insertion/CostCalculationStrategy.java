@@ -59,11 +59,16 @@ public interface CostCalculationStrategy {
 		@Override
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
 				DetourTimeInfo detourTimeInfo) {
+
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			double waitTimeViolation = Math.max(0,
-					detourTimeInfo.pickupDetourInfo.departureTime - request.getLatestStartTime());
-			double travelTimeViolation = Math.max(0,
-					detourTimeInfo.dropoffDetourInfo.arrivalTime - request.getLatestArrivalTime());
+			// (additional time vehicle will operate if insertion is accepted)
+
+			double waitTimeViolation = Math.max(0, detourTimeInfo.pickupDetourInfo.departureTime - request.getLatestStartTime());
+			// (if drt vehicle picks up too late) (max wait time (often 600 sec) after submission)
+
+			double travelTimeViolation = Math.max(0, detourTimeInfo.dropoffDetourInfo.arrivalTime - request.getLatestArrivalTime());
+			// (if drt vehicle drops off too late) (submission time + alpha * directTravelTime + beta)
+
 			return MAX_WAIT_TIME_VIOLATION_PENALTY * waitTimeViolation
 					+ MAX_TRAVEL_TIME_VIOLATION_PENALTY * travelTimeViolation
 					+ totalTimeLoss;

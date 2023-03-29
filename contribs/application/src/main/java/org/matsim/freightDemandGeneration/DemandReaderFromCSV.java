@@ -19,14 +19,6 @@
  * *********************************************************************** */
 package org.matsim.freightDemandGeneration;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -39,28 +31,28 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 /**
  * This DemandReaderFromCSV reads all demand information given in the read CSV
  * file and creates the demand for the carriers. While the process of creating
  * the demand the consistency of the information will be checked.
- * 
+ *
  * @author Ricardo Ewert
  */
 public final class DemandReaderFromCSV {
 	private static final Logger log = LogManager.getLogger(DemandReaderFromCSV.class);
-	private static Random rand = new Random(4711);
+	private static final Random rand = new Random(4711);
 
 	/**
 	 * DemandInformationElement is a set of information being read from the input
@@ -91,7 +83,7 @@ public final class DemandReaderFromCSV {
 		 */
 		private final Double shareOfPopulationWithFirstJobElement;
 		/**
-		 * Sets the areas where the services/pickups should be created. Therefore a
+		 * Sets the areas where the services/pickups should be created. Therefore, a
 		 * shape input is necessary.
 		 */
 		private final String[] areasFirstJobElement;
@@ -117,7 +109,7 @@ public final class DemandReaderFromCSV {
 		 */
 		private final Double shareOfPopulationWithSecondJobElement;
 		/**
-		 * Sets the areas where the deliveries should be created. Therefore a shape
+		 * Sets the areas where the deliveries should be created. Therefore, a shape
 		 * input is necessary.
 		 */
 		private final String[] areasSecondJobElement;
@@ -323,21 +315,22 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Reads the csv with the demand information and adds this demand to the related
 	 * carriers.
-	 * 
+	 *
 	 * @param scenario
 	 * @param csvLocationDemand
 	 * @param polygonsInShape
 	 * @param combineSimilarJobs
 	 * @param crsTransformationNetworkAndShape
 	 * @param population
+	 * @param shapeCategory
 	 * @throws IOException
 	 */
-	static void readAndCreateDemand(Scenario scenario, String csvLocationDemand,
-			Collection<SimpleFeature> polygonsInShape, boolean combineSimilarJobs,
-			CoordinateTransformation crsTransformationNetworkAndShape, Population population) throws IOException {
+	static void readAndCreateDemand(Scenario scenario, Path csvLocationDemand,
+									Collection<SimpleFeature> polygonsInShape, boolean combineSimilarJobs,
+									CoordinateTransformation crsTransformationNetworkAndShape, Population population, String shapeCategory) throws IOException {
 
 		Set<DemandInformationElement> demandInformation = readDemandInformation(csvLocationDemand);
-		checkNewDemand(scenario, demandInformation, polygonsInShape);
+		checkNewDemand(scenario, demandInformation, polygonsInShape, shapeCategory);
 		createDemandForCarriers(scenario, polygonsInShape, demandInformation, population, combineSimilarJobs,
 				crsTransformationNetworkAndShape);
 	}
@@ -345,19 +338,16 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Reads the demand information from the csv file and checks if the information
 	 * are consistent
-	 * 
+	 *
 	 * @param csvLocationDemand
-	 * @param demandInformation
-	 * @param scenario
-	 * @param polygonsInShape
 	 * @return
 	 * @throws IOException
 	 */
-	static Set<DemandInformationElement> readDemandInformation(String csvLocationDemand) throws IOException {
+	static Set<DemandInformationElement> readDemandInformation(Path csvLocationDemand) throws IOException {
 
 		Set<DemandInformationElement> demandInformation = new HashSet<>();
-		CSVParser parse = CSVFormat.DEFAULT.withDelimiter('\t').withFirstRecordAsHeader()
-				.parse(IOUtils.getBufferedReader(csvLocationDemand));
+		CSVParser parse = new CSVParser(Files.newBufferedReader(csvLocationDemand),
+				CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build());
 
 		for (CSVRecord record : parse) {
 			DemandInformationElement.Builder builder;
@@ -412,13 +402,14 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Checks if the read demand information are useful to create the shipment or
 	 * service demands
-	 * 
+	 *
 	 * @param scenario
 	 * @param demandInformation
 	 * @param polygonsInShape
+	 * @param shapeCategory
 	 */
 	static void checkNewDemand(Scenario scenario, Set<DemandInformationElement> demandInformation,
-			Collection<SimpleFeature> polygonsInShape) {
+							   Collection<SimpleFeature> polygonsInShape, String shapeCategory) {
 
 		for (DemandInformationElement newDemand : demandInformation) {
 			Carriers carriers = (Carriers) scenario.getScenarioElement("carriers");
@@ -456,16 +447,14 @@ public final class DemandReaderFromCSV {
 					boolean isInShape = false;
 
 					for (SimpleFeature singlePolygon : polygonsInShape)
-						if ((singlePolygon.getAttribute("Ortsteil") != null
-								&& singlePolygon.getAttribute("Ortsteil").equals(demandArea))
-								|| (singlePolygon.getAttribute("BEZNAME") != null
-										&& singlePolygon.getAttribute("BEZNAME").equals(demandArea))) {
+						if ((singlePolygon.getAttribute(shapeCategory) != null
+								&& singlePolygon.getAttribute(shapeCategory).equals(demandArea))) {
 							isInShape = true;
 							break;
 						}
 					if (!isInShape)
 						throw new RuntimeException("The area " + demandArea + " for the demand generation of carrier "
-								+ newDemand.getCarrierName() + " is not part of the given shapeFile");
+								+ newDemand.getCarrierName() + " is not part of the given shapeFile. The areas should be in the shape file column " + shapeCategory);
 				}
 			}
 			if (newDemand.getLocationsOfFirstJobElement() != null)
@@ -519,8 +508,7 @@ public final class DemandReaderFromCSV {
 					for (String demand : newDemand.getAreasSecondJobElement()) {
 						boolean isInShape = false;
 						for (SimpleFeature singlePolygon : polygonsInShape)
-							if (singlePolygon.getAttribute("Ortsteil").equals(demand)
-									|| singlePolygon.getAttribute("BEZNAME").equals(demand)) {
+							if (singlePolygon.getAttribute(shapeCategory).equals(demand)) {
 								isInShape = true;
 								break;
 							}
@@ -548,7 +536,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Creates for every demand information the services/shipments for the carriers
-	 * 
+	 *
 	 * @param scenario
 	 * @param polygonsInShape
 	 * @param demandInformation
@@ -573,7 +561,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Creates the services.
-	 * 
+	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
 	 * @param polygonsInShape
@@ -589,7 +577,7 @@ public final class DemandReaderFromCSV {
 		int distributedDemand = 0;
 		double roundingError = 0;
 		Double shareOfPopulationWithThisService = newDemandInformationElement.getShareOfPopulationWithFirstJobElement();
-		Integer numberOfJobs = 0;
+		Integer numberOfJobs;
 		Integer demandToDistribute = newDemandInformationElement.getDemandToDistribute();
 		String[] areasForServiceLocations = newDemandInformationElement.getAreasFirstJobElement();
 		String[] locationsOfServices = newDemandInformationElement.getLocationsOfFirstJobElement();
@@ -604,7 +592,7 @@ public final class DemandReaderFromCSV {
 			numberOfJobs = newDemandInformationElement.getNumberOfJobs();
 		else if (population == null)
 			throw new RuntimeException(
-					"No population found although input paramater <ShareOfPopulationWithThisDemand> is set");
+					"No population found although input parameter <ShareOfPopulationWithThisDemand> is set");
 		else {
 			double sampleSizeInputPopulation = (double) population.getAttributes().getAttribute("sampleSize");
 			double sampleTo = (double) population.getAttributes().getAttribute("samplingTo");
@@ -615,10 +603,8 @@ public final class DemandReaderFromCSV {
 						crsTransformationNetworkAndShape);
 			else
 				possiblePersonsForService.putAll(population.getPersons());
-			int numberPossibleServices = 0;
-			if (shareOfPopulationWithThisService != null)
-				numberPossibleServices = (int) Math
-						.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
+			int numberPossibleServices = (int) Math
+					.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
 			if (sampleSizeInputPopulation == sampleTo)
 				numberOfJobs = (int) Math.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
 			else if (samplingOption.equals("changeNumberOfLocationsWithDemand"))
@@ -642,7 +628,7 @@ public final class DemandReaderFromCSV {
 			for (String selectedLinkIdService : locationsOfServices)
 				if (!possibleLinksForService.containsKey(Id.createLinkId(selectedLinkIdService)))
 					throw new RuntimeException("The selected link " + selectedLinkIdService
-							+ " for the service is not part of the possible links. Plaese check!");
+							+ " for the service is not part of the possible links. Please check!");
 
 		if (numberOfJobs == null) {
 			// creates services with a demand of 1
@@ -674,18 +660,18 @@ public final class DemandReaderFromCSV {
 							"Not enough links in the shape file to distribute the demand. Select an different shapefile or check the CRS of the shapefile and network");
 				if (numberOfServiceLocations != null)
 					throw new RuntimeException(
-							"Because the demand is higher than the number of links, the demand will be distrubted evenly over all links. You selected a certain number of service locations, which is not possible here!");
-				double sumOfPossibleLinkLenght = 0;
-				possibleLinksForService.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLenght));
+							"Because the demand is higher than the number of links, the demand will be distributed evenly over all links. You selected a certain number of service locations, which is not possible here!");
+				double sumOfPossibleLinkLength = 0;
+				possibleLinksForService.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLength));
 				for (Link link : possibleLinksForService.values()) {
 					int demandForThisLink;
 					if (countOfLinks == scenario.getNetwork().getLinks().size()) {
 						demandForThisLink = demandToDistribute - distributedDemand;
 					} else {
 						demandForThisLink = (int) Math
-								.ceil(link.getLength() / sumOfPossibleLinkLenght * (double) demandToDistribute);
+								.ceil(link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute);
 						roundingError = roundingError + ((double) demandForThisLink
-								- (link.getLength() / sumOfPossibleLinkLenght * (double) demandToDistribute));
+								- (link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute));
 						if (roundingError > 1) {
 							demandForThisLink = demandForThisLink - 1;
 							roundingError = roundingError - 1;
@@ -716,7 +702,7 @@ public final class DemandReaderFromCSV {
 				if (i * 2 > numberOfLinksInNetwork)
 					throw new RuntimeException(
 							"Not enough links in the shape file to distribute the demand. Select an different shapefile or check if shapefile and network has the same coordinateSystem.");
-				Link link = null;
+				Link link;
 				if (numberOfServiceLocations == null || usedServiceLocations.size() < numberOfServiceLocations) {
 					if (locationsOfServices != null && locationsOfServices.length > i) {
 						link = scenario.getNetwork().getLinks().get(Id.createLinkId(locationsOfServices[i]));
@@ -740,7 +726,7 @@ public final class DemandReaderFromCSV {
 						roundingError = roundingError - 1;
 					}
 				}
-				double serviceTime = 0;
+				double serviceTime;
 				if (demandToDistribute == 0)
 					serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit();
 				else
@@ -767,7 +753,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Creates the shipments of a carrier.
-	 * 
+	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
 	 * @param polygonsInShape
@@ -785,7 +771,7 @@ public final class DemandReaderFromCSV {
 		Double shareOfPopulationWithThisPickup = newDemandInformationElement.getShareOfPopulationWithFirstJobElement();
 		Double shareOfPopulationWithThisDelivery = newDemandInformationElement
 				.getShareOfPopulationWithSecondJobElement();
-		Integer numberOfJobs = 0;
+		Integer numberOfJobs;
 		Integer demandToDistribute = newDemandInformationElement.getDemandToDistribute();
 		Integer numberOfPickupLocations = newDemandInformationElement.getNumberOfFirstJobElementLocations();
 		Integer numberOfDeliveryLocations = newDemandInformationElement.getNumberOfSecondJobElementLocations();
@@ -805,7 +791,7 @@ public final class DemandReaderFromCSV {
 			numberOfJobs = newDemandInformationElement.getNumberOfJobs();
 		else if (population == null)
 			throw new RuntimeException(
-					"No population found although input paramater <ShareOfPopulationWithThisDemand> is set");
+					"No population found although input parameter <ShareOfPopulationWithThisDemand> is set");
 		else {
 			double sampleSizeInputPopulation = (double) population.getAttributes().getAttribute("sampleSize");
 			double sampleTo = (double) population.getAttributes().getAttribute("samplingTo");
@@ -907,8 +893,8 @@ public final class DemandReaderFromCSV {
 			// creates shipments with a demand of 1
 			if (possibleLinksPickup.size() > demandToDistribute || possibleLinksDelivery.size() > demandToDistribute) {
 				for (int i = 0; i < demandToDistribute; i++) {
-					Link linkPickup = null;
-					Link linkDelivery = null;
+					Link linkPickup;
+					Link linkDelivery;
 					linkPickup = findNextUsedLink(scenario, polygonsInShape, possibleLinksPickup,
 							numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup, usedPickupLocations,
 							possiblePersonsPickup, nearestLinkPerPersonPickup, crsTransformationNetworkAndShape, i);
@@ -942,32 +928,32 @@ public final class DemandReaderFromCSV {
 			{
 				if (numberOfPickupLocations != null && numberOfDeliveryLocations != null)
 					throw new RuntimeException(
-							"Because the demand is higher than the number of links, the demand will be distrubted evenly over all links. You selected a certain number of pickup and delivery locations, which is not possible here!");
-				HashMap<Id<Link>, Link> demandBasesLinks = null;
-				double sumOfDemandBasedLinks = 0;
+							"Because the demand is higher than the number of links, the demand will be distributed evenly over all links. You selected a certain number of pickup and delivery locations, which is not possible here!");
+				HashMap<Id<Link>, Link> demandBasesLinks;
+				double sumOfDemandBasedLinks;
 				boolean pickupIsDemandBase = true;
-				Link linkPickup = null;
-				Link linkDelivery = null;
-				double sumOfPossibleLinkLenghtPickup = 0;
-				double sumOfPossibleLinkLenghtDelivery = 0;
-				possibleLinksPickup.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLenghtPickup));
-				possibleLinksDelivery.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLenghtDelivery));
+				Link linkPickup;
+				Link linkDelivery;
+				double sumOfPossibleLinkLengthPickup = 0;
+				double sumOfPossibleLinkLengthDelivery = 0;
+				possibleLinksPickup.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthPickup));
+				possibleLinksDelivery.values().forEach(l -> Double.sum(l.getLength(), sumOfPossibleLinkLengthDelivery));
 				if (numberOfPickupLocations == null && numberOfDeliveryLocations == null)
 					if (possibleLinksPickup.size() > possibleLinksDelivery.size()) {
 						demandBasesLinks = possibleLinksPickup;
-						sumOfDemandBasedLinks = sumOfPossibleLinkLenghtPickup;
+						sumOfDemandBasedLinks = sumOfPossibleLinkLengthPickup;
 					} else {
 						demandBasesLinks = possibleLinksDelivery;
-						sumOfDemandBasedLinks = sumOfPossibleLinkLenghtDelivery;
+						sumOfDemandBasedLinks = sumOfPossibleLinkLengthDelivery;
 						pickupIsDemandBase = false;
 					}
 				else if (numberOfPickupLocations != null) {
 					demandBasesLinks = possibleLinksDelivery;
-					sumOfDemandBasedLinks = sumOfPossibleLinkLenghtDelivery;
+					sumOfDemandBasedLinks = sumOfPossibleLinkLengthDelivery;
 					pickupIsDemandBase = false;
 				} else {
 					demandBasesLinks = possibleLinksPickup;
-					sumOfDemandBasedLinks = sumOfPossibleLinkLenghtPickup;
+					sumOfDemandBasedLinks = sumOfPossibleLinkLengthPickup;
 				}
 				for (Link demandBasedLink : demandBasesLinks.values()) {
 					int demandForThisLink;
@@ -1073,8 +1059,8 @@ public final class DemandReaderFromCSV {
 					usedPickupLocations.add(linkPickup.getId().toString());
 				if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 					usedDeliveryLocations.add(linkDelivery.getId().toString());
-				double serviceTimePickup = 0;
-				double serviceTimeDelivery = 0;
+				double serviceTimePickup;
+				double serviceTimeDelivery;
 				if (demandForThisLink == 0) {
 					serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit();
 					serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit();
@@ -1105,7 +1091,7 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Creates a job Id for a new job. If a certain Id is already used a number will
 	 * be added at the end until no existing job was the same Id.
-	 * 
+	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
 	 * @param linkPickup
@@ -1114,7 +1100,7 @@ public final class DemandReaderFromCSV {
 	 */
 	private static String createJobId(Scenario scenario, DemandInformationElement newDemandInformationElement,
 			Id<Link> linkPickup, Id<Link> linkDelivery) {
-		String newJobId = null;
+		String newJobId;
 		if (linkDelivery != null) {
 			newJobId = "Shipment_" + linkPickup + "_" + linkDelivery;
 			if (FreightUtils.getCarriers(scenario).getCarriers()
@@ -1138,13 +1124,13 @@ public final class DemandReaderFromCSV {
 				}
 			}
 		}
-		return newJobId.toString();
+		return newJobId;
 	}
 
 	/**
-	 * If jobs of a carrier have the same characteristics (timewindow, location)
+	 * If jobs of a carrier have the same characteristics (time window, location)
 	 * they will be combined to one job,
-	 * 
+	 *
 	 * @param scenario
 	 * @param newDemandInformationElement
 	 */
@@ -1152,7 +1138,7 @@ public final class DemandReaderFromCSV {
 			DemandInformationElement newDemandInformationElement) {
 
 		log.warn(
-				"The number of Jobs will be reduzed if jobs have the same characteristics (e.g. time, location, carrier)");
+				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
 		int connectedJobs = 0;
 		if (newDemandInformationElement.getTypeOfDemand().equals("shipment")) {
 			HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToRemove = new HashMap<Id<CarrierShipment>, CarrierShipment>();
@@ -1203,7 +1189,7 @@ public final class DemandReaderFromCSV {
 			for (CarrierShipment carrierShipment : shipmentsToAdd) {
 				thisCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
 			}
-			log.warn("Number of reduzed shipments: " + connectedJobs);
+			log.warn("Number of reduced shipments: " + connectedJobs);
 		}
 		if (newDemandInformationElement.getTypeOfDemand().equals("service")) {
 			HashMap<Id<CarrierService>, CarrierService> servicesToRemove = new HashMap<Id<CarrierService>, CarrierService>();
@@ -1253,7 +1239,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Finds and returns all possible links for this job.
-	 * 
+	 *
 	 * @param scenario
 	 * @param polygonsInShape
 	 * @param crsTransformationNetworkAndShape
@@ -1272,14 +1258,11 @@ public final class DemandReaderFromCSV {
 		HashMap<Id<Link>, Link> possibleLinks = new HashMap<Id<Link>, Link>();
 		if (numberOfLocations == null) {
 			for (Link link : scenario.getNetwork().getLinks().values())
-				if (numberOfLocations == null && !link.getId().toString().contains("pt")
-						&& (!link.getAttributes().getAsMap().containsKey("type")
-								|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))
-						&& FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
-								areasForLocations, crsTransformationNetworkAndShape)) {
+				if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey("type") || !link.getAttributes().getAsMap().get("type").toString().contains("motorway")) && FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
+						areasForLocations, crsTransformationNetworkAndShape)) {
 					possibleLinks.put(link.getId(), link);
 				}
-		} else if (numberOfLocations != null) {
+		} else {
 			Link newPossibleLink = null;
 			while (possibleLinks.size() < numberOfLocations) {
 				newPossibleLink = findPossibleLinkForDemand(possibleLinks, possiblePersons, nearestLinkPerPerson,
@@ -1295,7 +1278,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Finds the next link which can be used as a location.
-	 * 
+	 *
 	 * @param scenario
 	 * @param polygonsInShape
 	 * @param possibleLinks
@@ -1334,7 +1317,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Finds all persons which are possible for the demand.
-	 * 
+	 *
 	 * @param population
 	 * @param areasForServiceLocations
 	 * @param polygonsInShape
@@ -1365,18 +1348,18 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Finds the nearest link for one person.
-	 * 
+	 *
 	 * @param scenario
 	 * @param nearestLinkPerPerson
-	 * @param persons
+	 * @param person
 	 */
 	static void findLinksForPersons(Scenario scenario,
 			HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
-	
+
 		for (Link link : scenario.getNetwork().getLinks().values())
 			if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey("type")
 					|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))) {
-				
+
 				Coord homePoint = MGC.point2Coord(MGC.xy2Point((double) person.getAttributes().getAttribute("homeX"),
 						(double) person.getAttributes().getAttribute("homeY")));
 				Coord middlePointLink = FreightDemandGenerationUtils.getCoordOfMiddlePointOfLink(link);
@@ -1391,7 +1374,7 @@ public final class DemandReaderFromCSV {
 
 	/**
 	 * Searches a possible link for the demand.
-	 * 
+	 *
 	 * @param possibleLinks
 	 * @param possiblePersons
 	 * @param nearestLinkPerPerson
