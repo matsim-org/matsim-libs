@@ -22,8 +22,6 @@ package org.matsim.contrib.ev.discharging;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -60,17 +58,8 @@ public class AuxDischargingHandler
 		ElectricVehicle getVehicle(ActivityStartEvent event);
 	}
 
-	private static final class VehicleAndLink {
-		private final ElectricVehicle vehicle;
-		private final Id<Link> linkId;
-
-		private VehicleAndLink(ElectricVehicle vehicle, Id<Link> linkId) {
-			this.vehicle = vehicle;
-			this.linkId = linkId;
-		}
+	private record VehicleAndLink(ElectricVehicle vehicle, Id<Link> linkId) {
 	}
-
-	private final static Logger log = LogManager.getLogger(AuxDischargingHandler.class );
 
 	private final VehicleProvider vehicleProvider;
 	private final int auxDischargeTimeStep;
