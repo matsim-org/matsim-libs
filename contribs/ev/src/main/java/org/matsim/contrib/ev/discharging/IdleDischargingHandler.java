@@ -63,7 +63,7 @@ public class IdleDischargingHandler
 
 	private final VehicleProvider vehicleProvider;
 	private final int auxDischargeTimeStep;
-	private EventsManager eventsManager;
+	private final EventsManager eventsManager;
 
 	private final ConcurrentMap<Id<Person>, VehicleAndLink> vehicles = new ConcurrentHashMap<>();
 
@@ -77,13 +77,14 @@ public class IdleDischargingHandler
 	@Override
 	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
 		if (e.getSimulationTime() % auxDischargeTimeStep == 0) {
-			for (VehicleAndLink vehicleAndLink : vehicles.values()) {
-				ElectricVehicle ev = vehicleAndLink.vehicle;
-				double energy = ev.getAuxEnergyConsumption()
-						.calcEnergyConsumption(e.getSimulationTime(), auxDischargeTimeStep, vehicleAndLink.linkId);
+			for (VehicleAndLink vl : vehicles.values()) {
+				ElectricVehicle ev = vl.vehicle;
+				double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(e.getSimulationTime(), auxDischargeTimeStep, vl.linkId);
 				ev.getBattery()
 						.dischargeEnergy(energy, missingEnergy -> eventsManager.processEvent(
-								new MissingEnergyEvent(e.getSimulationTime(), ev.getId(), vehicleAndLink.linkId, missingEnergy)));
+								new MissingEnergyEvent(e.getSimulationTime(), ev.getId(), vl.linkId, missingEnergy)));
+				eventsManager.processEvent(
+						new IdlingEnergyConsumptionEvent(e.getSimulationTime(), ev.getId(), vl.linkId, energy, ev.getBattery().getCharge()));
 			}
 		}
 	}

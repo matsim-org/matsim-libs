@@ -63,7 +63,7 @@ public class DriveDischargingHandler
 	}
 
 	private final Network network;
-	private EventsManager eventsManager;
+	private final EventsManager eventsManager;
 	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
 	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
@@ -117,6 +117,7 @@ public class DriveDischargingHandler
 			ev.getBattery()
 					.dischargeEnergy(energy,
 							missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(eventTime, ev.getId(), link.getId(), missingEnergy)));
+			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(eventTime, vehicleId, linkId, energy, ev.getBattery().getCharge()));
 
 			//FIXME emit a DriveOnLinkEnergyConsumptionEvent instead of calculating it here...
 			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
