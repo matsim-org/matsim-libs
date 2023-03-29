@@ -60,28 +60,27 @@ public class EvMobsimListener implements MobsimBeforeCleanupListener {
 
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
-
-		try {
-			CSVPrinter csvPrinter = new CSVPrinter(
-					Files.newBufferedWriter(Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "chargingStats.csv"))),
-					CSVFormat.DEFAULT.withDelimiter(';')
-							.withHeader("ChargerId", "chargeStartTime", "chargeEndTime", "ChargingDuration", "xCoord", "yCoord",
-									"energyTransmitted_kWh"));
+		try (CSVPrinter csvPrinter = new CSVPrinter(
+				Files.newBufferedWriter(Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "chargingStats.csv"))),
+				CSVFormat.DEFAULT.withDelimiter(';')
+						.withHeader("ChargerId", "chargeStartTime", "chargeEndTime", "ChargingDuration", "xCoord", "yCoord",
+								"energyTransmitted_kWh"))) {
 			for (ChargerPowerCollector.ChargingLogEntry e : chargerPowerCollector.getLogList()) {
 				double energyKWh = Math.round(EvUnits.J_to_kWh(e.transmitted_Energy()) * 10.) / 10.;
 				csvPrinter.printRecord(e.charger().getId(), Time.writeTime(e.chargeStart()), Time.writeTime(e.chargeEnd()),
 						Time.writeTime(e.chargeEnd() - e.chargeStart()), e.charger().getCoord().getX(), e.charger().getCoord().getY(), energyKWh);
 			}
-			csvPrinter.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
-			CSVPrinter csvPrinter2 = new CSVPrinter(Files.newBufferedWriter(
-					Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "evConsumptionPerLink.csv"))),
-					CSVFormat.DEFAULT.withDelimiter(';').withHeader("Link", "TotalConsumptionPerKm", "TotalConsumption"));
+		try (CSVPrinter csvPrinter2 = new CSVPrinter(Files.newBufferedWriter(
+				Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "evConsumptionPerLink.csv"))),
+				CSVFormat.DEFAULT.withDelimiter(';').withHeader("Link", "TotalConsumptionPerKm", "TotalConsumption"))) {
 			for (Map.Entry<Id<Link>, Double> e : energyConsumptionCollector.getEnergyConsumptionPerLink().entrySet()) {
 				csvPrinter2.printRecord(e.getKey(), (EvUnits.J_to_kWh(e.getValue())) / (network.getLinks().get(e.getKey()).getLength() / 1000.0),
 						EvUnits.J_to_kWh(e.getValue()));
 			}
-			csvPrinter2.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
