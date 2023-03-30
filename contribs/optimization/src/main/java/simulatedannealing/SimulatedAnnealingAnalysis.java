@@ -6,22 +6,17 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedAnnealing;
+package simulatedannealing;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;

@@ -6,16 +6,16 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedAnnealing;
+package simulatedannealing;
 
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import simulatedAnnealing.acceptor.Acceptor;
-import simulatedAnnealing.cost.CostCalculator;
-import simulatedAnnealing.perturbation.Perturbator;
-import simulatedAnnealing.perturbation.PerturbatorFactory;
-import simulatedAnnealing.temperature.TemperatureFunction;
+import simulatedannealing.acceptor.Acceptor;
+import simulatedannealing.cost.CostCalculator;
+import simulatedannealing.perturbation.Perturbator;
+import simulatedannealing.perturbation.PerturbatorFactory;
+import simulatedannealing.temperature.TemperatureFunction;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 

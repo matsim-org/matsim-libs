@@ -6,7 +6,7 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedAnnealing;
+package simulatedannealing;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -15,8 +15,7 @@ import org.junit.rules.TemporaryFolder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import simulatedAnnealing.perturbation.ChainedPerturbatorParams;
-import simulatedAnnealing.temperature.TemperatureFunction;
+import simulatedannealing.temperature.TemperatureFunction;
 
 import java.io.IOException;
 import java.nio.file.Path;

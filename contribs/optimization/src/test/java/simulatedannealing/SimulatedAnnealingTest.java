@@ -6,7 +6,7 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedAnnealing;
+package simulatedannealing;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -17,15 +17,14 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.gbl.MatsimRandom;
-import simulatedAnnealing.acceptor.Acceptor;
-import simulatedAnnealing.acceptor.DefaultAnnealingAcceptor;
-import simulatedAnnealing.cost.CostCalculator;
-import simulatedAnnealing.perturbation.PerturbatorFactory;
-import simulatedAnnealing.temperature.NonMonotonicAdaptiveTemperatureFunction;
-import simulatedAnnealing.temperature.TemperatureFunction;
+import simulatedannealing.acceptor.Acceptor;
+import simulatedannealing.acceptor.DefaultAnnealingAcceptor;
+import simulatedannealing.cost.CostCalculator;
+import simulatedannealing.perturbation.PerturbatorFactory;
+import simulatedannealing.temperature.NonMonotonicAdaptiveTemperatureFunction;
+import simulatedannealing.temperature.TemperatureFunction;
 
 import java.util.Random;
 

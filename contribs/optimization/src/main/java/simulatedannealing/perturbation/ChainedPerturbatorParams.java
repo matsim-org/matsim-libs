@@ -6,11 +6,11 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedAnnealing.perturbation;
+package simulatedannealing.perturbation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import simulatedAnnealing.SimulatedAnnealingConfigGroup;
+import simulatedannealing.SimulatedAnnealingConfigGroup;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

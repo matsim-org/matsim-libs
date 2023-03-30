@@ -6,11 +6,11 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedAnnealing.perturbation;
+package simulatedannealing.perturbation;
 
 import org.matsim.contrib.common.util.random.WeightedRandomSelection;
 import org.matsim.core.gbl.MatsimRandom;
-import simulatedAnnealing.SimulatedAnnealing;
+import simulatedannealing.SimulatedAnnealing;
 
 import java.util.*;
 

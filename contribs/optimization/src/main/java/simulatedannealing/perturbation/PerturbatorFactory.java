@@ -6,10 +6,10 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedAnnealing.perturbation;
+package simulatedannealing.perturbation;
 
-import simulatedAnnealing.SimulatedAnnealing;
-import simulatedAnnealing.SimulatedAnnealingListener;
+import simulatedannealing.SimulatedAnnealing;
+import simulatedannealing.SimulatedAnnealingListener;
 
 /**
  *
