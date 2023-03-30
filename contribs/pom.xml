@@ -92,11 +92,11 @@
 		<module>sbb-extensions</module>
 		<module>shared_mobility</module>
 		<module>signals</module>
+		<module>simulatedannealing</module>
 		<module>socnetsim</module>
 		<module>sumo</module>
 		<module>taxi</module>
 		<module>vsp</module>
-        <module>optimization</module>
     </modules>
 
 	<dependencies>
