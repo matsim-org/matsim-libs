@@ -186,7 +186,6 @@ final class EvNetworkRoutingModule implements RoutingModule {
 				});
 		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
-		double lastCharge = pseudoVehicle.getBattery().getCharge();
 		double linkEnterTime = basicLeg.getDepartureTime().seconds();
 		for (Link l : links) {
 			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime().seconds(), null, null);
