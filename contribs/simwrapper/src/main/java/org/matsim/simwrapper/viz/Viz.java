@@ -14,7 +14,6 @@ public abstract class Viz {
 	public String description;
 	public Double height;
 	public Double width;
-	public String dataset;
 
 	protected Viz(String type) {
 		this.type = type;

@@ -3,6 +3,7 @@ package org.matsim.simwrapper;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.analysis.traffic.LinkStats;
+import org.matsim.simwrapper.dashboard.StuckAgentDashboard;
 import org.matsim.simwrapper.viz.PieChart;
 import org.matsim.simwrapper.viz.TextBlock;
 import org.matsim.testcases.MatsimTestUtils;
@@ -20,8 +21,12 @@ public class SimWrapperTest {
 
 		SimWrapper simWrapper = SimWrapper.create();
 
+		simWrapper.addDashboard(new StuckAgentDashboard());
+
 		simWrapper.addDashboard((header, layout) -> {
-			header.title = "Test";
+			header.title = "Test Header";
+			header.tab = "Test Tab";
+			header.description = "Test Description";
 
 			layout.row("first", TextBlock.class, (viz, data) -> {
 				viz.title = "Title here";
