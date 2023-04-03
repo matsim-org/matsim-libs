@@ -56,9 +56,9 @@ public class RunCreateSmallScaleCommercialTrafficTest {
 		String landuseConfiguration = "useExistingDataDistribution";
 		String trafficType = "commercialTraffic";
 		String includeExistingModels = "true";
-		String zoneShapeFileName = "shp/testZones.shp";
-		String buildingsShapeFileName = "shp/testBuildings.shp";
-		String landuseShapeFileName = "shp/testLanduse.shp";
+		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
+		String buildingsShapeFileName = utils.getPackageInputDirectory() + "/shp/testBuildings.shp";
+		String landuseShapeFileName = utils.getPackageInputDirectory() + "/shp/testLanduse.shp";
 		String shapeCRS = "EPSG:4326";
 
 		new CreateSmallScaleCommercialTrafficDemand().execute(
