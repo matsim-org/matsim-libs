@@ -136,7 +136,7 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/**
-	 * Creates a population including the plans in preparation for the MATSim run.
+	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
 
 	static void createPlansBasedOnCarrierPlans(Scenario scenario, String usedTrafficType, Path output,
@@ -203,11 +203,15 @@ public class SmallScaleCommercialTrafficUtils {
 			}));
 			population.addPerson(newPerson);
 		}
+
+		String outputPopulationFile;
 		if (nameOutputPopulation == null)
-			PopulationUtils.writePopulation(population,
-				output.toString() + "/"+modelName +"_" + usedTrafficType + "_" + sampleName + "pct_plans.xml.gz");
-		else
-			PopulationUtils.writePopulation(population, output.toString() + "/" + nameOutputPopulation + ".xml.gz");
+			outputPopulationFile = output.toString() + "/"+modelName +"_" + usedTrafficType + "_" + sampleName + "pct_plans.xml.gz";
+		else {
+			CreateDifferentPlansForFreightPopulation.createPlanVariantsForPopulations("changeStartingTimes", population, 5, 6*3600, 14*3600, 8*3600);
+			outputPopulationFile = output.toString() + "/" + nameOutputPopulation;
+		}
+		PopulationUtils.writePopulation(population,outputPopulationFile);
 		scenario.getPopulation().getPersons().clear();
 	}
 	static String getSampleNameOfOutputFolder(double sample) {
