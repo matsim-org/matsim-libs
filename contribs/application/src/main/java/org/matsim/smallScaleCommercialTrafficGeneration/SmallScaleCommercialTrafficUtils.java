@@ -59,6 +59,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Utils for the SmallScaleFreightTraffic
@@ -144,6 +145,8 @@ public class SmallScaleCommercialTrafficUtils {
 		Population population = scenario.getPopulation();
 		PopulationFactory popFactory = population.getFactory();
 
+		Map<String, AtomicLong> idCounter = new HashMap<>();
+
 		Population populationFromCarrier = (Population) scenario.getScenarioElement("allpersons");
 		for (Person person : populationFromCarrier.getPersons().values()) {
 
@@ -179,7 +182,13 @@ public class SmallScaleCommercialTrafficUtils {
 					plan.addLeg(legActivity);
 				}
 			}
-			Person newPerson = popFactory.createPerson(person.getId());
+
+			String key = String.format("%s_%s_%s", relatedCarrier.getAttributes().getAttribute("tourStartArea"), relatedCarrier.getAttributes().getAttribute("purpose"), subpopulation);
+
+			long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
+
+			Person newPerson = popFactory.createPerson(Id.createPersonId(key+"_"+id));
+
 			newPerson.addPlan(plan);
 			PopulationUtils.putSubpopulation(newPerson, subpopulation);
 			newPerson.getAttributes().putAttribute("purpose",
