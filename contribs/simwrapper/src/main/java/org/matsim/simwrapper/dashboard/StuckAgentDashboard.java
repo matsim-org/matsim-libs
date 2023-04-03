@@ -7,7 +7,6 @@ import org.matsim.simwrapper.viz.Bar;
 import org.matsim.simwrapper.viz.PieChart;
 import org.matsim.simwrapper.viz.TextBlock;
 
-
 // TODO: doc
 public class StuckAgentDashboard implements Dashboard {
 
