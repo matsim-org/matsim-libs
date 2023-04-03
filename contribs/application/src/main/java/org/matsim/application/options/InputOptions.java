@@ -177,8 +177,9 @@ public final class InputOptions {
 	 */
 	public static String argName(String require) {
 		String[] split = require.split("\\.");
+		String s = split.length > 0 ? split[0] : require;
 
-		return split[0].replaceAll("_|/\"|\\\\|:|/", "-");
+		return s.replaceAll("_|/\"|\\\\|:|/", "-");
 	}
 
 	/**
