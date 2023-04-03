@@ -10,7 +10,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.run.ShiftDrtModeOptimi
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeQSimModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -38,7 +38,7 @@ public class EDrtOperationsControlerCreator {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				this.bind(AuxDischargingHandler.VehicleProvider.class).to(ShiftOperatingVehicleProvider.class);
+				this.bind(IdleDischargingHandler.VehicleProvider.class).to(ShiftOperatingVehicleProvider.class);
 			}
 		});
 
