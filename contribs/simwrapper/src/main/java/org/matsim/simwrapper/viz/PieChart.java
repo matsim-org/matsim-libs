@@ -13,6 +13,7 @@ public class PieChart extends Viz {
 	 * this is useful for MATSim outputs which list every
 	 * iteration's output, if you are only in the final iteration.
 	 */
+	@JsonProperty(required = true)
 	public String useLastRow;
 
 	/**

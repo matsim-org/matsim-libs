@@ -40,7 +40,7 @@ public class Heatmap extends Viz{
 	 */
 	public String flipAxes;
 
-	protected Heatmap() {
+	public Heatmap() {
 		super("heatmap");
 	}
 }

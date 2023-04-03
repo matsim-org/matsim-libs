@@ -6,10 +6,7 @@ import org.matsim.simwrapper.viz.Viz;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Helper class to define the layout of a {@link Dashboard}.
@@ -52,7 +49,7 @@ public final class Layout {
 	 */
 	Map<String, List<Viz>> create(Data data) {
 
-		Map<String, List<Viz>> rows = new HashMap<>();
+		Map<String, List<Viz>> rows = new LinkedHashMap<>();
 
 		for (Holder layout : layouts) {
 

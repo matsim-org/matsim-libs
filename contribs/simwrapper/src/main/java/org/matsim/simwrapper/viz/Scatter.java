@@ -1,7 +1,7 @@
 package org.matsim.simwrapper.viz;
 
 public class Scatter extends Plot{
-	protected Scatter() {
+	public Scatter() {
 		super("scatter");
 	}
 }

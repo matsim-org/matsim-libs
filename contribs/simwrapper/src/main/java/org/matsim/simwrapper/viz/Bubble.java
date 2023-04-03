@@ -7,7 +7,7 @@ public class Bubble extends Plot{
 	 */
 	public String bubble;
 
-	protected Bubble() {
+	public Bubble() {
 		super("bubble");
 	}
 }
