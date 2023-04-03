@@ -59,6 +59,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Utils for the SmallScaleFreightTraffic
@@ -135,14 +136,16 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/**
-	 * Creates a population including the plans in preparation for the MATSim run.
+	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
 
 	static void createPlansBasedOnCarrierPlans(Scenario scenario, String usedTrafficType, Path output,
-											   String modelName, String sampleName) {
+											   String modelName, String sampleName, String nameOutputPopulation) {
 
 		Population population = scenario.getPopulation();
 		PopulationFactory popFactory = population.getFactory();
+
+		Map<String, AtomicLong> idCounter = new HashMap<>();
 
 		Population populationFromCarrier = (Population) scenario.getScenarioElement("allpersons");
 		for (Person person : populationFromCarrier.getPersons().values()) {
@@ -179,7 +182,13 @@ public class SmallScaleCommercialTrafficUtils {
 					plan.addLeg(legActivity);
 				}
 			}
-			Person newPerson = popFactory.createPerson(person.getId());
+
+			String key = String.format("%s_%s_%s", relatedCarrier.getAttributes().getAttribute("tourStartArea"), relatedCarrier.getAttributes().getAttribute("purpose"), subpopulation);
+
+			long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
+
+			Person newPerson = popFactory.createPerson(Id.createPersonId(key+"_"+id));
+
 			newPerson.addPlan(plan);
 			PopulationUtils.putSubpopulation(newPerson, subpopulation);
 			newPerson.getAttributes().putAttribute("purpose",
@@ -194,8 +203,15 @@ public class SmallScaleCommercialTrafficUtils {
 			}));
 			population.addPerson(newPerson);
 		}
-		PopulationUtils.writePopulation(population,
-				output.toString() + "/"+modelName +"_" + usedTrafficType + "_" + sampleName + "pct_plans.xml.gz");
+
+		String outputPopulationFile;
+		if (nameOutputPopulation == null)
+			outputPopulationFile = output.toString() + "/"+modelName +"_" + usedTrafficType + "_" + sampleName + "pct_plans.xml.gz";
+		else {
+			CreateDifferentPlansForFreightPopulation.createPlanVariantsForPopulations("changeStartingTimes", population, 5, 6*3600, 14*3600, 8*3600);
+			outputPopulationFile = output.toString() + "/" + nameOutputPopulation;
+		}
+		PopulationUtils.writePopulation(population,outputPopulationFile);
 		scenario.getPopulation().getPersons().clear();
 	}
 	static String getSampleNameOfOutputFolder(double sample) {
