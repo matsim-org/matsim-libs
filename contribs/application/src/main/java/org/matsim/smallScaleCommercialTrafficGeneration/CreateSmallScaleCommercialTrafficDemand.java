@@ -142,6 +142,12 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	@CommandLine.Option(names = "--resistanceFactor", defaultValue = "0.005", description = "ResistanceFactor for the trip distribution")
 	private double resistanceFactor;
 
+	@CommandLine.Option(names = "--nameOutputPopulation", description = "Name of the output Population")
+	private String nameOutputPopulation;
+
+	@CommandLine.Option(names = "--PathOutput", description = "Path for the output")
+	private Path output;
+
 	private SplittableRandom rnd;
 
 	public static void main(String[] args) {
@@ -156,8 +162,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 
-		Config config = readAndCheckConfig(inputDataDirectory, modelName, sampleName);
-		Path output = Path.of(config.controler().getOutputDirectory());
+		Config config = readAndCheckConfig(inputDataDirectory, modelName, sampleName, output);
+
+		output = Path.of(config.controler().getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		String carriersFileLocation;
@@ -235,7 +242,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		Controler controler = prepareControler(scenario);
 		controler.run();
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
-				usedTrafficType.toString(), output, modelName, sampleName);
+				usedTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation);
 		return 0;
 	}
 
@@ -407,14 +414,16 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 
 	/** Reads and checks config if all necessary parameter are set.
 	 */
-	private Config readAndCheckConfig(Path inputDataDirectory, String modelName, String sampleName) throws Exception {
+	private Config readAndCheckConfig(Path inputDataDirectory, String modelName, String sampleName, Path output) throws Exception {
 
 		Config config = ConfigUtils.loadConfig(inputDataDirectory.resolve("config_demand.xml").toString());
-
-		config.controler().setOutputDirectory(Path.of(config.controler().getOutputDirectory()).resolve(modelName)
+		if (output == null)
+			config.controler().setOutputDirectory(Path.of(config.controler().getOutputDirectory()).resolve(modelName)
 				.resolve(usedTrafficType.toString() + "_" + sampleName + "pct" + "_"
 						+ java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay() + "_" + resistanceFactor)
 				.toString());
+		else
+			config.controler().setOutputDirectory(output.toString());
 		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
 				config.controler().getOverwriteFileSetting(), ControlerConfigGroup.CompressionType.gzip);
 		new File(Path.of(config.controler().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();

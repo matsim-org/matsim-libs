@@ -139,7 +139,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 
 	static void createPlansBasedOnCarrierPlans(Scenario scenario, String usedTrafficType, Path output,
-											   String modelName, String sampleName) {
+											   String modelName, String sampleName, String nameOutputPopulation) {
 
 		Population population = scenario.getPopulation();
 		PopulationFactory popFactory = population.getFactory();
@@ -194,8 +194,11 @@ public class SmallScaleCommercialTrafficUtils {
 			}));
 			population.addPerson(newPerson);
 		}
-		PopulationUtils.writePopulation(population,
+		if (nameOutputPopulation == null)
+			PopulationUtils.writePopulation(population,
 				output.toString() + "/"+modelName +"_" + usedTrafficType + "_" + sampleName + "pct_plans.xml.gz");
+		else
+			PopulationUtils.writePopulation(population, output.toString() + "/" + nameOutputPopulation + ".xml.gz");
 		scenario.getPopulation().getPersons().clear();
 	}
 	static String getSampleNameOfOutputFolder(double sample) {
