@@ -705,9 +705,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 
 		Carrier thisCarrier = CarrierUtils.createCarrier(Id.create(carrierName, Carrier.class));
 		if (trafficType.equals("businessTraffic") && purpose == 3)
-			thisCarrier.getAttributes().putAttribute("subpopulation", trafficType+"_withMC");
+			thisCarrier.getAttributes().putAttribute("subpopulation", trafficType+"_service");
 		else
-			thisCarrier.getAttributes().putAttribute("subpopulation", trafficType+"_noMC");
+			thisCarrier.getAttributes().putAttribute("subpopulation", trafficType);
 
 		thisCarrier.getAttributes().putAttribute("purpose", purpose);
 		thisCarrier.getAttributes().putAttribute("tourStartArea", startZone);
