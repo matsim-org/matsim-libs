@@ -29,19 +29,31 @@ import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import com.google.inject.Inject;
 
 /*
  * created by jbischoff, 26.10.2018
  */
-public class EvMobsimListener implements MobsimBeforeCleanupListener {
+public class EvMobsimListener implements MobsimBeforeCleanupListener, MobsimAfterSimStepListener {
 
 	@Inject
 	EnergyConsumptionCollector energyConsumptionCollector;
@@ -53,7 +65,10 @@ public class EvMobsimListener implements MobsimBeforeCleanupListener {
 	IterationCounter iterationCounter;
 	@Inject
 	Network network;
-
+	@Inject
+	EvConfigGroup evConfigGroup;
+	@Inject
+	ChargerPowerTimeProfileCollectorProvider chargerPowerTimeProfileCollectorProvider;
 	@Inject
 	EvMobsimListener() {
 	} // to make the constructor non-public.
@@ -83,6 +98,34 @@ public class EvMobsimListener implements MobsimBeforeCleanupListener {
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	/** After each chargeTimeStep, the power transfer from each station to the vehicles present at that station (vehiclesAtCharger) is calculated.
+	 * To do so, the energy at the previous chargeTimeStep needs to be known (vehiclesEnergyPreviousTimeStep). The power is then passed in to the
+	 * chargerPowerTimeProfileCollectorProvider. */
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
+		if ((event.getSimulationTime() + 1) % evConfigGroup.chargeTimeStep == 0) {
+			ElectricFleet evFleet = chargerPowerTimeProfileCollectorProvider.getEvFleet();
+			Map<Id<Charger>, List<Id<Vehicle>>> vehiclesAtCharger = chargerPowerTimeProfileCollectorProvider.getVehiclesAtCharger();
+			Map<Id<Vehicle>, Double> vehiclesEnergyPreviousTimeStep = chargerPowerTimeProfileCollectorProvider.getVehiclesEnergyPreviousTimeStep();
+			vehiclesAtCharger.forEach((charger, vehicleList) -> {
+				if (!vehicleList.isEmpty()) {
+					double energy = vehicleList.stream().mapToDouble(vehicleId -> EvUnits.J_to_kWh((Objects.requireNonNull(evFleet.getElectricVehicles().get(vehicleId)).getBattery()
+							.getCharge() - vehiclesEnergyPreviousTimeStep.get(vehicleId))*(3600.0/evConfigGroup.chargeTimeStep))).sum();
+					if (!Double.isNaN(energy) && !(energy == 0.0)) {
+						chargerPowerTimeProfileCollectorProvider.setChargerEnergy(charger, energy);
+						vehicleList.forEach(vehicleId -> chargerPowerTimeProfileCollectorProvider
+								.setVehiclesEnergyPreviousTimeStep(vehicleId, Objects.requireNonNull(evFleet.getElectricVehicles().get(vehicleId)).getBattery().getCharge()));
+					} else {
+						chargerPowerTimeProfileCollectorProvider.setChargerEnergy(charger, 0.0);
+					}
+				} else {
+					chargerPowerTimeProfileCollectorProvider.setChargerEnergy(charger, 0.0);
+				}
+			});
+
 		}
 	}
 }
