@@ -190,7 +190,8 @@ public class ApplicationUtils {
 		if (path.isPresent())
 			return path.get().toString();
 
-		path = matchSuffix(name + ".gz", dir);
+		// Match more general pattern at last
+		path = matchPattern( ".+\\.[a-zA-Z0-9]*_" + name + "\\..+", dir);
 		if (path.isPresent())
 			return path.get().toString();
 
@@ -200,6 +201,14 @@ public class ApplicationUtils {
 	private static Optional<Path> matchSuffix(String suffix, Path dir) {
 		try (Stream<Path> stream = Files.list(dir)) {
 			return stream.filter(p -> p.toString().endsWith(suffix)).findFirst();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private static Optional<Path> matchPattern(String pattern, Path dir) {
+		try (Stream<Path> stream = Files.list(dir)) {
+			return stream.filter(p -> p.toString().matches(pattern)).findFirst();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
