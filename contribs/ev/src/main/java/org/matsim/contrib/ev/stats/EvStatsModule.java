@@ -56,6 +56,9 @@ public class EvStatsModule extends AbstractModule {
 					bind(EnergyConsumptionCollector.class).asEagerSingleton();
 					addMobsimScopeEventHandlerBinding().to(EnergyConsumptionCollector.class);
 					// add more time profiles if necessary
+					bind(ChargerPowerTimeProfileCollectorProvider.class).asEagerSingleton();
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerPowerTimeProfileCollectorProvider.class);
+					addMobsimScopeEventHandlerBinding().to(ChargerPowerTimeProfileCollectorProvider.class);
 				}
 			}
 		});
