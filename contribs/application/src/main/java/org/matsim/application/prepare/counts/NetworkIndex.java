@@ -129,7 +129,10 @@ public class NetworkIndex<T> {
 			Map.Entry<Link, Geometry> next = it.next();
 			Link link = next.getKey();
 			for (BiPredicate<Link, T> predicate : this.filter) {
-				if (!predicate.test(link, toMatch)) it.remove();
+				if (!predicate.test(link, toMatch)) {
+					it.remove();
+					break;
+				}
 			}
 		}
 	}
