@@ -40,9 +40,9 @@ import org.matsim.vehicles.Vehicle;
 import com.google.inject.Inject;
 
 /**
- * Because in QSim and JDEQSim vehicles enter and leave traffic at the end of links, we skip the first link when
+ * Because in QSim vehicles enter and leave traffic at the end of links, we skip the first link when
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
- * aux discharge process (see {@link AuxDischargingHandler}).
+ * idle discharge process (see {@link IdleDischargingHandler}).
  */
 public class DriveDischargingHandler
 		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler {
@@ -63,10 +63,9 @@ public class DriveDischargingHandler
 	}
 
 	private final Network network;
-	private EventsManager eventsManager;
+	private final EventsManager eventsManager;
 	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
-	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
 	@Inject
 	DriveDischargingHandler(ElectricFleet data, Network network, EventsManager eventsManager) {
@@ -113,19 +112,12 @@ public class DriveDischargingHandler
 			ElectricVehicle ev = evDrive.ev;
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt) + ev.getAuxEnergyConsumption()
 					.calcEnergyConsumption(eventTime - tt, tt, linkId);
-			//Energy consumption might be negative on links with negative slope
+			//Energy consumption may be negative on links with negative slope
 			ev.getBattery()
 					.dischargeEnergy(energy,
 							missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(eventTime, ev.getId(), link.getId(), missingEnergy)));
-
-			//FIXME emit a DriveOnLinkEnergyConsumptionEvent instead of calculating it here...
-			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
-			energyConsumptionPerLink.put(linkId, linkConsumption);
+			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(eventTime, vehicleId, linkId, energy, ev.getBattery().getCharge()));
 		}
 		return evDrive;
-	}
-
-	public Map<Id<Link>, Double> getEnergyConsumptionPerLink() {
-		return energyConsumptionPerLink;
 	}
 }

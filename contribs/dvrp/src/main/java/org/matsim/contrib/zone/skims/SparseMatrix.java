@@ -34,7 +34,7 @@ import com.google.common.base.Preconditions;
 /**
  * @author Michal Maciejewski (michalm)
  */
-final class SparseMatrix {
+public final class SparseMatrix {
 	//Range of unsigned short: 0-65535 (18:12:15)
 	//In case 18 hours is not enough, we can reduce the resolution from seconds to tens of seconds
 	private static final int MAX_UNSIGNED_SHORT = Short.MAX_VALUE - Short.MIN_VALUE;
@@ -122,7 +122,7 @@ final class SparseMatrix {
 				: -1; // value not present if no row
 	}
 
-	int get(Node fromNode, Node toNode) {
+	public int get(Node fromNode, Node toNode) {
 		return get(fromNode.getId().index(), toNode.getId().index());
 	}
 

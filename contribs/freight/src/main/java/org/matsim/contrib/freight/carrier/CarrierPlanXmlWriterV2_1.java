@@ -176,6 +176,7 @@ import java.util.*;
 	}
 
 	private void writeServices(Carrier carrier, BufferedWriter writer) throws IOException {
+		if(carrier.getServices().isEmpty()) return;
 		writer.write("\t\t<services>\n");
 		for (CarrierService s : carrier.getServices().values()) {
 			serviceMap.put(s, s.getId());
