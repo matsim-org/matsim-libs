@@ -47,7 +47,7 @@ For information to implement your own estimators refer to `TripEstimator` and `L
 
 ## Plan strategies
 
-Available plan strategies are available as constants in `InformedModeChoiceModule`.
+All new plan strategies are available as constants in `InformedModeChoiceModule`.
 
 Replanning strategies can be added as usual either in the config or via code, e.g:
 ```java
@@ -60,3 +60,4 @@ strategies.add(new StrategyConfigGroup.StrategySettings()
 ## Config
 
 There is a dedicated config group named `InformedModeChoiceConfigGroup`, in which the annealing and used pruner can be configured.
+Please refer to the comments there for more information.
