@@ -4,7 +4,7 @@
 This contrib provides mode choice algorithms that can be used to replace the standard random based algorithms in MATSim.
 
 The main idea is that utilities of available modes are estimated in the planning phase and higher ranked alternatives selected with higher probability.
-Unpromising plan candidates can also be removed altogether, with a freely flexible pruning functionality.
+Unpromising plan candidates can also be removed altogether, with a flexible pruning functionality.
 Unlike the default mode choice implementation, it is also possibly to freely configure constraints on mode combinations.
 
 The whole methodology is described in the paper below.
