@@ -367,11 +367,11 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					}
 				}
 			} else if (planElement instanceof Activity) {
-				if (((Activity)planElement).getType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)) {
+				if (((Activity)planElement).getType().contains( UrbanEVModule.PLUGIN_INTERACTION )) {
 					Leg legToCharger = (Leg)modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(planElement) - 1);
 					chargingBegin = legToCharger.getDepartureTime().seconds() + legToCharger.getTravelTime().seconds();
 
-				} else if (((Activity)planElement).getType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)) {
+				} else if (((Activity)planElement).getType().contains( UrbanEVModule.PLUGOUT_INTERACTION )) {
 
 					Leg legFromCharger = (Leg)modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(planElement) + 1);
 					if (chargingBegin == null)
@@ -518,7 +518,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 		//add plugout act
 		Activity plugOutAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(), chargingLink.getId(),
-				routingMode + UrbanVehicleChargingHandler.PLUGOUT_IDENTIFIER);
+				routingMode + UrbanEVModule.PLUGOUT_IDENTIFIER );
 		plugOutAct = PopulationUtils.createActivity(plugOutAct); // createStageActivity... creates a InteractionActivity where duration cannot be set.
 		trip.add(plugOutAct);
 		now = timeInterpretation.decideOnElementEndTime(accessLeg, now).seconds();
@@ -575,7 +575,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 		//add plugin act
 		Activity pluginAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(), chargingLink.getId(),
-				routingMode + UrbanVehicleChargingHandler.PLUGIN_IDENTIFIER);
+				routingMode + UrbanEVModule.PLUGIN_IDENTIFIER );
 		pluginAct = PopulationUtils.createActivity(pluginAct); // createStageActivity... creates a InteractionActivity where duration cannot be set.
 		trip.add(pluginAct);
 
@@ -676,8 +676,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			if (planElements.get(ii) instanceof Activity) {
 				Activity act = (Activity)planElements.get(ii);
 				if (!StageActivityTypeIdentifier.isStageActivity(act.getType()) || act.getType()
-						.contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION) || act.getType()
-						.contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)) {
+						.contains( UrbanEVModule.PLUGIN_INTERACTION ) || act.getType()
+												    .contains( UrbanEVModule.PLUGOUT_INTERACTION )) {
 					prevAct = act;
 				}
 			}
@@ -700,8 +700,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			if (planElements.get(ii) instanceof Activity) {
 				Activity act = (Activity)planElements.get(ii);
 				if (!StageActivityTypeIdentifier.isStageActivity(act.getType()) || act.getType()
-						.contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION) || act.getType()
-						.contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)) {
+						.contains( UrbanEVModule.PLUGIN_INTERACTION ) || act.getType()
+												    .contains( UrbanEVModule.PLUGOUT_INTERACTION )) {
 					theIndex = ii;
 				}
 			}

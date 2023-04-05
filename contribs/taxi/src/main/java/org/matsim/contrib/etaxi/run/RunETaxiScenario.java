@@ -19,12 +19,7 @@
 
 package org.matsim.contrib.etaxi.run;
 
-import static java.util.stream.Collectors.toList;
 import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
-
-import java.net.URL;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -37,7 +32,7 @@ import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
-import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
 import org.matsim.contrib.ev.temperature.TemperatureService;
@@ -50,7 +45,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -86,7 +80,7 @@ public class RunETaxiScenario {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
+				this.bind(IdleDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
 			}
 		});
 

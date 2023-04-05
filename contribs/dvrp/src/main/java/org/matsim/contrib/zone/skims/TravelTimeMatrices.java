@@ -56,19 +56,20 @@ public final class TravelTimeMatrices {
 		}
 	}
 
-	public static SparseMatrix calculateTravelTimeSparseMatrix(RoutingParams params, double maxDistance, double departureTime) {
+	public static SparseMatrix calculateTravelTimeSparseMatrix(RoutingParams params, double maxDistance, double maxTravelTime, double departureTime) {
 		SparseMatrix travelTimeMatrix = new SparseMatrix();
 		var nodes = params.routingNetwork.getNodes().values();
 		var counter = "DVRP free-speed TT sparse matrix: node ";
-		Calculation<Node> calculation = (lcpTree, n) -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree, maxDistance);
+		Calculation<Node> calculation = (lcpTree, n) -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree, maxDistance,
+				maxTravelTime);
 		calculate(params, nodes, calculation, counter);
 		return travelTimeMatrix;
 	}
 
 	private static void computeForDepartureNode(Node fromNode, Collection<? extends Node> nodes, double departureTime, SparseMatrix sparseMatrix,
-			LeastCostPathTree lcpTree, double maxDistance) {
+			LeastCostPathTree lcpTree, double maxDistance, double maxTravelTime) {
 		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null,
-				(nodeIndex, arrivalTime, travelCost, distance, departTime) -> distance >= maxDistance);
+				(nodeIndex, arrivalTime, travelCost, distance, departTime) -> distance >= maxDistance && arrivalTime >= departTime + maxTravelTime);
 
 		List<NodeAndTime> neighborNodes = new ArrayList<>();
 		for (Node toNode : nodes) {

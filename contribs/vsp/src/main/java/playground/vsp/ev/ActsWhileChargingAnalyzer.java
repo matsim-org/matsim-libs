@@ -21,7 +21,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
-import playground.vsp.ev.UrbanVehicleChargingHandler;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -87,7 +86,7 @@ class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, ActivityEn
                     .acts.add(event.getActType());
 
         }
-        else if (event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)){
+        else if (event.getActType().contains( UrbanEVModule.PLUGIN_INTERACTION )){
             String chargingActAndTime = event.getActType()+ event.getTime();
             containers.stream()
                     .filter(container -> container.personId.equals(event.getPersonId()))
