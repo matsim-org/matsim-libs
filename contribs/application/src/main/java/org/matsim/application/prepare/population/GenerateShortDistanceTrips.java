@@ -60,6 +60,9 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
     @CommandLine.Option(names = "--max-duration", description = "Maximum duration in seconds", defaultValue = "3600")
     private double maxDuration;
 
+	@CommandLine.Option(names = "--act-type", description = "Name of the generated activity type", defaultValue = "other")
+	private String actType;
+
     private final Random rnd = new Random(4711);
 
     private Population population;
@@ -207,7 +210,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
                             newPlan.addLeg(leg1);
 
                             Activity shortDistanceRangeActivity = population.getFactory().createActivityFromCoord(
-                                    "other_3600", getShortDistanceCoordinate(trip.getOriginActivity().getCoord(), range));
+									actType, getShortDistanceCoordinate(trip.getOriginActivity().getCoord(), range));
                             shortDistanceRangeActivity.setMaximumDuration(duration);
                             shortDistanceRangeActivity.setStartTime(newEndTime + walkTime / 2);
                             shortDistanceRangeActivity.setEndTime(newEndTime + walkTime / 2 + duration);
