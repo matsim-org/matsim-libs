@@ -21,8 +21,6 @@ public class SelectSingleTripModeStrategyTest extends ScenarioTest {
 	@Test
 	public void selectSingleTrip() {
 
-		// TODO: fails because scenario is created two times
-
 		Config config = TestScenario.loadConfig(utils);
 
 		config.controler().setLastIteration(10);

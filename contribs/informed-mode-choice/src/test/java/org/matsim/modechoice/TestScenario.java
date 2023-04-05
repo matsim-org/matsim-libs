@@ -24,8 +24,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import picocli.CommandLine;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;

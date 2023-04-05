@@ -29,10 +29,6 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private int topK = 5;
 
 	@Parameter
-	@Comment("Avoid using recently used mode combinations.")
-	private int avoidK = 10;
-
-	@Parameter
 	@Comment("1/beta parameter to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice.")
 	private double invBeta = 2.5;
 
@@ -83,14 +79,6 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public int getTopK() {
 		return topK;
-	}
-
-	public int getAvoidK() {
-		return avoidK;
-	}
-
-	public void setAvoidK(int avoidK) {
-		this.avoidK = avoidK;
 	}
 
 	public double getInvBeta() {

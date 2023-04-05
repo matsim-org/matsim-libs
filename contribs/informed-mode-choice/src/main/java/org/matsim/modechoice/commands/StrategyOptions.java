@@ -57,7 +57,6 @@ public final class StrategyOptions {
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 		imc.setTopK(group.k);
-		imc.setAvoidK(group.avoidK);
 		imc.setInvBeta(group.invBeta);
 		imc.setAnneal(group.anneal);
 		imc.setPruning(group.prune);
@@ -65,7 +64,7 @@ public final class StrategyOptions {
 
 		log.accept(config, "mc", getModeChoice());
 
-		if (getModeChoice() == ModeChoice.selectBestKPlanModes || getModeChoice() == ModeChoice.informedModeChoice) {
+		if (getModeChoice() == ModeChoice.selectBestKPlanModes) {
 			log.accept(config, "k", group.k);
 		}
 
@@ -125,8 +124,7 @@ public final class StrategyOptions {
 				DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator,
 				ModeChoice.selectSubtourMode.name,
 				ModeChoice.selectBestKPlanModes.name,
-				ModeChoice.randomSubtourMode.name,
-				ModeChoice.informedModeChoice.name
+				ModeChoice.randomSubtourMode.name
 		);
 
 		// Always collect all strategies, these won't be removed
@@ -182,8 +180,7 @@ public final class StrategyOptions {
 		selectSingleTripMode(InformedModeChoiceModule.SELECT_SINGLE_TRIP_MODE_STRATEGY),
 		selectBestKPlanModes(InformedModeChoiceModule.SELECT_BEST_K_PLAN_MODES_STRATEGY),
 		selectSubtourMode(InformedModeChoiceModule.SELECT_SUBTOUR_MODE_STRATEGY),
-		randomSubtourMode(InformedModeChoiceModule.RANDOM_SUBTOUR_MODE_STRATEGY),
-		informedModeChoice(InformedModeChoiceModule.INFORMED_MODE_CHOICE);
+		randomSubtourMode(InformedModeChoiceModule.RANDOM_SUBTOUR_MODE_STRATEGY);
 
 		private final String name;
 

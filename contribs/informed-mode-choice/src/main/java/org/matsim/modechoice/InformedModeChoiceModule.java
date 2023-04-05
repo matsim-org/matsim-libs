@@ -41,7 +41,6 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	public static String SELECT_SUBTOUR_MODE_STRATEGY = "SelectSubtourMode";
 	public static String RANDOM_SUBTOUR_MODE_STRATEGY = "RandomSubtourMode";
 
-	public static String INFORMED_MODE_CHOICE = "InformedModeChoice";
 
 	private final Builder builder;
 
@@ -88,7 +87,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		addPlanStrategyBinding(SELECT_SINGLE_TRIP_MODE_STRATEGY).toProvider(SelectSingleTripModeStrategyProvider.class);
 		addPlanStrategyBinding(SELECT_SUBTOUR_MODE_STRATEGY).toProvider(SelectSubtourModeStrategyProvider.class);
 		addPlanStrategyBinding(RANDOM_SUBTOUR_MODE_STRATEGY).toProvider(RandomSubtourModeStrategyProvider.class);
-		addPlanStrategyBinding(INFORMED_MODE_CHOICE).toProvider(InformedModeChoiceStrategyProvider.class);
+		//addPlanStrategyBinding(INFORMED_MODE_CHOICE).toProvider(InformedModeChoiceStrategyProvider.class);
 
 		// Ensure that only one instance exists
 		bind(ModeChoiceWeightScheduler.class).in(Singleton.class);
