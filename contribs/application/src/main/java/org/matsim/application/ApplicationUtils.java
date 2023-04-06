@@ -150,11 +150,11 @@ public class ApplicationUtils {
 
 
 	/**
-	 * Whether this command accepts the {@link org.matsim.application.options.ShpOptions}.
+	 * Whether this command accepts a specific class as options.
 	 */
-	public static boolean acceptsShpFile(Class<? extends MATSimAppCommand> command) {
+	public static boolean acceptsOptions(Class<? extends MATSimAppCommand> command, Class<?> options) {
 		for (Field field : command.getDeclaredFields()) {
-			if (field.getType().equals(ShpOptions.class) && field.getAnnotation(CommandLine.Mixin.class) != null)
+			if (field.getType().equals(options) && field.getAnnotation(CommandLine.Mixin.class) != null)
 				return true;
 		}
 

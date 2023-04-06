@@ -7,7 +7,9 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedAcyclicGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
+import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.InputOptions;
+import org.matsim.application.options.ShpOptions;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,10 +30,11 @@ public final class CommandRunner {
 	private Path output;
 
 	private String defaultShp = null;
+	private String defaultCrs = null;
+
 	private final Map<Class<? extends MATSimAppCommand>, String> shpFiles = new HashMap<>();
 	private final Map<Class<? extends MATSimAppCommand>, String[]> args = new HashMap<>();
 
-	// TODO: Input and output path separated
 
 	/**
 	 * Construct a new runner.
@@ -170,13 +173,20 @@ public final class CommandRunner {
 			args.add(ApplicationUtils.matchInput("network.xml", input));
 		}
 
-		if (ApplicationUtils.acceptsShpFile(command) && !ArrayUtils.contains(existingArgs, "--shp")) {
+		if (ApplicationUtils.acceptsOptions(command, ShpOptions.class) && !ArrayUtils.contains(existingArgs, "--shp")) {
 			if (shpFiles.containsKey(command)) {
 				args.add("--shp");
 				args.add(shpFiles.get(command));
 			} else if (defaultShp != null) {
 				args.add("--shp");
 				args.add(defaultShp);
+			}
+		}
+
+		if (ApplicationUtils.acceptsOptions(command, CrsOptions.class) && !ArrayUtils.contains(existingArgs, "--input-crs")) {
+			if (defaultCrs != null) {
+				args.add("--input-crs");
+				args.add(defaultCrs);
 			}
 		}
 
@@ -197,6 +207,17 @@ public final class CommandRunner {
 	 */
 	public String getPath(Class<? extends MATSimAppCommand> command, String file) {
 		CommandSpec spec = ApplicationUtils.getSpec(command);
+		return buildPath(spec).resolve(file).toString();
+	}
+
+	/**
+	 * Returns the output path of a command. Will throw an exception if this command does not declared it as an output.
+	 */
+	public String getRequiredPath(Class<? extends MATSimAppCommand> command, String file) {
+		CommandSpec spec = ApplicationUtils.getSpec(command);
+		if (!ArrayUtils.contains(spec.produces(), file))
+			throw new IllegalArgumentException(String.format("Command %s does not declare output %s", command, file));
+
 		return buildPath(spec).resolve(file).toString();
 	}
 
@@ -258,5 +279,10 @@ public final class CommandRunner {
 		defaultShp = path;
 	}
 
-
+	/**
+	 * Set the CRS passed to input
+	 */
+	public void setCRS(String crs) {
+		defaultCrs = crs;
+	}
 }

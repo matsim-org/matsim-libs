@@ -69,7 +69,7 @@ public final class ShpOptions {
 	 * Return whether a shape was set.
 	 */
 	public boolean isDefined() {
-		return shp != null && !shp.toString().isBlank();
+		return shp != null && !shp.toString().isBlank() && !shp.toString().equals("none");
 	}
 
 	/**
@@ -170,7 +170,7 @@ public final class ShpOptions {
 	 */
 	public Index createIndex(String queryCRS, String attr, Set<String> filter) {
 
-		if (shp == null)
+		if (!isDefined())
 			throw new IllegalStateException("Shape file path not specified");
 		if (!Files.exists(shp))
 			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
@@ -204,7 +204,7 @@ public final class ShpOptions {
 
 	private String detectCRS() {
 
-		if (shpCrs == null) {
+		if (!isDefined()) {
 			try {
 				ShapefileDataStore ds = openDataStore(shp);
 				CoordinateReferenceSystem crs = ds.getSchema().getCoordinateReferenceSystem();

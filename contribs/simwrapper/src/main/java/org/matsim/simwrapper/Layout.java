@@ -51,7 +51,9 @@ public final class Layout {
 					Viz o = (Viz) constructor.newInstance();
 					el.el.configure(o, data);
 					row.add(o);
-
+				} catch (IllegalArgumentException e) {
+					log.error("Illegal argument in dashboards", e);
+					throw e;
 				} catch (NoSuchMethodException e) {
 					log.error("Could not construct the specified type. Probably public default constructor is missing.", e);
 				} catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {

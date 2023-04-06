@@ -1,5 +1,6 @@
 package org.matsim.application.options;
 
+import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.CommandSpec;
@@ -176,10 +177,23 @@ public final class InputOptions {
 	 * Return the argument name of an input file.
 	 */
 	public static String argName(String require) {
-		String[] split = require.split("\\.");
-		String s = split.length > 0 ? split[0] : require;
 
-		return s.replaceAll("_|/\"|\\\\|:|/", "-");
+		require = require.replace(".gz", "");
+		String[] split = require.split("\\.");
+
+		// Remove the suffix
+		String s = split.length > 1
+				? StringUtils.join(split, "-", 0, split.length - 1)
+				: require;
+
+		// replace special chars
+		String result = s.replaceAll("_|/\"|\\\\|:|/", "-");
+
+		// crs is a reserved name from other options
+		if (result.equals("crs"))
+			result = "crs-file";
+
+		return result;
 	}
 
 	/**
