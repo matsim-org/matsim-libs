@@ -17,39 +17,39 @@ public class StuckAgentDashboard implements Dashboard {
 		header.title = "Stuck Agents Dashboard";
 		header.description = "Description for the Stuck Agents Dashboard";
 
-		layout.row("first", TextBlock.class, (viz, data) -> {
+
+		layout.row("first").el(TextBlock.class, (viz, data) -> {
 			viz.title = "";
 			viz.file = data.compute(StuckAgentAnalysis.class, "table1.md");
 			viz.height = 1.;
-
 		});
 
-		layout.row("second", PieChart.class, (viz, data) -> {
-			viz.title = "Stuck Agents per Transport Mode";
-			viz.dataset = "piechart.csv";
-			viz.useLastRow = "true";
-		});
+		layout.row("second")
+				.el(PieChart.class, (viz, data) -> {
+					viz.title = "Stuck Agents per Transport Mode";
+					viz.dataset = "piechart.csv";
+					viz.useLastRow = "true";
+				})
+				.el(TextBlock.class, (viz, data) -> {
+					viz.title = "";
+					viz.file = "table2.md";
+				});
 
-		layout.row("second", TextBlock.class, (viz, data) -> {
-			viz.title = "";
-			viz.file = "table2.md";
-		});
+		layout.row("third")
+				.el(Bar.class, (viz, data) -> {
+					viz.title = "Stuck Agents per Hour";
+					viz.stacked = "true";
+					viz.dataset = "stuckAgentsPerHour.csv";
+					viz.x = "hour";
+					viz.xAxisName = "Hour";
+					viz.yAxisName = "# Stuck";
+				})
+				.el(TextBlock.class, (viz, data) -> {
+					viz.title = "";
+					viz.file = "table3.md";
+				});
 
-		layout.row("third", Bar.class, (viz, data) -> {
-			viz.title = "Stuck Agents per Hour";
-			viz.stacked = "true";
-			viz.dataset ="stuckAgentsPerHour.csv";
-			viz.x = "hour";
-			viz.xAxisName = "Hour";
-			viz.yAxisName = "# Stuck";
-		});
-
-		layout.row("third", TextBlock.class, (viz, data) -> {
-			viz.title = "";
-			viz.file = "table3.md";
-		});
-
-		layout.row("four", TextBlock.class, (viz, data) -> {
+		layout.row("four").el(TextBlock.class, (viz, data) -> {
 			viz.title = "Stuck Agents per Link (Top 20)";
 			viz.file = "table4.md";
 		});

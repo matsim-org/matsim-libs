@@ -27,7 +27,7 @@ public class SimWrapperTest {
 			header.tab = "Area Tab";
 			header.description = "Area Description";
 
-			layout.row("first", Area.class, (viz, data) -> {
+			layout.row("first").el(Area.class, (viz, data) -> {
 				viz.title = "Stats";
 			});
 		});
@@ -37,7 +37,7 @@ public class SimWrapperTest {
 			header.tab = "Bar Tab";
 			header.description = "Bar Description";
 
-			layout.row("first", Bar.class, (viz, data) -> {
+			layout.row("first").el( Bar.class, (viz, data) -> {
 				viz.title = "Stats";
 			});
 		});
@@ -47,7 +47,7 @@ public class SimWrapperTest {
 			header.tab = "Bubble Tab";
 			header.description = "Bubble Description";
 
-			layout.row("first", Bubble.class, (viz, data) -> {
+			layout.row("first").el( Bubble.class, (viz, data) -> {
 				viz.title = "Stats";
 			});
 		});
@@ -57,7 +57,7 @@ public class SimWrapperTest {
 			header.tab = "CalculationTable Tab";
 			header.description = "CalculationTable Description";
 
-			layout.row("first", CalculationTable.class, (viz, data) -> {
+			layout.row("first").el( CalculationTable.class, (viz, data) -> {
 				viz.title = "CalculationTable";
 			});
 		});
@@ -67,7 +67,7 @@ public class SimWrapperTest {
 			header.tab = "Heatmap Tab";
 			header.description = "Heatmap Description";
 
-			layout.row("first", Heatmap.class, (viz, data) -> {
+			layout.row("first").el( Heatmap.class, (viz, data) -> {
 				viz.title = "Heatmap";
 			});
 		});
@@ -77,7 +77,7 @@ public class SimWrapperTest {
 			header.tab = "Line Tab";
 			header.description = "Line Description";
 
-			layout.row("first", Line.class, (viz, data) -> {
+			layout.row("first").el( Line.class, (viz, data) -> {
 				viz.title = "Line";
 			});
 		});
@@ -87,7 +87,7 @@ public class SimWrapperTest {
 			header.tab = "PieChart Tab";
 			header.description = "PieChart Description";
 
-			layout.row("first", PieChart.class, (viz, data) -> {
+			layout.row("first").el( PieChart.class, (viz, data) -> {
 				viz.title = "PieChart";
 			});
 		});
@@ -97,7 +97,7 @@ public class SimWrapperTest {
 			header.tab = "Scatter Tab";
 			header.description = "Scatter Description";
 
-			layout.row("first", Scatter.class, (viz, data) -> {
+			layout.row("first").el( Scatter.class, (viz, data) -> {
 				viz.title = "Scatter";
 			});
 		});
@@ -107,7 +107,7 @@ public class SimWrapperTest {
 			header.tab = "TextBlock Tab";
 			header.description = "TextBlock Description";
 
-			layout.row("first", TextBlock.class, (viz, data) -> {
+			layout.row("first").el( TextBlock.class, (viz, data) -> {
 				viz.title = "TextBlock";
 			});
 		});

@@ -6,7 +6,10 @@ import org.matsim.simwrapper.viz.Viz;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class to define the layout of a {@link Dashboard}.
@@ -16,32 +19,18 @@ public final class Layout {
 
 	private static final Logger log = LogManager.getLogger(Layout.class);
 
-	private final List<Holder> layouts = new ArrayList<>();
+
+	private final Map<String, Row> rows = new LinkedHashMap<>();
 
 
 	/**
-	 * Add a single element to row in the layout, using default context.
+	 * Returns a row, which can be used to add elements to it.
+	 * If a row with the same name already exists it will be returned instead of creating a new one.
 	 *
-	 * @see #row(String, String, Class, RowElement)
+	 * @param name internal name of the row.
 	 */
-	public <T extends Viz> void row(String name, Class<T> type, RowElement<T> el) {
-		row(name, "", type, el);
-	}
-
-	/**
-	 * Add a single element to row in the layout. Note that this only stores the specification. The actual code is executed later.
-	 * <p>
-	 * If a row with the same already exists, this element will be added to the same row.
-	 * The order how this function is called will determine the order in the layout.
-	 *
-	 * @param name    name of the row
-	 * @param context content which can hold different parameters for the same dashboard.
-	 * @param type    class of the viz element
-	 * @param el      setup of the viz element
-	 * @param <T>     type of the element
-	 */
-	public <T extends Viz> void row(String name, String context, Class<T> type, RowElement<T> el) {
-		layouts.add(new Holder(name, context, type, (RowElement<Viz>) el));
+	public Row row(String name) {
+		return rows.computeIfAbsent(name, Row::new);
 	}
 
 	/**
@@ -51,33 +40,70 @@ public final class Layout {
 
 		Map<String, List<Viz>> rows = new LinkedHashMap<>();
 
-		for (Holder layout : layouts) {
+		for (Row def : this.rows.values()) {
 
-			List<Viz> row = rows.computeIfAbsent(layout.name, (k) -> new ArrayList<>());
+			List<Viz> row = rows.computeIfAbsent(def.name, (k) -> new ArrayList<>());
+			for (Holder el : def.elements) {
+				data.setCurrentContext(el.context);
 
-			data.setCurrentContext(layout.context);
+				try {
+					Constructor<?> constructor = el.type.getConstructor();
+					Viz o = (Viz) constructor.newInstance();
+					el.el.configure(o, data);
+					row.add(o);
 
-			try {
-				Constructor<?> constructor = layout.type.getConstructor();
-				Viz o = (Viz) constructor.newInstance();
-				layout.el.configure(o, data);
-				row.add(o);
+				} catch (NoSuchMethodException e) {
+					log.error("Could not construct the specified type. Probably public default constructor is missing.", e);
+				} catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+					log.error("Error occurred when constructing the viz object", e);
+				}
 
-			} catch (NoSuchMethodException e) {
-				log.error("Could not construct the specified type. Probably public default constructor is missing.", e);
-			} catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-				log.error("Error occurred when constructing the viz object", e);
+				data.setCurrentContext("");
 			}
-
-			data.setCurrentContext("");
-
 		}
 
 		return rows;
 	}
 
 
-	private record Holder(String name, String context, Class<?> type, RowElement<Viz> el) {
+	/**
+	 * One row holding multiple {@link Viz} elements.
+	 */
+	public static final class Row {
+
+		private final String name;
+
+		private final List<Holder> elements = new ArrayList<>();
+
+		private Row(String name) {
+			this.name = name;
+		}
+
+		/**
+		 * Adds a viz element to the row with default context.
+		 *
+		 * @see #el(String, Class, RowElement)
+		 */
+		public <T extends Viz> Row el(Class<T> type, RowElement<T> el) {
+			return el("", type, el);
+		}
+
+		/**
+		 * Adds a viz element to the row.
+		 *
+		 * @param context content which can hold different parameters for the same dashboard.
+		 * @param type    class of the viz element
+		 * @param el      setup of the viz element
+		 * @param <T>     type of the element
+		 */
+		public <T extends Viz> Row el(String context, Class<T> type, RowElement<T> el) {
+			elements.add(new Holder(context, type, (RowElement<Viz>) el));
+			return this;
+		}
+
+	}
+
+	private record Holder(String context, Class<?> type, RowElement<Viz> el) {
 	}
 
 }
