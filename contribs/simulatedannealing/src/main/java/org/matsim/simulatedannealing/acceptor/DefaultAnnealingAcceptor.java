@@ -6,13 +6,13 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedannealing.acceptor;
+package org.matsim.simulatedannealing.acceptor;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.matsim.contrib.common.util.random.RandomUtils;
 import org.matsim.core.gbl.Gbl;
-import simulatedannealing.SimulatedAnnealing;
-import simulatedannealing.SimulatedAnnealingConfigGroup;
+import org.matsim.simulatedannealing.SimulatedAnnealing;
+import org.matsim.simulatedannealing.SimulatedAnnealingConfigGroup;
 
 /**
  * @author nkuehnel / MOIA
@@ -32,8 +32,8 @@ public final class DefaultAnnealingAcceptor<T> implements Acceptor<T> {
 
 	@Override
 	public boolean accept(SimulatedAnnealing.Solution<T> currentSolution,
-                          SimulatedAnnealing.Solution<T> acceptedSolution,
-                          double temperature) {
+						  SimulatedAnnealing.Solution<T> acceptedSolution,
+						  double temperature) {
 
 		Gbl.assertNotNull(currentSolution);
 		Gbl.assertNotNull(acceptedSolution);

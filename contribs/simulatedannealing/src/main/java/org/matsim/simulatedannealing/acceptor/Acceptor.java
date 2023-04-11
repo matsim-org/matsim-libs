@@ -6,9 +6,9 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedannealing.acceptor;
+package org.matsim.simulatedannealing.acceptor;
 
-import simulatedannealing.SimulatedAnnealing;
+import org.matsim.simulatedannealing.SimulatedAnnealing;
 
 /**
  *

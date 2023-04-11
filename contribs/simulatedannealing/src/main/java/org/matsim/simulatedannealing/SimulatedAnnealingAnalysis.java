@@ -6,7 +6,7 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedannealing;
+package org.matsim.simulatedannealing;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
@@ -47,11 +47,10 @@ public final class SimulatedAnnealingAnalysis<T> implements IterationStartsListe
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if(simulatedAnnealing.getLastIteration().isPresent()) {
-			SimulatedAnnealing.SimulatedAnnealingIteration<T> lastIteration = (SimulatedAnnealing.SimulatedAnnealingIteration<T>) simulatedAnnealing.getLastIteration().get();
+		if(simulatedAnnealing.getCurrentState().isPresent()) {
+			SimulatedAnnealing.SimulatedAnnealingIteration<T> lastIteration = simulatedAnnealing.getCurrentState().get();
 			String summarizeAnnealing = new StringJoiner(delimiter)
 					.add("" + lastIteration.accepted().getCost().orElse(Double.NaN))
-					.add("" + lastIteration.initial().getCost().orElse(Double.NaN))
 					.add("" + lastIteration.current().getCost().orElse(Double.NaN))
 					.add("" + lastIteration.best().getCost().orElse(Double.NaN))
 					.add("" + lastIteration.temperature())
@@ -68,7 +67,7 @@ public final class SimulatedAnnealingAnalysis<T> implements IterationStartsListe
 		try (var bw = getAppendingBufferedWriter("simulatedAnnealing_" + simulatedAnnealing.get().getClass().getSimpleName(), ".csv")) {
 			if (!headerWritten) {
 				headerWritten = true;
-				bw.write(line("runId", "iteration", "acceptedCost", "initialCost", "currentCost", "bestCost", "temperature"));
+				bw.write(line("runId", "iteration", "acceptedCost", "currentCost", "bestCost", "temperature"));
 			}
 			bw.write(runId + delimiter + it + delimiter + summarizeAnnealing);
 			bw.newLine();

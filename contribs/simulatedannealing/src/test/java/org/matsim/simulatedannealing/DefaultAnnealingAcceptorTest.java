@@ -6,14 +6,16 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedannealing;
+package org.matsim.simulatedannealing;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.controler.IterationCounter;
-import simulatedannealing.acceptor.DefaultAnnealingAcceptor;
-import simulatedannealing.temperature.TemperatureFunction;
+import org.matsim.simulatedannealing.SimulatedAnnealing;
+import org.matsim.simulatedannealing.SimulatedAnnealingConfigGroup;
+import org.matsim.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
+import org.matsim.simulatedannealing.temperature.TemperatureFunction;
 
 /**
  * @author nkuehnel / MOIA

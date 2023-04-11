@@ -6,11 +6,11 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedannealing.perturbation;
+package org.matsim.simulatedannealing.perturbation;
 
 import org.matsim.contrib.common.util.random.WeightedRandomSelection;
 import org.matsim.core.gbl.MatsimRandom;
-import simulatedannealing.SimulatedAnnealing;
+import org.matsim.simulatedannealing.SimulatedAnnealing;
 
 import java.util.*;
 
@@ -57,7 +57,7 @@ public class ChainedPeturbatorFactory<T> implements PerturbatorFactory<T> {
 	}
 
 	public void solutionAccepted(SimulatedAnnealing.Solution<T> oldSolution,
-                                 SimulatedAnnealing.Solution<T> newSolution) {
+								 SimulatedAnnealing.Solution<T> newSolution) {
 		for (PerturbatorFactory<T> perturbatorFactory : perturbatorFactories) {
 			perturbatorFactory.solutionAccepted(oldSolution, newSolution);
 		}

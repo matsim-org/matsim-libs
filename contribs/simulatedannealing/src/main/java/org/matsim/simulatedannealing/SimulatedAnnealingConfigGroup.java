@@ -6,14 +6,14 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedannealing;
+package org.matsim.simulatedannealing;
 
 import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import simulatedannealing.temperature.TemperatureFunction;
+import org.matsim.simulatedannealing.temperature.TemperatureFunction;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -72,7 +72,6 @@ public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 	@PositiveOrZero
 	public int iterationRatio = 1;
 
-
 	@Parameter
 	@Comment("Tuning parameter k. See http://doi.org/10.5772/5560. If in doubt, set to 1.")
 	@PositiveOrZero
@@ -90,7 +89,6 @@ public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Defines whether only temperature, only the current solution or both are reset.")
 	public ResetOption resetOption = ResetOption.temperatureOnly;
 
-
 	@Parameter
 	@Comment("Number of iterations after which there won't be any more resets.")
 	public int lastResetIteration = Integer.MAX_VALUE;
@@ -99,6 +97,10 @@ public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Last iteration after which there will be no more optimization and the solution will be fixed to the best" +
 			"found solution.")
 	public int lastIteration = Integer.MAX_VALUE;
+
+	@Parameter
+	@Comment("First iteration from which the optimization starts.")
+	public int firstIteration = 0;
 
 
 	public static abstract class PerturbationParams extends ReflectiveConfigGroup implements MatsimParameters {

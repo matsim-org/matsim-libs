@@ -6,19 +6,21 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedannealing;
+package org.matsim.simulatedannealing;
 
-import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import simulatedannealing.acceptor.Acceptor;
-import simulatedannealing.cost.CostCalculator;
-import simulatedannealing.perturbation.Perturbator;
-import simulatedannealing.perturbation.PerturbatorFactory;
-import simulatedannealing.temperature.TemperatureFunction;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.simulatedannealing.acceptor.Acceptor;
+import org.matsim.simulatedannealing.cost.CostCalculator;
+import org.matsim.simulatedannealing.perturbation.Perturbator;
+import org.matsim.simulatedannealing.perturbation.PerturbatorFactory;
+import org.matsim.simulatedannealing.temperature.TemperatureFunction;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +33,7 @@ import java.util.OptionalDouble;
  *
  * @author nkuehnel / MOIA
  */
-public final class SimulatedAnnealing<T> implements IterationEndsListener, Provider<T> {
+public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimListener, AfterMobsimListener {
 
 	private static final Logger logger = LogManager.getLogger(SimulatedAnnealing.class);
 
@@ -59,14 +61,12 @@ public final class SimulatedAnnealing<T> implements IterationEndsListener, Provi
 		}
 	}
 
-	record SimulatedAnnealingIteration<T>(Solution<T> initial, Solution<T> best,
+	record SimulatedAnnealingIteration<T>(Solution<T> best,
 										  Solution<T> accepted, Solution<T> current, double temperature){};
 
 	private Solution<T> currentSolution;
 	private Solution<T> acceptedSolution;
 	private Solution<T> bestSolution;
-	private final Solution<T> initialSolution;
-
 	private final CostCalculator<T> costCalculator;
 	private final Acceptor<T> acceptor;
 	private final PerturbatorFactory<T> perturbatorFactory;
@@ -82,7 +82,7 @@ public final class SimulatedAnnealing<T> implements IterationEndsListener, Provi
 
 	private double currentTemperature;
 
-	private SimulatedAnnealingIteration<T> lastIteration;
+	private SimulatedAnnealingIteration<T> currentState;
 
 	private final List<SimulatedAnnealingListener<T>> listeners = new ArrayList<>();
 
@@ -91,42 +91,62 @@ public final class SimulatedAnnealing<T> implements IterationEndsListener, Provi
 		this.costCalculator = costCalculator;
 		this.acceptor = acceptor;
 		this.perturbatorFactory = perturbatorFactory;
-		this.initialSolution = new Solution<>(initialSolution, costCalculator.calculateCost(initialSolution));
 		this.temperatureFunction = temperatureFunction;
 		this.simAnCfg = simAnCfg;
-		this.currentSolution = this.initialSolution;
-		this.bestSolution = this.initialSolution;
-		this.acceptedSolution = this.initialSolution;
+		this.currentSolution = new Solution<>(initialSolution, Double.POSITIVE_INFINITY);;
+		this.bestSolution = currentSolution;
+		this.acceptedSolution = currentSolution;
 		this.currentTemperature = simAnCfg.initialTemperature;
 		listeners.add(perturbatorFactory);
 	}
 
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		int iteration = event.getIteration();
+		if(simAnCfg.firstIteration == event.getIteration()) {
+			return;
+		}
+		if (simAnCfg.lastIteration >= iteration && simAnCfg.lastIteration > iteration) {
+			if(iteration % simAnCfg.iterationRatio == 0) {
+				Perturbator<T> perturbator = perturbatorFactory.createPerturbator(iteration, currentTemperature);
+				T newSolution = perturbator.perturbate(acceptedSolution.solution);
+				currentSolution = new Solution<>(newSolution);
+			}
+		} else if(simAnCfg.lastIteration < iteration) {
+			currentSolution = bestSolution;
+			acceptedSolution = bestSolution;
+			currentState = new SimulatedAnnealingIteration<>(bestSolution, acceptedSolution, currentSolution, currentTemperature);
+		}
+	}
 
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		if (simAnCfg.lastIteration >= event.getIteration()) {
-
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		int iteration = event.getIteration();
+		if (simAnCfg.lastIteration >= iteration) {
 			double cost = costCalculator.calculateCost(currentSolution.solution);
 			currentSolution = new Solution<>(currentSolution.solution, cost);
-			calcCurrentTemperature(currentSolution.getCost().orElse(Double.POSITIVE_INFINITY), bestSolution.getCost().orElse(Double.POSITIVE_INFINITY), event.getIteration());
+			calcCurrentTemperature(currentSolution.getCost().orElse(Double.POSITIVE_INFINITY),
+					bestSolution.getCost().orElse(Double.POSITIVE_INFINITY), iteration);
 
 			if (acceptor.accept(currentSolution, acceptedSolution, currentTemperature)) {
 				Solution<T> oldSolution = acceptedSolution;
 				acceptedSolution = currentSolution;
-				logger.debug(String.format("Updated accepted {%s} solution with cost of %f in iteration %d", currentSolution.solution.toString(), currentSolution.cost, event.getIteration()));
+				logger.debug(String.format("Updated accepted {%s} solution with cost of %f in iteration %d",
+						currentSolution.solution.toString(), currentSolution.cost, iteration));
 				if (bestSolution == null || acceptedSolution.cost < bestSolution.cost) {
 					bestSolution = acceptedSolution;
-					logger.debug(String.format("Updated best solution {%s} with cost of %f in iteration %d", bestSolution.solution.toString(), bestSolution.cost, event.getIteration()));
-					if (simAnCfg.resetUponBestSolution && simAnCfg.lastResetIteration > event.getIteration()){
-						reset(event.getIteration(), false);
+					logger.debug(String.format("Updated best solution {%s} with cost of %f in iteration %d",
+							bestSolution.solution.toString(), bestSolution.cost, iteration));
+					if (simAnCfg.resetUponBestSolution && simAnCfg.lastResetIteration > iteration){
+						reset(iteration, false);
 						logger.debug("Reset of acceptor to current iteration");
 					}
 					iterationsWithoutImprovement = 0;
 				} else {
 					iterationsWithoutImprovement++;
 					if(iterationsWithoutImprovement >= simAnCfg.deadEndIterationReset
-							&& simAnCfg.lastResetIteration > event.getIteration()) {
-						reset(event.getIteration(), false);
+							&& simAnCfg.lastResetIteration > iteration) {
+						reset(iteration, false);
 					}
 				}
 				for (SimulatedAnnealingListener<T> listener : listeners) {
@@ -134,21 +154,11 @@ public final class SimulatedAnnealing<T> implements IterationEndsListener, Provi
 				}
 			}
 
-			if(simAnCfg.lastResetIteration == event.getIteration()) {
-				reset(event.getIteration(), true);
+			if(simAnCfg.lastResetIteration == iteration) {
+				reset(iteration, true);
 			}
 
-			lastIteration = new SimulatedAnnealingIteration<>(initialSolution, bestSolution, acceptedSolution, currentSolution, currentTemperature);
-
-			if(event.getIteration() % simAnCfg.iterationRatio == 0) {
-				Perturbator<T> perturbator = perturbatorFactory.createPerturbator(event.getIteration(), currentTemperature);
-				T newSolution = perturbator.perturbate(acceptedSolution.solution);
-				currentSolution = new Solution<>(newSolution);
-			}
-		} else if(simAnCfg.lastIteration < event.getIteration()) {
-			currentSolution = bestSolution;
-			acceptedSolution = bestSolution;
-			lastIteration = new SimulatedAnnealingIteration<>(initialSolution, bestSolution, acceptedSolution, currentSolution, currentTemperature);
+			currentState = new SimulatedAnnealingIteration<>(bestSolution, acceptedSolution, currentSolution, currentTemperature);
 		}
 	}
 
@@ -158,12 +168,8 @@ public final class SimulatedAnnealing<T> implements IterationEndsListener, Provi
 			return;
 		}
 		switch (simAnCfg.resetOption) {
-			case temperatureOnly -> {
-				startIteration = iteration;
-			}
-			case solutionOnly -> {
-				acceptedSolution = bestSolution;
-			}
+			case temperatureOnly -> startIteration = iteration;
+			case solutionOnly -> acceptedSolution = bestSolution;
 			case temperatureAndSolution -> {
 				startIteration = iteration;
 				acceptedSolution = bestSolution;
@@ -188,13 +194,13 @@ public final class SimulatedAnnealing<T> implements IterationEndsListener, Provi
 				cycles, iteration, currentCost, bestCost);
 	}
 
-	public Optional<SimulatedAnnealingIteration<T>> getLastIteration() {
-		return Optional.ofNullable(lastIteration);
-	}
-
 	@Override
 	public T get() {
 		return currentSolution.solution;
+	}
+
+	public Optional<SimulatedAnnealingIteration<T>> getCurrentState() {
+		return Optional.ofNullable(currentState);
 	}
 
 	public void addListener(SimulatedAnnealingListener<T> listener) {

@@ -6,7 +6,7 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedannealing;
+package org.matsim.simulatedannealing;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -17,14 +17,17 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.gbl.MatsimRandom;
-import simulatedannealing.acceptor.Acceptor;
-import simulatedannealing.acceptor.DefaultAnnealingAcceptor;
-import simulatedannealing.cost.CostCalculator;
-import simulatedannealing.perturbation.PerturbatorFactory;
-import simulatedannealing.temperature.NonMonotonicAdaptiveTemperatureFunction;
-import simulatedannealing.temperature.TemperatureFunction;
+import org.matsim.simulatedannealing.SimulatedAnnealing;
+import org.matsim.simulatedannealing.SimulatedAnnealingConfigGroup;
+import org.matsim.simulatedannealing.acceptor.Acceptor;
+import org.matsim.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
+import org.matsim.simulatedannealing.cost.CostCalculator;
+import org.matsim.simulatedannealing.perturbation.PerturbatorFactory;
+import org.matsim.simulatedannealing.temperature.NonMonotonicAdaptiveTemperatureFunction;
+import org.matsim.simulatedannealing.temperature.TemperatureFunction;
 
 import java.util.Random;
 
@@ -55,12 +58,13 @@ public class SimulatedAnnealingTest {
 
 		SimulatedAnnealing<String> simulatedAnnealing = new SimulatedAnnealing<>(costCalculator, acceptor, perturbator, "mistam", temperatureFunction, simAnCfg);
 
-		for (int i = 0; i < 500; i++) {
+		for (int i = 0; i < 600; i++) {
 			iteration.setValue(i);
-			simulatedAnnealing.notifyIterationEnds(new IterationEndsEvent(null, i, false));
+			simulatedAnnealing.notifyBeforeMobsim(new BeforeMobsimEvent(null, i, false));
+			simulatedAnnealing.notifyAfterMobsim(new AfterMobsimEvent(null, i, false));
 		}
 
-		Assert.assertEquals("matsim", simulatedAnnealing.getLastIteration().get().accepted().get());
+		Assert.assertEquals("matsim", simulatedAnnealing.getCurrentState().get().accepted().get());
 	}
 
 	private PerturbatorFactory<String> perturbatorFactory() {

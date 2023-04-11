@@ -15,6 +15,6 @@
  * @since 15.xx
  * @author nkuehnel
  */
-package simulatedannealing;
+package org.matsim.simulatedannealing;
 
 

@@ -6,10 +6,10 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package simulatedannealing.perturbation;
+package org.matsim.simulatedannealing.perturbation;
 
-import simulatedannealing.SimulatedAnnealing;
-import simulatedannealing.SimulatedAnnealingListener;
+import org.matsim.simulatedannealing.SimulatedAnnealing;
+import org.matsim.simulatedannealing.SimulatedAnnealingListener;
 
 /**
  *
