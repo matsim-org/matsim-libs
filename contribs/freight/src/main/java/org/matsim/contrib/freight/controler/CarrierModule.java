@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -107,7 +106,7 @@ public final class CarrierModule extends AbstractModule {
 	// We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
 	// The freight QSim needs it (see below [[where?]]).
 	// yyyy this feels rather scary.  kai, oct'19
-	// Since we are exporting it anyways, we could as well also inject it.  kai, sep'20
+	// Since we are exporting it anyway, we could as well also inject it.  kai, sep'20
 	// Is this maybe already resolved now?  kai, jul'22
 //	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
 //		return carrierControlerListener.getCarrierAgentTracker();

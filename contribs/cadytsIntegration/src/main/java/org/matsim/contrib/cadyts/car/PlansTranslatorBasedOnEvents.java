@@ -25,7 +25,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -50,7 +51,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	// could be/remain public as long as constructor is package-private. kai, feb'20
 	// used from outside, e.g. vsp-playgrounds
 	
-	private static final Logger log = Logger.getLogger(PlansTranslatorBasedOnEvents.class);
+	private static final Logger log = LogManager.getLogger(PlansTranslatorBasedOnEvents.class);
 
 	private final Scenario scenario;
 

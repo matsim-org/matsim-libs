@@ -1,30 +1,154 @@
-<?xml version="1.0" ?>
-<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/electric_vehicles_v1.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
 
-<vehicles>
-	<vehicle id="taxi_1_1" battery_capacity="20" initial_soc="16.0"/>
-	<vehicle id="taxi_1_2" battery_capacity="20" initial_soc="14.0"/>
-	<vehicle id="taxi_1_3" battery_capacity="20" initial_soc="12.0"/>
-	<vehicle id="taxi_1_4" battery_capacity="20" initial_soc="10.0"/>
-	<vehicle id="taxi_1_5" battery_capacity="20" initial_soc="8.0"/>
-	<vehicle id="taxi_2_1" battery_capacity="20" initial_soc="15.5"/>
-	<vehicle id="taxi_2_2" battery_capacity="20" initial_soc="13.5"/>
-	<vehicle id="taxi_2_3" battery_capacity="20" initial_soc="11.5"/>
-	<vehicle id="taxi_2_4" battery_capacity="20" initial_soc="9.5"/>
-	<vehicle id="taxi_2_5" battery_capacity="20" initial_soc="7.5"/>
-	<vehicle id="taxi_3_1" battery_capacity="20" initial_soc="15.0"/>
-	<vehicle id="taxi_3_2" battery_capacity="20" initial_soc="13.0"/>
-	<vehicle id="taxi_3_3" battery_capacity="20" initial_soc="11.0"/>
-	<vehicle id="taxi_3_4" battery_capacity="20" initial_soc="9.0"/>
-	<vehicle id="taxi_3_5" battery_capacity="20" initial_soc="7.0"/>
-	<vehicle id="taxi_4_1" battery_capacity="20" initial_soc="14.5"/>
-	<vehicle id="taxi_4_2" battery_capacity="20" initial_soc="12.5"/>
-	<vehicle id="taxi_4_3" battery_capacity="20" initial_soc="10.5"/>
-	<vehicle id="taxi_4_4" battery_capacity="20" initial_soc="8.5"/>
-	<vehicle id="taxi_4_5" battery_capacity="20" initial_soc="6.5"/>
-	<vehicle id="taxi_5_1" battery_capacity="20" initial_soc="14.0"/>
-	<vehicle id="taxi_5_2" battery_capacity="20" initial_soc="12.0"/>
-	<vehicle id="taxi_5_3" battery_capacity="20" initial_soc="10.0"/>
-	<vehicle id="taxi_5_4" battery_capacity="20" initial_soc="8.0"/>
-	<vehicle id="taxi_5_5" battery_capacity="20" initial_soc="6.0"/>
-</vehicles>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="EV_20.0kWh">
+
+		<capacity seats="0" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="chargerTypes" class="java.util.Collections$UnmodifiableCollection">["default"]</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">20.0</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="taxi_1_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.8</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_1_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.7</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_1_3" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.6</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_1_4" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.5</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_1_5" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.4</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_2_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.775</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_2_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.675</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_2_3" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.575</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_2_4" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.475</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_2_5" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.375</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_3_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.75</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_3_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.65</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_3_3" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.55</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_3_4" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.45</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_3_5" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.35</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_4_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.725</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_4_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.625</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_4_3" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.525</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_4_4" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.425</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_4_5" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.325</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_5_1" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.7</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_5_2" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.6</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_5_3" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.5</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_5_4" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.4</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="taxi_5_5" type="EV_20.0kWh">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">0.3</attribute>
+		</attributes>
+	</vehicle>
+		
+
+</vehicleDefinitions>

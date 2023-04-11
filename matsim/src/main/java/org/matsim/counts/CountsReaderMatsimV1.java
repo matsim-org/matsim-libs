@@ -20,7 +20,8 @@
 
 package org.matsim.counts;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +48,7 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 	private final Counts counts;
 	private Count currcount = null;
 
-	private static final Logger log = Logger.getLogger(CountsReaderMatsimV1.class);
+	private static final Logger log = LogManager.getLogger(CountsReaderMatsimV1.class);
 
 	public CountsReaderMatsimV1(final Counts counts) {
 		this( new IdentityTransformation(), counts );

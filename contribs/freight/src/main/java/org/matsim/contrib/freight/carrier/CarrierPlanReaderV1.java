@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
@@ -48,7 +49,7 @@ import org.xml.sax.Attributes;
  */
 class CarrierPlanReaderV1 extends MatsimXmlParser {
 
-	private static final Logger logger = Logger.getLogger(CarrierPlanReaderV1.class);
+	private static final Logger logger = LogManager.getLogger(CarrierPlanReaderV1.class);
 	private static final String CARRIERS = "carriers";
 	private static final String CARRIER = "carrier";
 	private static final String LINK_ID = "linkId";
@@ -83,7 +84,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	private final CarrierVehicleTypes carrierVehicleTypes;
 
 	/**
-	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
+	 * Constructs a reader with an empty carriers-container for the carriers to be constructed.
 	 *
 	 * @param carriers which is a map that stores carriers
 	 * @param carrierVehicleTypes
@@ -164,8 +165,6 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance( Id.create( vId, Vehicle.class ),
 					  Id.create( linkId, Link.class ), vehicleType );
-//				vehicleBuilder.setTypeId( Id.create( typeId, VehicleType.class ) );
-//				vehicleBuilder.setType( VehicleUtils.getFactory().createVehicleType( Id.create( typeId, VehicleType.class ) ) );
 				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
 				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
 				CarrierVehicle vehicle = vehicleBuilder.build();
@@ -205,34 +204,32 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 			}
 			case ACTIVITY:
 			{
-				switch( attributes.getValue( TYPE ) ){
-					case "start":
-						currentStartTime = getDouble( attributes.getValue( "end_time" ) );
+				switch (attributes.getValue(TYPE)) {
+					case "start" -> {
+						currentStartTime = getDouble(attributes.getValue("end_time"));
 						previousActLoc = currentVehicle.getLinkId();
-						currentTourBuilder.scheduleStart( currentVehicle.getLinkId(),
-							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
-						break;
-					case "pickup":{
+						currentTourBuilder.scheduleStart(currentVehicle.getLinkId(),
+								TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+					}
+					case "pickup" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
-						CarrierShipment s = currentShipments.get( id );
-						finishLeg( s.getFrom() );
-						currentTourBuilder.schedulePickup( s );
+						CarrierShipment s = currentShipments.get(id);
+						finishLeg(s.getFrom());
+						currentTourBuilder.schedulePickup(s);
 						previousActLoc = s.getFrom();
-						break;
 					}
-					case "delivery":{
+					case "delivery" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
-						CarrierShipment s = currentShipments.get( id );
-						finishLeg( s.getTo() );
-						currentTourBuilder.scheduleDelivery( s );
+						CarrierShipment s = currentShipments.get(id);
+						finishLeg(s.getTo());
+						currentTourBuilder.scheduleDelivery(s);
 						previousActLoc = s.getTo();
-						break;
 					}
-					case "end":
-						finishLeg( currentVehicle.getLinkId() );
-						currentTourBuilder.scheduleEnd( currentVehicle.getLinkId(),
-							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
-						break;
+					case "end" -> {
+						finishLeg(currentVehicle.getLinkId());
+						currentTourBuilder.scheduleEnd(currentVehicle.getLinkId(),
+								TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+					}
 				}
 				break ;
 			}

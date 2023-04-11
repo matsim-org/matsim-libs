@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
@@ -41,7 +42,7 @@ import java.io.IOException;
  */
 public final class TimeProvider implements ActivityStartEventHandler, ActivityEndEventHandler{
 	
-	private final static Logger log = Logger.getLogger(TimeProvider.class);
+	private final static Logger log = LogManager.getLogger(TimeProvider.class);
 
     private final double timeSlotSize;
 	private int[] weights = null;

@@ -23,7 +23,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -33,7 +34,7 @@ import org.matsim.core.utils.io.IOUtils;
 @Deprecated
 public class CemdapToursParser {
 
-	private final static Logger log = Logger.getLogger(CemdapToursParser.class);
+	private final static Logger log = LogManager.getLogger(CemdapToursParser.class);
 
 	// cemdap tour file columns
 	private static final int HH_ID = 0;

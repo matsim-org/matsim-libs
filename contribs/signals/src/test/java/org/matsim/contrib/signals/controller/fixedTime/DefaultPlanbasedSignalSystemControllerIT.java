@@ -21,7 +21,8 @@
  */
 package org.matsim.contrib.signals.controller.fixedTime;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,7 +79,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class DefaultPlanbasedSignalSystemControllerIT {
 
-	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemControllerIT.class);
+	private static final Logger log = LogManager.getLogger(DefaultPlanbasedSignalSystemControllerIT.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

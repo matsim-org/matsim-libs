@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
@@ -20,6 +21,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * Created by fouriep on 1/28/15.
@@ -28,7 +30,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * its score in PSim
  */
 public class PlanGenome implements Plan {
-    private final static Logger log = Logger.getLogger(PlanGenome.class);
+    private final static Logger log = LogManager.getLogger(PlanGenome.class);
     protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
     ArrayList<PlanScoreComponent> scoreComponents = new ArrayList<>();
     ArrayList<PlanScoreComponent> altScoreComponents = new ArrayList<>();
@@ -39,7 +41,7 @@ public class PlanGenome implements Plan {
     private String type = null;
     private Customizable customizableDelegate;
     
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	@Override
 	public final Attributes getAttributes() {
 		return this.attributes;

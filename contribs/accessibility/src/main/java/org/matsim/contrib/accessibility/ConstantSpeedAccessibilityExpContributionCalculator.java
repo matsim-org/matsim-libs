@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.accessibility;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,7 +43,7 @@ import java.util.*;
  * @author thibautd, dziemke
  */
 final class ConstantSpeedAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger LOG = Logger.getLogger(ConstantSpeedAccessibilityExpContributionCalculator.class);
+	private static final Logger LOG = LogManager.getLogger(ConstantSpeedAccessibilityExpContributionCalculator.class);
 
 	// Estimates travel time by a constant speed along network, considering all links (including highways, which seems
 	// to be realistic in South Africa, but less elsewhere)

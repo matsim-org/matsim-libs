@@ -23,7 +23,8 @@ package org.matsim.core.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,7 +41,7 @@ public final class NetworkWriteAsTable implements NetworkRunnable {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(NetworkWriteAsTable.class);
+	private final static Logger log = LogManager.getLogger(NetworkWriteAsTable.class);
 
 	private final String outdir;
 	private final double offset;

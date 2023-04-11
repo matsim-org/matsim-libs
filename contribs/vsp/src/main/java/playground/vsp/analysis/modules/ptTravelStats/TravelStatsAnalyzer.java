@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -55,7 +56,7 @@ public class TravelStatsAnalyzer extends AbstractAnalysisModule {
 	public final static String VEHICLE = "vehicle";
 	public final static String OCCUPANCY = "occupancy";
 	
-	private final static Logger log = Logger.getLogger(TravelStatsAnalyzer.class);
+	private final static Logger log = LogManager.getLogger(TravelStatsAnalyzer.class);
 	private final String separator = ";";
 	private final String header = "linkId" + separator + "x1" + separator + "y1" + separator + "x2" + separator + "y2" + separator + "total";
 	private Scenario scenario;

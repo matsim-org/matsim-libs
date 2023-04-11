@@ -25,7 +25,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -74,7 +75,7 @@ public class WaitTimeCalculatorSerializable implements
 	private Map<String, String> stopOfVehicle = new HashMap<String, String>();
 
 	public static void printCallStatisticsAndReset() {
-		Logger logger = Logger.getLogger(WaitTimeCalculatorSerializable.class);
+		Logger logger = LogManager.getLogger(WaitTimeCalculatorSerializable.class);
 		logger.warn("scheduled wait time calls vs unscheduled: " + scheduleCalls + " : " + waitTimeCalls);
 		scheduleCalls = 0;
 		waitTimeCalls = 0;

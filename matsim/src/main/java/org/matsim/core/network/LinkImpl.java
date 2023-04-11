@@ -24,7 +24,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,10 +34,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /*deliberately package*/ class LinkImpl implements Link {
 
-	private final static Logger log = Logger.getLogger(Link.class);
+	private final static Logger log = LogManager.getLogger(Link.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -67,7 +69,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	private static final Set<String> DEFAULT_ALLOWED_MODES = HashSetCache.get(Set.of(TransportMode.car));
 
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	/*deliberately package*/ LinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		this.id = id;

@@ -69,11 +69,11 @@ public class DrtFareHandler implements DrtRequestSubmittedEventHandler, Passenge
 	 */
 	public DrtFareHandler(String mode, DrtFareParams drtFareParams) {
 		this.mode = mode;
-		this.distanceFare_Meter = drtFareParams.getDistanceFare_m();
-		this.baseFare = drtFareParams.getBaseFare();
-		this.minFarePerTrip = drtFareParams.getMinFarePerTrip();
-		this.dailyFee = drtFareParams.getDailySubscriptionFee();
-		this.timeFare_sec = drtFareParams.getTimeFare_h() / 3600.0;
+		this.distanceFare_Meter = drtFareParams.distanceFare_m;
+		this.baseFare = drtFareParams.baseFare;
+		this.minFarePerTrip = drtFareParams.minFarePerTrip;
+		this.dailyFee = drtFareParams.dailySubscriptionFee;
+		this.timeFare_sec = drtFareParams.timeFare_h / 3600.0;
 	}
 
 	DrtFareHandler(String mode, DrtFareParams drtFareParams, EventsManager events) {

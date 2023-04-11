@@ -30,7 +30,8 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -51,7 +52,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class DynamicGroupIdentifier implements GroupIdentifier {
 	private static final Logger log =
-		Logger.getLogger(DynamicGroupIdentifier.class);
+		LogManager.getLogger(DynamicGroupIdentifier.class);
 
 	private final Scenario scenario;
 	private final Random random;

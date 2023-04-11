@@ -23,7 +23,8 @@ package org.matsim.examples;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,14 +44,13 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 @RunWith(Parameterized.class)
 public class EquilTest  {
-	private static final Logger log = Logger.getLogger( EquilTest.class ) ;
-	
+	private static final Logger log = LogManager.getLogger( EquilTest.class ) ;
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final boolean isUsingFastCapacityUpdate;
@@ -71,13 +71,13 @@ public class EquilTest  {
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
 		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile );
-		
+
 		String netFileName = "test/scenarios/equil/network.xml";
 		String popFileName = "test/scenarios/equil/plans100.xml";
 
 		System.out.println( utils.getInputDirectory() );
 		String referenceFileName = utils.getInputDirectory() + "events.xml.gz";
-		
+
 		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
 
 		MutableScenario scenario = ScenarioUtils.createMutableScenario(config );

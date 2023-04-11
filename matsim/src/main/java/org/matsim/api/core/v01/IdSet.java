@@ -7,9 +7,9 @@ import java.util.*;
  */
 public class IdSet<T> implements Set<Id<T>> {
 
-	private Class<T> idClass;
+	private final Class<T> idClass;
 	private int size = 0;
-	private BitSet data;
+	private final BitSet data;
 
 	public IdSet(Class<T> idClass) {
 		this(idClass, Math.max(Id.getNumberOfIds(idClass), 100));
@@ -40,6 +40,10 @@ public class IdSet<T> implements Set<Id<T>> {
 
 	public boolean contains(Id<T> id) {
 		return this.data.get(id.index());
+	}
+
+	public boolean contains(int index) {
+		return this.data.get(index);
 	}
 
 	@Override
@@ -229,9 +233,7 @@ public class IdSet<T> implements Set<Id<T>> {
 				return false;
 			try {
 				return containsAll(c);
-			} catch (ClassCastException unused) {
-				return false;
-			} catch (NullPointerException unused) {
+			} catch (ClassCastException | NullPointerException unused) {
 				return false;
 			}
 		}

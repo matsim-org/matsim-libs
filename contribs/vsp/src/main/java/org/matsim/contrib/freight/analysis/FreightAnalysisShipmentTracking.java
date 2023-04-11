@@ -26,16 +26,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
-import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndEvent;
+import org.matsim.contrib.freight.events.FreightShipmentPickupEndEvent;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 /**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ *
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
+@Deprecated(since = "apr23", forRemoval = true)
 class FreightAnalysisShipmentTracking {
 
 	private final LinkedHashMap<Id<CarrierShipment>, ShipmentTracker> shipments = new LinkedHashMap<>();
@@ -78,24 +83,31 @@ class FreightAnalysisShipmentTracking {
 		}
 	}
 // untested LSP Event handling for precise Shipment Tracking
-	public void trackPickedUpEvent(ShipmentPickedUpEvent event) {
-		if (shipments.containsKey(event.getShipment().getId())) {
-			CarrierShipment shipment = event.getShipment();
-			shipments.get(shipment.getId()).pickUpTime = event.getTime();
-			shipments.get(shipment.getId()).driverId = event.getDriverId();
+	public void trackPickedUpEvent(FreightShipmentPickupEndEvent event) {
+		if (shipments.containsKey(event.getShipmentId())) {
+			shipments.get(event.getShipmentId()).pickUpTime = event.getTime();
+			//FixMe: Driver is no longer part of the events... kmt jul22
+//			shipments.get(shipment.getId()).driverId = event.getDriverId();
 		}
 	}
 
 
-	public void trackDeliveryEvent(ShipmentDeliveredEvent event) {
-		if (shipments.containsKey(event.getShipment().getId())){
-			ShipmentTracker shipmentTracker = shipments.get(event.getShipment().getId());
+	public void trackDeliveryEvent(FreightShipmentDeliveryEndEvent event) {
+		if (shipments.containsKey(event.getShipmentId())){
+			ShipmentTracker shipmentTracker = shipments.get(event.getShipmentId());
 			shipmentTracker.deliveryTime=event.getTime();
 			shipmentTracker.deliveryDuration +=  (event.getTime() - shipmentTracker.pickUpTime);
 		}
 	}
 }
 
+/**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ */
+
+@Deprecated(since = "apr23", forRemoval = true)
 class ShipmentTracker {
 	public Id<Person> driverIdGuess;
 	public double deliveryTimeGuess;

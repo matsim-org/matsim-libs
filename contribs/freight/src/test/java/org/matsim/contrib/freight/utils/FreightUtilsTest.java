@@ -22,7 +22,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
@@ -61,7 +63,7 @@ public class FreightUtilsTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private static final Logger log = Logger.getLogger(FreightUtilsTest.class);
+	private static final Logger log = LogManager.getLogger(FreightUtilsTest.class);
 
 	private final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
@@ -418,7 +420,7 @@ public class FreightUtilsTest {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		FreightUtils.loadCarriersAccordingToFreightConfig(scenario );
 		Controler controler = new Controler(scenario);
 
 		try {

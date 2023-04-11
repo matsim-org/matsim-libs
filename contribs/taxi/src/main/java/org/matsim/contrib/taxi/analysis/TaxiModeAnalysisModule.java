@@ -18,9 +18,6 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
 package org.matsim.contrib.taxi.analysis;
 
 import java.awt.Color;
@@ -80,7 +77,7 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 						getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
 		addControlerListenerBinding().to(modalKey(TaxiStatsDumper.class));
 
-		if (taxiCfg.getTimeProfiles()) {
+		if (taxiCfg.timeProfiles) {
 			bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 					getter -> new VehicleOccupancyProfileCalculator(getMode(),
 							getter.getModal(FleetSpecification.class), 300, getter.get(QSimConfigGroup.class),

@@ -20,7 +20,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -201,7 +202,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         this.writer = new ObjectOutputStream(socket.getOutputStream());
 
         int myNumber = reader.readInt();
-        slaveLogger = Logger.getLogger(("SLAVE_" + myNumber));
+        slaveLogger = LogManager.getLogger(("SLAVE_" + myNumber));
 
         numberOfPSimIterationsPerCycle = reader.readInt();
         numberOfPlansOnSlave = reader.readInt();

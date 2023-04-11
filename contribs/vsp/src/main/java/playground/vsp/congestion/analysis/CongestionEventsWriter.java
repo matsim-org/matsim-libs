@@ -21,7 +21,8 @@ package playground.vsp.congestion.analysis;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -42,7 +43,7 @@ import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
  *
  */
 public class CongestionEventsWriter {
-	private static final Logger log = Logger.getLogger(CongestionEventsWriter.class);
+	private static final Logger log = LogManager.getLogger(CongestionEventsWriter.class);
 	
 	static String runDirectory;
 	

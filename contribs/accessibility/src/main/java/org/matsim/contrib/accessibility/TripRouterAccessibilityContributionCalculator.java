@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,13 +51,13 @@ import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * @author nagel, dziemke
  */
 class TripRouterAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger LOG = Logger.getLogger( TripRouterAccessibilityContributionCalculator.class );
+	private static final Logger LOG = LogManager.getLogger( TripRouterAccessibilityContributionCalculator.class );
 	private TripRouter tripRouter ;
 	private String mode;
 	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
@@ -136,7 +137,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 			ActivityFacility destinationFacility = activityFacilitiesFactory.createActivityFacility(null, destination.getNearestBasicLocation().getCoord());
 
 			Gbl.assertNotNull(tripRouter);
-			List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, null, new Attributes());
+			List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, null, new AttributesImpl());
 
 			double utility = 0.;
 			List<Leg> legs = TripStructureUtils.getLegs(plan);

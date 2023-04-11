@@ -28,11 +28,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
- * 
- *  
+ * <p>
+ *
  * @author sschroeder, mzilske
  *
  */
@@ -48,7 +49,7 @@ public final class CarrierImpl implements Carrier {
 	private final Map<Id<CarrierService>, CarrierService> services;
 	private CarrierCapabilities carrierCapabilities;
 	private CarrierPlan selectedPlan;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	CarrierImpl( final Id<Carrier> id ) {
 		super();
@@ -82,9 +83,9 @@ public final class CarrierImpl implements Carrier {
 
 	/**
 	 * Selects the selectedPlan.
-	 * 
+	 *
 	 * <p> If the plan-collection does not contain the selectedPlan, it is added to that collection.
-	 * 
+	 *
 	 * @param selectedPlan to be selected
 	 */
 	@Override

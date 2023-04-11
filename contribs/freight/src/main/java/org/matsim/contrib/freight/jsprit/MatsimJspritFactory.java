@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2011 Stefan Schroeder.
  * eMail: stefan.schroeder@kit.edu
- *
+ * <p>
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Public License v2.0
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
+ * <p>
  * Contributors:
  *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
@@ -36,7 +36,8 @@ import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,7 +48,7 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -59,7 +60,7 @@ import java.util.List;
 
 /**
  * A factory that creates matsim-object from jsprit
- * (https://github.com/jsprit/jsprit) and vice versa.
+ * (<a href="https://github.com/jsprit/jsprit">...</a>) and vice versa.
  *
  * @author sschroeder
  *         <p>
@@ -68,7 +69,8 @@ import java.util.List;
  */
 public final class MatsimJspritFactory {
 
-	private static final  Logger log = Logger.getLogger(MatsimJspritFactory.class);
+	@SuppressWarnings("unused")
+	private static final  Logger log = LogManager.getLogger(MatsimJspritFactory.class);
 
 	// How to deal with a multi-depot VRP? Which depotLink should be used? kmt
 	// jul/18
@@ -366,7 +368,7 @@ public final class MatsimJspritFactory {
 	 * @return ScheduledTour
 	 * @throws IllegalStateException if tourActivity is NOT {@link ServiceActivity}.
 	 */
-	static ScheduledTour createTour(VehicleRoute jspritRoute) {
+	static ScheduledTour createTour(VehicleRoute jspritRoute, Id<Tour> tourId) {
 		// have made this non-public for the time being since it is nowhere used within the freight contrib, and we might want to add the
 		// vehicle types as argument.  If this is publicly used, please move back to public.  kai, jan'22
 
@@ -377,7 +379,7 @@ public final class MatsimJspritFactory {
 		CarrierVehicle carrierVehicle = createCarrierVehicle(jspritRoute.getVehicle());
 		double depTime = jspritRoute.getStart().getEndTime();
 
-		Tour.Builder matsimFreightTourBuilder = Tour.Builder.newInstance();
+		Tour.Builder matsimFreightTourBuilder = Tour.Builder.newInstance(tourId);
 		matsimFreightTourBuilder.scheduleStart(Id.create(jspritRoute.getStart().getLocation().getId(), Link.class));
 		for (TourActivity act : tour.getActivities()) {
 			if (act instanceof ServiceActivity || act instanceof PickupService) {
@@ -408,7 +410,7 @@ public final class MatsimJspritFactory {
 		matsimFreightTourBuilder.scheduleEnd(Id.create(jspritRoute.getEnd().getLocation().getId(), Link.class));
 		org.matsim.contrib.freight.carrier.Tour matsimVehicleTour = matsimFreightTourBuilder.build();
 		ScheduledTour sTour = ScheduledTour.newInstance(matsimVehicleTour, carrierVehicle, depTime);
-    
+
 		if (jspritRoute.getDepartureTime() != sTour.getDeparture())
 			throw new AssertionError("departureTime of both route and scheduledTour must be equal");
 
@@ -475,7 +477,7 @@ public final class MatsimJspritFactory {
 	 * Creates an immutable {@link VehicleRoutingProblem} from {@link Carrier}.
 	 *
 	 * <p>
-	 * For creation it takes only the information needed to setup the problem (not
+	 * For creation, it takes only the information needed to set up the problem (not
 	 * the solution, i.e. predefined plans are ignored).
 	 * <p>
 	 * The network is required to retrieve coordinates of locations.
@@ -489,8 +491,13 @@ public final class MatsimJspritFactory {
 	public static VehicleRoutingProblem createRoutingProblem(Carrier carrier, Network network,
 			VehicleRoutingTransportCosts transportCosts, VehicleRoutingActivityCosts activityCosts) {
 		VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-		boolean serviceInVrp = false;
-		boolean shipmentInVrp = false;
+		boolean serviceInVrp = !carrier.getServices().isEmpty();
+		boolean shipmentInVrp = !carrier.getShipments().isEmpty();
+
+		if (shipmentInVrp && serviceInVrp) {
+			throw new UnsupportedOperationException(
+					"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+		}
 
 		FleetSize fleetSize;
 		CarrierCapabilities carrierCapabilities = carrier.getCarrierCapabilities();
@@ -522,47 +529,43 @@ public final class MatsimJspritFactory {
 			vrpBuilder.addVehicle(veh);
 		}
 
-		for (CarrierService service : carrier.getServices().values()) {
-			if (shipmentInVrp) {
-				throw new UnsupportedOperationException(
-						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+
+		if (serviceInVrp) {
+			for (CarrierService service : carrier.getServices().values()) {
+
+				Coord coordinate = null;
+				if (network != null) {
+					Link link = network.getLinks().get(service.getLocationLinkId());
+					if (link != null) {
+						coordinate = link.getCoord();
+					} else
+						log.warn("cannot find linkId " + service.getLocationLinkId());
+				}
+				vrpBuilder.addJob(createService(service, coordinate));
 			}
-			Coord coordinate = null;
-			if (network != null) {
-				Link link = network.getLinks().get(service.getLocationLinkId());
-				if (link != null) {
-					coordinate = link.getCoord();
-				} else
-					log.warn("cannot find linkId " + service.getLocationLinkId());
-			}
-			serviceInVrp = true;
-			vrpBuilder.addJob(createService(service, coordinate));
 		}
 
-		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
-			if (serviceInVrp) {
-				throw new UnsupportedOperationException(
-						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
-			}
-			Coord fromCoordinate = null;
-			Coord toCoordinate = null;
-			if (network != null) {
-				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
-				Link toLink = network.getLinks().get(carrierShipment.getTo());
+		if (shipmentInVrp) {
+			for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
+				Coord fromCoordinate = null;
+				Coord toCoordinate = null;
+				if (network != null) {
+					Link fromLink = network.getLinks().get(carrierShipment.getFrom());
+					Link toLink = network.getLinks().get(carrierShipment.getTo());
 
-				if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
-															// specified location
-					fromCoordinate = fromLink.getCoord();
-					toCoordinate = toLink.getCoord();
-					vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
-				} else
-					throw new IllegalStateException(
-							"cannot create shipment since neither fromLinkId " + carrierShipment.getTo()
-									+ " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
+					if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
+						// specified location
+						fromCoordinate = fromLink.getCoord();
+						toCoordinate = toLink.getCoord();
+						vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+					} else
+						throw new IllegalStateException(
+								"cannot create shipment since neither fromLinkId " + carrierShipment.getTo()
+										+ " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
 
+				}
+				vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 			}
-			shipmentInVrp = true;
-			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 		}
 
 		if (transportCosts != null)
@@ -579,7 +582,7 @@ public final class MatsimJspritFactory {
 	 * from network and carrier such as {@link NetworkBasedTransportCosts}.
 	 *
 	 * <p>
-	 * For creation it takes only the information needed to setup the problem (not
+	 * For creation, it takes only the information needed to set up the problem (not
 	 * the solution, i.e. predefined plans are ignored).
 	 * <p>
 	 * The network is required to retrieve coordinates of locations.
@@ -592,8 +595,13 @@ public final class MatsimJspritFactory {
 	 */
 	public static VehicleRoutingProblem.Builder createRoutingProblemBuilder(Carrier carrier, Network network) {
 		VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-		boolean serviceInVrp = false;
-		boolean shipmentInVrp = false;
+		boolean serviceInVrp = !carrier.getServices().isEmpty();
+		boolean shipmentInVrp = !carrier.getShipments().isEmpty();
+
+		if (shipmentInVrp && serviceInVrp) {
+			throw new UnsupportedOperationException(
+					"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+		}
 
 		FleetSize fleetSize;
 		CarrierCapabilities carrierCapabilities = carrier.getCarrierCapabilities();
@@ -618,51 +626,44 @@ public final class MatsimJspritFactory {
 			vrpBuilder.addVehicle(createVehicle(carrierVehicle, coordinate));
 		}
 
-		for (CarrierService service : carrier.getServices().values()) {
-			log.debug("Handle CarrierService: " + service.toString());
-			if (shipmentInVrp) {
-				throw new UnsupportedOperationException(
-						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+		if (serviceInVrp) {
+			for (CarrierService service : carrier.getServices().values()) {
+				log.debug("Handle CarrierService: " + service.toString());
+				Coord coordinate = null;
+				if (network != null) {
+					Link link = network.getLinks().get(service.getLocationLinkId());
+					if (link == null) {
+						throw new IllegalStateException("cannot create service since linkId " + service.getLocationLinkId()
+								+ " does not exists in network.");
+					} else
+						coordinate = link.getCoord();
+				}
+				vrpBuilder.addJob(createService(service, coordinate));
 			}
-			Coord coordinate = null;
-			if (network != null) {
-				Link link = network.getLinks().get(service.getLocationLinkId());
-				if (link == null) {
-					throw new IllegalStateException("cannot create service since linkId " + service.getLocationLinkId()
-							+ " does not exists in network.");
-				} else
-					coordinate = link.getCoord();
-			}
-			serviceInVrp = true;
-			vrpBuilder.addJob(createService(service, coordinate));
 		}
 
-		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
-			log.debug("Handle CarrierShipment: " + carrierShipment.toString());
-			if (serviceInVrp) {
-				throw new UnsupportedOperationException(
-						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+		if (shipmentInVrp) {
+			for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
+				log.debug("Handle CarrierShipment: " + carrierShipment.toString());
+				Coord fromCoordinate = null;
+				Coord toCoordinate = null;
+				if (network != null) {
+					Link fromLink = network.getLinks().get(carrierShipment.getFrom());
+					Link toLink = network.getLinks().get(carrierShipment.getTo());
+
+					if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
+						// specified location
+						log.debug("Shipment identified as Shipment: " + carrierShipment.getId().toString());
+						fromCoordinate = fromLink.getCoord();
+						toCoordinate = toLink.getCoord();
+					} else
+						throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString()
+								+ " since either fromLinkId " + carrierShipment.getFrom() + " or toLinkId "
+								+ carrierShipment.getTo() + " exists in network.");
+
+				}
+				vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 			}
-
-			Coord fromCoordinate = null;
-			Coord toCoordinate = null;
-			if (network != null) {
-				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
-				Link toLink = network.getLinks().get(carrierShipment.getTo());
-
-				if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
-															// specified location
-					log.debug("Shipment identified as Shipment: " + carrierShipment.getId().toString());
-					fromCoordinate = fromLink.getCoord();
-					toCoordinate = toLink.getCoord();
-				} else
-					throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString()
-							+ " since either fromLinkId " + carrierShipment.getFrom() + " or toLinkId "
-							+ carrierShipment.getTo() + " exists in network.");
-
-			}
-			shipmentInVrp = true;
-			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 		}
 
 		return vrpBuilder;
@@ -727,8 +728,10 @@ public final class MatsimJspritFactory {
 	 */
 	public static CarrierPlan createPlan(Carrier carrier, VehicleRoutingProblemSolution solution) {
 		Collection<ScheduledTour> tours = new ArrayList<>();
+		int tourIdindex = 1;
 		for (VehicleRoute route : solution.getRoutes()) {
-			ScheduledTour scheduledTour = createTour(route);
+			ScheduledTour scheduledTour = createTour(route, Id.create(tourIdindex, Tour.class));
+			tourIdindex++;
 			tours.add(scheduledTour);
 		}
 		CarrierPlan carrierPlan = new CarrierPlan(carrier, tours);
@@ -756,58 +759,45 @@ public final class MatsimJspritFactory {
 				throw new RuntimeException(e);
 			}
 			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
-			case noDistanceConstraint:
-				algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
-				break;
-			case basedOnEnergyConsumption:
-				log.info("Use the distanceConstraint based on energy consumption.");
-				StateManager stateManager = new StateManager(problem);
-
-				StateId distanceStateId = stateManager.createStateId("distance");
-
-				stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
-
-				ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-				constraintManager.addConstraint(
-						new DistanceConstraint(
-								FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
-						ConstraintManager.Priority.CRITICAL);
-
-				AlgorithmConfig algorithmConfig = new AlgorithmConfig();
-				AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
-				xmlReader.read(vraURL);
-				algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, algorithmConfig, 0, null,
-						stateManager, constraintManager, true);
-				break;
-			default:
-				throw new IllegalStateException(
+				case noDistanceConstraint -> algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
+				case basedOnEnergyConsumption -> {
+					log.info("Use the distanceConstraint based on energy consumption.");
+					StateManager stateManager = new StateManager(problem);
+					StateId distanceStateId = stateManager.createStateId("distance");
+					stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
+					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+					constraintManager.addConstraint(
+							new DistanceConstraint(
+									FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+							ConstraintManager.Priority.CRITICAL);
+					AlgorithmConfig algorithmConfig = new AlgorithmConfig();
+					AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
+					xmlReader.read(vraURL);
+					algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, algorithmConfig, 0, null,
+							stateManager, constraintManager, true);
+				}
+				default -> throw new IllegalStateException(
 						"Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
 			}
 
 		} else {
 			log.info("Use a VehicleRoutingAlgorithm out of the box.");
 			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
-			case noDistanceConstraint:
-				algorithm = new SchrimpfFactory().createAlgorithm(problem);
-				break;
-			case basedOnEnergyConsumption:
-				log.info("Use the distanceConstraint based on energy consumption.");
-				StateManager stateManager = new StateManager(problem);
-
-				StateId distanceStateId = stateManager.createStateId("distance");
-
-				stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
-
-				ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-				constraintManager.addConstraint(
-						new DistanceConstraint(
-								FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
-						ConstraintManager.Priority.CRITICAL);
-				algorithm = Jsprit.Builder.newInstance(problem)
-						.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
-				break;
-			default:
-				throw new IllegalStateException(
+				case noDistanceConstraint -> algorithm = new SchrimpfFactory().createAlgorithm(problem);
+				case basedOnEnergyConsumption -> {
+					log.info("Use the distanceConstraint based on energy consumption.");
+					StateManager stateManager = new StateManager(problem);
+					StateId distanceStateId = stateManager.createStateId("distance");
+					stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
+					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+					constraintManager.addConstraint(
+							new DistanceConstraint(
+									FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+							ConstraintManager.Priority.CRITICAL);
+					algorithm = Jsprit.Builder.newInstance(problem)
+							.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
+				}
+				default -> throw new IllegalStateException(
 						"Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
 			}
 		}

@@ -1,7 +1,7 @@
 package org.matsim.contrib.analysis.spatial;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;

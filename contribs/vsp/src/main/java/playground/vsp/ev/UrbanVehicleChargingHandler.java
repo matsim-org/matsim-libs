@@ -31,7 +31,6 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -53,16 +52,10 @@ import java.util.*;
  */
 class UrbanVehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
-		ChargingEndEventHandler, ChargingStartEventHandler, MobsimScopeEventHandler {
+		ChargingEndEventHandler, ChargingStartEventHandler, QueuedAtChargerEventHandler, MobsimScopeEventHandler {
 
-	static final String PLUGIN_IDENTIFIER = " plugin";
-	public static final String PLUGIN_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
-			PLUGIN_IDENTIFIER);
-	static final String PLUGOUT_IDENTIFIER = " plugout";
-	public static final String PLUGOUT_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
-			PLUGOUT_IDENTIFIER);
 	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
-	private final Map<Id<ElectricVehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
 
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final ElectricFleet electricFleet;
@@ -84,10 +77,10 @@ class UrbanVehicleChargingHandler
 	 */
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (event.getActType().endsWith(PLUGIN_INTERACTION)) {
+		if (event.getActType().endsWith( UrbanEVModule.PLUGIN_INTERACTION )) {
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
-				Id<ElectricVehicle> evId = Id.create(vehicleId, ElectricVehicle.class);
+				Id<Vehicle> evId = Id.create(vehicleId, Vehicle.class);
 				if (electricFleet.getElectricVehicles().containsKey(evId)) {
 					ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
 					List<Charger> chargers = chargersAtLinks.get(event.getLinkId());
@@ -117,10 +110,10 @@ class UrbanVehicleChargingHandler
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (event.getActType().endsWith(PLUGOUT_INTERACTION)) {
+		if (event.getActType().endsWith( UrbanEVModule.PLUGOUT_INTERACTION )) {
 			Tuple<Id<Vehicle>, Id<Charger>> tuple = chargingProcedures.get(event.getLinkId()).remove(event.getPersonId());
 			if (tuple != null) {
-				Id<ElectricVehicle> evId = Id.create(tuple.getFirst(), ElectricVehicle.class);
+				Id<Vehicle> evId = Id.create(tuple.getFirst(), Vehicle.class);
 				if(vehiclesAtChargers.remove(evId) != null){ //if null, vehicle is fully charged and de-plugged already (see handleEvent(ChargingEndedEvent) )
 					Id<Charger> chargerId = tuple.getSecond();
 					Charger c = chargingInfrastructure.getChargers().get(chargerId);
@@ -149,5 +142,9 @@ class UrbanVehicleChargingHandler
 		//Charging has started
 	}
 
-
+	@Override
+	public void handleEvent(QueuedAtChargerEvent event) {
+		vehiclesAtChargers.put(event.getVehicleId(), event.getChargerId());
+		//Charging may start soon
+	}
 }

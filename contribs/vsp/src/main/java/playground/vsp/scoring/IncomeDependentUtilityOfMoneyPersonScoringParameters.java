@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package playground.vsp.scoring;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
@@ -42,22 +43,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * This class is an adoption of {@link org.matsim.core.scoring.functions.SubpopulationScoringParameters}.
  * It additionaly allows for person-specific marginalUtilityOfMoney.
- * In order to use this, you need to provide an attribute {@link #PERSONAL_INCOME_ATTRIBUTE_NAME} for persons that have
- * a specific income. Persons in the population, that have no attribute {@link #PERSONAL_INCOME_ATTRIBUTE_NAME} will use the
+ * For marginalUtilityOfMoney an attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} for persons that have a specific
+ * income is used. Persons in the population, that have no attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} will use the
  * default marginal utility set in their subpopulation's scoring parameters.
  * <p>
  * The person specific marginal utility is computed by subpopulationMgnUtilityOfMoney * AVERAGE_INCOME / PERSONAL_INCOME
  * where
- * AVERAGE_INCOME is computed as the average of all values of the attribute {@link #PERSONAL_INCOME_ATTRIBUTE_NAME} that are contained in the population.
+ * AVERAGE_INCOME is computed as the average of all values of the attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} that are contained in the population.
  * <p>
  * If you want to distinguish between 'rich' areas and 'poor' areas, make use of the subpopulation feature and set subpopulation-specific mgnUtilityOfMoney in
  * the #PlanCalcScoreConfigGroup
  */
 public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements ScoringParametersForPerson {
-    Logger log = Logger.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
-
-    public static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
-
+    Logger log = LogManager.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
     private final PlanCalcScoreConfigGroup config;
     private final ScenarioConfigGroup scConfig;
     private final TransitConfigGroup transitConfigGroup;
@@ -74,7 +72,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
     }
 
     private double computeAvgIncome(Population population) {
-        log.info("read income attribute '" + PERSONAL_INCOME_ATTRIBUTE_NAME + "' of all agents and compute global average.\n" +
+        log.info("reading income attribute using " + PersonUtils.class + " of all agents and compute global average.\n" +
                 "Make sure to set this attribute only to appropriate agents (i.e. true 'persons' and not freight agents) \n" +
                 "Income values <= 0 are ignored. Agents that have negative or 0 income will use the marginalUtilityOfMOney in their subpopulation's scoring params..");
         OptionalDouble averageIncome = population.getPersons().values().stream()

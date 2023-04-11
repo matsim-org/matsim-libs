@@ -24,7 +24,7 @@ public class MultiModeDrtMainModeIdentifierTest {
 	public void test() {
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		String drtMode = "drt";
-		drtConfigGroup.setMode(drtMode);
+		drtConfigGroup.mode = drtMode;
 		Config config = ConfigUtils.createConfig();
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);

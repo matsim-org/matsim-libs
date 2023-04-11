@@ -28,6 +28,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -77,7 +78,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	private boolean mergeStops;
 
 	@CommandLine.Option(names = "--prefix", description = "Prefixes to add to the gtfs ids. Required if multiple inputs are used and ids are not unique.", split = ",")
-	private List<String> prefixes;
+	private List<String> prefixes = new ArrayList<>();
 
 	@CommandLine.Mixin
 	private CrsOptions crs = new CrsOptions("EPSG:4326");

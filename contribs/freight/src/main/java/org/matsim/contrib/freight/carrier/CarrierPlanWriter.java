@@ -44,7 +44,7 @@ public class CarrierPlanWriter {
 	}
 
 	public void write(String filename) {
-		this.writeV2(filename);
+		this.writeV2_1(filename);
 	}
 
 	/**
@@ -58,12 +58,29 @@ public class CarrierPlanWriter {
 
 	/**
 	 * Writes out the Carriers file in version 2.
-//	 * Please use the method {@link #write(String)} instead to always ensure writing out to the newest format.
+	 * Please use the method {@link #write(String)} instead to always ensure writing out to the newest format.
+	 *
+	 * @deprecated The underlining {@Link{CarrierPlanXmlWriterV2} is deprecated since Sep'22
 	 *
 	 * @param filename Name of the file that should be written.
 	 */
-	public void writeV2(String filename) {
+	@Deprecated public void writeV2(String filename) {
 		CarrierPlanXmlWriterV2 writer = new CarrierPlanXmlWriterV2(this.carriers);
+		if (this.attributeConverters != null) {
+			writer.putAttributeConverters(this.attributeConverters);
+		}
+		writer.write(filename);
+	}
+
+	/**
+	 * Writes out the Carriers file in version 2.1.
+	 * Please use the method {@link #write(String)} to always ensure writing out to the newest format.
+	 * --> keeping it private
+	 *
+	 * @param filename Name of the file that should be written.
+	 */
+	private void writeV2_1(String filename) {
+		CarrierPlanXmlWriterV2_1 writer = new CarrierPlanXmlWriterV2_1(this.carriers);
 		if (this.attributeConverters != null) {
 			writer.putAttributeConverters(this.attributeConverters);
 		}

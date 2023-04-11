@@ -47,7 +47,7 @@ public class FixedSpeedCharging implements BatteryCharging {
 	@Override
 	public double calcEnergyCharged(ChargerSpecification charger, double chargePeriod) {
 		final Battery battery = electricVehicle.getBattery();
-		return Math.min(calcChargingPower(charger) * chargePeriod, battery.getCapacity() - battery.getSoc());
+		return Math.min(calcChargingPower(charger) * chargePeriod, battery.getCapacity() - battery.getCharge());
 	}
 
 	@Override

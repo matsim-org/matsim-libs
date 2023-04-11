@@ -147,6 +147,8 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				// mode strings might be registered multiple times (these are not sets).  kai, may'18
 
 				this.tripsToLegs = new TripsToLegsAlgorithm(this.mainModeIdentifier);
+
+				// change single leg would not respect car availability, if car is not a chain based mode -- cr, aug'22
 				this.changeSingleLegMode = new ChooseRandomSingleLegMode(possibleModes, rng, true);
 			}
 		}
@@ -318,7 +320,19 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				}
 			}
 
-			usableModes.remove(getTransportMode(subtour));
+			if (behavior == SubtourModeChoice.Behavior.betweenAllAndFewerConstraints) {
+
+				// only remove candidates if the whole trip uses the same mode
+				usableModes.removeIf(mode -> subtour.getTrips().stream().allMatch(
+						trip-> mode.equals(mainModeIdentifier.identifyMainMode(trip.getTripElements()))
+				));
+
+			} else {
+				// The old behaviour removes candidates that could change trips to a different mode
+				usableModes.remove(getTransportMode(subtour));
+			}
+
+
 			// (remove current mode so we don't get it again; note that the parent plan is kept anyways)
 			for (String transportMode : usableModes) {
 				choiceSet.add(

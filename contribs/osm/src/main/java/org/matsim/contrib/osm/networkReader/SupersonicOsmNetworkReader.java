@@ -2,7 +2,8 @@ package org.matsim.contrib.osm.networkReader;
 
 import com.slimjars.dist.gnu.trove.list.TLongList;
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -35,7 +36,7 @@ import java.util.function.Predicate;
  */
 public class SupersonicOsmNetworkReader {
 
-    private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReader.class);
+    private static final Logger log = LogManager.getLogger(SupersonicOsmNetworkReader.class);
 
     private static final Set<String> reverseTags = new HashSet<>(Arrays.asList("-1", "reverse"));
     private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));

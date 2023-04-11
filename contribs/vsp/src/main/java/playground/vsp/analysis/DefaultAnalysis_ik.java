@@ -23,7 +23,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -45,7 +46,7 @@ import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
  */
 public class DefaultAnalysis_ik {
 	
-	private final static Logger log = Logger.getLogger(DefaultAnalysis_ik.class);
+	private final static Logger log = LogManager.getLogger(DefaultAnalysis_ik.class);
 	
 	private final String outputDir;
 	private final String eventsFile;

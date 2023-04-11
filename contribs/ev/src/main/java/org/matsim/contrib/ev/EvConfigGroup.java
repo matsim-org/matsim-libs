@@ -19,12 +19,8 @@
 
 package org.matsim.contrib.ev;
 
-import java.util.Map;
-
-import javax.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -36,136 +32,45 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 		return (EvConfigGroup)config.getModule(GROUP_NAME);
 	}
 
-	public static final String CHARGE_TIME_STEP = "chargeTimeStep";
-	static final String CHARGE_TIME_STEP_EXP = "charging will be simulated every 'chargeTimeStep'-th time step";
-
-	public static final String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
-	static final String AUX_DISCHARGE_TIME_STEP_EXP = "AUX discharging will be simulated every 'auxDischargeTimeStep'-th time step";
-
-	public static final String MINCHARGETIME = "minChargingTime";
-	static final String MINCHARGETIME_EXP = "Miinum activity duration for charging. Used in EvNetwork Routing.";
-
-	// input
-	public static final String CHARGERS_FILE = "chargersFile";
-	static final String CHARGERS_FILE_EXP = "Location of the chargers file";
-
-	public static final String VEHICLES_FILE = "vehiclesFile";
-	static final String VEHICLES_FILE_EXP = "Location of the vehicles file."
-			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
-			+ " See ElectricFleetModule.";
-
-	// output
-	public static final String TIME_PROFILES = "timeProfiles";
-	static final String TIME_PROFILES_EXP = "If true, SOC time profile plots will be created";
-
-	private static final String TRANSFER_FINAL_SOC_TO_NEXT_ITERATION_EXP = "determines whether the resulting SoC at the end of the iteration X is set to be the initial SoC in iteration X+1 for each EV." +
-			" If set to true, bear in mind that EV might start with 0% battery charge.";
-	private static final String TRANSFER_FINAL_SOC_TO_NEXT_ITERATION = "transferFinalSoCToNextIteration";
-
+	@Parameter
+	@Comment("charging will be simulated every 'chargeTimeStep'-th time step")
 	// no need to simulate with 1-second time step
 	@Positive
-	private int chargeTimeStep = 5; // 5 s ==> 0.35% SOC (fast charging, 50 kW)
+	public int chargeTimeStep = 5; // 5 s ==> 0.35% SOC (fast charging, 50 kW)
 
-	private int minimumChargeTime = 1200;
-
+	@Parameter
+	@Comment("AUX discharging will be simulated every 'auxDischargeTimeStep'-th time step")
 	// only used if SeparateAuxDischargingHandler is used, otherwise ignored
 	@Positive
-	private int auxDischargeTimeStep = 60; // 1 min ==> 0.25% SOC (3 kW AUX power)
+	public int auxDischargeTimeStep = 60; // 1 min ==> 0.25% SOC (3 kW AUX power)
 
+	@Parameter("minChargingTime")
+	@Comment("Minimum activity duration for charging. Used in EvNetwork Routing.")
+	public int minimumChargeTime = 1200;
+
+	@Parameter
+	@Comment("Location of the chargers file")
 	@NotNull
-	private String chargersFile = null;
+	public String chargersFile = null;
 
-	@Nullable
-	private String vehiclesFile = null;
+	// output
+	@Parameter
+	@Comment("If true, charge/SoC time profile plots will be created")
+	public boolean timeProfiles = false;
 
-	private boolean timeProfiles = false;
+	@Parameter
+	@Comment("Number of individual time profiles to be created")
+	@Positive
+	public int numberOfIndividualTimeProfiles = 50;
 
-	private boolean transferFinalSoCToNextIteration = false;
+	@Parameter
+	@Comment("determines whether the resulting SoC at the end of the iteration X is set to be the initial SoC"
+			+ "in iteration X+1 for each EV."
+			+ " If set to true, bear in mind that EV might start with 0% battery charge.")
+	public boolean transferFinalSoCToNextIteration = false;
 
 	public EvConfigGroup() {
 		super(GROUP_NAME);
-	}
-
-	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> map = super.getComments();
-		map.put(CHARGE_TIME_STEP, CHARGE_TIME_STEP_EXP);
-		map.put(AUX_DISCHARGE_TIME_STEP, AUX_DISCHARGE_TIME_STEP_EXP);
-		map.put(CHARGERS_FILE, CHARGERS_FILE_EXP);
-		map.put(VEHICLES_FILE, VEHICLES_FILE_EXP);
-		map.put(TIME_PROFILES, TIME_PROFILES_EXP);
-		map.put(MINCHARGETIME, MINCHARGETIME_EXP);
-		return map;
-	}
-
-	@StringGetter(CHARGE_TIME_STEP)
-	public int getChargeTimeStep() {
-		return chargeTimeStep;
-	}
-
-	@StringSetter(CHARGE_TIME_STEP)
-	public void setChargeTimeStep(int chargeTimeStep) {
-		this.chargeTimeStep = chargeTimeStep;
-	}
-
-	@StringGetter(AUX_DISCHARGE_TIME_STEP)
-	public int getAuxDischargeTimeStep() {
-		return auxDischargeTimeStep;
-	}
-
-	@StringSetter(AUX_DISCHARGE_TIME_STEP)
-	public void setAuxDischargeTimeStep(int auxDischargeTimeStep) {
-		this.auxDischargeTimeStep = auxDischargeTimeStep;
-	}
-
-	@StringGetter(CHARGERS_FILE)
-	public String getChargersFile() {
-		return chargersFile;
-	}
-
-	@StringSetter(CHARGERS_FILE)
-	public void setChargersFile(String chargersFile) {
-		this.chargersFile = chargersFile;
-	}
-
-	@StringGetter(VEHICLES_FILE)
-	public String getVehiclesFile() {
-		return vehiclesFile;
-	}
-
-	@StringSetter(VEHICLES_FILE)
-	public void setVehiclesFile(String vehiclesFile) {
-		this.vehiclesFile = vehiclesFile;
-	}
-
-	@StringGetter(TIME_PROFILES)
-	public boolean getTimeProfiles() {
-		return timeProfiles;
-	}
-
-	@StringSetter(TIME_PROFILES)
-	public void setTimeProfiles(boolean timeProfiles) {
-		this.timeProfiles = timeProfiles;
-	}
-
-	@StringSetter(MINCHARGETIME)
-	public void setMinimumChargeTime(int minimumChargeTime) {
-		this.minimumChargeTime = minimumChargeTime;
-	}
-
-	@StringGetter(MINCHARGETIME)
-	public int getMinimumChargeTime() {
-		return minimumChargeTime;
-	}
-
-	@StringSetter(TRANSFER_FINAL_SOC_TO_NEXT_ITERATION)
-	public void setTransferFinalSoCToNextIteration(boolean transferFinalSoCToNextIteration) {
-		this.transferFinalSoCToNextIteration = transferFinalSoCToNextIteration;
-	}
-
-	@StringGetter(TRANSFER_FINAL_SOC_TO_NEXT_ITERATION)
-	public boolean getTransferFinalSoCToNextIteration() {
-		return transferFinalSoCToNextIteration;
 	}
 }
 

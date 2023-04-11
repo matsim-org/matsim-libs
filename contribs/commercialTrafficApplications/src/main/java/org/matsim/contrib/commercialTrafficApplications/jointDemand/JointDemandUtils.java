@@ -67,6 +67,14 @@ public class JointDemandUtils {
         activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, copy);
     }
 
+	public static void setJobDuration(Activity activity, int commercialJobIndex, double duration) {
+		Collection<String> commercialJobProperties = getCommercialJob(activity, commercialJobIndex);
+		List<String> copy = new ArrayList<>();
+		copy.addAll(commercialJobProperties);
+		copy.set(COMMERCIALJOB_ATTRIBUTE_DURATION_IDX, String.valueOf(duration));
+		activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, copy);
+	}
+
     public static Set<Id<Carrier>> getExistingOperatorsForMarket(Carriers carriers, String market) {
         return carriers.getCarriers().values().
                 stream()

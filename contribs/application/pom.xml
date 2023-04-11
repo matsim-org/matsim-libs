@@ -56,7 +56,14 @@
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>freight</artifactId>
 			<version>15.0-SNAPSHOT</version>
-		</dependency>		
+			<exclusions>
+				<!-- Logging levels are all messed up without this exclusion -->
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-reload4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 		<dependency>
 			<groupId>com.github.matsim-org</groupId>
@@ -78,12 +85,12 @@
 		<dependency>
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
-			<version>4.6.3</version>
+			<version>4.7.2</version>
 		</dependency>
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
 			<artifactId>fastutil</artifactId>
-			<version>8.5.8</version>
+			<version>8.5.12</version>
 		</dependency>
 
 		<dependency>
@@ -99,9 +106,8 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>

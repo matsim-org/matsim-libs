@@ -20,7 +20,6 @@
 
 package org.matsim.core.replanning.selectors;
 
-
 /**
  * Tests for {@link ExpBetaPlanSelector}.
  *

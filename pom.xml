@@ -30,11 +30,11 @@
         <maven.compiler.release>17</maven.compiler.release>
         <argLine></argLine>
 
-        <log4j.version>2.18.0</log4j.version>
-        <geotools.version>27.1</geotools.version>
+        <log4j.version>2.20.0</log4j.version>
+        <geotools.version>29.0</geotools.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>5.1.0</guice.version>
-        <jackson.version>2.13.3</jackson.version>
+        <jackson.version>2.14.2</jackson.version>
     </properties>
 
     <scm>
@@ -85,11 +85,6 @@
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-1.2-api</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
     </dependencies>
 
     <!-- Some commonly used dependencies with fixed versions, please try to avoid replicating the versions in other poms -->
@@ -112,13 +107,8 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
-                <artifactId>commons-math</artifactId>
-                <version>2.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.21</version>
+                <version>1.23.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
@@ -133,12 +123,12 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
-                <version>1.9</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
-                <version>5.6</version>
+                <version>5.7.1</version>
             </dependency>
             <dependency>
                 <groupId>org.geotools</groupId>
@@ -187,7 +177,7 @@
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-bom</artifactId>
-                <version>4.0.0</version>
+                <version>4.0.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -195,7 +185,7 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
-                <version>2.15.0</version>
+                <version>2.18.0</version>
             </dependency>
 
             <dependency>
@@ -207,7 +197,7 @@
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
                 <artifactId>woodstox-core</artifactId>
-                <version>6.3.0</version>
+                <version>6.5.0</version>
             </dependency>
 
             <dependency>
@@ -226,13 +216,13 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.36</version>
+                <version>2.0.7</version>
             </dependency>
 
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.36</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
 
             <dependency>
@@ -244,7 +234,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>3.4.2</version>
+                <version>3.5.1</version>
             </dependency>
 
             <dependency>
@@ -274,24 +264,37 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.24.0</version>
+                <version>3.33.0</version>
             </dependency>
 
-            <dependency>
+			<dependency>
+				<groupId>javax.measure</groupId>
+				<artifactId>unit-api</artifactId>
+				<version>2.1.3</version>
+			</dependency>
+
+			<dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.23.1</version>
+                <version>3.24.2</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>4.6.1</version>
+                <version>5.2.0</version>
                 <scope>test</scope>
             </dependency>
 
-        </dependencies>
+			<dependency>
+				<groupId>net.bytebuddy</groupId>
+				<artifactId>byte-buddy</artifactId>
+				<version>1.14.4</version>
+				<scope>test</scope>
+			</dependency>
+
+		</dependencies>
     </dependencyManagement>
 
     <build>
@@ -299,12 +302,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.11.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
@@ -361,17 +364,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M7</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0-M7</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -381,17 +384,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -442,30 +445,13 @@
             </build>
         </profile>
         <profile>
-            <id>hudson</id>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <configuration>
-                                <doclint>none</doclint>
-                                <quiet>true</quiet>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
             <id>jacoco</id>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.8</version>
+                        <version>0.8.9</version>
                         <executions>
                             <execution>
                                 <id>default-prepare-agent</id>

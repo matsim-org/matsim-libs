@@ -21,7 +21,8 @@ package org.matsim.contrib.emissions;
 
 import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,7 +37,7 @@ import java.util.Set;
  *
  */
 public final class EmissionModule {
-	private static final Logger logger = Logger.getLogger(EmissionModule.class);
+	private static final Logger logger = LogManager.getLogger(EmissionModule.class);
 	
 	private final Scenario scenario;
 	private WarmEmissionHandler warmEmissionHandler;
@@ -103,6 +104,12 @@ public final class EmissionModule {
 	public void writeEmissionInformation() {
 		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
 				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
+		int noVehicleLeavesTrafficEmissions = warmEmissionHandler.getSameLinkTrafficLeaveWarnCnt() + warmEmissionHandler.getUnusualTrafficLeaveWarnCnt();
+		logger.info("Warm emissions were not calculated for " + noVehicleLeavesTrafficEmissions + " of " + warmEmissionHandler.getTrafficLeaveCnt() +
+				" vehicle leaves traffic events (no corresponding link enter event).");
+		if ( warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() > 0 ) {
+			logger.info(warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() + " events occurred where the vehicle left traffic without entering ANY link " +
+					"(no warm emissions calculated). These events might need to be investigated."); }
 
 		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
 
@@ -163,6 +170,11 @@ public final class EmissionModule {
 		if (shouldCreateAverageTables()) {
 			this.avgHbefaColdTable = HbefaTables.loadAverageCold(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(coldPollutants, avgHbefaColdTable.keySet());
+			// yy The naming and signature of the above should presumably be changed: (1) addPollutantsToX implies signature (pollutants,
+			// X).  But it is actually the other way round (even if it does not read that way.  (2) "coldPollutants" is not a Map.  Since
+			// this is a private method, maybe one could also have a method "memorizeColdPollutants" and then not have coldPollutants as
+			// field. kai, dec'22
+
 			this.avgHbefaWarmTable = HbefaTables.loadAverageWarm(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(warmPollutants, avgHbefaWarmTable.keySet());
 		}

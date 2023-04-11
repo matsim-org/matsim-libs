@@ -26,11 +26,5 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * @author dgrether
  */
 public interface Vehicle extends Attributable, Identifiable<Vehicle> {
-
 	VehicleType getType();
-
-	@Deprecated // refactoring device, please inline
-	default VehicleType getVehicleType() {
-		return getType() ;
-	}
 }

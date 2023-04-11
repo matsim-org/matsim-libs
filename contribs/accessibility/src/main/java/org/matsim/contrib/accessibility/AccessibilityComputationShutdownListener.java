@@ -24,7 +24,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import com.google.common.collect.Iterables;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +46,7 @@ import org.matsim.facilities.ActivityFacility;
  * @author dziemke
  */
 final class AccessibilityComputationShutdownListener implements ShutdownListener {
-	private static final Logger LOG = Logger.getLogger(AccessibilityComputationShutdownListener.class);
+	private static final Logger LOG = LogManager.getLogger(AccessibilityComputationShutdownListener.class);
 
     private final ActivityFacilities measuringPoints;
     private ActivityFacilities opportunities;

@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -61,7 +62,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String BIKE_SPEED = "bikeSpeed";
 	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
 	
-	private static final Logger log = Logger.getLogger(PlansCalcRouteConfigGroup.class) ;
+	private static final Logger log = LogManager.getLogger(PlansCalcRouteConfigGroup.class) ;
 	
 	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
 
@@ -88,6 +89,28 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public static class TeleportedModeParams extends ModeRoutingParams {
 		public TeleportedModeParams( String mode ){
 			super( mode );
+		}
+
+		// repeating the setters so that they return the right type with chaining.  kai, jan'23
+		@Override public TeleportedModeParams setMode( String mode ) {
+			super.setMode( mode );
+			return this;
+		}
+		@Override public TeleportedModeParams setTeleportedModeSpeed( Double teleportedModeSpeed ) {
+			super.setTeleportedModeSpeed( teleportedModeSpeed );
+			return this;
+		}
+		@Override public TeleportedModeParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
+			super.setTeleportedModeFreespeedLimit( teleportedModeFreespeedLimit );
+			return this;
+		}
+		@Override public TeleportedModeParams setTeleportedModeFreespeedFactor( Double teleportedModeFreespeedFactor ) {
+			super.setTeleportedModeFreespeedFactor( teleportedModeFreespeedFactor );
+			return this;
+		}
+		@Override public TeleportedModeParams setBeelineDistanceFactor( Double beelineDistanceFactor ) {
+			super.setBeelineDistanceFactor( beelineDistanceFactor );
+			return this;
 		}
 	}
 	/**
@@ -165,7 +188,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		 * 
 		 * @param teleportedModeFreespeedLimit -- {@value #TELEPORTED_MODE_FREESPEED_LIMIT_CMT}
 		 */
-		public final ModeRoutingParams setTeleportedModeFreespeedLimit(Double teleportedModeFreespeedLimit) {
+		public ModeRoutingParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
 			this.teleportedModeFreespeedLimit = teleportedModeFreespeedLimit;
 			return this;
 		}

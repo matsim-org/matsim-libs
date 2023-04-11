@@ -25,8 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -38,7 +39,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
  *
  */
 public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup {
-	private static final Logger log = Logger.getLogger( TravelTimeCalculatorConfigGroup.class ) ;
+	private static final Logger log = LogManager.getLogger( TravelTimeCalculatorConfigGroup.class ) ;
 
 	public static final String GROUPNAME = "travelTimeCalculator";
 

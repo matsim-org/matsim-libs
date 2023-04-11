@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -47,8 +48,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.api.core.v01.events.HasPersonId;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -78,7 +81,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
-
+	
 	private final EventsToLegs legsDelegate;
 	private final EventsToActivities actsDelegate;
 
@@ -90,9 +93,18 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
 
 	@Inject
-	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities,
-				      EventsToLegs eventsToLegs, Population population, ScoringFunctionFactory scoringFunctionFactory) {
-		controlerListenerManager.addControlerListener((IterationStartsListener) event -> init());
+	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
+						 Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
+		ControlerConfigGroup controlerConfigGroup = config.controler();
+		
+		if (controlerConfigGroup.getEventTypeToCreateScoringFunctions() == ControlerConfigGroup.EventTypeToCreateScoringFunctions.IterationStarts) {
+			controlerListenerManager.addControlerListener((IterationStartsListener) event -> init());
+		} else if (controlerConfigGroup.getEventTypeToCreateScoringFunctions() == ControlerConfigGroup.EventTypeToCreateScoringFunctions.BeforeMobsim) {
+			controlerListenerManager.addControlerListener((BeforeMobsimListener) event -> init());
+		} else {
+			throw new RuntimeException("Unknown approach when to create the scoring functions for population. Aborting...");
+		}
+
 		this.population = population;
 		this.legsDelegate = eventsToLegs;
 		this.actsDelegate = eventsToActivities;

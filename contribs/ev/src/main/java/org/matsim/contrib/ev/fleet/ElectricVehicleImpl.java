@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
@@ -50,11 +51,11 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 
 	private ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification) {
 		this.vehicleSpecification = vehicleSpecification;
-		battery = new BatteryImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialSoc());
+		battery = new BatteryImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialCharge());
 	}
 
 	@Override
-	public Id<ElectricVehicle> getId() {
+	public Id<Vehicle> getId() {
 		return vehicleSpecification.getId();
 	}
 
@@ -64,8 +65,8 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 	}
 
 	@Override
-	public String getVehicleType() {
-		return vehicleSpecification.getVehicleType();
+	public ElectricVehicleSpecification getVehicleSpecification() {
+		return vehicleSpecification;
 	}
 
 	@Override

@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -35,12 +36,17 @@ import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 
 /**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ *
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
+@Deprecated(since = "apr23", forRemoval = true)
 class FreightAnalysisVehicleTracking {
 
-	private static final  Logger log = Logger.getLogger(FreightAnalysisVehicleTracking.class);
+	private static final  Logger log = LogManager.getLogger(FreightAnalysisVehicleTracking.class);
 
 	private final LinkedHashMap<Id<Vehicle>, VehicleTracker> trackers = new LinkedHashMap<>();
 	private final LinkedHashMap<Id<Person>, Id<Vehicle>> driver2VehicleId = new LinkedHashMap<>();
@@ -152,6 +158,13 @@ class FreightAnalysisVehicleTracking {
 
 }
 
+
+/**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ */
+@Deprecated(since = "apr23")
 class VehicleTracker {
 	public double lastExit;
 	public Id<Person> lastDriverId = Id.createPersonId(-1);

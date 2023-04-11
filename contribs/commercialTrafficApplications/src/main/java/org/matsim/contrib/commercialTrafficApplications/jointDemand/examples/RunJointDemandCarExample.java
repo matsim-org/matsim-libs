@@ -19,13 +19,14 @@
 
 package org.matsim.contrib.commercialTrafficApplications.jointDemand.examples;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommercialJobOperator;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -44,7 +45,7 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 class RunJointDemandCarExample {
 
     private static final  String EXAMPLE_CONFIG = "scenarios/grid/jointDemand_config.xml";
-    private static final Logger log = Logger.getLogger(RunJointDemandCarExample.class);
+    private static final Logger log = LogManager.getLogger(RunJointDemandCarExample.class);
 
     public static void main(String[] args) throws IOException {
         final URL configUrl;

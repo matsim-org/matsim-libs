@@ -26,7 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.supply.SimResults;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,7 +56,7 @@ import org.matsim.counts.Counts;
  */
 public class ModalCountsCadytsContext implements CadytsContextI<ModalCountsLinkIdentifier>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
-	private final static Logger log = Logger.getLogger(ModalCountsCadytsContext.class);
+	private final static Logger log = LogManager.getLogger(ModalCountsCadytsContext.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";

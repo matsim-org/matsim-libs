@@ -20,7 +20,8 @@
 
 package org.matsim.core.population.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -33,13 +34,14 @@ import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
 
 public final class StreamingPopulationWriter implements PersonAlgorithm {
-	private final static Logger log = Logger.getLogger(StreamingPopulationWriter.class);
+	private final static Logger log = LogManager.getLogger(StreamingPopulationWriter.class);
 
 	private final double write_person_fraction;
 
@@ -145,7 +147,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			@Override
 			public Attributes getAttributes() {
 				//A stream written Population cannot contain Population Attributes, only Person Attributes.
-				return new Attributes();
+				return new AttributesImpl();
 			}
 
 		} ;

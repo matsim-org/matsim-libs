@@ -20,14 +20,22 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.*;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
-public class CountsParserTest extends MatsimTestCase {
+public class CountsParserTest {
 
-	public void testSEElementCounts() throws SAXException {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testSEElementCounts() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -45,7 +53,7 @@ public class CountsParserTest extends MatsimTestCase {
 		}
 	}
 
-	public void testSEElementCountWithoutCoords() throws SAXException {
+	@Test public void testSEElementCountWithoutCoords() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -62,7 +70,7 @@ public class CountsParserTest extends MatsimTestCase {
 		reader.endElement("", "counts", "counts");
 	}
 
-	public void testSEElementCountWithCoords() throws SAXException {
+	@Test public void testSEElementCountWithCoords() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -73,14 +81,14 @@ public class CountsParserTest extends MatsimTestCase {
 
 		Count count = counts.getCount(Id.create(1, Link.class));
 		assertNotNull("Count attribute x,y setting failed", count.getCoord());
-		assertEquals("Count attribute x setting failed", 123.456, count.getCoord().getX(), EPSILON);
-		assertEquals("Count attribute y setting failed", 987.654, count.getCoord().getY(), EPSILON);
+		assertEquals("Count attribute x setting failed", 123.456, count.getCoord().getX(), MatsimTestUtils.EPSILON);
+		assertEquals("Count attribute y setting failed", 987.654, count.getCoord().getY(), MatsimTestUtils.EPSILON);
 
 		reader.endElement("", "count", "count");
 		reader.endElement("", "counts", "counts");
 	}
 
-	public void testSEElementVolume() throws SAXException {
+	@Test public void testSEElementVolume() throws SAXException {
 		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		MatsimCountsReader reader = new MatsimCountsReader(counts);
@@ -90,7 +98,7 @@ public class CountsParserTest extends MatsimTestCase {
 		reader.startElement("", "count", "count", attributeFactory.createCountAttributes());
 		reader.startElement("", "volume", "volume", attributeFactory.createVolumeAttributes());
 
-		assertEquals("Volume attribute setting failed", 100.0, counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(), EPSILON);
+		assertEquals("Volume attribute setting failed", 100.0, counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(), MatsimTestUtils.EPSILON);
 
 		reader.endElement("", "volume", "volume");
 		reader.endElement("", "count", "count");

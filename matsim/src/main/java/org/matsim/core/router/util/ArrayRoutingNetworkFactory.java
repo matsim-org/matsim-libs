@@ -23,7 +23,8 @@ package org.matsim.core.router.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,7 +33,7 @@ import org.matsim.core.network.LinkFactory;
 
 public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 	
-	private final static Logger log = Logger.getLogger(ArrayRoutingNetworkFactory.class);
+	private final static Logger log = LogManager.getLogger(ArrayRoutingNetworkFactory.class);
 	
 	private int nodeArrayIndexCounter;
 	private int linkArrayIndexCounter;

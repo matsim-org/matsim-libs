@@ -22,7 +22,8 @@ package org.matsim.counts;
 
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -36,7 +37,7 @@ import org.xml.sax.Attributes;
  */
 public class MatsimCountsReader extends MatsimXmlParser {
 
-	private final static Logger log = Logger.getLogger(MatsimCountsReader.class);
+	private final static Logger log = LogManager.getLogger(MatsimCountsReader.class);
 	private final static String COUNTS_V1 = "counts_v1.xsd";
 
 	private final Counts counts;

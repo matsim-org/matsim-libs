@@ -28,7 +28,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -60,7 +61,7 @@ import playground.vsp.congestion.events.CongestionEvent;
 class CongestionHandlerBaseImpl implements CongestionHandler {
 	// if someone needs this public, it should also be final.  kai, aug'16
 
-	private final static Logger log = Logger.getLogger(CongestionHandlerBaseImpl.class);
+	private final static Logger log = LogManager.getLogger(CongestionHandlerBaseImpl.class);
 
 	private final Scenario scenario;
 	private final EventsManager events;

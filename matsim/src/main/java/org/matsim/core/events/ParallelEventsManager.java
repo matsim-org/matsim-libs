@@ -28,7 +28,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -39,7 +40,7 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public final class ParallelEventsManager implements EventsManager {
 
-	private final static Logger log = Logger.getLogger(ParallelEventsManager.class);
+	private final static Logger log = LogManager.getLogger(ParallelEventsManager.class);
 
 	private Distributor distributor;
 	private ArrayList<EventsManager> eventsManagers = new ArrayList<>();

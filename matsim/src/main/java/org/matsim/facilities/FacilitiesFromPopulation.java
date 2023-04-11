@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -58,7 +59,7 @@ import org.matsim.core.population.PopulationUtils;
  */
 public final class FacilitiesFromPopulation {
 
-	private final static Logger log = Logger.getLogger(FacilitiesFromPopulation.class);
+	private final static Logger log = LogManager.getLogger(FacilitiesFromPopulation.class);
 
 	private final ActivityFacilities facilities;
 	private Scenario scenario;

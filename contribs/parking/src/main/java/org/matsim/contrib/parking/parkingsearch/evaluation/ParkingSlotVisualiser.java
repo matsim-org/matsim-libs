@@ -28,7 +28,8 @@ import java.util.Random;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -94,7 +95,7 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 		}
 		
 		for(Id<Link> linkID : nrOfSlotsPerLink.keySet()){
-//			Logger.getLogger(getClass()).info("initialize parking visualisation for link " + linkID);
+//			LogManager.getLogger(getClass()).info("initialize parking visualisation for link " + linkID);
 			this.slotsOnLink.put(linkID, new ParkingSlotManager(network.getLinks().get(linkID), nrOfSlotsPerLink.get(linkID).intValue()));
 		}
 	}
@@ -197,7 +198,7 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Logger.getLogger(getClass()).info("FINISHED WRITING PARKING SLOT VISUALISATION FILE TO: " +filename);
+		LogManager.getLogger(getClass()).info("FINISHED WRITING PARKING SLOT VISUALISATION FILE TO: " +filename);
 	}
 
 	@Override

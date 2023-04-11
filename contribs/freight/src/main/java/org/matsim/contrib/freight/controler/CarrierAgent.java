@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.events.*;
@@ -40,7 +41,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.events.FreightEventCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -50,13 +51,13 @@ import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This keeps track of the carrier during simulation.
- * 
+ *
  * @author mzilske, sschroeder
  *
  */
 final class CarrierAgent implements Identifiable<Carrier>
 {
-	private static final Logger log = Logger.getLogger( CarrierAgent.class );
+	private static final Logger log = LogManager.getLogger( CarrierAgent.class );
 
 	private final Id<Carrier> id;
 
@@ -70,14 +71,14 @@ final class CarrierAgent implements Identifiable<Carrier>
 
 	private final ScoringFunction scoringFunction;
 	private final EventsManager events;
-	private final Collection<LSPEventCreator> lspEventCreators;
+	private final Collection<FreightEventCreator> freightEventCreators;
 
-	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, EventsManager events, Collection<LSPEventCreator> lspEventCreators ) {
+	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, EventsManager events, Collection<FreightEventCreator> freightEventCreators) {
 		this.carrier = carrier;
 		this.id = carrier.getId();
 		this.scoringFunction = carrierScoringFunction;
 		this.events = events;
-		this.lspEventCreators = lspEventCreators;
+		this.freightEventCreators = freightEventCreators;
 	}
 
 	@Override public Id<Carrier> getId() {
@@ -86,9 +87,9 @@ final class CarrierAgent implements Identifiable<Carrier>
 
 	/**
 	 * Returns a list of plans created on the basis of the carrier's plan.
-	 * 
+	 *
 	 * <p>A carrier plan consists usually of many tours (activity chains). Each plan in the returned list represents a carrier tour.
-	 *  
+	 *
 	 * @return list of plans
 	 * @see Plan, CarrierPlan
 	 */
@@ -107,12 +108,12 @@ final class CarrierAgent implements Identifiable<Carrier>
 			CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 			Person driverPerson = createDriverPerson(driverId);
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
-			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour, scoringFunction, carrier, events, lspEventCreators );
+			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour, scoringFunction, carrier, events, freightEventCreators);
 			Plan plan = PopulationUtils.createPlan();
 			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLinkId() );
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
-			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {				
+			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
 				if ( tourElement instanceof Tour.Leg tourLeg ) {
 					Route route = tourLeg.getRoute();
 
@@ -124,7 +125,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 					//this returns TransportMode.car if the attribute is null
 					Leg leg = PopulationUtils.createLeg(CarrierUtils.getCarrierMode(carrier));
 
-					//TODO we might need to set the route to null if the the mode is a drt mode
+					//TODO we might need to set the route to null if the mode is a drt mode
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 
@@ -133,9 +134,8 @@ final class CarrierAgent implements Identifiable<Carrier>
 					// yy why is it setting travel time twice?  kai, jul'22
 
 					plan.addLeg(leg);
-				} else if (tourElement instanceof TourActivity) {
-					TourActivity act = (TourActivity) tourElement;
-					Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());					
+				} else if (tourElement instanceof TourActivity act) {
+					Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());
 					double duration = act.getDuration() ;
 					tourElementActivity.setMaximumDuration(duration); // "maximum" has become a bit of a misnomer ...
 					plan.addActivity(tourElementActivity);
@@ -191,10 +191,10 @@ final class CarrierAgent implements Identifiable<Carrier>
 		log.warn("score=" + score);
 		carrier.getSelectedPlan().setScore( score );
 	}
-	void handleEvent( Event event, Id<Person> driverId ) {
+	void handleEvent(Event event, Id<Person> driverId) {
 		// the event comes to here from CarrierAgentTracker only for those drivers that belong to this carrier.  The driver IDs are also
 		// passed on "as a service", which means that here we can distribute the events to the drivers.
-		getDriver( driverId ).handleAnEvent( event );
+		getDriver( driverId ).handleAnEvent( event);
 	}
 	CarrierDriverAgent getDriver(Id<Person> driverId){
 		return carrierDriverAgents.get(driverId);

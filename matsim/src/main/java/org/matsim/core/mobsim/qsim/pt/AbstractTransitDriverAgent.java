@@ -22,7 +22,8 @@ package org.matsim.core.mobsim.qsim.pt;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -49,7 +50,7 @@ import org.matsim.vehicles.Vehicle;
 
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
-	private static final Logger log = Logger.getLogger(AbstractTransitDriverAgent.class);
+	private static final Logger log = LogManager.getLogger(AbstractTransitDriverAgent.class);
 
 	private EventsManager eventsManager;
 

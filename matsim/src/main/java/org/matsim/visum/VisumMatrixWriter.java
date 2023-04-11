@@ -26,7 +26,8 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 
@@ -38,7 +39,7 @@ import org.matsim.matrices.Matrix;
  */
 public class VisumMatrixWriter {
 
-	/*package*/ final static Logger log = Logger.getLogger(VisumMatrixWriter.class);
+	/*package*/ final static Logger log = LogManager.getLogger(VisumMatrixWriter.class);
 
 	Matrix matrix;
 	Set<String> ids;

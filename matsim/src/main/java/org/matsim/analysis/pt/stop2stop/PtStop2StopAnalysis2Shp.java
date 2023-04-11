@@ -21,7 +21,8 @@ package org.matsim.analysis.pt.stop2stop;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -51,7 +52,7 @@ import static org.matsim.analysis.pt.stop2stop.PtStop2StopAnalysis.aggregateStop
 public class PtStop2StopAnalysis2Shp {
 
     private static final String[] headerCsv = {"link", "transitLine", "stop", "departures", "passengers", "totalVehicleCapacity"};
-    private static final Logger log = Logger.getLogger(PtStop2StopAnalysis2Shp.class);
+    private static final Logger log = LogManager.getLogger(PtStop2StopAnalysis2Shp.class);
 
     public static void writePtStop2StopAnalysisByTransitLine2ShpFile(
             final Scenario scenario, final List<PtStop2StopAnalysis.Stop2StopEntry> stop2StopEntriesForEachDeparture, String shpFileName, String coordinateSystem) {

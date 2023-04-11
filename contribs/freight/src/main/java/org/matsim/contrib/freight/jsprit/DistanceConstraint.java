@@ -28,7 +28,8 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.DeliverShipme
 import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupShipment;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.vehicles.VehicleType;
@@ -36,12 +37,12 @@ import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author rewert
- * 
+ *
  *         Includes all classes and methods for the distance constraint of every
  *         vehicle with an energyCapacity. The base for calculating the
  *         consumption is only the driven distance and not the transported
  *         weight or other influences. But is possible to integrate it.
- * 
+ * <p>
  *         !! No recharging or refueling is integrated. Vehicles are totally
  *         full at the beginning.
  *
@@ -49,7 +50,8 @@ import org.matsim.vehicles.VehicleUtils;
  */
 /* package-private */ class DistanceConstraint implements HardActivityConstraint {
 
-	static final Logger log = Logger.getLogger(DistanceConstraint.class);
+	@SuppressWarnings("unused")
+	private static final Logger log = LogManager.getLogger(DistanceConstraint.class);
 
 	private final CarrierVehicleTypes vehicleTypes;
 
@@ -101,7 +103,7 @@ import org.matsim.vehicles.VehicleUtils;
 				// calculates the additional distance for adding a pickup and checks the shortest possibility for adding the associated delivery
 				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
 						- getDistance(prevAct, nextAct, newVehicle)+ findMinimalAdditionalDistance(context, newAct, newAct);
-				
+
 			} else if (newAct instanceof DeliverShipment) {
 				// calculates the distance new for integrating the associated pickup
 				routeDistance = calculateRouteDistanceWithAssociatedPickup(context);
@@ -132,24 +134,18 @@ import org.matsim.vehicles.VehicleUtils;
 	 * activities. The method also integrates the associated pickup in the tour.
 	 */
 	private double calculateRouteDistanceWithAssociatedPickup(JobInsertionContext context) {
-		double routeDistance = 0;
+		double routeDistance;
 		int positionOfRelatedPickup = context.getRelatedActivityContext().getInsertionIndex();
 		int nextRouteActivity = 0;
 
 		// checks if the associated pickup is on first position
 		if (positionOfRelatedPickup == 0 && context.getRoute().getActivities().isEmpty()) {
 			context.getRoute().getStart().setLocation(context.getNewVehicle().getStartLocation());
-			//This value is never used. it gets overwritten before usage. -- commenting it out. KMT, Jun'20
-//			routeDistance = getDistance(context.getRoute().getStart(), context.getAssociatedActivities().get(0),
-//					context.getNewVehicle(), context.getNewDepTime());
 			context.getRoute().getEnd().setLocation(context.getNewVehicle().getEndLocation());
 			routeDistance = getDistance(context.getAssociatedActivities().get(0), context.getRoute().getEnd(),
 					context.getNewVehicle(), context.getNewDepTime());
 			return routeDistance;
 		} else if (positionOfRelatedPickup == 0 && !context.getRoute().getActivities().isEmpty()) {
-			//This value is never used. it gets overwritten before usage. -- commenting it out. KMT, Jun'20
-//			routeDistance = getDistance(context.getRoute().getStart(), context.getAssociatedActivities().get(0),
-//					context.getNewVehicle(), context.getNewDepTime());
 			routeDistance = getDistance(context.getAssociatedActivities().get(0),
 					context.getRoute().getActivities().get(0), context.getNewVehicle(), context.getNewDepTime());
 		} else {
@@ -228,8 +224,8 @@ import org.matsim.vehicles.VehicleUtils;
 		if (context.getAssociatedActivities().get(1) instanceof DeliverShipment) {
 			TourActivity assignedDelivery = context.getAssociatedActivities().get(1);
 			minimalAdditionalDistance = 0;
-			int indexNextActicity = nextAct.getIndex();
-			int tourPositionOfAcitivityBehindNewPickup = 0;
+			int indexNextActivity = nextAct.getIndex();
+			int tourPositionOfActivityBehindNewPickup = 0;
 			int countIndex = 0;
 			Vehicle newVehicle = context.getNewVehicle();
 			VehicleRoute route = context.getRoute();
@@ -237,10 +233,10 @@ import org.matsim.vehicles.VehicleUtils;
 			// search the index of the activity behind the pickup activity which should be
 			// added to the tour
 			a: for (TourActivity tourActivity : route.getTourActivities().getActivities()) {
-				if (tourActivity.getIndex() == indexNextActicity) {
+				if (tourActivity.getIndex() == indexNextActivity) {
 					while (countIndex < route.getTourActivities().getActivities().size()) {
-						if (route.getTourActivities().getActivities().get(countIndex).getIndex() == indexNextActicity) {
-							tourPositionOfAcitivityBehindNewPickup = countIndex;
+						if (route.getTourActivities().getActivities().get(countIndex).getIndex() == indexNextActivity) {
+							tourPositionOfActivityBehindNewPickup = countIndex;
 							break a;
 						}
 						countIndex++;
@@ -248,17 +244,17 @@ import org.matsim.vehicles.VehicleUtils;
 				}
 			}
 
-			// search the minimal distance between every exiting TourAcitivity
-			while ((tourPositionOfAcitivityBehindNewPickup + 1) < route.getTourActivities().getActivities().size()) {
+			// search the minimal distance between every exiting TourActivity
+			while ((tourPositionOfActivityBehindNewPickup + 1) < route.getTourActivities().getActivities().size()) {
 				TourActivity activityBefore = route.getTourActivities().getActivities()
-						.get(tourPositionOfAcitivityBehindNewPickup);
+						.get(tourPositionOfActivityBehindNewPickup);
 				TourActivity activityAfter = route.getTourActivities().getActivities()
-						.get(tourPositionOfAcitivityBehindNewPickup + 1);
+						.get(tourPositionOfActivityBehindNewPickup + 1);
 				double possibleAdditionalDistance = getDistance(activityBefore, assignedDelivery, newVehicle)
 						+ getDistance(assignedDelivery, activityAfter, newVehicle)
 						- getDistance(activityBefore, activityAfter, newVehicle);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
-				tourPositionOfAcitivityBehindNewPickup++;
+				tourPositionOfActivityBehindNewPickup++;
 			}
 			// checks the distance if the delivery is the last activity before the end of
 			// the tour
@@ -271,9 +267,9 @@ import org.matsim.vehicles.VehicleUtils;
 						- getDistance(activityLastDelivery, activityEnd, newVehicle);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 
-				// Checks the distance if the delivery will added directly behind the pickup
+				// Checks the distance if the delivery will be added directly behind the pickup
 				TourActivity activityAfter = route.getTourActivities().getActivities()
-						.get(tourPositionOfAcitivityBehindNewPickup);
+						.get(tourPositionOfActivityBehindNewPickup);
 				possibleAdditionalDistance = getDistance(newInvestigatedPickup, assignedDelivery, newVehicle)
 						+ getDistance(assignedDelivery, activityAfter, newVehicle)
 						- getDistance(newInvestigatedPickup, activityAfter, newVehicle);
@@ -303,7 +299,7 @@ import org.matsim.vehicles.VehicleUtils;
 		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), from.getEndTime(),
 				vehicle);
 		if (!(distance >= 0.))
-			throw new AssertionError("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString()
+			throw new AssertionError("Distance must not be negative! From, to" + from + ", " + to
 					+ " distance " + distance);
 		return distance;
 	}
@@ -312,7 +308,7 @@ import org.matsim.vehicles.VehicleUtils;
 		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), departureTime,
 				vehicle);
 		if (!(distance >= 0.))
-			throw new AssertionError("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString()
+			throw new AssertionError("Distance must not be negative! From, to" + from + ", " + to
 					+ " distance " + distance);
 		return distance;
 	}

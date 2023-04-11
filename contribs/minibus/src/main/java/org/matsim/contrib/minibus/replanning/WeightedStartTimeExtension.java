@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.replanning;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.contrib.minibus.hook.TimeProvider;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
  */
 public final class WeightedStartTimeExtension extends AbstractPStrategyModule {
 	
-	private final static Logger log = Logger.getLogger(WeightedStartTimeExtension.class);
+	private final static Logger log = LogManager.getLogger(WeightedStartTimeExtension.class);
 	public static final String STRATEGY_NAME = "WeightedStartTimeExtension";
 
 	private TimeProvider timeProvider = null;

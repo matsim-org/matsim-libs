@@ -19,18 +19,13 @@
  *  *                                                                         *
  *  * ***********************************************************************
  *
- * ${filecomment}
- * ${package_declaration}
- *
- * ${typecomment}
- * ${type_declaration}
  */
 
 package org.matsim.contrib.freight.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
@@ -44,14 +39,21 @@ import javax.inject.Inject;
  * <p></p>
  * <p>Processes the required actions during the matsim simulation workflow (replanning, scoring, sim). For example, it informs agents to
  * score their plans when it is scoring time, and it informs them to re-plan, or it injects carriers into the simulation when it is time
- * to inject them. Currently it is kept to minimum functions, i.e. injecting carrier plans into sim and the possibility
+ * to inject them. Currently, it is kept to minimum functions, i.e. injecting carrier plans into sim and the possibility
  * to set custom scoring- and replanning-functionalities.
  *
  * @author sschroeder, mzilske
+ *
+ * // not sure if this _should_ be public, but current LSP design makes this necessary.  kai, sep'20
  */
 
-class CarrierControlerListener implements ScoringListener, ReplanningListener {
-	private static final Logger log = Logger.getLogger( CarrierControlerListener.class ) ;
+public class CarrierControlerListener implements ScoringListener, ReplanningListener {
+	// not sure if this _should_ be public, but current LSP design makes this necessary.
+	// It is done analogue to CarrierAgentTracker. kmt oct'22
+
+
+	@SuppressWarnings("unused")
+	private static final Logger log = LogManager.getLogger( CarrierControlerListener.class ) ;
 
 	private final CarrierStrategyManager strategyManager;
 	private final CarrierAgentTracker carrierAgentTracker;

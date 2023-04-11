@@ -20,8 +20,10 @@
 
 package org.matsim.pt.router;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -30,10 +32,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 
-public class TransitActsRemoverTest extends TestCase {
+public class TransitActsRemoverTest {
 
-	
-	public void testNormalTransitPlan() {
+
+	@Test public void testNormalTransitPlan() {
 		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
@@ -43,9 +45,9 @@ public class TransitActsRemoverTest extends TestCase {
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
 		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
-		
+
 		plan.addActivity(PopulationUtils.createActivityFromCoord("w", dummyCoord));
-		
+
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
 		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
@@ -56,7 +58,7 @@ public class TransitActsRemoverTest extends TestCase {
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
 
 		plan.addActivity(PopulationUtils.createActivityFromCoord("s", dummyCoord));
-		
+
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
 		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
@@ -66,10 +68,10 @@ public class TransitActsRemoverTest extends TestCase {
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
 		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
-		
+
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
 		new TransitActsRemover().run(plan);
-		
+
 		assertEquals(7, plan.getPlanElements().size());
 		assertEquals("h", ((Activity) plan.getPlanElements().get(0)).getType());
 		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
@@ -80,15 +82,15 @@ public class TransitActsRemoverTest extends TestCase {
 		assertNull(((Leg) plan.getPlanElements().get(5)).getRoute());
 		assertEquals("h", ((Activity) plan.getPlanElements().get(6)).getType());
 	}
-	
-	public void testEmptyPlan() {
+
+	@Test public void testEmptyPlan() {
 		Plan plan = PopulationUtils.createPlan();
 		new TransitActsRemover().run(plan);
 		assertEquals(0, plan.getPlanElements().size());
 		// this mostly checks that there is no exception
 	}
-	
-	public void testPlanWithoutLegs() {
+
+	@Test public void testPlanWithoutLegs() {
 		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
@@ -97,7 +99,7 @@ public class TransitActsRemoverTest extends TestCase {
 		// this mostly checks that there is no exception
 	}
 
-	public void testWalkOnlyPlan() {
+	@Test public void testWalkOnlyPlan() {
 		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
@@ -107,8 +109,8 @@ public class TransitActsRemoverTest extends TestCase {
 		assertEquals(3, plan.getPlanElements().size());
 		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
 	}
-	
-	public void testNoTransitActPlan() {
+
+	@Test public void testNoTransitActPlan() {
 		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
@@ -118,5 +120,5 @@ public class TransitActsRemoverTest extends TestCase {
 		assertEquals(3, plan.getPlanElements().size());
 		assertEquals(TransportMode.car, ((Leg) plan.getPlanElements().get(1)).getMode());
 	}
-	
+
 }

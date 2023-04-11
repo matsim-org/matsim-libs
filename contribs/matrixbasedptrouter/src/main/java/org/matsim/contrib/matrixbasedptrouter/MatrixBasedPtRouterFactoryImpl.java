@@ -22,7 +22,8 @@
  */
 package org.matsim.contrib.matrixbasedptrouter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.*;
@@ -35,7 +36,7 @@ import javax.inject.Provider;
  */
 public final class MatrixBasedPtRouterFactoryImpl implements Provider<TripRouter> {
 
-	private static final Logger log = Logger.getLogger(MatrixBasedPtRouterFactoryImpl.class);
+	private static final Logger log = LogManager.getLogger(MatrixBasedPtRouterFactoryImpl.class);
 
 	private Provider<TripRouter> delegate;
 

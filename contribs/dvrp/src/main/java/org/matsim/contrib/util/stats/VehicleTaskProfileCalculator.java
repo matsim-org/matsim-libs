@@ -1,7 +1,8 @@
 package org.matsim.contrib.util.stats;
 
 import com.google.common.base.Verify;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -33,7 +34,7 @@ public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
 		private double beginTime;
 	}
 
-	private final static Logger log = Logger.getLogger(VehicleTaskProfileCalculator.class);
+	private final static Logger log = LogManager.getLogger(VehicleTaskProfileCalculator.class);
 	private final TimeDiscretizer timeDiscretizer;
 
 	private Map<Task.TaskType, double[]> taskProfiles;

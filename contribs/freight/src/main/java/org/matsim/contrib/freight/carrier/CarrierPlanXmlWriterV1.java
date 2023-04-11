@@ -29,7 +29,8 @@ import java.util.Map;
 
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
@@ -41,7 +42,7 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * A writer that writes carriers and their plans in a xml-file.
- * 
+ *
  * @author sschroeder
  *
  * @deprecated Use {@link CarrierPlanWriter} instead which writes the newest format
@@ -49,14 +50,16 @@ import org.matsim.core.utils.misc.Time;
 @Deprecated
 public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 
-	private static final  Logger logger = Logger.getLogger(CarrierPlanXmlWriterV1.class);
+	@SuppressWarnings("unused")
+	private static final  Logger logger = LogManager.getLogger(CarrierPlanXmlWriterV1.class);
+
 	private final Collection<Carrier> carriers;
 	private int idCounter = 0;
 	private final Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<>();
 
 	/**
 	 * Constructs the writer with the carriers to be written.
-	 * 
+	 *
 	 * @param carriers to be written
 	 */
 	public CarrierPlanXmlWriterV1(Collection<Carrier> carriers) {
@@ -66,7 +69,7 @@ public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 
 	/**
 	 * Writes carriers and their plans into a xml-file.
-	 * 
+	 *
 	 * @param filename should be the target xml-file
 	 */
 	public void write(String filename) {
@@ -152,7 +155,7 @@ public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 		if (carrier.getSelectedPlan() == null) {
 			return;
 		}
-		
+
 		for(CarrierPlan plan : carrier.getPlans()){
 			writer.write("\t\t\t<plan");
 			if(plan.getScore() != null){
@@ -170,7 +173,7 @@ public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 				writer.write(" selected=\"false\"");
 			}
 			writer.write(">\n");
-					
+
 			for (ScheduledTour tour : plan.getScheduledTours()) {
 				writer.write("\t\t\t\t<tour ");
 				writer.write("vehicleId=\"" + tour.getVehicle().getId()
@@ -179,8 +182,7 @@ public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())
 						+ "\"/>\n");
 				for (TourElement tourElement : tour.getTour().getTourElements()) {
-					if (tourElement instanceof Leg) {
-						Leg leg = (Leg) tourElement;
+					if (tourElement instanceof Leg leg) {
 						writer.write("\t\t\t\t\t<leg dep_time=\""
 								+ Time.writeTime(leg.getExpectedDepartureTime())
 								+ "\" transp_time=\""
@@ -204,8 +206,7 @@ public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 							writer.write("</leg>\n");
 						}
 					}
-					if (tourElement instanceof ShipmentBasedActivity) {
-						ShipmentBasedActivity act = (ShipmentBasedActivity) tourElement;
+					if (tourElement instanceof ShipmentBasedActivity act) {
 						writer.write("\t\t\t\t\t<act ");
 						writer.write("type=\"" + act.getActivityType() + "\" ");
 						writer.write("shipmentId=\""
@@ -221,7 +222,7 @@ public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 			}
 			writer.write("\t\t\t</plan>\n\n");
 		}
-		
+
 	}
 
 	private void endCarrier(BufferedWriter writer) throws IOException {

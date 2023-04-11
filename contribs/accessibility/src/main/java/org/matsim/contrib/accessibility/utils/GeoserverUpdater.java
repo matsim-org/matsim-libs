@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -53,7 +54,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
-	static Logger LOG = Logger.getLogger(GeoserverUpdater.class);
+	static Logger LOG = LogManager.getLogger(GeoserverUpdater.class);
 
 	private String crs;
 	private String name;

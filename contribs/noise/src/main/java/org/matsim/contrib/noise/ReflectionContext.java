@@ -1,6 +1,7 @@
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.algorithm.Angle;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.util.AffineTransformation;
@@ -18,7 +19,7 @@ public class ReflectionContext {
 
     static final double SCAN_LINE_LENGTH = 1;
 
-    private final static Logger logger = Logger.getLogger(org.matsim.contrib.noise.ShieldingContext.class);
+    private final static Logger logger = LogManager.getLogger(org.matsim.contrib.noise.ShieldingContext.class);
 
     private Set<LineSegment> visibleEdges;
     private Coordinate receiver;
@@ -182,6 +183,12 @@ public class ReflectionContext {
     }
 
     private Coordinate getReflectionSegment(Coordinate coordinate, LineSegment segment, double length) {
+
+		if (segment.getLength() == 0) {
+			// yyyy added this here to avoid crashing feb'2023 - cr
+			logger.warn("Zero length line segment on {}", coordinate);
+			return null;
+		}
 
         final Coordinate right = segment.pointAlongOffset(0.5, length);
         LineSegment segmentRight = new LineSegment(coordinate, right);

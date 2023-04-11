@@ -4,7 +4,8 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,7 +43,7 @@ import java.util.function.Supplier;
  */
 public class SwissRailRaptorData {
 
-    private static final Logger log = Logger.getLogger(SwissRailRaptorData.class);
+    private static final Logger log = LogManager.getLogger(SwissRailRaptorData.class);
 
     final RaptorStaticConfig config;
     final int countStops;

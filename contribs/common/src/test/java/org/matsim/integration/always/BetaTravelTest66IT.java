@@ -20,6 +20,8 @@
 
 package org.matsim.integration.always;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +30,10 @@ import java.util.HashSet;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -66,7 +71,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * This TestCase should ensure the correct behavior of agents when different
@@ -83,7 +88,11 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class BetaTravelTest66IT extends MatsimTestCase {
+public class BetaTravelTest66IT {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/* This TestCase uses a custom Controler, named TestControler, to load
 	 * specific strategies. The strategies make use of a test-specific
@@ -121,15 +130,15 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	public void testBetaTravel_66() {
-		Config config = loadConfig("../../examples/scenarios/equil/config.xml");
-		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
+	@Test public void testBetaTravel_66() {
+		Config config = utils.loadConfig("../../examples/scenarios/equil/config.xml");
+		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
-		 * to store the persons in the population, we have to sort the population manually.  
+		 * to store the persons in the population, we have to sort the population manually.
 		 * cdobler, oct'11
 		 */
 		PopulationUtils.sortPersons(scenario.getPopulation());
@@ -167,7 +176,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 		private final ArrayList<Double> enterTimes = new ArrayList<>(100);
 		private final ArrayList<Double> leaveTimes = new ArrayList<>(100);
 
-		private static final Logger log = Logger.getLogger(TestControlerListener.class);
+		private static final Logger log = LogManager.getLogger(TestControlerListener.class);
 
 		LinkAnalyzer(final String linkId) {
 			this.linkId = linkId;
@@ -243,7 +252,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 				}
 			}
 		}
-		
+
 		@Deprecated // use from BetaTravelTest6.  kai, dec'17
 		void printInfo() {
 			log.info("Statistics for link " + this.linkId + " in iteration " + this.iteration);
@@ -255,7 +264,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 			log.info(" max # cars at time: " + this.maxCarsOnLinkTime);
 		}
 	}
-	
+
 	@Deprecated // use from BetaTravelTest6.  kai, dec'17
 	private static class MyStrategyManagerProvider implements Provider<StrategyManager> {
 
@@ -271,7 +280,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector<>());
 			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(config.global().getNumberOfThreads()));
-			
+
 			// Trying to replace this by the standard mutator ...
 //			double mutationRange = 1800. ;
 //			boolean affectingDuration = false ;
@@ -376,14 +385,14 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 					assertEquals(54, this.la.maxCarsOnLink);
 					assertEquals(19563.0, this.la.maxCarsOnLinkTime, 0.0);
 					System.out.println("all checks passed!");
-					
+
 					// The results changed after Michał's change of the QueueWithBuffer slow capacity update.  See 4dda004a8db98d9a2e757b1896cd3250d4e84ba5 .
 					// The old results were (only where we had changes):
 //					assertEquals(18710.0, this.la.firstCarEnter, 0.0);
 //					assertEquals(18890.0, this.la.firstCarLeave, 0.0);
 //					assertEquals(59, this.la.maxCarsOnLink);
 //					assertEquals(19589.0, this.la.maxCarsOnLinkTime, 0.0);
-					
+
 				} else if (beta_travel == -66.0) {
 					System.out.println("checking results for case `beta_travel = -66'...");
 					System.out.println("firstCarEnter=" + this.la.firstCarEnter + "; lastCarEnter=" + this.la.lastCarEnter + "; firstCarLeave=" + this.la.firstCarLeave +
