@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
@@ -15,10 +15,10 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalSt
 /**
  * @author nkuehnel / MOIA
  */
-public class ShiftOperatingVehicleProvider implements AuxDischargingHandler.VehicleProvider {
+public class ShiftOperatingVehicleProvider implements IdleDischargingHandler.VehicleProvider {
 
     private final DvrpVehicleLookup dvrpVehicleLookup;
-    private final AuxDischargingHandler.VehicleProvider delegate;
+    private final IdleDischargingHandler.VehicleProvider delegate;
 
     @Inject
     public ShiftOperatingVehicleProvider(DvrpVehicleLookup dvrpVehicleLookup) {
