@@ -18,10 +18,12 @@
 
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,13 +32,13 @@ import java.util.List;
 
 /**
  * This returns a receiver that has characteristics and orders.
- * 
+ *
  * @author wlbean, jwjoubert
  */
 class ReceiverImpl implements Receiver {
-	final private Logger log = Logger.getLogger(Receiver.class);
-	
-	private final Attributes attributes = new Attributes();
+	final private Logger log = LogManager.getLogger(Receiver.class);
+
+	private final Attributes attributes = new AttributesImpl();
 	private Id<Link> location;
 
 	private final Id<Receiver> id;
@@ -51,7 +53,7 @@ class ReceiverImpl implements Receiver {
 		this.plans = new ArrayList<>();
 		this.products = new ArrayList<>();
 	}
-	
+
 
 	@Override
 	public boolean addPlan(ReceiverPlan plan) {
@@ -72,7 +74,7 @@ class ReceiverImpl implements Receiver {
 
 		return plan;
 	}
-	
+
 
 	/*
 	 * Removes an order from the receiver's list of orders.
@@ -86,7 +88,7 @@ class ReceiverImpl implements Receiver {
 	/*
 	 * Returns the receiver id.
 	 */
-	
+
 	@Override
 	public Id<Receiver> getId() {
 		return id;
@@ -95,7 +97,7 @@ class ReceiverImpl implements Receiver {
 	/*
 	 * Returns a list of the receiver's orders.
 	 */
-	
+
 	@Override
 	public List<ReceiverPlan> getPlans() {
 		return plans;
@@ -121,8 +123,8 @@ class ReceiverImpl implements Receiver {
 	public ReceiverPlan getSelectedPlan() {
 		return this.selectedPlan;
 	}
-	
-	
+
+
 	/**
 	 * Sets the selected receiver plan.
 	 */
@@ -135,7 +137,7 @@ class ReceiverImpl implements Receiver {
 
 		selectedPlan.setSelected(true);
 		if(!plans.contains(selectedPlan)) plans.add(selectedPlan);
-		this.selectedPlan = selectedPlan;	
+		this.selectedPlan = selectedPlan;
 	}
 
 
@@ -154,7 +156,7 @@ class ReceiverImpl implements Receiver {
 		return this.location;
 	}
 
-	
+
 	@Override
 	public Receiver setLinkId(Id<Link> linkId) {
 		this.location = linkId;
@@ -172,7 +174,7 @@ class ReceiverImpl implements Receiver {
 			}
 		}
 		if(product == null) {
-			log.warn("Receiver \"" + this.id.toString() 
+			log.warn("Receiver \"" + this.id.toString()
 			+ "\" does not have the requested product type \"" + productType.toString() + "\". Returning null.");
 		}
 		return product;

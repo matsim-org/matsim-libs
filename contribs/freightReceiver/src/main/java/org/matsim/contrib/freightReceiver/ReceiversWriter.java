@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -30,11 +31,11 @@ import java.io.IOException;
 
 /**
  * Writes a {@link Receivers} container in the MATSim XML format.
- * 
+ *
  * @author jwjoubert
  */
 public final class ReceiversWriter extends MatsimXmlWriter implements MatsimWriter{
-	final private Logger log = Logger.getLogger(ReceiversWriter.class);
+	final private Logger log = LogManager.getLogger(ReceiversWriter.class);
 	final private Receivers receivers;
 	final private Counter counter = new Counter("   receiver # ");
 
@@ -42,15 +43,15 @@ public final class ReceiversWriter extends MatsimXmlWriter implements MatsimWrit
 		super();
 		this.receivers = receivers;
 	}
-	
-	
+
+
 	@Override
 	public void write(String filename) {
 		log.info("Writing receivers to file: " + filename);
 		writeV2(filename);
 	}
-	
-	
+
+
 	public void writeV1(String filename) {
 		String dtd = "https://matsim.org/files/dtd/freightReceivers_v1.dtd";
 		ReceiversWriterHandler handler = new ReceiversWriterHandlerImplV1();

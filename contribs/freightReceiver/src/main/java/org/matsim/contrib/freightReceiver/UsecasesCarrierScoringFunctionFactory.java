@@ -1,6 +1,7 @@
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -18,15 +19,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 /*
- * This is a sample carrier scoring function factory implementation (CarrierScoringFunctionImpl.class) developed by sschroeder, 
+ * This is a sample carrier scoring function factory implementation (CarrierScoringFunctionImpl.class) developed by sschroeder,
  * I just changed the penalty cost and time parameter, etc.
  */
 public class UsecasesCarrierScoringFunctionFactory implements CarrierScoringFunctionFactory {
 
-	private static Logger log = Logger.getLogger(UsecasesCarrierScoringFunctionFactory.class);
-	
-	private Network network;
-	
+	private static Logger log = LogManager.getLogger(UsecasesCarrierScoringFunctionFactory.class);
+
+	private final Network network;
+
 	public UsecasesCarrierScoringFunctionFactory( Network network ) {
 		this.network = network;
 	}
@@ -69,7 +70,7 @@ public class UsecasesCarrierScoringFunctionFactory implements CarrierScoringFunc
 	                    double penalty_score = (-1)*(actStartTime - tw.getEnd())*missedTimeWindowPenalty;
 	                    assert penalty_score <= 0.0 : "penalty score must be negative";
 	                    score += penalty_score;
-	                }	     
+	                }
 	                double actTimeCosts = (act.getEndTime().seconds()-actStartTime)*timeParameter;
 	                assert actTimeCosts >= 0.0 : "actTimeCosts must be positive";
 	                score += actTimeCosts*(-1);

@@ -4,19 +4,20 @@ package org.matsim.contrib.freightReceiver.collaboration;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freightReceiver.Receiver;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
  * This class implements a coalition between carriers and receivers.
- * 
+ *
  * @author wlbean
  */
 final class MutableCoalition implements Coalition {
-	//private final Logger log = Logger.getLogger(MutableCoalition.class);
+	//private final Logger log = LogManager.getLogger(MutableCoalition.class);
 	private double coalitionCost = 0.0;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	private final ArrayList<Receiver> receiverMembers = new ArrayList<>();
 	private final ArrayList<Carrier> carrierMembers = new ArrayList<>();
 
@@ -24,12 +25,12 @@ final class MutableCoalition implements Coalition {
 	/* package-private */ MutableCoalition(){
 
 	}
-	
+
 	@Override
 	public Attributes getAttributes() {
 		return attributes;
-	}	
-	
+	}
+
 
 	@Override
 	public double getCoalitionCost() {
@@ -51,17 +52,17 @@ final class MutableCoalition implements Coalition {
 
 	@Override
 	public void addCarrierCoalitionMember(Carrier carrier) {
-		carrierMembers.add(carrier);		
+		carrierMembers.add(carrier);
 	}
 
 	@Override
 	public void removeReceiverCoalitionMember(Receiver receiver) {
-		receiverMembers.remove(receiver);		
+		receiverMembers.remove(receiver);
 	}
 
 	@Override
 	public void removeCarrierCoalitionMember(Carrier carrier) {
-		carrierMembers.remove(carrier);		
+		carrierMembers.remove(carrier);
 	}
 
 	@Override

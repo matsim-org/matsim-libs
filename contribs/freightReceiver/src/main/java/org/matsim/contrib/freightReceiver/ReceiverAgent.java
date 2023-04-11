@@ -18,13 +18,14 @@
 
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * This keeps track of a single receiver during simulation.
- * 
+ *
  * @author wlbean
  */
 
@@ -32,25 +33,24 @@ class ReceiverAgent {
 
 	private final Receiver receiver;
 	private final ScoringFunction scoringFunction;
-	final private Logger log = Logger.getLogger(ReceiverAgent.class);
-	//private Id<Receiver> id;
+	final private Logger log = LogManager.getLogger(ReceiverAgent.class);
 
 
 	public ReceiverAgent(Receiver receiver, ScoringFunction receiverScorFunc) {
 		this.receiver = receiver;
 		this.scoringFunction = receiverScorFunc;
-		//this.id = receiver.getId();		
+		//this.id = receiver.getId();
 	}
 
 
 	/**
-	 * Score the receiver agent's selected order. This score reflects the receiver 
-	 * cost and is currently determined as the carrier's delivery cost to that 
-	 * receiver (based on the proportion of this receiver's orders in all the 
-	 * orders delivered by the carrier). This is not really realistic, and will 
+	 * Score the receiver agent's selected order. This score reflects the receiver
+	 * cost and is currently determined as the carrier's delivery cost to that
+	 * receiver (based on the proportion of this receiver's orders in all the
+	 * orders delivered by the carrier). This is not really realistic, and will
 	 * be changed in the future.
-	 *
-	 * FIXME: JWJ (23/6/2018): I'm not quite sure what the purpose of this 
+	 * <p>
+	 * FIXME: JWJ (23/6/2018): I'm not quite sure what the purpose of this
 	 *  method is. I've updated it so that the plan's cost is simply the sum
 	 *  of all individual order's costs.
 	 *
@@ -66,14 +66,14 @@ class ReceiverAgent {
 		}
 
 		cost = receiver.getSelectedPlan().getScore();
-		
+
 		scoringFunction.addMoney(cost);
 		scoringFunction.finish();
-		
+
 		receiver.getSelectedPlan().setScore(scoringFunction.getScore());
 		receiver.getAttributes().putAttribute(ReceiverUtils.ATTR_RECEIVER_SCORE, scoringFunction.getScore());
 	}
-	
+
 
 
 	/**

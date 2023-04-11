@@ -18,13 +18,14 @@
 
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.contrib.freightReceiver.replanning.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
 public final class ReceiverModule extends AbstractModule {
-    final private static Logger LOG = Logger.getLogger(ReceiverModule.class);
+    final private static Logger LOG = LogManager.getLogger(ReceiverModule.class);
     private ReceiverReplanningType replanningType = null;
     private Boolean createPNG = true;
 

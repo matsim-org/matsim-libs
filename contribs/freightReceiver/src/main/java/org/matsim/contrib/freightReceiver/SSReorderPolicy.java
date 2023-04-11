@@ -21,19 +21,20 @@
 package org.matsim.contrib.freightReceiver;
 
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.Objects;
 
 /**
- * Basic implementation of an (s,S) reordering policy. That is, as soon as the 
- * current inventory level reaches a value below 's', the product is replenished 
+ * Basic implementation of an (s,S) reordering policy. That is, as soon as the
+ * current inventory level reaches a value below 's', the product is replenished
  * by a quantity that will get the inventory back up to 'S'.
- * 
+ *
  * @author jwjoubert
  */
 public final class SSReorderPolicy implements ReorderPolicy {
-	final private Attributes attributes = new Attributes();
-	
+	final private Attributes attributes = new AttributesImpl();
+
 	/**
 	 * This is the preferred method of instantiating the class.
 	 */
@@ -43,7 +44,7 @@ public final class SSReorderPolicy implements ReorderPolicy {
 		// (these need to be attributes since they are written to file and read back in.  yet, they are policy specific, so
 		// there is no reason to make them truly typed. kai, jan'19
 	}
-	
+
 	/**
 	 * This method should (ideally) only be used by the {@link ReceiversReader}.
 	 */
@@ -52,7 +53,7 @@ public final class SSReorderPolicy implements ReorderPolicy {
 
 	/**
 	 * This method assumes that the stock on hand, and the reordering policy's
-	 * quantities are expressed in the same unit-of-measure. 
+	 * quantities are expressed in the same unit-of-measure.
 	 */
 	@Override
 	public double calculateOrderQuantity(double onHand) {

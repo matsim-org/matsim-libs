@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.freightReceiver.usecases.chessboard;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -28,7 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freightReceiver.*;
 import org.matsim.contrib.freightReceiver.collaboration.CollaborationUtils;
 import org.matsim.core.config.Config;
@@ -53,7 +54,7 @@ import java.util.Random;
  * @author jwjoubert, wlbean
  */
 public class BaseReceiverChessboardScenario {
-    private final static Logger LOG = Logger.getLogger(BaseReceiverChessboardScenario.class);
+    private final static Logger LOG = LogManager.getLogger(BaseReceiverChessboardScenario.class);
 
 
     /**
@@ -122,7 +123,7 @@ public class BaseReceiverChessboardScenario {
 
         new NetworkWriter(sc.getNetwork()).write(outputFolder + "network.xml");
         new ConfigWriter(sc.getConfig()).write(outputFolder + "config.xml");
-        new CarrierPlanXmlWriterV2(FreightUtils.getCarriers(sc)).write(outputFolder + "carriers.xml");
+        FreightUtils.writeCarriers(FreightUtils.getCarriers(sc),outputFolder + "carriers.xml");
         new ReceiversWriter(ReceiverUtils.getReceivers(sc)).write(outputFolder + "receivers.xml");
 
         /* Write the vehicle types. FIXME This will have to change so that vehicle
@@ -149,7 +150,7 @@ public class BaseReceiverChessboardScenario {
         if (!vehicles.hasNext()) {
             throw new RuntimeException("Must have vehicles to get origin link!");
         }
-        Id<Link> carrierOriginLinkId = vehicles.next().getLocation();
+        Id<Link> carrierOriginLinkId = vehicles.next().getLinkId();
 
         /* Create generic product types with a description and required capacity (in kg per item). */
         ProductType productTypeOne = ReceiverUtils.createAndGetProductType(receivers, Id.create("P1", ProductType.class), carrierOriginLinkId);

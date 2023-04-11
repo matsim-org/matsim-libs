@@ -17,7 +17,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Map;
@@ -27,7 +28,7 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
     public ReceiverConfigGroup() { super(NAME); }
 
     @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger(ReceiverConfigGroup.class);
+    private static final Logger LOG = LogManager.getLogger(ReceiverConfigGroup.class);
 
     public static final String NAME = "freightReceiver";
 

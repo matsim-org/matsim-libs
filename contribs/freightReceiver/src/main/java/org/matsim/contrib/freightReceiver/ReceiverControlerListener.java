@@ -19,7 +19,8 @@
 package org.matsim.contrib.freightReceiver;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -27,7 +28,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freightReceiver.collaboration.CollaborationUtils;
 import org.matsim.contrib.freightReceiver.replanning.ReceiverOrderStrategyManagerFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -60,9 +61,9 @@ import java.util.Map;
 class ReceiverControlerListener implements ScoringListener,
         ReplanningListener, BeforeMobsimListener, ShutdownListener {
 
-    final private static Logger LOG = Logger.getLogger(ReceiverControlerListener.class);
-    private ReceiverOrderStrategyManagerFactory stratManFac;
-    private ReceiverScoringFunctionFactory scorFuncFac;
+    final private static Logger LOG = LogManager.getLogger(ReceiverControlerListener.class);
+    private final ReceiverOrderStrategyManagerFactory stratManFac;
+    private final ReceiverScoringFunctionFactory scorFuncFac;
     private ReceiverTracker tracker;
     @Inject
     EventsManager eMan;
@@ -107,8 +108,7 @@ class ReceiverControlerListener implements ScoringListener,
             }
 
             /* Replanning for grand coalition receivers.*/
-            GenericStrategyManager<ReceiverPlan, Receiver> collaborationStratMan = stratMan;
-            //		GenericPlanStrategyImpl<ReceiverPlan, Receiver> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<ReceiverPlan, Receiver>());
+			//		GenericPlanStrategyImpl<ReceiverPlan, Receiver> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<ReceiverPlan, Receiver>());
             //		strategy.addStrategyModule(new CollaborationStatusMutator());
             //		collaborationStratMan.addStrategy(strategy, null, 0.2);
             //		collaborationStratMan.addChangeRequest((int) Math.round((fsc.getScenario().getConfig().controler().getLastIteration())*0.8), strategy, null, 0.0);
@@ -119,10 +119,10 @@ class ReceiverControlerListener implements ScoringListener,
             }
 
             /* Run replanning for non-collaborating receivers */
-            stratMan.run(receiverControlCollection, null, event.getIteration(), event.getReplanningContext());
+            stratMan.run(receiverControlCollection, event.getIteration(), event.getReplanningContext());
 
             /* Run replanning for grand coalition receivers.*/
-            collaborationStratMan.run(receiverCollection, null, event.getIteration(), event.getReplanningContext());
+            stratMan.run(receiverCollection, event.getIteration(), event.getReplanningContext());
         }
     }
 
@@ -146,7 +146,7 @@ class ReceiverControlerListener implements ScoringListener,
             for (Receiver receiver : ReceiverUtils.getReceivers(sc).getReceivers().values()) {
                 double score = (double) receiver.getAttributes().getAttribute(ReceiverUtils.ATTR_RECEIVER_SCORE);
 //				double score = (double) receiver.getSelectedPlan().getScore();
-                receiver.getSelectedPlan().setScore(new Double(score));
+                receiver.getSelectedPlan().setScore(score);
             }
         }
     }
@@ -183,59 +183,55 @@ class ReceiverControlerListener implements ScoringListener,
             receiverLinkMap.put(linkId, receiver);
         }
 
-        BufferedWriter bw = IOUtils.getBufferedWriter(this.sc.getConfig().controler().getOutputDirectory() + "output_receiverInTourPlacement.csv.gz");
-        try {
-            bw.write("receiverId,twStart,twEnd,twDuration,positionInTour,product,deliveryStart,deliveryEnd");
-            bw.newLine();
+		try (BufferedWriter bw = IOUtils.getBufferedWriter(this.sc.getConfig().controler().getOutputDirectory() + "output_receiverInTourPlacement.csv.gz")) {
+			bw.write("receiverId,twStart,twEnd,twDuration,positionInTour,product,deliveryStart,deliveryEnd");
+			bw.newLine();
 
 			for (Carrier carrier : FreightUtils.getCarriers(this.sc).getCarriers().values()) {
-                Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-                for (ScheduledTour tour : scheduledTours) {
-                    for (int i = 0; i < tour.getTour().getTourElements().size(); i++) {
-                        Tour.TourElement element = tour.getTour().getTourElements().get(i);
-                        if (element instanceof Tour.ShipmentBasedActivity) {
-                            Tour.ShipmentBasedActivity act = (Tour.ShipmentBasedActivity) element;
+				Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+				for (ScheduledTour tour : scheduledTours) {
+					for (int i = 0; i < tour.getTour().getTourElements().size(); i++) {
+						Tour.TourElement element = tour.getTour().getTourElements().get(i);
+						if (element instanceof Tour.ShipmentBasedActivity) {
+							Tour.ShipmentBasedActivity act = (Tour.ShipmentBasedActivity) element;
 
-                            String shipmentId = act.getShipment().getId().toString();
-                            if (act.getActivityType().equalsIgnoreCase("delivery")) {
-                                Id<Link> linkId = act.getShipment().getTo();
-                                if (!receiverLinkMap.containsKey(linkId)) {
-                                    LOG.error("Woops, the carrier is delivering a shipment to an unknown receiver!");
-                                    throw new RuntimeException("Don't know to whom delivery is.");
-                                }
+							String shipmentId = act.getShipment().getId().toString();
+							if (act.getActivityType().equalsIgnoreCase("delivery")) {
+								Id<Link> linkId = act.getShipment().getTo();
+								if (!receiverLinkMap.containsKey(linkId)) {
+									LOG.error("Woops, the carrier is delivering a shipment to an unknown receiver!");
+									throw new RuntimeException("Don't know to whom delivery is.");
+								}
 
-                                Tour.Leg precedingLeg = (Tour.Leg) tour.getTour().getTourElements().get(i - 1);
-                                Tour.Leg followingLeg = (Tour.Leg) tour.getTour().getTourElements().get(i + 1);
+								Tour.Leg precedingLeg = (Tour.Leg) tour.getTour().getTourElements().get(i - 1);
+								Tour.Leg followingLeg = (Tour.Leg) tour.getTour().getTourElements().get(i + 1);
 
-                                String startTime = Time.writeTime(
-                                        precedingLeg.getExpectedDepartureTime() +
-                                                precedingLeg.getExpectedTransportTime());
-                                String endTime = Time.writeTime(followingLeg.getExpectedDepartureTime());
+								String startTime = Time.writeTime(
+									precedingLeg.getExpectedDepartureTime() +
+										precedingLeg.getExpectedTransportTime());
+								String endTime = Time.writeTime(followingLeg.getExpectedDepartureTime());
 
-                                Receiver thisReceiver = receiverLinkMap.get(linkId);
-                                String twStart = Time.writeTime(thisReceiver.getSelectedPlan().getTimeWindows().get(0).getStart());
-                                String twEnd = Time.writeTime(thisReceiver.getSelectedPlan().getTimeWindows().get(0).getEnd());
-                                String tw = Time.writeTime(Time.parseTime(twEnd) - Time.parseTime(twStart));
-                                double position = ((double) i) / ((double) tour.getTour().getTourElements().size());
-                                bw.write(String.format("%s,%s,%s,%s,%.4f,%s,%s,%s\n",
-                                        thisReceiver.getId().toString(),
-                                        twStart,
-                                        twEnd,
-                                        tw,
-                                        position,
-                                        shipmentId,
-                                        startTime,
-                                        endTime)
-                                );
-                            }
-                        }
-                    }
-                }
-            }
-        } finally {
-            bw.close();
-        }
-
+								Receiver thisReceiver = receiverLinkMap.get(linkId);
+								String twStart = Time.writeTime(thisReceiver.getSelectedPlan().getTimeWindows().get(0).getStart());
+								String twEnd = Time.writeTime(thisReceiver.getSelectedPlan().getTimeWindows().get(0).getEnd());
+								String tw = Time.writeTime(Time.parseTime(twEnd) - Time.parseTime(twStart));
+								double position = ((double) i) / ((double) tour.getTour().getTourElements().size());
+								bw.write(String.format("%s,%s,%s,%s,%.4f,%s,%s,%s\n",
+									thisReceiver.getId().toString(),
+									twStart,
+									twEnd,
+									tw,
+									position,
+									shipmentId,
+									startTime,
+									endTime)
+								);
+							}
+						}
+					}
+				}
+			}
+		}
     }
 
 

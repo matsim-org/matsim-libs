@@ -15,10 +15,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-  
+
 package org.matsim.contrib.freightReceiver.collaboration;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.contrib.freightReceiver.Order;
 import org.matsim.contrib.freightReceiver.ReceiverOrder;
 import org.matsim.contrib.freightReceiver.ReceiverPlan;
@@ -27,40 +28,40 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 
 /**
  * Changes the service time of a receivers' orders.
- * 
+ *
  * @author wlbean
  */
 
 public final class ServiceTimeMutator implements GenericPlanStrategyModule<ReceiverPlan> {
-	private static final Logger log = Logger.getLogger( ServiceTimeMutator.class ) ;
+	private static final Logger log = LogManager.getLogger( ServiceTimeMutator.class ) ;
 
 	private double time;
 	private double range;
 	private boolean increase;
-	
+
 	/**
-	 * This class changes the service time of a receivers' orders with the 
+	 * This class changes the service time of a receivers' orders with the
 	 * specified time. If {@link #increase} is true, the service time will increase
 	 * until the max allowed duration is
-	 * reached. Conversely, if increase is false, the service time will decrease 
+	 * reached. Conversely, if increase is false, the service time will decrease
 	 * until the minimum duration is reached.
-	 * 
+	 *
 	 * @param mutationTime
 	 * @param mutationRange
 	 * @param increase
 	 */
-	
+
 	public ServiceTimeMutator(double mutationTime, double mutationRange, boolean increase){
 //		this.time = mutationTime*MatsimRandom.getLocalInstance().nextDouble();
 		this.time = mutationTime;
 		this.range = mutationRange;
 		this.increase = increase;
 	}
-	
+
 
 	@Override
 	public void prepareReplanning(ReplanningContext replanningContext) {
-		
+
 	}
 
 	@Override
@@ -74,17 +75,17 @@ public final class ServiceTimeMutator implements GenericPlanStrategyModule<Recei
 			for(Order order: ro.getReceiverProductOrders()){
 
 				double duration = order.getServiceDuration();
-				
+
 				if (increase == true){
 					if ( duration + time <= range){
-						duration = duration + time;		
+						duration = duration + time;
 					} else duration = range;
 				}
-				else 
+				else
 					if (duration - time >= range){
-						duration = duration - time;		
+						duration = duration - time;
 					} else duration = range;
-				
+
 				order.setServiceDuration(duration);
 			}
 		}

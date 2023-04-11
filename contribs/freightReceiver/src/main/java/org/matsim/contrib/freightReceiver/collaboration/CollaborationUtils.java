@@ -1,16 +1,17 @@
 package org.matsim.contrib.freightReceiver.collaboration;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freightReceiver.*;
 
 public class CollaborationUtils{
 	private CollaborationUtils(){} // do not instantiate
-	private static final Logger LOG = Logger.getLogger(CollaborationUtils.class);
+	private static final Logger LOG = LogManager.getLogger(CollaborationUtils.class);
 
 	public static final String ATTR_COLLABORATION_STATUS = "collaborationStatus" ;
 	public static final String ATTR_GRANDCOALITION_MEMBER = "grandCoalitionMember" ;
@@ -24,7 +25,7 @@ public class CollaborationUtils{
 	public static void setCoalitionFromReceiverAttributes( Scenario sc ){
 		for ( Receiver receiver : ReceiverUtils.getReceivers( sc ).getReceivers().values()){
 			if (receiver.getAttributes().getAttribute( ATTR_COLLABORATION_STATUS ) != null){
-				if ((boolean) receiver.getAttributes().getAttribute(ATTR_COLLABORATION_STATUS) == true){
+				if ((boolean) receiver.getAttributes().getAttribute(ATTR_COLLABORATION_STATUS)){
 					if (!getCoalition( sc ).getReceiverCoalitionMembers().contains(receiver)){
 						getCoalition( sc ).addReceiverCoalitionMember(receiver);
 					}
@@ -105,7 +106,7 @@ public class CollaborationUtils{
 		}
 		LOG.info("Current number of receiver coalition members: " + coalition.getReceiverCoalitionMembers().size());
 		LOG.info("Current number of carrier coalition members: " + coalition.getCarrierCoalitionMembers().size());
-		LOG.info("Total number of receiver agents: " + Integer.toString( ReceiverUtils.getReceivers( scenario ).getReceivers().size() ) );
+		LOG.info("Total number of receiver agents: " + ReceiverUtils.getReceivers(scenario).getReceivers().size());
 	}
 
 }

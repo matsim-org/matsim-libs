@@ -1,6 +1,7 @@
 package org.matsim.contrib.freightReceiver.replanning;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.contrib.freightReceiver.ReceiverPlan;
 import org.matsim.contrib.freightReceiver.collaboration.CollaborationUtils;
 import org.matsim.core.replanning.ReplanningContext;
@@ -13,14 +14,14 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
  */
 
 public final class CollaborationStatusMutator implements GenericPlanStrategyModule<ReceiverPlan> {
-	private static final Logger log = Logger.getLogger( CollaborationStatusMutator.class ) ;
-	
+	private static final Logger log = LogManager.getLogger( CollaborationStatusMutator.class ) ;
+
 	/*
 	 * A class that changes a receiver's collaboration status.
 	 */
-	
+
 public CollaborationStatusMutator(){
-		
+
 	}
 
 	@Override
@@ -36,7 +37,7 @@ public CollaborationStatusMutator(){
 		boolean newstatus;
 		boolean grandMember = (boolean) receiverPlan.getReceiver().getAttributes().getAttribute( CollaborationUtils.ATTR_GRANDCOALITION_MEMBER );
 		boolean status = (boolean) receiverPlan.getReceiver().getAttributes().getAttribute(CollaborationUtils.ATTR_COLLABORATION_STATUS );
-		
+
 
 		if (grandMember == true){
 			if (status == true){

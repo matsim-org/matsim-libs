@@ -16,20 +16,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.freightReceiver;
 
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * Scoring function factory interface for receiver agents;
- * 
+ *
  * @author wlbean
  */
 public interface ReceiverScoringFunctionFactory {
-	
+
 	ScoringFunction createScoringFunction(Receiver receiver);
-	
+
 }

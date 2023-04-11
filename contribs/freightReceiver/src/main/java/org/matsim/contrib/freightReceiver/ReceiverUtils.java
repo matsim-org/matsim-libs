@@ -1,6 +1,7 @@
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -9,10 +10,10 @@ import org.matsim.core.config.ConfigUtils;
 
 public class ReceiverUtils {
 	private final static String REPLAN_INTERVAL = "replanInterval";
-	private static final Logger LOG = Logger.getLogger( ReceiverUtils.class ) ;
-	
+	private static final Logger LOG = LogManager.getLogger( ReceiverUtils.class ) ;
+
 	private ReceiverUtils(){} // do not instantiate
-	
+
 	public static final String ATTR_RECEIVER_SCORE = "score" ;
 	public static final String ATTR_RECEIVER_TW_COST = "twCost" ;
 
@@ -33,14 +34,14 @@ public class ReceiverUtils {
 	 */
 	public static Receiver newInstance( Id<Receiver> id){
 		// this pattern allows to make the implementation package-protected. kai, sep'18
-		
+
 		return new ReceiverImpl(id);
 	}
 
 	public static void setReceivers( final Receivers receivers, final Scenario sc ) {
 		sc.addScenarioElement( RECEIVERS_SCENARIO_ELEMENT, receivers );
 	}
-	
+
 	public static Receivers getReceivers( final Scenario sc ) {
 		Receivers receivers = (Receivers) sc.getScenarioElement( RECEIVERS_SCENARIO_ELEMENT );
 		if ( receivers == null ) {
@@ -63,5 +64,5 @@ public class ReceiverUtils {
 		return ConfigUtils.addOrGetModule(config, ReceiverConfigGroup.class);
 	}
 
-	
+
 }

@@ -23,24 +23,25 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * This implements the product types used among all {@link Receivers}.
- * 
+ * <p>
  * TODO (JWJ, WLB, April 2018: think about how we can/should convert (seemlessly)
  * between volume and weight. Consider the IATA Dimensional Weight Factor. Think
  * about expressing a factor "percentage of cube(meter)-ton". A cubic meter of
  * toilet paper will have a factor of 1.0, and at the same time a brick-size
- * weighing a ton will also have a factor of 1.0. This is necessary as jsprit 
+ * weighing a ton will also have a factor of 1.0. This is necessary as jsprit
  * can only work with ONE unit throughout its optimisation, i.e. and associate
  * it with vehicle capacity.
- * 
+ *
  * @author wlbean
  */
 public class ProductType implements Identifiable<ProductType>, Attributable {
 
-	private final Attributes attributes = new Attributes();
-	
+	private final Attributes attributes = new AttributesImpl();
+
 	/**
 	 * Set default values.
 	 */
@@ -69,7 +70,7 @@ public class ProductType implements Identifiable<ProductType>, Attributable {
 	public void setDescription(String description){
 		this.descr = description;
 	}
-	
+
 	public void setRequiredCapacity(double reqCapacity){
 		this.reqCapacity = reqCapacity;
 	}
@@ -77,11 +78,11 @@ public class ProductType implements Identifiable<ProductType>, Attributable {
 	public String getDescription(){
 		return descr;
 	}
-	
+
 	public double getRequiredCapacity(){
 		return reqCapacity;
 	}
-	
+
 	public Id<ProductType> getId(){
 		return typeId;
 	}

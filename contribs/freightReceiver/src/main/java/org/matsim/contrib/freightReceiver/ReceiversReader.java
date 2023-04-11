@@ -29,7 +29,7 @@ import java.util.Stack;
  * Reader for the container of freight {@link Receivers} in MATSim XML format.
  * This reader recognises the format of the plans-file and uses the correct
  * reader for the specific plans-version, without manual setting.
- * 
+ *
  * @author jwjoubert
  */
 public final class ReceiversReader extends MatsimXmlParser{
@@ -37,11 +37,11 @@ public final class ReceiversReader extends MatsimXmlParser{
 	private final static String RECEIVERS_V2 = "freightReceivers_v2.dtd";
 	private MatsimXmlParser delegate = null;
 	private final Receivers receivers;
-	
+
 	public ReceiversReader(Receivers receivers) {
 		this.receivers = receivers;
 	}
-	
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		this.delegate.startTag(name, atts, context);
@@ -51,19 +51,15 @@ public final class ReceiversReader extends MatsimXmlParser{
 	public void endTag(String name, String content, Stack<String> context) {
 		this.delegate.endTag(name, content, context);
 	}
-	
+
 	@Override
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 		switch (doctype) {
-		case RECEIVERS_V1:
-			throw new IllegalArgumentException("There is no backward compatibility for v1. It had inconsistent file formats.");
-		case RECEIVERS_V2:
-			this.delegate = new ReceiversReaderV2(this.receivers);
-			break;
-		default:
-			throw new IllegalArgumentException("No receivers reader available for doctype \"" + doctype + "\".");
+			case RECEIVERS_V1 -> throw new IllegalArgumentException("There is no backward compatibility for v1. It had inconsistent file formats.");
+			case RECEIVERS_V2 -> this.delegate = new ReceiversReaderV2(this.receivers);
+			default -> throw new IllegalArgumentException("No receivers reader available for doctype \"" + doctype + "\".");
 		}
 	}
-	
+
 }

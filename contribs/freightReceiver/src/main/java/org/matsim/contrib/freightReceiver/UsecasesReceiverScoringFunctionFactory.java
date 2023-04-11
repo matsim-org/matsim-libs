@@ -15,42 +15,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-  
+
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.MoneyScoring;
 
 public class UsecasesReceiverScoringFunctionFactory implements ReceiverScoringFunctionFactory {
-	
+
     public UsecasesReceiverScoringFunctionFactory() {
     }
-    
+
 	@Override
 	public ScoringFunction createScoringFunction(Receiver receiver) {
 		SumScoringFunction sscorfunc = new SumScoringFunction();
-		
-				
+
+
 		MoneyScoring carriertoReceiverCostAllocation = new CarriertoReceiverCostAllocation();
 		sscorfunc.addScoringFunction(carriertoReceiverCostAllocation);
-	    
+
 		return sscorfunc;
 	}
 
 	static class CarriertoReceiverCostAllocation implements MoneyScoring {
-		
+
 		private double cost = 0.0;
-		
+
 	 public void reset(){
 			this.cost = 0.0;
 		}
 
 		@Override
 		public void finish() {
-		
-		}			
+
+		}
 
 
 		@Override
@@ -63,7 +64,7 @@ public class UsecasesReceiverScoringFunctionFactory implements ReceiverScoringFu
 		 */
 		@Override
 		public void addMoney(double amount) {
-			Logger.getLogger(UsecasesReceiverScoringFunctionFactory.class).error("Where is this used?!");
+			LogManager.getLogger(UsecasesReceiverScoringFunctionFactory.class).error("Where is this used?!");
 			this.cost += amount;
 		}
 	}

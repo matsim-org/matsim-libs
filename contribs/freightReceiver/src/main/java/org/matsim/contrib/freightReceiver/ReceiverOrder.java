@@ -18,7 +18,8 @@
 
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -28,13 +29,13 @@ import java.util.Collection;
 
 /**
  * A collection of all the orders of a receiver delivered by a single carrier.
- * 
+ *
  * @author wlbean, jwjoubert
  */
 
 public class ReceiverOrder implements BasicPlan{
 
-	private final Logger log = Logger.getLogger(ReceiverOrder.class);
+	private final Logger log = LogManager.getLogger(ReceiverOrder.class);
 	private final Id<Receiver> receiverId;
 	private final Collection<Order> orders;
 	private Double cost = null;
@@ -57,7 +58,7 @@ public class ReceiverOrder implements BasicPlan{
 	public ReceiverOrder(final Id<Receiver> receiverId, final Collection<Order> orders, final Id<Carrier> carrierId){
 		this.orders = orders;
 		this.receiverId = receiverId;
-		this.carrierId = carrierId;		
+		this.carrierId = carrierId;
 	}
 
 	public final ReceiverOrder createCopy() {
@@ -66,7 +67,7 @@ public class ReceiverOrder implements BasicPlan{
 			ordersCopy.add( order.createCopy() ) ;
 		}
 		ReceiverOrder receiverOrderCopy = new ReceiverOrder( this.receiverId, ordersCopy, this.carrierId );
-		receiverOrderCopy.cost = new Double( this.cost );
+		receiverOrderCopy.cost = this.cost;
 		receiverOrderCopy.carrier = this.carrier ;
 		return receiverOrderCopy ;
 	}
@@ -100,8 +101,8 @@ public class ReceiverOrder implements BasicPlan{
 	/**
 	 * Get the actual {@link Carrier} of this {@link ReceiverOrder}. This will
 	 * only be set once FIXME ... has been called to link the receivers and
-	 * carriers. 
-	 * 
+	 * carriers.
+	 *
 	 * @return
 	 */
 	public Carrier getCarrier() {
@@ -113,7 +114,7 @@ public class ReceiverOrder implements BasicPlan{
 
 	/**
 	 * Get the pointer {@link Id} of this {@link ReceiverOrder}'s {@link Carrier}.
-	 * 
+	 *
 	 * @return
 	 */
 	public Id<Carrier> getCarrierId(){

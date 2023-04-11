@@ -18,11 +18,13 @@
 
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -36,8 +38,8 @@ import java.util.TreeMap;
  */
 public final class Receivers implements Attributable {
 
-    private final Logger log = Logger.getLogger(Receivers.class);
-    private final Attributes attributes = new Attributes();
+    private final Logger log = LogManager.getLogger(Receivers.class);
+    private final Attributes attributes = new AttributesImpl();
     private String desc = "";
 
     /**
@@ -75,7 +77,7 @@ public final class Receivers implements Attributable {
 
     /**
      * Add a new receiver to the container.
-     *
+     * <p>
      * TODO Needs a test.
      */
     public void addReceiver(Receiver receiver) {
@@ -90,7 +92,7 @@ public final class Receivers implements Attributable {
      * keeping unit (SKU). When the product type is created, it is registered
      * here inside the receivers container to ensure all unique SKUs are used
      * consistently.
-     *
+     * <p>
      * TODO Needs test.
      */
     ProductType createAndAddProductType(final Id<ProductType> typeId, final Id<Link> originLinkId) {
@@ -121,7 +123,7 @@ public final class Receivers implements Attributable {
         }
     }
 
-    public final Collection<ProductType> getAllProductTypes() {
+    public Collection<ProductType> getAllProductTypes() {
         return this.productTypeMap.values();
     }
 
