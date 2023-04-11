@@ -101,8 +101,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		// Output files
 		File scheduleFile = new File(output, name + "-transitSchedule.xml.gz");
 		File networkPTFile = new File(output,
-				Path.of(IOUtils.resolveFileOrResource(networkFile).getPath())
-						.getFileName().toString()
+				new File(IOUtils.resolveFileOrResource(networkFile).toURI()).getName()
 						.replace(".xml", "-with-pt.xml"));
 		File transitVehiclesFile = new File(output, name + "-transitVehicles.xml.gz");
 
