@@ -25,7 +25,6 @@ import org.matsim.vehicles.*;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,12 +56,12 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	private String name;
 
 	@CommandLine.Option(names = "--network", description = "Base network that will be merged with pt network.", required = true)
-	private Path networkFile;
+	private String networkFile;
 
 	@CommandLine.Option(names = "--date", arity = "1..*", description = "The day for which the schedules will be extracted, can also be multiple", required = true)
 	private List<LocalDate> date;
 
-	@CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
+	@CommandLine.Option(names = "--output", description = "Output folder", required = true)
 	private File output;
 
 	@CommandLine.Option(names = "--copy-late-early", description = "Copy late/early departures to have at complete schedule")
@@ -100,7 +99,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 		// Output files
 		File scheduleFile = new File(output, name + "-transitSchedule.xml.gz");
-		File networkPTFile = new File(output, networkFile.getFileName().toString().replace(".xml", "-with-pt.xml"));
+		File networkPTFile = new File(output, Path.of(networkFile).getFileName().toString().replace(".xml", "-with-pt.xml"));
 		File transitVehiclesFile = new File(output, name + "-transitVehicles.xml.gz");
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -139,7 +138,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			TransitSchedulePostProcessTools.copyEarlyDeparturesToFollowingNight(scenario.getTransitSchedule(), 6 * 3600, "copied");
 		}
 
-		Network network = Files.exists(networkFile) ? NetworkUtils.readNetwork(networkFile.toString()) : scenario.getNetwork();
+		Network network = NetworkUtils.readNetwork(networkFile);
 
 		Scenario ptScenario = getScenarioWithPseudoPtNetworkAndTransitVehicles(network, scenario.getTransitSchedule(), "pt_");
 
@@ -148,7 +147,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			TransitScheduleValidator.ValidationResult checkResult = TransitScheduleValidator.validateAll(ptScenario.getTransitSchedule(), ptScenario.getNetwork());
 			if (checkResult.isValid()) {
 				log.info("TransitSchedule and Network valid according to TransitScheduleValidator");
-				log.warn("TransitScheduleValidator warnings:\n" + checkResult.getWarnings());
+				log.warn("TransitScheduleValidator warnings: {}", checkResult.getWarnings());
 			} else {
 				log.error(checkResult.getErrors());
 				throw new RuntimeException("TransitSchedule and/or Network invalid");
