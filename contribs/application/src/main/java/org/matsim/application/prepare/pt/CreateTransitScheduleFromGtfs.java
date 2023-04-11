@@ -1,6 +1,7 @@
 package org.matsim.application.prepare.pt;
 
 import com.conveyal.gtfs.model.Stop;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -101,8 +102,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		// Output files
 		File scheduleFile = new File(output, name + "-transitSchedule.xml.gz");
 		File networkPTFile = new File(output,
-				Path.of(IOUtils.resolveFileOrResource(networkFile).getPath())
-						.getFileName().toString()
+				FilenameUtils.getName(IOUtils.resolveFileOrResource(networkFile).getPath())
 						.replace(".xml", "-with-pt.xml"));
 		File transitVehiclesFile = new File(output, name + "-transitVehicles.xml.gz");
 
