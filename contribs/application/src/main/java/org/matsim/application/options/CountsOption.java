@@ -103,7 +103,7 @@ public final class CountsOption {
 	}
 
 	/**
-	 * Check whether station id should be ignored
+	 * Check whether station id should be ignored.
 	 */
 	public boolean isIgnored(String stationId) {
 		readIgnored();
@@ -115,22 +115,12 @@ public final class CountsOption {
 	 *
 	 * @return null if not matched
 	 */
-	public Map<String, Id<Link>> isManuallyMatched(String stationId) {
+	public Id<Link> isManuallyMatched(String stationId) {
 		readManualMatched();
-		List<String> matchedStations = manualMatchedCounts.keySet().stream().
-				filter(key -> key.contains(stationId)).
-				collect(Collectors.toList());
 
-		if(matchedStations.isEmpty()){
+		if (manualMatchedCounts.isEmpty() || !manualMatchedCounts.containsKey(stationId))
 			return null;
-		} else{
-			Map<String, Id<Link>> result = new HashMap<>();
 
-			for(String m: matchedStations)
-				result.put(m, manualMatchedCounts.get(m));
-
-			return result;
-		}
-
+		return manualMatchedCounts.get(stationId);
 	}
 }
