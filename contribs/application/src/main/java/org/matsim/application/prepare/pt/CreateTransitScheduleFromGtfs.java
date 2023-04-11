@@ -18,6 +18,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.TransitScheduleValidator;
@@ -99,7 +100,10 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 		// Output files
 		File scheduleFile = new File(output, name + "-transitSchedule.xml.gz");
-		File networkPTFile = new File(output, Path.of(networkFile).getFileName().toString().replace(".xml", "-with-pt.xml"));
+		File networkPTFile = new File(output,
+				Path.of(IOUtils.resolveFileOrResource(networkFile).getPath())
+						.getFileName().toString()
+						.replace(".xml", "-with-pt.xml"));
 		File transitVehiclesFile = new File(output, name + "-transitVehicles.xml.gz");
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
