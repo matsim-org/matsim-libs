@@ -51,9 +51,9 @@ class ReceiverScoringFunctionFactoryMoneyOnly implements ReceiverScoringFunction
 		@Override
 		public void addMoney(double amount) {
 			if (amount > 0) {
-				LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class).error("What?! The receiver is getting paid for a delivery?!");
+				LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class).warn("What?! The receiver is getting paid for a delivery?! Make sure this is what you want.");
 			}
-			LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class).error("Where is this used?!");
+//			LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class).error("Where is this used?!");
 			this.moneyBalance += amount;
 		}
 	}

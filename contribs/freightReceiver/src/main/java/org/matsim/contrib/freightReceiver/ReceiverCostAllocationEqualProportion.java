@@ -17,27 +17,27 @@
  * *
  * ***********************************************************************
  */
+
 package org.matsim.contrib.freightReceiver;
 
-import org.apache.logging.log4j.LogManager;
 import org.matsim.contrib.freight.carrier.Carrier;
 
 /**
- * A simple implementation where the cost allocated by the {@link Carrier} to
- * the {@link Receiver} is a fixed value.
+ * A cost allocation model where the {@link Carrier} distributes its cost
+ * equally among the {@link Receiver}s it services.
  */
-class ReceiverCostAllocationFixed implements ReceiverCostAllocation{
+class ReceiverCostAllocationEqualProportion implements ReceiverCostAllocation{
 
-	private final double cost;
-
-	ReceiverCostAllocationFixed(double cost){
-		this.cost = cost;
-		if(cost < 0.0){
-			LogManager.getLogger(ReceiverCostAllocationFixed.class).warn("A negative cost implies an income. Is the carrier (really) paying receivers to perform deliveries?");
-		}
-	}
+	private boolean built = false;
 	@Override
 	public double getCost(Carrier carrier, Receiver receiver) {
-		return this.cost;
+		if(!built){
+			setup(carrier, receiver);
+		}
+		return 0;
+	}
+
+	private void setup(Carrier carrier, Receiver receiver){
+
 	}
 }
