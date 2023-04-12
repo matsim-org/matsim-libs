@@ -39,10 +39,10 @@ public class ChainedPerturbatorParams extends SimulatedAnnealingConfigGroup.Pert
 	}
 
 	public void addPerturbationParams(final SimulatedAnnealingConfigGroup.PerturbationParams params) {
-		final SimulatedAnnealingConfigGroup.PerturbationParams previous = this.getPerturbationParams(params.getIdentifier());
+		final SimulatedAnnealingConfigGroup.PerturbationParams previous = this.getPerturbationParams(params.identifier);
 
 		if (previous != null) {
-			log.info("perturbation parameters for identifier " + previous.getIdentifier()
+			log.info("perturbation parameters for identifier " + previous.identifier
 					+ " were just overwritten.");
 
 			final boolean removed = removeParameterSet(previous);
@@ -61,7 +61,7 @@ public class ChainedPerturbatorParams extends SimulatedAnnealingConfigGroup.Pert
 		final Map<String, SimulatedAnnealingConfigGroup.PerturbationParams> map = new LinkedHashMap<>();
 
 		for (SimulatedAnnealingConfigGroup.PerturbationParams pars : getPerturbationParams()) {
-			map.put(pars.getIdentifier(), pars);
+			map.put(pars.identifier, pars);
 		}
 
 		return map;

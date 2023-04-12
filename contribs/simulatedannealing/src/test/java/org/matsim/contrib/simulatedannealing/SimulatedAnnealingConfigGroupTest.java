@@ -79,7 +79,7 @@ public class SimulatedAnnealingConfigGroupTest {
 
 		Assert.assertFalse(saConfig.getPerturbationParams().isEmpty());
 		Assert.assertTrue(saConfig.getPerturbationParamsPerType().containsKey("perturb"));
-		Assert.assertEquals(1., saConfig.getPerturbationParamsPerType().get("perturb").getWeight(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1., saConfig.getPerturbationParamsPerType().get("perturb").weight, MatsimTestUtils.EPSILON);
 
 	}
 }
