@@ -107,13 +107,15 @@ public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 
 		public final static String SET_TYPE = "perturbationParams";
 
-		public static final String PERTURBATION_IDENTIFIER = "identifier";
 		public static final String PERTURBATION_WEIGHT = "weight";
 
+		@Parameter
+		@Comment("Identifier of the perturbation.")
+		public String identifier;
 
-		private String identifier;
-
-		private double weight;
+		@Parameter
+		@Comment("Sampling weight for the given perturbation strategy.")
+		public double weight;
 
 		public PerturbationParams(String identifier, double weight) {
 			super(SET_TYPE);
@@ -125,46 +127,13 @@ public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 			this(identifier, 1.);
 		}
 
-		/**
-		 * {@value -- PERTURBATION_IDENTIFIER}
-		 */
-		@StringGetter(PERTURBATION_IDENTIFIER)
-		public String getIdentifier() {
-			return this.identifier;
-		}
-
-		/**
-		 * {@value -- PERTURBATION_IDENTIFIER}
-		 */
-		@StringSetter(PERTURBATION_IDENTIFIER)
-		public void setIdentifier(final String identifier) {
-			testForLocked();
-			this.identifier = identifier;
-		}
-
-		/**
-		 * {@value -- PERTURBATION_IDENTIFIER}
-		 */
-		@StringGetter(PERTURBATION_WEIGHT)
-		public double getWeight() {
-			return this.weight;
-		}
-
-		/**
-		 * {@value -- PERTURBATION_IDENTIFIER}
-		 */
-		@StringSetter(PERTURBATION_WEIGHT)
-		public void setWeight(final double weight) {
-			testForLocked();
-			this.weight = weight;
-		}
 	}
 
 	public void addPerturbationParams(final PerturbationParams params) {
-		final PerturbationParams previous = this.getPerturbationParams(params.getIdentifier());
+		final PerturbationParams previous = this.getPerturbationParams(params.identifier);
 
 		if (previous != null) {
-			log.info("perturbation parameters for identifier " + previous.getIdentifier()
+			log.info("perturbation parameters for identifier " + previous.identifier
 						+ " were just overwritten.");
 
 			final boolean removed = removeParameterSet(previous);
@@ -183,7 +152,7 @@ public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 		final Map<String, PerturbationParams> map = new LinkedHashMap<>();
 
 		for (PerturbationParams pars : getPerturbationParams()) {
-			map.put(pars.getIdentifier(), pars);
+			map.put(pars.identifier, pars);
 		}
 
 		return map;
