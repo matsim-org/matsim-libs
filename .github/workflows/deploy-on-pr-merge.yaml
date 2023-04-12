@@ -3,10 +3,10 @@ name: deploy-on-pr-merge
 on:
   push: # snapshot deployment
     branches:
-      - master
+      - 15.x
   pull_request_target: # pr-labelled deployment
     branches:
-      - master
+      - 15.x
     types:
       - closed
 

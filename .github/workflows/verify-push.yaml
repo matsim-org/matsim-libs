@@ -3,7 +3,7 @@ name: verify-push
 on:
   push:
     branches-ignore:
-      - 'master' # no need to run after merging to master
+      - '15.x' # no need to run after merging to 15.x
     tags-ignore:
       - '*' # do not run on pushing tags (see deploy-on-release-created)
   pull_request:
@@ -68,7 +68,7 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v3
 
-      - name: Detect changes against master
+      - name: Detect changes against 15.x
         # we only want to build matsim (module) if changes are not limited to contribs
         id: detect-changes
         uses: dorny/paths-filter@v2
