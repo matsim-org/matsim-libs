@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.freightReceiver.usecases.chessboard;
+package org.matsim.contrib.freightReceiver.run.chessboard;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +35,7 @@ import org.matsim.contrib.freightReceiver.collaboration.CollaborationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -53,17 +54,17 @@ import java.util.Random;
  *
  * @author jwjoubert, wlbean
  */
-public class BaseReceiverChessboardScenario {
-    private final static Logger LOG = LogManager.getLogger(BaseReceiverChessboardScenario.class);
+public class ReceiverChessboardScenario {
+    private final static Logger LOG = LogManager.getLogger(ReceiverChessboardScenario.class);
 
 
     /**
      * Build the entire chessboard example.
      */
-    public static Scenario createChessboardScenario(long seed, int numberOfReceivers, boolean write) {
+    public static Scenario createChessboardScenario(long seed, int numberOfReceivers, String outputFolder, boolean write) {
         MatsimRandom.reset(seed);
 
-        Config config = setupChessboardConfig(seed);
+        Config config = setupChessboardConfig(seed, outputFolder);
 
         Scenario sc = ScenarioUtils.loadScenario(config);
 
@@ -80,7 +81,6 @@ public class BaseReceiverChessboardScenario {
 //		generateCarrierPlan( sc );
         // needs to be done in iterations startup listener, where it is also done during the iterations.  kai, jan'19
 
-
         if (write) {
             writeFreightScenario(sc);
         }
@@ -95,28 +95,33 @@ public class BaseReceiverChessboardScenario {
     /**
      * FIXME Need to complete this.
      */
-    private static Config setupChessboardConfig(long seed) {
+    private static Config setupChessboardConfig(long seed, String outputFolder) {
         URL context = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
         Config config = ConfigUtils.createConfig();
 
         config.setContext(context);
 
+		config.controler().setOutputDirectory(outputFolder);
         config.controler().setFirstIteration(0);
-        config.controler().setLastIteration(ChessboardExperimentParameters.NUM_ITERATIONS);
+        config.controler().setLastIteration(ReceiverChessboardParameters.NUM_ITERATIONS);
         config.controler().setMobsim("qsim");
-        config.controler().setWriteSnapshotsInterval(ChessboardExperimentParameters.STAT_INTERVAL);
+        config.controler().setWriteSnapshotsInterval(ReceiverChessboardParameters.STAT_INTERVAL);
         config.global().setRandomSeed(seed);
         config.network().setInputFile("grid9x9.xml");
+
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
         return config;
     }
 
+	/**
+	 * Write the scenario to the output folder defined in the scenario's config object.
+	 */
     public static void writeFreightScenario(Scenario sc) {
         /* Write the necessary bits to file. */
         String outputFolder = sc.getConfig().controler().getOutputDirectory();
-        outputFolder += outputFolder.endsWith("/") ? "" : "/";
-        boolean success = new File(outputFolder).mkdirs();
+		boolean success = new File(outputFolder).mkdirs();
         if (!success) {
             LOG.warn("Could not successfully create '" + outputFolder + "'. Maybe it already exists?");
         }
@@ -134,7 +139,7 @@ public class BaseReceiverChessboardScenario {
 
 
     /**
-     * Creates the product orders for the receiver agents in the simulation. Currently (28/08/18) all the receivers have the same orders
+     * Creates the product orders for the receiver agents in the simulation. Currently (28/08/2018) all the receivers have the same orders
      * for experiments, but this must be adapted in the future to accept other parameters as inputs to enable different orders per receiver.
      */
     private static void createReceiverOrders(Scenario sc) {
@@ -162,9 +167,9 @@ public class BaseReceiverChessboardScenario {
         productTypeTwo.setRequiredCapacity(2);
 
         for (int r = 1; r < ReceiverUtils.getReceivers(sc).getReceivers().size() + 1; r++) {
-            int tw = ChessboardExperimentParameters.TIME_WINDOW_DURATION;
-            int numDel = ChessboardExperimentParameters.NUM_DELIVERIES;
-            String serdur = ChessboardExperimentParameters.SERVICE_TIME;
+            int tw = ReceiverChessboardParameters.TIME_WINDOW_DURATION_IN_HOURS;
+            int numDel = ReceiverChessboardParameters.NUM_DELIVERIES;
+            String serdur = ReceiverChessboardParameters.SERVICE_TIME;
 
             /* Create receiver-specific products */
             Receiver receiver = receivers.getReceivers().get(Id.create(Integer.toString(r), Receiver.class));
@@ -202,7 +207,7 @@ public class BaseReceiverChessboardScenario {
             receiver.setSelectedPlan(receiverPlan);
             receiver.getAttributes().putAttribute(
                     ReceiverUtils.ATTR_RECEIVER_TW_COST,
-                    ChessboardExperimentParameters.TIME_WINDOW_HOURLY_COST);
+                    ReceiverChessboardParameters.TIME_WINDOW_HOURLY_COST);
 
             /* Convert receiver orders to initial carrier shipment. */
             convertReceiverOrdersToInitialCarrierShipments(carriers, receiverOrder, receiverPlan);
@@ -346,7 +351,7 @@ public class BaseReceiverChessboardScenario {
     private static ReceiverProduct createReceiverProduct(ProductType productType, int minLevel, int maxLevel) {
         ReceiverProduct.Builder builder = ReceiverProduct.Builder.newInstance();
         return builder
-                .setReorderingPolicy(new SSReorderPolicy(minLevel, maxLevel))
+                .setReorderingPolicy(ReceiverUtils.createSSReorderPolicy(minLevel, maxLevel))
                 .setProductType(productType)
                 .build();
     }

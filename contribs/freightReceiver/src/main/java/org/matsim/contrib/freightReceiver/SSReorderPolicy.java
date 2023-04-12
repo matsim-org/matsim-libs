@@ -32,16 +32,19 @@ import java.util.Objects;
  *
  * @author jwjoubert
  */
-public final class SSReorderPolicy implements ReorderPolicy {
+final class SSReorderPolicy implements ReorderPolicy {
+	final String policyName = "(s,S)";
+	final private String attributeMinimumLevel = "s";
+	final private String attributeMaximumLevel = "S";
 	final private Attributes attributes = new AttributesImpl();
 
 	/**
-	 * This is the preferred method of instantiating the class.
+	 * This class should be instantiated through {@link ReceiverUtils#createSSReorderPolicy(double, double)}.
 	 */
-	public SSReorderPolicy(double minLevel, double maxLevel) {
-		this.attributes.putAttribute("s", minLevel);
-		this.attributes.putAttribute("S", maxLevel);
-		// (these need to be attributes since they are written to file and read back in.  yet, they are policy specific, so
+	SSReorderPolicy(double minLevel, double maxLevel) {
+		this.attributes.putAttribute(attributeMinimumLevel, minLevel);
+		this.attributes.putAttribute(attributeMaximumLevel, maxLevel);
+		// (these need to be attributes since they are written to file and read back in.  Yet, they are policy specific, so
 		// there is no reason to make them truly typed. kai, jan'19
 	}
 
@@ -70,19 +73,19 @@ public final class SSReorderPolicy implements ReorderPolicy {
 	 * Get the lower limit 's' of the (s,S) stock ordering policy.
 	 */
 	public double getMinimumStockLevel() {
-		return Double.parseDouble(Objects.requireNonNull(attributes.getAttribute("s")).toString());
+		return Double.parseDouble(Objects.requireNonNull(attributes.getAttribute(attributeMinimumLevel)).toString());
 	}
 
 	/**
 	 * Get the upper limit 'S' of the (s,S) stock ordering policy.
 	 */
 	public double getMaximumStockLevel() {
-		return Double.parseDouble(Objects.requireNonNull(attributes.getAttribute("S")).toString());
+		return Double.parseDouble(Objects.requireNonNull(attributes.getAttribute(attributeMaximumLevel)).toString());
 	}
 
 	@Override
 	public String getPolicyName() {
-		return "(s,S)";
+		return policyName;
 	}
 
 	@Override

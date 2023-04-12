@@ -34,7 +34,7 @@ import java.util.TreeMap;
 /**
  * A container for all {@link Receiver}s.
  *
- * @author wlbean jwjoubert
+ * @author wlbean, jwjoubert
  */
 public final class Receivers implements Attributable {
 
@@ -58,7 +58,7 @@ public final class Receivers implements Attributable {
      * Returns the receivers in the container. The design choice (May'21)
      * was that this should be unmodifiable. If you want to edit a
      * {@link Receiver}, you cannot access it via this map, but should rather
-     * use {@link #getReceiver(Id).}
+     * use {@link Receivers#getReceiver(Id)}.
      */
     public Map<Id<Receiver>, Receiver> getReceivers() {
         return Collections.unmodifiableMap(receiverMap);
@@ -77,8 +77,6 @@ public final class Receivers implements Attributable {
 
     /**
      * Add a new receiver to the container.
-     * <p>
-     * TODO Needs a test.
      */
     public void addReceiver(Receiver receiver) {
         if (!receiverMap.containsKey(receiver.getId())) {
@@ -92,8 +90,6 @@ public final class Receivers implements Attributable {
      * keeping unit (SKU). When the product type is created, it is registered
      * here inside the receivers container to ensure all unique SKUs are used
      * consistently.
-     * <p>
-     * TODO Needs test.
      */
     ProductType createAndAddProductType(final Id<ProductType> typeId, final Id<Link> originLinkId) {
         if(this.productTypeMap.containsKey(typeId)){
@@ -111,7 +107,6 @@ public final class Receivers implements Attributable {
      * Gets a registered {@link ProductType} that represents a unique SKU. If
      * the product type has not been registered, the code will crash with a
      * {@link RuntimeException}.
-     * TODO Needs test.
      */
     ProductType getProductType(Id<ProductType> typeId) {
         if (this.productTypeMap.containsKey(typeId)) {
@@ -139,6 +134,4 @@ public final class Receivers implements Attributable {
     public String getDescription() {
         return this.desc;
     }
-
-
 }

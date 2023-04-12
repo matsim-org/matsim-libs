@@ -24,10 +24,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
@@ -43,10 +40,10 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 
-public class ReceiverTriggersCarrierReplanningListener implements IterationStartsListener {
-    @Inject private Scenario sc;
+class ReceiverTriggersCarrierReplanningListener implements IterationStartsListener {
+	@Inject private Scenario sc;
 
-    public ReceiverTriggersCarrierReplanningListener(){
+    ReceiverTriggersCarrierReplanningListener(){
     }
 
     @Override
@@ -102,7 +99,7 @@ public class ReceiverTriggersCarrierReplanningListener implements IterationStart
             VehicleRoutingProblem vrp = vrpBuilder.setRoutingCost(netBasedCosts).build();
 
             //read and create a pre-configured algorithms to solve the vrp
-            URL algoConfigFileName = IOUtils.extendUrl( sc.getConfig().getContext(), "initialPlanAlgorithm.xml" );
+			URL algoConfigFileName = IOUtils.extendUrl( sc.getConfig().getContext(), "initialPlanAlgorithm.xml");
             VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algoConfigFileName);
 
             //solve the problem
@@ -118,9 +115,9 @@ public class ReceiverTriggersCarrierReplanningListener implements IterationStart
             carrier.setSelectedPlan(newPlan);
 
         }
-
-		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers(sc)).write(sc.getConfig().controler().getOutputDirectory() + "carriers.xml");
-        new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(sc.getConfig().controler().getOutputDirectory() + "receivers.xml");
-
+		String outputdirectory = sc.getConfig().controler().getOutputDirectory();
+		outputdirectory += outputdirectory.endsWith("/") ? "" : "/";
+		new CarrierPlanWriter(FreightUtils.getCarriers(sc)).write(outputdirectory + ReceiverConfigGroup.CARRIERS_FILE);
+        new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(outputdirectory + ReceiverConfigGroup.RECEIVERS_FILE);
     }
 }

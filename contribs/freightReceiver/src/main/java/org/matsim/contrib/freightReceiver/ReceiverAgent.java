@@ -21,10 +21,17 @@ package org.matsim.contrib.freightReceiver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.scoring.ScoringFunction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * This keeps track of a single receiver during simulation.
+ * This keeps track of a single freight receiver during simulation.
  *
  * @author wlbean
  */
@@ -36,10 +43,9 @@ class ReceiverAgent {
 	final private Logger log = LogManager.getLogger(ReceiverAgent.class);
 
 
-	public ReceiverAgent(Receiver receiver, ScoringFunction receiverScorFunc) {
+	public ReceiverAgent(Receiver receiver, ScoringFunction receiverScoringFunction) {
 		this.receiver = receiver;
-		this.scoringFunction = receiverScorFunc;
-		//this.id = receiver.getId();
+		this.scoringFunction = receiverScoringFunction;
 	}
 
 
@@ -56,18 +62,29 @@ class ReceiverAgent {
 	 *
 	 * @author wlbean, jwjoubert
 	 */
-	public void scoreSelectedPlan() {
-		double cost;
+	public void scoreSelectedPlan(Scenario scenario, ReceiverCostAllocation costAllocation) {
 
 		ReceiverPlan selectedPlan = receiver.getSelectedPlan();
 		if (selectedPlan == null) {
-			log.warn("Receiver plan not yet selected.");
+			log.warn("No receiver plan is selected.");
 			return;
 		}
 
-		cost = receiver.getSelectedPlan().getScore();
+		Carriers carriers = FreightUtils.getCarriers(scenario);
+		double cost = 0.0;
+		List<Id<Carrier>> carrierIds = new ArrayList<>();
 
-		scoringFunction.addMoney(cost);
+		/* Each order my have a different carrier and therefore incur its own score. */
+		for (ReceiverOrder order : selectedPlan.getReceiverOrders()) {
+			Id<Carrier> carrierId = order.getCarrierId();
+			if (!carrierIds.contains(order.getCarrierId())) {
+				cost += costAllocation.getCost(carriers.getCarriers().get(carrierId), receiver);
+				carrierIds.add(carrierId);
+			}
+		}
+
+		/* A positive 'score' is a negative money transaction. */
+		scoringFunction.addMoney(-cost);
 		scoringFunction.finish();
 
 		receiver.getSelectedPlan().setScore(scoringFunction.getScore());
@@ -75,11 +92,9 @@ class ReceiverAgent {
 	}
 
 
-
 	/**
 	 * Returns the receiver agent's unique receiver id.
 	 */
-
 	public Id<Receiver> getId() {
 		return receiver.getId();
 	}

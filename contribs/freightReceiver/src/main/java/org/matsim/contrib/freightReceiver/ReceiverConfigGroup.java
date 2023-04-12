@@ -32,15 +32,15 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
 
     public static final String NAME = "freightReceiver";
 
-    final static String COSTSHARING = "collaboration";
-    final static String RECEIVER_FILE = "receiversFile";
-    final static String CARRIERS_FILE = "carriersFile";
-    final static String NONCOLLABORATING_FEE = "noncollaboratingFee";
-    final static String CREATE_PNG = "createPNG";
-    final static String REPLANNING_TYPE = "replanningModules";
+    final static String ELEMENT_COSTSHARING = "collaboration";
+    final static String ELEMENT_RECEIVER_FILE = "receiversFile";
+    final static String ELEMENT_CARRIERS_FILE = "carriersFile";
+    final static String ELEMENT_NONCOLLABORATING_FEE = "noncollaboratingFee";
+    final static String ELEMENT_CREATE_PNG = "createPNG";
+    final static String ELEMENT_REPLANNING_TYPE = "replanningModules";
 
-    private String receiversFile = "./receivers.xml.gz";
-    private String carriersFile = "./carriers.xml.gz";
+    static String RECEIVERS_FILE = "./receivers.xml.gz";
+    static String CARRIERS_FILE = "./carriers.xml.gz";
     private String costSharing = "proportional";
     private boolean createPNG = true;
     private ReceiverReplanningType replanningType = ReceiverReplanningType.serviceTime;
@@ -49,57 +49,57 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
     @Override
     public Map<String, String> getComments() {
         Map<String, String> comments = super.getComments();
-        comments.put(COSTSHARING, "The mechanism by which the carriers' costs are shared among receivers. " +
+        comments.put(ELEMENT_COSTSHARING, "The mechanism by which the carriers' costs are shared among receivers. " +
                 "Available values are 'proportional' (default), and 'marginal'.");
-        comments.put(RECEIVER_FILE, "Path to the file containing the receivers.");
-        comments.put(CARRIERS_FILE, "Path to the file containing the carriers.");
-        comments.put(NONCOLLABORATING_FEE, "The fixed fee charged per receiver NOT collaborating in a coalition.");
-        comments.put(CREATE_PNG, "Should PNG output be created? Default is 'true'");
-        comments.put(REPLANNING_TYPE, "Replanning strategy used. Available values are 'serviceTime' (default), " +
+        comments.put(ELEMENT_RECEIVER_FILE, "Path to the file containing the receivers.");
+        comments.put(ELEMENT_CARRIERS_FILE, "Path to the file containing the carriers.");
+        comments.put(ELEMENT_NONCOLLABORATING_FEE, "The fixed fee charged per receiver NOT collaborating in a coalition.");
+        comments.put(ELEMENT_CREATE_PNG, "Should PNG output be created? Default is 'true'");
+        comments.put(ELEMENT_REPLANNING_TYPE, "Replanning strategy used. Available values are 'serviceTime' (default), " +
                 "'timeWindow' and 'deliveryFrequency'.");
         return comments;
     }
 
 //    @StringGetter(RECEIVER_FILE)
     public String getReceiversFile() {
-        return receiversFile;
+        return RECEIVERS_FILE;
     }
 
 //    @StringSetter(RECEIVER_FILE)
     public void setReceiversFile(String receiversFile) {
-        this.receiversFile = receiversFile;
+        this.RECEIVERS_FILE = receiversFile;
     }
 
-    @StringGetter(CARRIERS_FILE)
+    @StringGetter(ELEMENT_CARRIERS_FILE)
     public String getCarriersFile() {
-        return carriersFile;
+        return CARRIERS_FILE;
     }
 
-    @StringSetter(CARRIERS_FILE)
+    @StringSetter(ELEMENT_CARRIERS_FILE)
     public void setCarriersFile(String carriersFile) {
-        this.carriersFile = carriersFile;
+        this.CARRIERS_FILE = carriersFile;
     }
 
-    @StringGetter(COSTSHARING)
+    @StringGetter(ELEMENT_COSTSHARING)
     public String getCostSharing() {
         return costSharing;
     }
 
-    @StringSetter(COSTSHARING)
+    @StringSetter(ELEMENT_COSTSHARING)
     public void setCostSharing(String costSharing) {
         this.costSharing = costSharing;
     }
 
-    @StringGetter(CREATE_PNG)
+    @StringGetter(ELEMENT_CREATE_PNG)
     public boolean isCreatePNG() { return createPNG; }
 
-    @StringSetter(CREATE_PNG)
+    @StringSetter(ELEMENT_CREATE_PNG)
     public void setCreatePNG(boolean createPNG) { this.createPNG = createPNG; }
 
-    @StringGetter(REPLANNING_TYPE)
+    @StringGetter(ELEMENT_REPLANNING_TYPE)
     public ReceiverReplanningType getReplanningType() { return replanningType; }
 
-    @StringSetter(REPLANNING_TYPE)
+    @StringSetter(ELEMENT_REPLANNING_TYPE)
     public void setReplanningType(ReceiverReplanningType replanningType) {
         this.replanningType = replanningType;
     }

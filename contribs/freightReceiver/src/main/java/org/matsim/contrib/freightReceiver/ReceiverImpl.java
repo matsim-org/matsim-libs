@@ -45,7 +45,7 @@ class ReceiverImpl implements Receiver {
 	private final List<ReceiverPlan> plans;
 	private final List<ReceiverProduct> products;
 	private ReceiverPlan selectedPlan;
-	private double cost = 0.0;
+	private double moneyBalance = 0.0;
 
 	ReceiverImpl(final Id<Receiver> id){
 		super();
@@ -182,12 +182,12 @@ class ReceiverImpl implements Receiver {
 
 	@Override
 	public void setInitialCost(double cost) {
-		this.cost = cost;
+		this.moneyBalance = cost;
 	}
 
 	@Override
 	public double getInitialCost() {
-		return this.cost;
+		return this.moneyBalance;
 	}
 
 }

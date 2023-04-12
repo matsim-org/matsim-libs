@@ -19,18 +19,18 @@
 package org.matsim.contrib.freightReceiver;
 
 /**
- * Returns a new instance of a receiver product with associated information, such as location, order policy parameters (min and max levels) and possibly demand rate (to be included later).
+ * Returns a new instance of a receiver product with associated information,
+ * such as location, order policy parameters (min and max levels) and possibly
+ * demand rate (to be included later).
+ * <p><p>
+ * The default values are: min level = 1000 units, max level = 5000 units.
  *
- * The default values are: min level =  100 000 units, max level = 500 000 units.
- *
- * @author wlbean
- *
+ * @author wlbean, jwjoubert
  */
 public class ReceiverProduct {
 
 	private final ReorderPolicy policy;
 	private final double stockOnHand;
-
 	private final ProductType productType;
 
 
@@ -44,7 +44,6 @@ public class ReceiverProduct {
 	/**
 	 * Returns receiver product type.
 	 */
-
 	public ProductType getProductType(){
 		return productType;
 	}
@@ -72,31 +71,26 @@ public class ReceiverProduct {
 		/**
 		 * This returns a builder with locationId.
 		 */
-
 		public static Builder newInstance(){
 			return new Builder();
 		}
 
-		private ReorderPolicy policy = new SSReorderPolicy(1000, 5000);
+		private ReorderPolicy policy = ReceiverUtils.createSSReorderPolicy(1000, 5000);
 		private double onHand = 0.0;
 		private ProductType productType;
 
 
 		/**
 		 * Set relevant receiver product types.
-		 * @param productType2
-		 * @return
 		 */
-
-		public Builder setProductType(ProductType productType2){
-			this.productType = productType2;
+		public Builder setProductType(ProductType productType){
+			this.productType = productType;
 			return this;
 		}
 
 		/**
 		 * Set relevant product type id.
 		 */
-
 		public Builder setReorderingPolicy(ReorderPolicy policy) {
 			this.policy = policy;
 			return this;
@@ -105,11 +99,9 @@ public class ReceiverProduct {
 
 		/**
 		 * Set the current (opening) inventory for the product at the receiver. Defaults to 0 units on hand.
-		 * @param onHand
-		 * @return
 		 */
-		public Builder setStockOnHand(double onHand) {
-			this.onHand = onHand;
+		public Builder setStockOnHand(double stockOnHand) {
+			this.onHand = stockOnHand;
 			return this;
 		}
 

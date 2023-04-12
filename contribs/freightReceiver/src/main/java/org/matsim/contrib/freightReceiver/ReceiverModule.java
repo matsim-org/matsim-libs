@@ -20,6 +20,7 @@ package org.matsim.contrib.freightReceiver;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freightReceiver.replanning.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -28,8 +29,16 @@ public final class ReceiverModule extends AbstractModule {
     final private static Logger LOG = LogManager.getLogger(ReceiverModule.class);
     private ReceiverReplanningType replanningType = null;
     private Boolean createPNG = true;
+	final private ReceiverCostAllocation costAllocation;
 
-    public ReceiverModule() {
+	/**
+	 * Creating the module that deals with freight receivers.
+	 * @param costAllocation an instance of {@link ReceiverCostAllocation} that
+	 *                       specifies how the {@link Carrier}
+	 *                       costs are to be allocated to the different {@link Receiver}s.
+	 */
+    public ReceiverModule(ReceiverCostAllocation costAllocation) {
+		this.costAllocation = costAllocation;
     }
 
     @Override
@@ -41,9 +50,8 @@ public final class ReceiverModule extends AbstractModule {
         /* Carrier */
         this.addControlerListenerBinding().to(ReceiverTriggersCarrierReplanningListener.class);
 
-
-        /* Receiver FIXME at this point the strategies are mutually exclusive. That is, only one allowed. */
-        bind(ReceiverScoringFunctionFactory.class).toInstance(new UsecasesReceiverScoringFunctionFactory());
+        bind(ReceiverScoringFunctionFactory.class).toInstance(new ReceiverScoringFunctionFactoryMoneyOnly());
+		bind(ReceiverCostAllocation.class).toInstance(costAllocation);
 
         /* Check defaults */
         if (this.replanningType != null) {
@@ -54,23 +62,20 @@ public final class ReceiverModule extends AbstractModule {
                 configGroup.setReplanningType(this.replanningType);
             }
         }
-        LOG.warn("Receiver replanning: " + configGroup.getReplanningType());
-        switch (configGroup.getReplanningType()) {
-            case timeWindow:
-                bind(ReceiverOrderStrategyManagerFactory.class).toInstance(ReceiverReplanningUtils.createTimeWindowFactory());
-                break;
-            case serviceTime:
-                bind(ReceiverOrderStrategyManagerFactory.class).toInstance(ReceiverReplanningUtils.createServiceTimeFactory());
-                break;
-            case orderFrequency:
-                bind(ReceiverOrderStrategyManagerFactory.class).toInstance(ReceiverReplanningUtils.createNumberOfDeliveryFactory());
-                break;
-//            case afterHoursTimeWindow:
-//            	bind(ReceiverOrderStrategyManagerFactory.class).toInstance(ReceiverReplanningUtils.createCapeTownFactory());
-//            	break;
-            default:
-                throw new RuntimeException("No valid (receiver) order strategy manager selected.");
-        }
+
+		/* This module limits the number of 'levers' that you can pull, at the
+		 * same time, to affect the receiver's behaviour. Consequently, the next
+		 * piece of code aims to bind a (limited set of) StrategyManagers. These
+		 * are used during replanning in the ReceiverControlerListener.
+		 * FIXME at this point (Apr'23, JWJ), these are mutually exclusive. So, each combination must be created explicitly.
+		 */
+		switch (configGroup.getReplanningType()) {
+			case timeWindow -> bind(ReceiverStrategyManager.class).toProvider(ReceiverReplanningUtils.createStrategyManager(ReceiverReplanningType.timeWindow));
+			case serviceTime -> bind(ReceiverStrategyManager.class).toProvider(ReceiverReplanningUtils.createStrategyManager(ReceiverReplanningType.serviceTime));
+			case orderFrequency -> bind(ReceiverStrategyManager.class).toProvider(ReceiverReplanningUtils.createStrategyManager(ReceiverReplanningType.orderFrequency));
+			default -> throw new RuntimeException("Strategy manager for '" + configGroup.getReplanningType() + "' not implemented yet!!");
+		}
+
         addControlerListenerBinding().to(ReceiverControlerListener.class);
         //FIXME override the createPNG
 

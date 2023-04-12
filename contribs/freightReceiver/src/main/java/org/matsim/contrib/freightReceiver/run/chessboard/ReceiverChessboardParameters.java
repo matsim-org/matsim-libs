@@ -16,33 +16,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.freightReceiver.usecases.chessboard;
+package org.matsim.contrib.freightReceiver.run.chessboard;
+
+import org.matsim.contrib.freightReceiver.ReceiverReplanningType;
 
 /**
- * Class to help with setting experimental parameters, which are called 
- * from multiple places, in ONE location.
- * 
+ * Class to help with setting experimental parameters. These parameters are
+ * called from multiple places, so they need to be in ONE location to ensure
+ * consistency.
+ *
  * @author jwjoubert, wlbean
  */
-class ChessboardExperimentParameters {
-	
-	public static int NUM_ITERATIONS = 200;
-	
-	public static int STAT_INTERVAL = 1;
-	
-	public static int REPLAN_INTERVAL = 10;
-	
-	public static int NUMBER_OF_RECEIVERS = 5;
-	
-	public static int TIME_WINDOW_DURATION = 12;
-	
-	public static String SERVICE_TIME = "02:00:00";
-	
-	public static int NUM_DELIVERIES = 5;
-	
-	public static String DAY_START = "06:00:00";
+class ReceiverChessboardParameters {
 
-	public static String DAY_END = "18:00:00";
-	
-	public static double TIME_WINDOW_HOURLY_COST = 0.0;
+
+
+	static String OUTPUT_FOLDER = "./output/receivers/chessboard";
+	static ReceiverReplanningType RECEIVER_REPLANNING = ReceiverReplanningType.serviceTime;
+
+	static int NUM_ITERATIONS = 200;
+
+	static int STAT_INTERVAL = 1;
+
+	static int REPLAN_INTERVAL = 10;
+
+	static long SEED_BASE = 12345L;
+	static int NUMBER_OF_RECEIVERS = 5;
+
+	static int TIME_WINDOW_DURATION_IN_HOURS = 12;
+
+	static String SERVICE_TIME = "02:00:00";
+
+	static int NUM_DELIVERIES = 5;
+
+	static String DAY_START = "06:00:00";
+
+	static String DAY_END = "18:00:00";
+
+	static double TIME_WINDOW_HOURLY_COST = 0.0;
 }

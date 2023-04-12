@@ -74,7 +74,6 @@ public class ReceiverOrder implements BasicPlan{
 
 	/**
 	 * Get the back pointer to this {@link ReceiverOrder}'s {@link Receiver}.
-	 * @return
 	 */
 	public Id<Receiver> getReceiverId(){
 		return receiverId;
@@ -102,8 +101,6 @@ public class ReceiverOrder implements BasicPlan{
 	 * Get the actual {@link Carrier} of this {@link ReceiverOrder}. This will
 	 * only be set once FIXME ... has been called to link the receivers and
 	 * carriers.
-	 *
-	 * @return
 	 */
 	public Carrier getCarrier() {
 		if(this.carrier == null) {
@@ -114,18 +111,11 @@ public class ReceiverOrder implements BasicPlan{
 
 	/**
 	 * Get the pointer {@link Id} of this {@link ReceiverOrder}'s {@link Carrier}.
-	 *
-	 * @return
 	 */
 	public Id<Carrier> getCarrierId(){
 		return this.carrierId;
 	}
 
-	//	public ReceiverOrder createCopy() {
-	//		ReceiverOrder newOrder = new ReceiverOrder(receiverId, orders, carrierId);
-	//		newOrder.setScore(cost == null ? null : Double.valueOf(cost));
-	//		return newOrder;
-	//	}
 
 	public void setCarrier(final Carrier carrier) {
 		this.carrier = carrier;

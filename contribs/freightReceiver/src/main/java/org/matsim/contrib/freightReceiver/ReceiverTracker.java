@@ -18,6 +18,7 @@
 
 package org.matsim.contrib.freightReceiver;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.handler.EventHandler;
@@ -30,20 +31,22 @@ import java.util.Collection;
  * This keeps track of all receiver agents during simulation.
  *
  * @author wlbean
- *
  */
 
 
  final class ReceiverTracker implements EventHandler {
-//	@Inject Scenario sc;
+//	@Inject
+//	Scenario sc;
 	private final Scenario sc;
+	private final ReceiverCostAllocation costAllocation;
 
 	//private final Receivers receivers;
-	private final Collection<ReceiverAgent> receiverAgents = new ArrayList<ReceiverAgent>();
+	private final Collection<ReceiverAgent> receiverAgents = new ArrayList<>();
 
-	public ReceiverTracker(ReceiverScoringFunctionFactory scorFuncFac, Scenario sc){
+	public ReceiverTracker(ReceiverScoringFunctionFactory scoringFunctionFactory, Scenario sc, ReceiverCostAllocation costAllocation){
 		this.sc = sc;
-		createReceiverAgents(scorFuncFac);
+		this.costAllocation = costAllocation;
+		createReceiverAgents(scoringFunctionFactory);
 	}
 
 	/**
@@ -63,7 +66,7 @@ import java.util.Collection;
 		for (Receiver receiver : ReceiverUtils.getReceivers( sc ).getReceivers().values()){
 			ReceiverAgent rAgent = findReceiver(receiver.getId());
 			assert rAgent != null;
-			rAgent.scoreSelectedPlan();
+			rAgent.scoreSelectedPlan(sc, costAllocation);
 		}
 	}
 
@@ -71,10 +74,10 @@ import java.util.Collection;
 	/**
 	 * Creates the list of all receiver agents.
 	 */
-	private void createReceiverAgents(ReceiverScoringFunctionFactory scorFuncFac) {
+	private void createReceiverAgents(ReceiverScoringFunctionFactory scoringFunctionFactory) {
 		for (Receiver receiver: ReceiverUtils.getReceivers( sc ).getReceivers().values()){
-			ScoringFunction receiverScorFunc = scorFuncFac.createScoringFunction(receiver);
-			ReceiverAgent rAgent = new ReceiverAgent(receiver, receiverScorFunc);
+			ScoringFunction scoringFunction = scoringFunctionFactory.createScoringFunction(receiver);
+			ReceiverAgent rAgent = new ReceiverAgent(receiver, scoringFunction);
 			receiverAgents.add(rAgent);
 		}
 	}

@@ -9,52 +9,38 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 
 /**
  * This is a class that changes a receiver's collaboration status during replanning.
- * @author wlbean
  *
+ * @author wlbean, jwjoubert
  */
 
-public final class CollaborationStatusMutator implements GenericPlanStrategyModule<ReceiverPlan> {
-	private static final Logger log = LogManager.getLogger( CollaborationStatusMutator.class ) ;
+final class CollaborationStatusMutator implements GenericPlanStrategyModule<ReceiverPlan> {
+	private static final Logger log = LogManager.getLogger(CollaborationStatusMutator.class);
 
-	/*
-	 * A class that changes a receiver's collaboration status.
-	 */
-
-public CollaborationStatusMutator(){
-
+	CollaborationStatusMutator() {
 	}
 
 	@Override
 	public void prepareReplanning(ReplanningContext replanningContext) {
-
 	}
 
 	@Override
 	public void handlePlan(ReceiverPlan receiverPlan) {
-		log.warn("entering handlePlan" ) ;
+		log.warn("entering handlePlan");
 
+		boolean newStatus;
+		boolean grandMember = (boolean) receiverPlan.getReceiver().getAttributes().getAttribute(CollaborationUtils.ATTR_GRANDCOALITION_MEMBER);
+		boolean collaborationStatus = (boolean) receiverPlan.getReceiver().getAttributes().getAttribute(CollaborationUtils.ATTR_COLLABORATION_STATUS);
 
-		boolean newstatus;
-		boolean grandMember = (boolean) receiverPlan.getReceiver().getAttributes().getAttribute( CollaborationUtils.ATTR_GRANDCOALITION_MEMBER );
-		boolean status = (boolean) receiverPlan.getReceiver().getAttributes().getAttribute(CollaborationUtils.ATTR_COLLABORATION_STATUS );
+		if (grandMember) {
+			newStatus = !collaborationStatus;
+		} else newStatus = collaborationStatus;
 
-
-		if (grandMember == true){
-			if (status == true){
-				newstatus = false;
-			} else {
-				newstatus = true;
-			}
-		} else newstatus = status;
-
-		receiverPlan.getReceiver().getAttributes().putAttribute(CollaborationUtils.ATTR_COLLABORATION_STATUS, newstatus);
-		receiverPlan.getAttributes().putAttribute(CollaborationUtils.ATTR_COLLABORATION_STATUS, newstatus);
-
+		receiverPlan.getReceiver().getAttributes().putAttribute(CollaborationUtils.ATTR_COLLABORATION_STATUS, newStatus);
+		receiverPlan.getAttributes().putAttribute(CollaborationUtils.ATTR_COLLABORATION_STATUS, newStatus);
 	}
 
 	@Override
 	public void finishReplanning() {
-
 	}
 
 }

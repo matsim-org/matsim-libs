@@ -16,21 +16,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.contrib.freightReceiver.replanning;
+package org.matsim.contrib.freightReceiver;
 
-import org.matsim.contrib.freightReceiver.Receiver;
-import org.matsim.contrib.freightReceiver.ReceiverPlan;
-import org.matsim.core.replanning.GenericStrategyManager;
+import org.apache.logging.log4j.LogManager;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.SumScoringFunction.MoneyScoring;
 
-/**
- *
- * @author wlbean
- */
-public interface ReceiverOrderStrategyManagerFactory {
+class ReceiverScoringFunctionFactoryMoneyOnly implements ReceiverScoringFunctionFactory {
 
-	GenericStrategyManager<ReceiverPlan, Receiver> createReceiverStrategyManager();
+	ReceiverScoringFunctionFactoryMoneyOnly() {
+	}
+
+	@Override
+	public ScoringFunction createScoringFunction(Receiver receiver) {
+		SumScoringFunction sumScoringFunction = new SumScoringFunction();
+		sumScoringFunction.addScoringFunction(new CarrierToReceiverCostAllocation());
+		return sumScoringFunction;
+	}
+
+	static class CarrierToReceiverCostAllocation implements MoneyScoring {
+
+		private double moneyBalance = 0.0;
+
+		@Override
+		public void finish() {
+		}
+
+		@Override
+		public double getScore() {
+			return this.moneyBalance;
+		}
+
+		@Override
+		public void addMoney(double amount) {
+			if (amount > 0) {
+				LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class).error("What?! The receiver is getting paid for a delivery?!");
+			}
+			LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class).error("Where is this used?!");
+			this.moneyBalance += amount;
+		}
+	}
 
 }

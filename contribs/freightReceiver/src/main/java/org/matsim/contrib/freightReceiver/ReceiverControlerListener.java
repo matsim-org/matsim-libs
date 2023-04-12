@@ -19,8 +19,8 @@
 package org.matsim.contrib.freightReceiver;
 
 import com.google.inject.Inject;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -30,8 +30,7 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freightReceiver.collaboration.CollaborationUtils;
-import org.matsim.contrib.freightReceiver.replanning.ReceiverOrderStrategyManagerFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.freightReceiver.replanning.ReceiverStrategyManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -41,7 +40,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -53,37 +51,39 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This controller ensures that each receiver receives a cost (score) per order at the end of each iteration and replans its orders based on the cost of the previous iteration and past iterations.
+ * This controller ensures that each receiver receives a cost (score) per order
+ * at the end of each iteration and replans its orders based on the cost of the
+ * previous iteration and past iterations.
  *
- * @author wlbean
- *
+ * @author wlbean, jwjoubert
  */
 class ReceiverControlerListener implements ScoringListener,
         ReplanningListener, BeforeMobsimListener, ShutdownListener {
 
     final private static Logger LOG = LogManager.getLogger(ReceiverControlerListener.class);
-    private final ReceiverOrderStrategyManagerFactory stratManFac;
-    private final ReceiverScoringFunctionFactory scorFuncFac;
+//    private final ReceiverOrderStrategyManagerFactory strategyManagerFactory;
+    private final ReceiverStrategyManager strategyManager;
+    private final ReceiverScoringFunctionFactory scoringFunctionFactory;
+    private final ReceiverCostAllocation costAllocation;
     private ReceiverTracker tracker;
-    @Inject
-    EventsManager eMan;
     @Inject
     Scenario sc;
 
-    @Inject
-    private ReceiverControlerListener(ReceiverOrderStrategyManagerFactory stratManFac, ReceiverScoringFunctionFactory scorFuncFac) {
-        this.stratManFac = stratManFac;
-        this.scorFuncFac = scorFuncFac;
+	@Inject
+    private ReceiverControlerListener(ReceiverStrategyManager strategyManager, ReceiverScoringFunctionFactory scoringFunctionFactory, ReceiverCostAllocation costAllocation) {
+//        this.strategyManagerFactory = strategyManagerFactory;
+		this.strategyManager = strategyManager;
+        this.scoringFunctionFactory = scoringFunctionFactory;
+		this.costAllocation = costAllocation;
     }
 
     @Override
     public void notifyReplanning(final ReplanningEvent event) {
 
-        if (stratManFac == null) {
-            return;
-        }
-
-        GenericStrategyManager<ReceiverPlan, Receiver> stratMan = stratManFac.createReceiverStrategyManager();
+//        if (strategyManagerFactory == null) {
+//            return;
+//        }
+//        GenericStrategyManager<ReceiverPlan, Receiver> stratMan = strategyManagerFactory.createReceiverStrategyManager();
 
         Collection<HasPlansAndId<ReceiverPlan, Receiver>> receiverCollection = new ArrayList<>();
         Collection<HasPlansAndId<ReceiverPlan, Receiver>> receiverControlCollection = new ArrayList<>();
@@ -119,18 +119,17 @@ class ReceiverControlerListener implements ScoringListener,
             }
 
             /* Run replanning for non-collaborating receivers */
-            stratMan.run(receiverControlCollection, event.getIteration(), event.getReplanningContext());
+            strategyManager.run(receiverControlCollection, event.getIteration(), event.getReplanningContext());
 
             /* Run replanning for grand coalition receivers.*/
-            stratMan.run(receiverCollection, event.getIteration(), event.getReplanningContext());
+            strategyManager.run(receiverCollection, event.getIteration(), event.getReplanningContext());
         }
     }
 
 
-    /*
+    /**
      * Determines the order cost at the end of each iteration.
      */
-
     @Override
     public void notifyScoring(ScoringEvent event) {
         if (event.getIteration() == 0) {
@@ -153,15 +152,14 @@ class ReceiverControlerListener implements ScoringListener,
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        tracker = new ReceiverTracker(scorFuncFac, sc);
-//		eMan.addHandler(tracker);
+        tracker = new ReceiverTracker(scoringFunctionFactory, sc, costAllocation);
     }
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
         /* Method to check the status of time windows. */
         try {
-            linkReceiverTimewindowToCarrierTourPosition();
+            linkReceiverTimeWindowToCarrierTourPosition();
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Cannot write receiver output, linking them to tour positions.");
@@ -169,7 +167,7 @@ class ReceiverControlerListener implements ScoringListener,
 
     }
 
-    private void linkReceiverTimewindowToCarrierTourPosition() throws IOException {
+    private void linkReceiverTimeWindowToCarrierTourPosition() throws IOException {
         LOG.info("Writing output to link receivers to the position in the carrier's tour.");
         /* Map the receivers to link Ids */
         Map<Id<Link>, Receiver> receiverLinkMap = new HashMap<>();
@@ -192,8 +190,7 @@ class ReceiverControlerListener implements ScoringListener,
 				for (ScheduledTour tour : scheduledTours) {
 					for (int i = 0; i < tour.getTour().getTourElements().size(); i++) {
 						Tour.TourElement element = tour.getTour().getTourElements().get(i);
-						if (element instanceof Tour.ShipmentBasedActivity) {
-							Tour.ShipmentBasedActivity act = (Tour.ShipmentBasedActivity) element;
+						if (element instanceof Tour.ShipmentBasedActivity act) {
 
 							String shipmentId = act.getShipment().getId().toString();
 							if (act.getActivityType().equalsIgnoreCase("delivery")) {

@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freightReceiver.usecases.chessboard.BaseReceiverChessboardScenario;
+import org.matsim.contrib.freightReceiver.run.chessboard.ReceiverChessboardScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
@@ -34,13 +34,13 @@ import java.util.Calendar;
 public class ReceiversWriterTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	
+
 	@Test
 	public void testV1() {
-		Scenario sc = BaseReceiverChessboardScenario.createChessboardScenario(1L, 5, false );
+		Scenario sc = ReceiverChessboardScenario.createChessboardScenario(1L, 5, utils.getOutputDirectory(), false );
 		ReceiverUtils.getReceivers(sc).getAttributes().putAttribute("date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format( Calendar.getInstance().getTime()));
-		
+
 		/* Now the receiver is 'complete', and we can write it to file. */
 		try {
 			new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).writeV1(utils.getOutputDirectory() + "receivers_v1.xml");
@@ -54,7 +54,7 @@ public class ReceiversWriterTest {
 
 	@Test
 	public void testV2() {
-		Scenario sc = BaseReceiverChessboardScenario.createChessboardScenario(1L, 5, false );
+		Scenario sc = ReceiverChessboardScenario.createChessboardScenario(1L, 5,  utils.getOutputDirectory(), false );
 		ReceiverUtils.getReceivers(sc).getAttributes().putAttribute("date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format( Calendar.getInstance().getTime()));
 
