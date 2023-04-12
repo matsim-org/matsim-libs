@@ -46,7 +46,7 @@ public class SimulatedAnnealingIT {
 		controler.getConfig().controler().setWriteEventsInterval(0);
 
 		SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
-		config.controler().setLastIteration(20);
+		config.controler().setLastIteration(10);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

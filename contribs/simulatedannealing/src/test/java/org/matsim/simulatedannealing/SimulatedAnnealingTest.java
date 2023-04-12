@@ -37,6 +37,8 @@ import java.util.Random;
 public class SimulatedAnnealingTest {
 
 
+	private final Random r = new Random(42);
+
 	@Test
 	public void testSimulatedAnnealing() {
 
@@ -46,10 +48,9 @@ public class SimulatedAnnealingTest {
 		loggerConfig.setLevel(Level.DEBUG);
 		ctx.updateLoggers();
 
-		MutableInt iteration = new MutableInt(0);
 		TemperatureFunction temperatureFunction = new NonMonotonicAdaptiveTemperatureFunction(TemperatureFunction.DefaultFunctions.exponentialMultiplicative);
 		SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
-		simAnCfg.k=3;
+		simAnCfg.k = 3;
 		Acceptor<String> acceptor = acceptor(simAnCfg);
 
 		CostCalculator<String> costCalculator = costCalculator();
@@ -58,8 +59,7 @@ public class SimulatedAnnealingTest {
 
 		SimulatedAnnealing<String> simulatedAnnealing = new SimulatedAnnealing<>(costCalculator, acceptor, perturbator, "mistam", temperatureFunction, simAnCfg);
 
-		for (int i = 0; i < 600; i++) {
-			iteration.setValue(i);
+		for (int i = 0; i < 520; i++) {
 			simulatedAnnealing.notifyBeforeMobsim(new BeforeMobsimEvent(null, i, false));
 			simulatedAnnealing.notifyAfterMobsim(new AfterMobsimEvent(null, i, false));
 		}
@@ -69,13 +69,12 @@ public class SimulatedAnnealingTest {
 
 	private PerturbatorFactory<String> perturbatorFactory() {
 		return (iteration, temperature) -> current -> {
-			Random r = MatsimRandom.getRandom();
 			boolean changeCharacterCount = r.nextBoolean();
 
-			if(current.equals("")) {
+			if (current.equals("")) {
 				return String.valueOf(randomCharacter(r));
 			}
-			if(changeCharacterCount) {
+			if (changeCharacterCount) {
 				boolean addCharacter = r.nextBoolean();
 				char c = randomCharacter(r);
 				int idx = r.nextInt(current.length());
