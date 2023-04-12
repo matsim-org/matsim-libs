@@ -25,12 +25,10 @@ import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftDrtSche
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskSchedulerImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.*;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
@@ -119,9 +117,9 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
 				getter -> new ShiftInsertionCostCalculator(getter.get(MobsimTimer.class),
-						getter.getModal(CostCalculationStrategy.class))));
+						new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class)))));
 
-		bindModal(VehicleEntry.EntryFactory.class).toInstance(new ShiftVehicleDataEntryFactory(drtCfg));
+		bindModal(VehicleEntry.EntryFactory.class).toInstance(new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl(drtCfg)));
 
 		final ShiftDrtTaskFactoryImpl taskFactory = new ShiftDrtTaskFactoryImpl(new DrtTaskFactoryImpl());
 		bindModal(DrtTaskFactory.class).toInstance(taskFactory);

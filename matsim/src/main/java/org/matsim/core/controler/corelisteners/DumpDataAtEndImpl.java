@@ -237,7 +237,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpHouseholds() {
 		try {
-			new HouseholdsWriterV10(this.households).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.households));
+			HouseholdsWriterV10 writer = new HouseholdsWriterV10(this.households);
+			writer.putAttributeConverters(this.attributeConverters);
+			writer.writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.households));
 		} catch ( Exception ee ) {
 			log.error("Exception writing households.", ee);
 		}

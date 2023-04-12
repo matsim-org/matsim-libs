@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>matsim-all</artifactId>
-		<version>15.0-SNAPSHOT</version>
+		<version>16.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -117,7 +117,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.0.0-M8</version>
+				<version>3.0.0</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -161,7 +161,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -203,7 +203,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.2-5</version>
+			<version>1.5.5-1</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -321,7 +321,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.4.2</version>
+						<version>3.5.0</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly-release.xml</descriptor>

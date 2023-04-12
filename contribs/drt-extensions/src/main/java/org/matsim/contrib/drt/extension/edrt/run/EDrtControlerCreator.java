@@ -18,10 +18,6 @@
 
 package org.matsim.contrib.drt.extension.edrt.run;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -30,7 +26,7 @@ import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -63,7 +59,7 @@ public class EDrtControlerCreator {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
+				this.bind(IdleDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
 			}
 		});
 
