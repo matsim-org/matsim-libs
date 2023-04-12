@@ -26,18 +26,23 @@ import org.matsim.contrib.freight.carrier.Carrier;
  * A simple implementation where the cost allocated by the {@link Carrier} to
  * the {@link Receiver} is a fixed value.
  */
-class ReceiverCostAllocationFixed implements ReceiverCostAllocation{
+class ReceiverCostAllocationFixed implements ReceiverCostAllocation {
 
 	private final double cost;
 
-	ReceiverCostAllocationFixed(double cost){
+	ReceiverCostAllocationFixed(double cost) {
 		this.cost = cost;
-		if(cost < 0.0){
+		if (cost < 0.0) {
 			LogManager.getLogger(ReceiverCostAllocationFixed.class).warn("A negative cost implies an income. Is the carrier (really) paying receivers to perform deliveries?");
 		}
 	}
+
 	@Override
-	public double getCost(Carrier carrier, Receiver receiver) {
-		return this.cost;
+	public double getScore(Carrier carrier, Receiver receiver) {
+		return -this.cost;
+	}
+
+	@Override
+	public void reset() {
 	}
 }

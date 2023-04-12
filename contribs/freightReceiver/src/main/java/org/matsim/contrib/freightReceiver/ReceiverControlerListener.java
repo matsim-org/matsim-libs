@@ -32,14 +32,8 @@ import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freightReceiver.collaboration.CollaborationUtils;
 import org.matsim.contrib.freightReceiver.replanning.ReceiverStrategyManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -57,7 +51,7 @@ import java.util.Map;
  *
  * @author wlbean, jwjoubert
  */
-class ReceiverControlerListener implements ScoringListener,
+class ReceiverControlerListener implements ScoringListener, IterationEndsListener,
         ReplanningListener, BeforeMobsimListener, ShutdownListener {
 
     final private static Logger LOG = LogManager.getLogger(ReceiverControlerListener.class);
@@ -79,17 +73,10 @@ class ReceiverControlerListener implements ScoringListener,
 
     @Override
     public void notifyReplanning(final ReplanningEvent event) {
-
-//        if (strategyManagerFactory == null) {
-//            return;
-//        }
-//        GenericStrategyManager<ReceiverPlan, Receiver> stratMan = strategyManagerFactory.createReceiverStrategyManager();
-
         Collection<HasPlansAndId<ReceiverPlan, Receiver>> receiverCollection = new ArrayList<>();
         Collection<HasPlansAndId<ReceiverPlan, Receiver>> receiverControlCollection = new ArrayList<>();
 
         for (Receiver receiver : ReceiverUtils.getReceivers(sc).getReceivers().values()) {
-
             if ((event.getIteration() - 1) % ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval() == 0) {
                 // (= one iteration after replanning)
 
@@ -133,21 +120,18 @@ class ReceiverControlerListener implements ScoringListener,
     @Override
     public void notifyScoring(ScoringEvent event) {
         if (event.getIteration() == 0) {
+			/* 0th iteration. */
             this.tracker.scoreSelectedPlans();
-        }
-
-//		if ((event.getIteration()+1) % ReceiverUtils.getReplanInterval( sc ) == 0) {
-        if ((event.getIteration() + 1) % ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval() == 0 && event.getIteration() > 0) {
-            // this is called in the iteration after the replanning iteration.
-            this.tracker.scoreSelectedPlans();
-        } else {
-            // this is called in all other iterations.  why?
+        } else if((event.getIteration() + 1) % ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval() == 0){
+			/* Receiver replanning iteration. */
+			this.tracker.scoreSelectedPlans();
+		} else{
+			/* Non-replanning iteration. */
             for (Receiver receiver : ReceiverUtils.getReceivers(sc).getReceivers().values()) {
                 double score = (double) receiver.getAttributes().getAttribute(ReceiverUtils.ATTR_RECEIVER_SCORE);
-//				double score = (double) receiver.getSelectedPlan().getScore();
                 receiver.getSelectedPlan().setScore(score);
             }
-        }
+		}
     }
 
     @Override
@@ -232,4 +216,8 @@ class ReceiverControlerListener implements ScoringListener,
     }
 
 
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		costAllocation.reset();
+	}
 }

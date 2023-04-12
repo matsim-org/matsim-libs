@@ -71,20 +71,22 @@ class ReceiverAgent {
 		}
 
 		Carriers carriers = FreightUtils.getCarriers(scenario);
-		double cost = 0.0;
+		double score = 0.0;
 		List<Id<Carrier>> carrierIds = new ArrayList<>();
 
-		/* Each order my have a different carrier and therefore incur its own score. */
+		/* Each order may have a different carrier and therefore incur its own score. */
 		for (ReceiverOrder order : selectedPlan.getReceiverOrders()) {
 			Id<Carrier> carrierId = order.getCarrierId();
 			if (!carrierIds.contains(order.getCarrierId())) {
-				cost += costAllocation.getCost(carriers.getCarriers().get(carrierId), receiver);
+				score += costAllocation.getScore(carriers.getCarriers().get(carrierId), receiver);
 				carrierIds.add(carrierId);
 			}
 		}
 
-		/* A positive 'score' is a negative money transaction. */
-		scoringFunction.addMoney(-cost);
+		/* A negative 'score' is a negative money transaction, i.e. a cost.
+		 * I cannot see how this can really be an income. It is more important
+		 * to ensure consistency in how utility and costs are handled. */
+		scoringFunction.addMoney(score);
 		scoringFunction.finish();
 
 		receiver.getSelectedPlan().setScore(scoringFunction.getScore());

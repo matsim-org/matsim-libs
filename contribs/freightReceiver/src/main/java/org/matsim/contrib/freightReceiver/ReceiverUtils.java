@@ -79,6 +79,15 @@ public class ReceiverUtils {
 		return new ReceiverCostAllocationFixed(cost);
 	}
 
+	/**
+	 * A cost allocation model where each {@link Carrier} charges an equal amount
+	 * to each of the receivers it services, irrespective of the number, size or
+	 * value of the {@link Receiver}'s order.
+	 */
+	public static ReceiverCostAllocationEqualProportion createEqualProportionCostAllocation(){
+		return new ReceiverCostAllocationEqualProportion();
+	}
+
 	public static ReorderPolicy createSSReorderPolicy(double s, double S) {
 		return new SSReorderPolicy(s, S);
 	}

@@ -20,9 +20,10 @@
 
 package org.matsim.contrib.freightReceiver;
 
-import com.google.inject.Inject;
 import org.matsim.contrib.freight.carrier.Carrier;
 
 public interface ReceiverCostAllocation {
-	double getCost(Carrier carrier, Receiver receiver);
+	double getScore(Carrier carrier, Receiver receiver);
+
+	void reset();
 }

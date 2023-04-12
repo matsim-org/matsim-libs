@@ -22,6 +22,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.*;
@@ -48,11 +49,12 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        // replan only in replanning iteration:
-        if(event.getIteration() % ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval() != 0) {
+        /* Replan the carrier at iteration zero, and one iteration after the receivers have replanned. */
+		if(event.getIteration() > 0 &&
+			(event.getIteration()+1) % ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval() != 0) {
             return;
         }
-
+		LogManager.getLogger(ReceiverTriggersCarrierReplanningListener.class).info("--> Receiver triggering carrier to replan.");
         // Adds the receiver agents that are part of the current (sub)coalition.
         CollaborationUtils.setCoalitionFromReceiverAttributes( sc );
 
