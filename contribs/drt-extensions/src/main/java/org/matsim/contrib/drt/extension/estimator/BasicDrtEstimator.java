@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.estimator;
+package org.matsim.contrib.drt.extension.estimator;
 
 import com.google.inject.Inject;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -8,9 +8,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.estimator.run.DrtEstimatorConfigGroup;
+import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -50,7 +49,8 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 
 		DrtSpeedUpParams modal;
 		try {
-			modal = injector.getModal(DrtSpeedUpParams.class);
+			DrtSpeedUp speedUp = injector.getModal(DrtSpeedUp.class);
+			modal = speedUp.getParams();
 		} catch (Exception e) {
 			modal = null;
 			// speed-up not installed

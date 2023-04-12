@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.estimator;
+package org.matsim.contrib.drt.extension.estimator;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -6,8 +6,8 @@ import com.google.inject.Key;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.drt.estimator.run.DrtEstimatorConfigGroup;
-import org.matsim.contrib.drt.estimator.run.MultiModeDrtEstimatorConfigGroup;
+import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
+import org.matsim.contrib.drt.extension.estimator.run.MultiModeDrtEstimatorConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;

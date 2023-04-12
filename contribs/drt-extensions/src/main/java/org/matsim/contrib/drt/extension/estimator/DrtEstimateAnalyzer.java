@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.estimator;
+package org.matsim.contrib.drt.extension.estimator;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -7,7 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.estimator.run.DrtEstimatorConfigGroup;
+import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;

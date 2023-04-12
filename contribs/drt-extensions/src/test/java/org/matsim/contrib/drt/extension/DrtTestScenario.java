@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt;
+package org.matsim.contrib.drt.extension;
 
 import com.google.common.collect.Sets;
 import org.matsim.api.core.v01.Id;
@@ -27,8 +27,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +43,7 @@ public class DrtTestScenario extends MATSimApplication {
 	private final Consumer<Config> prepareConfig;
 
 	public static void main(String[] args) {
-		MATSimApplication.run(DrtTestScenario.class, args);
+		run(DrtTestScenario.class, args);
 	}
 
 	public DrtTestScenario() {

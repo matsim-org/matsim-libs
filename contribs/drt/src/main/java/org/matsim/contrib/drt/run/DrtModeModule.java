@@ -28,7 +28,6 @@ import org.matsim.contrib.drt.optimizer.insertion.IncrementalStopDurationEstimat
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
 import org.matsim.contrib.drt.schedule.StopDurationEstimator;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
-import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
@@ -76,7 +75,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		drtCfg.getDrtSpeedUpParams().ifPresent(drtSpeedUpParams -> {
-			bindModal(DrtSpeedUpParams.class).toProvider(modalProvider(getter -> drtCfg.getDrtSpeedUpParams().get()));
 			bindModal(DrtSpeedUp.class).toProvider(modalProvider(
 					getter -> new DrtSpeedUp(getMode(), drtSpeedUpParams, getConfig().controler(),
 							getter.get(Network.class), getter.getModal(FleetSpecification.class),

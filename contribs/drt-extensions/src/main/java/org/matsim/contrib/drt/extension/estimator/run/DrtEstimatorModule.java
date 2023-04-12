@@ -1,8 +1,8 @@
-package org.matsim.contrib.drt.estimator.run;
+package org.matsim.contrib.drt.extension.estimator.run;
 
 import com.google.inject.Singleton;
-import org.matsim.contrib.drt.estimator.DrtEstimateAnalyzer;
-import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.extension.estimator.DrtEstimateAnalyzer;
+import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;

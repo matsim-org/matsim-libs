@@ -1,13 +1,13 @@
-package org.matsim.contrib.drt.estimator;
+package org.matsim.contrib.drt.extension.estimator;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.MATSimApplication;
-import org.matsim.contrib.drt.DrtTestScenario;
-import org.matsim.contrib.drt.estimator.run.DrtEstimatorConfigGroup;
-import org.matsim.contrib.drt.estimator.run.DrtEstimatorModule;
-import org.matsim.contrib.drt.estimator.run.MultiModeDrtEstimatorConfigGroup;
+import org.matsim.contrib.drt.extension.DrtTestScenario;
+import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
+import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorModule;
+import org.matsim.contrib.drt.extension.estimator.run.MultiModeDrtEstimatorConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;

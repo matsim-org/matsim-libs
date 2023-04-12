@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.estimator.run;
+package org.matsim.contrib.drt.extension.estimator.run;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -7,8 +7,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.estimator.BasicDrtEstimator;
-import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.extension.estimator.BasicDrtEstimator;
+import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;

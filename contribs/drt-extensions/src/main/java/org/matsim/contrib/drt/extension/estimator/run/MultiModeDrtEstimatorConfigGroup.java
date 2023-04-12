@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.estimator.run;
+package org.matsim.contrib.drt.extension.estimator.run;
 
 import java.util.Collection;
 import java.util.function.Supplier;
