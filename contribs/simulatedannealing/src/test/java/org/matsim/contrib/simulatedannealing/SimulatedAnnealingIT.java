@@ -1,4 +1,4 @@
-package org.matsim.simulatedannealing;
+package org.matsim.contrib.simulatedannealing;
 
 import com.google.inject.TypeLiteral;
 import org.junit.Rule;
@@ -17,10 +17,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
-import org.matsim.simulatedannealing.cost.CostCalculator;
-import org.matsim.simulatedannealing.perturbation.ChainedPeturbatorFactory;
-import org.matsim.simulatedannealing.perturbation.PerturbatorFactory;
+import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
+import org.matsim.contrib.simulatedannealing.cost.CostCalculator;
+import org.matsim.contrib.simulatedannealing.perturbation.ChainedPeturbatorFactory;
+import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
 import javax.inject.Inject;

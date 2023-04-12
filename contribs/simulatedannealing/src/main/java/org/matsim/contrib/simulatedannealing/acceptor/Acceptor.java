@@ -6,9 +6,9 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package org.matsim.simulatedannealing.acceptor;
+package org.matsim.contrib.simulatedannealing.acceptor;
 
-import org.matsim.simulatedannealing.SimulatedAnnealing;
+import org.matsim.contrib.simulatedannealing.SimulatedAnnealing;
 
 /**
  *
@@ -20,7 +20,7 @@ import org.matsim.simulatedannealing.SimulatedAnnealing;
 public interface Acceptor<T> {
 
 	boolean accept(SimulatedAnnealing.Solution<T> currentSolution,
-                   SimulatedAnnealing.Solution<T> acceptedSolution,
-                   double temperature
+				   SimulatedAnnealing.Solution<T> acceptedSolution,
+				   double temperature
 	);
 }

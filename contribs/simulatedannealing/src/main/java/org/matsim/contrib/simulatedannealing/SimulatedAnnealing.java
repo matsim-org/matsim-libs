@@ -6,7 +6,7 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package org.matsim.simulatedannealing;
+package org.matsim.contrib.simulatedannealing;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,11 +14,11 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.simulatedannealing.acceptor.Acceptor;
-import org.matsim.simulatedannealing.cost.CostCalculator;
-import org.matsim.simulatedannealing.perturbation.Perturbator;
-import org.matsim.simulatedannealing.perturbation.PerturbatorFactory;
-import org.matsim.simulatedannealing.temperature.TemperatureFunction;
+import org.matsim.contrib.simulatedannealing.acceptor.Acceptor;
+import org.matsim.contrib.simulatedannealing.cost.CostCalculator;
+import org.matsim.contrib.simulatedannealing.perturbation.Perturbator;
+import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
+import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
 
 import javax.inject.Provider;
 import java.util.ArrayList;

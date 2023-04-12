@@ -6,9 +6,8 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package org.matsim.simulatedannealing;
+package org.matsim.contrib.simulatedannealing;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -19,15 +18,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.simulatedannealing.SimulatedAnnealing;
-import org.matsim.simulatedannealing.SimulatedAnnealingConfigGroup;
-import org.matsim.simulatedannealing.acceptor.Acceptor;
-import org.matsim.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
-import org.matsim.simulatedannealing.cost.CostCalculator;
-import org.matsim.simulatedannealing.perturbation.PerturbatorFactory;
-import org.matsim.simulatedannealing.temperature.NonMonotonicAdaptiveTemperatureFunction;
-import org.matsim.simulatedannealing.temperature.TemperatureFunction;
+import org.matsim.contrib.simulatedannealing.acceptor.Acceptor;
+import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
+import org.matsim.contrib.simulatedannealing.cost.CostCalculator;
+import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
+import org.matsim.contrib.simulatedannealing.temperature.NonMonotonicAdaptiveTemperatureFunction;
+import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
 
 import java.util.Random;
 

@@ -6,7 +6,7 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package org.matsim.simulatedannealing.perturbation;
+package org.matsim.contrib.simulatedannealing.perturbation;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,13 +6,13 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package org.matsim.simulatedannealing.acceptor;
+package org.matsim.contrib.simulatedannealing.acceptor;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.matsim.contrib.common.util.random.RandomUtils;
+import org.matsim.contrib.simulatedannealing.SimulatedAnnealing;
+import org.matsim.contrib.simulatedannealing.SimulatedAnnealingConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.simulatedannealing.SimulatedAnnealing;
-import org.matsim.simulatedannealing.SimulatedAnnealingConfigGroup;
 
 /**
  * @author nkuehnel / MOIA

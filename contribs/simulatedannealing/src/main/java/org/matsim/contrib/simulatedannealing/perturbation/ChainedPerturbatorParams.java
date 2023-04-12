@@ -6,11 +6,11 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package org.matsim.simulatedannealing.perturbation;
+package org.matsim.contrib.simulatedannealing.perturbation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.simulatedannealing.SimulatedAnnealingConfigGroup;
+import org.matsim.contrib.simulatedannealing.SimulatedAnnealingConfigGroup;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

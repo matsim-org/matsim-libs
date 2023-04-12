@@ -6,14 +6,14 @@
  * the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
-package org.matsim.simulatedannealing;
+package org.matsim.contrib.simulatedannealing;
 
 import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.simulatedannealing.temperature.TemperatureFunction;
+import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
