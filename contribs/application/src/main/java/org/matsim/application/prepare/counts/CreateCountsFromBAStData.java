@@ -5,8 +5,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.*;
-import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,7 +42,14 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * See description.
+ * Prepare command to generate Counts from the BASt traffic count data.
+ * If you want to use manual matched counts, you have to follow a name convention. Unfortunately one count station counts vehicles in
+ * both directions For example:
+ * The station id is 001. The count direction 1 (Column 'HiRi1') is E (east) and the count direction 2 (Column 'HiRi2') is W (west)
+ * If you want to match the count values of the east-lane to matsim link 'my_link_1' add a entry in the .csv like this:
+ * row1 : 001_1; my_link_1
+ * <p>
+ * If you want to ignore stations just paste the station id into the .csv. Both count directions of the station will be ignored.
  *
  * @author hzoerner
  */
@@ -100,7 +105,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		// Assigns link ids in the station objects
 		matchBAStWithNetwork(network, stations, counts, crs);
 
-		clean(stations);
+//		clean(stations);
 
 		readHourlyTrafficVolume(primaryData, stations);
 		readHourlyTrafficVolume(motorwayData, stations);
@@ -120,77 +125,28 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		return 0;
 	}
 
-	private void clean(Map<String, BAStCountStation> stations) {
-
-		log.info("+++++++ Check stations for duplicates and missing link ids +++++++");
-
-		//Set<Id<Link>>
-		Set<Id<Link>> uniqueIds = stations.values().stream()
-				.filter(BAStCountStation::hasMatchedLink)
-				.filter(BAStCountStation::hasOppLink)
-				.map(station -> List.of(station.getMatchedLink(), station.getOppLink()))
-				.flatMap(Collection::stream)
-				.map(Link::getId)
-				.collect(Collectors.toSet());
-
-		List<String> remove = new ArrayList<>();
-
-		for (BAStCountStation station : stations.values()) {
-
-			if (!station.hasMatchedLink() || !station.hasOppLink()) {
-				remove.add(station.getId());
-				continue;
-			}
-
-			var matched = station.getMatchedLink();
-			var opp = station.getOppLink();
-
-			if (matched.equals(opp)) {
-				remove.add(station.getId());
-				continue;
-			}
-
-			if (uniqueIds.contains(matched.getId()) && uniqueIds.contains(opp.getId())) {
-				uniqueIds.remove(matched.getId());
-				uniqueIds.remove(opp.getId());
-			} else {
-				remove.add(station.getId());
-			}
-		}
-
-		remove.forEach(stations.keySet()::remove);
-
-		log.info("+++++++ Removed {} stations +++++++", remove.size());
-	}
-
 	private void mapTrafficVolumeToCount(BAStCountStation station, Counts<Link> miv, Counts<Link> freight) {
 
-		if (station.getMivTrafficVolume1().isEmpty()) {
+		if (!station.hasMatchedLink())
+			return;
+
+		if (station.getMivTrafficVolume().isEmpty()) {
 			log.warn("No traffic counts available for station {}", station.getName());
 			return;
 		}
 
-		Count<Link> mivCount = miv.createAndAddCount(station.getMatchedLink().getId(), station.getName());
-		Count<Link> mivCountOpp = miv.createAndAddCount(station.getOppLink().getId(), station.getName());
+		Count<Link> mivCount = miv.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
+		Count<Link> freightCount = freight.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
 
-		Count<Link> freightCount = freight.createAndAddCount(station.getMatchedLink().getId(), station.getName());
-		Count<Link> freightCountOpp = freight.createAndAddCount(station.getOppLink().getId(), station.getName());
-
-		var mivTrafficVolumes = station.getMivTrafficVolume1();
-		var mivTrafficVolumesOpp = station.getMivTrafficVolume2();
-
-		var freightTrafficVolumes = station.getFreightTrafficVolume1();
-		var freightTrafficVolumesOpp = station.getFreightTrafficVolume2();
+		var mivTrafficVolumes = station.getMivTrafficVolume();
+		var freightTrafficVolumes = station.getFreightTrafficVolume();
 
 		for (String hour : mivTrafficVolumes.keySet()) {
 
 			if (hour.startsWith("0")) hour.replace("0", "");
 			int h = Integer.parseInt(hour);
 			mivCount.createVolume(h, mivTrafficVolumes.get(hour));
-			mivCountOpp.createVolume(h, mivTrafficVolumesOpp.get(hour));
-
 			freightCount.createVolume(h, freightTrafficVolumes.get(hour));
-			freightCountOpp.createVolume(h, freightTrafficVolumesOpp.get(hour));
 		}
 	}
 
@@ -236,7 +192,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			}
 		}
 
-		try{
+		try {
 			CSVParser records = CSVFormat
 					.Builder.create()
 					.setAllowMissingColumnNames(true)
@@ -245,17 +201,19 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 					.build()
 					.parse(reader);
 
-			Set<String> keys = stations.keySet();
+			Set<String> keys = stations.keySet().stream()
+					.map(key -> key.replaceAll("_1", "").replaceAll("_2", ""))
+					.collect(Collectors.toSet());
 
 			// Filter for weekday Tuesday-Wednesday
 			preFilteredRecords = StreamSupport.stream(records.spliterator(), false)
-					.filter(record -> keys.contains(record.get("Zst")))//ONLY FOR DEBUGGING
-					.filter(record -> {
+					.filter(row -> keys.contains(row.get("Zst")))
+					.filter(row -> {
 						int day;
-						try{
-							day = Integer.parseInt(record.get("Wotag").replace(" ", ""));
-						} catch (NumberFormatException e){
-							log.warn("Error parsing week day number: {}", record.get("Wotag"));
+						try {
+							day = Integer.parseInt(row.get("Wotag").replace(" ", ""));
+						} catch (NumberFormatException e) {
+							log.warn("Error parsing week day number: {}", row.get("Wotag"));
 							return false;
 						}
 						return day > 1 && day < 5;
@@ -270,63 +228,63 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			log.info("+++++++ Start aggregation of traffic volume data +++++++");
 
 			Set<String> stationIds = preFilteredRecords.stream()
-					.map(record -> record.get("Zst"))
+					.map(row -> row.get("Zst"))
 					.collect(Collectors.toSet());
 
 			for (String number : stationIds) {
-				BAStCountStation station = stations.get(number);
-				String direction1 = station.getMatchedDir();
-				String direction2 = station.getOppDir();
+				BAStCountStation direction1 = stations.get(number + "_1");
+				BAStCountStation direction2 = stations.get(number + "_2");
 
-				String mivCol1 = "KFZ_" + direction1;
-				String mivCol2 = "KFZ_" + direction2;
-				String freightCol1 = "Lkw_" + direction1;
-				String freightCol2 = "Lkw_" + direction2;
+				String mivCol1 = "KFZ_" + direction1.getDirectionField();
+				String mivCol2 = "KFZ_" + direction2.getDirectionField();
+				String freightCol1 = "Lkw_" + direction1.getDirectionField();
+				String freightCol2 = "Lkw_" + direction2.getDirectionField();
 
-				log.info("Process data for count station {}", station.getName());
+				//Use station name from 'direction1' because names of 'direction1' and 'direction2' are the same.
+				log.info("Process data for count station {}", direction1.getName());
 
 				List<CSVRecord> allEntriesOfStation = preFilteredRecords.stream()
-						.filter(record -> record.get("Zst").equals(number)).toList();
+						.filter(row -> row.get("Zst").equals(number)).toList();
 
 				for (String hour : hours) {
 					var hourlyTrafficVolumes = allEntriesOfStation.stream()
-							.filter(record -> record.get("Stunde").replace("\"", "")
+							.filter(row -> row.get("Stunde").replace("\"", "")
 									.equals(hour)).toList();
 
 					if (hourlyTrafficVolumes.isEmpty()) {
-						log.warn("No volume for station {} at hour {}", station.getName(), hour);
+						log.warn("No volume for station {} at hour {}", direction1.getName(), hour);
 						continue;
 					}
 
 					double divisor = hourlyTrafficVolumes.size();
 					double sumMiv1 = hourlyTrafficVolumes.stream()
-							.mapToDouble(record -> Double.parseDouble(record.get(mivCol1)))
+							.mapToDouble(row -> Double.parseDouble(row.get(mivCol1)))
 							.sum();
 
 					double sumMiv2 = hourlyTrafficVolumes.stream()
-							.mapToDouble(record -> Double.parseDouble(record.get(mivCol2)))
+							.mapToDouble(row -> Double.parseDouble(row.get(mivCol2)))
 							.sum();
 
 					double meanMiv1 = sumMiv1 / divisor;
 					double meanMiv2 = sumMiv2 / divisor;
 
-					station.getMivTrafficVolume1().put(hour, meanMiv1);
-					station.getMivTrafficVolume2().put(hour, meanMiv2);
+					direction1.getMivTrafficVolume().put(hour, meanMiv1);
+					direction2.getMivTrafficVolume().put(hour, meanMiv2);
 
 					//Same procedure for freight
 					double sumFreight1 = hourlyTrafficVolumes.stream()
-							.mapToDouble(record -> Double.parseDouble(record.get(freightCol1)))
+							.mapToDouble(row -> Double.parseDouble(row.get(freightCol1)))
 							.sum();
 
 					double sumFreight2 = hourlyTrafficVolumes.stream()
-							.mapToDouble(record -> Double.parseDouble(record.get(freightCol2)))
+							.mapToDouble(row -> Double.parseDouble(row.get(freightCol2)))
 							.sum();
 
 					double meanFreight1 = sumFreight1 / divisor;
 					double meanFreight2 = sumFreight2 / divisor;
 
-					station.getFreightTrafficVolume1().put(hour, meanFreight1);
-					station.getFreightTrafficVolume2().put(hour, meanFreight2);
+					direction1.getFreightTrafficVolume().put(hour, meanFreight1);
+					direction2.getFreightTrafficVolume().put(hour, meanFreight2);
 				}
 			}
 		} catch (IOException e) {
@@ -334,94 +292,30 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		}
 	}
 
-	private boolean checkManualMatching(BAStCountStation station, Network network, Map<String, Id<Link>> manualMatched){
-		if(manualMatched.size() > 2){
-			throw new RuntimeException("Too many manual matched links for station " + station.getName());
-		}
-		// Check direction matching
-		String dir1 = station.getDir1();
-		String dir2 = station.getDir2();
+	private void match(Network network, NetworkIndex index, BAStCountStation station, CountsOption counts) {
 
-		List<String> bastDirections = List.of(dir1, dir2);
-
-		List<String> manualDir = manualMatched.keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toList());
-
-		if(!manualDir.containsAll(bastDirections))
-			throw new RuntimeException("Wrong direction matching for station " + station.getName());
-
-
-		//Check if link is in the network
-		for(Id<Link> id: manualMatched.values()){
-
-			if (!network.getLinks().containsKey(id))
-				throw new RuntimeException("Manual matched station link " + id + " is not in the network!");
-		}
-
-		return true;
-	}
-
-	private void match(Network network, Index index, BAStCountStation station, CountsOption counts, CoordinateTransformation transformation) {
-
-		Map<String, Id<Link>> manuallyMatched = counts.isManuallyMatched(station.getId());
+		Id<Link> manuallyMatched = counts.isManuallyMatched(station.getId());
 		Link matched;
-		if(manuallyMatched != null) {
+		if (manuallyMatched != null) {
 
-			if(!checkManualMatching(station, network, manuallyMatched)){
+			//Check if link is in the network
+			if (!network.getLinks().containsKey(manuallyMatched))
+				throw new RuntimeException("Manual matched station link " + manuallyMatched + " is not in the network!");
+
+			matched = network.getLinks().get(manuallyMatched);
+		} else {
+
+			matched = index.query(station);
+
+			if (matched == null) {
 				station.setHasNoMatchedLink();
-				station.setHasNoOppLink();
+				log.warn("Could not match station {}", station.getName());
 				return;
 			}
 
-			String dir1 = station.getDir1();
-			String key1 = dir1 + "_" + station.getId();
-
-			String dir2 = station.getDir2();
-			String key2 = dir2 + "_" + station.getId();
-
-			Id<Link> matchedId = manuallyMatched.get(key1);
-			matched = network.getLinks().get(matchedId);
-
-			Id<Link> oppId = manuallyMatched.get(key2);
-			Link opp = network.getLinks().get(oppId);
-
-			station.setMatchedLink(matched);
-			station.setOppLink(opp);
-
-			station.overwriteDirections(dir1, dir2);
-
-			index.remove(matched);
-			index.remove(opp);
-		} else {
-
-			matched = NetworkUtils.getNearestLink(network, transformation.transform(station.getCoord()));
-
-			if (matched == null) {
-				log.debug("Query is used for matching!");
-				matched = index.query(station);
-				if (matched == null) {
-					station.setHasNoMatchedLink();
-					log.warn("Could not match station {}", station.getName());
-					return;
-				}
-			}
-
-			station.setMatchedLink(matched);
-
-			Link opp = NetworkUtils.findLinkInOppositeDirection(matched);
-
-			if (opp == null) {
-				opp = index.query(station);
-				if (opp == null) {
-					log.warn("Could not match station {} to an opposite link", station.getName());
-					station.setHasNoOppLink();
-					return;
-				}
-			}
-			station.setOppLink(opp);
-
-			index.remove(matched);
-			index.remove(opp);
 		}
+		station.setMatchedLink(matched);
+		index.remove(matched);
 	}
 
 	private List<Predicate<Link>> createRoadTypeFilter(List<String> types) {
@@ -432,7 +326,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 			Predicate<Link> p = link -> {
 				var attr = link.getAttributes().getAttribute("type");
-				if(attr == null)
+				if (attr == null)
 					return true;
 
 				Pattern pattern = Pattern.compile(type, Pattern.CASE_INSENSITIVE);
@@ -446,7 +340,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 	private void matchBAStWithNetwork(String pathToNetwork, Map<String, BAStCountStation> stations, CountsOption countsOption, CrsOptions crs) {
 
-		if(crs.getTargetCRS() != null)
+		if (crs.getTargetCRS() != null)
 			throw new RuntimeException("Please don't specify --target-crs. Only use --input-crs to determinate the network crs!");
 
 		Network filteredNetwork;
@@ -462,12 +356,23 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			filteredNetwork = filter.applyFilters();
 		}
 
-		Index index = new Index(filteredNetwork, searchRange);
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:25832", crs.getInputCRS());
+		NetworkIndex<BAStCountStation> index = new NetworkIndex(filteredNetwork, searchRange, station -> {
+			BAStCountStation countStation = (BAStCountStation) station;
+			Coord coord = countStation.getCoord();
+			Coord transform = coordinateTransformation.transform(coord);
+			return MGC.coord2Point(transform);
+		});
+
+		index.addLinkFilter((link, station) -> {
+			String linkDir = BAStCountStation.getLinkDirection(link);
+			String stationDir = station.getDirection();
+			return linkDir.contains(stationDir);
+		});
 
 		log.info("+++++++ Match BASt stations with network +++++++");
 		for (var station : stations.values())
-			match(filteredNetwork, index, station, countsOption, coordinateTransformation);
+			match(filteredNetwork, index, station, countsOption);
 	}
 
 	private Map<String, BAStCountStation> readBAStCountStations(Path pathToAggregatedData, ShpOptions shp, CountsOption counts) {
@@ -485,24 +390,26 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 					.build()
 					.parse(reader);
 
-			for (var record : records) {
+			for (CSVRecord row : records) {
 
-				String id = record.get("DZ_Nr");
-				String name = record.get("DZ_Name");
+				String id = row.get("DZ_Nr");
+				String name = row.get("DZ_Name");
 
 				if (counts.isIgnored(id) || counts.isIgnored(name))
 					continue;
 
-				String dir1 = record.get("Hi_Ri1");
-				String dir2 = record.get("Hi_Ri2");
+				String dir1 = row.get("Hi_Ri1");
+				String dir2 = row.get("Hi_Ri2");
 
-				String x = record.get("Koor_UTM32_E").replace(".", "");
-				String y = record.get("Koor_UTM32_N").replace(".", "");
+				String x = row.get("Koor_UTM32_E").replace(".", "");
+				String y = row.get("Koor_UTM32_N").replace(".", "");
 
 				Coord coord = new Coord(Double.parseDouble(x), Double.parseDouble(y));
 
-				BAStCountStation station = new BAStCountStation(id, name, dir1, dir2, coord);
-				stations.add(station);
+				BAStCountStation direction1 = new BAStCountStation(id + "_1", name, "R1", dir1, coord);
+				BAStCountStation direction2 = new BAStCountStation(id + "_2", name, "R2", dir2, coord);
+				stations.add(direction1);
+				stations.add(direction2);
 			}
 		} catch (IOException e) {
 			log.error("Error reading count stations", e);
@@ -510,7 +417,8 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		}
 
 		Set<String> ignored = counts.getIgnored();
-		final Predicate<BAStCountStation> optFilter = station -> !ignored.contains(station.getId());
+		final Predicate<BAStCountStation> optFilter = station -> !ignored.contains(station.getId().replaceAll("_1", "")
+				.replaceAll("_2", ""));
 
 		final Predicate<BAStCountStation> shpFilter;
 		if (shp.getShapeFile() != null) {
@@ -527,74 +435,5 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 				.collect(Collectors.toMap(
 						BAStCountStation::getId, Function.identity()
 				));
-	}
-
-	private static final class Index {
-
-		private final STRtree index = new STRtree();
-		private final GeometryFactory factory = new GeometryFactory();
-		private final double range;
-
-		public Index(Network network, double searchRange) {
-
-			this.range = searchRange;
-
-			for (Link link : network.getLinks().values()) {
-				Envelope env = getLinkEnvelope(link);
-				index.insert(env, link);
-			}
-
-			index.build();
-		}
-
-		@SuppressWarnings("unchecked")
-		public Link query(BAStCountStation station) {
-
-			Point p = MGC.coord2Point(station.getCoord());
-			Envelope searchArea = p.buffer(this.range).getEnvelopeInternal();
-
-			List<Link> result = index.query(searchArea);
-
-			if (result.isEmpty()) return null;
-			if (result.size() == 1) return result.get(0);
-
-			// Find the closest link matching the direction
-			Link closest = result.stream().findFirst().get();
-
-			for (Link l : result) {
-
-				if (station.getLinkDirection(l).equals(station.getMatchedDir())) continue;
-				if (l.equals(station.getMatchedLink())) continue;
-
-				double distance = link2LineString(l).distance(p);
-				double curClosest = link2LineString(closest).distance(p);
-
-				if (distance < curClosest) closest = l;
-			}
-
-			return closest;
-		}
-
-		private Envelope getLinkEnvelope(Link link) {
-			Coord from = link.getFromNode().getCoord();
-			Coord to = link.getToNode().getCoord();
-			Coordinate[] coordinates = {MGC.coord2Coordinate(from), MGC.coord2Coordinate(to)};
-
-			return factory.createLineString(coordinates).getEnvelopeInternal();
-		}
-
-		private LineString link2LineString(Link link) {
-
-			Coord from = link.getFromNode().getCoord();
-			Coord to = link.getToNode().getCoord();
-			Coordinate[] coordinates = {MGC.coord2Coordinate(from), MGC.coord2Coordinate(to)};
-
-			return factory.createLineString(coordinates);
-		}
-
-		public void remove(Link link) {
-			Envelope env = getLinkEnvelope(link);
-			index.remove(env, link);
-		}
 	}
 }

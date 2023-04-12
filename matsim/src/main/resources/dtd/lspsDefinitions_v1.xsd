@@ -87,9 +87,10 @@
 									<xs:element name="logisticChain" minOccurs="0">
 										<xs:complexType>
 											<xs:sequence>
-												<xs:element name="resource" minOccurs="0" maxOccurs="unbounded">
+												<xs:element name="logisticChainElement" minOccurs="0" maxOccurs="unbounded">
 													<xs:complexType>
 														<xs:attribute name="id" type="xs:string" />
+														<xs:attribute name="resourceId" type="xs:string" />
 													</xs:complexType>
 												</xs:element>
 											</xs:sequence>

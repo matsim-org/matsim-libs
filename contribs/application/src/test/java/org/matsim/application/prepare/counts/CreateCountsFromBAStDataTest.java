@@ -128,7 +128,7 @@ public class CreateCountsFromBAStDataTest {
 		String freight = utils.getOutputDirectory() + "manual-matched-" + freightOutput;
 
 		//Map contains supposed matching from manual.csv
-		Map<Id<Link>, String> manual = Map.of(Id.createLinkId("4205"), "Neukölln", Id.createLinkId("4219"), "Neukölln");
+		Map<Id<Link>, String> manual = Map.of(Id.createLinkId("4205"), "Neukölln_N", Id.createLinkId("4219"), "Neukölln_S");
 
 		String[] args = new String[]{
 				"--station-data=" + utils.getPackageInputDirectory() + stationData,
