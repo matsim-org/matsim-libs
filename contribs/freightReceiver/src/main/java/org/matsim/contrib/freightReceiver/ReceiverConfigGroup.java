@@ -39,8 +39,10 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
     final static String ELEMENT_CREATE_PNG = "createPNG";
     final static String ELEMENT_REPLANNING_TYPE = "replanningModules";
 
-    static String RECEIVERS_FILE = "./receivers.xml.gz";
-    static String CARRIERS_FILE = "./carriers.xml.gz";
+    private String RECEIVERS_FILE = "./receivers.xml.gz";
+    // (I converted this from "default" & static to private and non-static: static non-final non-private variables often eventually cause problems.  kai, apr'23)
+    private String CARRIERS_FILE = "./carriers.xml.gz";
+    // (I converted this from "default" & static to private and non-static: static non-final non-private variables often eventually cause problems.  kai, apr'23)
     private String costSharing = "proportional";
     private boolean createPNG = true;
     private ReceiverReplanningType replanningType = ReceiverReplanningType.serviceTime;
@@ -61,6 +63,8 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
     }
 
 //    @StringGetter(RECEIVER_FILE)
+    // Here and elsewhere I commented out the StringSetter/Getter stuff.  This makes the config accessible only from code.  Makes it easier to
+    // refactor later.  kai, apr'23
     public String getReceiversFile() {
         return RECEIVERS_FILE;
     }
@@ -75,31 +79,33 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
         return CARRIERS_FILE;
     }
 
-    @StringSetter(ELEMENT_CARRIERS_FILE)
+//    @StringSetter(ELEMENT_CARRIERS_FILE)
     public void setCarriersFile(String carriersFile) {
         this.CARRIERS_FILE = carriersFile;
     }
 
-    @StringGetter(ELEMENT_COSTSHARING)
+//    @StringGetter(ELEMENT_COSTSHARING)
     public String getCostSharing() {
         return costSharing;
     }
+    // yyyyyy shouldn't this be an enum?  kai, apr'23
 
-    @StringSetter(ELEMENT_COSTSHARING)
+//    @StringSetter(ELEMENT_COSTSHARING)
     public void setCostSharing(String costSharing) {
         this.costSharing = costSharing;
     }
 
-    @StringGetter(ELEMENT_CREATE_PNG)
+//    @StringGetter(ELEMENT_CREATE_PNG)
     public boolean isCreatePNG() { return createPNG; }
 
-    @StringSetter(ELEMENT_CREATE_PNG)
+//    @StringSetter(ELEMENT_CREATE_PNG)
     public void setCreatePNG(boolean createPNG) { this.createPNG = createPNG; }
+    // I would prefer to have "createPNG" as an enum ... allows to add options later (such als "createLotsOfPngs", "createSomePngs" etc.)
 
-    @StringGetter(ELEMENT_REPLANNING_TYPE)
+//    @StringGetter(ELEMENT_REPLANNING_TYPE)
     public ReceiverReplanningType getReplanningType() { return replanningType; }
 
-    @StringSetter(ELEMENT_REPLANNING_TYPE)
+//    @StringSetter(ELEMENT_REPLANNING_TYPE)
     public void setReplanningType(ReceiverReplanningType replanningType) {
         this.replanningType = replanningType;
     }

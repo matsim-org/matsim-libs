@@ -42,24 +42,26 @@ import java.util.Collection;
 import java.util.Map;
 
 class ReceiverTriggersCarrierReplanningListener implements IterationStartsListener {
-	@Inject private Scenario sc;
+    private final ReceiverConfigGroup receiverConfig;
+    @Inject private Scenario sc;
 
     ReceiverTriggersCarrierReplanningListener(){
+        this.receiverConfig = ConfigUtils.addOrGetModule( sc.getConfig(), ReceiverConfigGroup.class );
     }
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
         /* Replan the carrier at iteration zero, and one iteration after the receivers have replanned. */
-		if(event.getIteration() > 0 &&
-			(event.getIteration()+1) % ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval() != 0) {
+        if(event.getIteration() > 0 &&
+                           (event.getIteration()+1) % ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval() != 0) {
             return;
         }
-		LogManager.getLogger(ReceiverTriggersCarrierReplanningListener.class).info("--> Receiver triggering carrier to replan.");
+        LogManager.getLogger(ReceiverTriggersCarrierReplanningListener.class).info("--> Receiver triggering carrier to replan.");
         // Adds the receiver agents that are part of the current (sub)coalition.
         CollaborationUtils.setCoalitionFromReceiverAttributes( sc );
 
         // clean out plans, services, shipments from carriers:
-		Map<Id<Carrier>, Carrier> carriers = FreightUtils.getCarriers(sc).getCarriers();
+        Map<Id<Carrier>, Carrier> carriers = FreightUtils.getCarriers(sc).getCarriers();
         for( Carrier carrier : carriers.values() ){
             carrier.clearPlans();
             carrier.getShipments().clear();
@@ -75,16 +77,16 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
                 for( Order order : receiverOrder.getReceiverProductOrders() ){
                     nn++ ;
                     CarrierShipment.Builder builder = CarrierShipment.Builder.newInstance(
-                            Id.create("Order" + receiverPlan.getReceiver().getId().toString() + nn, CarrierShipment.class),
-                            order.getProduct().getProductType().getOriginLinkId(),
-                            order.getReceiver().getLinkId(),
-                            (int) (Math.round(order.getDailyOrderQuantity()*order.getProduct().getProductType().getRequiredCapacity())) );
+                                    Id.create("Order" + receiverPlan.getReceiver().getId().toString() + nn, CarrierShipment.class),
+                                    order.getProduct().getProductType().getOriginLinkId(),
+                                    order.getReceiver().getLinkId(),
+                                    (int) (Math.round(order.getDailyOrderQuantity()*order.getProduct().getProductType().getRequiredCapacity())) );
                     CarrierShipment newShipment = builder
-                            .setDeliveryServiceTime( order.getServiceDuration() )
-                            .setDeliveryTimeWindow( receiverPlan.getTimeWindows().get( 0 ) )
-                            // TODO This only looks at the FIRST time window. This may need revision once we handle multiple
-                            // time windows.
-                            .build();
+                                                                  .setDeliveryServiceTime( order.getServiceDuration() )
+                                                                  .setDeliveryTimeWindow( receiverPlan.getTimeWindows().get( 0 ) )
+                                                                  // TODO This only looks at the FIRST time window. This may need revision once we handle multiple
+                                                                  // time windows.
+                                                                  .build();
                     if (newShipment.getSize() != 0) {
                         receiverOrder.getCarrier().getShipments().put(newShipment.getId(), newShipment );
                     }
@@ -101,7 +103,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
             VehicleRoutingProblem vrp = vrpBuilder.setRoutingCost(netBasedCosts).build();
 
             //read and create a pre-configured algorithms to solve the vrp
-			URL algoConfigFileName = IOUtils.extendUrl( sc.getConfig().getContext(), "initialPlanAlgorithm.xml");
+            URL algoConfigFileName = IOUtils.extendUrl( sc.getConfig().getContext(), "initialPlanAlgorithm.xml");
             VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algoConfigFileName);
 
             //solve the problem
@@ -117,9 +119,11 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
             carrier.setSelectedPlan(newPlan);
 
         }
-		String outputdirectory = sc.getConfig().controler().getOutputDirectory();
-		outputdirectory += outputdirectory.endsWith("/") ? "" : "/";
-		new CarrierPlanWriter(FreightUtils.getCarriers(sc)).write(outputdirectory + ReceiverConfigGroup.CARRIERS_FILE);
-        new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(outputdirectory + ReceiverConfigGroup.RECEIVERS_FILE);
+        String outputdirectory = sc.getConfig().controler().getOutputDirectory();
+        outputdirectory += outputdirectory.endsWith("/") ? "" : "/";
+//        new CarrierPlanWriter(FreightUtils.getCarriers(sc)).write(outputdirectory + ReceiverConfigGroup.CARRIERS_FILE);
+        new CarrierPlanWriter(FreightUtils.getCarriers(sc)).write(outputdirectory +receiverConfig.getCarriersFile() );
+//        new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(outputdirectory + ReceiverConfigGroup.RECEIVERS_FILE);
+        new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(outputdirectory + receiverConfig.getReceiversFile());
     }
 }

@@ -103,18 +103,11 @@ import java.util.Stack;
 			startReceivers(atts);
 			break;
 		case ATTRIBUTES:
-			switch (context.peek()) {
-			case RECEIVERS:
-				currentAttributes = receivers.getAttributes(); 
-				break;
-			case RECEIVER:
-				currentAttributes = currentReceiver.getAttributes();
-				break;
-			case REORDER_POLICY:
-				currentAttributes = currentReorderPolicy.getAttributes();
-				break;
-			default:
-				throw new RuntimeException( context.peek() );
+			switch( context.peek() ){
+				case RECEIVERS -> currentAttributes = receivers.getAttributes();
+				case RECEIVER -> currentAttributes = currentReceiver.getAttributes();
+				case REORDER_POLICY -> currentAttributes = currentReorderPolicy.getAttributes();
+				default -> throw new RuntimeException( context.peek() );
 			}
 		case ATTRIBUTE:
 			attributesReader.startTag(name, atts, context, currentAttributes);
@@ -153,33 +146,23 @@ import java.util.Stack;
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		switch (name) {
-		case ATTRIBUTE:
-			attributesReader.endTag(name, content, context);
-			break;
-		case PRODUCT:
-			ReceiverProduct product = currentProductBuilder.build();
-			currentReceiver.addProduct(product);
-			break;
-		case RECEIVER:
-			receivers.addReceiver(currentReceiver);
-			currentReceiver = null;
-			counter.incCounter();
-			break;
-		case TIME_WINDOW:
-			currentPlanBuilder.addTimeWindow(currentTimeWindow);
-			break;
-		case ORDER:
-			endOrder();
-			break;
-		case PLAN:
-			endPlan();
-			break;
-		case RECEIVERS:
-			counter.printCounter();
-			break;
-		default:
-			break;
+		switch( name ){
+			case ATTRIBUTE -> attributesReader.endTag( name, content, context );
+			case PRODUCT -> {
+				ReceiverProduct product = currentProductBuilder.build();
+				currentReceiver.addProduct( product );
+			}
+			case RECEIVER -> {
+				receivers.addReceiver( currentReceiver );
+				currentReceiver = null;
+				counter.incCounter();
+			}
+			case TIME_WINDOW -> currentPlanBuilder.addTimeWindow( currentTimeWindow );
+			case ORDER -> endOrder();
+			case PLAN -> endPlan();
+			case RECEIVERS -> counter.printCounter();
+			default -> {
+			}
 		}
 	}
 
