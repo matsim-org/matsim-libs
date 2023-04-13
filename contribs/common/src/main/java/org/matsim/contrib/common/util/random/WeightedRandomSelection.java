@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util.random;
+package org.matsim.contrib.common.util.random;
 
 import java.util.ArrayList;
 import java.util.Collections;
