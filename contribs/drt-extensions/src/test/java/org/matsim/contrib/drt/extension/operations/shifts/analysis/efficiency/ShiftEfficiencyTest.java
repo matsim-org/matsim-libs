@@ -62,14 +62,14 @@ public class ShiftEfficiencyTest {
 
 		events.processEvent(new PassengerDroppedOffEvent(11 * 3600, "drt",
 				request1, person1, vehicle1));
-		Assert.assertTrue(shiftEfficiencyTracker.getRequestsByShift().get(shift1).contains(request1));
+		Assert.assertTrue(shiftEfficiencyTracker.getCurrentRecord().getRequestsByShift().get(shift1).contains(request1));
 
 		events.processEvent(new PersonMoneyEvent(11 * 3600, person1, -FARE,
 				DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE, "drt", request1.toString()));
-		Assert.assertEquals(FARE, shiftEfficiencyTracker.getRevenueByShift().get(shift1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(FARE, shiftEfficiencyTracker.getCurrentRecord().getRevenueByShift().get(shift1), MatsimTestUtils.EPSILON);
 
-		Assert.assertFalse(shiftEfficiencyTracker.getFinishedShifts().containsKey(shift1));
+		Assert.assertFalse(shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts().containsKey(shift1));
 		events.processEvent(new DrtShiftEndedEvent(20 * 3600, shift1, vehicle1, link1, operationFacility1));
-		Assert.assertTrue(shiftEfficiencyTracker.getFinishedShifts().containsKey(shift1));
+		Assert.assertTrue(shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts().containsKey(shift1));
 	}
 }

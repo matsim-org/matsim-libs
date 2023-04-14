@@ -27,6 +27,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 
+import javax.inject.Provider;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -35,8 +36,8 @@ import java.util.stream.Collectors;
 /**
  * @author nkuehnel / MOIA
  */
-final class ShiftEfficiencyAnalysisControlerListener implements IterationEndsListener {
-    private final DrtShiftsSpecification drtShiftsSpecification;
+public final class ShiftEfficiencyAnalysisControlerListener implements IterationEndsListener {
+    private final Provider<DrtShiftsSpecification> drtShiftsSpecification;
     private final MatsimServices matsimServices;
 
     private final DrtConfigGroup drtConfigGroup;
@@ -45,7 +46,7 @@ final class ShiftEfficiencyAnalysisControlerListener implements IterationEndsLis
     @Inject
     public ShiftEfficiencyAnalysisControlerListener(DrtConfigGroup drtConfigGroup,
                                                     ShiftEfficiencyTracker shiftEfficiencyTracker,
-                                                    DrtShiftsSpecification drtShiftsSpecification,
+                                                    Provider<DrtShiftsSpecification> drtShiftsSpecification,
                                                     MatsimServices matsimServices) {
         this.drtConfigGroup = drtConfigGroup;
         this.shiftEfficiencyTracker = shiftEfficiencyTracker;
@@ -58,9 +59,9 @@ final class ShiftEfficiencyAnalysisControlerListener implements IterationEndsLis
         boolean createGraphs = event.getServices().getConfig().controler().isCreateGraphs();
 
         writeAndPlotShiftEfficiency(
-                shiftEfficiencyTracker.getRevenueByShift(),
-                shiftEfficiencyTracker.getRequestsByShift(),
-                shiftEfficiencyTracker.getFinishedShifts(),
+                shiftEfficiencyTracker.getCurrentRecord().getRevenueByShift(),
+                shiftEfficiencyTracker.getCurrentRecord().getRequestsByShift(),
+                shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts(),
                 filename(event, "shiftRevenue", ".png"),
                 filename(event, "shiftRidesPerVrh", ".png"),
                 filename(event, "shiftEfficiency", ".csv"),
@@ -81,7 +82,7 @@ final class ShiftEfficiencyAnalysisControlerListener implements IterationEndsLis
             final List<Double> revenuePerVRHList = new ArrayList<>();
 
             for (Map.Entry<Id<DrtShift>, Double> revenuePerShiftEntry : revenuePerShift.entrySet()) {
-                DrtShiftSpecification drtShift = drtShiftsSpecification.getShiftSpecifications().get(revenuePerShiftEntry.getKey());
+                DrtShiftSpecification drtShift = drtShiftsSpecification.get().getShiftSpecifications().get(revenuePerShiftEntry.getKey());
                 int nRequests = requestsPerShift.getOrDefault(revenuePerShiftEntry.getKey(), Collections.EMPTY_LIST).size();
                 double vehicleRevenueHour = drtShift.getEndTime() - drtShift.getStartTime();
                 if (drtShift.getBreak().isPresent()) {
