@@ -76,23 +76,23 @@ public final class MatsimJspritFactory {
 	/**
 	 * Creates (MATSim) {@link CarrierShipment} from a (jsprit) {@link Shipment}
 	 *
-	 * @param shipment to be transformed to MATSim
+	 * @param jspritShipment to be transformed to MATSim
 	 * @return CarrierShipment
 	 * @see CarrierShipment, Shipment
 	 */
-	static CarrierShipment createCarrierShipment(Shipment shipment) {
+	static CarrierShipment createCarrierShipment(Shipment jspritShipment) {
 		CarrierShipment carrierShipment = CarrierShipment.Builder
-				.newInstance(Id.create(shipment.getId(), CarrierShipment.class),
-						Id.createLinkId(shipment.getPickupLocation().getId()),
-						Id.createLinkId(shipment.getDeliveryLocation().getId()), shipment.getSize().get(0))
-				.setDeliveryServiceTime(shipment.getDeliveryServiceTime())
-				.setDeliveryTimeWindow(TimeWindow.newInstance(shipment.getDeliveryTimeWindow().getStart(),
-						shipment.getDeliveryTimeWindow().getEnd()))
-				.setPickupServiceTime(shipment.getPickupServiceTime())
-				.setPickupTimeWindow(TimeWindow.newInstance(shipment.getPickupTimeWindow().getStart(),
-						shipment.getPickupTimeWindow().getEnd()))
+				.newInstance(Id.create(jspritShipment.getId(), CarrierShipment.class),
+						Id.createLinkId(jspritShipment.getPickupLocation().getId()),
+						Id.createLinkId(jspritShipment.getDeliveryLocation().getId()), jspritShipment.getSize().get(0))
+				.setDeliveryServiceTime(jspritShipment.getDeliveryServiceTime())
+				.setDeliveryTimeWindow(TimeWindow.newInstance(jspritShipment.getDeliveryTimeWindow().getStart(),
+						jspritShipment.getDeliveryTimeWindow().getEnd()))
+				.setPickupServiceTime(jspritShipment.getPickupServiceTime())
+				.setPickupTimeWindow(TimeWindow.newInstance(jspritShipment.getPickupTimeWindow().getStart(),
+						jspritShipment.getPickupTimeWindow().getEnd()))
 				.build();
-		FreightUtils.setSkills(carrierShipment, shipment.getRequiredSkills().values());
+		FreightUtils.setSkills(carrierShipment, jspritShipment.getRequiredSkills().values());
 		return carrierShipment;
 	}
 
@@ -103,7 +103,7 @@ public final class MatsimJspritFactory {
 	 * @return Shipment
 	 * @see CarrierShipment, Shipment
 	 */
-	static Shipment createShipment(CarrierShipment carrierShipment) {
+	static Shipment createJspritShipment(CarrierShipment carrierShipment) {
 		Shipment.Builder shipmentBuilder = Shipment.Builder.newInstance(carrierShipment.getId().toString())
 				.setDeliveryLocation(Location.newInstance(carrierShipment.getTo().toString()))
 				.setDeliveryServiceTime(carrierShipment.getDeliveryServiceTime())
@@ -122,7 +122,7 @@ public final class MatsimJspritFactory {
 		return shipmentBuilder.build();
 	}
 
-	static Shipment createShipment(CarrierShipment carrierShipment, Coord fromCoord, Coord toCoord) {
+	static Shipment createJspritShipment(CarrierShipment carrierShipment, Coord fromCoord, Coord toCoord) {
 		Location.Builder fromLocationBuilder = Location.Builder.newInstance();
 		fromLocationBuilder.setId(carrierShipment.getFrom().toString());
 		if (fromCoord != null) {
@@ -153,7 +153,7 @@ public final class MatsimJspritFactory {
 		return shipmentBuilder.build();
 	}
 
-	static Service createService(CarrierService carrierService, Coord locationCoord) {
+	static Service createJspritService(CarrierService carrierService, Coord locationCoord) {
 		Location.Builder locationBuilder = Location.Builder.newInstance();
 		locationBuilder.setId(carrierService.getLocationLinkId().toString());
 		if (locationCoord != null) {
@@ -173,15 +173,20 @@ public final class MatsimJspritFactory {
 		return serviceBuilder.build();
 	}
 
-	static CarrierService createCarrierService(Service service) {
+	/**
+	 * Creates a (MATSim) {@link CarrierService} from a (jsprit) Service
+	 * @param jspritService service from jsprit
+	 * @return CarrierService
+	 */
+	static CarrierService createCarrierService(Service jspritService) {
 		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(
-				Id.create(service.getId(), CarrierService.class), Id.create(service.getLocation().getId(), Link.class));
-		serviceBuilder.setCapacityDemand(service.getSize().get(0));
-		serviceBuilder.setServiceDuration(service.getServiceDuration());
+				Id.create(jspritService.getId(), CarrierService.class), Id.create(jspritService.getLocation().getId(), Link.class));
+		serviceBuilder.setCapacityDemand(jspritService.getSize().get(0));
+		serviceBuilder.setServiceDuration(jspritService.getServiceDuration());
 		serviceBuilder.setServiceStartTimeWindow(
-				TimeWindow.newInstance(service.getTimeWindow().getStart(), service.getTimeWindow().getEnd()));
+				TimeWindow.newInstance(jspritService.getTimeWindow().getStart(), jspritService.getTimeWindow().getEnd()));
 		CarrierService carrierService = serviceBuilder.build();
-		FreightUtils.setSkills(carrierService, service.getRequiredSkills().values());
+		FreightUtils.setSkills(carrierService, jspritService.getRequiredSkills().values());
 		return carrierService;
 	}
 
@@ -193,14 +198,14 @@ public final class MatsimJspritFactory {
 	 * @return jsprit vehicle
 	 * @see Vehicle, CarrierVehicle
 	 */
-	static com.graphhopper.jsprit.core.problem.vehicle.Vehicle createVehicle(org.matsim.contrib.freight.carrier.CarrierVehicle carrierVehicle, Coord locationCoord) {
+	static com.graphhopper.jsprit.core.problem.vehicle.Vehicle createJspritVehicle(CarrierVehicle carrierVehicle, Coord locationCoord) {
 		Location.Builder vehicleLocationBuilder = Location.Builder.newInstance();
 		vehicleLocationBuilder.setId(carrierVehicle.getLinkId().toString() );
 		if (locationCoord != null) {
 			vehicleLocationBuilder.setCoordinate(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
 		}
 		Location vehicleLocation = vehicleLocationBuilder.build();
-		com.graphhopper.jsprit.core.problem.vehicle.VehicleType vehicleType = createVehicleType(
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType vehicleType = createJspritVehicleType(
 				carrierVehicle.getType());
 		VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance(carrierVehicle.getId().toString());
 		vehicleBuilder.setEarliestStart(carrierVehicle.getEarliestStartTime())
@@ -228,14 +233,14 @@ public final class MatsimJspritFactory {
 	 * @return carrierVehicle
 	 * @see CarrierVehicle, Vehicle
 	 */
-	static org.matsim.contrib.freight.carrier.CarrierVehicle createCarrierVehicle(com.graphhopper.jsprit.core.problem.vehicle.Vehicle jspritVehicle) {
+	static CarrierVehicle createCarrierVehicle(com.graphhopper.jsprit.core.problem.vehicle.Vehicle jspritVehicle) {
 		VehicleType matsimVehicleType;
 		if (jspritVehicle.getType().getUserData() != null){
 			log.info("Use the (MATSim) vehicleType that was stored inside the (jsprit) vehicleType during the jsprit run but never interacted with jsprit. ");
 			matsimVehicleType = (VehicleType) jspritVehicle.getType().getUserData(); //Read in store MATSimVehicleType... Attention: This will not take care for any changes during the jsprit run
 		} else {
 			log.info("There was no (MATSim) vehicleType stored inside the (jsprit) vehicleType. -> create one from the available data of the (jsprit) vehicle type");
-			matsimVehicleType = createCarrierVehicleType(jspritVehicle.getType());
+			matsimVehicleType = createMatsimVehicleType(jspritVehicle.getType());
 		}
 		// yyyy
 
@@ -272,9 +277,9 @@ public final class MatsimJspritFactory {
 	 * setEngineInformation(engineInfo) from the returned object.
 	 *
 	 * @param jspritVehType to be transformed
-	 * @return CarrierVehicleType
+	 * @return MatsimVehicleType
 	 */
-	static VehicleType createCarrierVehicleType(com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritVehType) {
+	static VehicleType createMatsimVehicleType(com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritVehType) {
 		VehicleType matsimVehicleType = VehicleUtils.getFactory().createVehicleType(Id.create(jspritVehType.getTypeId(), VehicleType.class));
 		matsimVehicleType.getCapacity().setWeightInTons(jspritVehType.getCapacityDimensions().get(0));
 		matsimVehicleType.getCostInformation().setCostsPerMeter(jspritVehType.getVehicleCostParams().perDistanceUnit);
@@ -289,8 +294,10 @@ public final class MatsimJspritFactory {
 	/**
 	 * Creates a jsprit {@link com.graphhopper.jsprit.core.problem.vehicle.VehicleType} from a MATSin
 	 * {@link VehicleType}.
+	 * @param matsimVehicleType The (MATSim) {@link VehicleType} that should be converted
+	 * @return {@link com.graphhopper.jsprit.core.problem.vehicle.VehicleType} The jsprit VehicleType
 	 */
-	static com.graphhopper.jsprit.core.problem.vehicle.VehicleType createVehicleType(VehicleType matsimVehicleType) {
+	static com.graphhopper.jsprit.core.problem.vehicle.VehicleType createJspritVehicleType(VehicleType matsimVehicleType) {
 		if (matsimVehicleType == null)
 			throw new IllegalStateException("carrierVehicleType is null");
 		VehicleTypeImpl.Builder jspritVehTypeBuilder = VehicleTypeImpl.Builder
@@ -344,7 +351,7 @@ public final class MatsimJspritFactory {
 	 * @return ScheduledTour
 	 * @throws IllegalStateException if tourActivity is NOT {@link ServiceActivity}.
 	 */
-	static ScheduledTour createTour(VehicleRoute jspritRoute, Id<Tour> tourId) {
+	static ScheduledTour createScheduledTour(VehicleRoute jspritRoute, Id<Tour> tourId) {
 		// have made this non-public for the time being since it is nowhere used within the freight contrib, and we might want to add the
 		// vehicle types as argument.  If this is publicly used, please move back to public.  kai, jan'22
 
@@ -408,7 +415,7 @@ public final class MatsimJspritFactory {
 		double depTime = scheduledTour.getDeparture();
 		Tour tour = scheduledTour.getTour();
 		Id<org.matsim.vehicles.Vehicle> vehicleId = carrierVehicle.getId();
-		Vehicle jspritVehicle = getVehicle(vehicleId.toString(), vehicleRoutingProblem);
+		Vehicle jspritVehicle = getJspritVehicle(vehicleId.toString(), vehicleRoutingProblem);
 		if (jspritVehicle == null)
 			throw new IllegalStateException("jsprit-vehicle to id=" + vehicleId + " is missing");
 
@@ -441,7 +448,7 @@ public final class MatsimJspritFactory {
 		return jspritRoute;
 	}
 
-	private static Vehicle getVehicle(String id, VehicleRoutingProblem vehicleRoutingProblem) {
+	private static Vehicle getJspritVehicle(String id, VehicleRoutingProblem vehicleRoutingProblem) {
 		for (Vehicle vehicle : vehicleRoutingProblem.getVehicles()) {
 			if (vehicle.getId().equals(id))
 				return vehicle;
@@ -495,7 +502,7 @@ public final class MatsimJspritFactory {
 				coordinate = link.getCoord();
 			} else
 				log.warn("cannot find linkId " + carrierVehicle.getId());
-			Vehicle veh = createVehicle(carrierVehicle, coordinate);
+			Vehicle veh = createJspritVehicle(carrierVehicle, coordinate);
 
 			if (veh.getEarliestDeparture() != carrierVehicle.getEarliestStartTime())
 				throw new AssertionError("earliestDeparture of both vehicles must be equal");
@@ -517,7 +524,7 @@ public final class MatsimJspritFactory {
 					} else
 						log.warn("cannot find linkId " + service.getLocationLinkId());
 				}
-				vrpBuilder.addJob(createService(service, coordinate));
+				vrpBuilder.addJob(createJspritService(service, coordinate));
 			}
 		}
 
@@ -533,14 +540,14 @@ public final class MatsimJspritFactory {
 						// specified location
 						fromCoordinate = fromLink.getCoord();
 						toCoordinate = toLink.getCoord();
-						vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+						vrpBuilder.addJob(createJspritShipment(carrierShipment, fromCoordinate, toCoordinate));
 					} else
 						throw new IllegalStateException(
 								"cannot create shipment since neither fromLinkId " + carrierShipment.getTo()
 										+ " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
 
 				}
-				vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+				vrpBuilder.addJob(createJspritShipment(carrierShipment, fromCoordinate, toCoordinate));
 			}
 		}
 
@@ -599,7 +606,7 @@ public final class MatsimJspritFactory {
 				coordinate = link.getCoord();
 			} else
 				log.warn("cannot find linkId " + carrierVehicle.getId());
-			vrpBuilder.addVehicle(createVehicle(carrierVehicle, coordinate));
+			vrpBuilder.addVehicle(createJspritVehicle(carrierVehicle, coordinate));
 		}
 
 		if (serviceInVrp) {
@@ -614,7 +621,7 @@ public final class MatsimJspritFactory {
 					} else
 						coordinate = link.getCoord();
 				}
-				vrpBuilder.addJob(createService(service, coordinate));
+				vrpBuilder.addJob(createJspritService(service, coordinate));
 			}
 		}
 
@@ -638,7 +645,7 @@ public final class MatsimJspritFactory {
 								+ carrierShipment.getTo() + " exists in network.");
 
 				}
-				vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+				vrpBuilder.addJob(createJspritShipment(carrierShipment, fromCoordinate, toCoordinate));
 			}
 		}
 
@@ -682,7 +689,7 @@ public final class MatsimJspritFactory {
 		} else
 			capabilityBuilder.setFleetSize(org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize.INFINITE);
 		for (com.graphhopper.jsprit.core.problem.vehicle.VehicleType type : vrp.getTypes()) {
-			capabilityBuilder.addType(createCarrierVehicleType(type));
+			capabilityBuilder.addType(createMatsimVehicleType(type));
 		}
 		for (Vehicle vehicle : vrp.getVehicles()) {
 			capabilityBuilder.addVehicle(createCarrierVehicle(vehicle));
@@ -706,7 +713,7 @@ public final class MatsimJspritFactory {
 		Collection<ScheduledTour> tours = new ArrayList<>();
 		int tourIdIndex = 1;
 		for (VehicleRoute route : solution.getRoutes()) {
-			ScheduledTour scheduledTour = createTour(route, Id.create(tourIdIndex, Tour.class));
+			ScheduledTour scheduledTour = createScheduledTour(route, Id.create(tourIdIndex, Tour.class));
 			tourIdIndex++;
 			tours.add(scheduledTour);
 		}
