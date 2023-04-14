@@ -4,22 +4,20 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
-import org.matsim.contrib.drt.extension.operations.shifts.analysis.*;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
-import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
-import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
-import org.matsim.contrib.drt.extension.operations.shifts.io.OperationFacilitiesReader;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesSpecification;
-import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesSpecificationImpl;
+import org.matsim.contrib.drt.extension.operations.shifts.analysis.*;
+import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftStayTask;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -91,22 +89,13 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 			}).asEagerSingleton();
 		}
 
-		OperationFacilitiesParams operationFacilitiesParams = drtOperationsParams.getOperationFacilitiesParams().orElseThrow();
-		if (operationFacilitiesParams.operationFacilityInputFile != null) {
-			bindModal(OperationFacilitiesSpecification.class).toProvider(() -> {
-				OperationFacilitiesSpecification operationFacilitiesSpecification = new OperationFacilitiesSpecificationImpl();
-				new OperationFacilitiesReader(operationFacilitiesSpecification)
-						.readURL(operationFacilitiesParams.getOperationFacilityInputUrl(getConfig().getContext()));
-				return operationFacilitiesSpecification;
-			}).asEagerSingleton();
-		}
-
 		bindModal(ShiftDurationXY.class).toProvider(modalProvider(
-				getter -> new ShiftDurationXY(() -> getter.getModal(DrtShiftsSpecification.class))
+				getter -> new ShiftDurationXY(getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}))
 		)).asEagerSingleton();
 
 		bindModal(BreakCorridorXY.class).toProvider(modalProvider(
-				getter -> new BreakCorridorXY(() -> getter.getModal(DrtShiftsSpecification.class)))).asEagerSingleton();
+				getter -> new BreakCorridorXY(getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}))
+		)).asEagerSingleton();
 
 		bindModal(ShiftHistogram.class).toProvider(modalProvider(
 				getter -> new ShiftHistogram(getter.get(Population.class), getter.get(Config.class)))).asEagerSingleton();
@@ -125,7 +114,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DumpShiftDataAtEndImpl.class).toProvider(modalProvider(
 				getter -> new DumpShiftDataAtEndImpl(
-						(Provider<DrtShiftsSpecification>) () -> getter.getModal(DrtShiftsSpecification.class),
+						getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}),
 						getter.getModal(OperationFacilitiesSpecification.class),
 						getter.get(OutputDirectoryHierarchy.class)
 				))
