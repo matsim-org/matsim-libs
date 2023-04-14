@@ -42,7 +42,7 @@ public final class RunDiscreteModeChoiceExample{
 		config.plansCalcRoute().addTeleportedModeParams( new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(4./3.6 ) );
 
 		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeB ).setConstant( 13. ) );
-		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeC ).setConstant( 13. ) );
+		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeC ).setConstant( 12. ) );
 
 		// the following is first inlined and then adapted from DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement( config );
 		config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DiscreteModeChoiceModule.STRATEGY_NAME ).setWeight( 1. ) );
@@ -64,7 +64,7 @@ public final class RunDiscreteModeChoiceExample{
 				// (This sets the constraints explicitly.  Can be configured with the next two options. Since backwards compatibility
 				// with the old subtour mode choice behavior is not important for us, we remove the related constraint.)
 				{
-					dmcConfig.getVehicleTourConstraintConfig().setRestrictedModes( CollectionUtils.stringArrayToSet( new String[]{TransportMode.car, modeB, modeC } ) );
+					dmcConfig.getVehicleTourConstraintConfig().setRestrictedModes( CollectionUtils.stringArrayToSet( new String[]{TransportMode.car } ) );
 					// (config group for VehicleTourConstraint.  Vehicles in these modes need to be conserved.)
 
 //					dmcConfig.getSubtourConstraintConfig().setConstrainedModes( CollectionUtils.stringArrayToSet( modes ) );
