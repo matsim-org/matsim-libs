@@ -288,7 +288,7 @@ public final class MatsimJspritFactory {
 	}
 
 	/**
-	 * Creates a MATSim {@link VehicleType} from a jspirt
+	 * Creates a MATSim {@link VehicleType} from a jsprit
 	 * {@link com.graphhopper.jsprit.core.problem.vehicle.VehicleType}.
 	 *
 	 * <p>
@@ -343,13 +343,13 @@ public final class MatsimJspritFactory {
 		if (VehicleUtils.getCostsPerSecondInService(matsimVehicleType.getCostInformation()) != null) {
 			jspritVehTypeBuilder.setCostPerServiceTime(VehicleUtils.getCostsPerSecondInService(matsimVehicleType.getCostInformation()));
 		} else {
-			log.info("Costs per service time is not set in VehicleType attributes. Will use the value of costsPerMeter instead. VehicleTypeId: " + matsimVehicleType.getId());
+			log.info("'costsPerSecondInService' is not set in VehicleType attributes. Will use the value of 'costsPerSecond' instead. VehicleTypeId: " + matsimVehicleType.getId());
 			jspritVehTypeBuilder.setCostPerServiceTime(matsimVehicleType.getCostInformation().getCostsPerSecond());
 		}
 		if (VehicleUtils.getCostsPerSecondWaiting(matsimVehicleType.getCostInformation()) != null) {
 			jspritVehTypeBuilder.setCostPerWaitingTime(VehicleUtils.getCostsPerSecondWaiting(matsimVehicleType.getCostInformation()));
 		} else {
-			log.info("Costs per waiting time is not set in VehicleType attributes. Will use the value of costsPerMeter instead. VehicleTypeId: " + matsimVehicleType.getId());
+			log.info("'costsPerSecondWaiting' is not set in VehicleType attributes. Will use the value of 'costsPerSecond' instead. VehicleTypeId: " + matsimVehicleType.getId());
 			jspritVehTypeBuilder.setCostPerWaitingTime(matsimVehicleType.getCostInformation().getCostsPerSecond());
 		}
 		jspritVehTypeBuilder.setFixedCost(matsimVehicleType.getCostInformation().getFixedCosts());
@@ -728,10 +728,10 @@ public final class MatsimJspritFactory {
 	 */
 	public static CarrierPlan createPlan(Carrier carrier, VehicleRoutingProblemSolution solution) {
 		Collection<ScheduledTour> tours = new ArrayList<>();
-		int tourIdindex = 1;
+		int tourIdIndex = 1;
 		for (VehicleRoute route : solution.getRoutes()) {
-			ScheduledTour scheduledTour = createTour(route, Id.create(tourIdindex, Tour.class));
-			tourIdindex++;
+			ScheduledTour scheduledTour = createTour(route, Id.create(tourIdIndex, Tour.class));
+			tourIdIndex++;
 			tours.add(scheduledTour);
 		}
 		CarrierPlan carrierPlan = new CarrierPlan(carrier, tours);
