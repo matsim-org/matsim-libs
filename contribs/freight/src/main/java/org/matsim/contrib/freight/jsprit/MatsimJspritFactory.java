@@ -415,7 +415,13 @@ public final class MatsimJspritFactory {
 		double depTime = scheduledTour.getDeparture();
 		Tour tour = scheduledTour.getTour();
 		Id<org.matsim.vehicles.Vehicle> vehicleId = carrierVehicle.getId();
-		Vehicle jspritVehicle = getJspritVehicle(vehicleId.toString(), vehicleRoutingProblem);
+		Vehicle jspritVehicle = null;
+		for (Vehicle vehicle : vehicleRoutingProblem.getVehicles()) {
+			if (vehicle.getId().equals(vehicleId.toString())) {
+				jspritVehicle = vehicle;
+				break;
+			}
+		}
 		if (jspritVehicle == null)
 			throw new IllegalStateException("jsprit-vehicle to id=" + vehicleId + " is missing");
 
@@ -446,14 +452,6 @@ public final class MatsimJspritFactory {
 		if (jspritRoute.getDepartureTime() != scheduledTour.getDeparture())
 			throw new AssertionError("departureTimes of both routes must be equal");
 		return jspritRoute;
-	}
-
-	private static Vehicle getJspritVehicle(String id, VehicleRoutingProblem vehicleRoutingProblem) {
-		for (Vehicle vehicle : vehicleRoutingProblem.getVehicles()) {
-			if (vehicle.getId().equals(id))
-				return vehicle;
-		}
-		return null;
 	}
 
 	/**
