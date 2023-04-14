@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.run;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
@@ -101,10 +102,11 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		bindModal(ShiftDurationXY.class).toProvider(modalProvider(
-				getter -> new ShiftDurationXY(getter.getModal(DrtShiftsSpecification.class)))).asEagerSingleton();
+				getter -> new ShiftDurationXY(() -> getter.getModal(DrtShiftsSpecification.class))
+		)).asEagerSingleton();
 
 		bindModal(BreakCorridorXY.class).toProvider(modalProvider(
-				getter -> new BreakCorridorXY(getter.getModal(DrtShiftsSpecification.class)))).asEagerSingleton();
+				getter -> new BreakCorridorXY(() -> getter.getModal(DrtShiftsSpecification.class)))).asEagerSingleton();
 
 		bindModal(ShiftHistogram.class).toProvider(modalProvider(
 				getter -> new ShiftHistogram(getter.get(Population.class), getter.get(Config.class)))).asEagerSingleton();
@@ -123,7 +125,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DumpShiftDataAtEndImpl.class).toProvider(modalProvider(
 				getter -> new DumpShiftDataAtEndImpl(
-						getter.getModal(DrtShiftsSpecification.class),
+						(Provider<DrtShiftsSpecification>) () -> getter.getModal(DrtShiftsSpecification.class),
 						getter.getModal(OperationFacilitiesSpecification.class),
 						getter.get(OutputDirectoryHierarchy.class)
 				))
@@ -132,7 +134,6 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> getter.getModal(DumpShiftDataAtEndImpl.class)
 		));
-
 		bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
 						300, getter.get(QSimConfigGroup.class), ImmutableSet.of(DrtDriveTask.TYPE,

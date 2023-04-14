@@ -31,11 +31,12 @@ public class DrtShiftEfficiencyModeModule extends AbstractDvrpModeModule {
         bindModal(ShiftEfficiencyTracker.class).toProvider(modalProvider(getter ->
                 new ShiftEfficiencyTracker())).asEagerSingleton();
         addEventHandlerBinding().to(modalKey(ShiftEfficiencyTracker.class));
-        addControlerListenerBinding().toProvider(modalProvider(
-                getter -> new ShiftEfficiencyAnalysisControlerListener(drtConfigGroup,
-                        getter.getModal(ShiftEfficiencyTracker.class),
-                        getter.getModal(DrtShiftsSpecification.class),
-                        getter.get(MatsimServices.class)))).asEagerSingleton();
-
+		bindModal(ShiftEfficiencyAnalysisControlerListener.class).toProvider(modalProvider(getter ->
+						new ShiftEfficiencyAnalysisControlerListener(drtConfigGroup,
+								getter.getModal(ShiftEfficiencyTracker.class),
+								() -> getter.getModal(DrtShiftsSpecification.class),
+								getter.get(MatsimServices.class))
+		));
+        addControlerListenerBinding().to(modalKey(ShiftEfficiencyAnalysisControlerListener.class));
     }
 }
