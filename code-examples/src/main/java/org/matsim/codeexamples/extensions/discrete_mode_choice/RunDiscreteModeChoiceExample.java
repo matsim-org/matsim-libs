@@ -2,14 +2,18 @@ package org.matsim.codeexamples.extensions.discrete_mode_choice;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contribs.discrete_mode_choice.model.mode_availability.DefaultModeAvailability;
 import org.matsim.contribs.discrete_mode_choice.modules.*;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -38,7 +42,7 @@ public final class RunDiscreteModeChoiceExample{
 		config.plansCalcRoute().addTeleportedModeParams( new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(4./3.6 ) );
 
 		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeB ).setConstant( 13. ) );
-		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeC ).setConstant( 12. ) );
+		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeC ).setConstant( 13. ) );
 
 		// the following is first inlined and then adapted from DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement( config );
 		config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DiscreteModeChoiceModule.STRATEGY_NAME ).setWeight( 1. ) );
@@ -60,7 +64,7 @@ public final class RunDiscreteModeChoiceExample{
 				// (This sets the constraints explicitly.  Can be configured with the next two options. Since backwards compatibility
 				// with the old subtour mode choice behavior is not important for us, we remove the related constraint.)
 				{
-					dmcConfig.getVehicleTourConstraintConfig().setRestrictedModes( CollectionUtils.stringArrayToSet( new String[]{TransportMode.car} ) );
+					dmcConfig.getVehicleTourConstraintConfig().setRestrictedModes( CollectionUtils.stringArrayToSet( new String[]{TransportMode.car, modeB, modeC } ) );
 					// (config group for VehicleTourConstraint.  Vehicles in these modes need to be conserved.)
 
 //					dmcConfig.getSubtourConstraintConfig().setConstrainedModes( CollectionUtils.stringArrayToSet( modes ) );
@@ -79,7 +83,7 @@ public final class RunDiscreteModeChoiceExample{
 				dmcConfig.setModeAvailability( ModeAvailabilityModule.DEFAULT );
 				// (do not consider car availability.  If one looks into the code, this is in fact cleverly programmed as a user-replaceable guice binding.)
 
-				dmcConfig.getDefaultModeAvailabilityConfig().setAvailableModes( CollectionUtils.stringArrayToSet( new String[]{TransportMode.car, modeB, modeC} ) );
+				dmcConfig.getDefaultModeAvailabilityConfig().setAvailableModes( CollectionUtils.stringArrayToSet( new String[]{TransportMode.car, modeB, modeC } ) );
 				// (_If_ default mode availability is configured above, this configures which modes this will include.  Other modes will not
 				// be considered.  So if one removes modeC above, it will no longer be considered.)
 			}
@@ -90,6 +94,15 @@ public final class RunDiscreteModeChoiceExample{
 		Controler controler = new Controler( scenario );
 
 		controler.addOverridingModule( new DiscreteModeChoiceModule() );
+
+//		controler.addOverridingModule( new AbstractModule(){
+//			@Override public void install(){
+//				bindModeAvailability(DEFAULT).to( DefaultModeAvailability.class );
+//;
+//			}
+//		} )
+
+//		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run() ;
 
