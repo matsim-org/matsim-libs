@@ -72,30 +72,6 @@ public final class MatsimJspritFactory {
 	@SuppressWarnings("unused")
 	private static final  Logger log = LogManager.getLogger(MatsimJspritFactory.class);
 
-	// How to deal with a multi-depot VRP? Which depotLink should be used? kmt
-	// jul/18
-
-	/**
-	 * Creates (MATSim) CarrierShipment from a (jsprit) service
-	 *
-	 * @param service   to be transformed to Shipment
-	 * @param depotLink as from-link for Shipment
-	 * @return CarrierShipment
-	 * @see CarrierShipment, Service
-	 */
-	static CarrierShipment createCarrierShipmentFromService(Service service, String depotLink) {
-		CarrierShipment carrierShipment = CarrierShipment.Builder
-				.newInstance(Id.create(service.getId(), CarrierShipment.class), Id.create(depotLink, Link.class),
-						Id.create(service.getLocation().getId(), Link.class), service.getSize().get(0))
-				.setDeliveryServiceTime(service.getServiceDuration())
-				.setDeliveryTimeWindow(
-						TimeWindow.newInstance(service.getTimeWindow().getStart(), service.getTimeWindow().getEnd()))
-				.build();
-		for (String skill : service.getRequiredSkills().values()) {
-			FreightUtils.addSkill(carrierShipment, skill);
-		}
-		return carrierShipment;
-	}
 
 	/**
 	 * Creates (MATSim) {@link CarrierShipment} from a (jsprit) {@link Shipment}
