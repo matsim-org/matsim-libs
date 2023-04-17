@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.matsim.contrib.util.random.RandomUtils;
-import org.matsim.contrib.util.random.UniformRandom;
+import org.matsim.contrib.common.util.random.RandomUtils;
+import org.matsim.contrib.common.util.random.UniformRandom;
 
 /**
  * @author michalm

@@ -25,8 +25,8 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.matsim.contrib.util.random.RandomUtils;
-import org.matsim.contrib.util.random.UniformRandom;
+import org.matsim.contrib.common.util.random.RandomUtils;
+import org.matsim.contrib.common.util.random.UniformRandom;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class RandomPointUtils {

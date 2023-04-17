@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SSReorderPolicyTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util.random;
+package org.matsim.contrib.freightreceiver;
 
-import org.apache.commons.math3.random.*;
 
-/**
- * Based on org.matsim.core.gbl.MatsimRandom
- */
-public class RandomUtils {
-	public static final int DEFAULT_SEED = 4357;
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
-	private static final RandomGenerator rg = new MersenneTwister(DEFAULT_SEED);
+public class SSReorderPolicyTest {
 
-	private static final UniformRandom uniform = new UniformRandom(rg);
-
-	public static void reset() {
-		reset(DEFAULT_SEED);
+	@Test
+	public void testCalculateOrderQuantity() {
+		ReorderPolicy policy = ReceiverUtils.createSSReorderPolicy(5.0, 10.0);
+		Assert.assertEquals("Wrong reorder quantity", 0.0, policy.calculateOrderQuantity(6.0), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong reorder quantity", 5.0, policy.calculateOrderQuantity(5.0), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong reorder quantity", 6.0, policy.calculateOrderQuantity(4.0), MatsimTestUtils.EPSILON);
 	}
 
-	public static void reset(final int seed) {
-		rg.setSeed(seed);
-	}
-
-	public static RandomGenerator getGlobalGenerator() {
-		return rg;
-	}
-
-	public static UniformRandom getGlobalUniform() {
-		return uniform;
-	}
-
-	/**
-	 * Returns an instance of a random number generator, which can be used locally, e.g. in threads.
-	 */
-	public static RandomGenerator getLocalGenerator() {
-		return new MersenneTwister(rg.nextInt());
-	}
 }

@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util.random;
+package org.matsim.contrib.common.util.random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,6 +24,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.contrib.common.util.random.UniformRandom;
+import org.matsim.contrib.common.util.random.WeightedRandomSelection;
 
 /**
  * @author michalm
