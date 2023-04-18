@@ -8,6 +8,7 @@
  */
 package org.matsim.contrib.simulatedannealing;
 
+import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -25,15 +26,13 @@ import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.contrib.simulatedannealing.temperature.NonMonotonicAdaptiveTemperatureFunction;
 import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
 
-import java.util.Random;
-
 /**
  * @author nkuehnel / MOIA
  */
 public class SimulatedAnnealingTest {
 
 
-	private final Random r = new Random(42);
+	private final MersenneTwister r = new MersenneTwister(42);
 
 	@Test
 	public void testSimulatedAnnealing() {
@@ -55,7 +54,7 @@ public class SimulatedAnnealingTest {
 
 		SimulatedAnnealing<String> simulatedAnnealing = new SimulatedAnnealing<>(costCalculator, acceptor, perturbator, "mistam", temperatureFunction, simAnCfg);
 
-		for (int i = 0; i < 520; i++) {
+		for (int i = 0; i < 1125; i++) {
 			simulatedAnnealing.notifyBeforeMobsim(new BeforeMobsimEvent(null, i, false));
 			simulatedAnnealing.notifyAfterMobsim(new AfterMobsimEvent(null, i, false));
 		}
@@ -82,7 +81,7 @@ public class SimulatedAnnealingTest {
 		};
 	}
 
-	private char randomCharacter(Random r) {
+	private char randomCharacter(MersenneTwister r) {
 		return (char) (r.nextInt(26) + 'a');
 	}
 
