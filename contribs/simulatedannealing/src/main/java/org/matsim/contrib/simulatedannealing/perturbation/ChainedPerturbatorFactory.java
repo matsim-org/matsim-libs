@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * @author nkuehnel / MOIA
  */
-public class ChainedPeturbatorFactory<T> implements PerturbatorFactory<T> {
+public class ChainedPerturbatorFactory<T> implements PerturbatorFactory<T> {
 
 
 	private final List<PerturbatorFactory<T>> perturbatorFactories;
@@ -30,7 +30,7 @@ public class ChainedPeturbatorFactory<T> implements PerturbatorFactory<T> {
 
 	private final double initialTemperature;
 
-	private ChainedPeturbatorFactory(Map<PerturbatorFactory<T>, Double> perturbatorFactories,
+	private ChainedPerturbatorFactory(LinkedHashMap<PerturbatorFactory<T>, Double> perturbatorFactories,
 									 int minPerturbations,
 									 int maxPerturbations,
 									 double initialTemperature) {
@@ -72,7 +72,7 @@ public class ChainedPeturbatorFactory<T> implements PerturbatorFactory<T> {
 
 	public static class Builder<T> {
 
-		private final Map<PerturbatorFactory<T>, Double> perturbatorFactories = new HashMap<>();
+		private final LinkedHashMap<PerturbatorFactory<T>, Double> perturbatorFactories = new LinkedHashMap<>();
 
 		private int maxPerturbations = 10;
 
@@ -100,8 +100,8 @@ public class ChainedPeturbatorFactory<T> implements PerturbatorFactory<T> {
 			return this;
 		}
 
-		public ChainedPeturbatorFactory<T> build() {
-			return new ChainedPeturbatorFactory<>(perturbatorFactories, minPerturbations, maxPerturbations, initialTemperature);
+		public ChainedPerturbatorFactory<T> build() {
+			return new ChainedPerturbatorFactory<>(perturbatorFactories, minPerturbations, maxPerturbations, initialTemperature);
 		}
 
 	}
