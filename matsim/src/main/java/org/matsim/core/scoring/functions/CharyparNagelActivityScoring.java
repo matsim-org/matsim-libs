@@ -23,6 +23,7 @@ package org.matsim.core.scoring.functions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -34,8 +35,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class CharyparNagelActivityScoring implements org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
 	private static final double INITIAL_SCORE = 0.0;
 
-	private double score = INITIAL_SCORE;
-
+	private Score score = new Score();
 
 	private static int firstLastActWarning = 0;
 	private static short firstLastActOpeningTimesWarning = 0;
@@ -71,10 +71,18 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 	@Override
 	public double getScore() {
-		return this.score;
+		return this.score.act + this.score.actWaiting + this.score.actLateArrival + this.score.actEarlyDeparture;
 	}
 
-	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
+	@Override
+	public void explainScore(StringBuilder out) {
+		out.append("act=").append(this.score.act).append(ScoringFunction.SCORE_DELIMITER);
+		out.append("actWaiting=").append(this.score.actWaiting).append(ScoringFunction.SCORE_DELIMITER);
+		out.append("actLateArrival=").append(this.score.actLateArrival).append(ScoringFunction.SCORE_DELIMITER);
+		out.append("actEarlyDeparture=").append(this.score.actEarlyDeparture);
+	}
+
+	protected Score calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
@@ -82,7 +90,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 					"(module name=\"planCalcScore\" in the config file).");
 		}
 
-		double tmpScore = 0.0;
+		Score tmpScore = new Score();
 
 		if (actParams.isScoreAtAll()) {
 			/* Calculate the times the agent actually performs the
@@ -138,14 +146,14 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			// disutility if too early
 			if (arrivalTime < activityStart) {
 				// agent arrives to early, has to wait
-				tmpScore += this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime);
+				tmpScore.actWaiting += this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime);
 			}
 
 			// disutility if too late
 
 			OptionalTime latestStartTime = actParams.getLatestStartTime();
 			if (latestStartTime.isDefined() && (activityStart > latestStartTime.seconds())) {
-				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime.seconds());
+				tmpScore.actLateArrival += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime.seconds());
 			}
 
 			// utility of performing an action, duration is >= 1, thus log is no problem
@@ -156,16 +164,16 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 					double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 							* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
 					double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
-					tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+					tmpScore.act += Math.max(0, Math.max(utilPerf, utilWait));
 				} else {
-					tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
+					tmpScore.actLateArrival += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
 				}
 			} else {
 				if ( duration >= 3600.*actParams.getZeroUtilityDuration_h() ) {
 					double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 							* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
 					// also removing the "wait" alternative scoring.
-					tmpScore += utilPerf ;
+					tmpScore.act += utilPerf ;
 				} else {
 //					if ( wrnCnt < 1 ) {
 //						wrnCnt++ ;
@@ -188,7 +196,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 					if ( durationUnderrun < 0. ) {
 						throw new RuntimeException( "durationUnderrun < 0; this should not happen ...") ;
 					}
-					tmpScore -= slopeAtZeroUtility * durationUnderrun ;
+					tmpScore.act -= slopeAtZeroUtility * durationUnderrun ;
 				}
 				
 			}
@@ -196,18 +204,18 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			// disutility if stopping too early
 			OptionalTime earliestEndTime = actParams.getEarliestEndTime();
 			if ((earliestEndTime.isDefined()) && (activityEnd < earliestEndTime.seconds())) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime.seconds() - activityEnd);
+				tmpScore.actEarlyDeparture += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime.seconds() - activityEnd);
 			}
 
 			// disutility if going to away to late
 			if (activityEnd < departureTime) {
-				tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
+				tmpScore.actWaiting += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
 			}
 
 			// disutility if duration was too short
 			OptionalTime minimalDuration = actParams.getMinimalDuration();
 			if ((minimalDuration.isDefined()) && (duration < minimalDuration.seconds())) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration.seconds() - duration);
+				tmpScore.actEarlyDeparture += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration.seconds() - duration);
 			}
 		}
 		return tmpScore;
@@ -236,9 +244,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 				}
 			}
 
-			double calcActScore = calcActScore(lastActivity.getStartTime().seconds(),
+			Score calcActScore = calcActScore(lastActivity.getStartTime().seconds(),
 					this.firstActivity.getEndTime().seconds() + 24 * 3600, lastActivity);
-			this.score += calcActScore; // SCENARIO_DURATION
+			this.score.add(calcActScore); // SCENARIO_DURATION
 		} else {
 			// the first Act and the last Act have NOT the same type:
 			if (this.params.scoreActs) {
@@ -257,10 +265,10 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 				}
 
 				// score first activity
-				this.score += calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity);
+				this.score.add(calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity));
 				// score last activity
-				this.score += calcActScore(lastActivity.getStartTime().seconds(),
-						this.params.simulationPeriodInDays * 24 * 3600, lastActivity);
+				this.score.add(calcActScore(lastActivity.getStartTime().seconds(),
+						this.params.simulationPeriodInDays * 24 * 3600, lastActivity));
 			}
 		}
 	}
@@ -268,7 +276,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 	private void handleMorningActivity() {
 		assert firstActivity != null;
 		// score first activity
-		this.score += calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity);
+		this.score.add(calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity));
 	}
 
 	@Override
@@ -279,13 +287,30 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 	@Override
 	public void handleActivity(Activity act) {
-		this.score += calcActScore(act.getStartTime().seconds(), act.getEndTime().seconds(), act);
+		this.score.add(calcActScore(act.getStartTime().seconds(), act.getEndTime().seconds(), act));
 	}
 
 	@Override
 	public void handleLastActivity(Activity act) {
 		this.handleOvernightActivity(act);
 		this.firstActivity = null;
+	}
+
+
+	private static final class Score {
+
+		private double act = INITIAL_SCORE;
+		private double actWaiting = INITIAL_SCORE;
+		private double actLateArrival = INITIAL_SCORE;
+		private double actEarlyDeparture = INITIAL_SCORE;
+
+		private void add(Score s) {
+			act += s.act;
+			actWaiting += s.actWaiting;
+			actLateArrival += s.actLateArrival;
+			actEarlyDeparture += s.actEarlyDeparture;
+		}
+
 	}
 
 }

@@ -52,7 +52,7 @@ import org.matsim.pt.PtConstants;
  * <li>The parameter names in the config file are <i>not</i> changed in this way
  * since this would mean a public api change. kai, dec'10
  * </ul>
- * 
+ *
  * @author nagel
  *
  */
@@ -78,8 +78,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch";
 
+	private static final String EXPLAIN_SCORES = "explainScores";
+
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
-	
+
 	private boolean usesDeprecatedSyntax = false ;
 
 	public PlanCalcScoreConfigGroup() {
@@ -177,13 +179,13 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public String getValue(final String key) {
 		throw new IllegalArgumentException(key + ": getValue access disabled; use direct getter");
 	}
-	
+
 	private static final String msg = " is deprecated config syntax; please use the more " +
 								    "modern hierarchical format; your output_config.xml " +
 								    "will be in the correct version; the old version will fail eventually, since we want to reduce the " +
 								    "workload on this backwards compatibility (look into " +
 								    "PlanCalcScoreConfigGroup or PlanCalcRouteConfigGroup if you want to know what we mean).";
-	
+
 	@Override
 	public void addParam(final String key, final String value) {
 		testForLocked();
@@ -198,7 +200,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		else if (key.startsWith("activityType_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
-			
+
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityType_".length()));
 
 			actParams.setActivityType(value);
@@ -348,7 +350,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 //			log.warn( key + msg );
 //			usesDeprecatedSyntax = true ;
 			// this is the stuff with the default subpopulation
-			
+
 			getScoringParameters(null).addParam(key, value);
 		}
 
@@ -418,9 +420,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		map.put(WRITE_EXPERIENCED_PLANS,
 				"write a plans file in each iteration directory which contains what each agent actually did, and the score it received.");
 
+		map.put(EXPLAIN_SCORES,
+				 "Write detailed score composition into plan attributes after execution.");
+
 		return map;
 	}
-	
+
 	/*
 	 *
 	 * @returns a list of all Activities over all Subpopulations (if existent)
@@ -442,15 +447,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public Collection<String> getAllModes() {
 		if (getScoringParameters(null) != null) {
 			return getScoringParameters(null).getModes().keySet();
-			
+
 		} else {
 			Set<String> modes = new HashSet<>();
 			getScoringParametersPerSubpopulation().values().forEach(item -> modes.addAll(item.getModes().keySet()));
 			return modes;
 		}
-		
+
 	}
-	
+
 	public Collection<ActivityParams> getActivityParams() {
 		if (getScoringParameters(null) != null)
 			return getScoringParameters(null).getActivityParams();
@@ -469,8 +474,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			throw new RuntimeException("Default subpopulation is not defined");
 	}
 
-	
-	
+
+
 	public Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
 		@SuppressWarnings("unchecked")
 		final Collection<ScoringParameterSet> parameters = (Collection<ScoringParameterSet>) getParameterSets(
@@ -609,11 +614,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	@Override
 	protected final void checkConsistency(final Config config) {
 		super.checkConsistency(config);
-		
+
 		if ( usesDeprecatedSyntax && !config.global().isInsistingOnDeprecatedConfigVersion() ) {
 			throw new RuntimeException( msg ) ;
 		}
-		
+
 		if (getScoringParametersPerSubpopulation().size()>1){
 			if (!getScoringParametersPerSubpopulation().containsKey(PlanCalcScoreConfigGroup.DEFAULT_SUBPOPULATION)){
 				throw new RuntimeException("Using several subpopulations in "+PlanCalcScoreConfigGroup.GROUP_NAME+" requires defining a \""+PlanCalcScoreConfigGroup.DEFAULT_SUBPOPULATION+" \" subpopulation."
@@ -686,6 +691,14 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	public void setBrainExpBeta(double brainExpBeta) {
 		delegate.setBrainExpBeta(brainExpBeta);
+	}
+
+	public void setExplainScores(boolean value) {
+		delegate.setExplainScores(value);
+	}
+
+	public boolean isExplainScores() {
+		return delegate.isExplainScores();
 	}
 
 	public double getPathSizeLogitBeta() {
@@ -819,7 +832,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		// ActivityParams. I will try to pass the locked setting through the getters. kai, jun'15
 
 		public final static String SET_TYPE = "activityParams";
-		
+
 		// ---
 
 		private static final String TYPICAL_DURATION_SCORE_COMPUTATION = "typicalDurationScoreComputation";
@@ -1070,7 +1083,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		// ---
-		
+
 		static final String SCORING_THIS_ACTIVITY_AT_ALL = "scoringThisActivityAtAll";
 
 		private boolean scoringThisActivityAtAll = true;
@@ -1091,7 +1104,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public static class ModeParams extends ReflectiveConfigGroup implements MatsimParameters {
 
 		final static String SET_TYPE = "modeParams";
-		
+
 		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
 		private static final String MONETARY_DISTANCE_RATE_CMT = "[unit_of_money/m] conversion of distance into money. Normally negative.";
 
@@ -1101,12 +1114,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private static final String CONSTANT_CMT = "[utils] alternative-specific constant.  Normally per trip, but that is probably buggy for multi-leg trips.";
 
 		public static final String MODE = "mode";
-		
+
 		private static final String DAILY_MONETARY_CONSTANT = "dailyMonetaryConstant";
 		private static final String DAILY_MONETARY_CONSTANT_CMT = "[unit_of_money/day] Fixed cost of mode, per day.";
 
 		private static final String DAILY_UTILITY_CONSTANT = "dailyUtilityConstant";
-		
+
 		private String mode = null;
 		private double traveling = -6.0;
 		private double distance = 0.0;
@@ -1524,12 +1537,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@Override
 		public void checkConsistency(Config config) {
 			super.checkConsistency(config);
-			
-			
+
+
 			boolean hasOpeningAndClosingTime = false;
 			boolean hasOpeningTimeAndLatePenalty = false;
 
-	
+
 			// This cannot be done in ActivityParams (where it would make more
 			// sense),
 			// because some global properties are also checked
@@ -1584,6 +1597,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private Double fractionOfIterationsToStartScoreMSA = null;
 
 		private boolean usingOldScoringBelowZeroUtilityDuration = false;
+
+		private boolean explainScores = false;
 
 		@StringGetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
 		public Double getFractionOfIterationsToStartScoreMSA() {
@@ -1659,5 +1674,14 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.writeExperiencedPlans = writeExperiencedPlans;
 		}
 
+		@StringSetter(EXPLAIN_SCORES)
+		public void setExplainScores(boolean explainScores) {
+			this.explainScores = explainScores;
+		}
+
+		@StringGetter(EXPLAIN_SCORES)
+		public boolean isExplainScores() {
+			return explainScores;
+		}
 	}
 }

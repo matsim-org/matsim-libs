@@ -99,6 +99,11 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		return this.score;
 	}
 
+	@Override
+	public void explainScore(StringBuilder out) {
+		out.append("leg=").append(score);
+	}
+
 	private static int ccc=0 ;
 	
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {

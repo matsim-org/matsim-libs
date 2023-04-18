@@ -35,6 +35,12 @@ public final class SumScoringFunction implements ScoringFunction {
 	public interface BasicScoring {
 		void finish();
 		double getScore();
+
+		/**
+		 * @see ScoringFunction#explainScore(StringBuilder).
+		 */
+		default void explainScore(StringBuilder out) {
+		}
 	}
 
 	public interface ActivityScoring extends BasicScoring {
@@ -64,14 +70,14 @@ public final class SumScoringFunction implements ScoringFunction {
 	}
 
 	/**
-	 * NOTE: Despite its somewhat misleading name, only Events that at the same time implement HasPersonId are passed 
+	 * NOTE: Despite its somewhat misleading name, only Events that at the same time implement HasPersonId are passed
 	 * through this interface.  This excludes, in particular, LinkEnterEvent and LinkLeaveEvent.  This was done for performance reasons,
-	 * since passing those events to all handlers imposes a significant additional burden.  See comments in 
-	 * and implementation of the handleEvent 
+	 * since passing those events to all handlers imposes a significant additional burden.  See comments in
+	 * and implementation of the handleEvent
 	 * method in {@link EventsToScore}. (yyyyyy Those comments, and possibly also the events filtering, have gone
 	 * from EventsToScore in commit e718809884cac6a86bdc35ea2a03c10195d37c69 .  I don't know if the performance consequences
-	 * were tested.) 
-	 * 
+	 * were tested.)
+	 *
 	 * @author nagel
 	 */
 	public interface ArbitraryEventScoring extends BasicScoring {
@@ -177,6 +183,20 @@ public final class SumScoringFunction implements ScoringFunction {
 			score += contribution;
 		}
 		return score;
+	}
+
+
+	@Override
+	public void explainScore(StringBuilder out) {
+
+		for (BasicScoring s : basicScoringFunctions) {
+
+			// If something was already written, a delimiter needs to be placed
+			if (out.length() != 0)
+				out.append(SCORE_DELIMITER);
+
+			s.explainScore(out);
+		}
 	}
 
 	public void addScoringFunction(BasicScoring scoringFunction) {
