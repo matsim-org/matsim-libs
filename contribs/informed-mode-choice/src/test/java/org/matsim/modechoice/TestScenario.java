@@ -104,7 +104,7 @@ public class TestScenario extends MATSimApplication {
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 		imc.setModes(Set.of("car", "ride", "bike", "walk", "pt"));
 
-		config.planCalcScore().setExplainScores(true);
+//		config.planCalcScore().setExplainScores(true);
 
 		if (mc){
 			config.subtourModeChoice().setCoordDistance(50);
