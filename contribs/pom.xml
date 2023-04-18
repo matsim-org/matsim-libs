@@ -76,6 +76,7 @@
 		<module>emissions</module>
 		<module>eventsBasedPTRouter</module>
 		<module>freight</module>
+		<module>freightreceiver</module>
 		<module>hybridsim</module>
 		<module>informed-mode-choice</module>
 		<module>integration</module>
@@ -93,11 +94,12 @@
 		<module>sbb-extensions</module>
 		<module>shared_mobility</module>
 		<module>signals</module>
+		<module>simulatedannealing</module>
 		<module>socnetsim</module>
 		<module>sumo</module>
 		<module>taxi</module>
 		<module>vsp</module>
-	</modules>
+    </modules>
 
 	<dependencies>
 		<dependency>

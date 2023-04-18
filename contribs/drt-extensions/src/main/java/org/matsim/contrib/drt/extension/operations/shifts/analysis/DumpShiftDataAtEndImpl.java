@@ -10,6 +10,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
+import javax.inject.Provider;
+
 /**
  * Dumps DRT shift related data at end. Based on {@link org.matsim.core.controler.corelisteners.DumpDataAtEndImpl}
  *
@@ -18,13 +20,13 @@ import org.matsim.core.controler.listener.ShutdownListener;
 final public class DumpShiftDataAtEndImpl implements ShutdownListener {
 	private static final Logger log = LogManager.getLogger( DumpShiftDataAtEndImpl.class );
 
-	private final DrtShiftsSpecification shifts;
+	private final Provider<DrtShiftsSpecification> shifts;
 
 	private final OperationFacilitiesSpecification operationFacilities;
 
 	private final OutputDirectoryHierarchy controlerIO;
 
-	public DumpShiftDataAtEndImpl(DrtShiftsSpecification shifts, OperationFacilitiesSpecification operationFacilities, OutputDirectoryHierarchy controlerIO) {
+	public DumpShiftDataAtEndImpl(Provider<DrtShiftsSpecification> shifts, OperationFacilitiesSpecification operationFacilities, OutputDirectoryHierarchy controlerIO) {
 		this.shifts = shifts;
 		this.operationFacilities = operationFacilities;
 		this.controlerIO = controlerIO;
@@ -42,7 +44,7 @@ final public class DumpShiftDataAtEndImpl implements ShutdownListener {
 	private void dumpShiftPans() {
 		try {
 			if ( this.shifts!=null){
-				new DrtShiftsWriter(shifts).writeFile(this.controlerIO.getOutputFilename("output_shifts.xml.gz"));
+				new DrtShiftsWriter(shifts.get()).writeFile(this.controlerIO.getOutputFilename("output_shifts.xml.gz"));
 			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing shifts.", ee);

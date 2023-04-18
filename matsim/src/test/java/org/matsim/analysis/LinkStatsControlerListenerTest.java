@@ -46,17 +46,41 @@ import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.GZIPInputStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author mrieser
  */
 public class LinkStatsControlerListenerTest {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
-	
+	@Rule
+	public MatsimTestUtils util = new MatsimTestUtils();
+
+	@Test
+	public void testlinksOutputCSV() throws IOException {
+		String outputDirectory = util.getOutputDirectory();
+
+		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(10);
+		config.controler().setOutputDirectory(outputDirectory);
+		Controler c = new Controler(config);
+
+		c.run();
+
+		File csv = new File(outputDirectory, "output_links.csv.gz");
+
+		assertThat(csv).exists();
+
+		assertThat(new GZIPInputStream(new FileInputStream(csv)))
+				.asString(StandardCharsets.UTF_8)
+				.startsWith("link;from_node;to_node;length;freespeed;capacity;lanes;modes;vol_car;storageCapacityUsedInQsim;geometry");
+
+	}
+
 	@Test
 	public void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
@@ -80,7 +104,7 @@ public class LinkStatsControlerListenerTest {
 		// test defaults
 		Assert.assertEquals(10, config.linkStats().getWriteLinkStatsInterval());
 		Assert.assertEquals(5, config.linkStats().getAverageLinkStatsOverIterations());
-		
+
 		// now the real tests
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
@@ -104,10 +128,10 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertTrue(lscl.useVolumesOfIteration(19, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(20, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
-		
+
 		// change some values
-        config.linkStats().setWriteLinkStatsInterval(8);
-        config.linkStats().setAverageLinkStatsOverIterations(2);
+		config.linkStats().setWriteLinkStatsInterval(8);
+		config.linkStats().setAverageLinkStatsOverIterations(2);
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
@@ -130,10 +154,10 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(lscl.useVolumesOfIteration(19, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(20, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
-		
+
 		// change some values: averaging = 1
-        config.linkStats().setWriteLinkStatsInterval(5);
-        config.linkStats().setAverageLinkStatsOverIterations(1);
+		config.linkStats().setWriteLinkStatsInterval(5);
+		config.linkStats().setAverageLinkStatsOverIterations(1);
 		Assert.assertTrue(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
@@ -158,8 +182,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: averaging = 0
-        config.linkStats().setWriteLinkStatsInterval(5);
-        config.linkStats().setAverageLinkStatsOverIterations(0);
+		config.linkStats().setWriteLinkStatsInterval(5);
+		config.linkStats().setAverageLinkStatsOverIterations(0);
 		Assert.assertTrue(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
@@ -184,8 +208,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: interval = 0
-        config.linkStats().setWriteLinkStatsInterval(0);
-        config.linkStats().setAverageLinkStatsOverIterations(2);
+		config.linkStats().setWriteLinkStatsInterval(0);
+		config.linkStats().setAverageLinkStatsOverIterations(2);
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
@@ -208,10 +232,10 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(lscl.useVolumesOfIteration(19, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(20, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
-		
+
 		// change some values: interval equal averaging
-        config.linkStats().setWriteLinkStatsInterval(5);
-        config.linkStats().setAverageLinkStatsOverIterations(5);
+		config.linkStats().setWriteLinkStatsInterval(5);
+		config.linkStats().setAverageLinkStatsOverIterations(5);
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(2, 0));
@@ -236,8 +260,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertTrue(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: averaging > interval
-        config.linkStats().setWriteLinkStatsInterval(5);
-        config.linkStats().setAverageLinkStatsOverIterations(6);
+		config.linkStats().setWriteLinkStatsInterval(5);
+		config.linkStats().setAverageLinkStatsOverIterations(6);
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(2, 0));
@@ -260,10 +284,10 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertTrue(lscl.useVolumesOfIteration(19, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(20, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(21, 0));
-		
+
 		// change some values: different firstIteration
-        config.linkStats().setWriteLinkStatsInterval(5);
-        config.linkStats().setAverageLinkStatsOverIterations(3);
+		config.linkStats().setWriteLinkStatsInterval(5);
+		config.linkStats().setAverageLinkStatsOverIterations(3);
 		Assert.assertFalse(lscl.useVolumesOfIteration(4, 4));
 		Assert.assertFalse(lscl.useVolumesOfIteration(5, 4));
 		Assert.assertFalse(lscl.useVolumesOfIteration(6, 4));
@@ -283,15 +307,15 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertTrue(lscl.useVolumesOfIteration(20, 4));
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 4));
 	}
-	
+
 	@Test
 	public void test_writeLinkStatsInterval() {
 		Config config = this.util.loadConfig((String) null);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
-		
+
 		lsConfig.setWriteLinkStatsInterval(3);
 		lsConfig.setAverageLinkStatsOverIterations(1);
-		
+
 		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -305,12 +329,12 @@ public class LinkStatsControlerListenerTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
 
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
-		
+
 		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
@@ -320,7 +344,7 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
 	}
-	
+
 	@Test
 	public void testReset_CorrectlyExecuted() throws IOException {
 		Config config = this.util.loadConfig((String) null);
@@ -329,7 +353,7 @@ public class LinkStatsControlerListenerTest {
 		config.controler().setLastIteration(7);
 		config.controler().setWritePlansInterval(0);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
-		
+
 		lsConfig.setWriteLinkStatsInterval(3);
 		lsConfig.setAverageLinkStatsOverIterations(2);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -349,11 +373,11 @@ public class LinkStatsControlerListenerTest {
 			}
 		});
 
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
-		
+
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
@@ -362,7 +386,7 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.5/5.linkstats.txt.gz").exists());
 		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
-		
+
 		double[] volumes = getVolumes(config.controler().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt");
 		Assert.assertEquals(3, volumes[0], 1e-8);
 		Assert.assertEquals(3.5, volumes[1], 1e-8);
@@ -372,30 +396,32 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertEquals(6.5, volumes[1], 1e-8);
 		Assert.assertEquals(7, volumes[2], 1e-8);
 	}
-	
+
 	private double[] getVolumes(final String filename) throws IOException {
 		BufferedReader reader = IOUtils.getBufferedReader(filename);
 		reader.readLine(); // header
 		String line = reader.readLine(); // link 100
 		if (line == null) {
 			// should never happen...
-			return new double[] {Double.NaN, Double.NaN, Double.NaN};
+			return new double[]{Double.NaN, Double.NaN, Double.NaN};
 		}
 		String[] parts = line.split("\t");// [0] = linkId, [1] = matsim volume, [2] = real volume
-		return new double[] {
-				Double.parseDouble(parts[7]), // min	
-				Double.parseDouble(parts[8]),	// avg
-				Double.parseDouble(parts[9])	// max
+		return new double[]{
+				Double.parseDouble(parts[7]), // min
+				Double.parseDouble(parts[8]),    // avg
+				Double.parseDouble(parts[9])    // max
 		};
 	}
-	
+
 	private static class DummyMobsim implements Mobsim {
 		private final EventsManager eventsManager;
 		private final int nOfEvents;
+
 		public DummyMobsim(EventsManager eventsManager, final int nOfEvents) {
 			this.eventsManager = eventsManager;
 			this.nOfEvents = nOfEvents;
 		}
+
 		@Override
 		public void run() {
 			Id<Link> linkId = Id.create("100", Link.class);
@@ -409,7 +435,8 @@ public class LinkStatsControlerListenerTest {
 	private static class DummyMobsimFactory implements Provider<Mobsim> {
 		private int count = 1;
 
-		@Inject EventsManager eventsManager;
+		@Inject
+		EventsManager eventsManager;
 
 		@Override
 		public Mobsim get() {

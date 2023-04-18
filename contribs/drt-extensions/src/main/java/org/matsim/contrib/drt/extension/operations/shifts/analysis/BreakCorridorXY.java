@@ -12,6 +12,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
+import javax.inject.Provider;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -23,11 +24,11 @@ import java.util.Map;
  */
 public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
-    private final DrtShiftsSpecification shifts;
+    private final Provider<DrtShiftsSpecification> shifts;
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakStart = new HashMap<>();
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakEnd = new HashMap<>();
 
-    public BreakCorridorXY(DrtShiftsSpecification shifts) {
+    public BreakCorridorXY(Provider<DrtShiftsSpecification> shifts) {
         super();
         this.shifts = shifts;
         reset(0);
@@ -37,14 +38,14 @@ public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShi
 
     @Override
     public void handleEvent(DrtShiftBreakStartedEvent event) {
-        final DrtShiftBreakSpecification drtShiftBreak = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
+        final DrtShiftBreakSpecification drtShiftBreak = shifts.get().getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
         final double earliestBreakStartTime = drtShiftBreak.getEarliestBreakStartTime();
         shift2plannedVsActualBreakStart.put(event.getShiftId(), new Tuple<>(earliestBreakStartTime, event.getTime()));
     }
 
     @Override
     public void handleEvent(DrtShiftBreakEndedEvent event) {
-        final DrtShiftBreakSpecification drtShiftBreak = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
+        final DrtShiftBreakSpecification drtShiftBreak = shifts.get().getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
         final double latestBreakEndTime = drtShiftBreak.getLatestBreakEndTime();
         shift2plannedVsActualBreakEnd.put(event.getShiftId(), new Tuple<>(latestBreakEndTime, event.getTime()));
     }

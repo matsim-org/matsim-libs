@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +16,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util.random;
+package org.matsim.contrib.freightreceiver;
 
-import org.apache.commons.math3.random.RandomGenerator;
+import org.matsim.api.core.v01.Id;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class UniformRandom {
-	private final RandomGenerator rg;
 
-	public UniformRandom(RandomGenerator rg) {
-		this.rg = rg;
+public class ReceiverPlanTest {
+
+
+	@Test
+	public void testBuilderTwo() {
+		Receiver receiver = ReceiverUtils.newInstance( Id.create( "1", Receiver.class ) );
+		ReceiverPlan.Builder builder = ReceiverPlan.Builder.newInstance(receiver, true);
+		ReceiverPlan plan = builder.build();
+		Assert.assertEquals("Wrong receiver Id", Id.create("1", Receiver.class), plan.getReceiver().getId());
+		Assert.assertNull("Score should be null", plan.getScore());
 	}
 
-	public double nextDouble(double from, double to) {
-		return from == to ? from : from + (to - from) * rg.nextDouble();
-	}
+	/* TODO Add tests to check ReceiverOrders */
 
-	/**
-	 * @param from
-	 *            (inclusive)
-	 * @param to
-	 *            (inclusive)
-	 */
-	public int nextInt(int from, int to) {
-		if (from == to) {
-			return from;
-		}
-
-		long delta = (long)((1L + (long)to - (long)from) * rg.nextDouble());
-		return (int)(from + delta);
-	}
-
-	public double floorOrCeil(double value) {
-		double floor = Math.floor(value);
-		boolean selectCeil = trueOrFalse(value - floor);
-		return selectCeil ? floor + 1 : floor;
-	}
-
-	public boolean trueOrFalse(double trueProbability) {
-		return rg.nextDouble() < trueProbability;
-	}
 }

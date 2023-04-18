@@ -21,9 +21,9 @@ package org.matsim.contrib.drt.extension.companions;
 
 import java.util.List;
 
-import org.matsim.contrib.util.random.RandomUtils;
-import org.matsim.contrib.util.random.UniformRandom;
-import org.matsim.contrib.util.random.WeightedRandomSelection;
+import org.matsim.contrib.common.util.random.RandomUtils;
+import org.matsim.contrib.common.util.random.UniformRandom;
+import org.matsim.contrib.common.util.random.WeightedRandomSelection;
 
 /**
  *
