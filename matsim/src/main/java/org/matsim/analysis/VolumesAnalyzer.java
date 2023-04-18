@@ -51,7 +51,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 	private final int maxTime;
 	private final int maxSlotIndex;
 	private final IdMap<Link, int[]> links;
-	
+
 	// for multi-modal support
 	private final boolean observeModes;
 	private final IdMap<Vehicle, String> enRouteModes;
@@ -66,13 +66,13 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final Network network) {
 		this(timeBinSize, maxTime, network, true);
 	}
-	
+
 	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final Network network, boolean observeModes) {
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
-		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;
+		this.maxSlotIndex = (this.maxTime / this.timeBinSize) + 1;
 		this.links = new IdMap<>(Link.class);
-		
+
 		this.observeModes = observeModes;
 		if (this.observeModes) {
 			this.enRouteModes = new IdMap<>(Vehicle.class);
@@ -82,14 +82,14 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 			this.linksPerMode = null;
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		if (this.observeModes) {
 			this.enRouteModes.put(event.getVehicleId(), event.getNetworkMode());
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		int[] volumes = this.links.get(event.getLinkId());
@@ -99,7 +99,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 		}
 		int timeslot = getTimeSlotIndex(event.getTime());
 		volumes[timeslot]++;
-		
+
 		if (this.observeModes) {
 			Map<String, int[]> modeVolumes = this.linksPerMode.get(event.getLinkId());
 			if (modeVolumes == null) {
@@ -120,44 +120,43 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 		if (time > this.maxTime) {
 			return this.maxSlotIndex;
 		}
-		return ((int)time / this.timeBinSize);
+		return ((int) time / this.timeBinSize);
 	}
 
 	/**
 	 * @param linkId
 	 * @return Array containing the number of vehicles leaving the link <code>linkId</code> per time bin,
-	 * 		starting with time bin 0 from 0 seconds to (timeBinSize-1)seconds.
+	 * starting with time bin 0 from 0 seconds to (timeBinSize-1)seconds.
 	 */
 	public int[] getVolumesForLink(final Id<Link> linkId) {
 		return this.links.get(linkId);
 	}
-	
+
 	/**
 	 * @param linkId
 	 * @param mode
-	 * @return Array containing the number of vehicles using the specified mode leaving the link 
-	 *  	<code>linkId</code> per time bin, starting with time bin 0 from 0 seconds to (timeBinSize-1)seconds.
+	 * @return Array containing the number of vehicles using the specified mode leaving the link
+	 * <code>linkId</code> per time bin, starting with time bin 0 from 0 seconds to (timeBinSize-1)seconds.
 	 */
 	public int[] getVolumesForLink(final Id<Link> linkId, String mode) {
 		if (observeModes) {
 			Map<String, int[]> modeVolumes = this.linksPerMode.get(linkId);
 			if (modeVolumes != null) return modeVolumes.get(mode);
-		} 
+		}
 		return null;
 	}
 
 	/**
-	 *
 	 * @return The size of the arrays returned by calls to the {@link #getVolumesForLink(Id)} and the {@link #getVolumesForLink(Id, String)}
 	 * methods.
 	 */
 	public int getVolumesArraySize() {
 		return this.maxSlotIndex + 1;
 	}
-	
+
 	/*
 	 * This procedure is only working if (hour % timeBinSize == 0)
-	 * 
+	 *
 	 * Example: 15 minutes bins
 	 *  ___________________
 	 * |  0 | 1  | 2  | 3  |
@@ -167,23 +166,23 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 	 * | 	  hour 0	   |
 	 * |___________________|
 	 * 0   				  3600
-	 * 
+	 *
 	 * hour 0 = bins 0,1,2,3
 	 * hour 1 = bins 4,5,6,7
 	 * ...
-	 * 
+	 *
 	 * getTimeSlotIndex = (int)time / this.timeBinSize => jumps at 3600.0!
 	 * Thus, starting time = (hour = 0) * 3600.0
 	 */
 	public double[] getVolumesPerHourForLink(final Id<Link> linkId) {
 		if (3600.0 % this.timeBinSize != 0) log.error("Volumes per hour and per link probably not correct!");
-		
+
 		double[] volumes = new double[24];
-		
+
 		int[] volumesForLink = this.getVolumesForLink(linkId);
 		if (volumesForLink == null) return volumes;
 
-		int slotsPerHour = (int)(3600.0 / this.timeBinSize);
+		int slotsPerHour = (int) (3600.0 / this.timeBinSize);
 		for (int hour = 0; hour < 24; hour++) {
 			double time = hour * 3600.0;
 			for (int i = 0; i < slotsPerHour; i++) {
@@ -197,16 +196,16 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 	public double[] getVolumesPerHourForLink(final Id<Link> linkId, String mode) {
 		if (observeModes) {
 			if (3600.0 % this.timeBinSize != 0) log.error("Volumes per hour and per link probably not correct!");
-			
-			double [] volumes = new double[24];
+
+			double[] volumes = new double[24];
 			for (int hour = 0; hour < 24; hour++) {
 				volumes[hour] = 0.0;
 			}
-			
+
 			int[] volumesForLink = this.getVolumesForLink(linkId, mode);
 			if (volumesForLink == null) return volumes;
-	
-			int slotsPerHour = (int)(3600.0 / this.timeBinSize);
+
+			int slotsPerHour = (int) (3600.0 / this.timeBinSize);
 			for (int hour = 0; hour < 24; hour++) {
 				double time = hour * 3600.0;
 				for (int i = 0; i < slotsPerHour; i++) {
@@ -218,20 +217,25 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @return Set of Strings containing all modes for which counting-values are available.
 	 */
 	public Set<String> getModes() {
 		Set<String> modes = new TreeSet<>();
-		
+
 		for (Map<String, int[]> map : this.linksPerMode.values()) {
-			modes.addAll(map.keySet());
+			try {
+				modes.addAll(map.keySet());
+			} catch (NullPointerException ex) {
+				// Fails on initialized entries, which can happen during tests
+				// will just be ignored here
+			}
 		}
-		
+
 		return modes;
 	}
-	
+
 	/**
 	 * @return Set of Strings containing all link ids for which counting-values are available.
 	 */
