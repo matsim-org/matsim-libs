@@ -44,6 +44,7 @@ jobs:
           - contribs/noise
           - contribs/accidents
           - contribs/freight
+          - contribs/freightreceiver
           - contribs/parking
           - contribs/matrixbasedptrouter
           - contribs/accessibility
