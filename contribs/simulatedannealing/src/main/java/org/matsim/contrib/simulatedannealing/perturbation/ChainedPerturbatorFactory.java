@@ -30,7 +30,7 @@ public class ChainedPerturbatorFactory<T> implements PerturbatorFactory<T> {
 
 	private final double initialTemperature;
 
-	private ChainedPerturbatorFactory(Map<PerturbatorFactory<T>, Double> perturbatorFactories,
+	private ChainedPerturbatorFactory(LinkedHashMap<PerturbatorFactory<T>, Double> perturbatorFactories,
 									 int minPerturbations,
 									 int maxPerturbations,
 									 double initialTemperature) {
@@ -72,7 +72,7 @@ public class ChainedPerturbatorFactory<T> implements PerturbatorFactory<T> {
 
 	public static class Builder<T> {
 
-		private final Map<PerturbatorFactory<T>, Double> perturbatorFactories = new HashMap<>();
+		private final LinkedHashMap<PerturbatorFactory<T>, Double> perturbatorFactories = new LinkedHashMap<>();
 
 		private int maxPerturbations = 10;
 
