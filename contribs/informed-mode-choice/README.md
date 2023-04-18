@@ -10,8 +10,7 @@ Unlike the default mode choice implementation, it is also possibly to freely con
 The whole methodology is described in the paper below.
 
 When referencing this work, please cite the following paper:
-
-> C. Rakow and K. Nagel (2023) [An annealing based approach to informed mode choice in agent-based transport simulations](), *Procedia Computer Science*, **220C**, 667-673.
+> C. Rakow and K. Nagel (2023) [An annealing based approach to informed mode choice in agent-based transport simulations](https://doi.org/10.1016/j.procs.2023.03.086), *Procedia Computer Science*, **220**, 667-673.
 
 
 ## Usage
