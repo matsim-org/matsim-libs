@@ -16,6 +16,7 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.contrib.common.util.random.RandomUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.contrib.simulatedannealing.acceptor.Acceptor;
@@ -37,6 +38,7 @@ public class SimulatedAnnealingTest {
 
 	@Test
 	public void testSimulatedAnnealing() {
+		RandomUtils.reset();
 
 		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 		Configuration config = ctx.getConfiguration();
