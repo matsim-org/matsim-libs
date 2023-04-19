@@ -34,7 +34,7 @@ public class ChainedPerturbatorFactory<T> implements PerturbatorFactory<T> {
 									 int minPerturbations,
 									 int maxPerturbations,
 									 double initialTemperature) {
-		this.perturbatorFactorySampler = new WeightedRandomSelection<>();
+		this.perturbatorFactorySampler = new WeightedRandomSelection<>(random);
 		for (Map.Entry<PerturbatorFactory<T>, Double> entry : perturbatorFactories.entrySet()) {
 			perturbatorFactorySampler.add(entry.getKey(), entry.getValue());
 		}
