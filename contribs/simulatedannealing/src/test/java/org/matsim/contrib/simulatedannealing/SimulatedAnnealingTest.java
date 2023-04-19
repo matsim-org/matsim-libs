@@ -8,6 +8,8 @@
  */
 package org.matsim.contrib.simulatedannealing;
 
+import java.util.Random;
+
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -16,17 +18,15 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.contrib.common.util.random.RandomUtils;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.contrib.simulatedannealing.acceptor.Acceptor;
 import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
 import org.matsim.contrib.simulatedannealing.cost.CostCalculator;
 import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.contrib.simulatedannealing.temperature.NonMonotonicAdaptiveTemperatureFunction;
 import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
-
-import java.util.Random;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author nkuehnel / MOIA
@@ -38,7 +38,7 @@ public class SimulatedAnnealingTest {
 
 	@Test
 	public void testSimulatedAnnealing() {
-		RandomUtils.reset();
+		MatsimRandom.reset();
 
 		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 		Configuration config = ctx.getConfiguration();
@@ -57,7 +57,7 @@ public class SimulatedAnnealingTest {
 
 		SimulatedAnnealing<String> simulatedAnnealing = new SimulatedAnnealing<>(costCalculator, acceptor, perturbator, "mistam", temperatureFunction, simAnCfg);
 
-		for (int i = 0; i < 520; i++) {
+		for (int i = 0; i < 550; i++) {
 			simulatedAnnealing.notifyBeforeMobsim(new BeforeMobsimEvent(null, i, false));
 			simulatedAnnealing.notifyAfterMobsim(new AfterMobsimEvent(null, i, false));
 		}

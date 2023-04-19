@@ -21,11 +21,11 @@ package org.matsim.contrib.common.util.random;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Random;
+
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Before;
 import org.junit.Test;
-import org.matsim.contrib.common.util.random.UniformRandom;
-import org.matsim.contrib.common.util.random.WeightedRandomSelection;
 
 /**
  * @author michalm
@@ -37,7 +37,7 @@ public class WeightedRandomSelectionTest {
 
 	@Before
 	public void init() {
-		weightedRandomSelection = new WeightedRandomSelection<>(new UniformRandom(null) {
+		weightedRandomSelection = new WeightedRandomSelection<>(new Random() {
 			@Override
 			public double nextDouble(double from, double to) {
 				return randomDouble.doubleValue();
