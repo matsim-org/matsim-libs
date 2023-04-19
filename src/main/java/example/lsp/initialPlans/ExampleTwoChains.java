@@ -46,8 +46,8 @@ public class ExampleTwoChains {
 	private static final VehicleType VEH_TYPE_LARGE_50 = CarrierVehicleType.Builder.newInstance(Id.create("large50", VehicleType.class))
 			.setCapacity(50)
 			.setMaxVelocity(10)
-			.setFixCost(0)
-			.setCostPerDistanceUnit(1000)
+			.setFixCost(100)
+			.setCostPerDistanceUnit(0.01)
 			.setCostPerTimeUnit(0.01)
 			.build();
 
@@ -150,7 +150,36 @@ public class ExampleTwoChains {
 		log.info("create LSP");
 		Network network = scenario.getNetwork();
 
-		LSPPlan lspPlanTwoChains;
+		LSPPlan lspPlan_oneChain;
+		{
+			log.info("Create lspPlan with one chain");
+
+			Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
+			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+
+			CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
+			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
+					.setCarrier(directCarrier)
+					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.build();
+
+			LogisticChainElement directCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierLSE", LogisticChainElement.class))
+					.setResource(directCarrierRessource)
+					.build();
+
+
+			LogisticChain solution_direct = LSPUtils.LogisticChainBuilder.newInstance(Id.create("directSolution", LogisticChain.class))
+					.addLogisticChainElement(directCarrierElement)
+					.build();
+
+			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+			lspPlan_oneChain = LSPUtils.createLSPPlan()
+					.addLogisticChain(solution_direct)
+					.setAssigner(singleSolutionShipmentAssigner);
+		}
+
+
+		LSPPlan lspPlan_twoChains;
 		{
 			log.info("Create lspPlan with two chains");
 
@@ -193,20 +222,21 @@ public class ExampleTwoChains {
 					.build();
 
 			final ShipmentAssigner multipleSolutionShipmentAssigner = UsecaseUtils.createMultipleLogisticChainShipmentAssigner();
-			lspPlanTwoChains = LSPUtils.createLSPPlan()
+			lspPlan_twoChains = LSPUtils.createLSPPlan()
 					.addLogisticChain(solution_south)
 					.addLogisticChain(solution_north)
 					.setAssigner(multipleSolutionShipmentAssigner);
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
-		lspPlans.add(lspPlanTwoChains);
+		lspPlans.add(lspPlan_twoChains);
+		lspPlans.add(lspPlan_oneChain);
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(lspPlanTwoChains)
+				.setInitialPlan(lspPlan_twoChains)
 				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
-		//lsp.addPlan(lspPlan_OneChain); TODO: Wahrscheinlich brauche ich auch einen alternativen Plan mit einer Logistikkette
+		lsp.addPlan(lspPlan_oneChain);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
