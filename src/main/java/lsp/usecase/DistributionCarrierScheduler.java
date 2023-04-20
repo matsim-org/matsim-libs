@@ -68,7 +68,7 @@ import java.util.*;
 		int load = 0;
 		double cumulatedLoadingTime = 0;
 		double availiabilityTimeOfLastShipment = 0;
-		ArrayList<LspShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
+		ArrayList<LspShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(lspShipmentsWithTime);
 		ArrayList<LspShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
 		List<CarrierPlan> scheduledPlans = new LinkedList<>();
 
@@ -143,7 +143,7 @@ import java.util.*;
 
 	@Override
 	protected void updateShipments() {
-		for (LspShipmentWithTime tuple : shipments) {
+		for (LspShipmentWithTime tuple : lspShipmentsWithTime) {
 			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 				Tour tour = scheduledTour.getTour();
 				for (TourElement element : tour.getTourElements()) {

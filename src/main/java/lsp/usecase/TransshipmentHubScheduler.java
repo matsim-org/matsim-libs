@@ -41,7 +41,7 @@ import java.util.ArrayList;
 	private TransshipmentHubTourEndEventHandler eventHandler;
 
 	TransshipmentHubScheduler(UsecaseUtils.TranshipmentHubSchedulerBuilder builder) {
-		this.shipments = new ArrayList<>();
+		this.lspShipmentsWithTime = new ArrayList<>();
 		this.capacityNeedLinear = builder.getCapacityNeedLinear();
 		this.capacityNeedFixed = builder.getCapacityNeedFixed();
 
@@ -52,7 +52,7 @@ import java.util.ArrayList;
 	}
 	
 	@Override protected void scheduleResource() {
-		for( LspShipmentWithTime tupleToBeAssigned: shipments){
+		for( LspShipmentWithTime tupleToBeAssigned: lspShipmentsWithTime){
 			updateSchedule(tupleToBeAssigned);
 		}
 	}

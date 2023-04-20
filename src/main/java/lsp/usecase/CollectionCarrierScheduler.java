@@ -62,7 +62,7 @@ import java.util.ArrayList;
 
 	@Override
 	public void scheduleResource() {
-		for (LspShipmentWithTime tupleToBeAssigned : shipments) {
+		for (LspShipmentWithTime tupleToBeAssigned : lspShipmentsWithTime) {
 			CarrierService carrierService = convertToCarrierService(tupleToBeAssigned);
 			carrier.getServices().put(carrierService.getId(), carrierService);
 		}
@@ -82,7 +82,7 @@ import java.util.ArrayList;
 
 	@Override
 	protected void updateShipments() {
-		for (LspShipmentWithTime tuple : shipments) {
+		for (LspShipmentWithTime tuple : lspShipmentsWithTime) {
 			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 				Tour tour = scheduledTour.getTour();
 				for (TourElement element : tour.getTourElements()) {

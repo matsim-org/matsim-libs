@@ -71,7 +71,7 @@ import java.util.*;
 	}
 	@Override protected void scheduleResource() {
 		int load = 0;
-		List<LspShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
+		List<LspShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(lspShipmentsWithTime);
 		copyOfAssignedShipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
 		ArrayList<LspShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
 //		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
@@ -207,7 +207,7 @@ import java.util.*;
 	}
 	
 	@Override protected void updateShipments() {
-		for (LspShipmentWithTime tuple : shipments) {
+		for (LspShipmentWithTime tuple : lspShipmentsWithTime) {
 			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 				Tour tour = scheduledTour.getTour();
 				for (TourElement element : tour.getTourElements()) {
