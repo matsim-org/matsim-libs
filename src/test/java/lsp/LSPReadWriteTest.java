@@ -2,11 +2,12 @@ package lsp;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Collections;
 
 public class LSPReadWriteTest {
@@ -15,7 +16,7 @@ public class LSPReadWriteTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void readWriteTest() throws FileNotFoundException, IOException {
+	public void readWriteTest() {
 
 		LSPs lsPs = new LSPs(Collections.emptyList());
 		Carriers carriers = new Carriers();
@@ -39,7 +40,7 @@ public class LSPReadWriteTest {
 	}
 
 	@Test
-	public void readWriteReadTest() throws FileNotFoundException, IOException {
+	public void readWriteReadTest() {
 
 		LSPs lsps = new LSPs(Collections.emptyList());
 		Carriers carriers = new Carriers();
