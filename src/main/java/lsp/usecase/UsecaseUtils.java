@@ -437,14 +437,19 @@ public class UsecaseUtils {
 
 	private static final String CARRIER_TYPE_ATTR = "carrierType" ;
 
-	public static CARRIER_TYPE getCarrierType(Carrier carrier ) {
-		String result = (String) carrier.getAttributes().getAttribute(CARRIER_TYPE_ATTR);
-		if (result == null){
-			log.warn("Requested attribute " + CARRIER_TYPE_ATTR + " does not exists. Will return " + CARRIER_TYPE.undefined );
-			return CARRIER_TYPE.undefined;
+	public static CARRIER_TYPE getCarrierType(Carrier carrier) {
+		if (carrier.getAttributes().getAttribute(CARRIER_TYPE_ATTR) instanceof CARRIER_TYPE carrierType) {
+			return carrierType;
 		} else {
-			return CARRIER_TYPE.valueOf(result);
+			String result = (String) carrier.getAttributes().getAttribute(CARRIER_TYPE_ATTR);
+			if (result == null){
+				log.warn("Requested attribute " + CARRIER_TYPE_ATTR + " does not exists. Will return " + CARRIER_TYPE.undefined );
+				return CARRIER_TYPE.undefined;
+			} else {
+				return CARRIER_TYPE.valueOf(result);
+			}
 		}
+
 	}
 	private static void setCarrierType( Carrier carrier,  CARRIER_TYPE carrierType ) {
 		carrier.getAttributes().putAttribute(CARRIER_TYPE_ATTR, carrierType ) ;

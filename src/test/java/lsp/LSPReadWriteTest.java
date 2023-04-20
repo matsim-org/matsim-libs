@@ -41,7 +41,7 @@ public class LSPReadWriteTest {
 	@Test
 	public void readWriteReadTest() throws FileNotFoundException, IOException {
 
-		LSPs lsPs = new LSPs(Collections.emptyList());
+		LSPs lsps = new LSPs(Collections.emptyList());
 		Carriers carriers = new Carriers();
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 
@@ -55,17 +55,18 @@ public class LSPReadWriteTest {
 		CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, carrierVehicleTypes);
 		carrierReader.readFile(utils.getPackageInputDirectory() + "carriers.xml");
 
-		LSPPlanXmlReader reader = new LSPPlanXmlReader(lsPs, carriers);
+		LSPPlanXmlReader reader = new LSPPlanXmlReader(lsps, carriers);
 		reader.readFile(inputFilename);
 
-		new LSPPlanXmlWriter(lsPs).write(outputFilename);
+		new LSPPlanXmlWriter(lsps).write(outputFilename);
 
-		lsPs.getLSPs().clear();
+		//clear and 2nd read - based on written file.
+		lsps.getLSPs().clear();
 
-		LSPPlanXmlReader reader2 = new LSPPlanXmlReader(lsPs, carriers);
+		LSPPlanXmlReader reader2 = new LSPPlanXmlReader(lsps, carriers);
 		reader2.readFile(outputFilename);
 
-		new LSPPlanXmlWriter(lsPs).write(outputFilename2);
+		new LSPPlanXmlWriter(lsps).write(outputFilename2);
 
 		MatsimTestUtils.assertEqualFilesLineByLine(inputFilename, outputFilename2);
 	}
