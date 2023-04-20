@@ -79,7 +79,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 			}
 
 			// simulation trackers of solutions:
-			for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+			for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 				registerSimulationTrackers(solution );
 
 				// simulation trackers of solution elements:
@@ -155,7 +155,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		Carriers carriers = new Carriers();
 		for (LSP lsp : lsps.getLSPs().values()) {
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
-			for (LogisticChain solution : selectedPlan.getLogisticChain()) {
+			for (LogisticChain solution : selectedPlan.getLogisticChains()) {
 				for (LogisticChainElement element : solution.getLogisticChainElements()) {
 					if( element.getResource() instanceof LSPCarrierResource carrierResource ) {
 						Carrier carrier = carrierResource.getCarrier();

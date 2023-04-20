@@ -142,7 +142,7 @@ public final class LSPUtils {
 
 		public LSPBuilder setInitialPlan(LSPPlan plan) {
 			this.initialPlan = plan;
-			for (LogisticChain solution : plan.getLogisticChain()) {
+			for (LogisticChain solution : plan.getLogisticChains()) {
 				for (LogisticChainElement element : solution.getLogisticChainElements()) {
 					if (!resources.contains(element.getResource())) {
 						resources.add(element.getResource());

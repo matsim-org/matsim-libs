@@ -24,7 +24,7 @@ class MultipleLogisticChainShipmentAssigner implements ShipmentAssigner {
 
 	@Override
 	public void assignToLogisticChain(LSPShipment shipment) {
-		for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
 			if (logisticChain.getShipments().size() == 0) {
 				logisticChain.assignShipment(shipment);
 				break;

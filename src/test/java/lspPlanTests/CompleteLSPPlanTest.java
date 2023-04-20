@@ -218,8 +218,8 @@ public class CompleteLSPPlanTest {
 		assertSame(completePlan.getAssigner(), assigner);
 		assertNull(completePlan.getLSP());
 		assertEquals(0, (double) completePlan.getScore(), 0.0);
-		assertEquals(1, completePlan.getLogisticChain().size());
-		assertSame(completePlan.getLogisticChain().iterator().next(), logisticChain);
+		assertEquals(1, completePlan.getLogisticChains().size());
+		assertSame(completePlan.getLogisticChains().iterator().next(), logisticChain);
 	}
 
 }

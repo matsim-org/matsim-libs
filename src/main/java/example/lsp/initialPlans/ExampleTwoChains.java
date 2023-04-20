@@ -282,7 +282,7 @@ public class ExampleTwoChains {
 		log.info("Collecting all LSPResources from the LSPPlans");
 		List<LSPResource> resourceList = new ArrayList<>();
 		for (LSPPlan lspPlan : lspPlans) {
-			for (LogisticChain solution : lspPlan.getLogisticChain()) {
+			for (LogisticChain solution : lspPlan.getLogisticChains()) {
 				for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
 					resourceList.add(solutionElement.getResource());
 				}

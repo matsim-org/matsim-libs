@@ -146,7 +146,7 @@ public class CollectionLSPShipmentAssigmentTest {
 	public void testCollectionLSPShipmentAssignment() {
 		assertSame(collectionLSP.getSelectedPlan(), collectionPlan);
 		assertFalse(collectionLSP.getShipments().isEmpty());
-		ArrayList<LogisticChain> solutions = new ArrayList<>(collectionLSP.getSelectedPlan().getLogisticChain());
+		ArrayList<LogisticChain> solutions = new ArrayList<>(collectionLSP.getSelectedPlan().getLogisticChains());
 
 		for (LogisticChain solution : solutions) {
 			if (solutions.indexOf(solution) == 0) {

@@ -40,8 +40,8 @@ import java.util.Random;
 	public void assignToLogisticChain(LSPShipment shipment) {
 		boolean assignToday = random.nextBoolean();
 		if (assignToday) {
-			Gbl.assertIf(lsp.getSelectedPlan().getLogisticChain().size() == 1);
-			lsp.getSelectedPlan().getLogisticChain().iterator().next().assignShipment(shipment);
+			Gbl.assertIf(lsp.getSelectedPlan().getLogisticChains().size() == 1);
+			lsp.getSelectedPlan().getLogisticChains().iterator().next().assignShipment(shipment);
 		}
 	}
 

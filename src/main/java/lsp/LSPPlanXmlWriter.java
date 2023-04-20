@@ -170,7 +170,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 			writer.write(">\n");
 
 			writer.write("\t\t\t\t\t<" + LOGISTIC_CHAINS + ">\n");
-			for (LogisticChain logisticChain : plan.getLogisticChain()) {
+			for (LogisticChain logisticChain : plan.getLogisticChains()) {
 				writer.write("\t\t\t\t\t\t<" + LOGISTIC_CHAIN + " " + ID + "=\"" + logisticChain.getId() + "\">\n");
 				for (LogisticChainElement chainElement : logisticChain.getLogisticChainElements()) {
 					writer.write("\t\t\t\t\t\t\t<" + LOGISTIC_CHAIN_ELEMENT + " " + ID + "=\"" + chainElement.getId() + "\" ");

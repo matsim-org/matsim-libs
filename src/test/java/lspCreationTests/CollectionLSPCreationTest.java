@@ -118,8 +118,8 @@ public class CollectionLSPCreationTest {
 		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
 		assertSame(selectedPlan.getLSP(), collectionLSP);
 		assertSame(selectedPlan.getAssigner(), assigner);
-		assertSame(selectedPlan.getLogisticChain().iterator().next(), logisticChain);
-		assertSame(selectedPlan.getLogisticChain().iterator().next().getLSP(), collectionLSP);
+		assertSame(selectedPlan.getLogisticChains().iterator().next(), logisticChain);
+		assertSame(selectedPlan.getLogisticChains().iterator().next().getLSP(), collectionLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== collectionLSP);
 		assertSame(selectedPlan.getLSP(), collectionLSP);
 	}

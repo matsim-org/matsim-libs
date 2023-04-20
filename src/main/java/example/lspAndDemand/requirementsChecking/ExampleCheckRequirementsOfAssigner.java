@@ -207,7 +207,7 @@ class ExampleCheckRequirementsOfAssigner {
 			lsp.assignShipmentToLSP(shipment);
 		}
 
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			if (solution.getId().toString().equals("RedSolution")) {
 				for (LSPShipment shipment : solution.getShipments()) {
 					if (!(shipment.getRequirements().iterator().next() instanceof RedRequirement)) {

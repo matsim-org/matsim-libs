@@ -223,11 +223,11 @@ import java.util.*;
 		controler.run();
 
 		System.out.println("Shipments delivered today:");
-		for (LSPShipment shipment : lsp.getSelectedPlan().getLogisticChain().iterator().next().getShipments()) {
+		for (LSPShipment shipment : lsp.getSelectedPlan().getLogisticChains().iterator().next().getShipments()) {
 			System.out.println(shipment.getId());
 		}
 
-		lsp.getShipments().removeAll(lsp.getSelectedPlan().getLogisticChain().iterator().next().getShipments());
+		lsp.getShipments().removeAll(lsp.getSelectedPlan().getLogisticChains().iterator().next().getShipments());
 
 		System.out.println("Shipments delivered tomorrow:");
 		for (LSPShipment shipment : lsp.getShipments()) {

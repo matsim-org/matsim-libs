@@ -24,7 +24,6 @@ import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -219,8 +218,8 @@ public class CollectionLSPReplanningTest {
 
 	@Test
 	public void testCollectionLSPReplanning() {
-		System.out.println(collectionLSP.getSelectedPlan().getLogisticChain().iterator().next().getShipments().size());
-		assertTrue(collectionLSP.getSelectedPlan().getLogisticChain().iterator().next().getShipments().size() < 20);
+		System.out.println(collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getShipments().size());
+		assertTrue(collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getShipments().size() < 20);
 	}
 
 	@Test

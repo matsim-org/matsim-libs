@@ -239,8 +239,8 @@ public class CompleteLSPCreationTest {
 		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
 		assertSame(selectedPlan.getLSP(), completeLSP);
 		assertSame(selectedPlan.getAssigner(), assigner);
-		assertSame(selectedPlan.getLogisticChain().iterator().next(), logisticChain);
-		assertSame(selectedPlan.getLogisticChain().iterator().next().getLSP(), completeLSP);
+		assertSame(selectedPlan.getLogisticChains().iterator().next(), logisticChain);
+		assertSame(selectedPlan.getLogisticChains().iterator().next().getLSP(), completeLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== completeLSP);
 		assertSame(selectedPlan.getLSP(), completeLSP);
 	}

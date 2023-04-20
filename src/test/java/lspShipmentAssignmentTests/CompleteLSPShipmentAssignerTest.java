@@ -280,7 +280,7 @@ public class CompleteLSPShipmentAssignerTest {
 	@Test
 	public void testCollectionLSPShipmentAssignment() {
 		assertSame(completeLSP.getSelectedPlan(), completePlan);
-		ArrayList<LogisticChain> solutions = new ArrayList<>(completeLSP.getSelectedPlan().getLogisticChain());
+		ArrayList<LogisticChain> solutions = new ArrayList<>(completeLSP.getSelectedPlan().getLogisticChains());
 
 		for (LogisticChain solution : solutions) {
 			if (solutions.indexOf(solution) == 0) {
