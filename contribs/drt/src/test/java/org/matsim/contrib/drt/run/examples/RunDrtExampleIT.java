@@ -172,49 +172,6 @@ public class RunDrtExampleIT {
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
-	@Test
-	public void testAbortHandler() {
-		Id.resetCaches();
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-
-//		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
-			//relatively high max age to prevent rejections
-//			var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
-//			drtRequestInsertionRetryParams.maxRequestAge = 7200;
-//			drtCfg.addParameterSet(drtRequestInsertionRetryParams);
-//		}
-		// I don't know what the above does; might be useful to understand.
-
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-
-		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
-		List<String> components = qsimComponents.getActiveComponents();
-		components.add( MyAbortHandler.COMPONENT_NAME );
-		qsimComponents.setActiveComponents( components );
-
-		final Controler controler = DrtControlerCreator.createControler( config, false );
-
-		controler.addOverridingQSimModule( new AbstractQSimModule(){
-			@Override protected void configureQSim(){
-				this.addQSimComponentBinding( MyAbortHandler.COMPONENT_NAME ).to( MyAbortHandler.class );
-			}
-		} );
-
-		controler.run();
-
-		var expectedStats = Stats.newBuilder()
-					 .rejectionRate(0.0)
-					 .rejections(1)
-					 .waitAverage(305.97)
-					 .inVehicleTravelTimeMean(378.18)
-					 .totalTravelTimeMean(684.16)
-					 .build();
-
-		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
-	}
 
 	@Test
 	public void testRunDrtStopbasedExample() {
@@ -269,7 +226,7 @@ public class RunDrtExampleIT {
 	 * rejectionRate, rejections, waitAverage, inVehicleTravelTimeMean, & totalTravelTimeMean
 	 */
 
-	private void verifyDrtCustomerStatsCloseToExpectedStats(String outputDirectory, Stats expectedStats) {
+	static void verifyDrtCustomerStatsCloseToExpectedStats( String outputDirectory, Stats expectedStats ) {
 
 		String filename = outputDirectory + "/drt_customer_stats_drt.csv";
 
@@ -300,7 +257,7 @@ public class RunDrtExampleIT {
 		assertThat(actualStats).usingRecursiveComparison().isEqualTo(expectedStats);
 	}
 
-	private static class Stats {
+	static class Stats {
 		private final double rejectionRate;
 		private final double rejections;
 		private final double waitAverage;
@@ -371,94 +328,4 @@ public class RunDrtExampleIT {
 		}
 	}
 
-	private static class MyAbortHandler implements AbortHandler, MobsimEngine {
-		public static final String COMPONENT_NAME = "DrtAbortHandler";
-
-		@Inject EditTrips editTrips ;
-		@Inject EditPlans editPlans;
-		@Inject Network network;
-		@Inject Population population;
-		@Inject MobsimTimer mobsimTimer;
-		private InternalInterface internalInterface;
-		private List<MobsimAgent> agents = new ArrayList<>();
-		@Override public boolean handleAbort( MobsimAgent agent ){
-
-			log.warn("need to handle abort of agent=" + agent );
-
-
-			final String drtMode = "drt";
-			final String walkAfterRejectMode = "walkAfterReject";
-
-			if ( agent.getMode().equals( drtMode ) ) {
-				// yyyyyy this will have to work for all drt modes!!!
-
-				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
-				int index = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );
-
-				Id<Link> interactionLink = agent.getCurrentLinkId();
-
-				double now = mobsimTimer.getTimeOfDay();
-
-				// (1) The current leg needs to be modified so that it ends at the current location.  And one should somehow tag this
-				// as a failed drt trip.  (There is presumably already a drt rejected event, so this info could also be reconstructed.)
-
-				PopulationFactory pf = population.getFactory();
-
-				Leg leg = (Leg) plan.getPlanElements().get(index );
-				leg.setDepartureTime( now );
-				leg.setTravelTime( 0 );
-				leg.setRoute( pf.getRouteFactories().createRoute( GenericRouteImpl.class, interactionLink, interactionLink ) );
-				// (startLinkId and endLinkId are _only_ in the route)
-
-				// (2) An interaction activity needs to be inserted.
-
-				String modePrefix = TripStructureUtils.createStageActivityType( walkAfterRejectMode );
-				Coord interactionCoord = network.getLinks().get( interactionLink ).getCoord();
-				Activity activity = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix( interactionCoord, interactionLink, modePrefix );
-				editPlans.insertActivity( agent, index+1, activity, drtMode, walkAfterRejectMode );
-				// (inserts at given position; pushes everything else forward)
-
-				// (3) There needs to be a new teleportation leg from here to there.
-				// yy This looks more involved than it should be; presumably some methods need to be improved in editTrips/Plans.  kai, mar'23
-
-				Activity toActivity;
-				for ( int ii=index+1; true; ii++ ) {
-					if ( editPlans.isRealActivity( plan.getPlanElements().get(ii) ) ) {
-						toActivity = (Activity) plan.getPlanElements().get(ii );
-						break;
-					}
-				}
-				TripStructureUtils.Trip trip = editTrips.insertEmptyTrip( plan, activity, toActivity, "walkAfterReject" );
-				editTrips.replanFutureTrip( trip, plan, walkAfterRejectMode );
-
-
-				// (4) reset the agent caches:
-				WithinDayAgentUtils.resetCaches( agent );
-
-				// (5) add the agent to an internal list, which is processed during doSimStep, which formally ends the current
-				// (aborted) leg, and moves the agent forward in its state machine.
-				agents.add( agent );
-			}
-			return true;
-		}
-		@Override public void doSimStep( double time ){
-			for( MobsimAgent agent : agents ){
-				agent.endLegAndComputeNextState( time );
-				// (we haven't actually thrown an abort event, and are planning not to do this here.  We probably have thrown a drt
-				// rejected event.  The "endLeg..." method will throw a person arrival event.)
-
-				this.internalInterface.arrangeNextAgentState( agent );
-			}
-			agents.clear();
-		}
-		@Override public void onPrepareSim(){
-			throw new RuntimeException( "not implemented" );
-		}
-		@Override public void afterSim(){
-			throw new RuntimeException( "not implemented" );
-		}
-		@Override public void setInternalInterface( InternalInterface internalInterface ){
-			this.internalInterface = internalInterface;
-		}
-	}
 }
