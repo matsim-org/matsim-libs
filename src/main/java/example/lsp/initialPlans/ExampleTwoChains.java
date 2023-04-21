@@ -150,50 +150,51 @@ public class ExampleTwoChains {
 		log.info("create LSP");
 		Network network = scenario.getNetwork();
 
-		LSPPlan lspPlan_oneChain;
-		{
-			log.info("Create lspPlan with one chain");
-
-			Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
-			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-
-			CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
-					.setCarrier(directCarrier)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-					.build();
-
-			LogisticChainElement directCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierLSE", LogisticChainElement.class))
-					.setResource(directCarrierRessource)
-					.build();
-
-
-			LogisticChain solution_direct = LSPUtils.LogisticChainBuilder.newInstance(Id.create("directSolution", LogisticChain.class))
-					.addLogisticChainElement(directCarrierElement)
-					.build();
-
-			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-			lspPlan_oneChain = LSPUtils.createLSPPlan()
-					.addLogisticChain(solution_direct)
-					.setAssigner(singleSolutionShipmentAssigner);
-		}
+//		LSPPlan lspPlan_oneChain;
+//		{
+//			log.info("Create lspPlan with one chain");
+//
+//			Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
+//			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+//
+//			CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
+//			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
+//					.setCarrier(directCarrier)
+//					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+//					.build();
+//
+//			LogisticChainElement directCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierLSE", LogisticChainElement.class))
+//					.setResource(directCarrierRessource)
+//					.build();
+//
+//
+//			LogisticChain solution_direct = LSPUtils.LogisticChainBuilder.newInstance(Id.create("directSolution", LogisticChain.class))
+//					.addLogisticChainElement(directCarrierElement)
+//					.build();
+//
+//			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+//			lspPlan_oneChain = LSPUtils.createLSPPlan()
+//					.addLogisticChain(solution_direct)
+//					.setAssigner(singleSolutionShipmentAssigner);
+//		}
 
 
 		LSPPlan lspPlan_twoChains;
+		LSPPlan lspPlan_oneChain;
 		{
 			log.info("Create lspPlan with two chains");
 
 			// Building a south and north carrier
-			Carrier carrierSouth = CarrierUtils.createCarrier(Id.create("CarrierSouth", Carrier.class));
+			Carrier carrierSouth = CarrierUtils.createCarrier(Id.create("carrierSouth", Carrier.class));
 			carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource carrierSouthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("SouthCarrierRes", LSPResource.class), network)
+			LSPResource carrierSouthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("southCarrierRes", LSPResource.class), network)
 					.setCarrier(carrierSouth)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
-			LogisticChainElement southCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("SouthCarrierLSE", LogisticChainElement.class))
+			LogisticChainElement southCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("southCarrierLSE", LogisticChainElement.class))
 					.setResource(carrierSouthResource)
 					.build();
 
@@ -202,30 +203,39 @@ public class ExampleTwoChains {
 			carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource carrierNorthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("NorthCarrierRes", LSPResource.class), network)
+			LSPResource carrierNorthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("northCarrierRes", LSPResource.class), network)
 					.setCarrier(carrierNorth)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
-			LogisticChainElement northCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("NorthCarrierLSE", LogisticChainElement.class))
+			LogisticChainElement northCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("northCarrierLSE", LogisticChainElement.class))
 					.setResource(carrierNorthResource)
 					.build();
 
 
 			// Building a south and north Logistic chain
-			LogisticChain solution_south = LSPUtils.LogisticChainBuilder.newInstance(Id.create("southChain", LogisticChain.class))
+			LogisticChain southChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("southChain", LogisticChain.class))
 					.addLogisticChainElement(southCarrierElement)
 					.build();
 
-			LogisticChain solution_north = LSPUtils.LogisticChainBuilder.newInstance(Id.create("northChain", LogisticChain.class))
+			LogisticChain northChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("northChain", LogisticChain.class))
 					.addLogisticChainElement(northCarrierElement)
+					.build();
+
+			LogisticChain oneChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("oneChain", LogisticChain.class))
+					.addLogisticChainElement(southCarrierElement)
 					.build();
 
 			final ShipmentAssigner multipleSolutionShipmentAssigner = UsecaseUtils.createMultipleLogisticChainShipmentAssigner();
 			lspPlan_twoChains = LSPUtils.createLSPPlan()
-					.addLogisticChain(solution_south)
-					.addLogisticChain(solution_north)
+					.addLogisticChain(southChain)
+					.addLogisticChain(northChain)
 					.setAssigner(multipleSolutionShipmentAssigner);
+
+			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+			lspPlan_oneChain = LSPUtils.createLSPPlan()
+					.addLogisticChain(oneChain)
+					.setAssigner(singleSolutionShipmentAssigner);
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
@@ -255,8 +265,8 @@ public class ExampleTwoChains {
 
 		int capacityDemand = 1;
 
-		Id<LSPShipment> shipment1Id = Id.create("Shipment_South", LSPShipment.class);
-		ShipmentUtils.LSPShipmentBuilder shipment1Builder = ShipmentUtils.LSPShipmentBuilder.newInstance(shipment1Id);
+		Id<LSPShipment> shipmentSouthId = Id.create("shipmentSouth", LSPShipment.class);
+		ShipmentUtils.LSPShipmentBuilder shipment1Builder = ShipmentUtils.LSPShipmentBuilder.newInstance(shipmentSouthId);
 		shipment1Builder.setCapacityDemand(capacityDemand);
 		shipment1Builder.setFromLinkId(DEPOT_SOUTH_LINK_ID);
 		shipment1Builder.setToLinkId(Id.createLinkId("i(9,0)"));
@@ -265,8 +275,8 @@ public class ExampleTwoChains {
 		shipment1Builder.setDeliveryServiceTime(capacityDemand * 60);
 		shipmentList.add(shipment1Builder.build());
 
-		Id<LSPShipment> shipment2Id = Id.create("Shipment_North", LSPShipment.class);
-		ShipmentUtils.LSPShipmentBuilder shipment2Builder = ShipmentUtils.LSPShipmentBuilder.newInstance(shipment2Id);
+		Id<LSPShipment> shipmentNorthId = Id.create("shipmentNorth", LSPShipment.class);
+		ShipmentUtils.LSPShipmentBuilder shipment2Builder = ShipmentUtils.LSPShipmentBuilder.newInstance(shipmentNorthId);
 		shipment2Builder.setCapacityDemand(capacityDemand);
 		shipment2Builder.setFromLinkId(DEPOT_NORTH_LINK_ID);
 		shipment2Builder.setToLinkId(Id.createLinkId("i(9,8)"));
