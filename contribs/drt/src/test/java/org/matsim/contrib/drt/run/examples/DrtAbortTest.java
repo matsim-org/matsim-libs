@@ -38,9 +38,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class DrtAbortTest{
 	private static final Logger log = LogManager.getLogger(DrtAbortTest.class );
@@ -135,11 +133,12 @@ public class DrtAbortTest{
 
 	private static class MyAbortHandler implements AbortHandler, MobsimEngine{
 		public static final String COMPONENT_NAME = "DrtAbortHandler";
+		private static final String delimiter = "============";
 		@Inject Network network;
 		@Inject Population population;
 		@Inject MobsimTimer mobsimTimer;
 		private InternalInterface internalInterface;
-		private List<MobsimAgent> agents = new ArrayList<>();
+		private final List<MobsimAgent> agents = new ArrayList<>();
 
 		@Override public boolean handleAbort( MobsimAgent agent ){
 
@@ -153,10 +152,8 @@ public class DrtAbortTest{
 				// yyyyyy this will have to work for all drt modes!!!
 
 				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
-				log.warn("\n current plan=" + plan );
-				for( PlanElement planElement : plan.getPlanElements() ){
-					log.warn( planElement );
-				}
+
+				printPlan( "\n current plan=", plan );
 
 				int index = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );
 
@@ -203,10 +200,7 @@ public class DrtAbortTest{
 				// (aborted) leg, and moves the agent forward in its state machine.
 				agents.add( agent );
 
-				log.warn("\n plan after splicing=" + plan);
-				for( PlanElement planElement : plan.getPlanElements() ){
-					log.warn( planElement );
-				}
+				printPlan( "plan after splicing=", plan );
 			}
 			return true;
 		}
@@ -227,6 +221,16 @@ public class DrtAbortTest{
 		@Override public void setInternalInterface( InternalInterface internalInterface ){
 			this.internalInterface = internalInterface;
 		}
+		private static void printPlan( String x, Plan plan ){
+			log.warn( delimiter );
+			log.warn( x + plan );
+			for( PlanElement planElement : plan.getPlanElements() ){
+				log.warn( planElement );
+			}
+			log.warn( delimiter );
+		}
 	}
+
+
 
 }
