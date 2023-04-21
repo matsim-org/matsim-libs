@@ -230,13 +230,12 @@ import java.util.*;
 							.build());
 
 			//The scheduler for the main run Resource is created and added to the Resource
-			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(
-							Id.create("MainRunResource", LSPResource.class), network)
+			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
 					.setFromLinkId(depotLinkId)
 					.setToLinkId(hubLinkId)
-					.setCarrier(mainRunCarrier)
 					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 					.build();
+
 			mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
 					.setResource(mainRunResource)
 					.build();

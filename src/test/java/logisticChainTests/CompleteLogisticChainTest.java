@@ -132,18 +132,16 @@ public class CompleteLogisticChainTest {
 		Carrier mainRunCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId,
-				network);
-		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunResourceBuilder.setCarrier(collectionCarrier);
+		LSPResource mainRunResource  = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
+				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
+				.build();
 
 		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
 		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder
 				.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunResourceBuilder.build());
+		mainRunBuilder.setResource(mainRunResource);
 		mainRunElement = mainRunBuilder.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();

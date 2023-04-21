@@ -22,7 +22,7 @@ package lsp;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;

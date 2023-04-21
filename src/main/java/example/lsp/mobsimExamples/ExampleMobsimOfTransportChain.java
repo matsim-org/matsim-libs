@@ -131,11 +131,9 @@ import java.util.Random;
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		//The adapter i.e. the main run resource is created
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network)
+		LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
 				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
-				.setCarrier(mainRunCarrier)
 				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 				.build();
 

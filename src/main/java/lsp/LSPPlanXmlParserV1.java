@@ -41,6 +41,7 @@ import org.xml.sax.Attributes;
 
 import java.util.*;
 
+import static lsp.LSPConstants.LSP;
 import static lsp.LSPConstants.*;
 
 /**
@@ -291,8 +292,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 					case collectionCarrier -> lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
 							.build();
-					case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-							.setCarrier(currentCarrier)
+					case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 							.build();
 					case distributionCarrier -> lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(currentCarrier, null)

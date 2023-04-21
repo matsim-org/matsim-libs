@@ -236,8 +236,7 @@ final class ExampleTwoEchelonGrid {
 			mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource mainCarrierRessource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create("mainCarrierRes", LSPResource.class), network)
-					.setCarrier(mainCarrier)
+			LSPResource mainCarrierRessource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
 					.setFromLinkId(DEPOT_LINK_ID)
 					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 					.setToLinkId(HUB_LINK_ID)

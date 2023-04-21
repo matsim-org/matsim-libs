@@ -135,18 +135,15 @@ public class MainRunLSPSchedulingTest {
 		Carrier mainRunCarrier = CarrierUtils.createCarrier(mainRunCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunResourceBuilder.setFromLinkId(fromLinkId);
-		mainRunResourceBuilder.setToLinkId(toLinkId);
-		mainRunResourceBuilder.setCarrier(mainRunCarrier);
-		mainRunResource = mainRunResourceBuilder.build();
+		mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setFromLinkId(fromLinkId)
+				.setToLinkId(toLinkId)
+				.build();
 
-		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunResource);
-		mainRunElement = mainRunBuilder.build();
+		mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
+				.setResource(mainRunResource)
+				.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);
 		firstHubElement.connectWithNextElement(mainRunElement);

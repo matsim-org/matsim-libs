@@ -134,19 +134,16 @@ import java.util.Random;
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		//The adapter i.e. the main run resource is created
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network)
+		LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
 				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
-				.setCarrier(mainRunCarrier)
 				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 				.build();
 
 		//The LogisticsSolutionElement for the main run Resource is created
-		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunResource);
-		LogisticChainElement mainRunElement = mainRunBuilder.build();
+		LogisticChainElement mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
+				.setResource(mainRunResource)
+				.build();
 
 
 		//The second reloading adapter i.e. the Resource is created       
