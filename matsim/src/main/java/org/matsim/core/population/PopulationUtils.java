@@ -756,6 +756,9 @@ public final class PopulationUtils {
 		return getFactory().createActivityFromLinkId(type, linkId) ;
 	}
 
+	/**
+	 * This presumably works for plans in the agent database, but does not seem to work for within-day replanning.  kai, apr'23
+	 */
 	public static Activity createInteractionActivityFromLinkId(String type, Id<Link> linkId) {
 		return getFactory().createInteractionActivityFromLinkId(type, linkId) ;
 	}
@@ -764,6 +767,9 @@ public final class PopulationUtils {
 		return getFactory().createActivityFromActivityFacilityId(type, facilityId);
 	}
 
+	/**
+	 * This presumably works for plans in the agent database, but does not seem to work for within-day replanning.  kai, apr'23
+	 */
 	public static Activity createInteractionActivityFromFacilityId(String type, Id<ActivityFacility> facilityId) {
 		return getFactory().createInteractionActivityFromActivityFacilityId(type, facilityId);
 	}
@@ -772,6 +778,9 @@ public final class PopulationUtils {
 		return getFactory().createActivityFromCoord(type, coord) ;
 	}
 
+	/**
+	 * This presumably works for plans in the agent database, but does not seem to work for within-day replanning.  kai, apr'23
+	 */
 	public static Activity createInteractionActivityFromCoord(String type, Coord coord) {
 		return getFactory().createInteractionActivityFromCoord(type, coord) ;
 	}
@@ -782,6 +791,9 @@ public final class PopulationUtils {
 		return act ;
 	}
 
+	/**
+	 * This presumably works for plans in the agent database, but does not seem to work for within-day replanning.  kai, apr'23
+	 */
 	public static Activity createInteractionActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
 		Activity act = getFactory().createInteractionActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);

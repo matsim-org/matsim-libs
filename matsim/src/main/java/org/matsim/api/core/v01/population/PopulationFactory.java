@@ -44,7 +44,10 @@ public interface PopulationFactory extends MatsimFactory {
 	 * It might in fact make sense to add a creational method that takes coord <i>and</i> link id.  kai, aug'10
 	 */
 	Activity createActivityFromCoord(String actType, Coord coord);
-	
+
+	/**
+	 * This presumably works for plans in the agent database, but does not seem to work for within-day replanning.  kai, apr'23
+	 */
 	Activity createInteractionActivityFromCoord(String actType, Coord coord);
 
 	/**
