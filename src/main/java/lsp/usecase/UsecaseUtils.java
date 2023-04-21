@@ -261,14 +261,16 @@ public class UsecaseUtils {
 		private MainRunCarrierScheduler mainRunScheduler;
 		private VehicleReturn vehicleReturn;
 
-		private MainRunCarrierResourceBuilder(Id<LSPResource> id, Network network) {
-			this.id = id;
+		private MainRunCarrierResourceBuilder(Carrier carrier, Network network) {
+			this.id = Id.create(carrier.getId().toString(), LSPResource.class);
+			setCarrierType(carrier, CARRIER_TYPE.mainRunCarrier);
+			this.carrier = carrier;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
 		}
 
-		public static MainRunCarrierResourceBuilder newInstance(Id<LSPResource> id, Network network) {
-			return new MainRunCarrierResourceBuilder(id, network);
+		public static MainRunCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
+			return new MainRunCarrierResourceBuilder(carrier, network);
 		}
 
 		public MainRunCarrierResourceBuilder setCarrier(Carrier carrier) {
