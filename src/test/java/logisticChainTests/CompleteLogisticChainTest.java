@@ -24,7 +24,6 @@ import lsp.LSPResource;
 import lsp.LSPUtils;
 import lsp.LogisticChain;
 import lsp.LogisticChainElement;
-
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,11 +84,9 @@ public class CompleteLogisticChainTest {
 		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
-		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
 		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder
-				.newInstance(collectionResourceId, network);
+				.newInstance(collectionCarrier, network);
 		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionResourceBuilder.setCarrier(collectionCarrier);
 		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 
 		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement",

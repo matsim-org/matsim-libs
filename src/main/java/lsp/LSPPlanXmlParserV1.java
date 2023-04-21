@@ -288,16 +288,14 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				LSPResource lspResource;
 
 				switch (UsecaseUtils.getCarrierType(currentCarrier)) {
-					case collectionCarrier -> lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-							.setCarrier(currentCarrier)
+					case collectionCarrier -> lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
 							.build();
 					case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
 							.setCarrier(currentCarrier)
 							.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 							.build();
-					case distributionCarrier -> lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-							.setCarrier(currentCarrier)
+					case distributionCarrier -> lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 							.build();
 					default -> throw new IllegalStateException("Unexpected value: " + currentCarrier.getAttributes().toString());

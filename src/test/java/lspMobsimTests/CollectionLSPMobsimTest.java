@@ -26,7 +26,6 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -109,12 +108,10 @@ public class CollectionLSPMobsimTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		CollectionCarrierResourceBuilder adapterBuilder = CollectionCarrierResourceBuilder.newInstance(adapterId, scenario.getNetwork());
-		adapterBuilder.setCollectionScheduler(createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(carrier);
-		adapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionResource = adapterBuilder.build();
+
+		collectionResource  = CollectionCarrierResourceBuilder.newInstance(carrier, scenario.getNetwork())
+				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setLocationLinkId(collectionLinkId)
+				.build();
 
 		final LogisticChainElement collectionElement;
 		{
