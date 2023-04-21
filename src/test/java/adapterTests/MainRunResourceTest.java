@@ -21,7 +21,6 @@
 package adapterTests;
 
 import lsp.LSPCarrierResource;
-import lsp.LSPResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,14 +84,10 @@ public class MainRunResourceTest {
 		carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunBuilder.setCarrier(carrier);
-		mainRunResource = mainRunBuilder.build();
+		mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(carrier, network)
+				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setFromLinkId(Id.createLinkId("(4 2) (4 3)")).setToLinkId(Id.createLinkId("(14 2) (14 3)"))
+				.build();
 
 	}
 

@@ -21,7 +21,6 @@
 package adapterTests;
 
 import lsp.LSPCarrierResource;
-import lsp.LSPResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +44,7 @@ import static org.junit.Assert.*;
 public class CollectionResourceTest {
 
 	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
-	//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
+	//Man kann sie deshalb ja extra außerhalb des Builders einsetzen.
 
 	private org.matsim.vehicles.VehicleType collectionType;
 	private CarrierVehicle collectionCarrierVehicle;
@@ -85,12 +84,10 @@ public class CollectionResourceTest {
 		collectionCarrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder builder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
-		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		builder.setCarrier(collectionCarrier);
-		builder.setLocationLinkId(collectionLinkId);
-		carrierResource = builder.build();
+		carrierResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 	}
 
 
@@ -99,10 +96,7 @@ public class CollectionResourceTest {
 		assertNotNull(carrierResource.getClientElements());
 		assertTrue(carrierResource.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass()));
-		if (LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass())) {
-//			assertTrue(Carrier.class.isAssignableFrom(carrierResource.getClassOfResource()));
-			assertSame(carrierResource.getCarrier(), collectionCarrier);
-		}
+		assertSame(carrierResource.getCarrier(), collectionCarrier);
 		assertSame(carrierResource.getEndLinkId(), collectionLinkId);
 		assertSame(carrierResource.getStartLinkId(), collectionLinkId);
 		assertNotNull(carrierResource.getSimulationTrackers());

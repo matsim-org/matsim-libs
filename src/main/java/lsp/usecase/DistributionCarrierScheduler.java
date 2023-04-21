@@ -31,7 +31,10 @@ import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Ähnlich zu {@link CollectionCarrierScheduler}: Nun werden Sendungen verteilt statt eingesammelt.

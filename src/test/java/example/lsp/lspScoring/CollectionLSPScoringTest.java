@@ -23,7 +23,6 @@ package example.lsp.lspScoring;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,8 +77,8 @@ public class CollectionLSPScoringTest {
 		Carrier carrier = CarrierUtils.createCarrier(Id.create("CollectionCarrier", Carrier.class));
 		carrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance().addType(collectionVehicleType).addVehicle(carrierVehicle).setFleetSize(FleetSize.INFINITE).build());
 
-		LSPResource collectionResource = CollectionCarrierResourceBuilder.newInstance(Id.create("CollectionCarrierResource", LSPResource.class), network)
-				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setCarrier(carrier).setLocationLinkId(collectionLink.getId()).build();
+		LSPResource collectionResource = CollectionCarrierResourceBuilder.newInstance(carrier, network)
+				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setLocationLinkId(collectionLink.getId()).build();
 
 		LogisticChainElement collectionElement = LSPUtils.LogisticChainElementBuilder
 				.newInstance(Id.create("CollectionElement", LogisticChainElement.class)).setResource(collectionResource).build();

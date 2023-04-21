@@ -25,7 +25,6 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -103,17 +102,14 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionResourceId, network);
-		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionResourceBuilder.setCarrier(collectionCarrier);
-		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionResource = collectionResourceBuilder.build();
+		LSPResource collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
-		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(collectionElementId);
-		collectionBuilder.setResource(collectionResource);
-		LogisticChainElement collectionElement = collectionBuilder.build();
+		LogisticChainElement collectionElement  = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(collectionResource)
+				.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
@@ -157,18 +153,15 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunResourceBuilder.setCarrier(mainRunCarrier);
-		LSPResource mainRunResource = mainRunResourceBuilder.build();
+		LSPResource mainRunResource  = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
+				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
+				.build();
 
-		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunResource);
-		LogisticChainElement mainRunElement = mainRunBuilder.build();
+		LogisticChainElement mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
+				.setResource(mainRunResource)
+				.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
