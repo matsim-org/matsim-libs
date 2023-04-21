@@ -66,15 +66,19 @@
 	</module>
 
 	<module name="planCalcScore">
-		<param name="activityType_0" value="dummy"/>
-		<param name="activityTypicalDuration_0" value="24:00:00"/>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="dummy" />
+			<param name="typicalDuration" value="24:00:00" />
+		</parameterset>
 		<param name="traveling_taxi" value="-6"/>
 	</module>
 
 	<module name="strategy">
 		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
 		<param name="maxAgentPlanMemorySize" value="1"/>
-		<param name="ModuleProbability_1" value="1.0"/>
-		<param name="Module_1" value="KeepLastSelected"/>
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="KeepLastSelected" />
+			<param name="weight" value="1.0" />
+		</parameterset>
 	</module>
 </config>
