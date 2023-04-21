@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>application</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 
 
