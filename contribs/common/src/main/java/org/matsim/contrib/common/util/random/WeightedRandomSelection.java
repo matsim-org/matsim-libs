@@ -22,18 +22,15 @@ package org.matsim.contrib.common.util.random;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.random.RandomGenerator;
 
 public class WeightedRandomSelection<T> {
 	private final List<Entry<T>> entryList = new ArrayList<>();
 	private double totalWeight = 0;
-	private final UniformRandom uniform;
+	private final RandomGenerator random;
 
-	public WeightedRandomSelection() {
-		this(RandomUtils.getGlobalUniform());
-	}
-
-	public WeightedRandomSelection(UniformRandom uniform) {
-		this.uniform = uniform;
+	public WeightedRandomSelection(RandomGenerator random) {
+		this.random = random;
 	}
 
 	public void add(T obj, double weight) {
@@ -54,7 +51,7 @@ public class WeightedRandomSelection<T> {
 			throw new IllegalStateException("No entries in the list to select from");
 		}
 
-		double rnd = uniform.nextDouble(0, totalWeight);
+		double rnd = random.nextDouble(0, totalWeight);
 		int idx = Collections.binarySearch(entryList, new Entry<>(null, rnd));
 
 		if (idx < 0) {
