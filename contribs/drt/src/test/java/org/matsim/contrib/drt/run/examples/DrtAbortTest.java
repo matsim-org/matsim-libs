@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.run.examples;
 
 import com.google.inject.Inject;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
@@ -8,18 +9,28 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.run.*;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbortHandler;
@@ -37,10 +48,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DrtAbortTest{
 	private static final Logger log = LogManager.getLogger(DrtAbortTest.class );
@@ -56,6 +64,7 @@ public class DrtAbortTest{
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup() );
 
+		config.controler().setLastIteration(1);
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
@@ -117,16 +126,25 @@ public class DrtAbortTest{
 			}
 		} );
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.bind(DrtRejectionHandler.class).toInstance(new DrtRejectionHandler());
+				addEventHandlerBinding().to(DrtRejectionHandler.class);
+				addControlerListenerBinding().to(DrtRejectionHandler.class);
+			}
+		});
+
 		controler.run();
 
 		// yy I cannot say if the expected status is useful here.  kai, apr'23
 
 		var expectedStats = RunDrtExampleIT.Stats.newBuilder()
-							 .rejectionRate(0.0)
+							 .rejectionRate(1.0)
 							 .rejections(1)
-							 .waitAverage(305.97)
-							 .inVehicleTravelTimeMean(378.18)
-							 .totalTravelTimeMean(684.16)
+							 .waitAverage(Double.NaN)
+							 .inVehicleTravelTimeMean(Double.NaN)
+							 .totalTravelTimeMean(Double.NaN)
 							 .build();
 
 		RunDrtExampleIT.verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -226,6 +244,64 @@ public class DrtAbortTest{
 		}
 		@Override public void setInternalInterface( InternalInterface internalInterface ){
 			this.internalInterface = internalInterface;
+		}
+	}
+
+	private static class DrtRejectionHandler implements PassengerRequestRejectedEventHandler,
+			PassengerRequestSubmittedEventHandler, IterationEndsListener {
+		private final Map<Integer, MutableInt> numberOfRejectionsPerTimeBin = new HashMap<>();
+		private final Map<Integer, MutableInt> numberOfSubmissionsPerTimeBin = new HashMap<>();
+		private final Map<Integer, Double> probabilityOfRejectionPerTimeBin = new HashMap<>();
+		private final double timeBinSize = 900;
+		private final double rejectionCost = 12;
+		// 12 -> 2 hour of default performing score
+
+		@Inject
+		private EventsManager events;
+
+		@Override
+		public void handleEvent(PassengerRequestRejectedEvent event) {
+			if (event.getMode().equals(TransportMode.drt)) {
+				//TODO use drt config group to get mode
+				int timeBin = getTimeBin(event.getTime());
+				numberOfRejectionsPerTimeBin.computeIfAbsent(timeBin, c -> new MutableInt()).increment();
+			}
+		}
+
+		@Override
+		public void reset(int iteration) {
+			PassengerRequestRejectedEventHandler.super.reset(iteration);
+			if (iteration != 0) {
+				numberOfSubmissionsPerTimeBin.clear();
+				numberOfRejectionsPerTimeBin.clear();
+			}
+		}
+
+		private int getTimeBin(double time) {
+			return (int) (Math.floor(time / timeBinSize));
+		}
+
+		@Override
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			// Calculate the probability of being rejected at each time bin
+			for (Integer timeBin : numberOfSubmissionsPerTimeBin.keySet()) {
+				double probability = numberOfRejectionsPerTimeBin.getOrDefault(timeBin, new MutableInt()).doubleValue() /
+						numberOfSubmissionsPerTimeBin.get(timeBin).doubleValue();
+				probabilityOfRejectionPerTimeBin.put(timeBin, probability);
+			}
+		}
+
+		@Override
+		public void handleEvent(PassengerRequestSubmittedEvent event) {
+			if (event.getMode().equals(TransportMode.drt)) {
+				//TODO use drt config group to get mode
+				int timeBin = getTimeBin(event.getTime());
+				numberOfSubmissionsPerTimeBin.computeIfAbsent(timeBin, c -> new MutableInt()).increment();
+
+				// Add a cost for potential rejection
+				double extraScore = (-1) * rejectionCost * probabilityOfRejectionPerTimeBin.getOrDefault(getTimeBin(event.getTime()), 0.0);
+				events.processEvent(new PersonScoreEvent(event.getTime(), event.getPersonId(), extraScore, "Potential_of_being_rejected"));
+			}
 		}
 	}
 
