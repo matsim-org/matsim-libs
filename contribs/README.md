@@ -30,6 +30,7 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [freight](freight/README.md)                                             | Package that plugs freight algorithms
 | [hybridsim](hybridsim/README.md)                                         |
 | integration                                                              |
+| [informed-mode-choice](informed-mode-choice/README.md)                   | Mode choice algorithms based on trip utility estimation
 | [locationchoice](locationchoice/README.md)                               | Location choice for discretionary activities
 | [matrixbasedptrouter](matrixbasedptrouter/README.md)                     | Calculate PT travel times using a set of stops and a pre-calculated travel time 
 | [minibus](minibus/README.md)                                             | Runs an adaptive "minibus" model to serve given demand
@@ -43,7 +44,7 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [roadpricing](roadpricing/README.md)                                     | Functionality to simulate different road-pricing scenarios in MATSim
 | [shared_mobility](shared_mobility/README.md)                             | Simulate human-driven shared mobility (i.e., micromobility)
 | [signals](signals/README.md)                                             | Simulate traffic lights microscopically
-| [simwrapper](simwrapper/README.md)                                       | Creates dashboards automatically with [SimWrapper](https://simwrapper.github.io/) 
+| [simwrapper](simwrapper/README.md)                                       | Creates dashboards automatically with [SimWrapper](https://simwrapper.github.io/)
 | [socnetsim](socnetsim/README.md)                                         | Social network simulation
 | [sumo](sumo/README.md)                                                   | Converter and integrations for [SUMO](https://sumo.dlr.de/])
 | [taxi](taxi/README.md)                                                   | Taxi service functionality

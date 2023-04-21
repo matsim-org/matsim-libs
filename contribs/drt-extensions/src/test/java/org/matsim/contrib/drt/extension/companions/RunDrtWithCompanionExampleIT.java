@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -70,12 +70,12 @@ public class RunDrtWithCompanionExampleIT {
 		Controler controler = DrtCompanionControlerCreator.createControler(config);
 		controler.run();
 
-		verifyTotalNumberOfDrtRides(utils.getOutputDirectory(), 477);
+		int actualRides = getTotalNumberOfDrtRides();
+		Assertions.assertThat(actualRides).isEqualTo(471);
 	}
 
-	private void verifyTotalNumberOfDrtRides(String outputDirectory, int expectedNumberOfTrips) {
-
-		String filename = outputDirectory + "/drt_customer_stats_drt.csv";
+	private int getTotalNumberOfDrtRides() {
+		String filename = utils.getOutputDirectory() + "/drt_customer_stats_drt.csv";
 
 		final List<String> collect;
 		try {
@@ -88,12 +88,8 @@ public class RunDrtWithCompanionExampleIT {
 		List<String> keys = List.of(collect.get(0).split(";"));
 		List<String> lastIterationValues = List.of(collect.get(size - 1).split(";"));
 
-		Map<String, String> params = new HashMap<>();
-		for (int i = 0; i < keys.size(); i++) {
-			params.put(keys.get(i), lastIterationValues.get(i));
-		}
-
-		int actualRides = Integer.parseInt(params.get("rides"));
-		assert(actualRides == expectedNumberOfTrips);
+		int index = keys.indexOf("rides");
+        String value = lastIterationValues.get(index);
+		return Integer.parseInt(value);
 	}
 }

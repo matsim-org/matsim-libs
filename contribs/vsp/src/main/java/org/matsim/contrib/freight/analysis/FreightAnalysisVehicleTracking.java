@@ -36,9 +36,14 @@ import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 
 /**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ *
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
+@Deprecated(since = "apr23", forRemoval = true)
 class FreightAnalysisVehicleTracking {
 
 	private static final  Logger log = LogManager.getLogger(FreightAnalysisVehicleTracking.class);
@@ -153,6 +158,13 @@ class FreightAnalysisVehicleTracking {
 
 }
 
+
+/**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ */
+@Deprecated(since = "apr23")
 class VehicleTracker {
 	public double lastExit;
 	public Id<Person> lastDriverId = Id.createPersonId(-1);

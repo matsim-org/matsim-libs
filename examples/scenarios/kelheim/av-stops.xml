@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="115" x="710342.6822431424" y="5421698.351380847" linkRefId="-11812197#1"/>
+		<stopFacility id="116" x="710220.6057611711" y="5421674.293816676" linkRefId="367435047#2"/>
+		<stopFacility id="122" x="709577.1768693906" y="5421857.281419041" linkRefId="-403665341#3"/>
+		<stopFacility id="123" x="709972.8613644687" y="5421858.952827892" linkRefId="690955526"/>
+		<stopFacility id="124" x="710142.2942223058" y="5421898.973376873" linkRefId="376292334#1"/>
+		<stopFacility id="126" x="710697.1050503437" y="5421838.478607031" linkRefId="95355876"/>
+		<stopFacility id="127" x="710741.6738864479" y="5421970.347466995" linkRefId="-27456890#1"/>
+		<stopFacility id="128" x="710737.9195393474" y="5422327.268690442" linkRefId="239897149#1"/>
+		<stopFacility id="129" x="710460.9313599175" y="5422536.308689348" linkRefId="-26801184"/>
+		<stopFacility id="131" x="710227.8499625789" y="5422399.998221756" linkRefId="-27100093"/>
+		<stopFacility id="132" x="710391.971494141" y="5422379.622763705" linkRefId="26838017#2"/>
+		<stopFacility id="133" x="710544.337112707" y="5422311.725649062" linkRefId="27392297#1"/>
+		<stopFacility id="134" x="710417.3350385663" y="5422178.343189359" linkRefId="27392519#0"/>
+		<stopFacility id="135" x="710261.8825001372" y="5422135.903445284" linkRefId="618582560"/>
+	</transitStops>
+</transitSchedule>

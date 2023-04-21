@@ -94,6 +94,10 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		return new DrtTeleportedRouteCalculator(currentAvgWaitingTime, currentAvgInVehicleBeelineSpeed);
 	}
 
+	public DrtSpeedUpParams getParams() {
+		return drtSpeedUpParams;
+	}
+
 	double getCurrentAvgWaitingTime() {
 		return currentAvgWaitingTime;
 	}

@@ -22,9 +22,6 @@ package org.matsim.core.gbl;
 
 import java.util.Random;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 /**
  * An abstract class, providing random numbers for MATSim. Also provides
@@ -34,22 +31,6 @@ import org.apache.logging.log4j.Logger;
  * @author mrieser
  */
 public abstract class MatsimRandom {
-	private static final Logger log = LogManager.getLogger( MatsimRandom.class ) ;
-
-	private static final class InstrumentedRandom extends Random {
-		InstrumentedRandom(long defaultRandomSeed) {
-			super(defaultRandomSeed) ;
-		}
-		private long cntDbl = 0 ;
-		@Override public double nextDouble() {
-			cntDbl++ ; 
-			return super.nextDouble() ;
-		}
-		long numberOfDrawnDoubles() {
-			return cntDbl ;
-		}
-	}
-
 	private static final long DEFAULT_RANDOM_SEED = 4711;
 
 	private static long lastUsedSeed = DEFAULT_RANDOM_SEED;
@@ -57,7 +38,6 @@ public abstract class MatsimRandom {
 
 	/** the global random number generator */
 	private static final Random random = new Random(DEFAULT_RANDOM_SEED);
-//	private static final Random random = new InstrumentedRandom(DEFAULT_RANDOM_SEED);
 
 	/** Resets the random number generator with a default random seed. */
 	public static void reset() {
@@ -100,12 +80,4 @@ public abstract class MatsimRandom {
 			rng.nextDouble();
 		}
 	}
-
-	public static final void printRNGState(String label) {
-		if ( random instanceof InstrumentedRandom ) {
-			log.warn( "label=" + label + ";\tnumber of doubles draws = " + ((InstrumentedRandom) random).numberOfDrawnDoubles() ) ;
-		}
-		log.warn("label=" + label + ";\tnumber of local instances =" + internalCounter );
-	}
-
 }

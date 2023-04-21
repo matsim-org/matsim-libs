@@ -134,7 +134,8 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		}
 		dumpOutputTrips(event.getIteration());
         dumpOutputLegs(event.getIteration());
-		dumpExperiencedPlans(event.getIteration()) ;
+		dumpOutputActivities(event.getIteration());
+		dumpExperiencedPlans(event.getIteration());
 
 		if (controlerConfigGroup.getCleanItersAtEnd() == ControlerConfigGroup.CleanIterations.delete) {
 			this.controlerIO.deleteIterationDirectory();
@@ -174,6 +175,16 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 					this.controlerIO.getOutputFilename(Controler.DefaultFiles.tripscsv));
 		} catch (Exception ee) {
 			LogManager.getLogger(this.getClass()).error("writing output trips did not work; probably parameters were such that no trips CSV were "
+					+ "generated in the final iteration");
+		}
+	}
+
+	private void dumpOutputActivities(int iteration) {
+		try {
+			IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.activitiescsv),
+					this.controlerIO.getOutputFilename(Controler.DefaultFiles.activitiescsv));
+		} catch (Exception ee) {
+			LogManager.getLogger(this.getClass()).error("writing output activities did not work; probably parameters were such that no activities CSV were "
 					+ "generated in the final iteration");
 		}
 	}
@@ -237,7 +248,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpHouseholds() {
 		try {
-			new HouseholdsWriterV10(this.households).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.households));
+			HouseholdsWriterV10 writer = new HouseholdsWriterV10(this.households);
+			writer.putAttributeConverters(this.attributeConverters);
+			writer.writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.households));
 		} catch ( Exception ee ) {
 			log.error("Exception writing households.", ee);
 		}

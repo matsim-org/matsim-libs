@@ -43,12 +43,12 @@ public class DischargingModule extends AbstractModule {
 				addMobsimScopeEventHandlerBinding().to(DriveDischargingHandler.class);
 				// event handlers are not qsim components
 
-				this.bind(AuxDischargingHandler.class).in( Singleton.class );
-				addMobsimScopeEventHandlerBinding().to(AuxDischargingHandler.class);
-				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
+				this.bind(IdleDischargingHandler.class).in( Singleton.class );
+				addMobsimScopeEventHandlerBinding().to(IdleDischargingHandler.class);
+				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(IdleDischargingHandler.class);
 
 				//by default, no vehicle will be AUX-discharged when not moving
-				this.bind(AuxDischargingHandler.VehicleProvider.class).toInstance(event -> null);
+				this.bind(IdleDischargingHandler.VehicleProvider.class).toInstance(event -> null);
 			}
 		});
 	}
