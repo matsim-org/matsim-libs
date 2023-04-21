@@ -134,6 +134,9 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 					bicycleConfigGroup.getMarginalUtilityOfUserDefinedNetworkAttribute_m(),
 					bicycleConfigGroup.getUserDefinedNetworkAttributeName(),
 					bicycleConfigGroup.getUserDefinedNetworkAttributeDefaultValue());
+
+
+
 			// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
 			this.score += scoreOnLink;
 

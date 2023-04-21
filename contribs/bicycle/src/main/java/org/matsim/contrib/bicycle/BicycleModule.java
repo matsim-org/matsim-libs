@@ -63,6 +63,7 @@ public final class BicycleModule extends AbstractModule {
 				// yyyyyy remember that the 10it test needs to be un-ignored.  kai, dec'22
 
 				this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
+				this.bind( AdditionalBicycleLinkScore.class ).to( AdditionalBicycleLinkScoreDefaultImpl.class );
 			}
 			case linkBased -> {
 				bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);

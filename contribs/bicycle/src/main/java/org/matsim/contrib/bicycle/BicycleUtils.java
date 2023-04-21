@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.bicycle;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 
 /**
@@ -50,5 +51,9 @@ public final class BicycleUtils {
 
 	public static String getUserDefinedNetworkAttribute( Link link, String nameOfUserDefinedNetworkAttribute ) {
 		return (String) link.getAttributes().getAttribute( nameOfUserDefinedNetworkAttribute );
+	}
+
+	public static AdditionalBicycleLinkScore createDefaultBicycleLinkScore( Scenario scenario ) {
+		return new AdditionalBicycleLinkScoreDefaultImpl( scenario );
 	}
 }

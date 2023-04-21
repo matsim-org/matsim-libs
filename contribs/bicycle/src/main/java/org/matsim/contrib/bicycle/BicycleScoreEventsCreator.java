@@ -60,11 +60,12 @@ class BicycleScoreEventsCreator implements
 	private final String bicycleMode;
 	private final Network network;
 	private final EventsManager eventsManager;
+	private final AdditionalBicycleLinkScore additionalBicycleLinkScore;
 
 	Vehicle2DriverEventHandler vehicle2driver = new Vehicle2DriverEventHandler();
 	private Map<Id<Vehicle>,Id<Link>> firstLinkIdMap = new LinkedHashMap<>();
 
-	@Inject BicycleScoreEventsCreator( Scenario scenario, EventsManager eventsManager ) {
+	@Inject BicycleScoreEventsCreator( Scenario scenario, EventsManager eventsManager, AdditionalBicycleLinkScore additionalBicycleLinkScore ) {
 		this.eventsManager = eventsManager;
 
 		this.network = scenario.getNetwork();
@@ -77,6 +78,8 @@ class BicycleScoreEventsCreator implements
 		this.nameOfUserDefinedNetworkAttribute = bicycleConfigGroup.getUserDefinedNetworkAttributeName();
 		this.userDefinedNetworkAttributeDefaultValue = bicycleConfigGroup.getUserDefinedNetworkAttributeDefaultValue();
 		this.bicycleMode = bicycleConfigGroup.getBicycleMode();
+
+		this.additionalBicycleLinkScore = additionalBicycleLinkScore;
 	}
 
 	@Override public void reset( int iteration ){
@@ -92,9 +95,12 @@ class BicycleScoreEventsCreator implements
 			// can happen on first link.
 
 			Link link = network.getLinks().get( event.getLinkId() );
-			double amount = BicycleUtilityUtils.computeLinkBasedScore( link, marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m,
-					marginalUtilityOfGradient_m_100m, marginalUtilityOfUserDefinedNetworkAttribute_m, nameOfUserDefinedNetworkAttribute,
-					userDefinedNetworkAttributeDefaultValue);
+//			double amount = BicycleUtilityUtils.computeLinkBasedScore( link, marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m,
+//					marginalUtilityOfGradient_m_100m, marginalUtilityOfUserDefinedNetworkAttribute_m, nameOfUserDefinedNetworkAttribute,
+//					userDefinedNetworkAttributeDefaultValue);
+
+			double amount = additionalBicycleLinkScore.computeLinkBasedScore( link );
+
 			final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );
 			Gbl.assertNotNull( driverOfVehicle );
 			this.eventsManager.processEvent( new PersonScoreEvent( event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore" ) );
