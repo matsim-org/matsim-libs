@@ -186,8 +186,8 @@ public class UsecaseUtils {
 		CollectionCarrierScheduler collectionScheduler;
 
 		private CollectionCarrierResourceBuilder(Carrier carrier, Network network) {
-			this.id = Id.create(this.carrier.getId().toString(), LSPResource.class);
-			setCarrierType(this.carrier, CARRIER_TYPE.collectionCarrier);
+			this.id = Id.create(carrier.getId().toString(), LSPResource.class);
+			setCarrierType(carrier, CARRIER_TYPE.collectionCarrier);
 			this.carrier = carrier;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
