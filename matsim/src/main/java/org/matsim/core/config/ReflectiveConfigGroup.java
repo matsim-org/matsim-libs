@@ -249,7 +249,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				var typeArgument = pType.getActualTypeArguments()[0];
 				return typeArgument.equals(String.class);
 			}
+
+			if (rawType.equals(Class.class))
+				return true;
 		}
+
 		return false;
 	}
 
@@ -373,6 +377,12 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			return value.isBlank() ? ImmutableSet.of() : splitStringToStream(value).collect(toImmutableSet());
 		} else if (type.equals(List.class)) {
 			return value.isBlank() ? List.of() : splitStringToStream(value).toList();
+		} else if (type.equals(Class.class)) {
+			try {
+				return ClassLoader.getSystemClassLoader().loadClass(value);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException("Could not load specified class; " + value, e);
+			}
 		} else {
 			throw new RuntimeException("Unsupported type: " + type);
 		}
