@@ -11,40 +11,36 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbortHandler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.withinday.utils.EditPlans;
-import org.matsim.withinday.utils.EditTrips;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DrtAbortTest{
 	private static final Logger log = LogManager.getLogger(DrtAbortTest.class );
@@ -60,6 +56,20 @@ public class DrtAbortTest{
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup() );
 
+		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
+		{
+			final PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walkAfterRejectMode ) );
+			params.setScoringThisActivityAtAll( false );
+			config.planCalcScore().addActivityParams( params );
+		}
+		{
+			PlanCalcScoreConfigGroup.ModeParams params = new PlanCalcScoreConfigGroup.ModeParams( walkAfterRejectMode );
+			config.planCalcScore().addModeParams( params );
+		}
+
+		config.planCalcScore().setWriteExperiencedPlans( true );
 		for ( DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config ).getModalElements()) {
 		//relatively high max age to prevent rejections
 //			var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
@@ -75,19 +85,31 @@ public class DrtAbortTest{
 
 		}
 
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-
-		final PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walkAfterRejectMode ) );
-		params.setScoringThisActivityAtAll( false );
-		config.planCalcScore().addActivityParams( params );
 
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
 		List<String> components = qsimComponents.getActiveComponents();
 		components.add( MyAbortHandler.COMPONENT_NAME );
 		qsimComponents.setActiveComponents( components );
 
-		final Controler controler = DrtControlerCreator.createControler( config, false );
+		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get( config );
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.planCalcScore(), config.plansCalcRoute() );
+
+		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory( config );
+		ScenarioUtils.loadScenario(scenario );
+
+		// reduce to one person:
+		{
+			List<Id<Person>> keys = new ArrayList<>( scenario.getPopulation().getPersons().keySet() );
+			keys.remove( 0 );
+			for( Id<Person> personId : keys ){
+				scenario.getPopulation().removePerson( personId );
+			}
+		}
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new DvrpModule() );
+		controler.addOverridingModule(new MultiModeDrtModule() );
+		controler.configureQSimComponents( DvrpQSimComponents.activateAllModes(multiModeDrtConfig ) );
 
 		controler.addOverridingQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
@@ -123,7 +145,6 @@ public class DrtAbortTest{
 
 			log.warn("need to handle abort of agent=" + agent );
 
-
 			final String drtMode = "drt";
 
 			PopulationFactory pf = population.getFactory();
@@ -132,6 +153,11 @@ public class DrtAbortTest{
 				// yyyyyy this will have to work for all drt modes!!!
 
 				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
+				log.warn("\n current plan=" + plan );
+				for( PlanElement planElement : plan.getPlanElements() ){
+					log.warn( planElement );
+				}
+
 				int index = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );
 
 				Id<Link> interactionLink = agent.getCurrentLinkId();
@@ -154,7 +180,9 @@ public class DrtAbortTest{
 				// (2) An interaction activity needs to be inserted.
 				{
 					Coord interactionCoord = network.getLinks().get( interactionLink ).getCoord();
-					Activity activity = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix( interactionCoord, interactionLink, walkAfterRejectMode );
+//					Activity activity = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix( interactionCoord, interactionLink, walkAfterRejectMode );
+					Activity activity = pf.createActivityFromCoord( TripStructureUtils.createStageActivityType( walkAfterRejectMode ), interactionCoord );
+					activity.setMaximumDuration( 1. );
 					plan.getPlanElements().add( index+1, activity );
 					// (inserts at given position; pushes everything else forward)
 				}
@@ -174,6 +202,11 @@ public class DrtAbortTest{
 				// (5) add the agent to an internal list, which is processed during doSimStep, which formally ends the current
 				// (aborted) leg, and moves the agent forward in its state machine.
 				agents.add( agent );
+
+				log.warn("\n plan after splicing=" + plan);
+				for( PlanElement planElement : plan.getPlanElements() ){
+					log.warn( planElement );
+				}
 			}
 			return true;
 		}
