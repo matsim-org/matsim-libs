@@ -27,8 +27,8 @@ import java.util.function.BiConsumer;
 import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.common.csv.CSVLineBuilder;
 import org.matsim.contrib.common.csv.CompactCSVWriter;
-import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.contrib.common.timeprofile.TimeProfileCharts.ChartType;
+import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -42,11 +42,10 @@ import com.google.common.collect.ImmutableMap;
 
 public class TimeProfileCollector implements MobsimBeforeSimStepListener, MobsimBeforeCleanupListener {
 	public interface ProfileCalculator {
-		ImmutableList<String> getHeader();
-
 		ImmutableMap<String, Double> calcValues();
 	}
 
+	private final ImmutableList<String> header;
 	private final ProfileCalculator calculator;
 
 	private final List<Double> times = new ArrayList<>();
@@ -58,8 +57,9 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 	private BiConsumer<JFreeChart, ChartType> chartCustomizer;
 	private ChartType[] chartTypes = { ChartType.Line };
 
-	public TimeProfileCollector(ProfileCalculator calculator, int interval, String outputFile,
+	public TimeProfileCollector(ImmutableList<String> header, ProfileCalculator calculator, int interval, String outputFile,
 			MatsimServices matsimServices) {
+		this.header = header;
 		this.calculator = calculator;
 		this.interval = interval;
 		this.outputFile = outputFile;
@@ -84,16 +84,15 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		String file = matsimServices.getControlerIO()
-				.getIterationFilename(matsimServices.getIterationNumber(), outputFile);
+		String file = matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(), outputFile);
 		String timeFormat = interval % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
-			writer.writeNext(new CSVLineBuilder().add("time").addAll(calculator.getHeader()));
+			writer.writeNext(new CSVLineBuilder().add("time").addAll(header));
 
 			for (int i = 0; i < timeProfile.size(); i++) {
 				CSVLineBuilder builder = new CSVLineBuilder().add(Time.writeTime(times.get(i), timeFormat));
-				for (String column : calculator.getHeader()) {
+				for (String column : header) {
 					builder.add(timeProfile.get(i).getOrDefault(column, 0.) + "");
 				}
 				writer.writeNext(builder);
@@ -101,7 +100,7 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 		}
 
 		for (ChartType t : chartTypes) {
-			generateImage(calculator.getHeader(), t);
+			generateImage(header, t);
 		}
 	}
 
