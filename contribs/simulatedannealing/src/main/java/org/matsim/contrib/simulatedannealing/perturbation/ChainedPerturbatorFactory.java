@@ -8,7 +8,7 @@
  */
 package org.matsim.contrib.simulatedannealing.perturbation;
 
-import org.matsim.contrib.common.util.random.WeightedRandomSelection;
+import org.matsim.contrib.common.util.WeightedRandomSelection;
 import org.matsim.contrib.simulatedannealing.SimulatedAnnealing;
 import org.matsim.core.gbl.MatsimRandom;
 
