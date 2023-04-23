@@ -1,9 +1,9 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2021 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,15 +15,17 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
 
 package org.matsim.contrib.ev.stats;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.common.csv.CSVLineBuilder;
 import org.matsim.contrib.common.csv.CompactCSVWriter;
+import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -33,55 +35,48 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.utils.io.IOUtils;
 
-public class XYDataCollector<T extends Identifiable<T>>
-		implements MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimBeforeCleanupListener {
-	public interface XYDataCalculator<T> {
-		String[] getHeader();
+import com.google.inject.Inject;
 
-		Coord getCoord(T object);
+public class ChargerOccupancyXYDataCollector implements MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimBeforeCleanupListener {
 
-		double[] calculate(T object);
-	}
-
-	private final Iterable<T> monitoredObjects;
-	private final XYDataCalculator<T> calculator;
-	private final int interval;
-	private final String outputFile;
+	private final ChargingInfrastructure chargingInfrastructure;
 	private final MatsimServices matsimServices;
 
 	private CompactCSVWriter writer;
 
-	public XYDataCollector(Iterable<T> monitoredObjects, XYDataCalculator<T> calculator, int interval,
-			String outputFile, MatsimServices matsimServices) {
-		this.monitoredObjects = monitoredObjects;
-		this.calculator = calculator;
-		this.interval = interval;
-		this.outputFile = outputFile;
+	@Inject
+	public ChargerOccupancyXYDataCollector(ChargingInfrastructure chargingInfrastructure, MatsimServices matsimServices) {
+		this.chargingInfrastructure = chargingInfrastructure;
 		this.matsimServices = matsimServices;
 	}
 
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
-		String file = matsimServices.getControlerIO()
-				.getIterationFilename(matsimServices.getIterationNumber(), outputFile);
+		String file = matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(), "charger_occupancy_absolute");
 		writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".xy.gz"));
-		writer.writeNext(new CSVLineBuilder().addAll("time", "id", "x", "y").addAll(calculator.getHeader()));
+		writer.writeNext(new CSVLineBuilder().addAll("time", "id", "x", "y", "plugs", "plugged", "queued", "assigned"));
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
+		final int interval = 300;
 		if (e.getSimulationTime() % interval == 0) {
 			String time = (int)e.getSimulationTime() + "";
-			for (T o : monitoredObjects) {
-				Coord coord = calculator.getCoord(o);
-				CSVLineBuilder builder = new CSVLineBuilder().addAll(time, o.getId() + "", coord.getX() + "",
-						coord.getY() + "");
-				for (Double value : calculator.calculate(o)) {
+			for (var c : chargingInfrastructure.getChargers().values()) {
+				Coord coord = c.getCoord();
+				CSVLineBuilder builder = new CSVLineBuilder().addAll(time, c.getId() + "", coord.getX() + "", coord.getY() + "");
+				for (int value : calculate(c)) {
 					builder.add(value + "");
 				}
 				writer.writeNext(builder);
 			}
 		}
+	}
+
+	private int[] calculate(Charger charger) {
+		ChargingLogic logic = charger.getLogic();
+		int assignedCount = logic instanceof ChargingWithAssignmentLogic ? ((ChargingWithAssignmentLogic)logic).getAssignedVehicles().size() : 0;
+		return new int[] { charger.getPlugCount(), logic.getPluggedVehicles().size(), logic.getQueuedVehicles().size(), assignedCount };
 	}
 
 	@Override
