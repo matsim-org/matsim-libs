@@ -50,13 +50,13 @@ public class VehicleTypeAggregatedChargeTimeProfileCollectorProvider implements 
 	@Override
 	public MobsimListener get() {
 		final String ALL_VEHICLES_ID = "all vehicles";
-
 		var vehicleTypes = evFleet.getElectricVehicles()
 				.values()
 				.stream()
 				.map(ev -> ev.getVehicleSpecification().getMatsimVehicle().getType().getId() + "")
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		vehicleTypes.add(ALL_VEHICLES_ID);
+
 		var header = ImmutableList.copyOf(vehicleTypes);
 		ProfileCalculator calculator = () -> {
 			Map<String, Double> averageSocByType = evFleet.getElectricVehicles()
