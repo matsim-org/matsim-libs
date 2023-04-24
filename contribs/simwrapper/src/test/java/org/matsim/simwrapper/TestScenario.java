@@ -35,6 +35,7 @@ public class TestScenario extends MATSimApplication {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
+		config.controler().setWriteEventsInterval(1);
 
 		return config;
 	}

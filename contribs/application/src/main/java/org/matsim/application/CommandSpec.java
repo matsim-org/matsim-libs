@@ -16,6 +16,7 @@ public @interface CommandSpec {
 	 * List of file names that are used as input for this class.
 	 */
 	String[] requires() default {};
+
 	/**
 	 * Whether a network is required as input.
 	 */
@@ -30,6 +31,11 @@ public @interface CommandSpec {
 	 * Whether an events file is required as input.
 	 */
 	boolean requireEvents() default false;
+
+	/**
+	 * Whether a count file is required as input.
+	 */
+	boolean requireCounts() default false;
 
 	/**
 	 * Whether a run directory is required as input.

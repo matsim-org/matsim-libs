@@ -32,6 +32,7 @@ public final class InputOptions {
 	private Path runDirectory;
 	private String networkPath;
 	private String populationPath;
+	private String countsPath;
 	private String eventsPath;
 
 	private InputOptions(CommandSpec spec) {
@@ -53,7 +54,7 @@ public final class InputOptions {
 	 */
 	public String getPath(String name) {
 		if (!inputs.containsKey(name))
-			throw new IllegalArgumentException(String.format("The input '%s' is not registered", name));
+			throw new IllegalArgumentException(String.format("The input '%s' is not registered as required in @CommandSpec.", name));
 
 		return inputs.get(name);
 	}
@@ -79,6 +80,13 @@ public final class InputOptions {
 		return eventsPath;
 	}
 
+	public String getCountsPath() {
+		if (!spec.requireEvents())
+			throw new IllegalArgumentException("Counts can not be accessed unless, requireCounts=true.");
+
+		return countsPath;
+	}
+
 	public Path getRunDirectory() {
 		if (!spec.requireRunDirectory())
 			throw new IllegalArgumentException("Run directory can not be accessed unless, requireRunDirectory=true.");
@@ -91,9 +99,6 @@ public final class InputOptions {
 		AtomicBoolean flag = new AtomicBoolean(false);
 
 		command.mixinStandardHelpOptions(true);
-
-		// TODO: refactor the arg building
-		// other input args
 
 		for (String require : spec.requires()) {
 			if (require.isBlank())
@@ -134,6 +139,16 @@ public final class InputOptions {
 				@Override
 				public <T> T set(T value) {
 					populationPath = value.toString();
+					return value;
+				}
+			}));
+		}
+
+		if (spec.requireCounts()) {
+			command.add(createArg(flag, "--counts", "Path to input counts.", new CommandLine.Model.ISetter() {
+				@Override
+				public <T> T set(T value) {
+					countsPath = value.toString();
 					return value;
 				}
 			}));

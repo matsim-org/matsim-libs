@@ -20,14 +20,14 @@ public class StuckAgentDashboard implements Dashboard {
 
 		layout.row("first").el(TextBlock.class, (viz, data) -> {
 			viz.title = "";
-			viz.file = data.compute(StuckAgentAnalysis.class, "table1.md");
+			viz.file = "table1.md";
 			viz.height = 1.;
 		});
 
 		layout.row("second")
 				.el(PieChart.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Transport Mode";
-					viz.dataset = "piechart.csv";
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "piechart.csv");
 					viz.useLastRow = "true";
 				})
 				.el(TextBlock.class, (viz, data) -> {

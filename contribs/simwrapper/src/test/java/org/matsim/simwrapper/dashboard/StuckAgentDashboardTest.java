@@ -1,4 +1,4 @@
-package org.matsim.simwrapper.analysis;
+package org.matsim.simwrapper.dashboard;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
@@ -8,17 +8,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.TestScenario;
-import org.matsim.simwrapper.dashboard.StuckAgentDashboard;
 import org.matsim.testcases.MatsimTestUtils;
 
-
-public class StuckAgentAnalysisTest {
-
+public class StuckAgentDashboardTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void run() {
+	public void generate() {
 
 		Config config = TestScenario.loadConfig(utils);
 
@@ -30,4 +27,5 @@ public class StuckAgentAnalysisTest {
 
 		Assertions.fail("Implement assertions and remove this line.");
 	}
+
 }

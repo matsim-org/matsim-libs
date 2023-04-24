@@ -160,10 +160,6 @@ public final class CommandRunner {
 			args.add("--events");
 			args.add(ApplicationUtils.matchInput("events.xml", input));
 		}
-		if (spec.requireRunDirectory() && !ArrayUtils.contains(existingArgs, "--run-directory")) {
-			args.add("--run-directory");
-			args.add(input.toString());
-		}
 		if (spec.requirePopulation() && !ArrayUtils.contains(existingArgs, "--population")) {
 			args.add("--population");
 			args.add(ApplicationUtils.matchInput("plans.xml", input));
@@ -171,6 +167,14 @@ public final class CommandRunner {
 		if (spec.requireNetwork() && !ArrayUtils.contains(existingArgs, "--network")) {
 			args.add("--network");
 			args.add(ApplicationUtils.matchInput("network.xml", input));
+		}
+		if (spec.requireCounts() && !ArrayUtils.contains(existingArgs, "--counts")) {
+			args.add("--counts");
+			args.add(ApplicationUtils.matchInput("counts.xml", input));
+		}
+		if (spec.requireRunDirectory() && !ArrayUtils.contains(existingArgs, "--run-directory")) {
+			args.add("--run-directory");
+			args.add(input.toString());
 		}
 
 		if (ApplicationUtils.acceptsOptions(command, ShpOptions.class) && !ArrayUtils.contains(existingArgs, "--shp")) {

@@ -200,7 +200,7 @@ public class ApplicationUtils {
 
 	private static Optional<Path> matchSuffix(String suffix, Path dir) {
 		try (Stream<Path> stream = Files.list(dir)) {
-			return stream.filter(p -> p.toString().endsWith(suffix)).findFirst();
+			return stream.filter(p -> p.getFileName().toString().endsWith(suffix)).findFirst();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -208,7 +208,7 @@ public class ApplicationUtils {
 
 	private static Optional<Path> matchPattern(String pattern, Path dir) {
 		try (Stream<Path> stream = Files.list(dir)) {
-			return stream.filter(p -> p.toString().matches(pattern)).findFirst();
+			return stream.filter(p -> p.getFileName().toString().matches(pattern)).findFirst();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
