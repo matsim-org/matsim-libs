@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class CalculationTable extends Viz{
 
 	/**
-	 * Path to the config file
+	 * Path to the config file.
 	 */
 	@JsonProperty(required = true)
 	public String configFile;
