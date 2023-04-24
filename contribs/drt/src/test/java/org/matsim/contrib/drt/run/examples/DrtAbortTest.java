@@ -20,6 +20,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.path.VrpPaths;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -41,6 +42,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.modal.AbstractModalQSimModule;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
@@ -135,10 +137,14 @@ public class DrtAbortTest{
 			}
 		} );
 
+
+		// Prescription for the DRT Rejection module and add handler bindings to DRT Rejection Handler
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind(DrtRejectionHandler.class).toInstance(new DrtRejectionHandler());
+				// TODO Chengqi: perhaps there is a better way to do this? I remember you mentioned in class that bind to instance is not the best way...
+				bind(DrtRejectionHandler.class).toInstance(new DrtRejectionHandler());
+
 				addEventHandlerBinding().to(DrtRejectionHandler.class);
 				addControlerListenerBinding().to(DrtRejectionHandler.class);
 			}
@@ -156,6 +162,7 @@ public class DrtAbortTest{
 							 .totalTravelTimeMean(Double.NaN)
 							 .build();
 
+		// I commented this line, because NaN cannot be checked (NaN == NaN always false)
 //		RunDrtExampleIT.verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
 
@@ -167,19 +174,21 @@ public class DrtAbortTest{
 		@Inject Population population;
 		@Inject MobsimTimer mobsimTimer;
 
-		// TODO Chengqi: Injection does not work with these elements
-		TravelTime travelTime = new QSimFreeSpeedTravelTime(1);
+		TravelTime travelTime;
 		LeastCostPathCalculator router;
+
 		//	TODO Chengqi: I cannot get DRT config group
  		// @Inject DrtConfigGroup drtConfigGroup;
 
 		private InternalInterface internalInterface;
 		private final List<MobsimAgent> agents = new ArrayList<>();
 
-		@Override public boolean handleAbort( MobsimAgent agent ){
-			// TODO Chenggi: this should be initialized when the "MyAbortHandler" is created. But that is not possible because of the injected Network...
+		@Inject MyAbortHandler(Network network, Map<String, TravelTime> travelTimeMap){
+			travelTime = travelTimeMap.get(TransportMode.car);
 			router =  new SpeedyALTFactory().createPathCalculator(network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
+		}
 
+		@Override public boolean handleAbort( MobsimAgent agent ){
 			log.warn("need to handle abort of agent=" + agent );
 
 			final String drtMode = "drt";
@@ -228,7 +237,7 @@ public class DrtAbortTest{
 					secondLeg.setDepartureTime( now );
 					double directTravelTime = VrpPaths.calcAndCreatePath
 							(network.getLinks().get(interactionLink), network.getLinks().get(originallyPlannedDestinationLink), now, router, travelTime).getTravelTime();
-					//TODO Chengqi: get DRT config group
+					//TODO Chengqi: it would be better if we can get the alpha beta values from DRT config group directly
  					// double estimatedTravelTime = drtConfigGroup.maxTravelTimeAlpha * directTravelTime + drtConfigGroup.maxTravelTimeBeta;
 					double estimatedTravelTime = 1.5 * directTravelTime + 900;
 					secondLeg.setTravelTime( estimatedTravelTime );
@@ -279,17 +288,23 @@ public class DrtAbortTest{
 		private final Map<Integer, MutableInt> numberOfRejectionsPerTimeBin = new HashMap<>();
 		private final Map<Integer, MutableInt> numberOfSubmissionsPerTimeBin = new HashMap<>();
 		private final Map<Integer, Double> probabilityOfRejectionPerTimeBin = new HashMap<>();
+
+		// Key parameters
 		private final double timeBinSize = 900;
+		// Time bin to analyze the probability of being rejected
 		private final double rejectionCost = 12;
 		// 12 -> 2 hour of default performing score
+		private final double learningRate = 0.75;
+		// (1 - alpha) * old probability + alpha * new probability
 
-		@Inject
-		private EventsManager events;
+		@Inject private EventsManager events;
 
 		@Override
 		public void handleEvent(PassengerRequestRejectedEvent event) {
+			// Currently, we assume there is only 1 DRT operator with standard DRT mode ("drt")
+			// Because it is a little tricky to get DRT Config Group here (which can only be acquired via DvrpQSimModule),
+			// we just use the simple way. For multi-operator, a map can be introduced to store the data for different DRT modes
 			if (event.getMode().equals(TransportMode.drt)) {
-				//TODO Chengqi: use drt config group to get mode
 				int timeBin = getTimeBin(event.getTime());
 				numberOfRejectionsPerTimeBin.computeIfAbsent(timeBin, c -> new MutableInt()).increment();
 			}
@@ -304,16 +319,14 @@ public class DrtAbortTest{
 			}
 		}
 
-		private int getTimeBin(double time) {
-			return (int) (Math.floor(time / timeBinSize));
-		}
-
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			// Calculate the probability of being rejected at each time bin
 			for (Integer timeBin : numberOfSubmissionsPerTimeBin.keySet()) {
 				double probability = numberOfRejectionsPerTimeBin.getOrDefault(timeBin, new MutableInt()).doubleValue() /
 						numberOfSubmissionsPerTimeBin.get(timeBin).doubleValue();
+				// Apply exponential discount
+				probability = learningRate * probability + (1 - learningRate) * probabilityOfRejectionPerTimeBin.getOrDefault(timeBin, 0.);
 				probabilityOfRejectionPerTimeBin.put(timeBin, probability);
 			}
 		}
@@ -321,15 +334,19 @@ public class DrtAbortTest{
 		@Override
 		public void handleEvent(PassengerRequestSubmittedEvent event) {
 			if (event.getMode().equals(TransportMode.drt)) {
-				//TODO Chengqi: use drt config group to get mode
 				int timeBin = getTimeBin(event.getTime());
 				numberOfSubmissionsPerTimeBin.computeIfAbsent(timeBin, c -> new MutableInt()).increment();
 
 				// Add a cost for potential rejection
-				double extraScore = (-1) * rejectionCost * probabilityOfRejectionPerTimeBin.getOrDefault(getTimeBin(event.getTime()), 0.0);
+				double extraScore = (-1) * rejectionCost * probabilityOfRejectionPerTimeBin.getOrDefault(getTimeBin(event.getTime()), 0.);
 				events.processEvent(new PersonScoreEvent(event.getTime(), event.getPersonId(), extraScore, "Potential_of_being_rejected"));
 			}
 		}
+
+		private int getTimeBin(double time) {
+			return (int) (Math.floor(time / timeBinSize));
+		}
+
 	}
 
 }
