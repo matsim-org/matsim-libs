@@ -76,7 +76,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 
 			// Sort Map
 			List<String> sorted = new ArrayList<>(allStuckedLinks.keySet());
-			sorted.sort((o1, o2) -> (-1) * allStuckedLinks.get(o1).compareTo(allStuckedLinks.get(o2)));
+			sorted.sort((o1, o2) -> -Double.compare (allStuckedLinks.getDouble(o1), allStuckedLinks.getDouble(o2)));
 			List<String> header = new ArrayList<>(stuckAgentsPerLink.keySet());
 			header.add(0, "link");
 			header.add(1, "# Agents");
@@ -98,8 +98,8 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		// Stuck agents per mode
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerMode.csv").toString()), CSVFormat.DEFAULT)) {
 			printer.printRecord("Mode", "# Agents");
-			for (Map.Entry<String, Integer> entry : stuckAgentsPerMode.entrySet()) {
-				printer.printRecord(entry.getKey(), entry.getValue());
+			for (Object2IntMap.Entry<String> entry : stuckAgentsPerMode.object2IntEntrySet()) {
+				printer.printRecord(entry.getKey(), entry.getIntValue());
 			}
 		} catch (IOException ex) {
 			log.error(ex);
