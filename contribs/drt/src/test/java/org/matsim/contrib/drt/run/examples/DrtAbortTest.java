@@ -76,6 +76,8 @@ public class DrtAbortTest{
 				new OTFVisConfigGroup() );
 
 		config.controler().setLastIteration(1);
+		config.plans().setInputFile("plans_only_drt_rejection_test.xml");
+		// Chengqi: I have created a special plan for the rejection handler test: 3 requests within 1 time bin (6:45 - 7:00)
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
@@ -97,11 +99,20 @@ public class DrtAbortTest{
 //			drtCfg.addParameterSet(drtRequestInsertionRetryParams);
 			// I don't know what the above does; might be useful to understand.
 
-			drtCfg.maxTravelTimeAlpha = 1.;
-			drtCfg.maxTravelTimeBeta = 0.;
-			drtCfg.maxWaitTime = 1.;
+			drtCfg.maxTravelTimeAlpha = 1.2;
+			drtCfg.maxTravelTimeBeta = 100.;
+			drtCfg.maxWaitTime = 10.;
 			drtCfg.stopDuration = 1.;
+
+			drtCfg.vehiclesFile = "vehicles-rejection-test.xml";
+			// Chengqi: I have created a special vehicle file for the rejection handler test: 1 vehicle locates at the departure place of one request
+
 			// (Trying to force abort(s); can't say if this is the correct syntax.  kai, apr'23)
+			// Chengqi: With this parameter, 2 out of the 3 requests during 6:45-7:00 will be rejected
+			// -> 2/3 probability of being rejected -> 2/3 of penalty to everyone who submit DRT requests
+			// Based on current setup, at iteration 1, we should see person score event for each person
+			// with a negative score of -6: 12 (base penalty) * 2/3 (probability) * 0.75 (learning rate, current) + 0 (previous penalty) * 0.25 (learning rate, previous)
+			// Currently a manual check is performed and passed. Perhaps an integrated test can be implemtned here (TODO).
 
 		}
 
@@ -117,14 +128,17 @@ public class DrtAbortTest{
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory( config );
 		ScenarioUtils.loadScenario(scenario );
 
-		// reduce to one person:
-		{
-			List<Id<Person>> keys = new ArrayList<>( scenario.getPopulation().getPersons().keySet() );
-			keys.remove( 0 );
-			for( Id<Person> personId : keys ){
-				scenario.getPopulation().removePerson( personId );
-			}
-		}
+		// reduce to one person: Chengqi: with my special plans, this is no longer necessary :)
+//		{
+//			List<Id<Person>> keys = new ArrayList<>( scenario.getPopulation().getPersons().keySet() );
+//			keys.remove( 0 );
+//			keys.remove( 0 );
+//			keys.remove( 0 );
+//
+//			for( Id<Person> personId : keys ){
+//				scenario.getPopulation().removePerson( personId );
+//			}
+//		}
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule() );
@@ -177,8 +191,8 @@ public class DrtAbortTest{
 		TravelTime travelTime;
 		LeastCostPathCalculator router;
 
-		//	TODO Chengqi: I cannot get DRT config group
- 		// @Inject DrtConfigGroup drtConfigGroup;
+		// TODO we would need a DRT config group here, if we don't want to hardcode the alpha and beta values
+		// DrtConfigGroup drtConfigGroup;
 
 		private InternalInterface internalInterface;
 		private final List<MobsimAgent> agents = new ArrayList<>();
@@ -295,7 +309,7 @@ public class DrtAbortTest{
 		private final double rejectionCost = 12;
 		// 12 -> 2 hour of default performing score
 		private final double learningRate = 0.75;
-		// (1 - alpha) * old probability + alpha * new probability
+		// (1 - alpha) * old probability + alpha * new probability (0 < alpha <= 1)
 
 		@Inject private EventsManager events;
 
