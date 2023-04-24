@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.random.RandomGenerator;
 
+import com.google.common.base.Preconditions;
+
 public class WeightedRandomSelection<T> {
 	private final List<Entry<T>> entryList = new ArrayList<>();
 	private double totalWeight = 0;
@@ -48,9 +50,8 @@ public class WeightedRandomSelection<T> {
 	}
 
 	public T select() {
-		if (entryList.size() == 0) {
-			throw new IllegalStateException("No entries in the list to select from");
-		}
+		Preconditions.checkState(!entryList.isEmpty(), "No entries in the list to select from");
+		Preconditions.checkState(totalWeight > 0, "Total weight is not positive");
 
 		double rnd = random.nextDouble(0, totalWeight);
 		int idx = Collections.binarySearch(entryList, new Entry<>(null, rnd));
