@@ -95,6 +95,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	}
 
 	public void setBoardingTime(double boardingTime) {
+		OptionalTime.assertDefined(boardingTime);
 		this.boardingTime = boardingTime;
 	}
 

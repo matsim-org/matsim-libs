@@ -21,9 +21,8 @@ package org.matsim.contrib.drt.extension.companions;
 
 import java.util.List;
 
-import org.matsim.contrib.util.random.RandomUtils;
-import org.matsim.contrib.util.random.UniformRandom;
-import org.matsim.contrib.util.random.WeightedRandomSelection;
+import org.matsim.contrib.common.util.WeightedRandomSelection;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  *
@@ -33,12 +32,10 @@ import org.matsim.contrib.util.random.WeightedRandomSelection;
 public class DrtCompanionUtils {
 
 	public static WeightedRandomSelection<Integer> createIntegerSampler(final List<Double> distribution) {
-		WeightedRandomSelection<Integer> wrs = new WeightedRandomSelection<>(
-				new UniformRandom(RandomUtils.getLocalGenerator()));
+		WeightedRandomSelection<Integer> wrs = new WeightedRandomSelection<>(MatsimRandom.getLocalInstance());
 		for (int i = 0; i < distribution.size(); ++i) {
 			wrs.add(i, distribution.get(i));
 		}
 		return wrs;
 	}
-
 }

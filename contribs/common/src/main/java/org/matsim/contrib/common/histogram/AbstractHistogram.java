@@ -47,4 +47,12 @@ public abstract class AbstractHistogram<T> implements Histogram<T> {
 	public long getTotalCount() {
 		return totalCount;
 	}
+
+	public void addValues(double[] values) {
+		for (double v : values) {
+			addValue(v);
+		}
+	}
+
+	abstract public void addValue(double value);
 }

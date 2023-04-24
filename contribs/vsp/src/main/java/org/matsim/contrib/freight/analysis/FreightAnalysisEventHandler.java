@@ -58,6 +58,7 @@ import java.util.LinkedHashSet;
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  * */
 
+@Deprecated(since = "apr23")
 class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, FreightShipmentPickupEventHandler, FreightShipmentDeliveryEventHandler, FreightServiceStartEventHandler, FreightServiceEndEventHandler {
 
 	private final static Logger log = LogManager.getLogger(FreightAnalysisEventHandler.class);

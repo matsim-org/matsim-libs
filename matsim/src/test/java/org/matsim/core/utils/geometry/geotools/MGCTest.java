@@ -82,6 +82,27 @@ public class MGCTest {
 			org.junit.Assert.assertEquals("EPSG:32610", epsg);
 		}
 		{
+			//Anchorage - should be UTM 6 North --> EPSG:32606
+			double lat = 61.2176;
+			double lon  = -149.8997;
+			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
+			org.junit.Assert.assertEquals("EPSG:32606", epsg);
+		}
+		{
+			//Lourdes (France) - should be UTM 30 North --> EPSG:32630
+			double lat = 43.1;
+			double lon  = -0.05;
+			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
+			org.junit.Assert.assertEquals("EPSG:32630", epsg);
+		}
+		{
+			//east of Lourdes (France) - should be UTM 31 North --> EPSG:32631
+			double lat = 43.1;
+			double lon  = 0.05;
+			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
+			org.junit.Assert.assertEquals("EPSG:32631", epsg);
+		}
+		{
 			//Padang - should be UTM 47 South --> EPSG:32747
 			double lat = -0.959484;
 			double lon  =  100.354052;

@@ -1,4 +1,3 @@
-[![deploy-on-pr-merge](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml/badge.svg?event=push "snapshot release")](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml)
 [![deploy-on-pr-merge](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml/badge.svg?event=pull_request_target&branch= "PR-merge release")](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml)
 [![deploy-weekly](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml/badge.svg "weekly release")](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml)
 [![full-integration](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml/badge.svg "daily release-like build")](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml)
@@ -48,7 +47,7 @@ Releases (also PR-based and weekly releases) and snapshots can be found at https
 
 An example how to get started with your own project, including a complete pom.xml, is at https://github.com/matsim-org/matsim-example-project .
 
-Code examples are at https://github.com/matsim-org/matsim-code-examples .
+Code examples are at https://github.com/matsim-org/matsim-code-examples.
 
 
 

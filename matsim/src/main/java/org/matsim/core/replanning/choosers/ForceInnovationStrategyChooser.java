@@ -51,10 +51,11 @@ public class ForceInnovationStrategyChooser<PL extends BasicPlan, AG extends Has
 
 		for (int i = 0; i < weights.size(); i++) {
 
-			// Use zero weight every nth iteration
+
 			int term = (permute ? hash(person.getId().index()) >>> perm : person.getId().index()) % iter;
 			int mod = replanningContext.getIteration() % iter;
 
+			// Set selectors weight to zero, so only innovate strategies remain
 			if ((term == mod || -term == mod) && ReplanningUtils.isOnlySelector(weights.getStrategy(i))) {
 				w[i] = 0;
 			} else
