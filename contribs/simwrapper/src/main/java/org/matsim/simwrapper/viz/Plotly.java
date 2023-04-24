@@ -80,9 +80,6 @@ public class Plotly extends Viz {
 
 		// TODO: enable traces to be loaded from files
 
-		// entries must be mapped to column names
-
-		// x,y,color,size,opacity,text
 
 		// TODO: data mapping
 		// TODO: check if the mapping is valid and present
@@ -173,19 +170,20 @@ public class Plotly extends Viz {
 	 * Data mapping that is not using external data, but inlines it into the yaml files.
 	 */
 	public static Data inlineData() {
-		return null;
+		return new Data(null);
 	}
-
 
 	/**
 	 * Class to specify input path and map column names to their meaning.
 	 */
 	public static final class Data {
-
 		private final String path;
-
 		private String x;
 		private String y;
+		private String text;
+		private String size;
+		private String color;
+		private String opacity;
 
 		private Data(String path) {
 			this.path = path;
@@ -207,6 +205,37 @@ public class Plotly extends Viz {
 			return this;
 		}
 
+		/**
+		 * Mapping for text (label) column.
+		 */
+		public Data text(String columnName) {
+			text = columnName;
+			return this;
+		}
+
+		/**
+		 * Mapping for size column.
+		 */
+		public Data size(String columnName) {
+			size = columnName;
+			return this;
+		}
+
+		/**
+		 * Mapping for color column.
+		 */
+		public Data color(String columnName) {
+			color = columnName;
+			return this;
+		}
+
+		/**
+		 * Mapping for opacity column.
+		 */
+		public Data opacity(String columnName) {
+			opacity = columnName;
+			return this;
+		}
 	}
 
 }
