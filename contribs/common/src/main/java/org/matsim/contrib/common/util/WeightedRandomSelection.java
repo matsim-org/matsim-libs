@@ -67,15 +67,7 @@ public class WeightedRandomSelection<T> {
 		return entryList.size();
 	}
 
-	private static class Entry<E> implements Comparable<Entry<E>> {
-		final private E e;
-		final private double cumulativeWeight;
-
-		private Entry(E e, double cumulativeWeight) {
-			this.e = e;
-			this.cumulativeWeight = cumulativeWeight;
-		}
-
+	private record Entry<E>(E e, double cumulativeWeight) implements Comparable<Entry<E>> {
 		public int compareTo(Entry<E> o) {
 			double diff = this.cumulativeWeight - o.cumulativeWeight;
 			return diff == 0 ? 0 : (diff > 0 ? 1 : -1);
