@@ -142,9 +142,6 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 	public void handleEvent(PersonStuckEvent event) {
 		if (event.getEventType().equals("stuckAndAbort")) {
 
-			log.info("Person ID:" + event.getPersonId().toString());
-			log.info("Attributes:" + event.getAttributes());
-
 			// Pie chart
 			if (!stuckAgentsPerMode.containsKey(event.getLegMode())) stuckAgentsPerMode.put(event.getLegMode(), 1);
 			else stuckAgentsPerMode.put(event.getLegMode(), stuckAgentsPerMode.getInt(event.getLegMode()) + 1);
