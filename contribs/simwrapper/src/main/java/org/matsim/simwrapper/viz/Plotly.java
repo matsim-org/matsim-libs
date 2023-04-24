@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.el.MethodNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.tablesaw.plotly.components.Component;
 import tech.tablesaw.plotly.components.Config;
 import tech.tablesaw.plotly.components.Figure;
 import tech.tablesaw.plotly.components.Layout;
@@ -13,9 +14,7 @@ import tech.tablesaw.plotly.traces.Trace;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Viz for arbitrary plotly graphs.
@@ -35,6 +34,7 @@ public class Plotly extends Viz {
 	 */
 	public static final Object[] OBJ_INPUT = new Object[0];
 
+	@JsonIgnore
 	public List<Data> data = new ArrayList<>();
 
 	@JsonIgnore
@@ -73,50 +73,136 @@ public class Plotly extends Viz {
 	}
 
 	@JsonProperty("traces")
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	List<Map<String, Object>> getTraces() {
 
 		List<Map<String, Object>> result = new ArrayList<>();
 
-		// TODO: enable traces to be loaded from files
+		for (int i = 0; i < traces.size(); i++) {
+			Trace t = traces.get(i);
+			Data d = data.get(i);
 
+			Map<String, Object> object = convertTrace(t, i);
 
-		// TODO: data mapping
-		// TODO: check if the mapping is valid and present
-		// TODO: remove if data is present
-
-		int i = 0;
-		for (Trace t : traces) {
-
-			if (!(t instanceof AbstractTrace trace)) {
-				log.warn("Generation is only supported for AbstractTrace");
-				continue;
-			}
-
-			// Use one of the getContext methods
-			try {
-				Method m = t.getClass().getDeclaredMethod("getContext", int.class);
-				m.setAccessible(true);
-				result.add((Map<String, Object>) m.invoke(t, i++));
+			if (object == null)
 				continue;
 
-			} catch (MethodNotFoundException e) {
-				// Nothing done, go to next block
-			} catch (ReflectiveOperationException e) {
-				log.error("Could not create trace", e);
-			}
+			clean(object);
+			object.remove("variablename");
 
-			try {
-				Method m = AbstractTrace.class.getDeclaredMethod("getContext");
-				m.setAccessible(true);
+			if (d.path != null) {
+				object.put("data", d);
 
-				result.add((Map<String, Object>) m.invoke(t));
-			} catch (ReflectiveOperationException e) {
-				log.error("Could not create trace", e);
+				// Remove data entries that should be loaded from resources
+				if (d.x != null)
+					object.remove("x");
+
+				if (d.y != null)
+					object.remove("y");
+
+				if (d.text != null)
+					object.remove("text");
+
+				if (d.size != null && object.containsKey("marker"))
+					((Map) object.get("marker")).remove("size");
+
+				if (d.color != null && object.containsKey("marker"))
+					((Map) object.get("marker")).remove("color");
+
+				if (d.opacity != null && object.containsKey("marker"))
+					((Map) object.get("marker")).remove("opacity");
 			}
+			result.add(object);
 		}
 
 		return result;
+	}
+
+	/**
+	 * Recursively converts the object attributes to be consistent with plotly.
+	 *
+	 * @return same instance as input.
+	 */
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> clean(Map<String, Object> object) {
+
+		Iterator<Map.Entry<String, Object>> it = object.entrySet().iterator();
+
+		Map<String, Object> copy = new LinkedHashMap<>();
+		while (it.hasNext()) {
+			Map.Entry<String, Object> e = it.next();
+
+			if (e.getValue() == null || "".equals(e.getValue())) {
+				it.remove();
+				continue;
+			}
+
+			if (e.getValue() instanceof Map)
+				clean((Map<String, Object>) e.getValue());
+
+			if (e.getValue() instanceof Component c) {
+				Map<String, Object> obj = convertComponent(c);
+				if (obj != null) {
+					clean(obj);
+					copy.put(e.getKey().toLowerCase(), obj);
+				}
+				it.remove();
+				continue;
+			}
+
+			copy.put(e.getKey().toLowerCase(), e.getValue());
+			it.remove();
+		}
+
+		object.putAll(copy);
+		return object;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> convertTrace(Trace t, int i) {
+
+		if (!(t instanceof AbstractTrace)) {
+			log.warn("Generation is only supported for AbstractTrace");
+			return null;
+		}
+
+		// Use one of the getContext methods
+		try {
+			Method m = t.getClass().getDeclaredMethod("getContext", int.class);
+			m.setAccessible(true);
+			return (Map<String, Object>) m.invoke(t, i);
+
+		} catch (MethodNotFoundException e) {
+			// Nothing done, go to next block
+		} catch (ReflectiveOperationException e) {
+			log.error("Could not create trace", e);
+		}
+
+		try {
+			Method m = AbstractTrace.class.getDeclaredMethod("getContext");
+			m.setAccessible(true);
+			return (Map<String, Object>) m.invoke(t);
+		} catch (ReflectiveOperationException e) {
+			log.error("Could not create trace", e);
+		}
+
+
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> convertComponent(Component c) {
+		try {
+			// Use protected method
+			Method m = Component.class.getDeclaredMethod("getJSONContext");
+			m.setAccessible(true);
+
+			return (Map<String, Object>) m.invoke(c);
+
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	@JsonProperty("config")
@@ -131,7 +217,7 @@ public class Plotly extends Viz {
 			Method m = Config.class.getDeclaredMethod("getJSONContext");
 			m.setAccessible(true);
 
-			return (Map<String, Object>) m.invoke(config);
+			return clean((Map<String, Object>) m.invoke(config));
 
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(e);
@@ -150,7 +236,7 @@ public class Plotly extends Viz {
 			Method m = Layout.class.getDeclaredMethod("getContext");
 			m.setAccessible(true);
 
-			return (Map<String, Object>) m.invoke(layout);
+			return clean((Map<String, Object>) m.invoke(layout));
 
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(e);
@@ -169,7 +255,7 @@ public class Plotly extends Viz {
 	/**
 	 * Data mapping that is not using external data, but inlines it into the yaml files.
 	 */
-	public static Data inlineData() {
+	public static Data inline() {
 		return new Data(null);
 	}
 
