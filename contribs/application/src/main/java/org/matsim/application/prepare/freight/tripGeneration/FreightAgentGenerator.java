@@ -36,7 +36,7 @@ public class FreightAgentGenerator {
             return freightAgents; // This trip relation is irrelevant as it does not contain any freight by road
         }
 
-        int numOfTrips = numOfTripsCalculator.calculateNumberOfTrips(tripRelation.getTonsPerYear(), tripRelation.getGoodsType());
+        int numOfTrips = numOfTripsCalculator.calculateNumberOfTrips(tripRelation.getTonsPerYearMainRun(), tripRelation.getGoodsTypeMainRun());
         for (int i = 0; i < numOfTrips; i++) {
             // pre-run
             if (preRunMode.equals("2")) {
@@ -44,7 +44,7 @@ public class FreightAgentGenerator {
                 Plan plan = populationFactory.createPlan();
                 double departureTime = departureTimeCalculator.getDepartureTime();
 
-                Id<Link> startLinkId = locationCalculator.getLocationOnNetwork(tripRelation.getOriginalCell());
+                Id<Link> startLinkId = locationCalculator.getLocationOnNetwork(tripRelation.getOriginalOriginCell());
                 Activity startAct = populationFactory.createActivityFromLinkId("freight_start", startLinkId);
                 startAct.setCoord(network.getLinks().get(startLinkId).getToNode().getCoord());
                 startAct.setEndTime(departureTime);
@@ -60,7 +60,7 @@ public class FreightAgentGenerator {
 
                 person.addPlan(plan);
                 person.getAttributes().putAttribute("trip_type", "pre-run");
-                writeCommonAttributes(person, tripRelation, tripRelationId);
+				LongDistanceFreightUtils.writeCommonAttributesV1(person, tripRelation, tripRelationId);
 
                 freightAgents.add(person);
             }
@@ -87,7 +87,7 @@ public class FreightAgentGenerator {
 
                 person.addPlan(plan);
                 person.getAttributes().putAttribute("trip_type", "main-run");
-                writeCommonAttributes(person, tripRelation, tripRelationId);
+				LongDistanceFreightUtils.writeCommonAttributesV1(person, tripRelation, tripRelationId);
 
                 freightAgents.add(person);
             }
@@ -107,35 +107,20 @@ public class FreightAgentGenerator {
                 Leg leg = populationFactory.createLeg("freight");
                 plan.addLeg(leg);
 
-                Id<Link> endLinkId = locationCalculator.getLocationOnNetwork(tripRelation.getDestinationCell());
+                Id<Link> endLinkId = locationCalculator.getLocationOnNetwork(tripRelation.getFinalDestinationCell());
                 Activity endAct = populationFactory.createActivityFromLinkId("freight_end", endLinkId);
                 endAct.setCoord(network.getLinks().get(endLinkId).getToNode().getCoord());
                 plan.addActivity(endAct);
 
                 person.addPlan(plan);
                 person.getAttributes().putAttribute("trip_type", "post-run");
-                writeCommonAttributes(person, tripRelation, tripRelationId);
+				LongDistanceFreightUtils.writeCommonAttributesV1(person, tripRelation, tripRelationId);
 
                 freightAgents.add(person);
             }
         }
 
         return freightAgents;
-    }
-
-    // TODO store this attribute names as public static strings
-    private void writeCommonAttributes(Person person, TripRelation tripRelation, String tripRelationId){
-        person.getAttributes().putAttribute("subpopulation", "freight");
-        person.getAttributes().putAttribute("trip_relation_index", tripRelationId);
-        person.getAttributes().putAttribute("pre-run_mode", tripRelation.getModePreRun());
-        person.getAttributes().putAttribute("main-run_mode", tripRelation.getModeMainRun());
-        person.getAttributes().putAttribute("post-run_mode", tripRelation.getModePostRun());
-        person.getAttributes().putAttribute("initial_origin_cell", tripRelation.getOriginalCell());
-        person.getAttributes().putAttribute("origin_cell_main_run", tripRelation.getDestinationCellMainRun());
-        person.getAttributes().putAttribute("destination_cell_main_run", tripRelation.getDestinationCellMainRun());
-        person.getAttributes().putAttribute("final_destination_cell", tripRelation.getDestinationCell());
-        person.getAttributes().putAttribute("goods_type", tripRelation.getGoodsType());
-        person.getAttributes().putAttribute("tons_per_year", tripRelation.getTonsPerYear());
     }
 
     public interface LocationCalculator {
