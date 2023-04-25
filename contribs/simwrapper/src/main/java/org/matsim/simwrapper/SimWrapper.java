@@ -6,12 +6,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandRunner;
 import org.matsim.simwrapper.viz.Viz;
+import tech.tablesaw.plotly.components.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -83,7 +85,10 @@ public final class SimWrapper {
 
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER).enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
 				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+				.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
 				.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+
+		mapper.addMixIn(Component.class, ComponentMixin.class);
 
 		ObjectWriter writer = mapper.writerFor(YAML.class);
 

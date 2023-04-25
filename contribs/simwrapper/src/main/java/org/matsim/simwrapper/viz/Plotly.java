@@ -2,18 +2,17 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.el.MethodNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import tech.tablesaw.plotly.components.Component;
 import tech.tablesaw.plotly.components.Config;
 import tech.tablesaw.plotly.components.Figure;
 import tech.tablesaw.plotly.components.Layout;
-import tech.tablesaw.plotly.traces.AbstractTrace;
 import tech.tablesaw.plotly.traces.Trace;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -45,7 +44,6 @@ public class Plotly extends Viz {
 	public Layout layout;
 
 	@Nullable
-	@JsonIgnore
 	public Config config;
 
 
@@ -73,7 +71,6 @@ public class Plotly extends Viz {
 	}
 
 	@JsonProperty("traces")
-	@SuppressWarnings("rawtypes")
 	List<Map<String, Object>> getTraces() {
 
 		List<Map<String, Object>> result = new ArrayList<>();
@@ -82,44 +79,83 @@ public class Plotly extends Viz {
 			Trace t = traces.get(i);
 			Data d = data.get(i);
 
-			Map<String, Object> object = convertTrace(t, i);
+			Map<String, Object> object = convertTrace(t, d, i);
 
-			if (object == null)
-				continue;
-
-			clean(object);
-			object.remove("variablename");
-
-			if (d.path != null) {
-				object.put("data", d);
-
-				// Remove data entries that should be loaded from resources
-				if (d.x != null)
-					object.remove("x");
-
-				if (d.y != null)
-					object.remove("y");
-
-				if (d.text != null)
-					object.remove("text");
-
-				if (d.size != null && object.containsKey("marker"))
-					((Map) object.get("marker")).remove("size");
-
-				if (d.color != null && object.containsKey("marker"))
-					((Map) object.get("marker")).remove("color");
-
-				if (d.opacity != null && object.containsKey("marker"))
-					((Map) object.get("marker")).remove("opacity");
-			}
 			result.add(object);
 		}
 
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> convertTrace(Trace t, Data d, int i) {
+
+		Map<String, Object> object = new LinkedHashMap<>();
+
+		if (d.path != null) {
+			object.put("data", d);
+		}
+
+		Field[] fields = t.getClass().getDeclaredFields();
+
+		for (Field field : fields) {
+
+			if (!field.trySetAccessible())
+				continue;
+
+			if (Modifier.isStatic(field.getModifiers()))
+				continue;
+
+			try {
+				Object o = field.get(t);
+
+				if (o == null)
+					continue;
+				if (o.equals(""))
+					continue;
+
+				object.put(field.getName().toLowerCase(), o);
+			} catch (IllegalAccessException e) {
+				log.warn("Could not retrieve field {}", field.getName(), e);
+				continue;
+			}
+
+		}
+
+		// Remove data entries that should be loaded from resources
+		if (d.x != null)
+			object.remove("x");
+
+		if (d.y != null)
+			object.remove("y");
+
+		if (d.text != null)
+			object.remove("text");
+
+		return object;
+	}
+
+	@JsonProperty("layout")
+	@SuppressWarnings("unchecked")
+	Map<String, Object> getLayout() {
+
+		if (layout == null)
+			return null;
+
+		try {
+			// Use protected method
+			Method m = Layout.class.getDeclaredMethod("getContext");
+			m.setAccessible(true);
+
+			return clean((Map<String, Object>) m.invoke(layout));
+
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
-	 * Recursively converts the object attributes to be consistent with plotly.
+	 * Recursively converts object attributes to be consistent with plotly.
 	 *
 	 * @return same instance as input.
 	 */
@@ -140,107 +176,12 @@ public class Plotly extends Viz {
 			if (e.getValue() instanceof Map)
 				clean((Map<String, Object>) e.getValue());
 
-			if (e.getValue() instanceof Component c) {
-				Map<String, Object> obj = convertComponent(c);
-				if (obj != null) {
-					clean(obj);
-					copy.put(e.getKey().toLowerCase(), obj);
-				}
-				it.remove();
-				continue;
-			}
-
 			copy.put(e.getKey().toLowerCase(), e.getValue());
 			it.remove();
 		}
 
 		object.putAll(copy);
 		return object;
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> convertTrace(Trace t, int i) {
-
-		if (!(t instanceof AbstractTrace)) {
-			log.warn("Generation is only supported for AbstractTrace");
-			return null;
-		}
-
-		// Use one of the getContext methods
-		try {
-			Method m = t.getClass().getDeclaredMethod("getContext", int.class);
-			m.setAccessible(true);
-			return (Map<String, Object>) m.invoke(t, i);
-
-		} catch (MethodNotFoundException e) {
-			// Nothing done, go to next block
-		} catch (ReflectiveOperationException e) {
-			log.error("Could not create trace", e);
-		}
-
-		try {
-			Method m = AbstractTrace.class.getDeclaredMethod("getContext");
-			m.setAccessible(true);
-			return (Map<String, Object>) m.invoke(t);
-		} catch (ReflectiveOperationException e) {
-			log.error("Could not create trace", e);
-		}
-
-
-		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> convertComponent(Component c) {
-		try {
-			// Use protected method
-			Method m = Component.class.getDeclaredMethod("getJSONContext");
-			m.setAccessible(true);
-
-			return (Map<String, Object>) m.invoke(c);
-
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException(e);
-		}
-
-	}
-
-	@JsonProperty("config")
-	@SuppressWarnings("unchecked")
-	Map<String, Object> getConfig() {
-
-		if (config == null)
-			return null;
-
-		try {
-			// Use protected method
-			Method m = Config.class.getDeclaredMethod("getJSONContext");
-			m.setAccessible(true);
-
-			return clean((Map<String, Object>) m.invoke(config));
-
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@JsonProperty("layout")
-	@SuppressWarnings("unchecked")
-	Map<String, Object> getLayout() {
-
-		if (layout == null)
-			return null;
-
-		try {
-			// Use protected method
-			Method m = Layout.class.getDeclaredMethod("getContext");
-			m.setAccessible(true);
-
-			return clean((Map<String, Object>) m.invoke(layout));
-
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**

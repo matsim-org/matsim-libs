@@ -6,22 +6,29 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import tech.tablesaw.plotly.components.*;
+import org.matsim.simwrapper.ComponentMixin;
+import org.matsim.testcases.MatsimTestUtils;
 import tech.tablesaw.plotly.components.Line;
+import tech.tablesaw.plotly.components.*;
 import tech.tablesaw.plotly.components.change.ChangeLine;
 import tech.tablesaw.plotly.components.change.Decreasing;
-import tech.tablesaw.plotly.components.threeD.Camera;
-import tech.tablesaw.plotly.components.threeD.Scene;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.HistogramTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
+import java.io.File;
+
 public class PlotlyTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private ObjectWriter writer;
 
@@ -30,8 +37,11 @@ public class PlotlyTest {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
 				.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
 				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
+				.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
 				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 				.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+
+		mapper.addMixIn(Component.class, ComponentMixin.class);
 
 		writer = mapper.writerFor(Plotly.class);
 	}
@@ -48,7 +58,10 @@ public class PlotlyTest {
 
 		plot.addTrace(trace, Plotly.inline());
 
-		writer.writeValueAsString(plot);
+		String value = writer.writeValueAsString(plot);
+
+		Assertions.assertThat(new File(utils.getClassInputDirectory(), "inline.yaml"))
+				.hasContent(value);
 
 	}
 
@@ -62,7 +75,11 @@ public class PlotlyTest {
 
 		plot.addTrace(trace, Plotly.data("ref.csv").x("values").y("names"));
 
-		writer.writeValueAsString(plot);
+		String value = writer.writeValueAsString(plot);
+
+		Assertions.assertThat(new File(utils.getClassInputDirectory(), "data.yaml"))
+				.hasContent(value);
+
 
 	}
 
@@ -106,12 +123,10 @@ public class PlotlyTest {
 				.responsive(true)
 				.build();
 
-		String content = writer.writeValueAsString(plot);
+		String value = writer.writeValueAsString(plot);
 
-		System.out.println(content);
-
-
-		Assertions.fail("Implement");
+		Assertions.assertThat(new File(utils.getClassInputDirectory(), "multiple.yaml"))
+				.hasContent(value);
 
 	}
 
