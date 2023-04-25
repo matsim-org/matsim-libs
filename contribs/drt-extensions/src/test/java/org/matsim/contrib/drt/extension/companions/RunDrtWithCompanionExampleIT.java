@@ -20,16 +20,7 @@
 package org.matsim.contrib.drt.extension.companions;
 
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -44,6 +35,13 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Steffen Axer
@@ -70,8 +68,7 @@ public class RunDrtWithCompanionExampleIT {
 		Controler controler = DrtCompanionControlerCreator.createControler(config);
 		controler.run();
 
-		int actualRides = getTotalNumberOfDrtRides();
-		Assertions.assertThat(actualRides).isEqualTo(471);
+		Assert.assertEquals(471, getTotalNumberOfDrtRides());
 	}
 
 	private int getTotalNumberOfDrtRides() {
