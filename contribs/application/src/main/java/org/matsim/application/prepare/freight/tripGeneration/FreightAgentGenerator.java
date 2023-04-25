@@ -26,7 +26,7 @@ public class FreightAgentGenerator {
         this.network = network;
     }
 
-    public List<Person> generateFreightAgents(TripRelation tripRelation, String tripRelationId) {
+    public List<Person> generateRoadFreightAgents(TripRelation tripRelation, String tripRelationId) {
         List<Person> freightAgents = new ArrayList<>();
         String preRunMode = tripRelation.getModePreRun();
         String mainRunMode = tripRelation.getModeMainRun();

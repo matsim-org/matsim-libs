@@ -70,7 +70,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
         log.info("Start generating population...");
         Population outputPopulation = PopulationUtils.createPopulation(ConfigUtils.createConfig());
         for (int i = 0; i < tripRelations.size(); i++) {
-            List<Person> persons = freightAgentGenerator.generateFreightAgents(tripRelations.get(i), Integer.toString(i));
+            List<Person> persons = freightAgentGenerator.generateRoadFreightAgents(tripRelations.get(i), Integer.toString(i));
             for (Person person : persons) {
                 outputPopulation.addPerson(person);
             }
