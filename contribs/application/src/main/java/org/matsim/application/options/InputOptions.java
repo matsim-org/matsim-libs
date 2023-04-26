@@ -20,23 +20,70 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class InputOptions {
 
 	/**
+	 * Class original used to create this option.
+	 */
+	private final Class<? extends MATSimAppCommand> clazz;
+	private final CommandSpec spec;
+	private final Map<String, String> inputs = new HashMap<>();
+	/**
 	 * Needs to be present or the mixin will not be processed at all.
 	 */
 	@CommandLine.Option(names = "--unused-input-option", hidden = true)
 	private String unused;
-
-	private final CommandSpec spec;
-
-	private final Map<String, String> inputs = new HashMap<>();
-
 	private Path runDirectory;
 	private String networkPath;
 	private String populationPath;
 	private String countsPath;
 	private String eventsPath;
 
-	private InputOptions(CommandSpec spec) {
+	private InputOptions(Class<? extends MATSimAppCommand> clazz, CommandSpec spec) {
+		this.clazz = clazz;
 		this.spec = spec;
+	}
+
+	/**
+	 * Return the argument names, the first specified argument will also be named with {@code first}.
+	 */
+	static String[] argNames(AtomicBoolean flag, String first, String name) {
+		if (!flag.get()) {
+			flag.set(true);
+			return new String[]{first, name};
+		}
+		return new String[]{name};
+	}
+
+	/**
+	 * Return the argument name of an input file.
+	 */
+	public static String argName(String require) {
+
+		require = require.replace(".gz", "");
+		String[] split = require.split("\\.");
+
+		// Remove the suffix
+		String s = split.length > 1
+				? StringUtils.join(split, "-", 0, split.length - 1)
+				: require;
+
+		// replace special chars
+		String result = s.replaceAll("_|/\"|\\\\|:|/", "-");
+
+		// crs is a reserved name from other options
+		if (result.equals("crs"))
+			result = "crs-file";
+
+		return result;
+	}
+
+	/**
+	 * Creates a new instance by evaluating the {@link CommandSpec} annotation.
+	 */
+	public static InputOptions ofCommand(Class<? extends MATSimAppCommand> command) {
+		CommandSpec spec = command.getAnnotation(CommandSpec.class);
+		if (spec == null)
+			throw new IllegalArgumentException("CommandSpec annotation must be present on " + command);
+
+		return new InputOptions(command, spec);
 	}
 
 	/**
@@ -99,6 +146,12 @@ public final class InputOptions {
 		AtomicBoolean flag = new AtomicBoolean(false);
 
 		command.mixinStandardHelpOptions(true);
+
+		if (!command.userObject().getClass().equals(clazz)) {
+
+			throw new IllegalArgumentException(String.format("InputOptions in the implementation of '%s' is using class '%s' as reference. These two must be the same",
+					command.userObject().getClass(), clazz));
+		}
 
 		for (String require : spec.requires()) {
 			if (require.isBlank())
@@ -175,50 +228,5 @@ public final class InputOptions {
 				.required(true);
 
 		return arg.build();
-	}
-
-	/**
-	 * Return the argument names, the first specified argument will also be named with {@code first}.
-	 */
-	static String[] argNames(AtomicBoolean flag, String first, String name) {
-		if (!flag.get()) {
-			flag.set(true);
-			return new String[]{first, name};
-		}
-		return new String[]{name};
-	}
-
-	/**
-	 * Return the argument name of an input file.
-	 */
-	public static String argName(String require) {
-
-		require = require.replace(".gz", "");
-		String[] split = require.split("\\.");
-
-		// Remove the suffix
-		String s = split.length > 1
-				? StringUtils.join(split, "-", 0, split.length - 1)
-				: require;
-
-		// replace special chars
-		String result = s.replaceAll("_|/\"|\\\\|:|/", "-");
-
-		// crs is a reserved name from other options
-		if (result.equals("crs"))
-			result = "crs-file";
-
-		return result;
-	}
-
-	/**
-	 * Creates a new instance by evaluating the {@link CommandSpec} annotation.
-	 */
-	public static InputOptions ofCommand(Class<? extends MATSimAppCommand> command) {
-		CommandSpec spec = command.getAnnotation(CommandSpec.class);
-		if (spec == null)
-			throw new IllegalArgumentException("CommandSpec annotation must be present on " + command);
-
-		return new InputOptions(spec);
 	}
 }
