@@ -140,7 +140,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 
 	static void createPlansBasedOnCarrierPlans(Scenario scenario, String usedTrafficType, Path output,
-											   String modelName, String sampleName, String nameOutputPopulation) {
+											   String modelName, String sampleName, String nameOutputPopulation, boolean createDifferentPlansForAgent) {
 
 		Population population = scenario.getPopulation();
 		PopulationFactory popFactory = population.getFactory();
@@ -208,7 +208,8 @@ public class SmallScaleCommercialTrafficUtils {
 		if (nameOutputPopulation == null)
 			outputPopulationFile = output.toString() + "/"+modelName +"_" + usedTrafficType + "_" + sampleName + "pct_plans.xml.gz";
 		else {
-			CreateDifferentPlansForFreightPopulation.createPlanVariantsForPopulations("changeStartingTimes", population, 5, 6*3600, 14*3600, 8*3600);
+			if (createDifferentPlansForAgent)
+				CreateDifferentPlansForFreightPopulation.createPlanVariantsForPopulations("changeStartingTimes", population, 5, 6*3600, 14*3600, 8*3600);
 			outputPopulationFile = output.toString() + "/" + nameOutputPopulation;
 		}
 		PopulationUtils.writePopulation(population,outputPopulationFile);
