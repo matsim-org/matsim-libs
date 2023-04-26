@@ -90,6 +90,7 @@
 		<module>parking</module>
 		<module>protobuf</module>
 		<module>pseudosimulation</module>
+		<module>railsim</module>
 		<module>roadpricing</module>
 		<module>sbb-extensions</module>
 		<module>shared_mobility</module>
