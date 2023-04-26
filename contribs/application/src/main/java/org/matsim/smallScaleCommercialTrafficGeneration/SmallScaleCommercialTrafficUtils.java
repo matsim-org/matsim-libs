@@ -140,7 +140,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 
 	static void createPlansBasedOnCarrierPlans(Scenario scenario, String usedTrafficType, Path output,
-											   String modelName, String sampleName, String nameOutputPopulation, boolean createDifferentPlansForAgent) {
+											   String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 
 		Population population = scenario.getPopulation();
 		PopulationFactory popFactory = population.getFactory();
@@ -208,8 +208,10 @@ public class SmallScaleCommercialTrafficUtils {
 		if (nameOutputPopulation == null)
 			outputPopulationFile = output.toString() + "/"+modelName +"_" + usedTrafficType + "_" + sampleName + "pct_plans.xml.gz";
 		else {
-			if (createDifferentPlansForAgent)
-				CreateDifferentPlansForFreightPopulation.createPlanVariantsForPopulations("changeStartingTimes", population, 5, 6*3600, 14*3600, 8*3600);
+			if (numberOfPlanVariantsPerAgent > 1)
+				CreateDifferentPlansForFreightPopulation.createPlanVariantsForPopulations("changeStartingTimes", population, numberOfPlanVariantsPerAgent, 6*3600, 14*3600, 8*3600);
+			else if (numberOfPlanVariantsPerAgent < 1)
+				log.warn("You selected " + numberOfPlanVariantsPerAgent + " of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.");
 			outputPopulationFile = output.toString() + "/" + nameOutputPopulation;
 		}
 		PopulationUtils.writePopulation(population,outputPopulationFile);
