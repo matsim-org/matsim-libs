@@ -5,3 +5,6 @@ traces:
     x: values
     "y": names
   orientation: v
+  type: bar
+  xaxis: x
+  yaxis: "y"

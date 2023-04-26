@@ -29,6 +29,8 @@ traces:
       dash: longdash
   yaxis: "y"
   whiskerwidth: 0.0
+  type: scatter
+  xaxis: x
 - fill: none
   "y": []
   x: []
@@ -56,14 +58,19 @@ traces:
     changeline:
       color: '#3D9970'
       width: 10
+  type: scatter
+  xaxis: x
+  yaxis: "y"
 - x: []
-  opacity: 1.0
   nbinsx: 0
   nbinsy: 0
   autobinx: true
   autobiny: false
   histnorm: density
   histfunc: count
+  type: histogram
+  xaxis: x
+  yaxis: "y"
 layout:
   hoverdistance: 5
   margin:

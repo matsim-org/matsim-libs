@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import tech.tablesaw.plotly.components.Config;
 import tech.tablesaw.plotly.components.Figure;
 import tech.tablesaw.plotly.components.Layout;
+import tech.tablesaw.plotly.traces.AbstractTrace;
 import tech.tablesaw.plotly.traces.Trace;
 
 import javax.annotation.Nullable;
@@ -87,6 +88,14 @@ public class Plotly extends Viz {
 		return result;
 	}
 
+	private static List<Field> getAllFields(Class<?> type) {
+		List<Field> fields = new ArrayList<>();
+		for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+			fields.addAll(Arrays.asList(c.getDeclaredFields()));
+		}
+		return fields;
+	}
+
 	private Map<String, Object> convertTrace(Trace t, Data d, int i) {
 
 		Map<String, Object> object = new LinkedHashMap<>();
@@ -95,9 +104,12 @@ public class Plotly extends Viz {
 			object.put("data", d);
 		}
 
-		Field[] fields = t.getClass().getDeclaredFields();
+		List<Field> fields = getAllFields(t.getClass());
 
 		for (Field field : fields) {
+
+			if (field.getName().equals("engine"))
+				continue;
 
 			if (!field.trySetAccessible())
 				continue;
@@ -112,6 +124,13 @@ public class Plotly extends Viz {
 					continue;
 				if (o.equals(""))
 					continue;
+
+				// Some special cases that don't need to be written
+				if (field.getName().equals("opacity") && Objects.equals(o, 1.0))
+					continue;
+				if (field.getName().equals("visible") && Objects.equals(o, AbstractTrace.Visibility.TRUE))
+					continue;
+
 
 				object.put(field.getName().toLowerCase(), o);
 			} catch (IllegalAccessException e) {

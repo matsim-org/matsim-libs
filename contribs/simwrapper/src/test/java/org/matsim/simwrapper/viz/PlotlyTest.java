@@ -24,6 +24,7 @@ import tech.tablesaw.plotly.traces.HistogramTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.io.File;
+import java.io.IOException;
 
 public class PlotlyTest {
 
@@ -47,7 +48,7 @@ public class PlotlyTest {
 	}
 
 	@Test
-	public void inline() throws JsonProcessingException {
+	public void inline() throws IOException {
 
 		Object[] x = {"sheep", "cows", "fish", "tree sloths"};
 		double[] y = {1, 4, 9, 16};
@@ -66,7 +67,7 @@ public class PlotlyTest {
 	}
 
 	@Test
-	public void data() throws JsonProcessingException {
+	public void data() throws IOException {
 
 
 		BarTrace trace = BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build();
@@ -84,7 +85,7 @@ public class PlotlyTest {
 	}
 
 	@Test
-	public void multiple() throws JsonProcessingException {
+	public void multiple() throws IOException {
 
 
 		ScatterTrace scatter = ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
