@@ -87,12 +87,11 @@ public class Plotly extends Viz {
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
 	private Map<String, Object> convertTrace(Trace t, Data d, int i) {
 
 		Map<String, Object> object = new LinkedHashMap<>();
 
-		if (d.path != null) {
+		if (d.file != null) {
 			object.put("data", d);
 		}
 
@@ -204,7 +203,7 @@ public class Plotly extends Viz {
 	 * Class to specify input path and map column names to their meaning.
 	 */
 	public static final class Data {
-		private final String path;
+		private final String file;
 		private String x;
 		private String y;
 		private String text;
@@ -212,8 +211,8 @@ public class Plotly extends Viz {
 		private String color;
 		private String opacity;
 
-		private Data(String path) {
-			this.path = path;
+		private Data(String file) {
+			this.file = file;
 		}
 
 		/**

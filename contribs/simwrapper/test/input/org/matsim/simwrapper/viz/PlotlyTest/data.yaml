@@ -1,7 +1,7 @@
 type: plotly
 traces:
 - data:
-    path: ref.csv
+    file: ref.csv
     x: values
     "y": names
   orientation: v
