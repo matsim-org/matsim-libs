@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="BS_A" x="-1.4828883140879065E7" y="1.5997974937651653E7" linkRefId="BS_A" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="BS_D_r" x="-1.4828883140879065E7" y="1.5997974937651653E7" linkRefId="BS_D_r" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="BS_B" x="-1.4828883140879065E7" y="1.5997974937651653E7" linkRefId="BS_B" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="DMT_D" x="-1.3697751387515185E7" y="1.6006394253106734E7" linkRefId="DMT_D" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="DMT_D_r" x="-1.3697751387515185E7" y="1.6006394253106734E7" linkRefId="DMT_D_r" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="DMT_B" x="-1.3697751387515185E7" y="1.6006394253106734E7" linkRefId="DMT_B" isBlocking="false">
+		</stopFacility>
+	</transitStops>
+	<transitLine id="line1">
+		<transitRoute id="line1_route1_0">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="BS_A" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="DMT_D" arrivalOffset="04:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="BS_A"/>
+				<link refId="1"/>
+				<link refId="2"/>
+				<link refId="4"/>
+				<link refId="BSDH_A"/>
+				<link refId="7"/>
+				<link refId="MST_A"/>
+				<link refId="13"/>
+				<link refId="DOR_A"/>
+				<link refId="15"/>
+				<link refId="AE_A"/>
+				<link refId="18"/>
+				<link refId="19"/>
+				<link refId="DUG"/>
+				<link refId="20"/>
+				<link refId="GREL_A"/>
+				<link refId="23"/>
+				<link refId="ZWG_D"/>
+				<link refId="30"/>
+				<link refId="LFN_B"/>
+				<link refId="33"/>
+				<link refId="LSB_A"/>
+				<link refId="36"/>
+				<link refId="SOY_A"/>
+				<link refId="39"/>
+				<link refId="40"/>
+				<link refId="41"/>
+				<link refId="42"/>
+				<link refId="47"/>
+				<link refId="48"/>
+				<link refId="DMT_D"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train1"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="line1_r">
+		<transitRoute id="line1_r_route1_r_0">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="DMT_D_r" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="BS_D_r" arrivalOffset="04:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="DMT_D_r"/>
+				<link refId="48_r"/>
+				<link refId="47_r"/>
+				<link refId="42_r"/>
+				<link refId="41_r"/>
+				<link refId="40_r"/>
+				<link refId="39_r"/>
+				<link refId="SOY_A_r"/>
+				<link refId="36_r"/>
+				<link refId="LSB_A_r"/>
+				<link refId="33_r"/>
+				<link refId="LFN_B_r"/>
+				<link refId="30_r"/>
+				<link refId="ZWG_D_r"/>
+				<link refId="23_r"/>
+				<link refId="22_r"/>
+				<link refId="GREL_B_r"/>
+				<link refId="21_r"/>
+				<link refId="20_r"/>
+				<link refId="DUG_r"/>
+				<link refId="19_r"/>
+				<link refId="AE_B_r"/>
+				<link refId="16_r"/>
+				<link refId="DOR_B_r"/>
+				<link refId="14_r"/>
+				<link refId="MST_B_r"/>
+				<link refId="8_r"/>
+				<link refId="BSDH_B_r"/>
+				<link refId="5_r"/>
+				<link refId="BS_D_r"/>		
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train3"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="line2">
+		<transitRoute id="line2_route1_0">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="BS_B" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="DMT_B" arrivalOffset="04:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="BS_B"/>
+				<link refId="2"/>
+				<link refId="4"/>
+				<link refId="BSDH_A"/>
+				<link refId="7"/>
+				<link refId="MST_A"/>
+				<link refId="13"/>
+				<link refId="DOR_A"/>
+				<link refId="15"/>
+				<link refId="AE_A"/>
+				<link refId="18"/>
+				<link refId="19"/>
+				<link refId="DUG"/>
+				<link refId="20"/>
+				<link refId="GREL_A"/>
+				<link refId="23"/>
+				<link refId="ZWG_D"/>
+				<link refId="30"/>
+				<link refId="LFN_B"/>
+				<link refId="33"/>
+				<link refId="LSB_A"/>
+				<link refId="36"/>
+				<link refId="SOY_A"/>
+				<link refId="39"/>
+				<link refId="40"/>
+				<link refId="41"/>
+				<link refId="42"/>
+				<link refId="43"/>
+				<link refId="45"/>
+				<link refId="DMT_B"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:15:00" vehicleRefId="train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

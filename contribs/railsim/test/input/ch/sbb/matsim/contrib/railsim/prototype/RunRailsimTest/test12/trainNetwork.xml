@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+	 
+	 
+	<nodes>
+		<node id="X0" x="-250" y="0" >
+		</node>
+		<node id="X1" x="250" y="0" >
+		</node>
+		<node id="A" x="-2000" y="1000" >
+		</node>
+		<node id="A0" x="-2100" y="1100" >
+		</node>
+		<node id="B" x="-2000" y="-1000" >
+		</node>
+		<node id="B0" x="-2100" y="-1100" >
+		</node>
+		<node id="C" x="2000" y="1000" >
+		</node>
+		<node id="C0" x="2100" y="1100" >
+		</node>
+		<node id="D" x="2000" y="-1000" >
+		</node>
+		<node id="D0" x="2100" y="-1100" >
+		</node>
+		
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+	
+		<link id="X" from="X0" to="X1" length="500" freespeed="2.77" capacity="3600.0" permlanes="1" oneway="1" modes="rail" >
+			<attributes>
+				<attribute name="trainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="X1_C" from="X1" to="C" length="1000" freespeed="15." capacity="3600.0" permlanes="1" oneway="1" modes="rail" >
+		</link>
+		<link id="X1_A" from="X1" to="A" length="1000" freespeed="15." capacity="3600.0" permlanes="1" oneway="1" modes="rail" >
+		</link>
+		<link id="B_X0" from="B" to="X0" length="1000" freespeed="15." capacity="3600.0" permlanes="1" oneway="1" modes="rail" >
+		</link>
+		<link id="D_X0" from="D" to="X0" length="1000" freespeed="15." capacity="3600.0" permlanes="1" oneway="1" modes="rail" >
+		</link>
+		
+		<link id="A" from="A" to="A0" length="500" freespeed="2.77" capacity="3600.0" permlanes="1" oneway="1" modes="rail" >
+			<attributes>
+				<attribute name="trainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="C" from="C" to="C0" length="500" freespeed="2.77" capacity="3600.0" permlanes="1" oneway="1" modes="rail" >
+			<attributes>
+				<attribute name="trainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		
+		<link id="B" from="B0" to="B" length="500" freespeed="2.77" capacity="3600.0" permlanes="1" oneway="1" modes="rail" >
+			<attributes>
+				<attribute name="trainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="D" from="D0" to="D" length="500" freespeed="2.77" capacity="3600.0" permlanes="1" oneway="1" modes="rail" >
+			<attributes>
+				<attribute name="trainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		
+		
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>

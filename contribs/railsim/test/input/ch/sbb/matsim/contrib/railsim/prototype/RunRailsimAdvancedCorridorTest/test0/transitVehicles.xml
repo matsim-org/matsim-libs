@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="Express">
+		<attributes>
+			<attribute name="acceleration" class="java.lang.Double">0.7</attribute>
+			<attribute name="deceleration" class="java.lang.Double">0.7</attribute>
+		</attributes>
+		<capacity seats="40" standingRoomInPersons="0">
+		</capacity>
+		<length meter="500.0"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+	
+	<vehicleType id="Regio">
+		<attributes>
+			<attribute name="acceleration" class="java.lang.Double">0.7</attribute>
+			<attribute name="deceleration" class="java.lang.Double">0.7</attribute>
+		</attributes>
+		<capacity seats="40" standingRoomInPersons="0">
+		</capacity>
+		<length meter="500.0"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+	
+	<vehicleType id="Cargo">
+		<attributes>
+			<attribute name="acceleration" class="java.lang.Double">0.1</attribute>
+			<attribute name="deceleration" class="java.lang.Double">0.1</attribute>
+		</attributes>
+		<capacity seats="40" standingRoomInPersons="0">
+		</capacity>
+		<length meter="1000.0"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+
+	<vehicle id="train1" type="Cargo"/>	
+	<vehicle id="train2" type="Express"/>
+	<vehicle id="train3" type="Regio"/>	
+	
+</vehicleDefinitions>
