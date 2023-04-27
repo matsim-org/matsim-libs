@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,18 +34,24 @@ public class PlotlyTest {
 
 	private ObjectWriter writer;
 
-	@Before
-	public void setUp() throws Exception {
+	public static ObjectWriter createWriter() {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
 				.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
 				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
-				.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
 				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+				.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+				.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 				.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
+		mapper.registerModule(new JavaTimeModule());
 		mapper.addMixIn(Component.class, ComponentMixin.class);
 
-		writer = mapper.writerFor(Plotly.class);
+		return mapper.writerFor(Plotly.class);
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		writer = createWriter();
 	}
 
 	@Test

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandRunner;
@@ -83,11 +84,15 @@ public final class SimWrapper {
 	 */
 	public void generate(Path dir) throws IOException {
 
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER).enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
+				.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
 				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 				.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+				.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 				.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
+		mapper.registerModule(new JavaTimeModule());
 		mapper.addMixIn(Component.class, ComponentMixin.class);
 
 		ObjectWriter writer = mapper.writerFor(YAML.class);

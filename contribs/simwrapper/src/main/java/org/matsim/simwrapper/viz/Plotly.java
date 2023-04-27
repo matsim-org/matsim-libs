@@ -21,19 +21,16 @@ import java.util.*;
  */
 public class Plotly extends Viz {
 
-	private static final Logger log = LogManager.getLogger(Plotly.class);
-
 	/**
 	 * Empty placeholder array, which may be used as input for constructing traces.
 	 * Actual data is loaded later from files and not used directly in the specification file.
 	 */
 	public static final double[] INPUT = new double[0];
-
 	/**
 	 * See {@link #INPUT}.
 	 */
 	public static final Object[] OBJ_INPUT = new Object[0];
-
+	private static final Logger log = LogManager.getLogger(Plotly.class);
 	@JsonIgnore
 	public List<Data> data = new ArrayList<>();
 
@@ -50,6 +47,49 @@ public class Plotly extends Viz {
 
 	public Plotly() {
 		super("plotly");
+	}
+
+	/**
+	 * Constructor for given layout and traces, which will be inlined.
+	 */
+	public Plotly(@Nullable Layout layout, Trace... trace) {
+		super("plotly");
+		this.layout = layout;
+		for (Trace t : trace) {
+			addTrace(t, inline());
+		}
+	}
+
+	/**
+	 * Constructor for a given {@link Figure}.
+	 */
+	public Plotly(Figure figure) {
+		super("plotly");
+		fromFigure(figure);
+	}
+
+	private static List<Field> getAllFields(Class<?> type) {
+		List<Field> fields = new ArrayList<>();
+		for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+			fields.addAll(Arrays.asList(c.getDeclaredFields()));
+		}
+		return fields;
+	}
+
+	/**
+	 * Create a new data mapping.
+	 *
+	 * @param path path to input csv.
+	 */
+	public static Data data(String path) {
+		return new Data(path);
+	}
+
+	/**
+	 * Data mapping that is not using external data, but inlines it into the yaml files.
+	 */
+	public static Data inline() {
+		return new Data(null);
 	}
 
 	/**
@@ -71,6 +111,18 @@ public class Plotly extends Viz {
 		return new Figure(layout, config, traces.toArray(new Trace[0]));
 	}
 
+	/**
+	 * Fill content from a given {@link Figure}.
+	 */
+	public void fromFigure(Figure figure) {
+		for (Trace t : figure.getTraces()) {
+			addTrace(t, inline());
+		}
+
+		layout = figure.getLayout();
+		config = figure.getConfig();
+	}
+
 	@JsonProperty("traces")
 	List<Map<String, Object>> getTraces() {
 
@@ -86,14 +138,6 @@ public class Plotly extends Viz {
 		}
 
 		return result;
-	}
-
-	private static List<Field> getAllFields(Class<?> type) {
-		List<Field> fields = new ArrayList<>();
-		for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-			fields.addAll(Arrays.asList(c.getDeclaredFields()));
-		}
-		return fields;
 	}
 
 	private Map<String, Object> convertTrace(Trace t, Data d, int i) {
@@ -200,22 +244,6 @@ public class Plotly extends Viz {
 
 		object.putAll(copy);
 		return object;
-	}
-
-	/**
-	 * Create a new data mapping.
-	 *
-	 * @param path path to input csv.
-	 */
-	public static Data data(String path) {
-		return new Data(path);
-	}
-
-	/**
-	 * Data mapping that is not using external data, but inlines it into the yaml files.
-	 */
-	public static Data inline() {
-		return new Data(null);
 	}
 
 	/**
