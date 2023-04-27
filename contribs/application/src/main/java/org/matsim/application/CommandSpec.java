@@ -55,6 +55,6 @@ public @interface CommandSpec {
 	/**
 	 * Group name / identifier.
 	 */
-	String group() default "";
+	String group() default "general";
 
 }

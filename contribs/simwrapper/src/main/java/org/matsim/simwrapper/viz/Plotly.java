@@ -26,10 +26,17 @@ public class Plotly extends Viz {
 	 * Actual data is loaded later from files and not used directly in the specification file.
 	 */
 	public static final double[] INPUT = new double[0];
+
 	/**
 	 * See {@link #INPUT}.
 	 */
 	public static final Object[] OBJ_INPUT = new Object[0];
+
+	/**
+	 * See {@link #INPUT}.
+	 */
+	public static final String[] TEXT_INPUT = new String[0];
+
 	private static final Logger log = LogManager.getLogger(Plotly.class);
 	@JsonIgnore
 	public List<Data> data = new ArrayList<>();

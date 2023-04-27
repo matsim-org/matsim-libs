@@ -1,10 +1,21 @@
 type: plotly
 traces:
 - data:
-    file: ref.csv
-    x: values
-    "y": names
-  orientation: v
-  type: bar
+    file: test.csv
+    x: xColumn
+    "y": yColumn
+    text: labelColumn
+    size: sizeColumn
+    color: colorColumn
+    opacity: opacityColumn
+  fill: none
+  mode: markers
+  marker:
+    cauto: true
+    autocolorscale: true
+    opacity: 1.0
+    sizemode: diameter
+  whiskerwidth: 0.0
+  type: scatter
   xaxis: x
   yaxis: "y"

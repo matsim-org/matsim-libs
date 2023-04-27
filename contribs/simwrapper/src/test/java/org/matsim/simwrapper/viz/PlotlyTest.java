@@ -76,19 +76,26 @@ public class PlotlyTest {
 	@Test
 	public void data() throws IOException {
 
+		ScatterTrace.ScatterBuilder trace = ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+				.text(Plotly.TEXT_INPUT)
+				.marker(Marker.builder()
+						.color(Plotly.TEXT_INPUT)
+						.size(Plotly.INPUT)
+						.build());
 
-		BarTrace trace = BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build();
+		Plotly plotly = new Plotly();
 
-		Plotly plot = new Plotly();
-
-		plot.addTrace(trace, Plotly.data("ref.csv").x("values").y("names"));
-
-		String value = writer.writeValueAsString(plot);
+		plotly.addTrace(trace.build(), Plotly.data("test.csv")
+				.x("xColumn")
+				.y("yColumn")
+				.text("labelColumn")
+				.size("sizeColumn")
+				.opacity("opacityColumn")
+				.color("colorColumn")
+		);
 
 		Assertions.assertThat(new File(utils.getClassInputDirectory(), "data.yaml"))
-				.hasContent(value);
-
-
+				.hasContent(writer.writeValueAsString(plotly));
 	}
 
 	@Test
