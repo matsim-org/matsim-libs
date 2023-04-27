@@ -22,13 +22,16 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	@Inject
 	private SimWrapper simWrapper;
 
+	@Inject(optional = true)
+	private SimWrapperConfigGroup config;
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
-		// TODO: probably config group is needed
 		// setup defaults dashboards
-
-		simWrapper.addDashboard(new StuckAgentDashboard());
+		if (config == null || config.defaultDashboards != SimWrapperConfigGroup.Mode.disabled) {
+			simWrapper.addDashboard(new StuckAgentDashboard());
+		}
 
 		try {
 			simWrapper.generate(Path.of(event.getServices().getControlerIO().getOutputPath()));

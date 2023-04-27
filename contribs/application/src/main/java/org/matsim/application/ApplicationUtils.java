@@ -220,4 +220,12 @@ public class ApplicationUtils {
 	public static CommandSpec getSpec(Class<? extends MATSimAppCommand> command) {
 		return command.getAnnotation(CommandSpec.class);
 	}
+
+	/**
+	 * Get the {@link CommandLine.Command} of a {@link MATSimAppCommand}.
+	 */
+	public static CommandLine.Command getCommand(Class<? extends MATSimAppCommand> command) {
+		return command.getAnnotation(CommandLine.Command.class);
+	}
+
 }

@@ -59,7 +59,10 @@ public final class Data {
 	 */
 	public String compute(Class<? extends MATSimAppCommand> command, String file, String... args) {
 		currentContext.add(command, args);
-		return currentContext.getRequiredPath(command, file);
+		Path path = currentContext.getRequiredPath(command, file);
+
+		// Relative path from the simulation output
+		return this.path.getParent().relativize(path).toString();
 	}
 
 	public String subcommand(String command, String file) {

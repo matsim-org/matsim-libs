@@ -14,6 +14,7 @@ import picocli.CommandLine;
 import tech.tablesaw.api.*;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.joining.DataFrameJoiner;
+import tech.tablesaw.selection.Selection;
 
 import java.util.*;
 
@@ -74,7 +75,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 				.columnTypesPartial(Map.of("person", ColumnType.TEXT, "trav_time", ColumnType.STRING,
-						"longest_distance_mode", ColumnType.STRING, "main_mode", ColumnType.STRING))
+						"longest_distance_mode", ColumnType.STRING, "main_mode", ColumnType.STRING, "end_activity_type", ColumnType.TEXT))
 				.separator(';').build());
 
 		// Use longest_distance_mode where main_mode is not present
@@ -193,6 +194,12 @@ public class TripAnalysis implements MATSimAppCommand {
 				IntColumn.create("departure_h", departure.intStream().toArray()),
 				IntColumn.create("arrival_h", arrival.intStream().toArray())
 		);
+
+		TextColumn purpose = trips.textColumn("end_activity_type");
+
+		// Remove suffix durations like _345
+		Selection withDuration = purpose.matchesRegex("^.+_[0-9]+$");
+		purpose.set(withDuration, purpose.where(withDuration).replaceAll("_[0-9]+$", ""));
 
 		Table tArrival = trips.summarize("trip_id", count).by("end_activity_type", "arrival_h");
 

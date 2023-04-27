@@ -14,9 +14,8 @@ public class StuckAgentDashboard implements Dashboard {
 	@Override
 	public void configure(Header header, Layout layout) {
 
-		header.title = "Stuck Agents Dashboard";
-		header.description = "Description for the Stuck Agents Dashboard";
-
+		header.title = "Stuck Agents";
+		header.description = "Analyze agents that are 'stuck' i.e. could not finish their daily plan.";
 
 		layout.row("first").el(TextBlock.class, (viz, data) -> {
 			viz.title = "";
@@ -27,7 +26,7 @@ public class StuckAgentDashboard implements Dashboard {
 		layout.row("second")
 				.el(PieChart.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Transport Mode";
-					viz.dataset = data.compute(StuckAgentAnalysis.class, "piechart.csv");
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerMode.csv");
 					viz.useLastRow = "true";
 				})
 				.el(TextBlock.class, (viz, data) -> {
@@ -39,7 +38,7 @@ public class StuckAgentDashboard implements Dashboard {
 				.el(Bar.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Hour";
 					viz.stacked = "true";
-					viz.dataset = "stuckAgentsPerHour.csv";
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerHour.csv");
 					viz.x = "hour";
 					viz.xAxisName = "Hour";
 					viz.yAxisName = "# Stuck";

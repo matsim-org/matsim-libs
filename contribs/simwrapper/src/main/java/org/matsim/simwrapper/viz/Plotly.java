@@ -39,10 +39,10 @@ public class Plotly extends Viz {
 
 	private static final Logger log = LogManager.getLogger(Plotly.class);
 	@JsonIgnore
-	public List<Data> data = new ArrayList<>();
+	private List<Data> data = new ArrayList<>();
 
 	@JsonIgnore
-	public List<Trace> traces = new ArrayList<>();
+	private List<Trace> traces = new ArrayList<>();
 
 	@Nullable
 	@JsonIgnore
@@ -88,7 +88,7 @@ public class Plotly extends Viz {
 	 *
 	 * @param path path to input csv.
 	 */
-	public static Data data(String path) {
+	public static Data fromFile(String path) {
 		return new Data(path);
 	}
 

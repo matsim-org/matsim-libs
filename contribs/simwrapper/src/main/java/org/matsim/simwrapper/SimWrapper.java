@@ -125,9 +125,6 @@ public final class SimWrapper {
 
 		ObjectWriter configWriter = mapper.writerFor(Config.class);
 
-		config.fullWidth = true;
-		config.hideLeftBar = true;
-
 		Path out = target.resolve("simwrapper-config.yaml");
 		configWriter.writeValue(out.toFile(), config);
 
@@ -153,11 +150,13 @@ public final class SimWrapper {
 
 	}
 
+	/**
+	 * Class representing the simwrapper config.
+	 */
 	public static final class Config {
 
-		private boolean hideLeftBar;
-
-		private boolean fullWidth;
+		public boolean hideLeftBar = false;
+		public boolean fullWidth = true;
 
 	}
 }

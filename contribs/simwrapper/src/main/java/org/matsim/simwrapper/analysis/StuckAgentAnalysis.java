@@ -2,7 +2,10 @@ package org.matsim.simwrapper.analysis;
 
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -19,23 +22,24 @@ import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@CommandLine.Command(name = "todo", description = "todo")
-@CommandSpec(requireEvents = true, produces = {"stuckAgentsPerHour.csv", "piechart.csv", "stuckAgentsPerLink.csv", "stuckAgentsPerMode.csv"})
+@CommandLine.Command(name = "stuck-agents", description = "Generates statistics for stuck agents.")
+@CommandSpec(requireEvents = true, produces = {"stuckAgentsPerHour.csv", "stuckAgentsPerMode.csv", "stuckAgentsPerLink.csv", "stuckAgentsPerMode.csv"})
 public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHandler {
 	private static final Logger log = LogManager.getLogger(StuckAgentAnalysis.class);
 	private final Object2IntMap<String> stuckAgentsPerMode = new Object2IntOpenHashMap<>();
 	private final Map<String, Int2DoubleMap> stuckAgentsPerHour = new HashMap<>();
 	private final Map<String, Object2DoubleOpenHashMap<String>> stuckAgentsPerLink = new HashMap<>();
 	private final Object2DoubleOpenHashMap<String> allStuckedLinks = new Object2DoubleOpenHashMap<>();
-	private int maxHour = 0;
-
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(StuckAgentAnalysis.class);
-
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(StuckAgentAnalysis.class);
+	private int maxHour = 0;
 
 	public static void main(String[] args) {
 		new StuckAgentAnalysis().execute(args);
@@ -50,6 +54,9 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		manager.initProcessing();
 
 		EventsUtils.readEvents(manager, input.getEventsPath());
+
+		manager.finishProcessing();
+
 		// Per hour
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerHour.csv").toString()), CSVFormat.DEFAULT)) {
 
@@ -58,7 +65,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 			header.add(1, "Total");
 			// Write to .csv
 			printer.printRecord(header);
-			for ( int i = 0; i <= maxHour; i ++) {
+			for (int i = 0; i <= maxHour; i++) {
 				String[] result = new String[header.size()];
 				result[0] = String.valueOf(i);
 				result[1] = String.valueOf(this.summarizeStuckAgentsPerHour(i));
@@ -76,7 +83,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 
 			// Sort Map
 			List<String> sorted = new ArrayList<>(allStuckedLinks.keySet());
-			sorted.sort((o1, o2) -> -Double.compare (allStuckedLinks.getDouble(o1), allStuckedLinks.getDouble(o2)));
+			sorted.sort((o1, o2) -> -Double.compare(allStuckedLinks.getDouble(o1), allStuckedLinks.getDouble(o2)));
 			List<String> header = new ArrayList<>(stuckAgentsPerLink.keySet());
 			header.add(0, "link");
 			header.add(1, "# Agents");
@@ -106,7 +113,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		}
 
 		// Pie chart
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("piechart.csv").toString()), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerMode.csv").toString()), CSVFormat.DEFAULT)) {
 
 			List<String> header = new ArrayList<>(stuckAgentsPerMode.keySet());
 			List<Integer> values = new ArrayList<>(stuckAgentsPerMode.values());
@@ -116,8 +123,6 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		} catch (IOException ex) {
 			log.error(ex);
 		}
-
-		manager.finishProcessing();
 
 		return 0;
 	}
@@ -140,23 +145,22 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
-		if (event.getEventType().equals("stuckAndAbort")) {
 
-			// Pie chart
-			if (!stuckAgentsPerMode.containsKey(event.getLegMode())) stuckAgentsPerMode.put(event.getLegMode(), 1);
-			else stuckAgentsPerMode.put(event.getLegMode(), stuckAgentsPerMode.getInt(event.getLegMode()) + 1);
+		// Pie chart
+		if (!stuckAgentsPerMode.containsKey(event.getLegMode())) stuckAgentsPerMode.put(event.getLegMode(), 1);
+		else stuckAgentsPerMode.put(event.getLegMode(), stuckAgentsPerMode.getInt(event.getLegMode()) + 1);
 
-			// Stuck Agents per Hour
-			Int2DoubleMap perHour = stuckAgentsPerHour.computeIfAbsent(event.getLegMode(), (k) -> new Int2DoubleOpenHashMap());
-			int hour = (int) event.getTime() / 3600;
-			if (hour > maxHour) maxHour = hour;
-			perHour.mergeDouble(hour, 1, Double::sum);
+		// Stuck Agents per Hour
+		Int2DoubleMap perHour = stuckAgentsPerHour.computeIfAbsent(event.getLegMode(), (k) -> new Int2DoubleOpenHashMap());
+		int hour = (int) event.getTime() / 3600;
+		if (hour > maxHour) maxHour = hour;
+		perHour.mergeDouble(hour, 1, Double::sum);
 
-			// Stuck Agents per Link
-			Object2DoubleMap<String> perLink = stuckAgentsPerLink.computeIfAbsent(event.getLegMode(), (k) -> new Object2DoubleOpenHashMap<>());
-			String link = event.getLinkId().toString();
-			allStuckedLinks.merge(link, 1., Double::sum);
-			perLink.mergeDouble(link, 1, Double::sum);
-		}
+		// Stuck Agents per Link
+		Object2DoubleMap<String> perLink = stuckAgentsPerLink.computeIfAbsent(event.getLegMode(), (k) -> new Object2DoubleOpenHashMap<>());
+		String link = event.getLinkId().toString();
+		allStuckedLinks.merge(link, 1., Double::sum);
+		perLink.mergeDouble(link, 1, Double::sum);
 	}
+
 }

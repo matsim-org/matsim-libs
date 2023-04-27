@@ -3,7 +3,6 @@ package org.matsim.simwrapper.viz;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -85,7 +84,7 @@ public class PlotlyTest {
 
 		Plotly plotly = new Plotly();
 
-		plotly.addTrace(trace.build(), Plotly.data("test.csv")
+		plotly.addTrace(trace.build(), Plotly.fromFile("test.csv")
 				.x("xColumn")
 				.y("yColumn")
 				.text("labelColumn")
