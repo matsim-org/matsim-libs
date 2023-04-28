@@ -2,12 +2,14 @@ package org.matsim.contrib.freight.analysis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.TreeMap;
 
 /**
  * Some basic analysis / data collection for {@link Carriers}(files)
@@ -30,7 +32,7 @@ public class CarrierPlanAnalysis  {
 		this.carriers = carriers;
 	}
 
-	public void runAnalysis(String analysisOutputDirectory) throws IOException {
+	public void runAnalysisAndWriteStats(String analysisOutputDirectory) throws IOException {
 		log.info("Writing out carrier analysis ...");
 		//Load per vehicle
 		String fileName = analysisOutputDirectory + "Carrier_stats.tsv";
@@ -41,8 +43,9 @@ public class CarrierPlanAnalysis  {
 		bw1.write("carrierId \t scoreOfSelectedPlan \t nuOfTours \t nuOfShipments(input) \t nuOfServices(input) ");
 		bw1.newLine();
 
+		final TreeMap<Id<Carrier>, Carrier> sortedCarrierMap = new TreeMap<>(carriers.getCarriers());
 
-		for (Carrier carrier : carriers.getCarriers().values()) {
+		for (Carrier carrier : sortedCarrierMap.values()) {
 			bw1.write(carrier.getId().toString());
 			bw1.write("\t" + carrier.getSelectedPlan().getScore());
 			bw1.write("\t" + carrier.getSelectedPlan().getScheduledTours().size());
