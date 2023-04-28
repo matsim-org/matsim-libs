@@ -10,6 +10,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -18,6 +19,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.MatsimVehicleWriter;
@@ -25,7 +29,7 @@ import org.matsim.vehicles.MatsimVehicleWriter;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Test for supply generation using railsim supply builder.
@@ -33,6 +37,7 @@ import static org.junit.Assert.assertEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RailsimSupplyBuilderTest {
 
+	private static final double TOLERANCE_DELTA = 0.001;
 	private static final String CONFIG_FILE = "config.xml";
 	private static final String NETWORK_FILE = "transitNetwork.xml";
 	private static final String SCHEDULE_FILE = "transitSchedule.xml";
@@ -87,6 +92,25 @@ public class RailsimSupplyBuilderTest {
 		assertEquals(6, scenario.getTransitSchedule().getFacilities().size());
 		assertEquals(2, scenario.getTransitSchedule().getTransitLines().size());
 		assertEquals(10, scenario.getTransitSchedule().getTransitLines().values().stream().mapToInt(l -> l.getRoutes().size()).sum());
+		// line
+		final String id = "IC";
+		var transitLine = scenario.getTransitSchedule().getTransitLines().get(Id.create(id, TransitLine.class));
+		assertEquals(id, transitLine.getId().toString());
+		assertNull(transitLine.getName());
+		assertEquals(6, transitLine.getRoutes().size());
+		// route
+		var transitRoute = transitLine.getRoutes().get(Id.create("IC_F_STATION_TO_STATION", TransitRoute.class));
+		assertNull(transitRoute.getDescription());
+		assertEquals(2, transitRoute.getDepartures().size());
+		assertEquals(2, transitRoute.getStops().size());
+		assertEquals(41400., transitRoute.getDepartures().get(Id.create("0", Departure.class)).getDepartureTime(), TOLERANCE_DELTA);
+		assertEquals(45000., transitRoute.getDepartures().get(Id.create("1", Departure.class)).getDepartureTime(), TOLERANCE_DELTA);
+		var firstStop = transitRoute.getStops().get(0);
+		assertTrue(firstStop.getArrivalOffset().isUndefined());
+		assertEquals(0., firstStop.getDepartureOffset().seconds(), TOLERANCE_DELTA);
+		var lastStop = transitRoute.getStops().get(transitRoute.getStops().size() - 1);
+		assertEquals(2700., lastStop.getArrivalOffset().seconds(), TOLERANCE_DELTA);
+		assertTrue(lastStop.getDepartureOffset().isUndefined());
 		// write files
 		String outputDir = utils.getOutputDirectory();
 		new NetworkWriter(scenario.getNetwork()).write(outputDir + NETWORK_FILE);

@@ -238,7 +238,7 @@ public class RailsimSupplyBuilder {
 		final List<TransitRouteStop> stops = new ArrayList<>();
 		double cumulativeTravelTime = 0.;
 		// first stop
-		stops.add(supplyFactory.createTransitRouteStop(routeStopInfos.get(0).getTransitStop(), cumulativeTravelTime));
+		stops.add(supplyFactory.createTransitTerminalStop(routeStopInfos.get(0).getTransitStop(), cumulativeTravelTime, true));
 		// intermediate stops
 		for (int stopCounter = 1; stopCounter <= routeStopInfos.size() - 2; stopCounter++) {
 			// increase cumulative travel time until arrival
@@ -252,7 +252,7 @@ public class RailsimSupplyBuilder {
 		}
 		// final stop
 		cumulativeTravelTime += travelTimes.getLast();
-		stops.add(supplyFactory.createTransitRouteStop(routeStopInfos.get(routeStopInfos.size() - 1).getTransitStop(), cumulativeTravelTime));
+		stops.add(supplyFactory.createTransitTerminalStop(routeStopInfos.get(routeStopInfos.size() - 1).getTransitStop(), cumulativeTravelTime, false));
 		// define route and add to transit line
 		final String routeId = String.format("%s_%s_%s", transitLineInfo.getId(), routeDirection.getAbbreviation(), routeType);
 		TransitRoute route = supplyFactory.createTransitRoute(transitLineInfo.getTransitLine(), routeId, routeLinks, stops);

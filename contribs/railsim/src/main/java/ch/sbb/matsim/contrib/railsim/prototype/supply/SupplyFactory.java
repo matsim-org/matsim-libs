@@ -44,11 +44,11 @@ class SupplyFactory {
 	private static final double DEFAULT_VEHICLE_ACCESS_TIME = 1.;
 	private static final double DEFAULT_VEHICLE_EGRESS_TIME = 1.;
 	private static final String ID_FORMAT_DEPARTURE = "%s";
-	private static final String ID_FORMAT_TRANSIT_LINE = "%s_line";
-	private static final String ID_FORMAT_TRANSIT_ROUTE = "%s_route";
+	private static final String ID_FORMAT_TRANSIT_LINE = "%s";
+	private static final String ID_FORMAT_TRANSIT_ROUTE = "%s";
 	private static final String ID_FORMAT_TRANSIT_STOP = "%s";
 	private static final String ID_FORMAT_VEHICLE = "%s";
-	private static final String ID_FORMAT_VEHICLE_TYPE = "train_%s";
+	private static final String ID_FORMAT_VEHICLE_TYPE = "%s";
 	private static final String ID_FORMAT_LINK = "%s_%s-%s";
 	private static final String ID_FORMAT_NODE = "%s";
 	private final TransitSchedule schedule;
@@ -108,9 +108,13 @@ class SupplyFactory {
 		return transitRouteStop;
 	}
 
-	TransitRouteStop createTransitRouteStop(TransitStopFacility transitStopFacility, double cumulativeTravelTime) {
-		log.debug("Creating TransitRouteStop at TransitStopFacility {} (using builder)", transitStopFacility.getId());
-		return sf.createTransitRouteStopBuilder(transitStopFacility).departureOffset(cumulativeTravelTime).build();
+	TransitRouteStop createTransitTerminalStop(TransitStopFacility transitStopFacility, double cumulativeTravelTime, boolean origin) {
+		log.debug("Creating terminal TransitRouteStop at TransitStopFacility {} (using builder)", transitStopFacility.getId());
+		if (origin) {
+			return sf.createTransitRouteStopBuilder(transitStopFacility).departureOffset(cumulativeTravelTime).build();
+		} else {
+			return sf.createTransitRouteStopBuilder(transitStopFacility).arrivalOffset(cumulativeTravelTime).build();
+		}
 	}
 
 	TransitStopFacility createTransitStopFacility(String id, Link link) {
