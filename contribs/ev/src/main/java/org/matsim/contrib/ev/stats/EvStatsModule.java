@@ -49,12 +49,14 @@ public class EvStatsModule extends AbstractModule {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider( ChargerOccupancyTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargerOccupancyXYDataCollector.class).asEagerSingleton();
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider( VehicleTypeAggregatedChargeTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
 
 					bind(ChargerPowerCollector.class).asEagerSingleton();
 					addMobsimScopeEventHandlerBinding().to(ChargerPowerCollector.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargerPowerCollector.class);
+
 					bind(EnergyConsumptionCollector.class).asEagerSingleton();
 					addMobsimScopeEventHandlerBinding().to(EnergyConsumptionCollector.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EnergyConsumptionCollector.class);
 					// add more time profiles if necessary
 				}
 			}
