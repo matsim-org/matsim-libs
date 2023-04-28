@@ -16,8 +16,7 @@ public class StuckAgentDashboard implements Dashboard {
 	public void configure(Header header, Layout layout) {
 
 		header.title = "Stuck Agents";
-		header.description = "Description for the Stuck Agents Dashboard";
-
+		header.description = "Analyze agents that are 'stuck' i.e. could not finish their daily plan.";
 
 		layout.row("first").el(TextBlock.class, (viz, data) -> {
 			viz.title = "";
