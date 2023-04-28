@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -42,7 +43,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	private final Map<Id<VehicleType>, Double> vehicleTypeId2SumOfDuration = new LinkedHashMap<>();
 	private final Map<Id<VehicleType>, Double> vehicleTypeId2Mileage = new LinkedHashMap<>();
 
-	private final Map<Id<Vehicle>, Id<VehicleType>> vehicleId2VehicleTypeId = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, Id<VehicleType>> vehicleId2VehicleTypeId = new TreeMap<>();
 
 	private final Map<String, Double> tourStartTime = new LinkedHashMap<>();
 
@@ -145,8 +146,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
 
 		//----- All VehicleTypes in vehicles container. Used so that all vehicleTypes will appear in the output
-		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(scenario.getVehicles().getVehicleTypes());
-
+//		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(scenario.getVehicles().getVehicleTypes());
+		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
 
 		String fileName = analysisOutputDirectory + "TimeDistance_perVehicleType.tsv";
 
