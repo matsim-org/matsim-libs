@@ -334,7 +334,7 @@
 							</excludes>
 						</requireReleaseDeps>
                         <requireMavenVersion>
-                            <version>3.6.1</version>
+                            <version>3.6.3</version>
                         </requireMavenVersion>
                     </rules>
                 </configuration>
