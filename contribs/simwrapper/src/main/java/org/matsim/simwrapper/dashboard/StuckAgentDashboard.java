@@ -6,6 +6,7 @@ import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.analysis.StuckAgentAnalysis;
 import org.matsim.simwrapper.viz.Bar;
 import org.matsim.simwrapper.viz.PieChart;
+import org.matsim.simwrapper.viz.Table;
 import org.matsim.simwrapper.viz.TextBlock;
 
 // TODO: doc
@@ -15,23 +16,24 @@ public class StuckAgentDashboard implements Dashboard {
 	public void configure(Header header, Layout layout) {
 
 		header.title = "Stuck Agents";
-		header.description = "Analyze agents that are 'stuck' i.e. could not finish their daily plan.";
+		header.description = "Description for the Stuck Agents Dashboard";
+
 
 		layout.row("first").el(TextBlock.class, (viz, data) -> {
 			viz.title = "";
-			viz.file = "table1.md";
+			viz.file = data.compute(StuckAgentAnalysis.class, "header.md");
 			viz.height = 1.;
 		});
 
 		layout.row("second")
 				.el(PieChart.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Transport Mode";
-					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerMode.csv");
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerModePieChart.csv");
 					viz.useLastRow = "true";
 				})
-				.el(TextBlock.class, (viz, data) -> {
-					viz.title = "";
-					viz.file = "table2.md";
+				.el(Table.class, (viz, data) -> {
+					viz.title = "Stuck Agents per Mode";
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerMode.csv");
 				});
 
 		layout.row("third")
@@ -43,14 +45,14 @@ public class StuckAgentDashboard implements Dashboard {
 					viz.xAxisName = "Hour";
 					viz.yAxisName = "# Stuck";
 				})
-				.el(TextBlock.class, (viz, data) -> {
-					viz.title = "";
-					viz.file = "table3.md";
+				.el(Table.class, (viz, data) -> {
+					viz.title = "Stuck Agents per Hour";
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerHour.csv");
 				});
 
-		layout.row("four").el(TextBlock.class, (viz, data) -> {
+		layout.row("four").el(Table.class, (viz, data) -> {
 			viz.title = "Stuck Agents per Link (Top 20)";
-			viz.file = "table4.md";
+			viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerLink.csv");
 		});
 	}
 }
