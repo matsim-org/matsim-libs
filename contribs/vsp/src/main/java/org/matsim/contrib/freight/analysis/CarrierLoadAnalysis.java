@@ -43,8 +43,6 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 			handlePickup( event);
 		} if (event.getEventType().equals(FreightShipmentDeliveryStartEvent.EVENT_TYPE)) {
 			handleDelivery(event);
-//		}  else if (event instanceof ActivityEndEvent activityEndEvent) {
-//			handleEvent(activityEndEvent);
 		}
 	}
 
@@ -73,11 +71,7 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 		vehicle2Load.put(vehicleId, list);
 	}
 
-	/*package-private*/ Map<Id<Vehicle>, LinkedList<Integer>> getVehicle2Load() {
-		return vehicle2Load;
-	}
-
-	static void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario, CarrierLoadAnalysis carrierLoadAnalysis) throws IOException {
+	void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out vehicle load analysis ...");
 		//Load per vehicle
 		String fileName = analysisOutputDirectory + "Load_perVehicle.tsv";
@@ -87,8 +81,6 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 		//Write headline:
 		bw1.write("vehicleId \t capacity \t maxLoad \t load state during tour");
 		bw1.newLine();
-
-		var vehicle2Load = carrierLoadAnalysis.getVehicle2Load();
 
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
 
