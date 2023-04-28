@@ -31,9 +31,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	private final static Logger log = LogManager.getLogger(FreightTimeAndDistanceAnalysisEventsHandler.class);
 
 	private final Scenario scenario;
-
-
-
 	private final Map<Id<Vehicle>, Double> vehicleId2TourDuration = new LinkedHashMap<>();
 	private final Map<Id<Vehicle>, Double> vehicleId2TourLength = new LinkedHashMap<>();
 
@@ -42,7 +39,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 
 	private final Map<Id<VehicleType>, Double> vehicleTypeId2SumOfDuration = new LinkedHashMap<>();
 	private final Map<Id<VehicleType>, Double> vehicleTypeId2Mileage = new LinkedHashMap<>();
-
 	private final Map<Id<Vehicle>, VehicleType> vehicleId2VehicleType = new TreeMap<>();
 
 	private final Map<String, Double> tourStartTime = new LinkedHashMap<>();
@@ -81,9 +77,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		vehicleTypeId2Mileage.merge(vehTypeId, distance, Double::sum);
 	}
 
-
 	@Override public void handleEvent(Event event) {
-//		log.info(event + " ; " +event.getEventType());
+
 		if (event instanceof FreightTourStartEvent freightTourStartEvent) {
 			handleEvent(freightTourStartEvent);
 		} else if (event instanceof FreightTourEndEvent freightTourEndEvent) {
@@ -92,7 +87,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			handleEvent(linkEnterEvent);
 		}
 	}
-
 
 	void writeTravelTimeAndDistance(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicle");
@@ -153,7 +147,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);
 		}
 
-
 		String fileName = analysisOutputDirectory + "TimeDistance_perVehicleType.tsv";
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
@@ -163,7 +156,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 				"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR/veh] \t" +
 				"varCostsTime[EUR] \t varCostsDist[EUR] \t fixedCosts[EUR] \t totalCosts[EUR]");
 		bw1.newLine();
-
 
 
 		for (VehicleType vehicleType : vehicleTypesMap.values()) {
