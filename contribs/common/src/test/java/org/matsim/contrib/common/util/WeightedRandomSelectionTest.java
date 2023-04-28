@@ -79,6 +79,15 @@ public class WeightedRandomSelectionTest {
 	}
 
 	@Test
+	public void testZeroTotalWeight() {
+		weightedRandomSelection.add("A", 0.);
+		weightedRandomSelection.add("B", 0.);
+		assertThatThrownBy(() -> weightedRandomSelection.select())//
+				.isExactlyInstanceOf(IllegalStateException.class)//
+				.hasMessage("Total weight is not positive");
+	}
+
+	@Test
 	public void testSingleValueList() {
 		weightedRandomSelection.add("A", 1);
 		assertThat(weightedRandomSelection.size()).isEqualTo(1);
