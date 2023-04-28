@@ -38,18 +38,15 @@ public class Plotly extends Viz {
 	public static final String[] TEXT_INPUT = new String[0];
 
 	private static final Logger log = LogManager.getLogger(Plotly.class);
-	@JsonIgnore
-	private List<Data> data = new ArrayList<>();
-
-	@JsonIgnore
-	private List<Trace> traces = new ArrayList<>();
-
 	@Nullable
 	@JsonIgnore
 	public Layout layout;
-
 	@Nullable
 	public Config config;
+	@JsonIgnore
+	private List<Data> data = new ArrayList<>();
+	@JsonIgnore
+	private List<Trace> traces = new ArrayList<>();
 
 
 	public Plotly() {
@@ -63,7 +60,7 @@ public class Plotly extends Viz {
 		super("plotly");
 		this.layout = layout;
 		for (Trace t : trace) {
-			addTrace(t, inline());
+			addTrace(t);
 		}
 	}
 
@@ -93,22 +90,24 @@ public class Plotly extends Viz {
 	}
 
 	/**
-	 * Data mapping that is not using external data, but inlines it into the yaml files.
-	 */
-	public static Data inline() {
-		return new Data(null);
-	}
-
-	/**
 	 * Add a trace to the figure.
 	 *
 	 * @param trace trace object, specifying one data set.
 	 * @param data  data mapping for the given trace.
 	 */
-	public Plotly addTrace(Trace trace, Data data) {
+	public Plotly addTrace(Trace trace, @Nullable Data data) {
 		this.data.add(data);
 		traces.add(trace);
 		return this;
+	}
+
+	/**
+	 * Add a trace to the figure. The trace object itself should already contain the data.
+	 *
+	 * @param trace trace object, specifying one data set.
+	 */
+	public Plotly addTrace(Trace trace) {
+		return addTrace(trace, null);
 	}
 
 	/**
@@ -123,7 +122,7 @@ public class Plotly extends Viz {
 	 */
 	public void fromFigure(Figure figure) {
 		for (Trace t : figure.getTraces()) {
-			addTrace(t, inline());
+			addTrace(t, null);
 		}
 
 		layout = figure.getLayout();
@@ -151,15 +150,18 @@ public class Plotly extends Viz {
 
 		Map<String, Object> object = new LinkedHashMap<>();
 
-		if (d.file != null) {
+		if (d != null && d.file != null) {
 			object.put("data", d);
 		}
 
 		List<Field> fields = getAllFields(t.getClass());
 
+		String type = "";
 		for (Field field : fields) {
 
-			if (field.getName().equals("engine"))
+			String name = field.getName();
+
+			if (name.equals("engine"))
 				continue;
 
 			if (!field.trySetAccessible())
@@ -177,29 +179,50 @@ public class Plotly extends Viz {
 					continue;
 
 				// Some special cases that don't need to be written
-				if (field.getName().equals("opacity") && Objects.equals(o, 1.0))
+				if (name.equals("opacity") && Objects.equals(o, 1.0))
 					continue;
-				if (field.getName().equals("visible") && Objects.equals(o, AbstractTrace.Visibility.TRUE))
+				if (name.equals("visible") && Objects.equals(o, AbstractTrace.Visibility.TRUE))
+					continue;
+				if (name.equals("xAxis") && Objects.equals(o, "x"))
+					continue;
+				if (name.equals("yAxis") && Objects.equals(o, "y"))
 					continue;
 
+				if (name.equals("type"))
+					type = (String) o;
 
-				object.put(field.getName().toLowerCase(), o);
+				object.put(name.toLowerCase(), o);
 			} catch (IllegalAccessException e) {
-				log.warn("Could not retrieve field {}", field.getName(), e);
-				continue;
+				log.warn("Could not retrieve field {}", name, e);
 			}
 
 		}
 
+		// Pie charts have an API that is quite confusing because the column names are different
+		// This codes fixes some errors
+		if ("pie".equals(type) && d != null) {
+
+			// Swap text and label column
+			if (d.text != null && d.labels == null) {
+				d.labels = d.text;
+				d.text = null;
+			}
+
+			d.values = d.x;
+			if (d.values == null)
+				d.values = d.y;
+
+			// x and y can not be used in this context
+			d.x = null;
+			d.y = null;
+		}
+
 		// Remove data entries that should be loaded from resources
-		if (d.x != null)
-			object.remove("x");
-
-		if (d.y != null)
-			object.remove("y");
-
-		if (d.text != null)
-			object.remove("text");
+		if (d != null && d.x != null) object.remove("x");
+		if (d != null && d.y != null) object.remove("y");
+		if (d != null && d.text != null) object.remove("text");
+		if (d != null && d.labels != null) object.remove("labels");
+		if (d != null && d.values != null) object.remove("values");
 
 		return object;
 	}
@@ -260,10 +283,19 @@ public class Plotly extends Viz {
 		private final String file;
 		private String x;
 		private String y;
+
+		/**
+		 * Only used for pie charts. T
+		 * his is not settable and will be taken from x or y.
+		 */
+		private String values;
+
 		private String text;
+		private String labels;
 		private String size;
 		private String color;
 		private String opacity;
+		private String groupBy;
 
 		private Data(String file) {
 			this.file = file;
@@ -294,6 +326,14 @@ public class Plotly extends Viz {
 		}
 
 		/**
+		 * Labels are used for piecharts.
+		 */
+		public Data labels(String columnName) {
+			labels = labels;
+			return this;
+		}
+
+		/**
 		 * Mapping for size column.
 		 */
 		public Data size(String columnName) {
@@ -316,6 +356,30 @@ public class Plotly extends Viz {
 			opacity = columnName;
 			return this;
 		}
+
+		/**
+		 * Split into multiple traces and group by this name.
+		 * TODO: Unstable API don't use yet.
+		 */
+		@Deprecated
+		public Data groupBy(String columnName) {
+			groupBy = columnName;
+			return this;
+		}
+
+	}
+
+	/**
+	 * Don't use yet, unfinished API.
+	 * TODO
+	 */
+	@Deprecated
+	public static final class Column {
+
+		public static Column transform(String columnName, String function) {
+			return null;
+		}
+
 	}
 
 }

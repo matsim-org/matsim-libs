@@ -63,7 +63,7 @@ public class PlotlyTest {
 
 		Plotly plot = new Plotly();
 
-		plot.addTrace(trace, Plotly.inline());
+		plot.addTrace(trace);
 
 		String value = writer.writeValueAsString(plot);
 
@@ -121,9 +121,9 @@ public class PlotlyTest {
 
 		Plotly plot = new Plotly();
 
-		plot.addTrace(scatter, Plotly.inline());
-		plot.addTrace(line, Plotly.inline());
-		plot.addTrace(hist, Plotly.inline());
+		plot.addTrace(scatter);
+		plot.addTrace(line);
+		plot.addTrace(hist);
 
 		plot.layout = Layout.builder()
 				.hoverDistance(5)

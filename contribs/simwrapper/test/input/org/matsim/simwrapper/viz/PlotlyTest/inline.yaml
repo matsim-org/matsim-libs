@@ -12,5 +12,3 @@ traces:
   - 16.0
   orientation: v
   type: bar
-  xaxis: x
-  yaxis: "y"

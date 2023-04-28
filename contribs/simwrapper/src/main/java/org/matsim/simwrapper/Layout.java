@@ -19,8 +19,18 @@ public final class Layout {
 
 	private static final Logger log = LogManager.getLogger(Layout.class);
 
-
+	/**
+	 * Different context allows different set of arguments and output folders for the same type of output.
+	 */
+	private final String defaultContext;
 	private final Map<String, Row> rows = new LinkedHashMap<>();
+
+	/**
+	 * Create new layout.
+	 */
+	Layout(String defaultContext) {
+		this.defaultContext = defaultContext;
+	}
 
 
 	/**
@@ -44,7 +54,7 @@ public final class Layout {
 
 			List<Viz> row = rows.computeIfAbsent(def.name, (k) -> new ArrayList<>());
 			for (Holder el : def.elements) {
-				data.setCurrentContext(el.context);
+				data.setCurrentContext(el.context != null ? el.context : defaultContext);
 
 				try {
 					Constructor<?> constructor = el.type.getConstructor();
@@ -60,7 +70,7 @@ public final class Layout {
 					log.error("Error occurred when constructing the viz object", e);
 				}
 
-				data.setCurrentContext("");
+				data.setCurrentContext(defaultContext);
 			}
 		}
 
@@ -87,7 +97,7 @@ public final class Layout {
 		 * @see #el(String, Class, RowElement)
 		 */
 		public <T extends Viz> Row el(Class<T> type, RowElement<T> el) {
-			return el("", type, el);
+			return el(null, type, el);
 		}
 
 		/**

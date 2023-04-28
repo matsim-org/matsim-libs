@@ -1,6 +1,26 @@
 type: plotly
 config:
   responsive: true
+layout:
+  hoverdistance: 5
+  margin:
+    left: 5
+    right: 80
+    top: 100
+    bottom: 80
+    autoexpand: true
+  paperbgcolor: black
+  grid:
+    rows: 80
+    roworder: top to bottom
+    pattern: coupled
+    columns: 80
+    xgap: 100.0
+    ygap: 80.0
+    xside: bottom
+    yside: left
+  width: 700
+  height: 450
 traces:
 - fill: none
   "y": []
@@ -30,7 +50,6 @@ traces:
   yaxis: "y"
   whiskerwidth: 0.0
   type: scatter
-  xaxis: x
 - fill: none
   "y": []
   x: []
@@ -59,8 +78,6 @@ traces:
       color: '#3D9970'
       width: 10
   type: scatter
-  xaxis: x
-  yaxis: "y"
 - x: []
   nbinsx: 0
   nbinsy: 0
@@ -69,25 +86,3 @@ traces:
   histnorm: density
   histfunc: count
   type: histogram
-  xaxis: x
-  yaxis: "y"
-layout:
-  hoverdistance: 5
-  margin:
-    left: 5
-    right: 80
-    top: 100
-    bottom: 80
-    autoexpand: true
-  paperbgcolor: black
-  grid:
-    rows: 80
-    roworder: top to bottom
-    pattern: coupled
-    columns: 80
-    xgap: 100.0
-    ygap: 80.0
-    xside: bottom
-    yside: left
-  width: 700
-  height: 450

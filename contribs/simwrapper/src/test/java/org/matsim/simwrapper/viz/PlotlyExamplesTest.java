@@ -8,12 +8,12 @@ import org.matsim.testcases.MatsimTestUtils;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.plotly.Plot;
 import tech.tablesaw.plotly.api.Heatmap;
 import tech.tablesaw.plotly.api.TimeSeriesPlot;
 import tech.tablesaw.plotly.components.Figure;
 import tech.tablesaw.plotly.components.Layout;
 import tech.tablesaw.plotly.traces.HistogramTrace;
+import tech.tablesaw.plotly.traces.PieTrace;
 import tech.tablesaw.plotly.traces.Scatter3DTrace;
 
 import java.io.File;
@@ -36,6 +36,20 @@ public class PlotlyExamplesTest {
 	public void setUp() throws Exception {
 		writer = createWriter();
 	}
+
+	@Test
+	public void pie() throws IOException {
+
+		String[] modes = {"car", "bike", "pt", "ride", "walk"};
+		double[] shares = {0.2, 0.15, 0.25, 0.1, 0.3};
+
+		Figure figure = new Figure(PieTrace.builder(modes, shares).build());
+
+		Plotly plot = new Plotly(figure);
+
+		writer.writeValue(new File(utils.getOutputDirectory(), "plotly-pie.yaml"), plot);
+	}
+
 
 	@Test
 	public void timeSeries() throws IOException {

@@ -17,5 +17,3 @@ traces:
     sizemode: diameter
   whiskerwidth: 0.0
   type: scatter
-  xaxis: x
-  yaxis: "y"

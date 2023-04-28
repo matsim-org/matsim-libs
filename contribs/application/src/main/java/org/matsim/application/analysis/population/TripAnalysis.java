@@ -98,7 +98,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		joined.addColumns(dist_group);
 
-		writeModeShare(joined);
+		writeModeShare(joined, labels);
 
 		writePopulationStats(persons, joined);
 
@@ -107,14 +107,17 @@ public class TripAnalysis implements MATSimAppCommand {
 		return 0;
 	}
 
-	private void writeModeShare(Table trips) {
+	private void writeModeShare(Table trips, List<String> labels) {
 
 		Table aggr = trips.summarize("trip_id", count).by("dist_group", "main_mode");
 
 		DoubleColumn share = aggr.numberColumn(2).divide(aggr.numberColumn(2).sum()).setName("share");
 		aggr.replaceColumn(2, share);
 
-		aggr = aggr.sortOn(0, 1);
+		// Sort by dist_group and mode
+		Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("dist_group")));
+		aggr = aggr.sortOn(cmp.thenComparing(row -> row.getString("main_mode")));
+
 		aggr.write().csv(output.getPath("mode_share.csv").toFile());
 	}
 
@@ -187,7 +190,6 @@ public class TripAnalysis implements MATSimAppCommand {
 			depTime[0] += travTimes[0];
 
 			arrival.add(depTime[0]);
-
 		}
 
 		trips.addColumns(

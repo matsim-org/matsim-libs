@@ -26,6 +26,7 @@ import java.util.Map;
 /**
  * Class to define and generate SimWrapper dashboards.
  */
+@SuppressWarnings("unused")
 public final class SimWrapper {
 
 	private static final Logger log = LogManager.getLogger(SimWrapper.class);
@@ -35,6 +36,7 @@ public final class SimWrapper {
 	private final Config config = new Config();
 
 	private final List<Dashboard> dashboards = new ArrayList<>();
+	private final List<String> context = new ArrayList<>();
 
 	/**
 	 * Use {@link #create()}.
@@ -61,21 +63,22 @@ public final class SimWrapper {
 	}
 
 	/**
-	 * Adds an dashboard definition to SimWrapper.
+	 * Adds a dashboard definition to SimWrapper.
 	 * This only stores the specification, the actual code is executed during {@link #generate(Path)}.
 	 */
 	public SimWrapper addDashboard(Dashboard d) {
-		dashboards.add(d);
-		return this;
+		return addDashboard(d, "");
 	}
 
 	/**
-	 * Add dashboard at specific index.
+	 * Adds a dashboard definition to SimWrapper.
+	 * This only stores the specification, the actual code is executed during {@link #generate(Path)}.
 	 *
-	 * @see #addDashboard(Dashboard)
+	 * @param context context name, which allows to add multiple dashboards of the same kind.
 	 */
-	public SimWrapper addDashboard(int index, Dashboard d) {
-		dashboards.add(index, d);
+	public SimWrapper addDashboard(Dashboard d, String context) {
+		dashboards.add(d);
+		this.context.add(context);
 		return this;
 	}
 
@@ -112,7 +115,7 @@ public final class SimWrapper {
 		for (Dashboard d : dashboards) {
 
 			YAML yaml = new YAML();
-			Layout layout = new Layout();
+			Layout layout = new Layout(context.get(i));
 
 			d.configure(yaml.header, layout);
 			yaml.layout = layout.create(data);

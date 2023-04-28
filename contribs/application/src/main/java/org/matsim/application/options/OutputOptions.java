@@ -1,5 +1,6 @@
 package org.matsim.application.options;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import picocli.CommandLine;
@@ -20,14 +21,13 @@ import static org.matsim.application.options.InputOptions.argNames;
  */
 public final class OutputOptions {
 
+	private final CommandSpec spec;
+	private final Map<String, Path> outputs = new HashMap<>();
 	/**
 	 * Needs to be present or the mixin will not be processed at all.
 	 */
 	@CommandLine.Option(names = "--unused-output-option", hidden = true)
 	private String unused;
-
-	private final CommandSpec spec;
-	private final Map<String, Path> outputs = new HashMap<>();
 
 	private OutputOptions(CommandSpec spec) {
 		this.spec = spec;
@@ -58,6 +58,9 @@ public final class OutputOptions {
 	 * Get the output path configured for a specific name.
 	 */
 	public Path getPath(String name) {
+
+		if (!ArrayUtils.contains(spec.produces(), name))
+			throw new IllegalArgumentException(String.format("The output file '%s' is not defined in the @CommandSpec", name));
 
 		Path output = outputs.containsKey(name) ? outputs.get(name) : Path.of(name);
 		try {
