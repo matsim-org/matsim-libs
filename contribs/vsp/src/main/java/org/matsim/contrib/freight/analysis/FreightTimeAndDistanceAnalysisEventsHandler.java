@@ -6,6 +6,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.events.FreightTourEndEvent;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -37,10 +39,21 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		return vehicle2TourLength;
 	}
 
+	public Map<Id<Vehicle>, Id<Carrier>> getVehicleId2CarrierId() {
+		return vehicleId2CarrierId;
+	}
+
+	public Map<Id<Vehicle>, Id<Tour>> getVehicleId2TourId() {
+		return vehicleId2TourId;
+	}
+
 	private final Map<Id<Vehicle>, Double> vehicle2TourDuration = new LinkedHashMap<>();
 	private final Map<Id<Vehicle>, Double> vehicle2TourLength = new LinkedHashMap<>();
 
 	private final Map<String, Double> tourStartTime = new LinkedHashMap<>();
+
+	private final Map<Id<Vehicle>, Id<Carrier>> vehicleId2CarrierId = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, Id<Tour>> vehicleId2TourId = new LinkedHashMap<>();
 
 	public FreightTimeAndDistanceAnalysisEventsHandler(Scenario scenario) {
 		this.scenario = scenario;
@@ -58,6 +71,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		double tourDuration = event.getTime() - tourStartTime.get(key);
 		vehicle2TourDuration.put(event.getVehicleId(), tourDuration);
 
+		vehicleId2CarrierId.put(event.getVehicleId(), event.getCarrierId());
+		vehicleId2TourId.put(event.getVehicleId(), event.getTourId());
 	}
 
 	private void handleEvent(LinkEnterEvent event) {
@@ -86,12 +101,14 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
 		//Write headline:
-		bw1.write("vehicleId \t tourDuration[s] \t travelDistance[m] \t " +
+		bw1.write("vehicleId \t carrierId \t vehicleTypeId \t tourId \t tourDuration[s] \t travelDistance[m] \t " +
 				"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR] \t varCostsTime[EUR] \t varCostsDist[EUR] \t totalCosts[EUR]");
 		bw1.newLine();
 
 		var vehicle2Duration = freightTimeAndDistanceAnalysisEventsHandler.getVehicle2TourDuration();
 		var vehicle2Distance = freightTimeAndDistanceAnalysisEventsHandler.getVehicle2TourLength();
+		var vehicleId2CarrierId = freightTimeAndDistanceAnalysisEventsHandler.getVehicleId2CarrierId();
+		var vehicleId2TourId = freightTimeAndDistanceAnalysisEventsHandler.getVehicleId2TourId();
 
 		for (Id<Vehicle> vehicleId : vehicle2Duration.keySet()) {
 
@@ -108,6 +125,10 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			final double totalVehCosts = fixedCost + varCostsTime + varCostsDist;
 
 			bw1.write(vehicleId.toString());
+			bw1.write("\t" + vehicleId2CarrierId.get(vehicleId));
+			bw1.write("\t" + vehicleType.getId().toString());
+			bw1.write("\t" + vehicleId2TourId.get(vehicleId));
+
 			bw1.write("\t" + durationInSeconds);
 			bw1.write("\t" + distanceInMeters);
 			bw1.write("\t" + costsPerSecond);
