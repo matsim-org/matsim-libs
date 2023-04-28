@@ -2,6 +2,7 @@ package ch.sbb.matsim.contrib.railsim.prototype.supply;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Vehicle type information
@@ -33,6 +34,24 @@ public class VehicleTypeInfo {
 		this.length = length;
 		this.maxVelocity = maxVelocity;
 		this.turnaroundTime = turnaroundTime;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		var that = (VehicleTypeInfo) o;
+		if (capacity != that.capacity) return false;
+		if (Double.compare(that.length, length) != 0) return false;
+		if (Double.compare(that.maxVelocity, maxVelocity) != 0) return false;
+		if (Double.compare(that.turnaroundTime, turnaroundTime) != 0) return false;
+		if (!Objects.equals(id, that.id)) return false;
+		return attributes.equals(that.attributes);
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id.hashCode() : 0;
 	}
 
 	public String getId() {

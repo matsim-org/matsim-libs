@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Coord;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Section segment information
@@ -26,6 +27,28 @@ public class SectionSegmentInfo {
 
 	public void addLinkAttribute(String key, Object value) {
 		linkAttributes.put(key, value);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		var that = (SectionSegmentInfo) o;
+		if (Double.compare(that.length, length) != 0) return false;
+		if (!Objects.equals(fromCoord, that.fromCoord)) return false;
+		if (!Objects.equals(toCoord, that.toCoord)) return false;
+		return linkAttributes.equals(that.linkAttributes);
+	}
+
+	@Override
+	public int hashCode() {
+		int result;
+		long temp;
+		result = fromCoord != null ? fromCoord.hashCode() : 0;
+		result = 31 * result + (toCoord != null ? toCoord.hashCode() : 0);
+		temp = Double.doubleToLongBits(length);
+		result = 31 * result + (int) (temp ^ (temp >>> 32));
+		return result;
 	}
 
 	public Coord getFromCoord() {

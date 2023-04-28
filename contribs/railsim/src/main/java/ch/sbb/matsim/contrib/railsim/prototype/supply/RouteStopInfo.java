@@ -3,6 +3,8 @@ package ch.sbb.matsim.contrib.railsim.prototype.supply;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import java.util.Objects;
+
 /**
  * Route stop information
  *
@@ -49,6 +51,27 @@ public class RouteStopInfo {
 	 */
 	public boolean isStoppingPass() {
 		return waitingTime > 0.;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		var that = (RouteStopInfo) o;
+		if (Double.compare(that.waitingTime, waitingTime) != 0) return false;
+		if (!Objects.equals(link, that.link)) return false;
+		return Objects.equals(transitStop, that.transitStop);
+	}
+
+	@Override
+	public int hashCode() {
+		int result;
+		long temp;
+		result = link != null ? link.hashCode() : 0;
+		result = 31 * result + (transitStop != null ? transitStop.hashCode() : 0);
+		temp = Double.doubleToLongBits(waitingTime);
+		result = 31 * result + (int) (temp ^ (temp >>> 32));
+		return result;
 	}
 
 	public Link getLink() {

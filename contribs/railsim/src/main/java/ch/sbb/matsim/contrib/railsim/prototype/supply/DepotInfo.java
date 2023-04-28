@@ -6,6 +6,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Depot information
@@ -34,6 +35,31 @@ public class DepotInfo {
 		this.capacity = capacity;
 		this.inLength = inLength;
 		this.outLength = outLength;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		var depotInfo = (DepotInfo) o;
+		if (Double.compare(depotInfo.length, length) != 0) return false;
+		if (Double.compare(depotInfo.inLength, inLength) != 0) return false;
+		if (Double.compare(depotInfo.outLength, outLength) != 0) return false;
+		if (capacity != depotInfo.capacity) return false;
+		if (!Objects.equals(id, depotInfo.id)) return false;
+		if (!Objects.equals(coord, depotInfo.coord)) return false;
+		if (!inLinkAttributes.equals(depotInfo.inLinkAttributes)) return false;
+		if (!depotLinkAttributes.equals(depotInfo.depotLinkAttributes)) return false;
+		if (!outLinkAttributes.equals(depotInfo.outLinkAttributes)) return false;
+		if (!Objects.equals(depot, depotInfo.depot)) return false;
+		if (!Objects.equals(depotIn, depotInfo.depotIn)) return false;
+		if (!Objects.equals(depotLink, depotInfo.depotLink)) return false;
+		return Objects.equals(depotOut, depotInfo.depotOut);
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id.hashCode() : 0;
 	}
 
 	public Map<String, Object> getInLinkAttributes() {

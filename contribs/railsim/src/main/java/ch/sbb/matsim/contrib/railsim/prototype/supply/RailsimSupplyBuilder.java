@@ -40,8 +40,11 @@ public class RailsimSupplyBuilder {
 	private final VehicleCircuitsPlanner vehicleCircuitsPlanner;
 	private final RailsimSupplyConfigGroup railsimSupplyConfigGroup;
 	private final SupplyFactory supplyFactory;
-	private final Map<String, TransitLineInfo> transitLineInfos = new HashMap<>();
 	private final Map<String, StopInfo> stopInfos = new HashMap<>();
+	private final Map<String, TransitLineInfo> transitLineInfos = new HashMap<>();
+	private final Map<String, VehicleTypeInfo> vehicleTypeInfos = new HashMap<>();
+	private final Map<String, DepotInfo> depotInfos = new HashMap<>();
+	private final Map<String, SectionPartInfo> sectionPartInfos = new HashMap<>();
 	private final Map<String, List<Id<Link>>> sectionParts = new HashMap<>();
 
 
@@ -80,12 +83,16 @@ public class RailsimSupplyBuilder {
 	 * @param y  the y coordinates of the stop.
 	 */
 	public void addStop(String id, double x, double y) {
-		// get stop infos from infrastructure provider
+		// ensure unique stop ids
+		if (stopInfos.containsKey(id)) {
+			throw new RuntimeException("Stop already existing for id " + id);
+		}
+		// get stop infos from infrastructure repository
 		var stopInfo = infrastructureRepository.getStop(id, x, y);
 		x = stopInfo.getCoord().getX();
 		y = stopInfo.getCoord().getY();
 		final double stopLinkLength = stopInfo.getStopLinkLength();
-		// create the stop link: (t_IN)<#####>(t_OUT)
+		// create the stop link
 		var tIn = supplyFactory.createNode(id + "_IN", new Coord(x - stopLinkLength, y));
 		var tOut = supplyFactory.createNode(id + "_OUT", stopInfo.getCoord());
 		var stopLink = supplyFactory.createLink(LinkType.STOP, tIn, tOut, stopLinkLength, stopInfo.getLinkAttributes());
@@ -123,17 +130,30 @@ public class RailsimSupplyBuilder {
 	 * @return A transit line information object.
 	 */
 	public TransitLineInfo addTransitLine(String id, String vehicleTypeid, String firstStopId, double waitingTime) {
+		// ensure unique transit line ids
 		if (transitLineInfos.containsKey(id)) {
 			throw new RuntimeException("Transit line already existing for id " + id);
 		}
 		var firstStopInfo = getStop(firstStopId);
-		// get vehicle type info from provider
+		// get vehicle type info from repository and ensure consistency
 		var vehicleTypeInfo = rollingStockRepository.getVehicleType(vehicleTypeid);
+		if (!isConsistent(vehicleTypeInfo)) {
+			throw new RuntimeException("Vehicle type from repository is not consistent for id " + vehicleTypeInfo.getId());
+		}
 		// create transit line and matsim object
 		var transitLineInfo = new TransitLineInfo(id, new RouteStopInfo(firstStopInfo, waitingTime), vehicleTypeInfo, supplyFactory.createTransitLine(id), this);
 		// store transit line info
 		transitLineInfos.put(id, transitLineInfo);
 		return transitLineInfo;
+	}
+
+	private boolean isConsistent(VehicleTypeInfo received) {
+		var existing = vehicleTypeInfos.get(received.getId());
+		if (existing == null) {
+			vehicleTypeInfos.put(received.getId(), received);
+			return true;
+		}
+		return received.equals(existing);
 	}
 
 	/**
@@ -183,8 +203,11 @@ public class RailsimSupplyBuilder {
 	 * @param stopInfo the stopInfo to add the depot to.
 	 */
 	private void addDepotToStop(StopInfo stopInfo) {
-		// request depot info from infrastructure provider
+		// request depot info from infrastructure repository and ensure consistency
 		var depotInfo = infrastructureRepository.getDepot(stopInfo);
+		if (!isConsistent(depotInfo)) {
+			throw new RuntimeException("Depot is from repository not consistent for id " + depotInfo.getId());
+		}
 		// create nodes
 		log.info("Adding depot to stop " + stopInfo.getId());
 		var dIn = supplyFactory.createNode(depotInfo.getId() + "_DPT_IN", depotInfo.getCoord());
@@ -202,6 +225,15 @@ public class RailsimSupplyBuilder {
 		depotInfo.setDepotOut(depotOutLink);
 		// add depot to transit stop
 		stopInfo.setDepotInfo(depotInfo);
+	}
+
+	private boolean isConsistent(DepotInfo received) {
+		var existing = depotInfos.get(received.getId());
+		if (existing == null) {
+			depotInfos.put(received.getId(), received);
+			return true;
+		}
+		return received.equals(existing);
 	}
 
 	/**
@@ -333,13 +365,16 @@ public class RailsimSupplyBuilder {
 		String id = String.format("%s_%s", fromStop.getId(), toStop.getId());
 		var sectionPart = sectionParts.get(id);
 		if (sectionPart != null) {
-			log.info(String.format("Section part already existing, skipping %s", id));
+			log.debug("Section part already existing, skipping {}", id);
 			return sectionPart;
 		}
-		// request section part information from infrastructure provider
+		// request section part information from infrastructure repository and ensure consistency
 		var sectionPartInfo = infrastructureRepository.getSectionPart(fromStop, toStop);
+		if (!isConsistent(sectionPartInfo)) {
+			throw new RuntimeException("Section part from repository is not consistent for id " + createSectionPartInfoId(sectionPartInfo));
+		}
 		// create link for each section until last
-		var nodePrefix = String.format("%s_%s_", sectionPartInfo.getFromStopId(), sectionPartInfo.getToStopId());
+		var nodePrefix = String.format("%s_", id);
 		var links = new ArrayList<Id<Link>>();
 		var sectionSegmentInfos = sectionPartInfo.getSectionSegmentInfos();
 		var currentNode = fromStop.getStopLink().getToNode();
@@ -360,6 +395,20 @@ public class RailsimSupplyBuilder {
 		// store links of section part
 		sectionParts.put(id, links);
 		return links;
+	}
+
+	private boolean isConsistent(SectionPartInfo received) {
+		var id = createSectionPartInfoId(received);
+		var existing = sectionPartInfos.get(id);
+		if (existing == null) {
+			sectionPartInfos.put(id, received);
+			return true;
+		}
+		return received.equals(existing);
+	}
+
+	private static String createSectionPartInfoId(SectionPartInfo sectionPartInfo) {
+		return String.format("%s_%s", sectionPartInfo.getFromStopId(), sectionPartInfo.getToStopId());
 	}
 
 	public Scenario getScenario() {

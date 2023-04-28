@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -23,7 +24,6 @@ import java.util.stream.Collectors;
 public class TransitLineInfo {
 
 	private static final Logger log = LogManager.getLogger(TransitLineInfo.class);
-
 	private static final double NO_STOP_TIME = 0.;
 	private final RailsimSupplyBuilder supplyBuilder;
 	// line
@@ -99,6 +99,23 @@ public class TransitLineInfo {
 		createLinksAndConnectStops();
 		logEntry();
 		built = true;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		var that = (TransitLineInfo) o;
+		// only compare id and supply builder instance since uniqueness in managed by builder
+		if (!Objects.equals(supplyBuilder, that.supplyBuilder)) return false;
+		return Objects.equals(id, that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = supplyBuilder != null ? supplyBuilder.hashCode() : 0;
+		result = 31 * result + (id != null ? id.hashCode() : 0);
+		return result;
 	}
 
 	private void addFirstStop(RouteStopInfo firstRouteStop) {
