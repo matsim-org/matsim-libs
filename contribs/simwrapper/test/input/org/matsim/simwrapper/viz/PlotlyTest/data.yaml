@@ -1,6 +1,6 @@
 type: plotly
 traces:
-- data:
+- dataset:
     file: test.csv
     x: xColumn
     "y": yColumn

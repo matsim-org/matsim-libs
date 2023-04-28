@@ -151,7 +151,7 @@ public class Plotly extends Viz {
 		Map<String, Object> object = new LinkedHashMap<>();
 
 		if (d != null && d.file != null) {
-			object.put("data", d);
+			object.put("dataset", d);
 		}
 
 		List<Field> fields = getAllFields(t.getClass());
