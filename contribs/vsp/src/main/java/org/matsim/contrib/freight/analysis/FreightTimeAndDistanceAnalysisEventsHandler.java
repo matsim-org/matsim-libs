@@ -47,22 +47,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	private final Map<String, Double> tourStartTime = new LinkedHashMap<>();
 
 
-	public Map<Id<Vehicle>, Double> getVehicleId2TourDuration() {
-		return vehicleId2TourDuration;
-	}
-
-	public Map<Id<Vehicle>, Double> getVehicleId2TourLength() {
-		return vehicleId2TourLength;
-	}
-
-	public Map<Id<Vehicle>, Id<Carrier>> getVehicleId2CarrierId() {
-		return vehicleId2CarrierId;
-	}
-
-	public Map<Id<Vehicle>, Id<Tour>> getVehicleId2TourId() {
-		return vehicleId2TourId;
-	}
-
 	public FreightTimeAndDistanceAnalysisEventsHandler(Scenario scenario) {
 		this.scenario = scenario;
 	}
@@ -109,7 +93,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	}
 
 
-	static void writeTravelTimeAndDistance(String analysisOutputDirectory, Scenario scenario, FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler) throws IOException {
+	void writeTravelTimeAndDistance(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicle");
 		//Travel time and distance per vehicle
 		String fileName = analysisOutputDirectory + "TimeDistance_perVehicle.tsv";
@@ -121,15 +105,10 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 				"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR] \t varCostsTime[EUR] \t varCostsDist[EUR] \t totalCosts[EUR]");
 		bw1.newLine();
 
-		var vehicle2Duration = freightTimeAndDistanceAnalysisEventsHandler.getVehicleId2TourDuration();
-		var vehicle2Distance = freightTimeAndDistanceAnalysisEventsHandler.getVehicleId2TourLength();
-		var vehicleId2CarrierId = freightTimeAndDistanceAnalysisEventsHandler.getVehicleId2CarrierId();
-		var vehicleId2TourId = freightTimeAndDistanceAnalysisEventsHandler.getVehicleId2TourId();
+		for (Id<Vehicle> vehicleId : vehicleId2VehicleTypeId.keySet()) {
 
-		for (Id<Vehicle> vehicleId : vehicle2Duration.keySet()) {
-
-			final Double durationInSeconds = vehicle2Duration.get(vehicleId);
-			final Double distanceInMeters = vehicle2Distance.get(vehicleId);
+			final Double durationInSeconds = vehicleId2TourDuration.get(vehicleId);
+			final Double distanceInMeters = vehicleId2TourLength.get(vehicleId);
 
 			final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
 			final Double costsPerSecond = vehicleType.getCostInformation().getCostsPerSecond();
@@ -162,7 +141,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	}
 
 
-	void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario, FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler) throws IOException {
+	void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
 
 		//----- All VehicleTypes in vehicles container. Used so that all vehicleTypes will appear in the output
