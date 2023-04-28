@@ -43,7 +43,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	private final Map<Id<VehicleType>, Double> vehicleTypeId2SumOfDuration = new LinkedHashMap<>();
 	private final Map<Id<VehicleType>, Double> vehicleTypeId2Mileage = new LinkedHashMap<>();
 
-	private final Map<Id<Vehicle>, Id<VehicleType>> vehicleId2VehicleTypeId = new TreeMap<>();
+	private final Map<Id<Vehicle>, VehicleType> vehicleId2VehicleType = new TreeMap<>();
 
 	private final Map<String, Double> tourStartTime = new LinkedHashMap<>();
 
@@ -63,14 +63,14 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		final String key = event.getCarrierId().toString() + "_" + event.getTourId().toString();
 		double tourDuration = event.getTime() - tourStartTime.get(key);
 		vehicleId2TourDuration.put(event.getVehicleId(), tourDuration);
-		Id<VehicleType> vehTypeId = VehicleUtils.findVehicle(event.getVehicleId(), scenario).getType().getId();
-		vehicleTypeId2SumOfDuration.merge(vehTypeId, tourDuration, Double::sum);
+		VehicleType vehType = VehicleUtils.findVehicle(event.getVehicleId(), scenario).getType();
+		vehicleTypeId2SumOfDuration.merge(vehType.getId(), tourDuration, Double::sum);
 
 		//Some general information for this vehicle
 		vehicleId2CarrierId.putIfAbsent(event.getVehicleId(), event.getCarrierId());
 		vehicleId2TourId.putIfAbsent(event.getVehicleId(), event.getTourId());
 
-		vehicleId2VehicleTypeId.putIfAbsent(event.getVehicleId(), vehTypeId);
+		vehicleId2VehicleType.putIfAbsent(event.getVehicleId(), vehType);
 	}
 
 	private void handleEvent(LinkEnterEvent event) {
@@ -106,7 +106,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 				"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR] \t varCostsTime[EUR] \t varCostsDist[EUR] \t totalCosts[EUR]");
 		bw1.newLine();
 
-		for (Id<Vehicle> vehicleId : vehicleId2VehicleTypeId.keySet()) {
+		for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
 
 			final Double durationInSeconds = vehicleId2TourDuration.get(vehicleId);
 			final Double distanceInMeters = vehicleId2TourLength.get(vehicleId);
@@ -145,9 +145,14 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
 
-		//----- All VehicleTypes in vehicles container. Used so that all vehicleTypes will appear in the output
-//		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(scenario.getVehicles().getVehicleTypes());
+		//----- All VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
+
 		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
+		//For the case that there are additional vehicle types found in the events.
+		for (VehicleType vehicleType : vehicleId2VehicleType.values()) {
+			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);
+		}
+
 
 		String fileName = analysisOutputDirectory + "TimeDistance_perVehicleType.tsv";
 
@@ -159,9 +164,11 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 				"varCostsTime[EUR] \t varCostsDist[EUR] \t fixedCosts[EUR] \t totalCosts[EUR]");
 		bw1.newLine();
 
+
+
 		for (VehicleType vehicleType : vehicleTypesMap.values()) {
 
-			long nuOfVehicles = vehicleId2VehicleTypeId.values().stream().filter(v -> v == vehicleType.getId()).count();
+			long nuOfVehicles = vehicleId2VehicleType.values().stream().filter(vehType -> vehType.getId() == vehicleType.getId()).count();
 
 			final Double costRatePerSecond = vehicleType.getCostInformation().getCostsPerSecond();
 			final Double costRatePerMeter = vehicleType.getCostInformation().getCostsPerMeter();
