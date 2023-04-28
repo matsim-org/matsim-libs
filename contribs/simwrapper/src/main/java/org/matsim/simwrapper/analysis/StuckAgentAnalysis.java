@@ -182,9 +182,6 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
-
-		//
-
 		// Pie chart
 		if (!stuckAgentsPerMode.containsKey(event.getLegMode())) stuckAgentsPerMode.put(event.getLegMode(), 1);
 		else stuckAgentsPerMode.put(event.getLegMode(), stuckAgentsPerMode.getInt(event.getLegMode()) + 1);
@@ -205,6 +202,5 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		if (!allAgents.contains(event.getPersonId().toString())) allAgents.add(event.getPersonId().toString());
-		if (allAgents.size()%1000 == 0) System.out.println(allAgents.size());
 	}
 }
