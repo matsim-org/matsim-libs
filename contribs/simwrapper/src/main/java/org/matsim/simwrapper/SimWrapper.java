@@ -97,8 +97,7 @@ public final class SimWrapper {
 
 		ObjectWriter writer = mapper.writerFor(YAML.class);
 
-		Path target = dir.resolve(".simwrapper");
-		Files.createDirectories(target);
+		Files.createDirectories(dir);
 
 		data.setPath(dir.resolve("analysis"));
 
@@ -117,7 +116,7 @@ public final class SimWrapper {
 			d.configure(yaml.header, layout);
 			yaml.layout = layout.create(data);
 
-			Path out = target.resolve("dashboard-" + i + ".yaml");
+			Path out = dir.resolve("dashboard-" + i + ".yaml");
 			writer.writeValue(out.toFile(), yaml);
 
 			i++;
@@ -125,7 +124,7 @@ public final class SimWrapper {
 
 		ObjectWriter configWriter = mapper.writerFor(Config.class);
 
-		Path out = target.resolve("simwrapper-config.yaml");
+		Path out = dir.resolve("simwrapper-config.yaml");
 		configWriter.writeValue(out.toFile(), config);
 
 		// TODO: think about json schema for the datatypes

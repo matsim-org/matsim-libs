@@ -8,9 +8,12 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
@@ -22,19 +25,21 @@ import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @CommandLine.Command(name = "stuck-agents", description = "Generates statistics for stuck agents.")
-@CommandSpec(requireEvents = true, produces = {"stuckAgentsPerHour.csv", "stuckAgentsPerMode.csv", "stuckAgentsPerLink.csv", "stuckAgentsPerMode.csv"})
-public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHandler {
+@CommandSpec(requireEvents = true, produces = {"stuckAgentsPerHour.csv", "stuckAgentsPerMode.csv", "stuckAgentsPerLink.csv", "stuckAgentsPerModePieChart.csv", "header.md"})
+public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHandler, ActivityStartEventHandler {
 	private static final Logger log = LogManager.getLogger(StuckAgentAnalysis.class);
 	private final Object2IntMap<String> stuckAgentsPerMode = new Object2IntOpenHashMap<>();
 	private final Map<String, Int2DoubleMap> stuckAgentsPerHour = new HashMap<>();
 	private final Map<String, Object2DoubleOpenHashMap<String>> stuckAgentsPerLink = new HashMap<>();
 	private final Object2DoubleOpenHashMap<String> allStuckedLinks = new Object2DoubleOpenHashMap<>();
+	private final List<String> allAgents = new ArrayList<>();
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(StuckAgentAnalysis.class);
 	@CommandLine.Mixin
@@ -56,6 +61,38 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		EventsUtils.readEvents(manager, input.getEventsPath());
 
 		manager.finishProcessing();
+
+		// Total stats
+		PrintWriter printWriter = new PrintWriter(IOUtils.getBufferedWriter(output.getPath("header.md").toString()));
+		String markdown = """
+					<div class='stack-agents-table'>
+
+					|**Total Agents**|**Stuck Agents**|**Proportion of stucket agents**|
+					|:-------:|:-------:|:-------:|
+					|**${totalAgents}**|**${stuckAgents}**|**${stuckAgentsProportion} %**|
+
+					</div>
+
+					<style>
+					    .stack-agents-table {
+					        font-size:20pt;
+					    }
+
+					    .stack-agents-table table {
+					        width: 100%
+					    }
+
+					    .stack-agents-table table tbody tr * {
+					        margin-bottom: 100px;
+					    }
+					</style>""";
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("totalAgents", String.valueOf(allAgents.size()));
+		data.put("stuckAgents", String.valueOf(allStuckedLinks.keySet().size()));
+		data.put("stuckAgentsProportion", String.valueOf((Math.round((100.0 / allAgents.size() * allStuckedLinks.keySet().size()) * 10000))/10000.0));
+		String formattedString = StrSubstitutor.replace(markdown, data);
+		printWriter.println(formattedString);
+		printWriter.close();
 
 		// Per hour
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerHour.csv").toString()), CSVFormat.DEFAULT)) {
@@ -113,7 +150,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		}
 
 		// Pie chart
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerMode.csv").toString()), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerModePieChart.csv").toString()), CSVFormat.DEFAULT)) {
 
 			List<String> header = new ArrayList<>(stuckAgentsPerMode.keySet());
 			List<Integer> values = new ArrayList<>(stuckAgentsPerMode.values());
@@ -146,6 +183,8 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 
+		//
+
 		// Pie chart
 		if (!stuckAgentsPerMode.containsKey(event.getLegMode())) stuckAgentsPerMode.put(event.getLegMode(), 1);
 		else stuckAgentsPerMode.put(event.getLegMode(), stuckAgentsPerMode.getInt(event.getLegMode()) + 1);
@@ -163,4 +202,9 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		perLink.mergeDouble(link, 1, Double::sum);
 	}
 
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		if (!allAgents.contains(event.getPersonId().toString())) allAgents.add(event.getPersonId().toString());
+		if (allAgents.size()%1000 == 0) System.out.println(allAgents.size());
+	}
 }
