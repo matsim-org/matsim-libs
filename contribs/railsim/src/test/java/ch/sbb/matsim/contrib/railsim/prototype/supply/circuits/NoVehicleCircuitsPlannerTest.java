@@ -19,11 +19,12 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Testing default vehicle circuits planner approach
+ * Testing no vehicle circuits planner approach
  *
  * @author Merlin Unterfinger
  */
-public class DefaultVehicleCircuitsPlannerTest {
+public class NoVehicleCircuitsPlannerTest {
+
 	private RailsimSupplyBuilder supply;
 
 	@Before
@@ -32,7 +33,7 @@ public class DefaultVehicleCircuitsPlannerTest {
 		var config = ConfigUtils.createConfig();
 		config.global().setCoordinateSystem("CH1903plus_LV95");
 		var railsimConfigGroup = ConfigUtils.addOrGetModule(config, RailsimSupplyConfigGroup.class);
-		railsimConfigGroup.setCircuitPlanningApproach(RailsimSupplyConfigGroup.CircuitPlanningApproach.DEFAULT);
+		railsimConfigGroup.setCircuitPlanningApproach(RailsimSupplyConfigGroup.CircuitPlanningApproach.NONE);
 		var scenario = ScenarioUtils.loadScenario(config);
 		// setup supply builder
 		supply = new RailsimSupplyBuilder(scenario);
@@ -66,14 +67,14 @@ public class DefaultVehicleCircuitsPlannerTest {
 		var schedule = supply.getScenario().getTransitSchedule();
 		// IR
 		String lineId = "IR";
-		assertTrue(checkVehicleIds(List.of("IR_1", "IR_2"), lineId, RouteDirection.FORWARD, RouteType.DEPOT_TO_DEPOT));
-		assertTrue(checkVehicleIds(List.of("IR_0", "IR_2", "IR_0"), lineId, RouteDirection.FORWARD, RouteType.DEPOT_TO_STATION));
+		assertTrue(checkVehicleIds(null, lineId, RouteDirection.FORWARD, RouteType.DEPOT_TO_DEPOT));
+		assertTrue(checkVehicleIds(null, lineId, RouteDirection.FORWARD, RouteType.DEPOT_TO_STATION));
 		assertTrue(checkVehicleIds(null, lineId, RouteDirection.FORWARD, RouteType.STATION_TO_DEPOT));
-		assertTrue(checkVehicleIds(null, lineId, RouteDirection.FORWARD, RouteType.STATION_TO_STATION));
-		assertTrue(checkVehicleIds(List.of("IR_1"), lineId, RouteDirection.REVERSE, RouteType.DEPOT_TO_DEPOT));
+		assertTrue(checkVehicleIds(List.of("IR_0", "IR_1", "IR_2", "IR_3", "IR_4"), lineId, RouteDirection.FORWARD, RouteType.STATION_TO_STATION));
+		assertTrue(checkVehicleIds(null, lineId, RouteDirection.REVERSE, RouteType.DEPOT_TO_DEPOT));
 		assertTrue(checkVehicleIds(null, lineId, RouteDirection.REVERSE, RouteType.DEPOT_TO_STATION));
-		assertTrue(checkVehicleIds(List.of("IR_0", "IR_2", "IR_0"), lineId, RouteDirection.REVERSE, RouteType.STATION_TO_DEPOT));
-		assertTrue(checkVehicleIds(null, lineId, RouteDirection.REVERSE, RouteType.STATION_TO_STATION));
+		assertTrue(checkVehicleIds(null, lineId, RouteDirection.REVERSE, RouteType.STATION_TO_DEPOT));
+		assertTrue(checkVehicleIds(List.of("IR_5", "IR_6", "IR_7", "IR_8"), lineId, RouteDirection.REVERSE, RouteType.STATION_TO_STATION));
 	}
 
 	private boolean checkVehicleIds(List<String> vehicleIds, String lineId, RouteDirection routeDirection, RouteType routeType) {
@@ -92,5 +93,4 @@ public class DefaultVehicleCircuitsPlannerTest {
 	private Id<TransitRoute> createRouteId(String lineId, RouteDirection routeDirection, RouteType routeType) {
 		return Id.create(String.format("%s_%s_%s", lineId, routeDirection.getAbbreviation(), routeType.name()), TransitRoute.class);
 	}
-
 }

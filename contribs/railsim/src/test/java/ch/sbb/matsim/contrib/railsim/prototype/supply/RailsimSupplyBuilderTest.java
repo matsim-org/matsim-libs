@@ -33,6 +33,8 @@ import static org.junit.Assert.*;
 
 /**
  * Test for supply generation using railsim supply builder.
+ *
+ * @author Merlin Unterfinger
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RailsimSupplyBuilderTest {

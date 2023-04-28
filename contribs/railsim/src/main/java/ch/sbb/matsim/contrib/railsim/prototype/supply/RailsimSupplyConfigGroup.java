@@ -45,9 +45,9 @@ public class RailsimSupplyConfigGroup extends ReflectiveConfigGroup {
 	private static final String VEHICLE_TURNAROUND_TIME = "vehicleTurnaroundTime"; // 5. * 60
 	// circuit
 	private static final String CIRCUIT_MAX_WAITING_TIME = "circuitMaxWaitingTime"; // 20 * 60
-	private static final String CIRCUIT_PLANNING_APPROACH = "circuitPlanningApproach"; // has no effect yet
+	private static final String CIRCUIT_PLANNING_APPROACH = "circuitPlanningApproach"; // DEFAULT
 
-	public enum CircuitPlanningApproach {WITH, WITHOUT}
+	public enum CircuitPlanningApproach {DEFAULT, NONE}
 
 	/**
 	 * Ctor
@@ -80,7 +80,7 @@ public class RailsimSupplyConfigGroup extends ReflectiveConfigGroup {
 	private double vehicleTurnaroundTime = 5. * 60; // seconds
 	// circuit
 	private double circuitMaxWaitingTime = 20. * 60; // meters per second
-	private CircuitPlanningApproach circuitPlanningApproach = CircuitPlanningApproach.WITH;  // options
+	private CircuitPlanningApproach circuitPlanningApproach = CircuitPlanningApproach.DEFAULT;  // options
 
 	@Override
 	public Map<String, String> getComments() {
@@ -109,7 +109,7 @@ public class RailsimSupplyConfigGroup extends ReflectiveConfigGroup {
 		comments.put(VEHICLE_TURNAROUND_TIME, "The time it takes the vehicle to turnaround in station (changing the driver's cab)");
 		// circuit
 		comments.put(CIRCUIT_MAX_WAITING_TIME, "The maximum waiting time of a vehicle on a stop link for the next circuit. If the next departure is after this waiting time, the vehicle is sent to the " + "depot.");
-		comments.put(CIRCUIT_PLANNING_APPROACH, "The circuits planning approach: " + Arrays.toString(CircuitPlanningApproach.values()) + ". " + CircuitPlanningApproach.WITH + " Plan vehicle circuits (default). " + CircuitPlanningApproach.WITHOUT + " Omit vehicle circuits and sent a new vehicle from depot to depot for each route (needs a high depot capacity).");
+		comments.put(CIRCUIT_PLANNING_APPROACH, "The circuits planning approach: " + Arrays.toString(CircuitPlanningApproach.values()) + ". " + CircuitPlanningApproach.DEFAULT + " Plan simple vehicle circuits (default). " + CircuitPlanningApproach.NONE + " Omit vehicle circuits and sent a new vehicle from depot to depot for each route (needs a high depot capacity).");
 		return comments;
 	}
 

@@ -20,14 +20,17 @@ import java.nio.file.Paths;
 public final class RunRailsimSupplyBuilder {
 
 	public static void main(String[] args) {
-		final String outputDir = "contribs/railsim/test/input/ch/sbb/matsim/contrib/railsim/prototype/RunRailsimTest/test4/";
+		// Note! Overwrites test04 example
+		final String outputDir = "contribs/railsim/test/input/ch/sbb/matsim/contrib/railsim/prototype/RunRailsimTest/test04/";
 		final double waitingTime = 3 * 60.;
 		createOutputDirectory(outputDir);
-
-		// setup supply builder
+		// configure
 		var config = ConfigUtils.createConfig();
 		config.global().setCoordinateSystem("CH1903plus_LV95");
+		var railsimConfigGroup = ConfigUtils.addOrGetModule(config, RailsimSupplyConfigGroup.class);
+		railsimConfigGroup.setCircuitPlanningApproach(RailsimSupplyConfigGroup.CircuitPlanningApproach.DEFAULT);
 		var scenario = ScenarioUtils.loadScenario(config);
+		// setup supply builder
 		var supply = new RailsimSupplyBuilder(scenario);
 
 		// first add the stop information

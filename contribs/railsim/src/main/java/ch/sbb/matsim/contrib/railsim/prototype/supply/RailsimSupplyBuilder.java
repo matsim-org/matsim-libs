@@ -1,6 +1,7 @@
 package ch.sbb.matsim.contrib.railsim.prototype.supply;
 
 import ch.sbb.matsim.contrib.railsim.prototype.supply.circuits.DefaultVehicleCircuitsPlanner;
+import ch.sbb.matsim.contrib.railsim.prototype.supply.circuits.NoVehicleCircuitsPlanner;
 import ch.sbb.matsim.contrib.railsim.prototype.supply.infrastructure.DefaultInfrastructureRepository;
 import ch.sbb.matsim.contrib.railsim.prototype.supply.rollingstock.DefaultRollingStockRepository;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +49,10 @@ public class RailsimSupplyBuilder {
 	 * @param scenario a scenario, set the CRS.
 	 */
 	public RailsimSupplyBuilder(Scenario scenario) {
-		this(scenario, new DefaultInfrastructureRepository(scenario), new DefaultRollingStockRepository(scenario), new DefaultVehicleCircuitsPlanner(scenario));
+		this(scenario, new DefaultInfrastructureRepository(scenario), new DefaultRollingStockRepository(scenario), switch (ConfigUtils.addOrGetModule(scenario.getConfig(), RailsimSupplyConfigGroup.class).getCircuitPlanningApproach()) {
+			case DEFAULT -> new DefaultVehicleCircuitsPlanner(scenario);
+			case NONE -> new NoVehicleCircuitsPlanner();
+		});
 	}
 
 	/**
