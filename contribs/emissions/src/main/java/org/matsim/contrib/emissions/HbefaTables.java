@@ -44,8 +44,9 @@ public abstract class HbefaTables {
         return load(file, HbefaTables::createWarmKey, record -> {
             var factor = Double.parseDouble(record.get("EFA_weighted"));
             var speed = Double.parseDouble(record.get("V_weighted"));
-			var roadGradient = record.get("Gradient");
-            return new HbefaWarmEmissionFactor(factor, speed, roadGradient);
+//            var roadGradient = record.get("Gradient");
+//            return new HbefaWarmEmissionFactor(factor, speed, roadGradient);
+            return new HbefaWarmEmissionFactor(factor, speed );
         });
     }
 
@@ -54,7 +55,10 @@ public abstract class HbefaTables {
             var key = createWarmKey(record);
             setCommonDetailedParametersOnKey(key, record);
             return key;
-        }, record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA")), Double.parseDouble(record.get("V")), record.get("Gradient")));
+        }, record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA"))
+                        , Double.parseDouble(record.get("V"))
+//                        , record.get("Gradient")
+        ));
     }
 
     static Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> loadAverageCold(URL file) {
@@ -133,7 +137,8 @@ public abstract class HbefaTables {
         }
     }
 //TODO	to use when enum functionality is implemented. also use it furtherup
-	private static HbefaRoadGradient mapString2HbefaRoadGradient(String string) {
+private static HbefaRoadGradient mapString2HbefaRoadGradient(String string) {
+        // I cannot say if and how this is needed.  Currently, it is never called.  kai, apr'23
 
 		if (string.equals("0%")) return HbefaRoadGradient.ZERO;
 		else if (string.equals("+2%")) return HbefaRoadGradient.PLUS_2;

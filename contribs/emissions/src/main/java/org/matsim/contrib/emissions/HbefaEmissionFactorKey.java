@@ -31,7 +31,8 @@ abstract class HbefaEmissionFactorKey {
 
 
 
-	private String roadGradient;
+//	private String roadGradient;
+	// this is, in the end, added in the WARMEmissionFactorKey, where it probably belongs.  kai, apr'23
 
 	HbefaEmissionFactorKey(HbefaEmissionFactorKey copyFrom) {
 		this.vehicleCategory = copyFrom.getVehicleCategory();
@@ -68,9 +69,9 @@ abstract class HbefaEmissionFactorKey {
 		this.component = component;
 	}
 
-	public String getRoadGradient() {
-		return roadGradient;
-	}
+//	public String getRoadGradient() {
+//		return roadGradient;
+//	}
 
 //	public void setRoadGradient(String roadGradient) { this.roadGradient = roadGradient; }
 

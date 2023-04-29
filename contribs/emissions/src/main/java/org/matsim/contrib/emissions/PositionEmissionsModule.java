@@ -97,11 +97,13 @@ public class PositionEmissionsModule extends AbstractModule {
 		private EmissionModule emissionModule;
 
 		Map<Pollutant, Double> calculateWarmEmissions(Vehicle vehicle, Link link, double distance, double time) {
-
 			var vehicleAttributes = getVehicleAttributes(vehicle);
 			var roadType = EmissionUtils.getHbefaRoadType(link);
 			var roadGradient = EmissionUtils.getHbefaRoadGradient(link);
 			return emissionModule.getWarmEmissionAnalysisModule().calculateWarmEmissions(time, roadType, roadGradient,link.getFreespeed(), distance, vehicleAttributes);
+			// The above is plausible as the adapter method which takes matsim objects (vehicle, link), and converts them into plain
+			// lookup tables.  HOWEVER, then one should either resolve vehicleAttributes into individual entries.  Or combine the link attributes into
+			// linkAttributes.  (This may not be so much a problem as long as (all the) calculateWarmEmissions are not public.)  kai, apr'23
 		}
 
 		Map<Pollutant, Double> calculateColdEmissions(Vehicle vehicle, double parkingDuration, int distance) {

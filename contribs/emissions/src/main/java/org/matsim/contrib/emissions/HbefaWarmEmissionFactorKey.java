@@ -27,6 +27,15 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 	private String roadCategory;
 	private HbefaTrafficSituation trafficSituation;
 	private String roadGradient; // added var roadGradient
+	// It is most probably correct to add roadGradient here.  However, the way it is done right now it is far from complete.  Including that it is
+	// not used in equals and in HashCode.  kai, apr'23
+
+	// What is also missing in general is some wildcard syntax.  This now comes in as a problem here since it makes retrofitting the non-grade
+	// code more difficult.  So far an easy solution for wildcards did not come to mind, and for a complicated solution we
+	// did not have the patience.  Maybe there is a library?  In the meantime, we have operated with the fallbacks in the config.  So one could
+	// now include something there either fall back to zero grade if grade is not available in the link.  Or abort.  (I find the latter more
+	// plausible; one can add a grade to each individual link in the pre-processing.)  kai, apr'23
+
 
 	/*package-private*/ HbefaWarmEmissionFactorKey() {
 	}

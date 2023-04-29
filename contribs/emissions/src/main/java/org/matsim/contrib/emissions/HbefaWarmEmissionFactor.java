@@ -27,16 +27,22 @@ class HbefaWarmEmissionFactor extends HbefaEmissionFactor {
 
 	private final double speed;
 
-	public String getRoadGradient() {
-		return roadGradient;
-	}
+//	public String getRoadGradient() {
+//		return roadGradient;
+//	}
+//
+//	private final String roadGradient;
 
-	private final String roadGradient;
+//	/*package-private*/ HbefaWarmEmissionFactor(double factor, double speed, @Deprecated String roadGradient) {
 
-	/*package-private*/ HbefaWarmEmissionFactor(double factor, double speed, String roadGradient) {
+//	 My strong intuition is that roadGradient does <i>not</i> belong into the emission factor.  Since the emissions factor is output,
+//	 not input.  For this, one has to note that for HBEFA speed is output, for a certain traffic state on a certain road category.  This is
+//	 nonwithstanding the fact that for some versions of the emission calculation it is then used as input.  kai, apr'23
+
+	/*package-private*/ HbefaWarmEmissionFactor(double factor, double speed ) {
 		super(factor);
 		this.speed = speed;
-		this.roadGradient = roadGradient;
+//		this.roadGradient = roadGradient;
 	}
 
 	public double getSpeed() {
@@ -47,7 +53,7 @@ class HbefaWarmEmissionFactor extends HbefaEmissionFactor {
 	public String toString() {
 		return "HbefaWarmEmissionFactor{" +
 				"speed=" + speed +
-				", roadGradient=" + roadGradient +
+//				", roadGradient=" + roadGradient +
 				", warmEmissionFactor=" + getFactor() +
 				'}';
 	}
