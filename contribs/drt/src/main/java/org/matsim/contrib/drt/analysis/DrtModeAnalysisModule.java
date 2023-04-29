@@ -34,13 +34,13 @@ import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
-import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfiles;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.util.stats.ProfileWriter;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.util.stats.VehicleOccupancyProfileView;
 import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleTaskProfileView;
 import org.matsim.core.config.Config;
@@ -65,6 +65,17 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 			return "A";
 		} else {
 			return "C" + type.name();
+		}
+	});
+
+	private static final Comparator<Task.TaskType> nonPassengerTaskTypeComparator = Comparator.comparing(type -> {
+		//we want the following order on the plot: STAY, RELOCATE, other
+		if (type.equals(DrtStayTask.TYPE)) {
+			return "C";
+		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)) {
+			return "B";
+		} else {
+			return "A" + type.name();
 		}
 	});
 
@@ -101,9 +112,13 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 		addControlerListenerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> DrtVehicleOccupancyProfiles.createProfileWriter(getter.get(MatsimServices.class), drtCfg.getMode(),
-						getter.getModal(VehicleOccupancyProfileCalculator.class))));
+		addControlerListenerBinding().toProvider(modalProvider(getter -> {
+			MatsimServices matsimServices = getter.get(MatsimServices.class);
+			String mode = drtCfg.getMode();
+			var profileView = new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class),
+					nonPassengerTaskTypeComparator, taskTypePaints);
+			return new ProfileWriter(matsimServices, mode, profileView, "occupancy_time_profiles");
+		}));
 
 		bindModal(VehicleTaskProfileCalculator.class).toProvider(modalProvider(
 				getter -> new VehicleTaskProfileCalculator(getMode(), getter.getModal(FleetSpecification.class), 300,
