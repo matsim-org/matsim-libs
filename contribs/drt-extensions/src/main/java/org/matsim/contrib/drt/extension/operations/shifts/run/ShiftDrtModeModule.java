@@ -27,8 +27,9 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.util.stats.ProfileWriter;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileWriter;
+import org.matsim.contrib.util.stats.VehicleOccupancyProfileView;
 import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
 import org.matsim.core.config.Config;
@@ -129,10 +130,9 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 						DefaultDrtStopTask.TYPE, ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE,
 						ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)))).asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new VehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
-						getter.getModal(VehicleOccupancyProfileCalculator.class), taskTypeComparator,
-						taskTypePaints, "shift_occupancy_time_profiles"))).in(Singleton.class);
+		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
+				new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class), taskTypeComparator, taskTypePaints),
+				"shift_occupancy_time_profiles"))).in(Singleton.class);
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
