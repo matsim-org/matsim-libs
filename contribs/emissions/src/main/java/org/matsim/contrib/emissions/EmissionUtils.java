@@ -187,18 +187,19 @@ public abstract class EmissionUtils {
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 
 		Gbl.assertNotNull(vehicleType);
-		Gbl.assertNotNull(vehicleType.getEngineInformation());
-		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory(vehicleType.getEngineInformation()));
+		final EngineInformation engineInformation = vehicleType.getEngineInformation();
+		Gbl.assertNotNull( engineInformation );
+		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory( engineInformation ) );
 
-		HbefaVehicleCategory hbefaVehicleCategory = mapString2HbefaVehicleCategory( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
+		HbefaVehicleCategory hbefaVehicleCategory = mapString2HbefaVehicleCategory( VehicleUtils.getHbefaVehicleCategory( engineInformation ) ) ;
 
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		final String hbefaTechnology = VehicleUtils.getHbefaTechnology( vehicleType.getEngineInformation() );
+		final String hbefaTechnology = VehicleUtils.getHbefaTechnology( engineInformation );
 		if ( hbefaTechnology!=null ){
 			hbefaVehicleAttributes.setHbefaTechnology( hbefaTechnology );
-			hbefaVehicleAttributes.setHbefaSizeClass( VehicleUtils.getHbefaSizeClass( vehicleType.getEngineInformation() ) );
-			hbefaVehicleAttributes.setHbefaEmConcept( VehicleUtils.getHbefaEmissionsConcept( vehicleType.getEngineInformation() ) );
+			hbefaVehicleAttributes.setHbefaSizeClass( VehicleUtils.getHbefaSizeClass( engineInformation ) );
+			hbefaVehicleAttributes.setHbefaEmConcept( VehicleUtils.getHbefaEmissionsConcept( engineInformation ) );
 		}
 		// yyyy we are as of now not catching the case where the information is not there. kai/kai, sep'19
 
