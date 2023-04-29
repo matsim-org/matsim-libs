@@ -44,16 +44,12 @@ import org.matsim.core.modal.AbstractModalQSimModule;
 
 public class UrbanEVModule extends AbstractModule {
 	static final String PLUGIN_IDENTIFIER = " plugin";
-	public static final String PLUGIN_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
-			PLUGIN_IDENTIFIER );
+	public static final String PLUGIN_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType( PLUGIN_IDENTIFIER );
 	static final String PLUGOUT_IDENTIFIER = " plugout";
-	public static final String PLUGOUT_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
-			PLUGOUT_IDENTIFIER );
-	@Inject
-	private Config config;
+	public static final String PLUGOUT_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType( PLUGOUT_IDENTIFIER );
+	@Inject private Config config;
 
-	@Override
-	public void install() {
+	@Override public void install() {
 		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
 		qsimComponentsConfig.addActiveComponent( EvModule.EV_COMPONENT );
 
@@ -91,7 +87,7 @@ public class UrbanEVModule extends AbstractModule {
 		addMobsimListenerBinding().to(UrbanEVTripsPlanner.class);
 		// (I think that this inserts the charging activities just before the mobsim starts (i.e. it is not in the plans).  kai, apr'23)
 
-		//TODO find a better solution for this yyyy yes.  We do not want automagic.  kai, apr'23
+		//TODO find a better solution for this yyyy yes.  We do not want automagic.  kai, apr'23  done.  kai, apr'23
 //		Collection<String> whileChargingActTypes = urbanEVConfig.getWhileChargingActivityTypes().isEmpty() ?
 //				config.planCalcScore().getActivityTypes() :
 //				urbanEVConfig.getWhileChargingActivityTypes();
@@ -108,16 +104,16 @@ public class UrbanEVModule extends AbstractModule {
 		addControlerListenerBinding().to(ActsWhileChargingAnalyzer.class);
 	}
 
-	private Set<String> getOpenBerlinActivityTypes() {
-		Set<String> activityTypes = new HashSet<>();
-		for (long ii = 600; ii <= 97200; ii += 600) {
-			activityTypes.add("home_" + ii + ".0");
-			activityTypes.add("work_" + ii + ".0");
-			activityTypes.add("leisure_" + ii + ".0");
-			activityTypes.add("shopping_" + ii + ".0");
-			activityTypes.add("other_" + ii + ".0");
-		}
-		return activityTypes;
-	}
+//	private Set<String> getOpenBerlinActivityTypes() {
+//		Set<String> activityTypes = new HashSet<>();
+//		for (long ii = 600; ii <= 97200; ii += 600) {
+//			activityTypes.add("home_" + ii + ".0");
+//			activityTypes.add("work_" + ii + ".0");
+//			activityTypes.add("leisure_" + ii + ".0");
+//			activityTypes.add("shopping_" + ii + ".0");
+//			activityTypes.add("other_" + ii + ".0");
+//		}
+//		return activityTypes;
+//	}
 
 }
