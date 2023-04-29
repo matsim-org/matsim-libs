@@ -44,11 +44,8 @@ public class ElectricFleetModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(ElectricFleetSpecification.class).toProvider(new Provider<>() {
-			@Inject
-			private Vehicles vehicles;
-
-			@Override
-			public ElectricFleetSpecification get() {
+			@Inject private Vehicles vehicles;
+			@Override public ElectricFleetSpecification get() {
 				ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
 				ElectricVehicleSpecificationImpl.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification,
 						vehicles.getVehicles().values());
@@ -60,14 +57,10 @@ public class ElectricFleetModule extends AbstractModule {
 			@Override
 			protected void configureQSim() {
 				bind(ElectricFleet.class).toProvider(new Provider<>() {
-					@Inject
-					private ElectricFleetSpecification fleetSpecification;
-					@Inject
-					private DriveEnergyConsumption.Factory driveConsumptionFactory;
-					@Inject
-					private AuxEnergyConsumption.Factory auxConsumptionFactory;
-					@Inject
-					private ChargingPower.Factory chargingPowerFactory;
+					@Inject private ElectricFleetSpecification fleetSpecification;
+					@Inject private DriveEnergyConsumption.Factory driveConsumptionFactory;
+					@Inject private AuxEnergyConsumption.Factory auxConsumptionFactory;
+					@Inject private ChargingPower.Factory chargingPowerFactory;
 
 					@Override
 					public ElectricFleet get() {
@@ -78,14 +71,9 @@ public class ElectricFleetModule extends AbstractModule {
 
 				if (evCfg.transferFinalSoCToNextIteration) {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toInstance(new MobsimBeforeCleanupListener() {
-						@Inject
-						private ElectricFleetSpecification electricFleetSpecification;
-
-						@Inject
-						private ElectricFleet electricFleet;
-
-						@Override
-						public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+						@Inject private ElectricFleetSpecification electricFleetSpecification;
+						@Inject private ElectricFleet electricFleet;
+						@Override public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 							for (var oldSpec : electricFleetSpecification.getVehicleSpecifications().values()) {
 								var matsimVehicle = oldSpec.getMatsimVehicle();
 								double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles().get(oldSpec.getId()).getBattery().getSoc();

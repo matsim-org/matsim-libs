@@ -107,9 +107,10 @@ public class RunUrbanEVExample {
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 
-		UrbanEVConfigGroup evReplanningCfg = new UrbanEVConfigGroup();
-		config.addModule(evReplanningCfg );
-		evReplanningCfg.setCriticalSOC(0.4);
+//		UrbanEVConfigGroup urbanEVConfi = new UrbanEVConfigGroup();
+//		config.addModule(urbanEVConfi );
+		UrbanEVConfigGroup urbanEVConfig = ConfigUtils.addOrGetModule( config, UrbanEVConfigGroup.class );
+		urbanEVConfig.setCriticalSOC(0.4);
 
 		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
 		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none );

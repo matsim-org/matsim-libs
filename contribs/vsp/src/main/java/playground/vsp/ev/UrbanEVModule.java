@@ -64,7 +64,7 @@ public class UrbanEVModule extends AbstractModule {
 //					"no config group of type " + UrbanEVConfigGroup.GROUP_NAME + " was specified in the config");
 		// was this meaningful?  I.e. do we want the code to fail if there is no such config group?  kai, apr'23
 
-		//standard EV stuff except for ElectricFleetModule
+		//standard EV stuff
 		install(new ChargingInfrastructureModule());
 		install(new ChargingModule());
 		install(new DischargingModule());
@@ -74,17 +74,22 @@ public class UrbanEVModule extends AbstractModule {
 		//bind custom EVFleet stuff
 //		bind(ElectricFleetUpdater.class).in(Singleton.class);
 		addControlerListenerBinding().to(ElectricFleetUpdater.class).in( Singleton.class );
+		// (this takes the matsim modal vehicles for each leg and gives them to the ElectricFleetSpecification.  Don't know why it has to be in
+		// this ad-hoc way.  kai, apr'23)
+
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
 				//this is responsible for charging vehicles according to person activity start and end events..
 //				bind(UrbanVehicleChargingHandler.class);
 				addMobsimScopeEventHandlerBinding().to(UrbanVehicleChargingHandler.class);
+				// (I think that this takes the plugin/plugout activities, and actually initiates the charging.  kai, apr'23)
 			}
 		});
 
 		//bind urban ev planning stuff
 		addMobsimListenerBinding().to(UrbanEVTripsPlanner.class);
+		// (I think that this inserts the charging activities just before the mobsim starts (i.e. it is not in the plans).  kai, apr'23)
 
 		//TODO find a better solution for this yyyy yes.  We do not want automagic.  kai, apr'23
 //		Collection<String> whileChargingActTypes = urbanEVConfig.getWhileChargingActivityTypes().isEmpty() ?
