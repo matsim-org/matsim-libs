@@ -21,6 +21,7 @@
 package playground.vsp.ev;
 
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,15 +38,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class ActivityWhileChargingFinder {
+	private static Logger log = LogManager.getLogger(ActivityWhileChargingFinder.class);
 
 	private final Collection<String> activityTypes;
 	private final double minimumActDuration;
 
-	private Logger log = LogManager.getLogger(ActivityWhileChargingFinder.class);
 
-	public ActivityWhileChargingFinder(Collection<String> possibleWhileChargingStartActTypes, double minimumActDuration){
-		this.activityTypes = possibleWhileChargingStartActTypes;
-		this.minimumActDuration = minimumActDuration;
+//	public ActivityWhileChargingFinder(Collection<String> possibleWhileChargingStartActTypes, double minimumActDuration){
+//		this.activityTypes = possibleWhileChargingStartActTypes;
+//		this.minimumActDuration = minimumActDuration;
+//	}
+	@Inject ActivityWhileChargingFinder( UrbanEVConfigGroup urbanEVConfig ) {
+		this.activityTypes = urbanEVConfig.getWhileChargingActivityTypes();
+		this.minimumActDuration = urbanEVConfig.getMinWhileChargingActivityDuration_s();
 	}
 
 	/**

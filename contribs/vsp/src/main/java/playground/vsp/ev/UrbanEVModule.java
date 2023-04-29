@@ -22,20 +22,25 @@ package playground.vsp.ev;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.discharging.DischargingModule;
 import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.modal.AbstractModalQSimModule;
 
 public class UrbanEVModule extends AbstractModule {
 	static final String PLUGIN_IDENTIFIER = " plugin";
@@ -49,10 +54,15 @@ public class UrbanEVModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup)config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
-		if (configGroup == null)
-			throw new IllegalArgumentException(
-					"no config group of type " + UrbanEVConfigGroup.GROUP_NAME + " was specified in the config");
+		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
+		qsimComponentsConfig.addActiveComponent( EvModule.EV_COMPONENT );
+
+//		UrbanEVConfigGroup urbanEVConfig = ConfigUtils.addOrGetModule( config, UrbanEVConfigGroup.class );
+
+//		if (urbanEVConfig == null)
+//			throw new IllegalArgumentException(
+//					"no config group of type " + UrbanEVConfigGroup.GROUP_NAME + " was specified in the config");
+		// was this meaningful?  I.e. do we want the code to fail if there is no such config group?  kai, apr'23
 
 		//standard EV stuff except for ElectricFleetModule
 		install(new ChargingInfrastructureModule());
@@ -62,29 +72,31 @@ public class UrbanEVModule extends AbstractModule {
 		install(new ElectricFleetModule());
 
 		//bind custom EVFleet stuff
-		bind(ElectricFleetUpdater.class).in(Singleton.class);
-		addControlerListenerBinding().to(ElectricFleetUpdater.class);
+//		bind(ElectricFleetUpdater.class).in(Singleton.class);
+		addControlerListenerBinding().to(ElectricFleetUpdater.class).in( Singleton.class );
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
 				//this is responsible for charging vehicles according to person activity start and end events..
-				bind(UrbanVehicleChargingHandler.class);
+//				bind(UrbanVehicleChargingHandler.class);
 				addMobsimScopeEventHandlerBinding().to(UrbanVehicleChargingHandler.class);
 			}
 		});
 
 		//bind urban ev planning stuff
 		addMobsimListenerBinding().to(UrbanEVTripsPlanner.class);
-		//TODO find a better solution for this
-		Collection<String> whileChargingActTypes = configGroup.getWhileChargingActivityTypes().isEmpty() ?
-				config.planCalcScore().getActivityTypes() :
-				configGroup.getWhileChargingActivityTypes();
-		bind(ActivityWhileChargingFinder.class).toInstance(new ActivityWhileChargingFinder(whileChargingActTypes,
-				configGroup.getMinWhileChargingActivityDuration_s()));
 
-		//TODO maybe move this out of this module...
-		//bind custom analysis
-		//install(new XYModule());
+		//TODO find a better solution for this yyyy yes.  We do not want automagic.  kai, apr'23
+//		Collection<String> whileChargingActTypes = urbanEVConfig.getWhileChargingActivityTypes().isEmpty() ?
+//				config.planCalcScore().getActivityTypes() :
+//				urbanEVConfig.getWhileChargingActivityTypes();
+
+//		bind(ActivityWhileChargingFinder.class).toInstance(new ActivityWhileChargingFinder(whileChargingActTypes,
+//				urbanEVConfig.getMinWhileChargingActivityDuration_s()));
+
+		bind( ActivityWhileChargingFinder.class ).in( Singleton.class );
+
+		//bind custom analysis:
 		addEventHandlerBinding().to(ChargerToXY.class).in(Singleton.class);
 		addMobsimListenerBinding().to(ChargerToXY.class);
 		addEventHandlerBinding().to(ActsWhileChargingAnalyzer.class).in(Singleton.class);
