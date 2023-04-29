@@ -122,7 +122,7 @@ public class DefaultPassengerEngineTest {
 		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
 				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "invalid"),
-				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
+				new PersonStuckEvent(1, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class DefaultPassengerEngineTest {
 		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
 				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "rejecting_all_requests"),
-				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
+				new PersonStuckEvent(1, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	private static class RejectingOneTaxiOptimizer implements VrpOptimizer {

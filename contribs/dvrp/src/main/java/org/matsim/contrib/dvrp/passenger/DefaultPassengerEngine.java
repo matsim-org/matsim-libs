@@ -95,11 +95,11 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	@Override
 	public void doSimStep(double time) {
-		while (!rejectedRequestsEvents.isEmpty()) {
+		while (!rejectedRequestsEvents.isEmpty() && rejectedRequestsEvents.peek().getTime() < time) {
 			MobsimPassengerAgent passenger = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
 			//not much else can be done for immediate requests
 			//set the passenger agent to abort - the event will be thrown by the QSim
-			passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
+			passenger.setStateToAbort(time);
 			internalInterface.arrangeNextAgentState(passenger);
 		}
 	}
