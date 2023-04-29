@@ -21,7 +21,9 @@
 package org.matsim.contrib.taxi.analysis;
 
 import java.awt.Color;
+import java.awt.Paint;
 import java.util.Comparator;
+import java.util.Map;
 
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -34,9 +36,9 @@ import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
-import org.matsim.contrib.taxi.util.stats.TaxiVehicleOccupancyProfiles;
 import org.matsim.contrib.util.stats.ProfileWriter;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.util.stats.VehicleOccupancyProfileView;
 import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleTaskProfileView;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -54,6 +56,17 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 
 	private final ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(TaxiEmptyDriveTask.TYPE,
 			TaxiPickupTask.TYPE, TaxiOccupiedDriveTask.TYPE, TaxiDropoffTask.TYPE);
+
+	private static final Comparator<Task.TaskType> nonPassengerTaskTypeComparator = Comparator.comparing(type -> {
+		//we want the following order on the plot: STAY, other
+		if (type.equals(TaxiStayTask.TYPE)) {
+			return "B";
+		} else {
+			return "A" + type.name();
+		}
+	});
+
+	private static final Map<Task.TaskType, Paint> taskTypePaints = ImmutableMap.of(TaxiStayTask.TYPE, Color.LIGHT_GRAY);
 
 	private final TaxiConfigGroup taxiCfg;
 
@@ -86,9 +99,13 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 			addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 			addControlerListenerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
-			addControlerListenerBinding().toProvider(modalProvider(
-					getter -> TaxiVehicleOccupancyProfiles.createProfileWriter(getter.get(MatsimServices.class),
-							getMode(), getter.getModal(VehicleOccupancyProfileCalculator.class))));
+			addControlerListenerBinding().toProvider(modalProvider(getter -> {
+				MatsimServices matsimServices = getter.get(MatsimServices.class);
+				String mode = getMode();
+				return new ProfileWriter(matsimServices, mode,
+						new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class), nonPassengerTaskTypeComparator,
+								taskTypePaints), "occupancy_time_profiles");
+			}));
 
 			bindModal(VehicleTaskProfileCalculator.class).toProvider(modalProvider(
 					getter -> new VehicleTaskProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
@@ -98,7 +115,7 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 
 			addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), getMode(),
 					new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), Comparator.comparing(Task.TaskType::name),
-							ImmutableMap.of(TaxiStayTask.TYPE, Color.LIGHT_GRAY)), "task_time_profiles")));
+							taskTypePaints), "task_time_profiles")));
 		}
 	}
 }
