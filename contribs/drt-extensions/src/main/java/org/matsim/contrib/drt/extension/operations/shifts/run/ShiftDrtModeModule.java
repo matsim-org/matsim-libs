@@ -31,7 +31,7 @@ import org.matsim.contrib.util.stats.ProfileWriter;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileView;
 import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
+import org.matsim.contrib.util.stats.VehicleTaskProfileView;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -134,9 +134,8 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class), taskTypeComparator, taskTypePaints),
 				"shift_occupancy_time_profiles"))).in(Singleton.class);
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
-						getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator,
-						taskTypePaints, "shift_task_time_profiles"))).in(Singleton.class);
+		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
+				new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator, taskTypePaints),
+				"shift_task_time_profiles"))).in(Singleton.class);
 	}
 }

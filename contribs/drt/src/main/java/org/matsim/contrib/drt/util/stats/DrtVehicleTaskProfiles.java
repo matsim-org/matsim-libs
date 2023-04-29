@@ -1,18 +1,19 @@
 package org.matsim.contrib.drt.util.stats;
 
-import com.google.common.collect.ImmutableMap;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
-import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
-import org.matsim.core.controler.MatsimServices;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Paint;
 import java.util.Comparator;
 import java.util.Map;
+
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.util.stats.ProfileWriter;
+import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
+import org.matsim.contrib.util.stats.VehicleTaskProfileView;
+import org.matsim.core.controler.MatsimServices;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Based on {@link DrtVehicleOccupancyProfiles}
@@ -34,10 +35,9 @@ public class DrtVehicleTaskProfiles {
 
 	private static final Map<Task.TaskType, Paint> taskTypePaints = ImmutableMap.of(DrtStayTask.TYPE, Color.LIGHT_GRAY);
 
-	public static VehicleTaskProfileWriter createProfileWriter(MatsimServices matsimServices, String mode,
-															   VehicleTaskProfileCalculator calculator) {
-		return new VehicleTaskProfileWriter(matsimServices, mode, calculator, taskTypeComparator,
-				taskTypePaints);
+	public static ProfileWriter createProfileWriter(MatsimServices matsimServices, String mode, VehicleTaskProfileCalculator calculator) {
+		return new ProfileWriter(matsimServices, mode, new VehicleTaskProfileView(calculator, taskTypeComparator, taskTypePaints),
+				"task_time_profiles");
 	}
 }
 
