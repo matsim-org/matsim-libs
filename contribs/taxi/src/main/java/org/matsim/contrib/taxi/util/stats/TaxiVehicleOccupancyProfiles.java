@@ -26,8 +26,9 @@ import java.util.Map;
 
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
+import org.matsim.contrib.util.stats.ProfileWriter;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileWriter;
+import org.matsim.contrib.util.stats.VehicleOccupancyProfileView;
 import org.matsim.core.controler.MatsimServices;
 
 import com.google.common.collect.ImmutableMap;
@@ -45,12 +46,10 @@ public class TaxiVehicleOccupancyProfiles {
 		}
 	});
 
-	private static final Map<Task.TaskType, Paint> taskTypePaints = ImmutableMap.of(TaxiStayTask.TYPE,
-			Color.LIGHT_GRAY);
+	private static final Map<Task.TaskType, Paint> taskTypePaints = ImmutableMap.of(TaxiStayTask.TYPE, Color.LIGHT_GRAY);
 
-	public static VehicleOccupancyProfileWriter createProfileWriter(MatsimServices matsimServices, String mode,
-			VehicleOccupancyProfileCalculator calculator) {
-		return new VehicleOccupancyProfileWriter(matsimServices, mode, calculator, nonPassengerTaskTypeComparator,
-				taskTypePaints);
+	public static ProfileWriter createProfileWriter(MatsimServices matsimServices, String mode, VehicleOccupancyProfileCalculator calculator) {
+		return new ProfileWriter(matsimServices, mode, new VehicleOccupancyProfileView(calculator, nonPassengerTaskTypeComparator, taskTypePaints),
+				"occupancy_time_profiles");
 	}
 }
