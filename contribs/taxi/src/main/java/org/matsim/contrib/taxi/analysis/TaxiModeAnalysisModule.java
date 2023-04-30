@@ -36,7 +36,7 @@ import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
-import org.matsim.contrib.util.stats.ProfileWriter;
+import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileView;
 import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;

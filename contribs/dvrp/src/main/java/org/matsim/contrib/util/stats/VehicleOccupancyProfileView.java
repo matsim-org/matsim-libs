@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 
