@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2021 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** *
  */
-package org.matsim.contrib.util.stats;
+package org.matsim.contrib.dvrp.analysis;
 
 import java.util.HashMap;
 import java.util.Map;

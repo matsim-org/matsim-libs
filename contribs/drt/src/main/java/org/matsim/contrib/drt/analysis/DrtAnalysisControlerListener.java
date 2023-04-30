@@ -75,7 +75,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
