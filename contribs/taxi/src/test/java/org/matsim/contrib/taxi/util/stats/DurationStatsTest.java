@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,18 +18,18 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.util.stats;
+package org.matsim.contrib.taxi.util.stats;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.matsim.contrib.util.stats.DurationStats.stateDurationByTimeBinAndState;
+import static org.matsim.contrib.taxi.util.stats.DurationStats.stateDurationByTimeBinAndState;
 
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.stream.Stream;
 
 import org.junit.Test;
-import org.matsim.contrib.util.stats.DurationStats.State;
+import org.matsim.contrib.taxi.util.stats.DurationStats.State;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -45,8 +45,7 @@ public class DurationStatsTest {
 	public void totalStateDurationByTimeBinAndType_oneType_manyBins() {
 		SortedMap<Integer, Map<String, Double>> durations = stateDurationByTimeBinAndState(
 				Stream.of(sample(0, "A", 10, 300), sample(1, "A", 10, 300), sample(2, "A", 10, 300)), 100);
-		assertThat(durations).containsExactly(entry(0, Map.of("A", 90.)), entry(1, Map.of("A", 100.)),
-				entry(2, Map.of("A", 100.)));
+		assertThat(durations).containsExactly(entry(0, Map.of("A", 90.)), entry(1, Map.of("A", 100.)), entry(2, Map.of("A", 100.)));
 	}
 
 	@Test

@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.etaxi.util;
 
-import static org.matsim.contrib.util.stats.DurationStats.stateDurationByTimeBinAndState;
+import static org.matsim.contrib.taxi.util.stats.DurationStats.stateDurationByTimeBinAndState;
 
 import java.util.List;
 import java.util.Map;
@@ -33,10 +33,10 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.etaxi.util.ETaxiStats.ETaxiState;
 import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector.ChargingSequence;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
-import org.matsim.contrib.util.stats.DurationStats;
-import org.matsim.contrib.util.stats.DurationStats.State;
-import org.matsim.contrib.util.stats.TimeBinSample;
-import org.matsim.contrib.util.stats.TimeBinSamples;
+import org.matsim.contrib.taxi.util.stats.DurationStats;
+import org.matsim.contrib.taxi.util.stats.DurationStats.State;
+import org.matsim.contrib.taxi.util.stats.TimeBinSample;
+import org.matsim.contrib.taxi.util.stats.TimeBinSamples;
 
 import com.google.common.collect.ImmutableList;
 

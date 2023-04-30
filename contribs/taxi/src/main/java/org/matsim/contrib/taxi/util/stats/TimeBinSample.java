@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.util.stats;
+package org.matsim.contrib.taxi.util.stats;
 
 /**
  * @author Michal Maciejewski (michalm)

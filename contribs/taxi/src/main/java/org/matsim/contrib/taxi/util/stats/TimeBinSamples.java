@@ -18,13 +18,13 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.util.stats;
+package org.matsim.contrib.taxi.util.stats;
 
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.analysis.ExecutedTask;
-import org.matsim.contrib.util.stats.DurationStats.State;
+import org.matsim.contrib.taxi.util.stats.DurationStats.State;
 
 /**
  * @author Michal Maciejewski (michalm)
