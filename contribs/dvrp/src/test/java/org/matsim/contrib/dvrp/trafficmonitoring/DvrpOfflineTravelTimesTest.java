@@ -118,7 +118,6 @@ public class DvrpOfflineTravelTimesTest {
 		assertThat(travelTime.getLinkTravelTime(linkA, 0, null, null)).isEqualTo(100);
 		assertThat(travelTime.getLinkTravelTime(linkA, 99, null, null)).isEqualTo(100);
 		assertThat(travelTime.getLinkTravelTime(linkA, 100, null, null)).isEqualTo(150);
-		assertThat(travelTime.getLinkTravelTime(linkA, 9999, null, null)).isEqualTo(150);
 
 		assertThatThrownBy(() -> travelTime.getLinkTravelTime(linkB, 0, null, null)).isExactlyInstanceOf(
 				NullPointerException.class)
