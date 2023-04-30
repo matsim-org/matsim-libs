@@ -36,7 +36,7 @@ public class TimeBinSamples {
 	}
 
 	public static <V> Stream<TimeBinSample<State<V>>> stateSamples(State<V> state, int binSize) {
-		return samples(state, state.beginTime, state.endTime, binSize);
+		return samples(state, state.beginTime(), state.endTime(), binSize);
 	}
 
 	public static <V> Stream<TimeBinSample<V>> samples(V value, double from, double to, int binSize) {

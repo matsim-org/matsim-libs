@@ -82,7 +82,7 @@ public class ETaxiStatsCalculator {
 
 		//optionally (only if queueing occurred)
 		seq.getQueuedAtCharger()
-				.map(e -> new State<>(ETaxiState.QUEUED, e.getTime(), pluggedState.beginTime))
+				.map(e -> new State<>(ETaxiState.QUEUED, e.getTime(), pluggedState.beginTime()))
 				.ifPresent(states::prepend);
 
 		return states.flatMap(eTaxiStateState -> TimeBinSamples.stateSamples(eTaxiStateState, binSize));

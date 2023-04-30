@@ -37,11 +37,7 @@ import com.google.common.base.Preconditions;
  * @author Michal Maciejewski (michalm)
  */
 public class DurationStats {
-	public static final class State<V> {
-		public final V value;
-		public final double beginTime;
-		public final double endTime;
-
+	public record State<V>(V value, double beginTime, double endTime) {
 		public State(V value, double beginTime, double endTime) {
 			Preconditions.checkArgument(beginTime <= endTime);
 			this.value = Preconditions.checkNotNull(value);
@@ -50,26 +46,23 @@ public class DurationStats {
 		}
 	}
 
-	public static SortedMap<Integer, Map<Task.TaskType, Double>> taskDurationByTimeBinAndType(
-			Stream<? extends ExecutedTask> tasks, int binSize) {
+	public static SortedMap<Integer, Map<Task.TaskType, Double>> taskDurationByTimeBinAndType(Stream<? extends ExecutedTask> tasks, int binSize) {
 		return tasks.flatMap(task -> TimeBinSamples.taskSamples(task, binSize))
-				.collect(groupingBy(TimeBinSample::timeBin, TreeMap::new, groupingBy(sample -> sample.value.taskType,
-						summingDouble(sample -> taskDurationInTimeBin(sample, binSize)))));
+				.collect(groupingBy(TimeBinSample::timeBin, TreeMap::new,
+						groupingBy(sample -> sample.value().taskType, summingDouble(sample -> taskDurationInTimeBin(sample, binSize)))));
 	}
 
-	public static <V> SortedMap<Integer, Map<V, Double>> stateDurationByTimeBinAndState(
-			Stream<TimeBinSample<State<V>>> stateSamples, int binSize) {
+	public static <V> SortedMap<Integer, Map<V, Double>> stateDurationByTimeBinAndState(Stream<TimeBinSample<State<V>>> stateSamples, int binSize) {
 		return stateSamples.collect(groupingBy(TimeBinSample::timeBin, TreeMap::new,
-				groupingBy(sample -> sample.value.value,
-						summingDouble(sample -> stateDurationInTimeBin(sample, binSize)))));
+				groupingBy(sample -> sample.value().value, summingDouble(sample -> stateDurationInTimeBin(sample, binSize)))));
 	}
 
 	private static double taskDurationInTimeBin(TimeBinSample<ExecutedTask> taskSample, int binSize) {
-		return durationInTimeBin(taskSample.value.beginTime, taskSample.value.endTime, taskSample.timeBin, binSize);
+		return durationInTimeBin(taskSample.value().beginTime, taskSample.value().endTime, taskSample.timeBin(), binSize);
 	}
 
 	private static <V> double stateDurationInTimeBin(TimeBinSample<State<V>> stateSample, int binSize) {
-		return durationInTimeBin(stateSample.value.beginTime, stateSample.value.endTime, stateSample.timeBin, binSize);
+		return durationInTimeBin(stateSample.value().beginTime, stateSample.value().endTime, stateSample.timeBin(), binSize);
 	}
 
 	private static double durationInTimeBin(double beginTime, double endTime, int timeBin, int binSize) {
