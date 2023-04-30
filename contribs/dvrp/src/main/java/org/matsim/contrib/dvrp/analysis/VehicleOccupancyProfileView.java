@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2021 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** *
  */
-package org.matsim.contrib.util.stats;
+package org.matsim.contrib.dvrp.analysis;
 
 import java.awt.Paint;
 import java.util.Comparator;
@@ -26,8 +26,9 @@ import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 
 import com.google.common.collect.ImmutableMap;
 

@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,16 +18,16 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.util.stats;
+package org.matsim.contrib.taxi.util.stats;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.util.stats.TimeBinSamples.taskSamples;
-import static org.mockito.Mockito.mock;
+import static org.matsim.contrib.taxi.util.stats.TimeBinSamples.taskSamples;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.analysis.ExecutedTask;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.mockito.Mockito;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -48,8 +48,7 @@ public class TimeBinSamplesTest {
 	@Test
 	public void taskSamples_threeSamples() {
 		var task = task(110, 390);
-		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task), new TimeBinSample<>(2, task),
-				new TimeBinSample<>(3, task));
+		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task), new TimeBinSample<>(2, task), new TimeBinSample<>(3, task));
 	}
 
 	@Test
@@ -59,7 +58,6 @@ public class TimeBinSamplesTest {
 	}
 
 	private ExecutedTask task(double beginTime, double endTime) {
-		return new ExecutedTask(mock(Task.TaskType.class), beginTime, endTime, Id.createLinkId("a"),
-				Id.createLinkId("b"));
+		return new ExecutedTask(Mockito.mock(Task.TaskType.class), beginTime, endTime, Id.createLinkId("a"), Id.createLinkId("b"));
 	}
 }
