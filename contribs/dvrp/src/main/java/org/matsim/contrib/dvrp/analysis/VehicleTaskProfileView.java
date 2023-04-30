@@ -29,7 +29,6 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -65,7 +64,7 @@ public class VehicleTaskProfileView implements ProfileWriter.ProfileView {
 	}
 
 	@Override
-	public TimeDiscretizer timeDiscretizer() {
-		return calculator.getTimeDiscretizer();
+	public int[] times() {
+		return calculator.getTimeDiscretizer().getTimes();
 	}
 }
