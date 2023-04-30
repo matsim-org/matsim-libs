@@ -64,6 +64,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
@@ -411,6 +412,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		dumpOutput(event.getIteration(), "constraints", "_travel_time.png");
 		dumpOutput(event.getIteration(), "drt_boardings", ".csv");
 		dumpOutput(event.getIteration(), "drt_alightments", ".csv");
+		dumpOutput(event.getIteration(), "occupancy_time_profiles", ".txt");
+		dumpOutput(event.getIteration(), "occupancy_time_profiles" + "_" + TimeProfileCharts.ChartType.Line, ".png");
+		dumpOutput(event.getIteration(), "occupancy_time_profiles" + "_" + TimeProfileCharts.ChartType.StackedArea, ".png");
+		dumpOutput(event.getIteration(), "task_time_profiles", ".txt");
+		dumpOutput(event.getIteration(), "task_time_profiles" + "_" + TimeProfileCharts.ChartType.Line, ".png");
+		dumpOutput(event.getIteration(), "task_time_profiles" + "_" + TimeProfileCharts.ChartType.StackedArea, ".png");
 	}
 
 	private void dumpOutput(int iteration, String prefix, String extension) {

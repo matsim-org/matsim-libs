@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultTableXYDataset;
@@ -37,9 +36,7 @@ import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -49,7 +46,7 @@ import com.google.common.collect.Lists;
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class ProfileWriter implements IterationEndsListener, ShutdownListener {
+public class ProfileWriter implements IterationEndsListener {
 
 	public interface ProfileView {
 		TimeDiscretizer timeDiscretizer();
@@ -132,30 +129,7 @@ public class ProfileWriter implements IterationEndsListener, ShutdownListener {
 		}
 	}
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		dumpOutput(outputFile, ".txt");
-		dumpOutput(outputFile + "_" + TimeProfileCharts.ChartType.Line, ".png");
-		dumpOutput(outputFile + "_" + TimeProfileCharts.ChartType.StackedArea, ".png");
-	}
-
-	private void dumpOutput(String prefix, String extension) {
-		try {
-			IOUtils.copyFile(filename(prefix) + extension, outputFilename(prefix) + extension);
-		} catch (Exception ee) {
-			LogManager.getLogger(this.getClass())
-					.error("writing output "
-							+ outputFilename(prefix)
-							+ extension
-							+ "did not work; probably parameters were such that no such output was generated in the final iteration");
-		}
-	}
-
 	private String filename(String prefix) {
 		return matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + mode);
-	}
-
-	private String outputFilename(String prefix) {
-		return matsimServices.getControlerIO().getOutputFilenameWithOutputPrefix(prefix + "_" + mode);
 	}
 }

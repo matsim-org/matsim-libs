@@ -53,8 +53,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class DrtPoolingParameterTest {
 
-	private Controler controler;
-
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -227,7 +225,7 @@ public class DrtPoolingParameterTest {
 			x.stopDuration = 1.;
 		});
 
-		controler = DrtControlerCreator.createControler(config, false);
+		Controler controler = DrtControlerCreator.createControler(config, false);
 		Scenario scenario = controler.getScenario();
 
 		Population population = scenario.getPopulation();
