@@ -38,7 +38,7 @@ import java.util.Objects;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.testcases.fakes.FakeLink;
 

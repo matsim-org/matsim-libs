@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 
 import com.google.common.collect.ImmutableMap;
 
