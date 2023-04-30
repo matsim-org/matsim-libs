@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
@@ -103,7 +104,7 @@ public class FreightUtilsIT {
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 		
 		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
-				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).setTypeId(carrierVehType.getId() ).build();
+				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance() 
 				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)
@@ -148,7 +149,7 @@ public class FreightUtilsIT {
 
 		//Convert to jsprit VRP
 		Carriers carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(
-				carriersWithServicesAndShpiments);
+				carriersWithServicesAndShpiments );
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;	

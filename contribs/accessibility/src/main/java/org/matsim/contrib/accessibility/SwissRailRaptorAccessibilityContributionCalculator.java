@@ -19,7 +19,8 @@
 package org.matsim.contrib.accessibility;
 
 import ch.sbb.matsim.routing.pt.raptor.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -31,7 +32,7 @@ import org.matsim.facilities.*;
 import org.matsim.pt.transitSchedule.TransitStopFacilityImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author dziemke
  */
 class SwissRailRaptorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger LOG = Logger.getLogger( SwissRailRaptorAccessibilityContributionCalculator.class );
+	private static final Logger LOG = LogManager.getLogger( SwissRailRaptorAccessibilityContributionCalculator.class );
 	private SwissRailRaptor raptor;
 	private String mode;
 	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
@@ -140,7 +141,7 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
         double expSum = 0.;
 
-        final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null, new Attributes());
+        final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null, new AttributesImpl());
 
         for (final AggregationObject destination : aggregatedOpportunities.values()) {
             //compute direct walk costs

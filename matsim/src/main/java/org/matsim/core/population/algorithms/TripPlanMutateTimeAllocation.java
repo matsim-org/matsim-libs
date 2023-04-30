@@ -40,6 +40,8 @@ import org.matsim.core.utils.misc.OptionalTime;
  */
 public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 
+	public static final double DEFAULT_LATEST_END_TIME = 24. * 3600;
+
 	private final double mutationRange;
 	private final Random random;
 	private boolean useActivityDurations = true;
@@ -47,21 +49,30 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 //	private final String subpopulationAttribute;
 	private final Map<String, Double> subpopulationMutationRanges;
 	private final Map<String, Boolean> subpopulationAffectingDuration;
+	private final double latestEndTime;
 
 	public TripPlanMutateTimeAllocation(final double mutationRange,
 			final boolean affectingDuration, final Random random) {
 		this(mutationRange, affectingDuration, random, null, null );
 	}
 
-	public TripPlanMutateTimeAllocation( final double mutationRange,
-					     final boolean affectingDuration, final Random random,
-					     final Map<String, Double> subpopulationMutationRanges, final Map<String, Boolean> subpopulationAffectingDuration ) {
+	public TripPlanMutateTimeAllocation(final double mutationRange, final boolean affectingDuration,
+			final Random random, final Map<String, Double> subpopulationMutationRanges,
+			final Map<String, Boolean> subpopulationAffectingDuration) {
+		this(mutationRange, affectingDuration, random, subpopulationMutationRanges, subpopulationAffectingDuration,
+				DEFAULT_LATEST_END_TIME);
+	}
+
+	public TripPlanMutateTimeAllocation(final double mutationRange, final boolean affectingDuration,
+			final Random random, final Map<String, Double> subpopulationMutationRanges,
+			final Map<String, Boolean> subpopulationAffectingDuration, final double latestEndTime) {
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
 //		this.subpopulationAttribute = subpopulationAttribute;
 		this.subpopulationMutationRanges = subpopulationMutationRanges;
 		this.subpopulationAffectingDuration = subpopulationAffectingDuration;
+		this.latestEndTime = latestEndTime;
 	}
 	
 	@Override
@@ -142,7 +153,8 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
+					// invalidate duration and end time because the plan will be interpreted
+					// this.latestEndTime hour wrap-around
 					act.setMaximumDurationUndefined();
 					act.setEndTimeUndefined();
 				}
@@ -166,11 +178,13 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	private double mutateTime(final OptionalTime time, final double mutationRange) {
 		if (time.isDefined()) {
 			double t = time.seconds() + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
-			if (t < 0) t = 0;
-			if (t > 24*3600) t = 24*3600;
+			if (t < 0)
+				t = 0;
+			if (t > this.latestEndTime)
+				t = this.latestEndTime;
 			return t;
 		} else {
-			return this.random.nextInt(24*3600);
+			return this.random.nextInt((int) this.latestEndTime);
 		}
 	}
 

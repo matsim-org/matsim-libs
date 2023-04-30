@@ -23,7 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -43,7 +44,7 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class HeatMap {
 
-	private static final Logger log = Logger.getLogger(HeatMap.class);
+	private static final Logger log = LogManager.getLogger(HeatMap.class);
 	private List<Tuple<Coord, Double>> values;
 	private double maxX = -Double.MAX_VALUE;
 	private double minX = Double.MAX_VALUE;

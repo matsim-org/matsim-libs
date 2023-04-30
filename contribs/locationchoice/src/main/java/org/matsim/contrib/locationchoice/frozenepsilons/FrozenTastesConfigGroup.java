@@ -20,14 +20,15 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroupI;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Map;
 
 public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements DestinationChoiceConfigGroupI {
-	private final static Logger log = Logger.getLogger( FrozenTastesConfigGroup.class );
+	private final static Logger log = LogManager.getLogger( FrozenTastesConfigGroup.class );
 	public static final String GROUP_NAME = "frozenTastes";
 
 	public enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };

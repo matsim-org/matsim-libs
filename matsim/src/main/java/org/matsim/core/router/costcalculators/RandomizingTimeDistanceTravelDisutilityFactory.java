@@ -20,7 +20,8 @@
 
 package org.matsim.core.router.costcalculators;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
@@ -42,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <a href="https://doi.org/10.1016/j.procs.2014.05.488">https://doi.org/10.1016/j.procs.2014.05.488</a> for a paper testing the approach.
  */
 public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
-	private static final Logger log = Logger.getLogger( RandomizingTimeDistanceTravelDisutilityFactory.class ) ;
+	private static final Logger log = LogManager.getLogger( RandomizingTimeDistanceTravelDisutilityFactory.class ) ;
 
 	private static final AtomicInteger wrnCnt = new AtomicInteger(0);
 	private static final AtomicInteger normalisationWrnCnt = new AtomicInteger(0);

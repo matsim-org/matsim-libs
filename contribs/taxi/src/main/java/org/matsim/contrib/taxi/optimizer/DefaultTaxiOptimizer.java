@@ -83,7 +83,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
 
-			if (params.doUnscheduleAwaitingRequests && taxiCfg.isVehicleDiversion()) {
+			if (params.doUnscheduleAwaitingRequests && taxiCfg.vehicleDiversion) {
 				scheduler.stopAllAimlessDriveTasks();
 			}
 
@@ -118,7 +118,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	}
 
 	protected boolean doReoptimizeAfterNextTask(Task newCurrentTask) {
-		return !taxiCfg.isDestinationKnown() && OCCUPIED_DRIVE.isBaseTypeOf(newCurrentTask);
+		return !taxiCfg.destinationKnown && OCCUPIED_DRIVE.isBaseTypeOf(newCurrentTask);
 	}
 
 	protected void setRequiresReoptimization(boolean requiresReoptimization) {

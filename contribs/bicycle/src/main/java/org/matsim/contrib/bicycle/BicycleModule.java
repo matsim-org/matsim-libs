@@ -20,27 +20,31 @@ package org.matsim.contrib.bicycle;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultTurnAcceptanceLogic;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.withinday.mobsim.WithinDayQSimModule;
 
 /**
  * @author smetzler, dziemke
  */
-final class BicycleModule extends AbstractModule {
-	// needs to be public since otherwise nobody can overwrite parts of Bicycles.addAsOverridingModules(...).  kai, sep'19
+public final class BicycleModule extends AbstractModule {
 
-	private static final Logger LOG = Logger.getLogger(BicycleModule.class);
+	private static final Logger LOG = LogManager.getLogger(BicycleModule.class);
 
 	@Inject
 	private BicycleConfigGroup bicycleConfigGroup;
-
-	BicycleModule() {
-	}
 
 	@Override
 	public void install() {
@@ -51,7 +55,20 @@ final class BicycleModule extends AbstractModule {
 		// TODO: bicycle contrib can not be used with other scoring functions at the moment, as only one can be installed
 		// TODO: scoring should work via a score event so it can be used together with other scoring functions
 
-		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
+		switch ( bicycleConfigGroup.getBicycleScoringType() ) {
+			case legBased -> {
+
+//				yyyyyy the status here is that this seems to work.  but because of numerical imprecision the results are _slightly_
+//				different.  This needs to be documented diligently test by test.  kai, dec'22
+				// yyyyyy remember that the 10it test needs to be un-ignored.  kai, dec'22
+
+				this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
+			}
+			case linkBased -> {
+				bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
+			}
+			default -> throw new IllegalStateException( "Unexpected value: " + bicycleConfigGroup.getBicycleScoringType() );
+		}
 
 		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
 
@@ -59,6 +76,19 @@ final class BicycleModule extends AbstractModule {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
 		}
 		addControlerListenerBinding().to(ConsistencyCheck.class);
+
+		this.installOverridingQSimModule( new AbstractQSimModule(){
+			@Inject EventsManager events;
+			@Inject Scenario scenario;
+			@Inject BicycleLinkSpeedCalculator bicycleLinkSpeedCalculator;
+			@Override protected void configureQSim(){
+				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+				factory.setLinkSpeedCalculator( bicycleLinkSpeedCalculator );
+				bind( QNetworkFactory.class ).toInstance(factory );
+				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring
+				// it in every iteration via the initializeFactory(...) method. kai, mar'16
+			}
+		} );
 	}
 
 	static class ConsistencyCheck implements StartupListener {

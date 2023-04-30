@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
@@ -35,7 +36,7 @@ import java.util.TreeSet;
  */
 class AgentsStuckHandlerImpl implements PersonStuckEventHandler{
 
-	private static final Logger log = Logger.getLogger(AgentsStuckHandlerImpl.class);
+	private static final Logger log = LogManager.getLogger(AgentsStuckHandlerImpl.class);
 
 	private Set<Id<Person>> agentsStuck;
 

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.replanning;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConfigGroup.PStrategySettings;
 import org.matsim.contrib.minibus.fare.StageContainerCreator;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
  */
 public final class PStrategyManager {
 	
-	private final static Logger log = Logger.getLogger(PStrategyManager.class);
+	private final static Logger log = LogManager.getLogger(PStrategyManager.class);
 	
 	private final ArrayList<PStrategy> strategies = new ArrayList<>();
 	private final ArrayList<Double> weights = new ArrayList<>();

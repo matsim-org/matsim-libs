@@ -21,29 +21,31 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 /**
- * 
- * 
+ *
+ *
  * @author sschroeder
  *
  */
-public class CarrierVehicle implements Vehicle {
+public final class CarrierVehicle implements Vehicle {
 
-	private static final Logger log = Logger.getLogger(CarrierVehicle.class);
+	private static final Logger log = LogManager.getLogger(CarrierVehicle.class);
 
 	/**
 	 * Returns a new instance of carrierVehicle.
-	 * 
+	 * <p>
 	 * The default values for other fields (being implicitly set) are [capacity=0][earliestStart=0.0][latestEnd=Integer.MaxValue()].
-	 * 
+	 *
 	 * @param vehicleId
 	 * @param locationId
 	 * @return CarrierVehicle
@@ -55,17 +57,17 @@ public class CarrierVehicle implements Vehicle {
 
 	/**
 	 * Builder to build vehicles.
-	 * 
+	 *
 	 * @author sschroeder
 	 *
 	 */
 	public static class Builder {
-		
+
 		/**
 		 * Returns a builder with vehicleId and locationId.
-		 * 
+		 * <p>
 		 * The default values for other fields (being implicitly set) are [capacity=0][earliestStart=0.0][latestEnd=Integer.MaxValue()].
-		 * 
+		 *
 		 * @param vehicleId
 		 * @param locationId
 		 * @param vehicleType
@@ -74,15 +76,15 @@ public class CarrierVehicle implements Vehicle {
 		public static Builder newInstance( Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType vehicleType ){
 			return new Builder(vehicleId, locationId, vehicleType );
 		}
-		
+
 		private final Id<Link> locationId;
 		private final Id<Vehicle> vehicleId;
 		private final VehicleType type;
 //		private Id<org.matsim.vehicles.VehicleType> typeId;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
-		
-		
+
+
 		public Builder( Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType vehicleType ){
 			this.locationId = locationId;
 			this.vehicleId = vehicleId;
@@ -105,33 +107,33 @@ public class CarrierVehicle implements Vehicle {
 		 * @deprecated The vehicleTypeId is no longer needed and was confusing -> Use getType().getId kai/kai jan'22
 		 */
 		@Deprecated
-		public Builder setTypeId(Id<org.matsim.vehicles.VehicleType> typeId ){
+		public Builder setTypeId(Id<VehicleType> typeId ){
 			log.warn(".setTypeId has no functionality anymore and is deprecated");
 //			this.typeId = typeId;
 			return this;
 		}
-		
-		
+
+
 		public Builder setEarliestStart(double earliestStart){
 			this.earliestStart=earliestStart;
 			return this;
 		}
-		
+
 		public Builder setLatestEnd(double latestEnd){
 			this.latestEnd = latestEnd;
 			return this;
 		}
-		
+
 		public CarrierVehicle build(){
 			Gbl.assertNotNull( this.type );
 			return new CarrierVehicle(this);
 		}
 	}
-	
+
 	private final Id<Link> locationId;
 	private final Id<Vehicle> vehicleId;
 	private final VehicleType vehicleType;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	private final double earliestStartTime;
 	private final double latestEndTime;
 
@@ -143,14 +145,21 @@ public class CarrierVehicle implements Vehicle {
 		latestEndTime = builder.latestEnd;
 	}
 
-	public Id<Link> getLocation() {
+	/**
+	 * Used to be getLocation.  Can't say if this is meant to contain only the starting position, or if it is meant to be changed over the day.  kai, jul'22
+	 */
+	public Id<Link> getLinkId() {
 		return locationId;
 	}
+	/**
+	 * @deprecated -- please inline.  kai, jul'22
+	 */
+	@Deprecated public Id<Link> getLocation() { return getLinkId(); }
 	@Override
 	public Id<Vehicle> getId() {
 		return vehicleId;
 	}
-	
+
 	@Override
 	public String toString() {
 		return vehicleId + " stationed at " + locationId;
@@ -168,9 +177,9 @@ public class CarrierVehicle implements Vehicle {
 
 	/**
 	 * Returns the earliest time a vehicle can be deployed (and thus can depart from its origin).
-	 * 
+	 * <p>
 	 * The default value is 0.0;
-	 * 
+	 *
 	 * @return the earliest start time
 	 */
 	public double getEarliestStartTime() {
@@ -179,17 +188,17 @@ public class CarrierVehicle implements Vehicle {
 
 	/**
 	 * Returns the latest time a vehicle has to be back in the depot (and thus has to arrive at its final destination).
-	 * 
+	 * <p>
 	 * The default value is Integer.MaxValue().
-	 * 
+	 *
 	 * @return latest arrival time
 	 */
 	public double getLatestEndTime() {
 		return latestEndTime;
 	}
 
-	
-	public Id<org.matsim.vehicles.VehicleType> getVehicleTypeId() {
+
+	public Id<VehicleType> getVehicleTypeId() {
 //		return typeId;
 		return vehicleType.getId();
 	}

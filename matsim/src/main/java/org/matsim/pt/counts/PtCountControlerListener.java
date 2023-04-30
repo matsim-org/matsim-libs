@@ -20,7 +20,8 @@
 
 package org.matsim.pt.counts;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -60,7 +61,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 
 	private static enum CountType { Boarding, Alighting, Occupancy }
 
-	private static final Logger log = Logger.getLogger(PtCountControlerListener.class);
+	private static final Logger log = LogManager.getLogger(PtCountControlerListener.class);
 
 	/*
 	 * String used to identify the operation in the IterationStopWatch.

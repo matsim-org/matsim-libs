@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.ev.charging;
 
+import com.google.inject.Singleton;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
@@ -34,25 +35,27 @@ import com.google.inject.Provider;
 public class ChargingModule extends AbstractModule {
 	@Override
 	public void install() {
+		// The following returns a charging logic for a given charger specification.  Needs to be a provider, since the eventsManager needs to be inserted.
 		bind(ChargingLogic.Factory.class).toProvider(new Provider<>() {
-			@Inject
-			private EventsManager eventsManager;
-
-			@Override
-			public ChargingLogic.Factory get() {
-				return charger -> new ChargingWithQueueingLogic(charger, new ChargeUpToMaxSocStrategy(charger, 1.),
-						eventsManager);
+			@Inject private EventsManager eventsManager;
+			@Override public ChargingLogic.Factory get() {
+				return charger -> new ChargingWithQueueingLogic(charger, new ChargeUpToMaxSocStrategy(charger, 1.), eventsManager);
 			}
 		});
 
+		// The following returns the charging power/speed for a vehicle:
 		bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 1));
 
 		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				this.bind(ChargingHandler.class).asEagerSingleton();
-				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargingHandler.class);
+			@Override protected void configureQSim() {
+				// The following binds the ChargingHandler as MobsimAfterSimstepListener.  That is what goes through the chargers and calls the charging logic.
+				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargingHandler.class).asEagerSingleton();
 			}
 		});
+		// One could instead have said addMobsimListenerBinding()... .  This would have been more expressive.  But it would no longer be
+		// possible to switch this on and off via EvModule.EV_COMPONENT.
+
+//		this.addMobsimListenerBinding().to( ChargingHandler.class ).in( Singleton.class );
+		// does not work since ChargingInfrastructure is not available.
 	}
 }

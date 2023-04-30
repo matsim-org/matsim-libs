@@ -45,7 +45,7 @@ public class KeepLastExecuted extends AbstractMultithreadedModule {
 			public void run(Plan plan) {
 				Plan newPlan = executedPlans.getExecutedPlans().get( plan.getPerson().getId() ) ;
 				Gbl.assertNotNull( newPlan ) ;
-				PopulationUtils.copyFromTo(newPlan, plan);
+				PopulationUtils.copyFromTo(newPlan, plan, true);
 			}
 		};
 	}

@@ -33,6 +33,9 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	private static final String INPUT_COMFORT = "marginalUtilityOfComfort_m";
 	private static final String INPUT_INFRASTRUCTURE = "marginalUtilityOfInfrastructure_m";
 	private static final String INPUT_GRADIENT = "marginalUtilityOfGradient_m_100m";
+	private static final String USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY = "marginalUtilityOfUserDefinedNetworkAttribute_m";
+	private static final String USER_DEFINED_NETWORK_ATTRIBUTE_NAME = "userDefinedNetworkAttributeName";
+	private static final String USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE = "userDefinedNetworkAttributeDefaultValue";
 	private static final String MAX_BICYCLE_SPEED_FOR_ROUTING = "maxBicycleSpeedForRouting";
 	private static final String BICYCLE_MODE = "bicycleMode";
 	private static final String MOTORIZED_INTERACTION = "motorizedInteraction";
@@ -46,11 +49,14 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	}
 	private double marginalUtilityOfInfrastructure;
 	private double marginalUtilityOfGradient;
+	private double marginalUtilityOfUserDefinedNetworkAttribute;
+	private String userDefinedNetworkAttributeName;
+	private double userDefinedNetworkAttributeDefaultValue;
 	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
 	private double maxBicycleSpeedForRouting = 25.0/3.6;
 	private String bicycleMode = "bicycle";
 	private boolean motorizedInteraction = false;
-	
+
 	public BicycleConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -61,35 +67,69 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		map.put(INPUT_COMFORT, "marginalUtilityOfSurfacetype");
 		map.put(INPUT_INFRASTRUCTURE, "marginalUtilityOfStreettype");
 		map.put(INPUT_GRADIENT, "marginalUtilityOfGradient");
+		map.put(USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY, "marginalUtilityOfUserDefinedNetworkAttribute");
+		map.put(USER_DEFINED_NETWORK_ATTRIBUTE_NAME, "userDefinedNetworkAttributeName");
+		map.put(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE, "userDefinedNetworkAttributeDefaultValue");
 		map.put(MAX_BICYCLE_SPEED_FOR_ROUTING, "maxBicycleSpeed");
 		return map;
 	}
 	@StringSetter( INPUT_COMFORT )
-	public void setMarginalUtilityOfComfort_m(final double value) {
+	public BicycleConfigGroup setMarginalUtilityOfComfort_m( final double value ) {
 		this.marginalUtilityOfComfort = value;
+		return this;
 	}
 	@StringGetter( INPUT_COMFORT )
 	public double getMarginalUtilityOfComfort_m() {
 		return this.marginalUtilityOfComfort;
 	}
 	@StringSetter( INPUT_INFRASTRUCTURE )
-	public void setMarginalUtilityOfInfrastructure_m(final double value) {
+	public BicycleConfigGroup setMarginalUtilityOfInfrastructure_m( final double value ) {
 		this.marginalUtilityOfInfrastructure = value;
+		return this;
 	}
 	@StringGetter( INPUT_INFRASTRUCTURE )
 	public double getMarginalUtilityOfInfrastructure_m() {
 		return this.marginalUtilityOfInfrastructure;
 	}
 	@StringSetter( INPUT_GRADIENT )
-	public void setMarginalUtilityOfGradient_m_100m(final double value) {
+	public BicycleConfigGroup setMarginalUtilityOfGradient_m_100m( final double value ) {
 		this.marginalUtilityOfGradient = value;
+		return this;
 	}
 	@StringGetter( INPUT_GRADIENT )
 	public double getMarginalUtilityOfGradient_m_100m() {
 		return this.marginalUtilityOfGradient;
 	}
-	public void setBicycleScoringType(final BicycleScoringType value) {
+	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY)
+	public BicycleConfigGroup setMarginalUtilityOfUserDefinedNetworkAttribute_m(final double value) {
+		this.marginalUtilityOfUserDefinedNetworkAttribute = value;
+		return this;
+	}
+	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY)
+	public double getMarginalUtilityOfUserDefinedNetworkAttribute_m() {
+		return this.marginalUtilityOfUserDefinedNetworkAttribute;
+	}
+	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_NAME)
+	public BicycleConfigGroup setUserDefinedNetworkAttributeName(String value) {
+		this.userDefinedNetworkAttributeName = value;
+		return this;
+	}
+	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_NAME)
+	public String getUserDefinedNetworkAttributeName() {
+		return this.userDefinedNetworkAttributeName;
+	}
+	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE)
+	public BicycleConfigGroup setUserDefinedNetworkAttributeDefaultValue(double value) {
+		this.userDefinedNetworkAttributeDefaultValue = value;
+		return this;
+	}
+	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE)
+	public double getUserDefinedNetworkAttributeDefaultValue() {
+		return this.userDefinedNetworkAttributeDefaultValue;
+	}
+	public BicycleConfigGroup setBicycleScoringType( final BicycleScoringType value ) {
 		this.bicycleScoringType = value;
+		return this;
 	}
 	public BicycleScoringType getBicycleScoringType() {
 		return this.bicycleScoringType;
@@ -97,8 +137,9 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( MAX_BICYCLE_SPEED_FOR_ROUTING )
 	@Deprecated
-	public void setMaxBicycleSpeedForRouting(final double value) {
+	public BicycleConfigGroup setMaxBicycleSpeedForRouting( final double value ) {
 		this.maxBicycleSpeedForRouting = value;
+		return this;
 	}
 
 	public enum BicycleScoringType {legBased, linkBased}
@@ -107,15 +148,17 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return this.bicycleMode;
 	}
 	@StringSetter( BICYCLE_MODE )
-	public void setBicycleMode(String bicycleMode) {
+	public BicycleConfigGroup setBicycleMode( String bicycleMode ) {
 		this.bicycleMode = bicycleMode;
+		return this;
 	}
 	@StringGetter( MOTORIZED_INTERACTION )
 	public boolean isMotorizedInteraction() {
 		return motorizedInteraction;
 	}
 	@StringSetter( MOTORIZED_INTERACTION )
-	public void setMotorizedInteraction(boolean motorizedInteraction) {
+	public BicycleConfigGroup setMotorizedInteraction( boolean motorizedInteraction ) {
 		this.motorizedInteraction = motorizedInteraction;
+		return this;
 	}
 }

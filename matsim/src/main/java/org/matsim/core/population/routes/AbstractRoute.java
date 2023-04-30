@@ -34,12 +34,14 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	// This has a public non-final non-empty method, which is "clone".  But in the end this is how it is designed.
 	// So we leave it as is; if we ever want to re-design it in the core, we will have to copy it and start
 	// from the copy.  kai, may'17
-	
+
+	protected static final double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
+
 	private boolean locked = false ;
 
 	private double dist = Double.NaN;
 
-	private OptionalTime travTime = OptionalTime.undefined();
+	protected double travTime = UNDEFINED_TIME;
 
 	private Id<Link> startLinkId = null;
 	private Id<Link> endLinkId = null;
@@ -47,6 +49,10 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	public AbstractRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		this.startLinkId = startLinkId;
 		this.endLinkId = endLinkId;
+	}
+
+	protected static OptionalTime asOptionalTime(double seconds) {
+		return seconds == UNDEFINED_TIME ? OptionalTime.undefined() : OptionalTime.defined(seconds);
 	}
 
 	@Override
@@ -61,17 +67,18 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	@Override
 	public final OptionalTime getTravelTime() {
-		return this.travTime;
+		return asOptionalTime(this.travTime);
 	}
 
 	@Override
 	public final void setTravelTime(final double travTime) {
-		this.travTime = OptionalTime.defined(travTime);
+		OptionalTime.assertDefined(travTime);
+		this.travTime = travTime;
 	}
 
 	@Override
 	public void setTravelTimeUndefined() {
-		this.travTime = OptionalTime.undefined();
+		this.travTime = UNDEFINED_TIME;
 	}
 
 	@Override

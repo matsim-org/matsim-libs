@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyActivityProbabilityCalculator.ActivityProbabilities;
@@ -35,8 +36,7 @@ import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyActivityPro
  */
 class BuildingEnergyActivityProbabilityDataWriter {
 
-	private static final Logger log = Logger
-			.getLogger(BuildingEnergyActivityProbabilityDataWriter.class);
+	private static final Logger log = LogManager.getLogger(BuildingEnergyActivityProbabilityDataWriter.class);
 
 	BuildingEnergyActivityProbabilityDataWriter() {
 	}

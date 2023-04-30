@@ -21,7 +21,8 @@ package org.matsim.core.config.groups;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
@@ -40,7 +41,7 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	private static final String SIMULATION_PERIOD_DAYS = "simulationPeriodInDays"; // is not yet written to log-output so we can still rename it internally
 	
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger( ScenarioConfigGroup.class ) ;
+	private static final Logger log = LogManager.getLogger( ScenarioConfigGroup.class ) ;
 
 	private double simulationPeriodInDays = 1.0;
 	

@@ -1,6 +1,7 @@
 package playground.vsp.andreas.utils.pop;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -23,7 +24,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  *
  */
 public class SetPersonCoordsToBoundingBox extends NewPopulation {
-	private static final Logger log = Logger.getLogger(SetPersonCoordsToBoundingBox.class);
+	private static final Logger log = LogManager.getLogger(SetPersonCoordsToBoundingBox.class);
 	private int planswritten = 0;
 	private int personshandled = 0;
 	private Coord minXY;

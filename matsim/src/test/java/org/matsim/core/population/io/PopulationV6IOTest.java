@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -37,6 +38,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -187,6 +189,7 @@ public class PopulationV6IOTest {
 		plan.addActivity( population.getFactory().createActivityFromLinkId( "tweet" , Id.createLinkId( 2 )));
 
 		leg.getAttributes().putAttribute( "mpg" , 0.000001d );
+		leg.setRoutingMode(TransportMode.car);
 
 		final String file = utils.getOutputDirectory()+"/population.xml";
 		new PopulationWriter( population ).writeV6( file );
@@ -197,11 +200,48 @@ public class PopulationV6IOTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 		final Leg readLeg = (Leg) readPerson.getSelectedPlan().getPlanElements().get( 1 );
 
+		Assert.assertEquals("Expected a single leg attribute.", 1, readLeg.getAttributes().size());
 		Assert.assertEquals( "Unexpected Double attribute in " + readLeg.getAttributes(),
 				leg.getAttributes().getAttribute( "mpg" ) ,
 				readLeg.getAttributes().getAttribute( "mpg" ) );
-	}
 
+		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
+	}
+	
+	@Test
+	public void testLegAttributesLegacyIO() {
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
+
+		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
+		population.addPerson( person );
+
+		final Plan plan = population.getFactory().createPlan();
+		person.addPlan( plan );
+		final Leg leg = population.getFactory().createLeg( "SUV" );
+		plan.addActivity( population.getFactory().createActivityFromLinkId( "speech" , Id.createLinkId( 1 )));
+		plan.addLeg( leg );
+		plan.addActivity( population.getFactory().createActivityFromLinkId( "tweet" , Id.createLinkId( 2 )));
+
+		leg.getAttributes().putAttribute( "mpg" , 0.000001d );
+		leg.getAttributes().putAttribute(TripStructureUtils.routingMode, TransportMode.car);
+
+		final String file = utils.getOutputDirectory()+"/population.xml";
+		new PopulationWriter( population ).writeV6( file );
+
+		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new PopulationReader( readScenario ).readFile( file );
+
+		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
+		final Leg readLeg = (Leg) readPerson.getSelectedPlan().getPlanElements().get( 1 );
+
+		Assert.assertEquals("Expected a single leg attribute.", 1, readLeg.getAttributes().size());
+		Assert.assertEquals( "Unexpected Double attribute in " + readLeg.getAttributes(),
+				leg.getAttributes().getAttribute( "mpg" ) ,
+				readLeg.getAttributes().getAttribute( "mpg" ) );
+
+		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
+	}
+	
 	@Test
 	public void testPlanAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );

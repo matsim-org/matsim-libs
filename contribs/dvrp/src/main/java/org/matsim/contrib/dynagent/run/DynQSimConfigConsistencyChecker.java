@@ -19,13 +19,14 @@
 
 package org.matsim.contrib.dynagent.run;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 
 public class DynQSimConfigConsistencyChecker implements ConfigConsistencyChecker {
-	private static final Logger log = Logger.getLogger(DynQSimConfigConsistencyChecker.class);
+	private static final Logger log = LogManager.getLogger(DynQSimConfigConsistencyChecker.class);
 
 	@Override
 	public void checkConsistency(Config config) {

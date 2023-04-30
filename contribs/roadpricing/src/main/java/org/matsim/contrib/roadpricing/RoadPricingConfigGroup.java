@@ -22,7 +22,8 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class RoadPricingConfigGroup extends ReflectiveConfigGroup {
@@ -38,7 +39,7 @@ public final class RoadPricingConfigGroup extends ReflectiveConfigGroup {
 	 * by themselves. kai, in consultation with michael z. and johan j, sep'14
 	 */
 
-	private static final Logger LOG = Logger.getLogger(RoadPricingConfigGroup.class);
+	private static final Logger LOG = LogManager.getLogger(RoadPricingConfigGroup.class);
 
 	public static final String GROUP_NAME = "roadpricing";
 

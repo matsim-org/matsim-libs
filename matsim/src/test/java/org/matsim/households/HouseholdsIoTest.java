@@ -19,16 +19,7 @@
 
 package org.matsim.households;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.households.Income.IncomePeriod;
-import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.objectattributes.attributable.Attributes;
-import org.matsim.vehicles.Vehicle;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,10 +27,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.households.Income.IncomePeriod;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.vehicles.Vehicle;
+
 /**
  * @author dgrether
  */
-public class HouseholdsIoTest extends MatsimTestCase {
+public class HouseholdsIoTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final String TESTHOUSEHOLDSINPUT  = "testHouseholds.xml";
 	private static final String TESTXMLOUTPUT  = "testHouseholdsOut.xml";
@@ -55,14 +59,14 @@ public class HouseholdsIoTest extends MatsimTestCase {
 	private final Id<Household> id24 = Id.create("24", Household.class);
 	private final Id<Household> id25 = Id.create("25", Household.class);
 
-	public void testBasicReaderWriter() throws IOException {
+	@Test public void testBasicReaderWriter() throws IOException {
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
-		reader.readFile(this.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
+		reader.readFile(utils.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
 		checkContent(households);
 
 		HouseholdsWriterV10 writer = new HouseholdsWriterV10(households);
-		String outfilename = this.getOutputDirectory() +  TESTXMLOUTPUT;
+		String outfilename = utils.getOutputDirectory() +  TESTXMLOUTPUT;
 		writer.writeFile(outfilename);
 
 		File outFile = new File(outfilename);
@@ -100,7 +104,7 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertNotNull(hh.getIncome().getIncomePeriod());
 		assertEquals(IncomePeriod.month, hh.getIncome().getIncomePeriod());
 		assertEquals("eur", hh.getIncome().getCurrency());
-		assertEquals(50000.0d, hh.getIncome().getIncome(), EPSILON);
+		assertEquals(50000.0d, hh.getIncome().getIncome(), MatsimTestUtils.EPSILON);
 
 		Attributes currentAttributes = hh.getAttributes();
 		assertNotNull("Custom attributes from household with id 23 should not be empty.", currentAttributes);
@@ -123,9 +127,9 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertNotNull(hh.getIncome().getIncomePeriod());
 		assertEquals(IncomePeriod.day, hh.getIncome().getIncomePeriod());
 		assertEquals("eur", hh.getIncome().getCurrency());
-		assertEquals(1000.0d, hh.getIncome().getIncome(), EPSILON);
-		
-		
+		assertEquals(1000.0d, hh.getIncome().getIncome(), MatsimTestUtils.EPSILON);
+
+
 		hh = households.getHouseholds().get(id25);
 		assertNotNull(hh);
 		assertEquals(id25, hh.getId());

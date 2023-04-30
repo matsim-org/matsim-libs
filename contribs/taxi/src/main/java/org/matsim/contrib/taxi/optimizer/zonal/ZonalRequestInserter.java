@@ -21,13 +21,13 @@ package org.matsim.contrib.taxi.optimizer.zonal;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -44,6 +44,7 @@ import org.matsim.contrib.zone.Zone;
 import org.matsim.contrib.zone.Zones;
 import org.matsim.contrib.zone.util.NetworkWithZonesUtils;
 import org.matsim.contrib.zone.util.ZoneFinderImpl;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -61,25 +62,23 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 	private final RuleBasedRequestInserter requestInserter;
 
 	private final Map<Id<Zone>, Zone> zones;
-	private Map<Id<Zone>, PriorityQueue<DvrpVehicle>> zoneToIdleVehicleQueue;
-	private final Map<Id<Link>, Zone> linkToZone;
+	private IdMap<Zone, PriorityQueue<DvrpVehicle>> zoneToIdleVehicleQueue;
+	private final IdMap<Link, Zone> linkToZone;
 
-	public ZonalRequestInserter(Fleet fleet, TaxiScheduler scheduler, MobsimTimer timer, Network network,
-			TravelTime travelTime, TravelDisutility travelDisutility, ZonalTaxiOptimizerParams params,
-			ZonalRegisters zonalRegisters, URL context) {
+	public ZonalRequestInserter(Fleet fleet, TaxiScheduler scheduler, MobsimTimer timer, Network network, TravelTime travelTime,
+			TravelDisutility travelDisutility, ZonalTaxiOptimizerParams params, ZonalRegisters zonalRegisters, URL context) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
-		this.dispatchFinder = new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime,
-				travelDisutility);
-		this.requestInserter = new RuleBasedRequestInserter(scheduler, timer, dispatchFinder,
-				params.getRuleBasedTaxiOptimizerParams(), zonalRegisters);
+		this.dispatchFinder = new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime, travelDisutility);
+		this.requestInserter = new RuleBasedRequestInserter(scheduler, timer, dispatchFinder, params.getRuleBasedTaxiOptimizerParams(),
+				zonalRegisters);
 
 		ZonalSystemParams zonalSystemParams = params.getZonalSystemParams();
-		zones = Zones.readZones(zonalSystemParams.getZonesXmlUrl(context), zonalSystemParams.getZonesShpUrl(context));
-		System.err.println("No conversion of SRS is done");
+		zones = Zones.readZones(ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesXmlFile),
+				ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesShpFile));
+		// TODO No conversion of SRS is done
 
-		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(network,
-				new ZoneFinderImpl(zones, zonalSystemParams.getExpansionDistance()));
+		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(network, new ZoneFinderImpl(zones, zonalSystemParams.expansionDistance));
 
 		// FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
 		// the zones used in ZonalTaxiOptim (for dispatching)
@@ -98,7 +97,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 	private void initIdleVehiclesInZones() {
 		// TODO use idle vehicle register instead...
 
-		zoneToIdleVehicleQueue = new HashMap<>();
+		zoneToIdleVehicleQueue = new IdMap<>(Zone.class);
 		for (Id<Zone> zoneId : zones.keySet()) {
 			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<>(10, LONGEST_WAITING_FIRST));
 		}

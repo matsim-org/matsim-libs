@@ -20,7 +20,8 @@
 
 package org.matsim.pt.router;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -39,7 +40,7 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
  *
  */
 public class TransitRouterConfig implements MatsimParameters {
-	private static final Logger log = Logger.getLogger( TransitRouterConfig.class ) ;
+	private static final Logger log = LogManager.getLogger( TransitRouterConfig.class ) ;
 
 	/**
 	 * The distance in meters in which stop facilities should be searched for
@@ -111,7 +112,7 @@ public class TransitRouterConfig implements MatsimParameters {
 		pcsConfig.setLocked(); pcrConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
 		
 		if (pcsConfig.getScoringParametersPerSubpopulation().size()>1){
-			Logger.getLogger(getClass()).warn("More than one subpopulation is used in plansCalcScore. "
+			LogManager.getLogger(getClass()).warn("More than one subpopulation is used in plansCalcScore. "
 					+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
 					+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
 		}

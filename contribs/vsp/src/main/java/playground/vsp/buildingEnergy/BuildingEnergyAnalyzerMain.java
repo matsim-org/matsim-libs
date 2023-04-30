@@ -22,7 +22,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -39,8 +40,7 @@ import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumption
  */
 class BuildingEnergyAnalyzerMain {
 
-	private static final Logger log = Logger
-			.getLogger(BuildingEnergyAnalyzerMain.class);
+	private static final Logger log = LogManager.getLogger(BuildingEnergyAnalyzerMain.class);
 	
 	private static final String[] ARGS = new String[]{
 		"E:\\VSP\\svn\\shared-svn\\studies\\droeder\\buildingEnergy\\runs\\",

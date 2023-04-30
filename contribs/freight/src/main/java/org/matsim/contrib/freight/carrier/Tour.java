@@ -21,13 +21,8 @@
 
 package org.matsim.contrib.freight.carrier;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
@@ -35,48 +30,74 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
+import java.util.*;
+
 /**
  * This is a tour of a carrier which is a sequence of activities and legs.
- * 
- * 
+ * <p>
+ *
  * @author sschroeder, mzilske
  *
  */
 public class Tour {
 
-	private static final Logger logger = Logger.getLogger(Tour.class);
+	private static final Logger logger = LogManager.getLogger(Tour.class);
 
 	/**
 	 * A builder building a tour.
-	 * 
-	 * 
+	 * <p>
+	 *
 	 * @author sschroeder
 	 *
 	 */
 	public static class Builder {
-		
-		/**
-		 * Returns a new tour builder.
-		 * 
-		 * @return the builder
-		 */
-		public static Builder newInstance(){ return new Builder(); }
-		
-		private Builder(){
-			
-		}
 
+		private final Id<Tour> tourId;
 		private final List<TourElement> tourElements = new ArrayList<>();
 		private final Set<CarrierShipment> openPickups = new HashSet<>();
 		private boolean previousElementIsActivity;
+
+
 		private Start start;
+
 		private End end;
-		
+
+		/**
+		 * Returns a new tour builder.
+		 *
+		 * @deprecated
+		 * Please use {@link #newInstance(Id)} instead. kmt sep'22
+		 * <p>
+		 *
+		 *
+		 * @return the builder including "unknown" as tourId
+		 */
+		@Deprecated
+		public static Builder newInstance(){
+			return new Builder(Id.create("unknown", Tour.class));
+		}
+
+		/**
+		 * Returns a new tour builder.
+		 * This now also includes an Id for this tour.
+		 *
+		 * @param tourId Id of this tour
+		 * @return the builder
+		 */
+		public static Builder newInstance(Id<Tour> tourId){
+			return new Builder(tourId);
+		}
+
+
+		private Builder(Id<Tour> tourId) {
+			this.tourId = tourId;
+		}
+
 		/**
 		 * Schedules the start of the tour.
-		 * 
-		 * <p> Tour start should correspond to the locationId of the vehicle that runs the tour. 
-		 * 
+		 *
+		 * <p> Tour start should correspond to the locationId of the vehicle that runs the tour.
+		 *
 		 * @param startLinkId
 		 * @return the builder again
 		 */
@@ -84,22 +105,22 @@ public class Tour {
 			scheduleStart(startLinkId, TimeWindow.newInstance(0.0, Double.MAX_VALUE));
 			return this;
 		}
-		
+
 		public Builder scheduleStart(Id<Link> startLinkId, TimeWindow timeWindow){
 			this.start = new Start(startLinkId, timeWindow);
 			previousElementIsActivity = true;
 			return this;
 		}
-		
+
 		public void scheduleEnd(Id<Link> endLinkId, TimeWindow timeWindow){
 			assertLastElementIsLeg();
 			this.end = new End(endLinkId, timeWindow);
 			previousElementIsActivity = true;
 		}
-		
+
 		/**
 		 * Schedules the end of the tour (in terms of locationId).
-		 * 
+		 *
 		 * @param endLinkId
 		 */
 		public void scheduleEnd(Id<Link> endLinkId) {
@@ -108,9 +129,9 @@ public class Tour {
 
 		/**
 		 * Adds a leg to the currentTour.
-		 * 
+		 *
 		 * <p>Consider that a leg follows an activity. Otherwise, an exception occurs.
-		 * 
+		 *
 		 * @param leg
 		 * @throws IllegalStateException if leg is null or if previous element is not an activity.
 		 */
@@ -123,7 +144,7 @@ public class Tour {
 			previousElementIsActivity = false;
 			return this;
 		}
-		
+
 		public Leg createLeg(Route route, double dep_time, double transportTime) {
 			Leg leg = new Leg();
 			leg.setRoute(route);
@@ -131,10 +152,10 @@ public class Tour {
 			leg.setExpectedTransportTime(transportTime);
 			return leg;
 		}
-		
+
 		/**
 		 * Inserts leg at the beginning of a tour.
-		 * 
+		 *
 		 * @param leg
 		 * @return the builder
 		 * @throws IllegalStateException if leg is null
@@ -148,7 +169,7 @@ public class Tour {
 
 		/**
 		 * Schedules a pickup of the shipment right at the beginning of the tour.
-		 * 
+		 *
 		 * @param shipment
 		 * @return the builder
 		 * @throws IllegalStateException if shipment is null or shipment has already been picked up.
@@ -169,8 +190,8 @@ public class Tour {
 
 		/**
 		 * Schedules pickup, i.e. adds a pickup to current tour.
-		 * 
-		 * 
+		 * <p>
+		 *
 		 * @param shipment to be picked up
 		 * @throws IllegalStateException if shipment is null or if shipment has already been picked up or if last element is not a leg.
 		 */
@@ -193,10 +214,10 @@ public class Tour {
 						"cannot add activity, since last tour element is not a leg.");
 			}
 		}
-		
+
 		/**
 		 * Schedules a delivery of a shipment, i.e. adds a delivery activity to current tour.
-		 * 
+		 *
 		 * @param shipment
 		 * @throws IllegalStateException if shipment is null or if shipment has not been picked up yet or if last element is not a leg.
 		 */
@@ -212,7 +233,7 @@ public class Tour {
 			tourElements.add(createDelivery(shipment));
 			previousElementIsActivity = true;
 		}
-		
+
 		public Builder scheduleService(CarrierService service){
 			ServiceActivity act = new ServiceActivity(service);
 			assertLastElementIsLeg();
@@ -223,7 +244,7 @@ public class Tour {
 
 		/**
 		 * Finally builds the tour.
-		 * 
+		 *
 		 * @return the tour that has been built
 		 */
 		public Tour build() {
@@ -240,7 +261,7 @@ public class Tour {
 
 		/**
 		 * Creates and returns an empty leg.
-		 * 
+		 *
 		 * @return Leg
 		 * @see Leg
 		 */
@@ -250,7 +271,7 @@ public class Tour {
 
 		/**
 		 * Creates and returns a network route.
-		 * 
+		 *
 		 * @param startLinkId
 		 * @param linkIds
 		 * @param endLinkId
@@ -267,7 +288,7 @@ public class Tour {
 		}
 
 	}
-	
+
 	public static abstract class TourElement {
 		public abstract TourElement duplicate();
 	}
@@ -307,7 +328,11 @@ public class Tour {
 		private Leg(Leg leg) {
 			this.expTransportTime = leg.getExpectedTransportTime();
 			this.departureTime = leg.getExpectedDepartureTime();
-			this.route = leg.getRoute().clone();
+			if ( leg.getRoute() == null ) {
+				this.route = null ;
+			} else{
+				this.route = leg.getRoute().clone();
+			}
 		}
 
 		public Route getRoute() {
@@ -339,7 +364,7 @@ public class Tour {
 			return new Leg(this);
 		}
 	}
-	
+
 	public static class ServiceActivity extends TourActivity {
 
 		private final CarrierService service;
@@ -348,7 +373,7 @@ public class Tour {
 		@Override public String toString() {
 			return "serviceActivity=" + super.toString() + "[arrTime=" + arrTime + "][service=" + service + "]" ;
 		}
-		
+
 		public ServiceActivity(CarrierService service) {
 			super();
 			this.service = service;
@@ -362,7 +387,7 @@ public class Tour {
 		public CarrierService getService(){
 			return service;
 		}
-		
+
 		@Override
 		public String getActivityType() {
 			return service.getType();
@@ -397,14 +422,14 @@ public class Tour {
 		public TourElement duplicate() {
 			return new ServiceActivity(this);
 		}
-		
+
 	}
 
 	public static class Start extends TourActivity {
 
 		private final Id<Link> locationLinkId;
 		private final TimeWindow timeWindow;
-		
+
 		public Start(Id<Link> locationLinkId, TimeWindow timeWindow) {
 			super();
 			this.locationLinkId = locationLinkId;
@@ -439,7 +464,7 @@ public class Tour {
 		@Override
 		public void setExpectedArrival(double arrivalTime) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -451,15 +476,15 @@ public class Tour {
 		public TourElement duplicate() {
 			return new Start(this);
 		}
-		
+
 	}
-	
+
 	public static class End extends TourActivity {
 
 		private final Id<Link> locationLinkId;
 		private final TimeWindow timeWindow;
 		private double arrTime;
-		
+
 		public End(Id<Link> locationLinkId, TimeWindow timeWindow) {
 			super();
 			this.locationLinkId = locationLinkId;
@@ -469,6 +494,7 @@ public class Tour {
 		private End(End end) {
 			this.locationLinkId = end.getLocation();
 			this.timeWindow = end.getTimeWindow();
+			this.arrTime = end.getExpectedArrival();
 		}
 
 		@Override
@@ -506,7 +532,7 @@ public class Tour {
 			return new End(this);
 		}
 	}
-	
+
 	public static class Pickup extends ShipmentBasedActivity {
 
 		private final CarrierShipment shipment;
@@ -614,7 +640,7 @@ public class Tour {
 		public double getExpectedArrival() {
 			return expArrTime;
 		}
-		
+
 		@Override
 		public TourElement duplicate() {
 			return new Delivery(this);
@@ -623,18 +649,22 @@ public class Tour {
 	}
 
 	private final List<TourElement> tourElements;
-	
+
 	private final Start start;
-	
+
 	private final End end;
-	
+
+	private final Id<Tour> tourId;
+
 	private Tour(Builder builder){
+		tourId = builder.tourId;
 		tourElements = builder.tourElements;
 		start = builder.start;
 		end = builder.end;
 	}
 
-	private Tour(Tour tour) {
+	private Tour(Tour tour, Id<Tour> newTourId) {
+		this.tourId = newTourId;
 		this.start = (Start) tour.start.duplicate();
 		this.end = (End) tour.end.duplicate();
 		List<TourElement> elements = new ArrayList<>();
@@ -645,17 +675,28 @@ public class Tour {
 	}
 
 	public Tour duplicate() {
-		return new Tour(this);
+		return new Tour(this, Id.create(this.tourId.toString(), Tour.class));
+	}
+
+	/*
+	 * returns a copy of the tour, but with a new Tour Id.
+	 */
+	public Tour duplicateWithNewId(Id<Tour> newTourId) {
+		return new Tour(this, newTourId);
 	}
 
 	public List<TourElement> getTourElements() {
 		return Collections.unmodifiableList(tourElements);
 	}
-	
+
+	public Id<Tour> getId(){
+		return tourId;
+	}
+
 	public Start getStart(){
 		return start;
 	}
-	
+
 	public End getEnd(){
 		return end;
 	}
@@ -667,7 +708,7 @@ public class Tour {
 	public Id<Link> getEndLinkId() {
 		return end.getLocation();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "[ startLinkId="+getStartLinkId()+" ][ endLinkId="+getEndLinkId()+" ][ #tourElements=" + tourElements.size() + "]";

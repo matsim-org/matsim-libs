@@ -29,7 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -57,7 +58,7 @@ import org.matsim.pt.PtConstants;
  */
 public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
-	private static final Logger log = Logger.getLogger(PlanCalcScoreConfigGroup.class);
+	private static final Logger log = LogManager.getLogger(PlanCalcScoreConfigGroup.class);
 
 	public static final String GROUP_NAME = "planCalcScore";
 

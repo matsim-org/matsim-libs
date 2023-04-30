@@ -20,7 +20,8 @@
 
 package org.matsim.core.population.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -39,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public final class StreamingPopulationReader implements MatsimReader {
-	private static final Logger log = Logger.getLogger(StreamingPopulationReader.class);
+	private static final Logger log = LogManager.getLogger(StreamingPopulationReader.class);
 	
 	private PopulationReader reader ;
 	private final StreamingPopulation pop ;

@@ -23,7 +23,8 @@ package org.matsim.facilities;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +45,7 @@ import org.xml.sax.Attributes;
  * @author balmermi
  */
 final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
-    private static final  Logger log = Logger.getLogger(FacilitiesReaderMatsimV1.class);
+    private static final  Logger log = LogManager.getLogger(FacilitiesReaderMatsimV1.class);
 
     private final static String FACILITIES = "facilities";
     private final static String FACILITY = "facility";
@@ -137,7 +138,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         this.facilities.setName(atts.getValue("name"));
         this.currAttributes = facilities.getAttributes();
         if (atts.getValue("aggregation_layer") != null) {
-            Logger.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
+            LogManager.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
         }
     }
 

@@ -26,7 +26,8 @@ package org.matsim.contrib.decongestion;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.decongestion.DecongestionConfigGroup.DecongestionApproach;
 import org.matsim.contrib.decongestion.DecongestionConfigGroup.IntegralApproach;
@@ -46,7 +47,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class DecongestionRunExample {
 
-	private static final Logger log = Logger.getLogger(DecongestionRunExample.class);
+	private static final Logger log = LogManager.getLogger(DecongestionRunExample.class);
 
 	private static String configFile;
 	

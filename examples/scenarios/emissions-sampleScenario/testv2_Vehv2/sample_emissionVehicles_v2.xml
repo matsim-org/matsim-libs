@@ -64,6 +64,6 @@
 	<vehicle id="570902.2#2983" type="car_petrol"/>
 	<vehicle id="pv_car_10041_9162_1" type="car_average"/>
 	<vehicle id="pv_car_5315_9162_1" type="car_average"/>
-	<vehicle id="gv_4499" type="truck"/>
-	<vehicle id="gv_4500" type="truck"/>
+	<vehicle id="gv_4499" type="car_average"/>
+	<vehicle id="gv_4500" type="car_average"/>
 </vehicleDefinitions>

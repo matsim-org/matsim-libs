@@ -121,7 +121,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				drtCfg.getDrtRequestInsertionRetryParams().orElse(new DrtRequestInsertionRetryParams())));
 
 		addModalComponent(QSimScopeForkJoinPoolHolder.class,
-				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));
+				() -> new QSimScopeForkJoinPoolHolder(drtCfg.numberOfThreads));
 
 		bindModal(UnplannedRequestInserter.class).toProvider(modalProvider(
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
@@ -139,7 +139,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
 
-		bindModal(CostCalculationStrategy.class).to(drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
+		bindModal(CostCalculationStrategy.class).to(drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated ?
 				CostCalculationStrategy.RejectSoftConstraintViolations.class :
 				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 

@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>15.0-SNAPSHOT</version>
+		<version>16.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -15,13 +15,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-core</artifactId>
 			<version>${jsprit.version}</version>
@@ -30,7 +23,7 @@
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
-			<version>1.5.3</version>
+			<version>1.5.4</version>
 		</dependency>
 
 		<dependency>
@@ -56,13 +49,13 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -71,18 +64,31 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j2-impl</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
+		</dependency>
+
+		<!-- This comes from jsprit, but is outdated there. Unclear, when the next release is coming.
+		 	Currently (Jan'23), there is a beta version which needs some code adaptions on our side -> will not use it directly...
+		 	So I (KMT) am fixing the security issue here by manually setting a more current version of the vulnerable dependencies -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<!-- This comes from jsprit, but is outdated there. Unclear, when the next release is coming.
+			 Currently (Jan'23), there is a beta version which needs some code adaptions on our side -> will not use it directly...
+			 So I (KMT) am fixing the security issue here by manually setting a more current version of the vulnerable dependencies -->
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.12.2</version>
 		</dependency>
 
 	</dependencies>

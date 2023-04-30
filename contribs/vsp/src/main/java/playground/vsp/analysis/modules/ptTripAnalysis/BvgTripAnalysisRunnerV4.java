@@ -27,7 +27,7 @@ package playground.vsp.analysis.modules.ptTripAnalysis;
 public class BvgTripAnalysisRunnerV4 {
 //			extends AbstractAnalyisModule{
 //	
-//	private final static Logger log = Logger.getLogger(BvgTripAnalysisRunnerV4.class);
+//	private final static Logger log = LogManager.getLogger(BvgTripAnalysisRunnerV4.class);
 //
 //	private ScenarioImpl scenario;
 //	private TTtripAnalysisV4 ana;

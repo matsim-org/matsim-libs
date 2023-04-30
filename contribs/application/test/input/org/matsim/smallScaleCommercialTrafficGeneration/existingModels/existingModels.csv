@@ -1,0 +1,3 @@
+model	sampleSize	trafficType	purpose	vehicleType	networkMode
+exampleServiceCarrier	1.0	businessTraffic	2		car
+exampleShipmentCarrier	1.0	freightTraffic	3	vehTyp3	freight

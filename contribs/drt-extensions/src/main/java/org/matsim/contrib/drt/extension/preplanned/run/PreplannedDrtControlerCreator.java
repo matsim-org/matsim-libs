@@ -24,7 +24,8 @@ package org.matsim.contrib.drt.extension.preplanned.run;
 
 import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.extension.preplanned.optimizer.WaitForStopTask;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -50,7 +51,7 @@ import com.google.common.collect.ImmutableSet;
  * @author michalm (Michal Maciejewski)
  */
 public final class PreplannedDrtControlerCreator {
-	private static final Logger log = Logger.getLogger(PreplannedDrtControlerCreator.class);
+	private static final Logger log = LogManager.getLogger(PreplannedDrtControlerCreator.class);
 
 	/**
 	 * Creates a controller in one step.

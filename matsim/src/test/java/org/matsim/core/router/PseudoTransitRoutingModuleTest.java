@@ -22,6 +22,7 @@ package org.matsim.core.router;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -51,11 +52,15 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class PseudoTransitRoutingModuleTest {
 
-	@SuppressWarnings("static-method")
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void testRouteLeg() {
 		final Fixture f = new Fixture();
@@ -100,6 +105,7 @@ public class PseudoTransitRoutingModuleTest {
 			params.setBeelineDistanceFactor(1.);
 			params.setTeleportedModeFreespeedLimit(5.);
 			f.s.getConfig().plansCalcRoute().addModeRoutingParams(params);
+			f.s.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
 			
 			com.google.inject.Injector injector = Injector.createInjector(f.s.getConfig(), new AbstractModule() {
 				@Override public void install() {
@@ -115,7 +121,7 @@ public class PseudoTransitRoutingModuleTest {
 			Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ) ;
 			Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() );
 			
-			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person, new Attributes()) ;
+			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person, new AttributesImpl()) ;
 			Gbl.assertIf( result.size()==1);
 			Leg newLeg = (Leg) result.get(0) ;
 

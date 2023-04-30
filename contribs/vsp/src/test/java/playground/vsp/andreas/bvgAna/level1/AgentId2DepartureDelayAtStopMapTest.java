@@ -3,9 +3,7 @@ package playground.vsp.andreas.bvgAna.level1;
 import java.util.Set;
 import java.util.TreeSet;
 
-import junit.framework.Assert;
-import playground.vsp.andreas.bvgAna.level1.AgentId2DepartureDelayAtStopMap;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -19,14 +17,14 @@ public class AgentId2DepartureDelayAtStopMapTest {
 
 	@Test
 	public void testAgentId2DepartureDelayAtStopMap() {
-		
+
 		Set<Id<Person>> idSet = new TreeSet<>();
 		for (int ii=0; ii<15; ii++){
 			idSet.add(Id.create(ii, Person.class));
 		}
-        
+
 //        assign Ids to routes, vehicles and agents to be used in Test
-        
+
         Id<Vehicle> vehId1 = Id.create(4, Vehicle.class);
         Id<Vehicle> vehId2 = Id.create(1, Vehicle.class);
         Id<Person> persId1 = Id.create(0, Person.class);
@@ -34,30 +32,30 @@ public class AgentId2DepartureDelayAtStopMapTest {
         Id<Link> linkId1 = Id.create(14, Link.class);
         Id<Link> linkId3 = Id.create(13, Link.class);
 
-        
+
         AgentId2DepartureDelayAtStopMap handler = new AgentId2DepartureDelayAtStopMap(idSet);
-        
+
 //        create Events
-        
+
         PersonDepartureEvent event3 = new PersonDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt, TransportMode.pt);
 		handler.handleEvent(event3);
 		PersonDepartureEvent event4 = new PersonDepartureEvent(2.1*3600, persId2, linkId1, TransportMode.pt, TransportMode.pt);
 		handler.handleEvent(event4);
-        
+
         PersonEntersVehicleEvent event1 = new PersonEntersVehicleEvent(2.9*3600, persId1, vehId1);
         handler.handleEvent(event1);
         PersonEntersVehicleEvent event2 = new PersonEntersVehicleEvent(2.1*3600, persId2, vehId2);
         handler.handleEvent(event2);
-        
+
 //        run tests
-		
+
         Assert.assertTrue(handler.getStopId2DelayAtStopMap().containsKey(persId1));
-		Assert.assertEquals(event3.getTime(), handler.getStopId2DelayAtStopMap().get(persId1).getAgentEntersVehicle().get(0));
-		
+		Assert.assertEquals(event3.getTime(), handler.getStopId2DelayAtStopMap().get(persId1).getAgentEntersVehicle().get(0), 0);
+
 		Assert.assertTrue(handler.getStopId2DelayAtStopMap().containsKey(persId2));
-		Assert.assertEquals(event4.getTime(), handler.getStopId2DelayAtStopMap().get(persId2).getAgentEntersVehicle().get(0));
-		
-		
+		Assert.assertEquals(event4.getTime(), handler.getStopId2DelayAtStopMap().get(persId2).getAgentEntersVehicle().get(0), 0);
+
+
 	}
 
 }

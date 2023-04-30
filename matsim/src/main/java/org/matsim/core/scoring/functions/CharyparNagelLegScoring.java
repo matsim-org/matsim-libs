@@ -24,7 +24,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -45,7 +46,7 @@ import org.matsim.pt.PtConstants;
 public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 	// yyyy URL in above javadoc is broken.  kai, feb'17
 
-	private static final Logger log = Logger.getLogger( CharyparNagelLegScoring.class ) ;
+	private static final Logger log = LogManager.getLogger( CharyparNagelLegScoring.class ) ;
 
 	protected double score;
 
@@ -121,11 +122,11 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 			if ( Double.isNaN(dist) ) {
 				if ( ccc<10 ) {
 					ccc++ ;
-					Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: Simulation does not report " +
+					LogManager.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: Simulation does not report " +
 							"a distance for this trip. Possible reason for that: mode is teleported and router does not " +
 							"write distance into plan.  Needs to be fixed or these plans will die out.") ;
 					if ( ccc==10 ) {
-						Logger.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
+						LogManager.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
 					}
 				}
 			}

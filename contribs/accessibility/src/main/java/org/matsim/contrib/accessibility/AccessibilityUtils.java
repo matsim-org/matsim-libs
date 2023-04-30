@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -49,7 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author dziemke
  */
 public class AccessibilityUtils {
-	public static final Logger LOG = Logger.getLogger(AccessibilityUtils.class);
+	public static final Logger LOG = LogManager.getLogger(AccessibilityUtils.class);
 
 	/**
 	 * Aggregates disutilities Vjk to get from node j to all k that are attached to j and assign sum(Vjk) is to node j.

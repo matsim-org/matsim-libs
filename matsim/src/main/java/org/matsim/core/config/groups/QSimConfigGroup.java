@@ -20,7 +20,8 @@
 
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -40,7 +41,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
+	private final static Logger log = LogManager.getLogger(QSimConfigGroup.class);
 
 	public static final String GROUP_NAME = "qsim";
 
@@ -127,7 +128,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		kinematicWaves /*kinematicWaves and withHoles produce same snapshots Amit Mar'17*/
 	}
 
-	private SnapshotStyle snapshotStyle = SnapshotStyle.equiDist;
+	private SnapshotStyle snapshotStyle = SnapshotStyle.queue;
 
 	// ---
 	private static final String MAIN_MODE = "mainMode";

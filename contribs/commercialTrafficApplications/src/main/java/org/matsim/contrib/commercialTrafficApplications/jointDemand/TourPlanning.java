@@ -27,7 +27,8 @@ import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstCons
 import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -56,7 +57,7 @@ import java.util.stream.Collectors;
 
 class TourPlanning {
 
-	private static final Logger log = Logger.getLogger(TourPlanning.class);
+	private static final Logger log = LogManager.getLogger(TourPlanning.class);
 
 	static void runTourPlanningForCarriersWithNetBasedCosts(Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
 															TravelTime travelTime) throws ExecutionException, InterruptedException {

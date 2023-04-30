@@ -18,9 +18,6 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
 package org.matsim.contrib.taxi.analysis;
 
 import java.awt.Color;
@@ -38,9 +35,10 @@ import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.contrib.taxi.util.stats.TaxiVehicleOccupancyProfiles;
+import org.matsim.contrib.util.stats.ProfileWriter;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
+import org.matsim.contrib.util.stats.VehicleTaskProfileView;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.MatsimServices;
@@ -80,7 +78,7 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 						getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
 		addControlerListenerBinding().to(modalKey(TaxiStatsDumper.class));
 
-		if (taxiCfg.getTimeProfiles()) {
+		if (taxiCfg.timeProfiles) {
 			bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 					getter -> new VehicleOccupancyProfileCalculator(getMode(),
 							getter.getModal(FleetSpecification.class), 300, getter.get(QSimConfigGroup.class),
@@ -98,11 +96,9 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 			addEventHandlerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 			addControlerListenerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 
-			addControlerListenerBinding().toProvider(modalProvider(
-					getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class), getMode(),
-							getter.getModal(VehicleTaskProfileCalculator.class),
-							Comparator.comparing(Task.TaskType::name),
-							ImmutableMap.of(TaxiStayTask.TYPE, Color.LIGHT_GRAY))));
+			addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), getMode(),
+					new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), Comparator.comparing(Task.TaskType::name),
+							ImmutableMap.of(TaxiStayTask.TYPE, Color.LIGHT_GRAY)), "task_time_profiles")));
 		}
 	}
 }

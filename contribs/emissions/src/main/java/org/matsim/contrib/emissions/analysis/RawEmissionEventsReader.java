@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.emissions.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
@@ -43,7 +44,7 @@ class RawEmissionEventsReader extends MatsimXmlParser {
     private static final String LINK_ID = "linkId";
     private static final String VEHICLE_ID = "vehicleId";
 
-    private static final Logger logger = Logger.getLogger(RawEmissionEventsReader.class);
+    private static final Logger logger = LogManager.getLogger(RawEmissionEventsReader.class);
     private static final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.UK);
 
     // create this mapping for parsing the pollutants and create backwards compatibility to older emission events files

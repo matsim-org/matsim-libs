@@ -20,17 +20,24 @@
 
 package org.matsim.pt.counts;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class PtOccupancyCountsComparisonAlgorithmTest extends MatsimTestCase {
+public class PtOccupancyCountsComparisonAlgorithmTest {
 
-	@Test
-	public void testCompare() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+
+	@Test public void testCompare() {
 		PtCountsFixture fixture = new PtOccupancyCountsFixture();
 		fixture.setUp();
 
@@ -52,8 +59,8 @@ public class PtOccupancyCountsComparisonAlgorithmTest extends MatsimTestCase {
 		}
 	}
 
-	@Test
-	public void testDistanceFilter() {
+
+	@Test public void testDistanceFilter() {
 		PtCountsFixture fixture = new PtOccupancyCountsFixture();
 		fixture.setUp();
 

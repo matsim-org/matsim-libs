@@ -2,7 +2,7 @@ package org.matsim.contrib.carsharing.relocation.controler;
 
 public class RelocationExample {
 	/*public static void main(final String[] args) {
-		Logger.getLogger("org.matsim.core.controler.Injector").setLevel(Level.OFF);
+		LogManager.getLogger("org.matsim.core.controler.Injector").setLevel(Level.OFF);
 
 		final Config config = ConfigUtils.loadConfig(args[0]);
 

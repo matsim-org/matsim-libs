@@ -55,5 +55,9 @@ public final class SpecificationContainer<I, S extends Identifiable<I>> {
 			throw new RuntimeException("A specification with id=" + id + " does not exist");
 		}
 	}
+
+	public void clear() {
+		specifications.clear();
+	}
 }
 

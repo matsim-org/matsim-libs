@@ -45,7 +45,7 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpLegFactory legFactory;
 
 	public DrtActionCreator(PassengerHandler passengerHandler, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
-		this(passengerHandler, v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
+		this(passengerHandler, v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v,
 				OnlineTrackerListener.NO_LISTENER, timer));
 	}
 

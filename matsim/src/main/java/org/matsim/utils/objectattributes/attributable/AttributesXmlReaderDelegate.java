@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * AttributesXmlReaderDelegate.java
@@ -22,29 +21,22 @@
  package org.matsim.utils.objectattributes.attributable;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
-import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
-import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
-import org.matsim.utils.objectattributes.attributeconverters.FloatConverter;
-import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
-import org.matsim.utils.objectattributes.attributeconverters.LongConverter;
-import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
 
 /**
  * This class is meant to be used as a delegate by any reader that reads an {@link Attributable} object
  * @author thibautd
  */
 public class AttributesXmlReaderDelegate {
-	private final static Logger log = Logger.getLogger(AttributesXmlReaderDelegate.class);
 	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
+	private final Map<String, String> stringCache = new HashMap<>(1000);
 
 	private Attributes currentAttributes = null;
 	private String currentAttribute = null;
@@ -60,7 +52,8 @@ public class AttributesXmlReaderDelegate {
 						 Stack<String> context,
 						 Attributes currentAttributes ) {
 		if (TAG_ATTRIBUTE.equals(name)) {
-			this.currentAttribute = atts.getValue(ATTR_ATTRIBUTENAME);
+			String attributeName = atts.getValue(ATTR_ATTRIBUTENAME);
+			this.currentAttribute = this.stringCache.computeIfAbsent(attributeName, k -> attributeName);
 			this.currentAttributeClass = atts.getValue(ATTR_ATTRIBUTECLASS);
 		} else if (TAG_ATTRIBUTES.equals(name)) {
 			this.currentAttributes = currentAttributes;

@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -48,7 +49,7 @@ import playground.vsp.parkAndRide.PRFacility;
  *
  */
 public class PRLocationStrategyMod implements PlanStrategyModule {
-	private static final Logger log = Logger.getLogger(PRLocationStrategyMod.class);
+	private static final Logger log = LogManager.getLogger(PRLocationStrategyMod.class);
 
 	private MutableScenario sc;
 	private Network net;

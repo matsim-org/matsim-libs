@@ -20,6 +20,8 @@
 
 package org.matsim.integration.always;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +30,10 @@ import java.util.HashSet;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -67,7 +72,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * This TestCase should ensure the correct behavior of agents when different
@@ -84,7 +89,11 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class BetaTravelTest6IT extends MatsimTestCase {
+public class BetaTravelTest6IT {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/* This TestCase uses a custom Controler, named TestControler, to load
 	 * specific strategies. The strategies make use of a test-specific
@@ -121,9 +130,9 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 	 *
 	 *  @author mrieser
 	 */
-	public void testBetaTravel_6() {
-		Config config = loadConfig("../../examples/scenarios/equil/config.xml"); // default config
-		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml"); // specific setting for this test
+	@Test public void testBetaTravel_6() {
+		Config config = utils.loadConfig("../../examples/scenarios/equil/config.xml"); // default config
+		ConfigUtils.loadConfig(config, utils.getInputDirectory() + "config.xml"); // specific setting for this test
 		config.controler().setWritePlansInterval(0);
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
 		/*
@@ -167,7 +176,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 		private final ArrayList<Double> enterTimes = new ArrayList<Double>(100);
 		private final ArrayList<Double> leaveTimes = new ArrayList<Double>(100);
 
-		private static final Logger log = Logger.getLogger(TestControlerListener.class);
+		private static final Logger log = LogManager.getLogger(TestControlerListener.class);
 
 		protected LinkAnalyzer(final String linkId) {
 			this.linkId = linkId;
@@ -265,23 +274,23 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 			manager.setMaxPlansPerAgent(5);
 
 			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector<Plan, Person>(config.planCalcScore()));
-			manager.addStrategyForDefaultSubpopulation(strategy1, 0.80);
+			manager.addStrategy( strategy1, null, 0.80 );
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(config.global().getNumberOfThreads()));
-			
+
 			// Trying to replace this by the standard mutator ...
 //			double mutationRange = 1800. ;
 //			boolean affectingDuration = false ;
 //			strategy2.addStrategyModule( new TimeAllocationMutator(config, mutationRange, affectingDuration));
 			// ... but the test result looks different. kai, sep'15
-			
-			manager.addStrategyForDefaultSubpopulation(strategy2, 0.80);
+
+			manager.addStrategy( strategy2, null, 0.80 );
 
 			// reduce the replanning probabilities over the iterations
-			manager.addChangeRequestForDefaultSubpopulation(50, strategy2, 0.30);
-			manager.addChangeRequestForDefaultSubpopulation(75, strategy2, 0.10);
-			manager.addChangeRequestForDefaultSubpopulation(95, strategy2, 0.00);
+			manager.addChangeRequest( 50, strategy2, null, 0.30 );
+			manager.addChangeRequest( 75, strategy2, null, 0.10 );
+			manager.addChangeRequest( 95, strategy2, null, 0.00 );
 
 			return manager;
 		}
@@ -373,14 +382,14 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 					assertEquals(54, this.la.maxCarsOnLink);
 					assertEquals(19563.0, this.la.maxCarsOnLinkTime, 0.0);
 					System.out.println("all checks passed!");
-					
+
 					// The results changed after Michał's change of the QueueWithBuffer slow capacity update.  See 4dda004a8db98d9a2e757b1896cd3250d4e84ba5 .
 					// The old results were (only where we had changes):
 //					assertEquals(18710.0, this.la.firstCarEnter, 0.0);
 //					assertEquals(18890.0, this.la.firstCarLeave, 0.0);
 //					assertEquals(59, this.la.maxCarsOnLink);
 //					assertEquals(19589.0, this.la.maxCarsOnLinkTime, 0.0);
-					
+
 				} else if (beta_travel == -66.0) {
 					System.out.println("checking results for case `beta_travel = -66'...");
 					System.out.println("firstCarEnter=" + this.la.firstCarEnter + "; lastCarEnter=" + this.la.lastCarEnter + "; firstCarLeave=" + this.la.firstCarLeave +

@@ -22,7 +22,8 @@ package org.matsim.contrib.minibus;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.fare.StageContainer;
@@ -43,7 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public final class RunConfigurableMinibusExample {
 
-	private final static Logger log = Logger.getLogger(RunConfigurableMinibusExample.class);
+	private final static Logger log = LogManager.getLogger(RunConfigurableMinibusExample.class);
 
 	public static void main(final String[] args) {
 

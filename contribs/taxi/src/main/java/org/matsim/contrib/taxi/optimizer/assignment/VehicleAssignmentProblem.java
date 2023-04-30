@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.util.StraightLineKnnFinder;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -33,14 +34,10 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-import org.matsim.contrib.common.util.StraightLineKnnFinder;
+import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.common.collect.Lists;
-
-import org.matsim.core.router.speedy.SpeedyGraph;
 
 /**
  * @author michalm
@@ -74,7 +71,8 @@ public class VehicleAssignmentProblem<D> {
 
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 		nodeMap.putAll(network.getNodes());
-		pathSearch = OneToManyPathSearch.createSearch(new SpeedyGraph(network), nodeMap, travelTime, travelDisutility, false);
+		pathSearch = OneToManyPathSearch.createSearch(new SpeedyGraph(network), nodeMap, travelTime, travelDisutility,
+				false);
 
 		// TODO this kNN is slow
 		destinationFinder = nearestDestinationLimit < 0 ?
@@ -107,18 +105,9 @@ public class VehicleAssignmentProblem<D> {
 
 		if (dData.getSize() > vData.getSize()) {
 			calcPathsForVehicles(pathDataMatrix);
-			// calcPathsForVehiclesCount++;
 		} else {
 			calcPathsForDestinations(pathDataMatrix);
-			// calcPathsForDestinationsCount++;
 		}
-
-		// if ( (calcPathsForDestinationsCount + calcPathsForVehiclesCount) % 100 == 0) {
-		// System.err.println("PathsForDestinations = " + calcPathsForDestinationsCount
-		// + " PathsForVehicles = " + calcPathsForVehiclesCount);
-		// System.err.println("dests = " + dData.getSize() + " vehs = " + vData.getSize()
-		// + " idleVehs = " + vData.getIdleCount());
-		// }
 
 		return pathDataMatrix;
 	}
@@ -130,7 +119,7 @@ public class VehicleAssignmentProblem<D> {
 			List<DestEntry<D>> filteredDests = destinationFinder == null ?
 					dData.getEntries() :
 					destinationFinder.findNearest(departure, dData.getEntries().stream());
-			List<Link> toLinks = Lists.transform(filteredDests, dest -> dest.link);
+			List<Link> toLinks = filteredDests.stream().map(dest -> dest.link).toList();
 			PathData[] paths = pathSearch.calcPathDataArray(departure.link, toLinks, departure.time, true);
 
 			for (int i = 0; i < filteredDests.size(); i++) {
@@ -148,7 +137,7 @@ public class VehicleAssignmentProblem<D> {
 			List<VehicleData.Entry> filteredVehs = vehicleFinder == null ?
 					vData.getEntries() :
 					vehicleFinder.findNearest(dest, vData.getEntries().stream());
-			List<Link> toLinks = Lists.transform(filteredVehs, veh -> veh.link);
+			List<Link> toLinks = filteredVehs.stream().map(veh -> veh.link).toList();
 			PathData[] paths = pathSearch.calcPathDataArray(dest.link, toLinks, dest.time, false);
 
 			for (int i = 0; i < filteredVehs.size(); i++) {

@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.bicycle;
 
+import org.matsim.api.core.v01.network.Link;
+
 /**
  * Enumeration of frequently used labels related to bicycles.
  *
@@ -37,5 +39,16 @@ public final class BicycleUtils {
 
 	private BicycleUtils() {
 		// Don't allow to create instances of this class
+	}
+	public static String getCyclewaytype( Link link ){
+		return (String) link.getAttributes().getAttribute( CYCLEWAY );
+	}
+
+	public static String getSurface( Link link ){
+		return (String) link.getAttributes().getAttribute( SURFACE );
+	}
+
+	public static String getUserDefinedNetworkAttribute( Link link, String nameOfUserDefinedNetworkAttribute ) {
+		return (String) link.getAttributes().getAttribute( nameOfUserDefinedNetworkAttribute );
 	}
 }

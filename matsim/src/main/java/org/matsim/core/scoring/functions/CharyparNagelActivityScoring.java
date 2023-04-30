@@ -20,7 +20,8 @@
 
 package org.matsim.core.scoring.functions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.misc.OptionalTime;
 
@@ -44,7 +45,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 	private Activity firstActivity;
 
-	private static final Logger log = Logger.getLogger(CharyparNagelActivityScoring.class);
+	private static final Logger log = LogManager.getLogger(CharyparNagelActivityScoring.class);
 
 	public CharyparNagelActivityScoring(final ScoringParameters params) {
 		this(params, new ActivityTypeOpeningIntervalCalculator(params));

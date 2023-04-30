@@ -31,7 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -61,7 +62,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  */
 public class AdvancedMarginalCongestionPricingHandler implements CongestionEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private final static Logger log = Logger.getLogger(AdvancedMarginalCongestionPricingHandler.class);
+	private final static Logger log = LogManager.getLogger(AdvancedMarginalCongestionPricingHandler.class);
 
 	private static int incompletedPlanWarning = 0;
 	

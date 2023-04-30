@@ -25,13 +25,16 @@ import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class ChargingActivity implements DynActivity {
+	/**
+	 * String constant should have different value from {@link org.matsim.contrib.ev.charging.VehicleChargingHandler#CHARGING_INTERACTION}.
+	 */
 	public static final String ACTIVITY_TYPE = "Charging";
 
 	private final ChargingTask chargingTask;
 	private double endTime = END_ACTIVITY_LATER;
 
 	private enum State {
-		init, queued, plugged, unplugged
+		init, added, queued, plugged, unplugged
 	}
 
 	private State state = State.init;
@@ -48,19 +51,12 @@ public class ChargingActivity implements DynActivity {
 	@Override
 	public void doSimStep(double now) {
 		switch (state) {
-			case init:
-				initialize(now);
-				return;
-
-			case queued:
-			case plugged:
+			case init -> initialize(now);
+			case added, queued, plugged -> {
 				if (endTime <= now) {
 					endTime = now + 1;
 				}
-				return;
-
-			default:
-				return;
+			}
 		}
 	}
 
@@ -69,6 +65,7 @@ public class ChargingActivity implements DynActivity {
 		ElectricVehicle ev = chargingTask.getElectricVehicle();
 		logic.unassignVehicle(ev);
 		logic.addVehicle(ev, new DvrpChargingListener(this), now);
+		state = State.added;
 	}
 
 	@Override

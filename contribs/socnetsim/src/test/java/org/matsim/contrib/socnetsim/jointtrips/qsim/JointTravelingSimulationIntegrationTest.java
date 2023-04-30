@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.qsim;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,7 +77,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class JointTravelingSimulationIntegrationTest {
 	private static final Logger log =
-		Logger.getLogger(JointTravelingSimulationIntegrationTest.class);
+		LogManager.getLogger(JointTravelingSimulationIntegrationTest.class);
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -91,14 +92,6 @@ public class JointTravelingSimulationIntegrationTest {
 	// helps to understand test failures, but makes the test more expensive.
 	// => to set to true when fixing tests only
 	private static final boolean DUMP_EVENTS = false;
-
-	static {
-		Logger.getLogger( "org.matsim" ).setLevel( Level.WARN );
-		Logger.getLogger( EventsManagerImpl.class ).setLevel( Level.WARN );
-		Logger.getLogger( Gbl.class ).setLevel( Level.WARN );
-
-		log.setLevel( Level.WARN );
-	}
 
 	private static final int N_RANDOM_SCENARIOS = 20;
 	private static final int N_LAPS = 5;
@@ -186,7 +179,6 @@ public class JointTravelingSimulationIntegrationTest {
 
 		// To make the output more readable (otherwise, warning that driver mode
 		// is added as a main mode is logged each time)
-		Logger.getLogger( JointQSimFactory.class ).setLevel( Level.ERROR );
 		for (int i=0; i < N_RANDOM_SCENARIOS; i++) {
 			log.info( "random test scenario "+i );
 			final Scenario sc =

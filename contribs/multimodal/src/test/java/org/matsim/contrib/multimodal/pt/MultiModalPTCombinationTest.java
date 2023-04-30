@@ -23,7 +23,8 @@ package org.matsim.contrib.multimodal.pt;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,7 +58,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class MultiModalPTCombinationTest {
 
-	private static final Logger log = Logger.getLogger(MultiModalPTCombinationTest.class);
+	private static final Logger log = LogManager.getLogger(MultiModalPTCombinationTest.class);
 	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -219,8 +220,8 @@ public class MultiModalPTCombinationTest {
 			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
 			Double modeTravelTime = this.travelTimesPerMode.get(mode);
 			if ( modeTravelTime==null ) {
-				Logger.getLogger(this.getClass()).warn("mode:" + mode );
-				Logger.getLogger(this.getClass()).warn("travelTimesPerMode:" + mode );
+				LogManager.getLogger(this.getClass()).warn("mode:" + mode );
+				LogManager.getLogger(this.getClass()).warn("travelTimesPerMode:" + mode );
 			}
 			this.travelTimesPerMode.put(mode, modeTravelTime + tripTravelTime);
 		}

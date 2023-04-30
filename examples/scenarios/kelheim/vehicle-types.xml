@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+    <vehicleType id="car">
+        <length meter="7.5"/>
+        <width meter="1.0"/>
+        <accessTime secondsPerPerson="1.0"/>
+        <egressTime secondsPerPerson="1.0"/>
+        <doorOperation mode="serial"/>
+        <passengerCarEquivalents pce="1.0"/>
+    </vehicleType>
+    <vehicleType id="ride">
+        <length meter="7.5"/>
+        <width meter="1.0"/>
+        <accessTime secondsPerPerson="1.0"/>
+        <egressTime secondsPerPerson="1.0"/>
+        <doorOperation mode="serial"/>
+        <passengerCarEquivalents pce="1.0"/>
+    </vehicleType>
+    <vehicleType id="freight">
+        <length meter="15.0"/>
+        <width meter="1.0"/>
+        <accessTime secondsPerPerson="1.0"/>
+        <egressTime secondsPerPerson="1.0"/>
+        <doorOperation mode="serial"/>
+        <passengerCarEquivalents pce="3.5"/>
+    </vehicleType>
+</vehicleDefinitions>

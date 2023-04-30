@@ -1,6 +1,7 @@
 package org.matsim.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -9,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MemoryObserver {
 
-	private final static Logger LOG = Logger.getLogger(MemoryObserver.class);
+	private final static Logger LOG = LogManager.getLogger(MemoryObserver.class);
 
 	private static Thread thread = null;
 	private static MemoryPrinter runnable = null;

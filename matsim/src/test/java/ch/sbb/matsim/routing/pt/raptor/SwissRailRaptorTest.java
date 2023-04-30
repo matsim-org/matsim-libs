@@ -44,9 +44,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,8 +97,8 @@ public class SwissRailRaptorTest {
         }
         double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestCase.EPSILON);
-        assertEquals(15434, Math.ceil(distance), MatsimTestCase.EPSILON);
+        assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestUtils.EPSILON);
+        assertEquals(15434, Math.ceil(distance), MatsimTestUtils.EPSILON);
     }
 
     @Test
@@ -131,7 +130,7 @@ public class SwissRailRaptorTest {
         }
         double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestCase.EPSILON);
+        assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestUtils.EPSILON);
     }
 
     @Test
@@ -163,7 +162,7 @@ public class SwissRailRaptorTest {
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(16100, 5050);
         double depTime = 5.0 * 3600;
-        List<? extends PlanElement> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+        List<? extends PlanElement> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
         assertEquals(3, legs.size());
         assertEquals(TransportMode.walk, ((Leg)legs.get(0)).getMode());
         assertEquals(TransportMode.pt, ((Leg)legs.get(1)).getMode());
@@ -178,8 +177,8 @@ public class SwissRailRaptorTest {
 
     /**
      * The fromFacility and toFacility are both closest to TransitStopFacility I. The expectation is that the Swiss Rail
-     * Raptor will return null (TripRouter / FallbackRouter will create a transit_walk between the fromFacility and 
-     * toFacility) instead of routing the agent to make a major detour by walking the triangle from the fromFacility to 
+     * Raptor will return null (TripRouter / FallbackRouter will create a transit_walk between the fromFacility and
+     * toFacility) instead of routing the agent to make a major detour by walking the triangle from the fromFacility to
      * the transitStopFacility and then to the toFacility, without once using pt.
      */
 
@@ -191,7 +190,7 @@ public class SwissRailRaptorTest {
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(4100, 5050);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null));
-        
+
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
@@ -208,15 +207,15 @@ public class SwissRailRaptorTest {
         Coord fromCoord = new Coord(4000, 3000);
         Coord toCoord = new Coord(8000, 3000);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null));
-        
+
         assertEquals(1, legs.size());
         assertEquals(TransportMode.walk, ((Leg)legs.get(0)).getMode());
         assertEquals(4000*1.3, ((Leg)legs.get(0)).getRoute().getDistance(), 0.0);
 		double actualTravelTime = ((Leg)legs.get(0)).getTravelTime().seconds();
         double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
+        assertEquals(expectedTravelTime, actualTravelTime, MatsimTestUtils.EPSILON);
     }
-    
+
     @Test
     public void testDirectWalkFactor() {
         Fixture f = new Fixture();
@@ -227,7 +226,7 @@ public class SwissRailRaptorTest {
         Coord fromCoord = new Coord(4000, 3000);
         Coord toCoord = new Coord(8000, 3000);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null));
-        
+
         assertEquals(3, legs.size());
         assertEquals(TransportMode.walk, ((Leg)legs.get(0)).getMode());
         assertEquals(TransportMode.pt, ((Leg)legs.get(1)).getMode());
@@ -240,7 +239,7 @@ public class SwissRailRaptorTest {
 
         double expectedPtTravelTime = 6.0*3600 + 6.0*60 - (5.0*3600 + expectedAccessWalkTravelTime) + 7*60; // next departure blue line is at 6.0*3600 + 6.0*60, 7*60 travel time
 		assertEquals(expectedPtTravelTime, ((Leg)legs.get(1)).getTravelTime().seconds(), 1.0);
-        
+
         Coord ptStop2 = f.schedule.getFacilities().get(Id.create("2", TransitStopFacility.class)).getCoord();
         double expectedEgressWalkTravelTime = CoordUtils.calcEuclideanDistance(ptStop2, toCoord) / raptorParams.getBeelineWalkSpeed();
 		assertEquals(expectedEgressWalkTravelTime, ((Leg)legs.get(2)).getTravelTime().seconds(), 1.0);
@@ -264,7 +263,7 @@ public class SwissRailRaptorTest {
 				actualTravelTime += ((Leg)leg).getTravelTime().seconds();
             }
             double waitingTime = ((46 - min) % 20) * 60; // departures at *:06 and *:26 and *:46
-            assertEquals("expected different waiting time at 05:"+min, waitingTime, actualTravelTime - inVehicleTime, MatsimTestCase.EPSILON);
+            assertEquals("expected different waiting time at 05:"+min, waitingTime, actualTravelTime - inVehicleTime, MatsimTestUtils.EPSILON);
         }
     }
 
@@ -302,7 +301,7 @@ public class SwissRailRaptorTest {
         }
         double expectedTravelTime = 31.0 * 60 + // agent takes the *:06 course, arriving in C at *:18, departing at *:21, arriving in K at*:31
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestCase.EPSILON);
+        assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestUtils.EPSILON);
     }
 
     @Test
@@ -343,7 +342,7 @@ public class SwissRailRaptorTest {
         }
         double expectedTravelTime = 29.0 * 60 + // agent takes the *:46 course, arriving in C at *:58, departing at *:00, arriving in G at*:09
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("12", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestCase.EPSILON);
+        assertEquals(Math.ceil(expectedTravelTime), actualTravelTime, MatsimTestUtils.EPSILON);
     }
 
 
@@ -433,7 +432,7 @@ public class SwissRailRaptorTest {
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(16100, 5050);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 25.0*3600, null));
-        
+
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
@@ -475,8 +474,8 @@ public class SwissRailRaptorTest {
 
     /**
      * Tests that if only exactly two transfer-/walk-link are found, the router correctly only returns
-     * null (which will be replaced by the TripRouter and FallbackRouter with one walk leg from start 
-     * to end). Differs from {@link #testSingleWalkOnly()} in that it tests for the correct internal 
+     * null (which will be replaced by the TripRouter and FallbackRouter with one walk leg from start
+     * to end). Differs from {@link #testSingleWalkOnly()} in that it tests for the correct internal
      * working when more than one walk links are returned.
      */
     @Test
@@ -487,7 +486,7 @@ public class SwissRailRaptorTest {
 
         TransitRouter router = createTransitRouter(f.schedule, f.scenario.getConfig(), f.scenario.getNetwork());
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(f.coord2), new FakeFacility(f.coord6), 990, null));
-        
+
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
@@ -684,7 +683,7 @@ public class SwissRailRaptorTest {
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(28100, 4950);
         double depTime = 5.0 * 3600 + 50 * 60;
-        List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 600, depTime, depTime + 3600, null, new Attributes());
+        List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 600, depTime, depTime + 3600, null, new AttributesImpl());
 
         for (int i = 0; i < routes.size(); i++) {
             RaptorRoute route = routes.get(i);
@@ -750,7 +749,7 @@ public class SwissRailRaptorTest {
             Coord fromCoord = new Coord(0, 100);
             Coord toCoord = new Coord(20000, 100);
             double depTime = 6.0 * 3600;
-            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
@@ -770,7 +769,7 @@ public class SwissRailRaptorTest {
             Coord fromCoord = new Coord(0, 100);
             Coord toCoord = new Coord(20000, 100);
             double depTime = 6.0 * 3600;
-            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
@@ -790,7 +789,7 @@ public class SwissRailRaptorTest {
             Coord fromCoord = new Coord(0, 100);
             Coord toCoord = new Coord(20000, 100);
             double depTime = 6.0 * 3600;
-            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
@@ -810,7 +809,7 @@ public class SwissRailRaptorTest {
             Coord fromCoord = new Coord(0, 100);
             Coord toCoord = new Coord(40000, 100);
             double depTime = 6.0 * 3600;
-            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new Attributes());
+            List<RaptorRoute> routes = raptor.calcRoutes(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null, new AttributesImpl());
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
@@ -1009,7 +1008,7 @@ public class SwissRailRaptorTest {
 
     /**
      * Tests what happens if there is a transit service available, but the agent's departure time (11 AM) is after the last transit
-     * departure time (9:46 AM). The expectation is that the router returns null and TripRouter/FallbackRouter will create a direct 
+     * departure time (9:46 AM). The expectation is that the router returns null and TripRouter/FallbackRouter will create a direct
      * walk leg to get from the fromFacility to the toFacility.
      */
     @Test

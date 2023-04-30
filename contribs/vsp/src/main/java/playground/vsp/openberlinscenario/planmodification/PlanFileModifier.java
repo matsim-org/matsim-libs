@@ -20,7 +20,8 @@ package playground.vsp.openberlinscenario.planmodification;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -47,7 +48,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  * configurable parameters. Then writes new plans file to a given location.
  */
 public class PlanFileModifier {
-	private final static Logger LOG = Logger.getLogger(PlanFileModifier.class);
+	private final static Logger LOG = LogManager.getLogger(PlanFileModifier.class);
 	
 	private String inputPlansFile;
 	private String outputPlansFile;

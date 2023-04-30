@@ -29,7 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -52,7 +53,7 @@ import org.matsim.core.utils.io.IOUtils;
 final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	IterationEndsListener, ShutdownListener {
 
-	final static private Logger log = Logger.getLogger(EventsHandlingImpl.class);
+	final static private Logger log = LogManager.getLogger(EventsHandlingImpl.class);
 	
 	private final EventsManager eventsManager;
 	private List<EventWriter> eventWriters = new LinkedList<>();

@@ -30,6 +30,7 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [freight](freight/README.md) | Package that plugs freight algorithms
 | [hybridsim](hybridsim/README.md) |
 | integration |
+| [informed-mode-choice](informed-mode-choice/README.md)                   | Mode choice algorithms based on trip utility estimation
 | [locationchoice](locationchoice/README.md) | Location choice for discretionary activities
 | [matrixbasedptrouter](matrixbasedptrouter/README.md) | Calculate PT travel times using a set of stops and a pre-calculated travel time 
 | [minibus](minibus/README.md) | Runs an adaptive "minibus" model to serve given demand

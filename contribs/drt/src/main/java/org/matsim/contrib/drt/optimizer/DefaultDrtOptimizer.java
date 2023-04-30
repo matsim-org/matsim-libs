@@ -22,12 +22,12 @@ package org.matsim.contrib.drt.optimizer;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -47,7 +47,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
  * @author michalm
  */
 public class DefaultDrtOptimizer implements DrtOptimizer {
-	private static final Logger log = Logger.getLogger(DefaultDrtOptimizer.class);
+	private static final Logger log = LogManager.getLogger(DefaultDrtOptimizer.class);
 
 	private final DrtConfigGroup drtCfg;
 	private final Integer rebalancingInterval;
@@ -64,9 +64,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final RequestQueue<DrtRequest> unplannedRequests;
 
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
-			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
-			ScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
-			UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
+			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry, ScheduleTimingUpdater scheduleTimingUpdater,
+			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -78,37 +77,39 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.requestInserter = requestInserter;
 		this.insertionRetryQueue = insertionRetryQueue;
 
-		rebalancingInterval = drtCfg.getRebalancingParams().map(RebalancingParams::getInterval).orElse(null);
-		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
-				drtCfg.getAdvanceRequestPlanningHorizon());
+		rebalancingInterval = drtCfg.getRebalancingParams().map(rebalancingParams -> rebalancingParams.interval).orElse(null);
+		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(drtCfg.advanceRequestPlanningHorizon);
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		unplannedRequests.updateQueuesOnNextTimeSteps(e.getSimulationTime());
 
-		if (!unplannedRequests.getSchedulableRequests().isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(
-				e.getSimulationTime())) {
+		boolean scheduleTimingUpdated = false;
+		if (!unplannedRequests.getSchedulableRequests().isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(e.getSimulationTime())) {
 			for (DvrpVehicle v : fleet.getVehicles().values()) {
 				scheduleTimingUpdater.updateTimings(v);
 			}
+			scheduleTimingUpdated = true;
 
 			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
 		}
 
 		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
+			if (!scheduleTimingUpdated) {
+				for (DvrpVehicle v : fleet.getVehicles().values()) {
+					scheduleTimingUpdater.updateTimings(v);
+				}
+			}
+
 			rebalanceFleet();
 		}
 	}
 
 	private void rebalanceFleet() {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
-		Stream<? extends DvrpVehicle> rebalancableVehicles = fleet.getVehicles()
-				.values()
-				.stream()
-				.filter(scheduleInquiry::isIdle);
-		List<Relocation> relocations = rebalancingStrategy.calcRelocations(rebalancableVehicles,
-				mobsimTimer.getTimeOfDay());
+		Stream<? extends DvrpVehicle> rebalancableVehicles = fleet.getVehicles().values().stream().filter(scheduleInquiry::isIdle);
+		List<Relocation> relocations = rebalancingStrategy.calcRelocations(rebalancableVehicles, mobsimTimer.getTimeOfDay());
 
 		if (!relocations.isEmpty()) {
 			log.debug("Fleet rebalancing: #relocations=" + relocations.size());
@@ -133,7 +134,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		vehicle.getSchedule().nextTask();
 
 		// if STOP->STAY then choose the best depot
-		if (drtCfg.getIdleVehiclesReturnToDepots() && Depots.isSwitchingFromStopToStay(vehicle)) {
+		if (drtCfg.idleVehiclesReturnToDepots && Depots.isSwitchingFromStopToStay(vehicle)) {
 			Link depotLink = depotFinder.findDepot(vehicle);
 			if (depotLink != null) {
 				relocator.relocateVehicle(vehicle, depotLink);

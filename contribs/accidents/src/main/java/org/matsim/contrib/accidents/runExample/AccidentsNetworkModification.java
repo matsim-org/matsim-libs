@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -51,7 +52,7 @@ import org.opengis.feature.simple.SimpleFeature;
 */
 
 public class AccidentsNetworkModification {
-	private static final Logger log = Logger.getLogger(AccidentsNetworkModification.class);
+	private static final Logger log = LogManager.getLogger(AccidentsNetworkModification.class);
 
 	private final Scenario scenario;
 

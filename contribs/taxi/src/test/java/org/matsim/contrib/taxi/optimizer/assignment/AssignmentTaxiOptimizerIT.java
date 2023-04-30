@@ -19,11 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
+import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
-import java.util.List;
-
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
@@ -34,69 +31,50 @@ public class AssignmentTaxiOptimizerIT {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment_arrivalTime() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
-
-		params.setMode(Mode.ARRIVAL_TIME);
-		params.setVehPlanningHorizonOversupply(99999);
-		params.setVehPlanningHorizonUndersupply(99999);
-		params.setNearestRequestsLimit(99999);
-		params.setNearestVehiclesLimit(99999);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
+		params.mode = Mode.ARRIVAL_TIME;
+		params.vehPlanningHorizonOversupply = 99999;
+		params.vehPlanningHorizonUndersupply = 99999;
+		params.nearestRequestsLimit = 99999;
+		params.nearestVehiclesLimit = 99999;
+		runBenchmark(true, params, utils);
 	}
 
 	@Test
-	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment_pickupTime() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
-
-		params.setMode(Mode.PICKUP_TIME);
-		params.setVehPlanningHorizonOversupply(120);
-		params.setVehPlanningHorizonUndersupply(30);
-		params.setNearestRequestsLimit(10);
-		params.setNearestVehiclesLimit(10);
-		params.setReoptimizationTimeStep(10);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
+		params.mode = Mode.PICKUP_TIME;
+		params.vehPlanningHorizonOversupply = 120;
+		params.vehPlanningHorizonUndersupply = 30;
+		params.nearestRequestsLimit = 10;
+		params.nearestVehiclesLimit = 10;
+		params.reoptimizationTimeStep = 10;
+		runBenchmark(true, params, utils);
 	}
 
 	@Test
-	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment_dse() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
-
-		params.setVehPlanningHorizonOversupply(120);
-		params.setVehPlanningHorizonUndersupply(30);
-		params.setNearestRequestsLimit(10);
-		params.setNearestVehiclesLimit(10);
-		params.setReoptimizationTimeStep(10);
-
-		params.setMode(Mode.DSE);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
-
+		params.mode = Mode.DSE;
+		params.vehPlanningHorizonOversupply = 120;
+		params.vehPlanningHorizonUndersupply = 30;
+		params.nearestRequestsLimit = 10;
+		params.nearestVehiclesLimit = 10;
+		params.reoptimizationTimeStep = 10;
+		runBenchmark(true, params, utils);
 	}
 
 	@Test
-	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment_totalWaitTime() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
-
-		params.setVehPlanningHorizonOversupply(120);
-		params.setVehPlanningHorizonUndersupply(30);
-		params.setNearestRequestsLimit(10);
-		params.setNearestVehiclesLimit(10);
-		params.setReoptimizationTimeStep(10);
-
-		params.setMode(Mode.TOTAL_WAIT_TIME);
-		params.setNullPathCost(300);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
+		params.mode = Mode.TOTAL_WAIT_TIME;
+		params.vehPlanningHorizonOversupply = 120;
+		params.vehPlanningHorizonUndersupply = 30;
+		params.nearestRequestsLimit = 10;
+		params.nearestVehiclesLimit = 10;
+		params.reoptimizationTimeStep = 10;
+		params.nullPathCost = 300;
+		runBenchmark(true, params, utils);
 	}
 }

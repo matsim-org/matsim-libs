@@ -23,7 +23,8 @@ package org.matsim.contrib.emissions;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -64,7 +65,7 @@ import org.matsim.vehicles.VehicleType;
  * @author benjamin
  */
 final class ColdEmissionAnalysisModule {
-	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
+	private static final Logger logger = LogManager.getLogger(ColdEmissionAnalysisModule.class);
 
 	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
@@ -96,10 +97,12 @@ final class ColdEmissionAnalysisModule {
 		this.eventsManager = eventsManager;
 	}
 
+	/**
+	 *  yy I do not know what the "W" in the method name means.  Normally, it means "With".  But that does not make sense here.  kai, dec'22
+	 */
 	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWColdEmissions(
 			VehicleType vehicleType, Id<Vehicle> vehicleId, Id<Link> coldEmissionEventLinkId,
 			double eventTime, double parkingDuration, int distance_km) {
-
 		{
 			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
 			// (this will, importantly, repair the hbefa description in the vehicle type. kai/kai, jan'20)
@@ -149,8 +152,8 @@ final class ColdEmissionAnalysisModule {
 		HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 		key.setVehicleCategory(vehicleInformationTuple.getFirst());
 
-		//HBEFA 3 provide cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
-		//HBEFA 4.1 provide cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
+		//HBEFA 3 provides cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
+		//HBEFA 4.1 provides cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
 		//see https://www.hbefa.net/e/documents/HBEFA41_Development_Report.pdf (WP 4 , page 23)  kturner, may'20
 		//Mapping everything except "motorcycle" to "pass.car", since this was done in the last years for HGV.
 		//This may can be improved: What should be better set to LGV or zero???? kturner, may'20

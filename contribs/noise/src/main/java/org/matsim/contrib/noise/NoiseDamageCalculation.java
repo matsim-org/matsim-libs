@@ -2,7 +2,8 @@ package org.matsim.contrib.noise;
 
 import com.google.inject.Inject;
 import gnu.trove.map.TObjectDoubleMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -14,7 +15,7 @@ import java.util.*;
 
 public class NoiseDamageCalculation {
 
-    private final static Logger log = Logger.getLogger(NoiseDamageCalculation.class);
+    private final static Logger log = LogManager.getLogger(NoiseDamageCalculation.class);
 
     private enum DayTime {NIGHT, DAY, EVENING}
 

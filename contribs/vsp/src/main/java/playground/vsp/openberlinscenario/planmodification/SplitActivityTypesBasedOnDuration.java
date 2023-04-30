@@ -22,7 +22,8 @@ package playground.vsp.openberlinscenario.planmodification;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,7 +39,7 @@ import playground.vsp.openberlinscenario.cemdap.output.ActivityTypes;
 * @author ikaddoura
 */
 public class SplitActivityTypesBasedOnDuration {
-	private final Logger log = Logger.getLogger(SplitActivityTypesBasedOnDuration.class);
+	private final Logger log = LogManager.getLogger(SplitActivityTypesBasedOnDuration.class);
 
 	private Scenario scenario;
 	

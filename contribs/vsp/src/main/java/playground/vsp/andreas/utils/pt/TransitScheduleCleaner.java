@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -20,7 +21,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class TransitScheduleCleaner {
 	
-	private static final Logger log = Logger.getLogger(TransitScheduleCleaner.class);
+	private static final Logger log = LogManager.getLogger(TransitScheduleCleaner.class);
 	
 	public static TransitSchedule removeRoutesWithoutDepartures(TransitSchedule transitSchedule){
 		

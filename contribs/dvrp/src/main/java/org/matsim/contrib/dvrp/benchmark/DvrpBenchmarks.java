@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class DvrpBenchmarks {
 	public static void adjustConfig(Config config) {
-		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of());// to switch off network filtering
+		DvrpConfigGroup.get(config).networkModes = ImmutableSet.of();// to switch off network filtering
 		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
 	}
 

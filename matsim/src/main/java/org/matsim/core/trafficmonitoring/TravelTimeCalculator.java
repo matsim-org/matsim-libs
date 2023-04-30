@@ -20,7 +20,8 @@
 package org.matsim.core.trafficmonitoring;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -72,7 +73,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler,
 									     VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, VehicleArrivesAtFacilityEventHandler,
 									     VehicleAbortsEventHandler {
-	private static final Logger log = Logger.getLogger(TravelTimeCalculator.class);
+	private static final Logger log = LogManager.getLogger(TravelTimeCalculator.class);
 
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
 											     "agent is not known the turning move travel time cannot be calculated!";

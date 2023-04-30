@@ -159,7 +159,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 	@Test
 	public void testSingleTourPlansNonOverlaping() {
-		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
 
@@ -191,7 +191,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 	@Test
 	public void testSingleTourPlansZeroDurationAct() {
-		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
 
@@ -223,7 +223,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 	@Test
 	public void testSingleTourPlansZeroDurationBegin() {
-		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
 
@@ -255,7 +255,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 	@Test
 	public void testSingleTourPlansZeroDurationEnd() {
-		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
 
@@ -287,7 +287,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 	@Test
 	public void testDoubleTourPlansZeroDurationEnd() {
-		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
 		final Id<ActivityFacility> wrongFacility = Id.create( "fac2" , ActivityFacility.class );
@@ -324,7 +324,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 	@Test
 	public void testSingleTourPlansInconsistentDurationAct() {
-		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		//LogManager.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
 

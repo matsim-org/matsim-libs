@@ -23,32 +23,63 @@
  */
 package org.matsim.contrib.drt.analysis;
 
-import com.google.common.collect.ImmutableSet;
+import java.awt.Color;
+import java.awt.Paint;
+import java.util.Comparator;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfiles;
-import org.matsim.contrib.drt.util.stats.DrtVehicleTaskProfiles;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.util.stats.ProfileWriter;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileWriter;
+import org.matsim.contrib.util.stats.VehicleOccupancyProfileView;
 import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
+import org.matsim.contrib.util.stats.VehicleTaskProfileView;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
 public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
-	private ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(DrtDriveTask.TYPE,
-			DefaultDrtStopTask.TYPE);
+	private ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE);
+
+	private static final Comparator<Task.TaskType> taskTypeComparator = Comparator.comparing(type -> {
+		//we want the following order on the plot: STAY, RELOCATE, other
+		if (type.equals(DrtStayTask.TYPE)) {
+			return "B";
+		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)) {
+			return "A";
+		} else {
+			return "C" + type.name();
+		}
+	});
+
+	private static final Comparator<Task.TaskType> nonPassengerTaskTypeComparator = Comparator.comparing(type -> {
+		//we want the following order on the plot: STAY, RELOCATE, other
+		if (type.equals(DrtStayTask.TYPE)) {
+			return "C";
+		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)) {
+			return "B";
+		} else {
+			return "A" + type.name();
+		}
+	});
+
+	private static final Map<Task.TaskType, Paint> taskTypePaints = ImmutableMap.of(DrtStayTask.TYPE, Color.LIGHT_GRAY);
 
 	public DrtModeAnalysisModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
@@ -63,28 +94,31 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		bindModal(ExecutedScheduleCollector.class).toProvider(
-				modalProvider(getter -> new ExecutedScheduleCollector(getMode()))).asEagerSingleton();
+		bindModal(ExecutedScheduleCollector.class).toProvider(modalProvider(getter -> new ExecutedScheduleCollector(getMode()))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(ExecutedScheduleCollector.class));
 
-		bindModal(DrtVehicleDistanceStats.class).toProvider(modalProvider(
-				getter -> new DrtVehicleDistanceStats(getter.get(Network.class), drtCfg,
-						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+		bindModal(DrtVehicleDistanceStats.class).toProvider(
+						modalProvider(getter -> new DrtVehicleDistanceStats(getter.get(Network.class), drtCfg, getter.getModal(FleetSpecification.class))))
+				.asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtVehicleDistanceStats.class));
 
-		bindModal(DrtEventSequenceCollector.class).toProvider(
-				modalProvider(getter -> new DrtEventSequenceCollector(drtCfg.getMode()))).asEagerSingleton();
+		bindModal(DrtEventSequenceCollector.class).toProvider(modalProvider(getter -> new DrtEventSequenceCollector(drtCfg.getMode())))
+				.asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtEventSequenceCollector.class));
 
 		bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
-				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
-						300, getter.get(QSimConfigGroup.class), passengerServingTaskTypes))).asEagerSingleton();
+				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class), 300,
+						getter.get(QSimConfigGroup.class), passengerServingTaskTypes))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 		addControlerListenerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> DrtVehicleOccupancyProfiles.createProfileWriter(getter.get(MatsimServices.class),
-						drtCfg.getMode(), getter.getModal(VehicleOccupancyProfileCalculator.class))));
+		addControlerListenerBinding().toProvider(modalProvider(getter -> {
+			MatsimServices matsimServices = getter.get(MatsimServices.class);
+			String mode = drtCfg.getMode();
+			var profileView = new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class),
+					nonPassengerTaskTypeComparator, taskTypePaints);
+			return new ProfileWriter(matsimServices, mode, profileView, "occupancy_time_profiles");
+		}));
 
 		bindModal(VehicleTaskProfileCalculator.class).toProvider(modalProvider(
 				getter -> new VehicleTaskProfileCalculator(getMode(), getter.getModal(FleetSpecification.class), 300,
@@ -92,15 +126,17 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		addEventHandlerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 		addControlerListenerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> DrtVehicleTaskProfiles.createProfileWriter(getter.get(MatsimServices.class),
-						drtCfg.getMode(), getter.getModal(VehicleTaskProfileCalculator.class))));
+		addControlerListenerBinding().toProvider(modalProvider(getter -> {
+			MatsimServices matsimServices = getter.get(MatsimServices.class);
+			String mode = drtCfg.getMode();
+			var profileView = new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator, taskTypePaints);
+			return new ProfileWriter(matsimServices, mode, profileView, "task_time_profiles");
+		}));
 
 		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,
-						getter.getModal(FleetSpecification.class), getter.getModal(DrtVehicleDistanceStats.class),
-						getter.get(MatsimServices.class), getter.get(Network.class),
-						getter.getModal(DrtEventSequenceCollector.class),
-						getter.getModal(VehicleOccupancyProfileCalculator.class)))).asEagerSingleton();
+						getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg, getter.getModal(FleetSpecification.class),
+								getter.getModal(DrtVehicleDistanceStats.class), getter.get(MatsimServices.class), getter.get(Network.class),
+								getter.getModal(DrtEventSequenceCollector.class), getter.getModal(VehicleOccupancyProfileCalculator.class))))
+				.asEagerSingleton();
 	}
 }

@@ -20,7 +20,8 @@
 
 package org.matsim.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -65,7 +66,7 @@ public class TravelDistanceStats {
 	private double[] legStatsHistory = null;
 	private double[] tripStatsHistory = null;
 
-	private final static Logger log = Logger.getLogger(TravelDistanceStats.class);
+	private final static Logger log = LogManager.getLogger(TravelDistanceStats.class);
 
 	@Inject
 	TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy controlerIO) {

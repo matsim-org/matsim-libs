@@ -19,7 +19,8 @@
 
 package playground.vsp.analysis.modules.ptTripAnalysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -31,7 +32,7 @@ import org.apache.log4j.Logger;
 public class PtTripAnalysisContainer {
 	
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(PtTripAnalysisContainer.class);
+	private static final Logger log = LogManager.getLogger(PtTripAnalysisContainer.class);
 	
 	public enum ZONES {
 		INSIDE_ZONE, LEAVING_ZONE, ENTERING_ZONE, OUTSIDE_ZONE

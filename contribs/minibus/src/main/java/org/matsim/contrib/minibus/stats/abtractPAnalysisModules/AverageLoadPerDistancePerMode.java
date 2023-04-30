@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats.abtractPAnalysisModules;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -30,7 +31,7 @@ import org.apache.log4j.Logger;
  */
 final class AverageLoadPerDistancePerMode extends AbstractPAnalyisModule {
 	
-	private final static Logger log = Logger.getLogger(AverageLoadPerDistancePerMode.class);
+	private final static Logger log = LogManager.getLogger(AverageLoadPerDistancePerMode.class);
 	
 	private final CountPassengerMeterPerMode countPassengerMeterPerMode;
 	private final CountCapacityMeterPerMode countCapacityMeterPerMode;

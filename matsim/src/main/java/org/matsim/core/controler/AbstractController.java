@@ -19,7 +19,8 @@
 
 package org.matsim.core.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -31,7 +32,7 @@ import org.matsim.utils.MemoryObserver;
     // we already had one case where a method of this was removed, causing downstream failures; better just not
 	// offer it at all; framework with injector should now be flexible enough.  kai, mar'18
 
-    private static final  Logger log = Logger.getLogger(AbstractController.class);
+    private static final  Logger log = LogManager.getLogger(AbstractController.class);
 
     private OutputDirectoryHierarchy controlerIO;
 

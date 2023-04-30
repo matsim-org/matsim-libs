@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.Event;
@@ -44,7 +45,7 @@ import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -67,7 +68,7 @@ public class VehicleOccupancyProfileCalculator
 		private double beginTime;
 	}
 
-	private final static Logger log = Logger.getLogger(VehicleOccupancyProfileCalculator.class);
+	private final static Logger log = LogManager.getLogger(VehicleOccupancyProfileCalculator.class);
 	private final TimeDiscretizer timeDiscretizer;
 
 	private Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
@@ -142,6 +143,23 @@ public class VehicleOccupancyProfileCalculator
 	public List<double[]> getVehicleOccupancyProfiles() {
 		this.consolidate();
 		return vehicleOccupancyProfiles;
+	}
+
+	public double[] getNumberOfVehiclesInServiceProfile() {
+		double[] numberOfVehiclesInServiceProfile = new double[timeDiscretizer.getIntervalCount()];
+		Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles = getNonPassengerServingTaskProfiles();
+		List<double[]> vehicleOccupancyProfiles = getVehicleOccupancyProfiles();
+		for (int i = 0; i < timeDiscretizer.getIntervalCount(); i++) {
+			double total = 0.0;
+			for (double[] profile : nonPassengerServingTaskProfiles.values()) {
+				total += profile[i];
+			}
+			for (double[] profile : vehicleOccupancyProfiles) {
+				total += profile[i];
+			}
+			numberOfVehiclesInServiceProfile[i] = total;
+		}
+		return numberOfVehiclesInServiceProfile;
 	}
 
 	public TimeDiscretizer getTimeDiscretizer() {

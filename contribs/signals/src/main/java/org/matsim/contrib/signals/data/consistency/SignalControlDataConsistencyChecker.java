@@ -21,7 +21,8 @@ package org.matsim.contrib.signals.data.consistency;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -40,7 +41,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
  */
 public final class SignalControlDataConsistencyChecker implements ConsistencyChecker {
 	
-	private static final Logger log = Logger.getLogger(SignalControlDataConsistencyChecker.class);
+	private static final Logger log = LogManager.getLogger(SignalControlDataConsistencyChecker.class);
 	
 	private SignalsData signalsData;
 

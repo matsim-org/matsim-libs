@@ -20,28 +20,36 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Tests if some graphs are created.
  * As types of graphs can be plugged in or removed no testing for the existence of particular graphs is done.
  */
-public class CountsHtmlAndGraphsWriterTest extends MatsimTestCase {
+public class CountsHtmlAndGraphsWriterTest {
 
-	public void testGraphCreation() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testGraphCreation() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 
 		CountsComparisonAlgorithm cca = fixture.getCCA();
 		cca.run();
 
-		CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(this.getOutputDirectory(), cca.getComparison(),1);
+		CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(utils.getOutputDirectory(), cca.getComparison(),1);
 		cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));
 		cgw.addGraphsCreator(new CountsErrorGraphCreator("Error Plots"));
 		cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("Load curve graph"));

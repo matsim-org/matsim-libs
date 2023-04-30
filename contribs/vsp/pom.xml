@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>15.0-SNAPSHOT</version>
+		<version>16.0-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -15,54 +15,59 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>multimodal</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>taxi</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>parking</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>freight</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>accessibility</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>emissions</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>minibus</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>common</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>informed-mode-choice</artifactId>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.processing</groupId>-->
@@ -82,22 +87,17 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.apache.commons</groupId>-->
-<!--			<artifactId>commons-math</artifactId>-->
-<!--			<version></version>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>noise</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>signals</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
@@ -135,12 +135,12 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>cadyts-integration</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.2</version>
+			<version>5.2.3</version>
 			<exclusions>
 				<!-- needed to compile in IntelliJ with Eclipse compiler -->
 				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
@@ -164,22 +164,34 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>drt</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
-			<version>18.0.1</version>
+			<version>20.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>graphhopper-core</artifactId>
-			<version>5.3</version>
+			<version>6.2</version>
+		</dependency>
+		<!-- Enforce version -->
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.12.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

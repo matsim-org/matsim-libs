@@ -21,9 +21,6 @@ package org.matsim.contrib.etaxi.run;
 
 import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
-import java.net.URL;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
@@ -39,7 +36,7 @@ import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
-import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
@@ -68,15 +65,15 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunETaxiBenchmark {
 	private static final double CHARGING_SPEED_FACTOR = 1.5; // > 1 in this example
-	private static final double MAX_RELATIVE_SOC = 0.8; // charge up to 80% SOC
+	private static final double MAX_SOC = 0.8; // charge up to 80% SOC
 	private static final double TEMPERATURE = 20; // oC
 
-	public static void run(URL configUrl, int runs) {
+	public static void run(String [] configUrl, int nIterations) {
 		Config config = ConfigUtils.loadConfig(configUrl,
 				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
 				new DvrpConfigGroup(), new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		createControler(config, runs).run();
+		createControler(config, nIterations).run();
 	}
 
 	public static Controler createControler(Config config, int runs) {
@@ -103,18 +100,19 @@ public class RunETaxiBenchmark {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
+				this.bind(IdleDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
 			}
 		});
 
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+//		controler.configureQSimComponents(
+//				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+		controler.configureQSimComponents( DvrpQSimComponents.activateModes( mode ) );
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
+						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_SOC)));
 				//TODO switch to VariableSpeedCharging for Nissan
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);

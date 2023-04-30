@@ -20,10 +20,8 @@
 
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.population.PopulationUtils;
@@ -37,7 +35,9 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 
 	public abstract static class NetworkRouteType {
 		public static final String LinkNetworkRoute = "LinkNetworkRoute";
-		public static final String CompressedNetworkRoute = "CompressedNetworkRoute";
+		@Deprecated public static final String CompressedNetworkRoute = "CompressedNetworkRoute";
+		public static final String MediumCompressedNetworkRoute = "MediumCompressedNetworkRoute";
+		public static final String HeavyCompressedNetworkRoute = "HeavyCompressedNetworkRoute";
 	}
 
 	public enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
@@ -86,7 +86,8 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 				NETWORK_ROUTE_TYPE,
 				"Defines how routes are stored in memory. Currently supported: " +
 				NetworkRouteType.LinkNetworkRoute + ", " +
-				NetworkRouteType.CompressedNetworkRoute + ".");
+				NetworkRouteType.MediumCompressedNetworkRoute + ", " +
+				NetworkRouteType.HeavyCompressedNetworkRoute + ".");
 //		comments.put(
 //				INPUT_PERSON_ATTRIBUTES_FILE,
 //				"Path to a file containing person attributes (required file format: ObjectAttributes).");
@@ -141,7 +142,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		return insistingOnUsingDeprecatedPersonAttributeFile;
 	}
 	
-	public static enum HandlingOfPlansWithoutRoutingMode { reject, useMainModeIdentifier };
+	public static enum HandlingOfPlansWithoutRoutingMode { reject, useMainModeIdentifier }
 	private HandlingOfPlansWithoutRoutingMode handlingOfPlansWithoutRoutingMode = HandlingOfPlansWithoutRoutingMode.reject ;
 	private static final String HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE = "handlingOfPlansWithoutRoutingMode" ;
 	@StringSetter(HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE)
@@ -214,9 +215,9 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 			/*
 			 * I don't think this is the correct place for consistency checks but this bug is so hard to find that the user should be warned in any case. dg 08-2012
 			 */
-			Logger.getLogger(this.getClass()).warn("You are using " + actDurInterpret + " as activityDurationInterpretation. " +
+			LogManager.getLogger(this.getClass()).warn("You are using " + actDurInterpret + " as activityDurationInterpretation. " +
 			"This is not working in conjunction with the pt module as pt interaction activities then will never end!");
-			Logger.getLogger(this.getClass()).warn("ActivityDurationInterpreation " + actDurInterpret + " is deprecated; use " 
+			LogManager.getLogger(this.getClass()).warn("ActivityDurationInterpreation " + actDurInterpret + " is deprecated; use "
 					+ PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime + " instead. kai, jan'13") ;
 		}
 		this.activityDurationInterpretation = actDurInterpret;

@@ -21,7 +21,8 @@
 
  package org.matsim.core.mobsim.qsim.changeeventsengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.jdeqsim.Message;
@@ -36,7 +37,7 @@ import javax.inject.Inject;
 import java.util.Queue;
 
 class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
-	private static final Logger log = Logger.getLogger( NetworkChangeEventsEngine.class ) ;
+	private static final Logger log = LogManager.getLogger( NetworkChangeEventsEngine.class ) ;
 
 	private final MessageQueue messageQueue;
 	private final Network network;

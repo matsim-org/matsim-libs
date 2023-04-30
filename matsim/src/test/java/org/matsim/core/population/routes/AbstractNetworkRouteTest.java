@@ -23,7 +23,8 @@ package org.matsim.core.population.routes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -32,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -44,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public abstract class AbstractNetworkRouteTest {
 
-	static private final Logger log = Logger.getLogger(AbstractNetworkRouteTest.class);
+	static private final Logger log = LogManager.getLogger(AbstractNetworkRouteTest.class);
 
 	abstract protected NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final Network network);
 
@@ -114,7 +115,7 @@ public abstract class AbstractNetworkRouteTest {
 		route.setLinkIds(link1, NetworkUtils.getLinkIds("22 12 -23 3"), link4);
 		route.setDistance(1234.5);
 
-		Assert.assertEquals("wrong difference.", 1234.5, route.getDistance(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong difference.", 1234.5, route.getDistance(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test

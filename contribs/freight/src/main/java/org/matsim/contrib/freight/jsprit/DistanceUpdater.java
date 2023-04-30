@@ -29,10 +29,10 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisit
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 
 /**
-	 * Given class for working with the a distance constraint
+	 * Given class for working with the distance constraint
 	 *
 	 */
-	/*package-privat*/ class DistanceUpdater implements StateUpdater, ActivityVisitor {
+	/*package-private*/ class DistanceUpdater implements StateUpdater, ActivityVisitor {
 
 		private final StateManager stateManager;
 
@@ -75,7 +75,7 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 		double getDistance(TourActivity from, TourActivity to) {
 			double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), 0, null);
 			if (!(distance >= 0.))
-				throw new AssertionError("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString() + " distance " + distance);
+				throw new AssertionError("Distance must not be negative! From, to" + from + ", " + to + " distance " + distance);
 			return distance;
 		}
 	}

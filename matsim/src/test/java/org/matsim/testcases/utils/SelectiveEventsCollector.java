@@ -26,7 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -37,7 +38,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
  */
 public class SelectiveEventsCollector implements BasicEventHandler {
 
-	private final static Logger log = Logger.getLogger(SelectiveEventsCollector.class);
+	private final static Logger log = LogManager.getLogger(SelectiveEventsCollector.class);
 
 	private final List<Event> events = new ArrayList<Event>(50);
 	private final Set<Class<?>> classes = new HashSet<Class<?>>();

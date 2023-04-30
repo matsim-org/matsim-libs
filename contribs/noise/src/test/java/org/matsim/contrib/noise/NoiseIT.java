@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,7 +70,7 @@ import org.matsim.vehicles.Vehicle;
  */
 
 public class NoiseIT {
-	private static final Logger log = Logger.getLogger( NoiseIT.class );
+	private static final Logger log = LogManager.getLogger( NoiseIT.class );
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

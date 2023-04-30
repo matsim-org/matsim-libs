@@ -22,7 +22,8 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
@@ -93,6 +94,8 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		tripscsv("trips.csv"),
 		personscsv("persons.csv"),
 		legscsv("legs.csv"),
+		linkscsv("links.csv"),
+		activitiescsv("activities.csv")
         ;
 
 		final String filename;
@@ -106,7 +109,7 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 
 	public static final String DIVIDER = "###################################################";
 
-	private static final Logger log = Logger.getLogger(Controler.class);
+	private static final Logger log = LogManager.getLogger(Controler.class);
 
 	public static final PatternLayout DEFAULTLOG4JLAYOUT = PatternLayout.newBuilder().withPattern("%d{ISO8601} %5p %C{1}:%L %m%n").build();
 
@@ -202,6 +205,41 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		// yy should probably come even earlier, before the scenario is generated. kai, jul'18
 	}
 
+	private void createInjector() {
+		if (!injectorCreated) {
+			this.injectorCreated = true;
+
+			this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), new AbstractModule() {
+				@Override
+				public void install() {
+					bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
+					}, Names.named("overrides"))).toInstance(overridingQSimModules);
+				}
+			});
+
+			// check config consistency just before creating injector; sometimes, we can provide better error messages there:
+			config.removeConfigConsistencyChecker( UnmaterializedConfigGroupChecker.class );
+			config.checkConsistency();
+			config.addConfigConsistencyChecker( new UnmaterializedConfigGroupChecker() );
+
+			final Set<AbstractModule> standardModules = Collections.singleton(
+					new AbstractModule(){
+						@Override
+						public void install(){
+							install( new NewControlerModule() );
+							install( new ControlerDefaultCoreListenersModule() );
+							for( AbstractModule module : modules ){
+								install( module );
+							}
+							// should not be necessary: created in the controler
+							//install(new ScenarioByInstanceModule(scenario));
+						}
+					}
+			);
+			this.injector = Injector.createInjector( config, AbstractModule.override( standardModules, overrides ) );
+		}
+	}
+
 	/**
 	 * Starts the iterations.
 	 */
@@ -215,36 +253,8 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		// - that called methods such as setScoringFunctionFactory(), that redirects to addOverridingModule()
 		// And this happens silently, leading to lots of time and hair lost.
 		// td, nov 16
-		this.injectorCreated = true;
+		createInjector();
 
-		this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
-				}, Names.named("overrides"))).toInstance(overridingQSimModules);
-			}
-		});
-
-		// check config consistency just before creating injector; sometimes, we can provide better error messages there:
-		config.removeConfigConsistencyChecker( UnmaterializedConfigGroupChecker.class );
-		config.checkConsistency();
-		config.addConfigConsistencyChecker( new UnmaterializedConfigGroupChecker() );
-
-		final Set<AbstractModule> standardModules = Collections.singleton(
-			  new AbstractModule(){
-				  @Override
-				  public void install(){
-					  install( new NewControlerModule() );
-					  install( new ControlerDefaultCoreListenersModule() );
-					  for( AbstractModule module : modules ){
-						  install( module );
-					  }
-					  // should not be necessary: created in the controler
-					  //install(new ScenarioByInstanceModule(scenario));
-				  }
-			  }
-												  );
-		this.injector = Injector.createInjector( config, AbstractModule.override( standardModules, overrides ) );
 		ControlerI controler = injector.getInstance(ControlerI.class);
 		controler.run();
 	}
@@ -365,7 +375,15 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 
 	@Override
 	public final com.google.inject.Injector getInjector() {
+		createInjector();
 		return this.injector;
+	}
+
+	/**
+	 * Reset injector flag, so it will be re-created if the scenario is run again.
+	 */
+	public final void resetInjector() {
+		this.injectorCreated = false;
 	}
 
 	/**

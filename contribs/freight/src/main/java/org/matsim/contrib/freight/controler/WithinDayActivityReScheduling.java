@@ -25,14 +25,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.freight.carrier.Tour.Start;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
-import org.matsim.contrib.freight.controler.CarrierAgent.CarrierDriverAgent;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -46,22 +46,24 @@ import com.google.inject.Inject;
 /*
  * Physically enforces beginnings of time windows for freight activities, i.e. freight agents
  * wait before closed doors until they can deliver / pick up their goods.
- * 
+ *
  * Required because there is no way to encode this in a MATSim plan. There is no actual
  * within-day replanning taking place. What we would need is an ActivityDurationInterpretation
  * which allows this. Then this could go away.
- * 
+ *
  */
 class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener {
 	public static final String COMPONENT_NAME=WithinDayActivityReScheduling.class.getSimpleName() ;
 
-	private static final  Logger logger = Logger.getLogger(WithinDayActivityReScheduling.class);
-	
-	private FreightAgentSource freightAgentSource;
-	
-	private Set<Activity> encounteredActivities = new HashSet<Activity>();
 
-	private CarrierAgentTracker carrierAgentTracker;
+	@SuppressWarnings("unused")
+	private static final  Logger logger = LogManager.getLogger(WithinDayActivityReScheduling.class);
+
+	private final FreightAgentSource freightAgentSource;
+
+	private final Set<Activity> encounteredActivities = new HashSet<>();
+
+	private final CarrierAgentTracker carrierAgentTracker;
 
 	@Inject
 	WithinDayActivityReScheduling(FreightAgentSource freightAgentSource, CarrierAgentTracker carrierAgentTracker) {
@@ -81,8 +83,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 		PlanAgent planAgent = (PlanAgent) mobsimAgent;
 		Id<Person> agentId = planAgent.getCurrentPlan().getPerson().getId();
 		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(mobsimAgent);
-		if (currentPlanElement instanceof Activity) {
-			Activity act = (Activity) currentPlanElement;
+		if (currentPlanElement instanceof Activity act) {
 			if (encounteredActivities.contains(act)) {
 				return;
 			}
@@ -92,11 +93,8 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 				encounteredActivities.add(act);
 			} else {
 				double newEndTime = Math.max(time, plannedActivity.getTimeWindow().getStart()) + plannedActivity.getDuration();
-//				logger.info("[agentId="+ agentId + "][currentTime="+Time.writeTime(time)+"][actDuration="+plannedActivity.getDuration()+
-//						"[timeWindow="+ plannedActivity.getTimeWindow() + "][plannedActEnd="+ Time.writeTime(act.getEndTime()) + "][newActEnd="+Time.writeTime(newEndTime)+"]");
 				act.setMaximumDurationUndefined();
 				act.setEndTime(newEndTime);
-//				WithinDayAgentUtils.calculateAndSetDepartureTime(mobsimAgent, act);
 				WithinDayAgentUtils.resetCaches( mobsimAgent );
 				WithinDayAgentUtils.rescheduleActivityEnd(mobsimAgent,mobsim);
 				encounteredActivities.add(act);

@@ -21,7 +21,8 @@ package org.matsim.codeexamples.fixedTimeSignals;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesData;
@@ -47,7 +48,7 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
  */
 public class CreateIntergreensExample {
 
-	private static final Logger log = Logger.getLogger(CreateIntergreensExample.class);
+	private static final Logger log = LogManager.getLogger(CreateIntergreensExample.class);
 	
 	private static final String INPUT_DIR = "examples/tutorial/example90TrafficLights/useSignalInput/woLanes/";
 	private static String outputDir = "output/example90TrafficLights/";

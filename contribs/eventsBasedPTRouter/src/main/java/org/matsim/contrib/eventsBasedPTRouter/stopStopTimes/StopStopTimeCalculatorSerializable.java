@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
@@ -44,7 +46,7 @@ public class StopStopTimeCalculatorSerializable implements StopStopTimeCalculato
 		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds()-config.qsim().getStartTime().seconds()));
 	}
 	public static void printCallStatisticsAndReset(){
-		org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(StopStopTimeCalculatorSerializable.class);
+		Logger logger = LogManager.getLogger(StopStopTimeCalculatorSerializable.class);
 		logger.warn("stop times read from schedule vs total (S:T) = " + scheduleCalls + " : " + totalCalls);
 		logger.warn("inflation of recorded times called vs their scheduled time:" +stopTimesInflation/(double)(totalCalls -scheduleCalls));
 		scheduleCalls = 0;

@@ -22,8 +22,9 @@ package playground.vsp.andreas.bvgAna.level4;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -34,7 +35,7 @@ import org.matsim.api.core.v01.Id;
  */
 public class StopId2MissedVehMapData {
 	
-	private final Logger log = Logger.getLogger(StopId2MissedVehMapData.class);
+	private final Logger log = LogManager.getLogger(StopId2MissedVehMapData.class);
 //	private final Level logLevel = Level.DEBUG;
 	
 	private final Id stopId;	

@@ -40,10 +40,11 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 class RecursiveLocationMutator extends AbstractLocationMutator{
 
-	//	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
+	//	private static final Logger log = LogManager.getLogger(LocationMutatorwChoiceSet.class);
 	private int unsuccessfullLC = 0;
 	private double recursionTravelSpeedChange = 0.1;
 	private double recursionTravelSpeed = 30.0;
@@ -190,7 +191,7 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 			  FacilitiesUtils.toFacility( fromAct, null ),
 			  FacilitiesUtils.toFacility( toAct, null ),
 				fromAct.getEndTime().seconds(),
-				person, new Attributes() );
+				person, new AttributesImpl() );
 
 		if ( trip.size() != 1 ) {
 			throw new IllegalStateException( "This method can only be used with "+

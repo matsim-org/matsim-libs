@@ -26,7 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -68,7 +69,7 @@ import javax.annotation.Nullable;
  */
 public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
 
-	private static final Logger log = Logger.getLogger(NetworkRoutingInclAccessEgressModule.class);
+	private static final Logger log = LogManager.getLogger(NetworkRoutingInclAccessEgressModule.class);
 
 	private final String mode;
 	private final PopulationFactory populationFactory;
@@ -311,7 +312,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	private static Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink, final String mode) {
 		Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
-		act.setMaximumDuration(0.0);
+//		act.setMaximumDuration(0.0); // obsolete since this is hard-coded in InteractionActivity
 		return act;
 	}
 
@@ -419,6 +420,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
+			route.setVehicleId(VehicleUtils.getVehicleId(person, leg.getMode()));
 			leg.setRoute(route);
 			travTime = 0;
 		}

@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.freight.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
@@ -31,14 +32,14 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
-import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
-import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.ShipmentDeliveredEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.ShipmentPickedUpEventHandler;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightServiceStartEvent;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndEvent;
+import org.matsim.contrib.freight.events.FreightShipmentPickupEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentPickupEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
@@ -57,8 +58,10 @@ import java.util.LinkedHashSet;
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  * */
 
-class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
-	private final static Logger log = Logger.getLogger(FreightAnalysisEventHandler.class);
+@Deprecated(since = "apr23")
+class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, FreightShipmentPickupEventHandler, FreightShipmentDeliveryEventHandler, FreightServiceStartEventHandler, FreightServiceEndEventHandler {
+
+	private final static Logger log = LogManager.getLogger(FreightAnalysisEventHandler.class);
 	private final Vehicles vehicles;
 	private final Network network;
 	private final Carriers carriers;
@@ -154,31 +157,35 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 
 	// LSP Events for Shipments and Services, those are UNTESTED
 	@Override
-	public void handleEvent(ShipmentDeliveredEvent event) {
+	public void handleEvent(FreightShipmentDeliveryEndEvent event) {
 		shipmentTracking.trackDeliveryEvent(event);
 	}
 
 	@Override
-	public void handleEvent(ShipmentPickedUpEvent event) {
+	public void handleEvent(FreightShipmentPickupEndEvent event) {
 		shipmentTracking.trackPickedUpEvent(event);
 		// as we know the driver of the shipment now, we can assign the shipment's carrier to the driver's vehicle.
-		if (shipmentTracking.getShipments().containsKey(event.getShipment().getId()) && vehicleTracking.getDriver2VehicleId(event.getDriverId())!=null){
-			vehicleTracking.addCarrier2Vehicle(vehicleTracking.getDriver2VehicleId(event.getDriverId()), shipmentTracking.getShipments().get(event.getShipment()).carrierId);
-		}
+		//FIXME: We do not have the driver in the events anymore. Need to collect them from other places (if we still need them)
+		log.error("Need a fix, since we are not having the drivers in here any more");
+//		if (shipmentTracking.getShipments().containsKey(event.getShipment().getId()) && vehicleTracking.getDriver2VehicleId(event.getDriverId())!=null){
+//			vehicleTracking.addCarrier2Vehicle(vehicleTracking.getDriver2VehicleId(event.getDriverId()), shipmentTracking.getShipments().get(event.getShipment()).carrierId);
+//		}
 	}
 
 	@Override
-	public void handleEvent(LSPServiceEndEvent event) {
+	public void handleEvent(FreightServiceEndEvent event) {
 		serviceTracking.handleEndEvent(event);
 	}
 
 	@Override
-	public void handleEvent(LSPServiceStartEvent event) {
+	public void handleEvent(FreightServiceStartEvent event) {
 		serviceTracking.handleStartEvent(event);
 		// as we know the driver of a service now, we can assign the shipment's carrier to the driver's vehicle.
-		if (serviceTracking.getCarrierServiceTrackers().containsKey(event.getService().getId()) && vehicleTracking.getDriver2VehicleId(event.getDriverId())!=null){
-			vehicleTracking.addCarrier2Vehicle(vehicleTracking.getDriver2VehicleId(event.getDriverId()), serviceTracking.getCarrierServiceTrackers().get(event.getService()).carrierId);
-		}
+		//FIXME: We do not have the driver in the events anymore. Need to collect them from other places (if we still need them)
+		log.error("Need a fix, since we are not having the drivers in here any more");
+//		if (serviceTracking.getCarrierServiceTrackers().containsKey(event.getServiceId()) && vehicleTracking.getDriver2VehicleId(event.getDriverId())!=null){
+//			vehicleTracking.addCarrier2Vehicle(vehicleTracking.getDriver2VehicleId(event.getDriverId()), serviceTracking.getCarrierServiceTrackers().get(event.getServiceId()).carrierId);
+//		}
 	}
 
 

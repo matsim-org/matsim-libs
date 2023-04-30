@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -129,7 +129,6 @@ public class SkillsIT {
 				CarrierVehicle vehicleOne = CarrierVehicle.Builder.newInstance(Id.createVehicleId("1"), carrierLocation, typeOne )
 						.setEarliestStart(0.0)
 						.setLatestEnd(Time.parseTime("24:00:00"))
-						.setType(typeOne)
 						.build();
 				capabilitiesBuilder.addVehicle(vehicleOne);
 
@@ -144,7 +143,6 @@ public class SkillsIT {
 				CarrierVehicle vehicleTwo = CarrierVehicle.Builder.newInstance(Id.createVehicleId("2"), carrierLocation, typeTwo )
 						.setEarliestStart(0.0)
 						.setLatestEnd(Time.parseTime("24:00:00"))
-						.setType(typeTwo)
 						.build();
 				capabilitiesBuilder.addVehicle(vehicleTwo);
 

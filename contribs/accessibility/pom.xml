@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>15.0-SNAPSHOT</version>
+		<version>16.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -37,12 +37,12 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>matrixbasedptrouter</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
@@ -70,17 +70,13 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>16.0-SNAPSHOT</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.matsim.contrib</groupId>-->
 <!--			<artifactId>dvrp</artifactId>-->
 <!--			<version>13.0-SNAPSHOT</version>-->
 <!--		</dependency>-->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-		</dependency>
 		<!-- This dependency is required to be able to push to the GeoServer -->
 		<dependency>
 			<groupId>org.geotools.jdbc</groupId>

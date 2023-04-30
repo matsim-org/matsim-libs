@@ -20,7 +20,8 @@
 
 package org.matsim.core.utils.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.gbl.Gbl;
 import org.xml.sax.*;
@@ -44,14 +45,14 @@ import java.util.zip.GZIPInputStream;
  * The parser implements a custom <code>EntityResolver</code> to look for DTDs in the MATSim world.
  * <p></p>
  * Notes:<ul>
- * <li> If implementing classes want to override the final methods, the will have to resort to delegation.   
+ * <li> If implementing classes want to override the final methods, the will have to resort to delegation.
  * </ul>
  *
  * @author mrieser
  */
 public abstract class MatsimXmlParser extends DefaultHandler implements MatsimReader {
 
-	private static final Logger log = Logger.getLogger(MatsimXmlParser.class);
+	private static final Logger log = LogManager.getLogger(MatsimXmlParser.class);
 
 	private final Stack<StringBuffer> buffers = new Stack<>();
 	private final Stack<String> theContext = new Stack<>();
@@ -60,9 +61,9 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	private boolean isNamespaceAware = true;
 
 	private String localDtdBase = null;
-	// yy this is NOT working for me with "dtd", but it IS working with null. 
+	// yy this is NOT working for me with "dtd", but it IS working with null.
 	// Note that I am typically NOT running java from the root of the classpath. kai, mar'15
-	
+
 	private boolean preferLocalDtds = false;
 
 	private String doctype = null;
@@ -154,6 +155,10 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		parse( url ) ;
 	}
 
+	public final void readStream(InputStream stream) throws UncheckedIOException {
+		parse(stream);
+	}
+
 	public final void parse(final URL url) throws UncheckedIOException {
 		Gbl.assertNotNull(url);
 		this.theSource = url.toString();
@@ -201,8 +206,8 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		}
 	}
 
-	// the following may be useful.  But it is nowhere used, so I am not sure if we fully understand its longterm maintenance implications, 
-	// so I rather comment it out. If it is needed somewhere, just comment it back in (and probably (**) above) 
+	// the following may be useful.  But it is nowhere used, so I am not sure if we fully understand its longterm maintenance implications,
+	// so I rather comment it out. If it is needed somewhere, just comment it back in (and probably (**) above)
 	// and leave a comment.  kai, jul'16
 //	protected ErrorHandler getErrorHandler() {
 //		return this;
@@ -218,7 +223,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	protected void setDoctype(final String doctype) {
 		// implementation of this method is what reacts to the different version of the file formats, so we cannot make it final. kai, jul'16
-		
+
 		this.doctype = doctype;
 	}
 
@@ -227,7 +232,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	@Override
 	public final InputSource resolveEntity(final String publicId, final String systemId) {
 		// ConfigReader* did override this.  Not sure if it did that for good reaons.  kai, jul'16
-		
+
 		// extract the last part of the systemId
 		int index = systemId.replace('\\', '/').lastIndexOf('/');
 		String shortSystemId = systemId.substring(index + 1);
@@ -279,8 +284,8 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 			URLConnection urlConn = url.openConnection();
 			urlConn.setConnectTimeout(5000);
 			urlConn.setReadTimeout(5000);
-			urlConn.setAllowUserInteraction(false);         
-			
+			urlConn.setAllowUserInteraction(false);
+
 			InputStream is = urlConn.getInputStream();
 			/* If there was no exception until here, than the path is valid.
 			 * Return the opened stream as a source. If we would return null, then the SAX-Parser
@@ -292,7 +297,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		}
 		return null;
 	}
-	
+
 	private InputSource findDtdInLocalFilesystem(final String shortSystemId) {
 		if (this.localDtdBase != null) {
 			String localFileName = this.localDtdBase + "/" + shortSystemId;
@@ -305,7 +310,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		}
 		return null;
 	}
-	
+
 	private InputSource findDtdInClasspath(final String shortSystemId) {
 		// still no success, try to load it with the ClassLoader, in case we're stuck in a jar...
 		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
@@ -315,7 +320,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		}
 		return null;
 	}
-	
+
 	private static InputSource findDtdInDefaultLocation(final String shortSystemId) {
 		log.info("Trying to access local dtd folder at standard location ./dtd...");
 		File dtdFile = new File("./dtd/" + shortSystemId);
@@ -331,7 +336,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	@Override
 	public void characters(final char[] ch, final int start, final int length) throws SAXException {
 		// has to be non-final since otherwise the events parser does not work.  Probably ok (this here is just a default implementation). kai, jul'16
-		
+
 		StringBuffer buffer = this.buffers.peek();
 		if (buffer != null) {
 			buffer.append(ch, start, length);
@@ -351,7 +356,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	@Override
 	public final void endElement(final String uri, final String localName, final String qName) throws SAXException {
 		// I have not good intuition if making this one non-final might be ok.  kai, jul'16
-		
+
 		String tag = (uri.length() == 0) ? qName : localName;
 		this.theContext.pop();
 		StringBuffer buffer = this.buffers.pop();

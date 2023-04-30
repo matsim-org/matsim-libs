@@ -24,7 +24,8 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -50,7 +51,7 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 final class CalcAverageTolledTripLength implements LinkEnterEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(CalcAverageTolledTripLength.class);
+	private static final Logger log = LogManager.getLogger(CalcAverageTolledTripLength.class);
 
 	private double sumLength = 0.0;
 	private int cntTrips = 0;
