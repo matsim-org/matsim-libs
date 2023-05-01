@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2021 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,91 +17,59 @@
  *                                                                         *
  * *********************************************************************** *
  */
-package org.matsim.contrib.util.stats;
+package org.matsim.contrib.common.timeprofile;
 
 import java.awt.Paint;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.contrib.common.csv.CSVLineBuilder;
 import org.matsim.contrib.common.csv.CompactCSVWriter;
-import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.common.util.ChartSaveUtils;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
-import one.util.streamex.EntryStream;
-
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class VehicleOccupancyProfileWriter implements IterationEndsListener, ShutdownListener {
+public class ProfileWriter implements IterationEndsListener {
 
-	private static final String DEFAULT_FILE_NAME = "occupancy_time_profiles";
-	private final String outputFile;
+	public interface ProfileView {
+		TimeDiscretizer timeDiscretizer();
+
+		ImmutableMap<String, double[]> profiles();
+
+		Map<String, Paint> seriesPaints();
+	}
 
 	private final MatsimServices matsimServices;
 	private final String mode;
-	private final VehicleOccupancyProfileCalculator calculator;
+	private final ProfileView view;
+	private final String outputFile;
 
-	private final Comparator<Task.TaskType> nonPassengerTaskTypeComparator;
-	private final Map<Task.TaskType, Paint> taskTypePaints;
-
-	public VehicleOccupancyProfileWriter(MatsimServices matsimServices, String mode,
-			VehicleOccupancyProfileCalculator calculator, Comparator<Task.TaskType> nonPassengerTaskTypeComparator,
-			Map<Task.TaskType, Paint> taskTypePaints) {
-		this(matsimServices, mode, calculator, nonPassengerTaskTypeComparator, taskTypePaints, DEFAULT_FILE_NAME);
-	}
-
-	public VehicleOccupancyProfileWriter(MatsimServices matsimServices, String mode,
-										 VehicleOccupancyProfileCalculator calculator, Comparator<Task.TaskType> nonPassengerTaskTypeComparator,
-										 Map<Task.TaskType, Paint> taskTypePaints, String fileName) {
+	public ProfileWriter(MatsimServices matsimServices, String mode, ProfileView profileView, String fileName) {
 		this.matsimServices = matsimServices;
 		this.mode = mode;
-		this.calculator = calculator;
-		this.nonPassengerTaskTypeComparator = nonPassengerTaskTypeComparator;
-		this.taskTypePaints = taskTypePaints;
+		this.view = profileView;
 		this.outputFile = fileName;
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
-
-		// stream tasks which are not related to passenger (unoccupied vehicle)
-		var nonPassengerTaskProfiles = calculator.getNonPassengerServingTaskProfiles()
-				.entrySet()
-				.stream()
-				.sorted(Entry.comparingByKey(nonPassengerTaskTypeComparator))
-				.map(e -> Pair.of(e.getKey().name(), e.getValue()));
-
-		// occupancy profiles (for tasks related to passengers)
-		var occupancyProfiles = EntryStream.of(calculator.getVehicleOccupancyProfiles())
-				.map(e -> Pair.of(e.getKey() + " pax", e.getValue()));
-
-		ImmutableMap<String, double[]> profiles = Stream.concat(nonPassengerTaskProfiles, occupancyProfiles)
-				.collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue));
+		TimeDiscretizer timeDiscretizer = view.timeDiscretizer();
+		ImmutableMap<String, double[]> profiles = view.profiles();
 
 		String file = filename(outputFile);
 		String timeFormat = timeDiscretizer.getTimeInterval() % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
@@ -109,8 +77,8 @@ public class VehicleOccupancyProfileWriter implements IterationEndsListener, Shu
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
 			String[] profileHeader = profiles.keySet().toArray(new String[0]);
 			writer.writeNext(new CSVLineBuilder().add("time").addAll(profileHeader));
-			timeDiscretizer.forEach((bin, time) -> writer.writeNext(
-					new CSVLineBuilder().add(Time.writeTime(time, timeFormat)).addAll(cells(profiles, bin))));
+			timeDiscretizer.forEach(
+					(bin, time) -> writer.writeNext(new CSVLineBuilder().add(Time.writeTime(time, timeFormat)).addAll(cells(profiles, bin))));
 		}
 
 		if (this.matsimServices.getConfig().controler().isCreateGraphs()) {
@@ -143,16 +111,16 @@ public class VehicleOccupancyProfileWriter implements IterationEndsListener, Shu
 		if (runID != null) {
 			chart.setTitle(runID + " " + chart.getTitle().getText());
 		}
-		makeStayTaskSeriesGrey(chart.getXYPlot());
+		setSeriesPaints(chart.getXYPlot());
 		String imageFile = filename(outputFile + "_" + chartType.name());
 		ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);
 	}
 
-	private void makeStayTaskSeriesGrey(XYPlot plot) {
-		var seriesPaints = EntryStream.of(taskTypePaints).mapKeys(Task.TaskType::name).toMap();
-		XYDataset dataset = plot.getDataset(0);
+	private void setSeriesPaints(XYPlot plot) {
+		var dataset = plot.getDataset(0);
+		var seriesPaints = view.seriesPaints();
 		for (int i = 0; i < dataset.getSeriesCount(); i++) {
-			Paint paint = seriesPaints.get((String)dataset.getSeriesKey(i));
+			var paint = seriesPaints.get((String)dataset.getSeriesKey(i));
 			if (paint != null) {
 				plot.getRenderer().setSeriesPaint(i, paint);
 			}
@@ -160,28 +128,6 @@ public class VehicleOccupancyProfileWriter implements IterationEndsListener, Shu
 	}
 
 	private String filename(String prefix) {
-		return matsimServices.getControlerIO()
-				.getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + mode);
-	}
-
-	private String outputFilename(String prefix) {
-		return matsimServices.getControlerIO()
-				.getOutputFilenameWithOutputPrefix(prefix + "_" + mode);
-	}
-
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		dumpOutput(outputFile, ".txt");
-		dumpOutput(outputFile + "_" + TimeProfileCharts.ChartType.Line, ".png");
-		dumpOutput(outputFile + "_" + TimeProfileCharts.ChartType.StackedArea, ".png");
-	}
-
-	private void dumpOutput(String prefix, String extension) {
-		try {
-			IOUtils.copyFile(filename(prefix) + extension, outputFilename(prefix) + extension);
-		} catch (Exception ee) {
-			LogManager.getLogger(this.getClass()).error("writing output " + outputFilename(prefix + extension) +
-					"did not work; probably parameters were such that no such output was generated in the final iteration");
-		}
+		return matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + mode);
 	}
 }
