@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="CH1903plus_LV95" />
+	</module>
+
+	<module name="controler">
+		<param name="runId" value="test" />
+		<param name="firstIteration" value="0" />
+	</module>
+
+	<module name="qsim">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="24:00:00" />		
+	
+		<param name="snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name="mainMode" value="car,rail" />
+		
+		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+		<param name="stuckTime" value="999999." />
+	</module>
+	
+	<module name="transit" >
+		<!-- The Coordinates Reference System in which the coordinates are expressed in the input file. At import, the coordinates will be converted to the coordinate system defined in "global", and willbe converted back at export. If not specified, no conversion happens. -->
+		<param name="inputScheduleCRS" value="null" />
+		<param name="insistingOnUsingDeprecatedAttributeFiles" value="false" />
+		<!-- The type of transit routing algorithm used, may have the values: [DijkstraBased, SwissRailRaptor] -->
+		<param name="routingAlgorithmType" value="SwissRailRaptor" />
+		<!-- Optional input file containing additional attributes for transit lines, stored as ObjectAttributes. -->
+		<param name="transitLinesAttributesFile" value="null" />
+		<!-- Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt'. -->
+		<param name="transitModes" value="pt" />
+		<!-- Optional input file containing additional attributes for transit stop facilities, stored as ObjectAttributes. -->
+		<param name="transitStopsAttributesFile" value="null" />
+		<!-- Set this parameter to true if transit should be simulated, false if not. -->
+		<param name="useTransit" value="true" />
+		<param name="usingTransitInMobsim" value="true" />	
+	</module>
+	
+</config>
