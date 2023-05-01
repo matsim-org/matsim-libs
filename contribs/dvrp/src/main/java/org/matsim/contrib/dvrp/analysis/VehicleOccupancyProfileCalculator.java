@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2021 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** *
  */
-package org.matsim.contrib.util.stats;
+package org.matsim.contrib.dvrp.analysis;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -26,11 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
@@ -40,17 +39,15 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
-import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -60,7 +57,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class VehicleOccupancyProfileCalculator
 		implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TaskStartedEventHandler,
-		TaskEndedEventHandler, AfterMobsimListener {
+		TaskEndedEventHandler {
 
 	private static class VehicleState {
 		private Task.TaskType taskType;
@@ -68,7 +65,6 @@ public class VehicleOccupancyProfileCalculator
 		private double beginTime;
 	}
 
-	private final static Logger log = LogManager.getLogger(VehicleOccupancyProfileCalculator.class);
 	private final TimeDiscretizer timeDiscretizer;
 
 	private Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
@@ -83,7 +79,6 @@ public class VehicleOccupancyProfileCalculator
 	private final String dvrpMode;
 
 	private boolean wasConsolidatedInThisIteration = false;
-	private boolean mobsimHasFinished = false;
 
 	public VehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
 			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
@@ -109,11 +104,11 @@ public class VehicleOccupancyProfileCalculator
 	}
 
 	private void consolidate() {
-		if (!mobsimHasFinished) {
-			log.error("Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
-			throw new RuntimeException(
-					"Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
-		}
+		Preconditions.checkState(!wasConsolidatedInThisIteration || vehicleStates.isEmpty(),
+					"The profiles has been already consolidated, but the vehicles states are not empty."
+							+ " This means consolidation was done too early (before all events has been processed)."
+							+ " Hint: run consolidate() after Mobsim is completed (e.g. MobsimBeforeCleanupEvent is sent).");
+
 		if (!wasConsolidatedInThisIteration) {
 			// consolidate
 			for (VehicleState state : vehicleStates.values()) {
@@ -217,7 +212,6 @@ public class VehicleOccupancyProfileCalculator
 		} else {
 			state = vehicleStates.get(event.getDvrpVehicleId());
 		}
-
 		state.taskType = event.getTaskType();
 		state.beginTime = event.getTime();
 	}
@@ -257,11 +251,6 @@ public class VehicleOccupancyProfileCalculator
 	}
 
 	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		mobsimHasFinished = true;
-	}
-
-	@Override
 	public void reset(int iteration) {
 		vehicleStates.clear();
 
@@ -271,6 +260,5 @@ public class VehicleOccupancyProfileCalculator
 
 		nonPassengerServingTaskProfiles = new HashMap<>();
 		wasConsolidatedInThisIteration = false;
-		mobsimHasFinished = false;
 	}
 }
