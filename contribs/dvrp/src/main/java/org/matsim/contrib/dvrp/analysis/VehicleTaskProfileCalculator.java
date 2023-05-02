@@ -1,25 +1,42 @@
-package org.matsim.contrib.util.stats;
+/*
+ * *********************************************************************** *
+ * project: org.matsim.*
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** *
+ */
+package org.matsim.contrib.dvrp.analysis;
 
-import com.google.common.base.Verify;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 
 /**
  * Collects task profiles of DVRP vehicles. Based on {@link VehicleOccupancyProfileCalculator} but only collects tasks.
@@ -27,14 +44,13 @@ import java.util.Map;
  * @author nkuehnel / MOIA
  */
 public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
-		TaskEndedEventHandler, AfterMobsimListener {
+		TaskEndedEventHandler {
 
 	private static class VehicleState {
 		private Task.TaskType taskType;
 		private double beginTime;
 	}
 
-	private final static Logger log = LogManager.getLogger(VehicleTaskProfileCalculator.class);
 	private final TimeDiscretizer timeDiscretizer;
 
 	private Map<Task.TaskType, double[]> taskProfiles;
@@ -46,7 +62,6 @@ public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
 	private final String dvrpMode;
 
 	private boolean wasConsolidatedInThisIteration = false;
-	private boolean mobsimHasFinished = false;
 
 	public VehicleTaskProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
 											 QSimConfigGroup qsimConfig) {
@@ -64,11 +79,11 @@ public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
 	}
 
 	private void consolidate() {
-		if (!mobsimHasFinished) {
-			log.error("Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
-			throw new RuntimeException(
-					"Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
-		}
+		Preconditions.checkState(!wasConsolidatedInThisIteration || vehicleStates.isEmpty(),
+					"The profiles has been already consolidated, but the vehicles states are not empty."
+							+ " This means consolidation was done too early (before all events has been processed)."
+							+ " Hint: run consolidate() after Mobsim is completed (e.g. MobsimBeforeCleanupEvent is sent).");
+
 		if (!wasConsolidatedInThisIteration) {
 			// consolidate
 			for (VehicleState state : vehicleStates.values()) {
@@ -158,16 +173,10 @@ public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
 	}
 
 	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		mobsimHasFinished = true;
-	}
-
-	@Override
 	public void reset(int iteration) {
 		vehicleStates.clear();
 
 		taskProfiles = new HashMap<>();
 		wasConsolidatedInThisIteration = false;
-		mobsimHasFinished = false;
 	}
 }

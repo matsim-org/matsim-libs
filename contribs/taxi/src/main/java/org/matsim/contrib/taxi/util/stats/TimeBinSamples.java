@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,13 +18,13 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.util.stats;
+package org.matsim.contrib.taxi.util.stats;
 
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.analysis.ExecutedTask;
-import org.matsim.contrib.util.stats.DurationStats.State;
+import org.matsim.contrib.taxi.util.stats.DurationStats.State;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -36,7 +36,7 @@ public class TimeBinSamples {
 	}
 
 	public static <V> Stream<TimeBinSample<State<V>>> stateSamples(State<V> state, int binSize) {
-		return samples(state, state.beginTime, state.endTime, binSize);
+		return samples(state, state.beginTime(), state.endTime(), binSize);
 	}
 
 	public static <V> Stream<TimeBinSample<V>> samples(V value, double from, double to, int binSize) {

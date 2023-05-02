@@ -37,7 +37,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
