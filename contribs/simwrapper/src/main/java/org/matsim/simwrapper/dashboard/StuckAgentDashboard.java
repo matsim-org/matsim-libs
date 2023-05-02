@@ -3,7 +3,7 @@ package org.matsim.simwrapper.dashboard;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
-import org.matsim.simwrapper.analysis.StuckAgentAnalysis;
+import org.matsim.application.analysis.population.StuckAgentAnalysis;
 import org.matsim.simwrapper.viz.Bar;
 import org.matsim.simwrapper.viz.PieChart;
 import org.matsim.simwrapper.viz.Table;

@@ -112,7 +112,7 @@ public final class CommandRunner {
 			packageName = packageName.substring(packageName.lastIndexOf(".") + 1);
 		}
 
-		String context = spec.group().isBlank() ? packageName: spec.group();
+		String context = spec.group().isBlank() ? packageName : spec.group();
 
 		if (name != null && !name.isBlank())
 			context += "-" + name;
@@ -212,13 +212,13 @@ public final class CommandRunner {
 	/**
 	 * Get the path for a certain file produced by a command.
 	 */
-	public String getPath(Class<? extends MATSimAppCommand> command, String file) {
+	private String getPath(Class<? extends MATSimAppCommand> command, String file) {
 		CommandSpec spec = ApplicationUtils.getSpec(command);
 		return buildPath(spec, command).resolve(file).toString();
 	}
 
 	/**
-	 * Returns the output path of a command. Will throw an exception if this command does not declared it as an output.
+	 * Returns the output path of a command. Will throw an exception if this command does not declare it as an output.
 	 */
 	public Path getRequiredPath(Class<? extends MATSimAppCommand> command, String file) {
 		CommandSpec spec = ApplicationUtils.getSpec(command);
@@ -243,6 +243,13 @@ public final class CommandRunner {
 	public CommandRunner setOutput(Path path) {
 		this.output = path;
 		return this;
+	}
+
+	/**
+	 * Name of the runner.
+	 */
+	public String getName() {
+		return name;
 	}
 
 	/**

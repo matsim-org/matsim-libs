@@ -1,4 +1,4 @@
-package org.matsim.application.analysis.travelTimeValidation;
+package org.matsim.application.analysis.traffic;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,4 +1,4 @@
-package org.matsim.simwrapper.analysis;
+package org.matsim.application.analysis.traffic;
 
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.population.StuckAgentAnalysis;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;

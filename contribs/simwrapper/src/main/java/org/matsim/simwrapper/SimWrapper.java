@@ -17,6 +17,8 @@ import org.matsim.simwrapper.viz.Viz;
 import tech.tablesaw.plotly.components.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -137,6 +139,19 @@ public final class SimWrapper {
 	 * Run data pipeline to create the necessary data for the dashboards.
 	 */
 	public void run(Path dir) {
+
+		for (Map.Entry<Path, URL> e : data.getResources().entrySet()) {
+			try {
+				Files.createDirectories(e.getKey());
+				try (InputStream is = e.getValue().openStream()) {
+					Files.copy(is, e.getKey());
+				}
+
+			} catch (IOException ex) {
+				log.error("Could not copy resources", ex);
+			}
+		}
+
 		for (CommandRunner runner : data.getRunners().values()) {
 			runner.run(dir);
 		}

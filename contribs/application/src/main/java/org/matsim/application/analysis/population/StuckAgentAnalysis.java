@@ -1,4 +1,4 @@
-package org.matsim.simwrapper.analysis;
+package org.matsim.application.analysis.population;
 
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
