@@ -111,6 +111,12 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
         //TODO: could make distinction between national and city, based on shapefile, or regions.
         double freeVelocity_kmh = speed * 3.6;
 
+        /*
+         * speed attributes are sometimes rounded beforehand.
+         * make sure the speed is a multiple of 10, as the HBEFA emission key factors are and otherwise we get problems later...
+         */
+		freeVelocity_kmh = Math.round(freeVelocity_kmh/10.0) * 10;
+
         if (type.equals("unclassified") || type.equals("road")) {
             if (freeVelocity_kmh <= 50) type = "living";
             else if (freeVelocity_kmh == 60) type = "tertiary";
