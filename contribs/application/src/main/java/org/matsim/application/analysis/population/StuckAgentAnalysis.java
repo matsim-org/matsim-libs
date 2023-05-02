@@ -67,7 +67,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		String markdown = """
 					<div class='stack-agents-table'>
 
-					|**Total Agents**|**Stuck Agents**|**Proportion of stucket agents**|
+					|**Total Agents**|**Stuck Agents**|**Proportion of stuck agents**|
 					|:-------:|:-------:|:-------:|
 					|**${totalAgents}**|**${stuckAgents}**|**${stuckAgentsProportion} %**|
 
