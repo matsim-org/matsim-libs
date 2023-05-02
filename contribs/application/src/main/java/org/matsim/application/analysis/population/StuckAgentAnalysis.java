@@ -89,7 +89,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("totalAgents", String.valueOf(allAgents.size()));
 		data.put("stuckAgents", String.valueOf(allStuckedLinks.keySet().size()));
-		data.put("stuckAgentsProportion", String.valueOf((Math.round((100.0 / allAgents.size() * allStuckedLinks.keySet().size()) * 10000))/10000.0));
+		data.put("stuckAgentsProportion", String.valueOf((Math.round((100.0 / allAgents.size() * allStuckedLinks.keySet().size()) * 100))/100.0));
 		String formattedString = StrSubstitutor.replace(markdown, data);
 		printWriter.println(formattedString);
 		printWriter.close();
