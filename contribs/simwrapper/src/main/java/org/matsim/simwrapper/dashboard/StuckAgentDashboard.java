@@ -28,7 +28,7 @@ public class StuckAgentDashboard implements Dashboard {
 				.el(PieChart.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Transport Mode";
 					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerModePieChart.csv");
-					viz.useLastRow = "true";
+					viz.useLastRow = true;
 				})
 				.el(Table.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Mode";
@@ -38,7 +38,7 @@ public class StuckAgentDashboard implements Dashboard {
 		layout.row("third")
 				.el(Bar.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Hour";
-					viz.stacked = "true";
+					viz.stacked = true;
 					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerHour.csv");
 					viz.x = "hour";
 					viz.xAxisName = "Hour";

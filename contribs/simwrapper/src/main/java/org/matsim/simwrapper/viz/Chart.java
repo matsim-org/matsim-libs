@@ -31,7 +31,7 @@ public abstract class Chart extends Viz{
 	 * for MATSim outputs which list every iteration's output,
 	 * if you are only in the final iteration.
 	 */
-	public String useLastRow;
+	public boolean useLastRow;
 
 	/**
 	 * Array of strings. Legend titles for each line. The column
