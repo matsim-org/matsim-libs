@@ -25,7 +25,6 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -99,18 +98,15 @@ public class MainRunOnlyLSPMobsimTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunResourceBuilder.setCarrier(mainRunCarrier);
-		LSPResource mainRunResource = mainRunResourceBuilder.build();
+		LSPResource mainRunResource  = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
+				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
+				.build();
 
-		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunResource);
-		LogisticChainElement mainRunElement = mainRunBuilder.build();
+		LogisticChainElement mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
+				.setResource(mainRunResource)
+				.build();
 
 
 		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);

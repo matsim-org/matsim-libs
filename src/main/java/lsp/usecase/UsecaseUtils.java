@@ -70,7 +70,7 @@ public class UsecaseUtils {
 	 * <p>
 	 * KMT/Jul22
 	 *
-	 * @param carrier
+	 * @param carrier the carrier
 	 * @return Collection of VehicleTypes
 	 */
 	static Collection<VehicleType> getVehicleTypeCollection(Carrier carrier) {
@@ -106,28 +106,32 @@ public class UsecaseUtils {
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-				final String str1 = "Shipment: " + shipment ;
-				System.out.println(str1);
-				writer.write(str1 + "\n");
-				for (ShipmentPlanElement element : elementList) {
-					final String str2 = element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
-					System.out.println(str2);
-					writer.write(str2 + "\n");
-				}
-				System.out.println();
-				writer.write("\n");
+				writeShipmentWithPlanElements(writer, shipment, elementList);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	private static void writeShipmentWithPlanElements(BufferedWriter writer, LSPShipment shipment, ArrayList<ShipmentPlanElement> elementList) throws IOException {
+		final String str1 = "Shipment: " + shipment ;
+		System.out.println(str1);
+		writer.write(str1 + "\n");
+		for (ShipmentPlanElement element : elementList) {
+			final String str2 = element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+			System.out.println(str2);
+			writer.write(str2 + "\n");
+		}
+		System.out.println();
+		writer.write("\n");
+	}
+
 	/**
 	 * Prints out the log of the shipment - this is not the shipment's plan
 	 * Maybe the log will get removed soon. kmt sep/oct'22
 	 *
-	 * @param outputDir
-	 * @param lsp
+	 * @param outputDir path, defining the location for the results
+	 * @param lsp the LSP, for which the results should be written out.
 	 */
 	public static void printResults_shipmentLog(String outputDir, LSP lsp) {
 		System.out.println("Writing out shipmentLog for LSP");
@@ -138,16 +142,7 @@ public class UsecaseUtils {
 			for (LSPShipment shipment : lsp.getShipments()) {
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getLog().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
-				final String str1 = "Shipment: " + shipment;
-				System.out.println(str1);
-				writer.write(str1 + "\n");
-				for (ShipmentPlanElement element : elementList) {
-					final String str2 = element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
-					System.out.println(str2);
-					writer.write(str2 + "\n");
-				}
-				System.out.println();
-				writer.write("\n");
+				writeShipmentWithPlanElements(writer, shipment, elementList);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -190,27 +185,22 @@ public class UsecaseUtils {
 		Id<Link> locationLinkId;
 		CollectionCarrierScheduler collectionScheduler;
 
-		private CollectionCarrierResourceBuilder(Id<LSPResource> id, Network network) {
-			this.id = id;
+		private CollectionCarrierResourceBuilder(Carrier carrier, Network network) {
+			this.id = Id.create(carrier.getId().toString(), LSPResource.class);
+			setCarrierType(carrier, CARRIER_TYPE.collectionCarrier);
+			this.carrier = carrier;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
 		}
 
-		public static CollectionCarrierResourceBuilder newInstance(Id<LSPResource> id, Network network) {
-			return new CollectionCarrierResourceBuilder(id, network);
+		public static CollectionCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
+			return new CollectionCarrierResourceBuilder(carrier, network);
 		}
 
 		public CollectionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
 			this.locationLinkId = locationLinkId;
 			return this;
 		}
-
-		public CollectionCarrierResourceBuilder setCarrier(Carrier carrier) {
-			setCarrierType(carrier, CARRIER_TYPE.collectionCarrier);
-			this.carrier = carrier;
-			return this;
-		}
-
 
 		public CollectionCarrierResourceBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler) {
 			this.collectionScheduler = collectionCarrierScheduler;
@@ -220,7 +210,6 @@ public class UsecaseUtils {
 		public CollectionCarrierResource build() {
 			return new CollectionCarrierResource(this);
 		}
-
 	}
 
 
@@ -233,27 +222,22 @@ public class UsecaseUtils {
 		Id<Link> locationLinkId;
 		DistributionCarrierScheduler distributionHandler;
 
-		private DistributionCarrierResourceBuilder(Id<LSPResource> id, Network network) {
-			this.id = id;
+		private DistributionCarrierResourceBuilder(Carrier carrier, Network network) {
+			this.id = Id.create(carrier.getId().toString(), LSPResource.class);
+			setCarrierType(carrier, CARRIER_TYPE.distributionCarrier);
+			this.carrier = carrier;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
 		}
 
-		public static DistributionCarrierResourceBuilder newInstance(Id<LSPResource> id, Network network) {
-			return new DistributionCarrierResourceBuilder(id, network);
+		public static DistributionCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
+			return new DistributionCarrierResourceBuilder(carrier, network);
 		}
 
 		public DistributionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
 			this.locationLinkId = locationLinkId;
 			return this;
 		}
-
-		public DistributionCarrierResourceBuilder setCarrier(Carrier carrier) {
-			setCarrierType(carrier, CARRIER_TYPE.distributionCarrier);
-			this.carrier = carrier;
-			return this;
-		}
-
 
 		public DistributionCarrierResourceBuilder setDistributionScheduler(DistributionCarrierScheduler distributionCarrierScheduler) {
 			this.distributionHandler = distributionCarrierScheduler;
@@ -277,14 +261,16 @@ public class UsecaseUtils {
 		private MainRunCarrierScheduler mainRunScheduler;
 		private VehicleReturn vehicleReturn;
 
-		private MainRunCarrierResourceBuilder(Id<LSPResource> id, Network network) {
-			this.id = id;
+		private MainRunCarrierResourceBuilder(Carrier carrier, Network network) {
+			this.id = Id.create(carrier.getId().toString(), LSPResource.class);
+			setCarrierType(carrier, CARRIER_TYPE.mainRunCarrier);
+			this.carrier = carrier;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
 		}
 
-		public static MainRunCarrierResourceBuilder newInstance(Id<LSPResource> id, Network network) {
-			return new MainRunCarrierResourceBuilder(id, network);
+		public static MainRunCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
+			return new MainRunCarrierResourceBuilder(carrier, network);
 		}
 
 		public MainRunCarrierResourceBuilder setCarrier(Carrier carrier) {
@@ -437,14 +423,19 @@ public class UsecaseUtils {
 
 	private static final String CARRIER_TYPE_ATTR = "carrierType" ;
 
-	public static CARRIER_TYPE getCarrierType(Carrier carrier ) {
-		CARRIER_TYPE result = (CARRIER_TYPE) carrier.getAttributes().getAttribute(CARRIER_TYPE_ATTR);
-		if (result == null){
-			log.error("Requested attribute " + CARRIER_TYPE_ATTR + " does not exists. Will return " + CARRIER_TYPE.undefined );
-			return CARRIER_TYPE.undefined;
+	public static CARRIER_TYPE getCarrierType(Carrier carrier) {
+		if (carrier.getAttributes().getAttribute(CARRIER_TYPE_ATTR) instanceof CARRIER_TYPE carrierType) {
+			return carrierType;
 		} else {
-			return result ;
+			String result = (String) carrier.getAttributes().getAttribute(CARRIER_TYPE_ATTR);
+			if (result == null){
+				log.warn("Requested attribute " + CARRIER_TYPE_ATTR + " does not exists. Will return " + CARRIER_TYPE.undefined );
+				return CARRIER_TYPE.undefined;
+			} else {
+				return CARRIER_TYPE.valueOf(result);
+			}
 		}
+
 	}
 	private static void setCarrierType( Carrier carrier,  CARRIER_TYPE carrierType ) {
 		carrier.getAttributes().putAttribute(CARRIER_TYPE_ATTR, carrierType ) ;

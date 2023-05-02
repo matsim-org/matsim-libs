@@ -2,11 +2,12 @@ package lsp;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Collections;
 
 public class LSPReadWriteTest {
@@ -15,7 +16,7 @@ public class LSPReadWriteTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void readWriteTest() throws FileNotFoundException, IOException {
+	public void readWriteTest() {
 
 		LSPs lsPs = new LSPs(Collections.emptyList());
 		Carriers carriers = new Carriers();
@@ -39,9 +40,9 @@ public class LSPReadWriteTest {
 	}
 
 	@Test
-	public void readWriteReadTest() throws FileNotFoundException, IOException {
+	public void readWriteReadTest() {
 
-		LSPs lsPs = new LSPs(Collections.emptyList());
+		LSPs lsps = new LSPs(Collections.emptyList());
 		Carriers carriers = new Carriers();
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 
@@ -55,17 +56,18 @@ public class LSPReadWriteTest {
 		CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, carrierVehicleTypes);
 		carrierReader.readFile(utils.getPackageInputDirectory() + "carriers.xml");
 
-		LSPPlanXmlReader reader = new LSPPlanXmlReader(lsPs, carriers);
+		LSPPlanXmlReader reader = new LSPPlanXmlReader(lsps, carriers);
 		reader.readFile(inputFilename);
 
-		new LSPPlanXmlWriter(lsPs).write(outputFilename);
+		new LSPPlanXmlWriter(lsps).write(outputFilename);
 
-		lsPs.getLSPs().clear();
+		//clear and 2nd read - based on written file.
+		lsps.getLSPs().clear();
 
-		LSPPlanXmlReader reader2 = new LSPPlanXmlReader(lsPs, carriers);
+		LSPPlanXmlReader reader2 = new LSPPlanXmlReader(lsps, carriers);
 		reader2.readFile(outputFilename);
 
-		new LSPPlanXmlWriter(lsPs).write(outputFilename2);
+		new LSPPlanXmlWriter(lsps).write(outputFilename2);
 
 		MatsimTestUtils.assertEqualFilesLineByLine(inputFilename, outputFilename2);
 	}

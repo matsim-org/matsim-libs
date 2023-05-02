@@ -41,6 +41,7 @@ import org.xml.sax.Attributes;
 
 import java.util.*;
 
+import static lsp.LSPConstants.LSP;
 import static lsp.LSPConstants.*;
 
 /**
@@ -65,10 +66,11 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 	private String chainId;
 	private Double score;
 	private String selected;
-	private final List<String> lspResourceIds = new LinkedList<>();
 	private String shipmentPlanId;
+	private final Map<String, String> elementIdResourceIdMap = new LinkedHashMap<>();
 	private final Map<String, ShipmentPlanElement> planElements = new LinkedHashMap<>();
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
+
 
 	LSPPlanXmlParserV1( LSPs lsPs, Carriers carriers ) {
 		super();
@@ -205,16 +207,18 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			}
 			case RESOURCES -> {
 			}
-			case RESOURCE -> {
-				String resourceId = atts.getValue(ID);
-				lspResourceIds.add(resourceId);
+			case LOGISTIC_CHAIN_ELEMENT -> {
+				String logisticChainElementId = atts.getValue(ID);
+				String resourceId = atts.getValue(RESOURCE_ID);
+
+				elementIdResourceIdMap.put(logisticChainElementId, resourceId);
 			}
 			case SHIPMENT_PLAN -> {
 				shipmentPlanId = atts.getValue(SHIPMENT_ID);
 				Gbl.assertNotNull(shipmentPlanId);
 			}
 			case ELEMENT -> {
-				String elementId = atts.getValue(ELEMENT_ID);
+				String elementId = atts.getValue(ID);
 				Gbl.assertNotNull(elementId);
 
 				String type = atts.getValue(TYPE);
@@ -285,16 +289,13 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				LSPResource lspResource;
 
 				switch (UsecaseUtils.getCarrierType(currentCarrier)) {
-					case collectionCarrier -> lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-							.setCarrier(currentCarrier)
+					case collectionCarrier -> lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
 							.build();
-					case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-							.setCarrier(currentCarrier)
+					case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 							.build();
-					case distributionCarrier -> lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create(currentCarrier.getId(), LSPResource.class), null)
-							.setCarrier(currentCarrier)
+					case distributionCarrier -> lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 							.build();
 					default -> throw new IllegalStateException("Unexpected value: " + currentCarrier.getAttributes().toString());
@@ -318,18 +319,20 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				LSPResource resource;
 				List<LogisticChainElement> logisticChainElements = new LinkedList<>();
 
-				for (String lspResourceId : lspResourceIds) {
+				for (Map.Entry<String, String> entry : elementIdResourceIdMap.entrySet()) {
 					for (LSPResource currentResource : currentLsp.getResources()) {
-						if (currentResource.getId().toString().equals(lspResourceId)) {
+						if (currentResource.getId().toString().equals(entry.getValue())) {
 							resource = currentResource;
 							Gbl.assertNotNull(resource);
-							LogisticChainElement logisticChainElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("lceId", LogisticChainElement.class))
+							LogisticChainElement logisticChainElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create(entry.getKey(), LogisticChainElement.class))
 									.setResource(resource)
 									.build();
 							logisticChainElements.add(logisticChainElement);
 						}
 					}
 				}
+
+				elementIdResourceIdMap.clear();
 
 				//create logisticChain
 				LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
@@ -361,7 +364,6 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 					currentLsp.addPlan(currentPlan);
 				}
 
-				lspResourceIds.clear();
 			}
 			case SHIPMENT_PLAN -> {
 				for (LSPShipment shipment : currentLsp.getShipments()) {
