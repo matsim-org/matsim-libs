@@ -10,7 +10,6 @@ import org.jgrapht.traverse.BreadthFirstIterator;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.ShpOptions;
-import picocli.CommandLine;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -105,10 +104,15 @@ public final class CommandRunner {
 	/**
 	 * Build the base path.
 	 */
-	private Path buildPath(CommandSpec spec, CommandLine.Command command) {
+	private Path buildPath(CommandSpec spec, Class<? extends MATSimAppCommand> command) {
 
 		// use the command name if it is present and no other group name given
-		String context = command != null && spec.group().equals("general") ? command.name() : spec.group();
+		String packageName = command.getPackageName();
+		if (packageName.contains(".")) {
+			packageName = packageName.substring(packageName.lastIndexOf(".") + 1);
+		}
+
+		String context = spec.group().isBlank() ? packageName: spec.group();
 
 		if (name != null && !name.isBlank())
 			context += "-" + name;
@@ -210,7 +214,7 @@ public final class CommandRunner {
 	 */
 	public String getPath(Class<? extends MATSimAppCommand> command, String file) {
 		CommandSpec spec = ApplicationUtils.getSpec(command);
-		return buildPath(spec, ApplicationUtils.getCommand(command)).resolve(file).toString();
+		return buildPath(spec, command).resolve(file).toString();
 	}
 
 	/**
@@ -221,7 +225,7 @@ public final class CommandRunner {
 		if (!ArrayUtils.contains(spec.produces(), file))
 			throw new IllegalArgumentException(String.format("Command %s does not declare output %s", command, file));
 
-		return buildPath(spec, ApplicationUtils.getCommand(command)).resolve(file);
+		return buildPath(spec, command).resolve(file);
 	}
 
 	/**

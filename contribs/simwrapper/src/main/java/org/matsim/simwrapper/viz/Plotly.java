@@ -282,6 +282,8 @@ public class Plotly extends Viz {
 	public static final class Data {
 		private final String file;
 		private String x;
+		private String x2;
+
 		private String y;
 
 		/**
@@ -306,6 +308,14 @@ public class Plotly extends Viz {
 		 */
 		public Data x(String columnName) {
 			x = columnName;
+			return this;
+		}
+
+		/**
+		 * Additional x column, which will create an array of values.
+		 */
+		public Data x2(String columnName) {
+			x2 = columnName;
 			return this;
 		}
 

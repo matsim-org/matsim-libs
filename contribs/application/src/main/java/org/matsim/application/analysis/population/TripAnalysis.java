@@ -21,7 +21,10 @@ import java.util.*;
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
 @CommandLine.Command(name = "trips", description = "Calculates various trip related metrics.")
-@CommandSpec(requires = {"trips.csv", "persons.csv"}, produces = {"mode_share.csv", "population_stats.csv", "trip_purposes_by_hour.csv"})
+@CommandSpec(
+		requires = {"trips.csv", "persons.csv"},
+		produces = {"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv", "trip_purposes_by_hour.csv"}
+)
 public class TripAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
@@ -119,16 +122,28 @@ public class TripAnalysis implements MATSimAppCommand {
 		aggr = aggr.sortOn(cmp.thenComparing(row -> row.getString("main_mode")));
 
 		aggr.write().csv(output.getPath("mode_share.csv").toFile());
+
+		// Norm each dist_group to 1
+		for (String label : labels) {
+			DoubleColumn dist_group = aggr.doubleColumn("share");
+			Selection sel = aggr.stringColumn("dist_group").isEqualTo(label);
+
+			double total = dist_group.where(sel).sum();
+			if (total > 0)
+				dist_group.set(sel, dist_group.divide(total));
+		}
+
+		aggr.write().csv(output.getPath("mode_share_per_dist.csv").toFile());
 	}
 
 	private void writePopulationStats(Table persons, Table trips) {
 
-		Object2IntMap<String> numTrips = new Object2IntOpenHashMap<>();
+		Object2IntMap<String> tripsPerPerson = new Object2IntOpenHashMap<>();
 		Map<String, Set<String>> modesPerPerson = new HashMap<>();
 
 		for (Row trip : trips) {
 			String id = trip.getString("person");
-			numTrips.mergeInt(id, 1, Integer::sum);
+			tripsPerPerson.mergeInt(id, 1, Integer::sum);
 			String mode = trip.getString("main_mode");
 			modesPerPerson.computeIfAbsent(id, s -> new HashSet<>()).add(mode);
 		}
@@ -140,31 +155,36 @@ public class TripAnalysis implements MATSimAppCommand {
 			}
 		}
 
-		double totalMobile = numTrips.size();
-		double avgTripsMobile = numTrips.values().intStream().average().orElse(0);
+		double totalMobile = tripsPerPerson.size();
+		double avgTripsMobile = tripsPerPerson.values().intStream().average().orElse(0);
 
 		for (Row person : persons) {
 			String id = person.getString("person");
-			if (!numTrips.containsKey(id))
-				numTrips.put(id, 0);
+			if (!tripsPerPerson.containsKey(id))
+				tripsPerPerson.put(id, 0);
 		}
 
-		double avgTrips = numTrips.values().intStream().average().orElse(0);
+		double avgTrips = tripsPerPerson.values().intStream().average().orElse(0);
 
-		Table table = Table.create();
+		Table table = Table.create(TextColumn.create("main_mode", usedModes.size()), DoubleColumn.create("user", usedModes.size()));
 
+		int i = 0;
 		for (Object2IntMap.Entry<String> e : usedModes.object2IntEntrySet()) {
-			table.addColumns(DoubleColumn.create(e.getKey() + "_user", e.getIntValue() / totalMobile));
+			table.textColumn(0).set(i, e.getKey());
+			table.doubleColumn(1).set(i++, e.getIntValue() / totalMobile);
 		}
+
+		table.write().csv(output.getPath("mode_users.csv").toFile());
+
+		table = Table.create();
 
 		table.addColumns(
-				DoubleColumn.create("n", (double) numTrips.size()),
-				DoubleColumn.create("mobile", totalMobile / numTrips.size()),
+				DoubleColumn.create("mobile", totalMobile / tripsPerPerson.size()),
 				DoubleColumn.create("avg_trips", avgTrips),
 				DoubleColumn.create("avg_trips_mobile", avgTripsMobile)
 		);
 
-		table.write().csv(output.getPath("population_stats.csv").toFile());
+		table.write().csv(output.getPath("trip_stats.csv").toFile());
 
 	}
 
