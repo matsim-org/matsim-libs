@@ -21,6 +21,17 @@ public class OsmHbefaMappingTest {
         assertEquals("URB/Trunk-City/70", hbefaType);
     }
 
+	@Test
+	public void testMergedLinkTypeMapping() {
+
+		var mapping = OsmHbefaMapping.build();
+		var link = getTestLink("primary|railway.tram", 70 / 3.6);
+
+		var hbefaType = mapping.determineHebfaType(link);
+
+		assertEquals("URB/Trunk-City/70", hbefaType);
+	}
+
     @Test(expected = RuntimeException.class)
     public void testUnknownType() {
 
@@ -42,6 +53,27 @@ public class OsmHbefaMappingTest {
 
         assertEquals("URB/MW-Nat./100", hbefaType);
     }
+
+	@Test
+	public void testFastMotorwayLink() {
+
+		var mapping = OsmHbefaMapping.build();
+		var link = getTestLink("motorway_link", 100 / 3.6);
+
+		var hbefaType = mapping.determineHebfaType(link);
+
+		assertEquals("URB/MW-Nat./100", hbefaType);
+	}
+
+	@Test
+	public void testLivingStreet() {
+		var mapping = OsmHbefaMapping.build();
+		var link = getTestLink("living_street", 50 / 3.6);
+
+		var hbefaType = mapping.determineHebfaType(link);
+
+		assertEquals("URB/Access/50", hbefaType);
+	}
 
     @Test
     public void testUnclassified() {
