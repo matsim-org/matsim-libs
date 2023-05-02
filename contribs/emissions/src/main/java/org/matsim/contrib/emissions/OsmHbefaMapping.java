@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,8 +119,10 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
             else type = "motorway";
         }
 
+
+
         //sometimes link type is smth like 'motorway_link' or 'living_street' or 'primary|railway.tram'. We only care about the first part, here
-		int idx = List.of(type.indexOf('.'), type.indexOf('|'), type.indexOf('_'), type.indexOf(','))
+		int idx = Arrays.asList(type.indexOf('.'), type.indexOf('|'), type.indexOf('_'), type.indexOf(','))
 				.stream()
 				.filter(i -> i>= 0) //if chrc is not in String indexOf returns -1
 				.min(Integer::compare)
