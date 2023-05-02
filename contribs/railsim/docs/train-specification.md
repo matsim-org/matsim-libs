@@ -11,6 +11,14 @@ In order to simulate this detailed behavior, additional attributes must be speci
 
 TODO, e.g. length and acceleration of a train.
 
+#### maxAcceleration
+
+The vehicle-specific acceleration. Unit: meters per square-seconds \[m/s²]
+
+#### maxDeceleration
+
+The vehicle-specific deceleration. Unit: meters per square-seconds \[m/s²]
+
 ## Examples
 
 TODO
