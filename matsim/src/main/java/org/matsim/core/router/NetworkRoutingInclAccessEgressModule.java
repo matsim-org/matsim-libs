@@ -272,8 +272,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				startLinkId = accessActLink.getId();
 			}
 
-			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, departureTime, startLinkId, accessActLink.getId(), populationFactory,
-					config);
+			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, departureTime, startLinkId, accessActLink.getId(), populationFactory, config);
 			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 
 			accessTrip.add(accessLeg);
@@ -332,7 +331,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			log.fatal( "(2) " + TransportMode.walk + " is routed on the network.  Then you need to define the corresponding teleportation (= mode routing) params for "
 						  + TransportMode.non_network_walk + ".");
 			log.fatal("The old default fallback bevhavior was disabled in may'21.");
-			throw new RuntimeException( "Need teleportation params for bushwhaking modes.  See log statements above." );
+			throw new RuntimeException( "Need teleportation params for bushwhacking modes.  See log statements above." );
 
 //			params = new ModeRoutingParams();
 //			// old defaults
@@ -341,6 +340,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			// yyyyyy The above may be a source for buggy behavior: If the teleportation params are cleared, then presumably also the
 			// non-network routing is cleared, and then here it will fall back on the auto-magic behavior.  kai, may'21.
+
+			// Not sure if this can happen:
+			// (1) If walk is a non-network mode, then using the params from that is what we want.
+			// (2) If walk is a network mode, then the walk params cannot be defined as teleportation mode params at the same time.
+			// But presumably there are other cases.  kai, jun'22
 		}
 
 		routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
