@@ -11,6 +11,8 @@ import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.nio.file.Path;
+
 public class DashboardTests {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -31,17 +33,26 @@ public class DashboardTests {
 	@Test
 	public void stuckAgents() {
 
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+
 		run(new StuckAgentDashboard());
 
-		Assertions.fail("Implement assertions and remove this line.");
+		Assertions.assertThat(out)
+				.isDirectoryContaining("glob:**stuck_agents.md");
+
 	}
 
 	@Test
 	public void trip() {
 
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+
 		run(new TripDashboard());
 
-		Assertions.fail("Implement assertions and remove this line.");
+		Assertions.assertThat(out)
+				.isDirectoryContaining("glob:**trip_stats.csv")
+				.isDirectoryContaining("glob:**mode_share.csv");
+
 	}
 
 }

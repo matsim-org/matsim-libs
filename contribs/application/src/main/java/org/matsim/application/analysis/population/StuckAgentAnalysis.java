@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 @CommandLine.Command(name = "stuck-agents", description = "Generates statistics for stuck agents.")
-@CommandSpec(requireEvents = true, produces = {"stuckAgentsPerHour.csv", "stuckAgentsPerMode.csv", "stuckAgentsPerLink.csv", "stuckAgentsPerModePieChart.csv", "header.md"})
+@CommandSpec(requireEvents = true, produces = {"stuck_agents_per_hour.csv", "stuck_agents_per_mode.csv", "stuck_agents_per_link.csv", "stuckAgentsPerModePieChart.csv", "stuck_agents.md"})
 public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHandler, ActivityStartEventHandler {
 	private static final Logger log = LogManager.getLogger(StuckAgentAnalysis.class);
 	private final Object2IntMap<String> stuckAgentsPerMode = new Object2IntOpenHashMap<>();
@@ -63,7 +63,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		manager.finishProcessing();
 
 		// Total stats
-		PrintWriter printWriter = new PrintWriter(IOUtils.getBufferedWriter(output.getPath("header.md").toString()));
+		PrintWriter printWriter = new PrintWriter(IOUtils.getBufferedWriter(output.getPath("stuck_agents.md").toString()));
 		String markdown = """
 					<div class='stack-agents-table'>
 
@@ -95,7 +95,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		printWriter.close();
 
 		// Per hour
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerHour.csv").toString()), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents_per_hour.csv").toString()), CSVFormat.DEFAULT)) {
 
 			List<String> header = new ArrayList<>(stuckAgentsPerHour.keySet());
 			header.add(0, "hour");
@@ -116,7 +116,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		}
 
 		// Per link
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerLink.csv").toString()), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents_per_link.csv").toString()), CSVFormat.DEFAULT)) {
 
 			// Sort Map
 			List<String> sorted = new ArrayList<>(allStuckedLinks.keySet());
@@ -140,7 +140,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		}
 
 		// Stuck agents per mode
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerMode.csv").toString()), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents_per_mode.csv").toString()), CSVFormat.DEFAULT)) {
 			printer.printRecord("Mode", "# Agents");
 			for (Object2IntMap.Entry<String> entry : stuckAgentsPerMode.object2IntEntrySet()) {
 				printer.printRecord(entry.getKey(), entry.getIntValue());
@@ -150,6 +150,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		}
 
 		// Pie chart
+		// FIXME: if plotly plugin is used, this file won't be needed anymore
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerModePieChart.csv").toString()), CSVFormat.DEFAULT)) {
 
 			List<String> header = new ArrayList<>(stuckAgentsPerMode.keySet());

@@ -20,11 +20,12 @@ public class StuckAgentDashboard implements Dashboard {
 
 		layout.row("first").el(TextBlock.class, (viz, data) -> {
 			viz.title = "";
-			viz.file = data.compute(StuckAgentAnalysis.class, "header.md");
+			viz.file = data.compute(StuckAgentAnalysis.class, "stuck_agents.md");
 			viz.height = 1.;
 		});
 
 		layout.row("second")
+				// FIXME: rewrite using plotly plugin
 				.el(PieChart.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Transport Mode";
 					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerModePieChart.csv");
@@ -32,26 +33,26 @@ public class StuckAgentDashboard implements Dashboard {
 				})
 				.el(Table.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Mode";
-					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerMode.csv");
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_mode.csv");
 				});
 
 		layout.row("third")
 				.el(Bar.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Hour";
 					viz.stacked = true;
-					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerHour.csv");
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
 					viz.x = "hour";
 					viz.xAxisName = "Hour";
 					viz.yAxisName = "# Stuck";
 				})
 				.el(Table.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Hour";
-					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerHour.csv");
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
 				});
 
 		layout.row("four").el(Table.class, (viz, data) -> {
 			viz.title = "Stuck Agents per Link (Top 20)";
-			viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerLink.csv");
+			viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_link.csv");
 		});
 	}
 }

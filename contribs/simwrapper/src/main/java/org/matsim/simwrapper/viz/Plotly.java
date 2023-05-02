@@ -287,8 +287,8 @@ public class Plotly extends Viz {
 		private String y;
 
 		/**
-		 * Only used for pie charts. T
-		 * his is not settable and will be taken from x or y.
+		 * Only used for pie charts.
+		 * This is not settable and will be taken from x or y.
 		 */
 		private String values;
 
