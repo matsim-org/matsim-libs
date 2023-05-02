@@ -27,7 +27,9 @@ public class CommandRunnerTest {
 
 		runner.run(Path.of(utils.getInputDirectory()));
 
-		Assertions.assertThat(path)
+		// Results will go into analysis subdirectory because of the commands package names
+
+		Assertions.assertThat(path.resolve("analysis"))
 				.isDirectoryContaining(p -> p.getFileName().toString().equals("out.xml"))
 				.isDirectoryContaining(p -> p.getFileName().toString().equals("processed.csv"));
 	}

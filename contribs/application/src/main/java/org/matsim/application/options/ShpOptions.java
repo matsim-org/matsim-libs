@@ -175,7 +175,7 @@ public final class ShpOptions {
 		if (!Files.exists(shp))
 			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 		if (queryCRS == null)
-			throw new IllegalArgumentException("Input crs must not be null!");
+			throw new IllegalArgumentException("Query crs must not be null!");
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(queryCRS, detectCRS());
 
@@ -204,7 +204,7 @@ public final class ShpOptions {
 
 	private String detectCRS() {
 
-		if (!isDefined()) {
+		if (shpCrs == null) {
 			try {
 				ShapefileDataStore ds = openDataStore(shp);
 				CoordinateReferenceSystem crs = ds.getSchema().getCoordinateReferenceSystem();
