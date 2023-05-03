@@ -21,6 +21,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import picocli.CommandLine;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -46,6 +48,9 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 	@CommandLine.Option(names = "--mode-filter", split = ",", defaultValue = "car",
 		description = "Only keep links if they have one of the specified modes. Specify 'none' to disable.")
 	private Set<String> modes;
+
+	@CommandLine.Option(names = "--precision", description = "Number of decimals places", defaultValue = "6")
+	private int precision;
 
 	@CommandLine.Option(names = "--with-properties", description = "Put network attributes as properties into the geojson.")
 	private boolean withProperties;
@@ -118,9 +123,10 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 
 		for (Link link : network.getLinks().values()) {
 
-			ObjectNode obj = ft.addObject();
 			if (!filter.test(link))
 				continue;
+
+			ObjectNode obj = ft.addObject();
 
 			obj.put("id", link.getId().toString());
 			obj.put("type", "Feature");
@@ -134,12 +140,12 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 			Coord to = ct.transform(link.getToNode().getCoord());
 
 			ArrayNode f = coords.addArray();
-			f.add(from.getX());
-			f.add(from.getY());
+			f.add(round(from.getX()));
+			f.add(round(from.getY()));
 
 			ArrayNode t = coords.addArray();
-			t.add(to.getX());
-			t.add(to.getY());
+			t.add(round(to.getX()));
+			t.add(round(to.getY()));
 
 			if (withProperties) {
 				ObjectNode prop = obj.putObject("properties");
@@ -152,4 +158,13 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 			}
 		}
 	}
+
+	/**
+	 * Round to desired precision.
+	 */
+	private double round(double x) {
+		BigDecimal d = BigDecimal.valueOf(x).setScale(precision, RoundingMode.HALF_UP);
+		return d.doubleValue();
+	}
+
 }
