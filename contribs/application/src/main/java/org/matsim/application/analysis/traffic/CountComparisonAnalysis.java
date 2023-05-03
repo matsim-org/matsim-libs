@@ -9,6 +9,7 @@ import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
+import org.matsim.application.options.SampleOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -21,6 +22,7 @@ import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
+import tech.tablesaw.table.Relation;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -35,7 +37,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(CountComparisonAnalysis.class);
 
-	@CommandLine.Option(names = "--sample-size", description = "Sample size of scenario", defaultValue = "0.25")
+	@CommandLine.Option(names = "--sample-size", description = "Sample size of population", defaultValue = "0.01")
 	private double sampleSize;
 
 	public static void main(String[] args) {
@@ -134,9 +136,15 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setString("road_type", type);
 			row.setDouble("observed_traffic_volume", observedTrafficVolumeByDay);
 			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
-
-			dailyTrafficVolume.write().csv(output.getPath("count_comparison_total.csv").toFile());
-			byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
 		}
+
+		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")
+				.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
+				.setName("rel_error");
+
+		dailyTrafficVolume.addColumns(relError);
+
+		dailyTrafficVolume.write().csv(output.getPath("count_comparison_total.csv").toFile());
+		byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
 	}
 }
