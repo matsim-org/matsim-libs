@@ -9,6 +9,7 @@ import org.jgrapht.graph.DirectedAcyclicGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.InputOptions;
+import org.matsim.application.options.SampleOptions;
 import org.matsim.application.options.ShpOptions;
 
 import java.nio.file.Files;
@@ -31,6 +32,7 @@ public final class CommandRunner {
 	private Path output;
 	private String defaultShp = null;
 	private String defaultCrs = null;
+	private String defaultSampleSize = null;
 
 
 	/**
@@ -197,6 +199,13 @@ public final class CommandRunner {
 			}
 		}
 
+		if (ApplicationUtils.acceptsOptions(command, SampleOptions.class) && !ArrayUtils.contains(existingArgs, "--sample-size")) {
+			if (defaultSampleSize != null) {
+				args.add("--sample-size");
+				args.add(defaultSampleSize);
+			}
+		}
+
 		// Adds output arguments for this class
 		for (String produce : spec.produces()) {
 			String arg = "--output-" + InputOptions.argName(produce);
@@ -294,9 +303,16 @@ public final class CommandRunner {
 	}
 
 	/**
-	 * Set the CRS passed to input
+	 * Set the default CRS passed to input.
 	 */
 	public void setCRS(String crs) {
 		defaultCrs = crs;
+	}
+
+	/**
+	 * Set the default sample size that is passed as input to commands.
+	 */
+	public void setSampleSize(String sampleSize) {
+		this.defaultSampleSize = sampleSize;
 	}
 }

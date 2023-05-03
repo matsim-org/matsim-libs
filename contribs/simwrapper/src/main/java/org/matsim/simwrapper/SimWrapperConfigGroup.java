@@ -16,7 +16,8 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	// For map:
 	// TODO: zoomLevel
 	// TODO: center
-	// default css
+	// default crs
+	// default sample size
 
 	public SimWrapperConfigGroup() {
 		super(NAME);

@@ -6,13 +6,13 @@ import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Scatter;
 
-public class CountCamparisonDashboard implements Dashboard {
+public class CountComparisonDashboard implements Dashboard {
 
 	@Override
 	public void configure(Header header, Layout layout) {
 
-		header.title = "Count Comparsion Dashboard";
-		header.description = "Comparsion of observed and simulated daily traffic volumes";
+		header.title = "Count Comparison";
+		header.description = "Comparison of observed and simulated daily traffic volumes";
 
 		layout.row("scatterplot").el(Scatter.class, ((viz, data) -> {
 			viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison.csv");

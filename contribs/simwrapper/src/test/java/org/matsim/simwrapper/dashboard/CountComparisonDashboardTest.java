@@ -18,13 +18,12 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.SplittableRandom;
 
-public class CountCamparisonDashboardTest {
+public class CountComparisonDashboardTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -37,7 +36,7 @@ public class CountCamparisonDashboardTest {
 		generateDummyCounts(config);
 
 		SimWrapper sw = SimWrapper.create()
-				.addDashboard(new CountCamparisonDashboard());
+				.addDashboard(new CountComparisonDashboard());
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
