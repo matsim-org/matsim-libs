@@ -37,19 +37,30 @@ public final class SimWrapper {
 
 	private final Config config = new Config();
 
+	private final SimWrapperConfigGroup configGroup;
+
 	private final List<Dashboard> dashboards = new ArrayList<>();
 	private final List<String> context = new ArrayList<>();
 
 	/**
-	 * Use {@link #create()}.
+	 * Use {@link #create(SimWrapperConfigGroup)}.
 	 */
-	private SimWrapper() {
+	private SimWrapper(SimWrapperConfigGroup configGroup) {
+		this.configGroup = configGroup;
 	}
 
-	// TODO: simwrapper folder name
-
+	/**
+	 * Create a new {@link SimWrapper} instance with default config.
+	 */
 	public static SimWrapper create() {
-		return new SimWrapper();
+		return new SimWrapper(new SimWrapperConfigGroup());
+	}
+
+	/**
+	 * * Create a new {@link SimWrapper} instance with given config.
+	 */
+	public static SimWrapper create(SimWrapperConfigGroup configGroup) {
+		return new SimWrapper(configGroup);
 	}
 
 	/**
@@ -59,9 +70,18 @@ public final class SimWrapper {
 		return data;
 	}
 
-	// TODO: docs
+	/**
+	 * Get the internal simwrapper config, which will be exported as yaml file.
+	 */
 	public Config getConfig() {
 		return config;
+	}
+
+	/**
+	 * Return associated config group.
+	 */
+	public SimWrapperConfigGroup getConfigGroup() {
+		return configGroup;
 	}
 
 	/**
@@ -90,12 +110,12 @@ public final class SimWrapper {
 	public void generate(Path dir) throws IOException {
 
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
-				.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
-				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
-				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-				.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-				.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-				.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+			.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+			.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
+			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+			.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+			.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+			.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
 		mapper.registerModule(new JavaTimeModule());
 		mapper.addMixIn(Component.class, ComponentMixin.class);
@@ -153,6 +173,9 @@ public final class SimWrapper {
 		}
 
 		for (CommandRunner runner : data.getRunners().values()) {
+
+			runner.setSampleSize(configGroup.sampleSize);
+
 			runner.run(dir);
 		}
 	}

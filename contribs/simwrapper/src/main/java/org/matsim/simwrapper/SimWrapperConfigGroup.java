@@ -13,11 +13,14 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Whether default dashboards should be generated.")
 	public Mode defaultDashboards = Mode.enabled;
 
+	@Parameter
+	@Comment("Sample size of the run, which may be required by certain analysis functions.")
+	public String sampleSize = "1.0";
+
 	// For map:
 	// TODO: zoomLevel
 	// TODO: center
 	// default crs
-	// default sample size
 
 	public SimWrapperConfigGroup() {
 		super(NAME);
