@@ -26,14 +26,11 @@ public final class CommandRunner {
 	 * Name of the runner.
 	 */
 	private final String name;
-
-	private Path output;
-
-	private String defaultShp = null;
-	private String defaultCrs = null;
-
 	private final Map<Class<? extends MATSimAppCommand>, String> shpFiles = new HashMap<>();
 	private final Map<Class<? extends MATSimAppCommand>, String[]> args = new HashMap<>();
+	private Path output;
+	private String defaultShp = null;
+	private String defaultCrs = null;
 
 
 	/**
@@ -107,14 +104,20 @@ public final class CommandRunner {
 	/**
 	 * Build the base path.
 	 */
-	private Path buildPath(CommandSpec spec) {
-		String context = "";
-		if (name != null && !name.isBlank())
-			context = "-" + name;
-		if (spec.group() != null)
-			return output.resolve(context);
+	private Path buildPath(CommandSpec spec, Class<? extends MATSimAppCommand> command) {
 
-		return output;
+		// use the command name if it is present and no other group name given
+		String packageName = command.getPackageName();
+		if (packageName.contains(".")) {
+			packageName = packageName.substring(packageName.lastIndexOf(".") + 1);
+		}
+
+		String context = spec.group().isBlank() ? packageName : spec.group();
+
+		if (name != null && !name.isBlank())
+			context += "-" + name;
+
+		return output.resolve(context);
 	}
 
 
@@ -209,20 +212,20 @@ public final class CommandRunner {
 	/**
 	 * Get the path for a certain file produced by a command.
 	 */
-	public String getPath(Class<? extends MATSimAppCommand> command, String file) {
+	private String getPath(Class<? extends MATSimAppCommand> command, String file) {
 		CommandSpec spec = ApplicationUtils.getSpec(command);
-		return buildPath(spec).resolve(file).toString();
+		return buildPath(spec, command).resolve(file).toString();
 	}
 
 	/**
-	 * Returns the output path of a command. Will throw an exception if this command does not declared it as an output.
+	 * Returns the output path of a command. Will throw an exception if this command does not declare it as an output.
 	 */
-	public String getRequiredPath(Class<? extends MATSimAppCommand> command, String file) {
+	public Path getRequiredPath(Class<? extends MATSimAppCommand> command, String file) {
 		CommandSpec spec = ApplicationUtils.getSpec(command);
 		if (!ArrayUtils.contains(spec.produces(), file))
 			throw new IllegalArgumentException(String.format("Command %s does not declare output %s", command, file));
 
-		return buildPath(spec).resolve(file).toString();
+		return buildPath(spec, command).resolve(file);
 	}
 
 	/**
@@ -240,6 +243,13 @@ public final class CommandRunner {
 	public CommandRunner setOutput(Path path) {
 		this.output = path;
 		return this;
+	}
+
+	/**
+	 * Name of the runner.
+	 */
+	public String getName() {
+		return name;
 	}
 
 	/**

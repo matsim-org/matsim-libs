@@ -11,10 +11,6 @@
 	<artifactId>simwrapper</artifactId>
 	<name>SimWrapper</name>
 
-	<properties>
-		<tablesaw.version>0.43.1</tablesaw.version>
-	</properties>
-
 	<dependencies>
 
 		<dependency>
@@ -30,21 +26,18 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>5.3</version>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>tech.tablesaw</groupId>
 			<artifactId>tablesaw-core</artifactId>
-			<version>${tablesaw.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>tech.tablesaw</groupId>
 			<artifactId>tablesaw-jsplot</artifactId>
-			<version>${tablesaw.version}</version>
 		</dependency>
 
 		<dependency>

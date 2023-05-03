@@ -3,12 +3,12 @@ package org.matsim.simwrapper.viz;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -24,6 +24,7 @@ import tech.tablesaw.plotly.traces.HistogramTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.io.File;
+import java.io.IOException;
 
 public class PlotlyTest {
 
@@ -32,22 +33,28 @@ public class PlotlyTest {
 
 	private ObjectWriter writer;
 
-	@Before
-	public void setUp() throws Exception {
+	public static ObjectWriter createWriter() {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
 				.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
 				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
-				.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
 				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+				.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+				.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 				.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
+		mapper.registerModule(new JavaTimeModule());
 		mapper.addMixIn(Component.class, ComponentMixin.class);
 
-		writer = mapper.writerFor(Plotly.class);
+		return mapper.writerFor(Plotly.class);
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		writer = createWriter();
 	}
 
 	@Test
-	public void inline() throws JsonProcessingException {
+	public void inline() throws IOException {
 
 		Object[] x = {"sheep", "cows", "fish", "tree sloths"};
 		double[] y = {1, 4, 9, 16};
@@ -56,7 +63,7 @@ public class PlotlyTest {
 
 		Plotly plot = new Plotly();
 
-		plot.addTrace(trace, Plotly.inline());
+		plot.addTrace(trace);
 
 		String value = writer.writeValueAsString(plot);
 
@@ -66,25 +73,32 @@ public class PlotlyTest {
 	}
 
 	@Test
-	public void data() throws JsonProcessingException {
+	public void data() throws IOException {
 
+		ScatterTrace.ScatterBuilder trace = ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+				.text(Plotly.TEXT_INPUT)
+				.marker(Marker.builder()
+						.color(Plotly.TEXT_INPUT)
+						.size(Plotly.INPUT)
+						.build());
 
-		BarTrace trace = BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build();
+		Plotly plotly = new Plotly();
 
-		Plotly plot = new Plotly();
-
-		plot.addTrace(trace, Plotly.data("ref.csv").x("values").y("names"));
-
-		String value = writer.writeValueAsString(plot);
+		plotly.addTrace(trace.build(), Plotly.fromFile("test.csv")
+				.x("xColumn")
+				.y("yColumn")
+				.text("labelColumn")
+				.size("sizeColumn")
+				.opacity("opacityColumn")
+				.color("colorColumn")
+		);
 
 		Assertions.assertThat(new File(utils.getClassInputDirectory(), "data.yaml"))
-				.hasContent(value);
-
-
+				.hasContent(writer.writeValueAsString(plotly));
 	}
 
 	@Test
-	public void multiple() throws JsonProcessingException {
+	public void multiple() throws IOException {
 
 
 		ScatterTrace scatter = ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -107,9 +121,9 @@ public class PlotlyTest {
 
 		Plotly plot = new Plotly();
 
-		plot.addTrace(scatter, Plotly.inline());
-		plot.addTrace(line, Plotly.inline());
-		plot.addTrace(hist, Plotly.inline());
+		plot.addTrace(scatter);
+		plot.addTrace(line);
+		plot.addTrace(hist);
 
 		plot.layout = Layout.builder()
 				.hoverDistance(5)

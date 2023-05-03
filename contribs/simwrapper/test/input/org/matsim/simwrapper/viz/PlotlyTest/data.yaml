@@ -1,7 +1,19 @@
 type: plotly
 traces:
-- data:
-    path: ref.csv
-    x: values
-    "y": names
-  orientation: v
+- dataset:
+    file: test.csv
+    x: xColumn
+    "y": yColumn
+    text: labelColumn
+    size: sizeColumn
+    color: colorColumn
+    opacity: opacityColumn
+  fill: none
+  mode: markers
+  marker:
+    cauto: true
+    autocolorscale: true
+    opacity: 1.0
+    sizemode: diameter
+  whiskerwidth: 0.0
+  type: scatter

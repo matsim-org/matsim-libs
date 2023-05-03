@@ -14,7 +14,7 @@ public class PieChart extends Viz {
 	 * iteration's output, if you are only in the final iteration.
 	 */
 	@JsonProperty(required = true)
-	public String useLastRow;
+	public boolean useLastRow;
 
 	/**
 	 * Array of strings. List the column names of any columns

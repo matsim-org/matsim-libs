@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandRunner;
@@ -16,6 +17,8 @@ import org.matsim.simwrapper.viz.Viz;
 import tech.tablesaw.plotly.components.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ import java.util.Map;
 /**
  * Class to define and generate SimWrapper dashboards.
  */
+@SuppressWarnings("unused")
 public final class SimWrapper {
 
 	private static final Logger log = LogManager.getLogger(SimWrapper.class);
@@ -34,6 +38,7 @@ public final class SimWrapper {
 	private final Config config = new Config();
 
 	private final List<Dashboard> dashboards = new ArrayList<>();
+	private final List<String> context = new ArrayList<>();
 
 	/**
 	 * Use {@link #create()}.
@@ -60,21 +65,22 @@ public final class SimWrapper {
 	}
 
 	/**
-	 * Adds an dashboard definition to SimWrapper.
+	 * Adds a dashboard definition to SimWrapper.
 	 * This only stores the specification, the actual code is executed during {@link #generate(Path)}.
 	 */
 	public SimWrapper addDashboard(Dashboard d) {
-		dashboards.add(d);
-		return this;
+		return addDashboard(d, "");
 	}
 
 	/**
-	 * Add dashboard at specific index.
+	 * Adds a dashboard definition to SimWrapper.
+	 * This only stores the specification, the actual code is executed during {@link #generate(Path)}.
 	 *
-	 * @see #addDashboard(Dashboard)
+	 * @param context context name, which allows to add multiple dashboards of the same kind.
 	 */
-	public SimWrapper addDashboard(int index, Dashboard d) {
-		dashboards.add(index, d);
+	public SimWrapper addDashboard(Dashboard d, String context) {
+		dashboards.add(d);
+		this.context.add(context);
 		return this;
 	}
 
@@ -83,17 +89,20 @@ public final class SimWrapper {
 	 */
 	public void generate(Path dir) throws IOException {
 
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER).enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
+				.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
 				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 				.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+				.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 				.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
+		mapper.registerModule(new JavaTimeModule());
 		mapper.addMixIn(Component.class, ComponentMixin.class);
 
 		ObjectWriter writer = mapper.writerFor(YAML.class);
 
-		Path target = dir.resolve(".simwrapper");
-		Files.createDirectories(target);
+		Files.createDirectories(dir);
 
 		data.setPath(dir.resolve("analysis"));
 
@@ -107,12 +116,12 @@ public final class SimWrapper {
 		for (Dashboard d : dashboards) {
 
 			YAML yaml = new YAML();
-			Layout layout = new Layout();
+			Layout layout = new Layout(context.get(i));
 
 			d.configure(yaml.header, layout);
 			yaml.layout = layout.create(data);
 
-			Path out = target.resolve("dashboard-" + i + ".yaml");
+			Path out = dir.resolve("dashboard-" + i + ".yaml");
 			writer.writeValue(out.toFile(), yaml);
 
 			i++;
@@ -120,10 +129,7 @@ public final class SimWrapper {
 
 		ObjectWriter configWriter = mapper.writerFor(Config.class);
 
-		config.fullWidth = true;
-		config.hideLeftBar = true;
-
-		Path out = target.resolve("simwrapper-config.yaml");
+		Path out = dir.resolve("simwrapper-config.yaml");
 		configWriter.writeValue(out.toFile(), config);
 
 		// TODO: think about json schema for the datatypes
@@ -133,6 +139,19 @@ public final class SimWrapper {
 	 * Run data pipeline to create the necessary data for the dashboards.
 	 */
 	public void run(Path dir) {
+
+		for (Map.Entry<Path, URL> e : data.getResources().entrySet()) {
+			try {
+				Files.createDirectories(e.getKey());
+				try (InputStream is = e.getValue().openStream()) {
+					Files.copy(is, e.getKey());
+				}
+
+			} catch (IOException ex) {
+				log.error("Could not copy resources", ex);
+			}
+		}
+
 		for (CommandRunner runner : data.getRunners().values()) {
 			runner.run(dir);
 		}
@@ -148,11 +167,13 @@ public final class SimWrapper {
 
 	}
 
+	/**
+	 * Class representing the simwrapper config.
+	 */
 	public static final class Config {
 
-		private boolean hideLeftBar;
-
-		private boolean fullWidth;
+		public boolean hideLeftBar = false;
+		public boolean fullWidth = true;
 
 	}
 }

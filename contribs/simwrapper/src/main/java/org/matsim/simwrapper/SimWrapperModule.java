@@ -37,8 +37,4 @@ public final class SimWrapperModule extends AbstractModule {
 		addControlerListenerBinding().to(SimWrapperListener.class);
 
 	}
-
-	// TODO: config group?
-	// param set of shape files
-
 }

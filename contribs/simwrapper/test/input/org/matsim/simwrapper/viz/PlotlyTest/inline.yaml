@@ -11,3 +11,4 @@ traces:
   - 9.0
   - 16.0
   orientation: v
+  type: bar

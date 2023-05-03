@@ -5,7 +5,7 @@ public class Bar extends Chart{
 	/**
 	 * true/false for bar charts, whether to stack multiple bars
 	 */
-	public String stacked; // TODO: should be boolean ?
+	public boolean stacked;
 
 	public Bar() {
 		super("bar");

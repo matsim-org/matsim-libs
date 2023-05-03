@@ -11,7 +11,12 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Whether default dashboards should be generated.")
-	private Mode defaultDashboards = Mode.enabled;
+	public Mode defaultDashboards = Mode.enabled;
+
+	// For map:
+	// TODO: zoomLevel
+	// TODO: center
+	// default css
 
 	public SimWrapperConfigGroup() {
 		super(NAME);

@@ -11,4 +11,16 @@ public interface Dashboard {
 	 */
 	void configure(Header header, Layout layout);
 
+	interface Customizable extends Dashboard {
+
+		/**
+		 * Set the title of this dashboard
+		 * @return same instance
+		 */
+		default Customizable withTitle(String title) {
+			return this;
+		}
+
+	}
+
 }

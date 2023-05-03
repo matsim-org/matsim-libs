@@ -53,7 +53,7 @@ public @interface CommandSpec {
 	Class<? extends MATSimAppCommand>[] dependsOn() default {};
 
 	/**
-	 * Group name / identifier.
+	 * Group name / identifier. Will use the package name if this is not changed here.
 	 */
 	String group() default "";
 
