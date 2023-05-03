@@ -34,7 +34,7 @@
         <geotools.version>29.0</geotools.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>5.1.0</guice.version>
-        <jackson.version>2.14.2</jackson.version>
+        <jackson.version>2.15.0</jackson.version>
     </properties>
 
     <scm>
@@ -197,7 +197,7 @@
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
                 <artifactId>woodstox-core</artifactId>
-                <version>6.5.0</version>
+                <version>6.5.1</version>
             </dependency>
 
             <dependency>
@@ -264,7 +264,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.33.0</version>
+                <version>3.34.0</version>
             </dependency>
 
 			<dependency>
@@ -274,6 +274,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>it.unimi.dsi</groupId>
+				<artifactId>fastutil</artifactId>
+				<version>8.5.12</version>
+			</dependency>
+
+            <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>3.24.2</version>
@@ -283,7 +289,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.3.0</version>
+                <version>5.3.1</version>
                 <scope>test</scope>
             </dependency>
 
@@ -451,7 +457,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.9</version>
+                        <version>0.8.10</version>
                         <executions>
                             <execution>
                                 <id>default-prepare-agent</id>

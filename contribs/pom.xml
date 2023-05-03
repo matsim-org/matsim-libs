@@ -78,6 +78,7 @@
 		<module>freight</module>
 		<module>freightreceiver</module>
 		<module>hybridsim</module>
+		<module>informed-mode-choice</module>
 		<module>integration</module>
 		<module>locationchoice</module>
 		<module>matrixbasedptrouter</module>

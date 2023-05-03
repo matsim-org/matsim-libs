@@ -47,9 +47,8 @@ import java.util.List;
  *
  * @author thibautd
  */
-public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
+public final class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private static final Logger log = LogManager.getLogger( PlanRouter.class ) ;
-	
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
 	private final TimeInterpretation timeInterpretation;
@@ -61,10 +60,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
 	 * origin and destination activity.
 	 */
-	public PlanRouter(
-			final TripRouter tripRouter,
-			final ActivityFacilities facilities,
-			final TimeInterpretation timeInterpretation) {
+	public PlanRouter( final TripRouter tripRouter, final ActivityFacilities facilities, final TimeInterpretation timeInterpretation) {
 		this.tripRouter = tripRouter;
 		this.facilities = facilities;
 		this.timeInterpretation = timeInterpretation;
@@ -73,21 +69,20 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	/**
 	 * Short for initialising without facilities.
 	 */
-	public PlanRouter(
-			final TripRouter routingHandler, final TimeInterpretation timeInterpretation) {
+	public PlanRouter( final TripRouter routingHandler, final TimeInterpretation timeInterpretation) {
 		this( routingHandler , null, timeInterpretation );
 	}
 
-	/**
-	 * Gives access to the {@link TripRouter} used
-	 * to compute routes.
-	 *
-	 * @return the internal TripRouter instance.
-	 */
-	@Deprecated // get TripRouter out of injection instead. kai, feb'16
-	public TripRouter getTripRouter() {
-		return tripRouter;
-	}
+//	/**
+//	 * Gives access to the {@link TripRouter} used
+//	 * to compute routes.
+//	 *
+//	 * @return the internal TripRouter instance.
+//	 */
+//	@Deprecated // get TripRouter out of injection instead. kai, feb'16
+//	public TripRouter getTripRouter() {
+//		return tripRouter;
+//	}
 
 	@Override
 	public void run(final Plan plan) {
@@ -99,7 +94,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			timeTracker.addActivity(oldTrip.getOriginActivity());
 			
 			if (log.isDebugEnabled()) log.debug("about to call TripRouter with routingMode=" + routingMode);
-			final List<? extends PlanElement> newTrip = tripRouter.calcRoute( //
+			final List<? extends PlanElement> newTripElements = tripRouter.calcRoute( //
 					routingMode, //
 					FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities), //
 					FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities), //
@@ -108,14 +103,11 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 					oldTrip.getTripAttributes() //
 			);
 			
-			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
-			TripRouter.insertTrip(
-					plan, 
-					oldTrip.getOriginActivity(),
-					newTrip,
-					oldTrip.getDestinationActivity());
+			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTripElements);
+
+			TripRouter.insertTrip( plan, oldTrip.getOriginActivity(), newTripElements, oldTrip.getDestinationActivity());
 			
-			timeTracker.addElements(newTrip);
+			timeTracker.addElements(newTripElements);
 		}
 	}
 
@@ -126,7 +118,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 * @param oldTrip The old trip
 	 * @param newTrip The new trip
 	 */
-	private static void putVehicleFromOldTripIntoNewTripIfMeaningful(Trip oldTrip, List<? extends PlanElement> newTrip) {
+	public static void putVehicleFromOldTripIntoNewTripIfMeaningful(Trip oldTrip, List<? extends PlanElement> newTrip) {
 		Id<Vehicle> oldVehicleId = getUniqueVehicleId(oldTrip);
 		if (oldVehicleId != null) {
 			for (Leg leg : TripStructureUtils.getLegs(newTrip)) {
