@@ -226,16 +226,16 @@ public class ExampleTwoChains {
 					.addLogisticChainElement(southCarrierElement)
 					.build();
 
-			final ShipmentAssigner multipleSolutionShipmentAssigner = UsecaseUtils.createMultipleLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = UsecaseUtils.createAnyNumberLogisticChainShipmentAssigner();
 			lspPlan_twoChains = LSPUtils.createLSPPlan()
 					.addLogisticChain(southChain)
 					.addLogisticChain(northChain)
-					.setAssigner(multipleSolutionShipmentAssigner);
+					.setAssigner(shipmentAssigner);
 
-			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+//			final shipmentAssigner singleShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 			lspPlan_oneChain = LSPUtils.createLSPPlan()
 					.addLogisticChain(oneChain)
-					.setAssigner(singleSolutionShipmentAssigner);
+					.setAssigner(shipmentAssigner);
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();

@@ -63,8 +63,8 @@ public class UsecaseUtils {
 		return new SingleLogisticChainShipmentAssigner();
 	}
 
-	public static MultipleLogisticChainShipmentAssigner createMultipleLogisticChainShipmentAssigner() {
-		return new MultipleLogisticChainShipmentAssigner();
+	public static AnyNumberLogisticChainShipmentAssigner createAnyNumberLogisticChainShipmentAssigner() {
+		return new AnyNumberLogisticChainShipmentAssigner();
 	}
 
 	/**
