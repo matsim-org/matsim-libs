@@ -73,7 +73,7 @@ public final class Data {
 		Path path = currentContext.getRequiredPath(command, file);
 
 		// Relative path from the simulation output
-		return this.path.getParent().relativize(path).toString();
+		return this.getUnixPath(this.path.getParent().relativize(path));
 	}
 
 	public String subcommand(String command, String file) {
@@ -111,9 +111,15 @@ public final class Data {
 			throw new RuntimeException("Illegal URL", e);
 		}
 
-		return this.path.getParent().relativize(resolved).toString();
+		return this.getUnixPath(this.path.getParent().relativize(resolved));
 	}
 
+	/**
+	 * Returns the unix path. Otherwise paths might be Windows paths, which are not compatible to simwrapper.
+	 * */
+	private String getUnixPath(Path p){
+		return p.toString().replace('\\', '/');
+	}
 
 	/**
 	 * Switch to a different context, which can hold different arguments and shp options.
