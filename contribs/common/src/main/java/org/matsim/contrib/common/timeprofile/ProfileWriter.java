@@ -47,10 +47,13 @@ import com.google.common.collect.Lists;
 public class ProfileWriter implements IterationEndsListener {
 
 	public interface ProfileView {
-		TimeDiscretizer timeDiscretizer();
+		// times at which profile samples were collected
+		int[] times();
 
+		// map of sampled time profiles
 		ImmutableMap<String, double[]> profiles();
 
+		// custom series paint (if not provided, the default paint is used instead)
 		Map<String, Paint> seriesPaints();
 	}
 
@@ -68,35 +71,39 @@ public class ProfileWriter implements IterationEndsListener {
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		TimeDiscretizer timeDiscretizer = view.timeDiscretizer();
+		var times = view.times();
 		ImmutableMap<String, double[]> profiles = view.profiles();
 
 		String file = filename(outputFile);
-		String timeFormat = timeDiscretizer.getTimeInterval() % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
+		String timeFormat = Time.TIMEFORMAT_HHMMSS;
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
 			String[] profileHeader = profiles.keySet().toArray(new String[0]);
 			writer.writeNext(new CSVLineBuilder().add("time").addAll(profileHeader));
-			timeDiscretizer.forEach(
-					(bin, time) -> writer.writeNext(new CSVLineBuilder().add(Time.writeTime(time, timeFormat)).addAll(cells(profiles, bin))));
+			for (int i = 0; i < times.length; i++) {
+				var line = new CSVLineBuilder().add(Time.writeTime(times[i], timeFormat)).addAll(cells(profiles, i));
+				writer.writeNext(line);
+			}
 		}
 
 		if (this.matsimServices.getConfig().controler().isCreateGraphs()) {
-			DefaultTableXYDataset xyDataset = createXYDataset(timeDiscretizer, profiles);
+			DefaultTableXYDataset xyDataset = createXYDataset(times, profiles);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.Line);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.StackedArea);
 		}
 	}
 
 	private Stream<String> cells(Map<String, double[]> profiles, int idx) {
-		return profiles.values().stream().map(values -> values[idx] + "");
+		return profiles.values().stream().map(profile -> profile[idx] + "");
 	}
 
-	private DefaultTableXYDataset createXYDataset(TimeDiscretizer timeDiscretizer, Map<String, double[]> profiles) {
+	private DefaultTableXYDataset createXYDataset(int[] times, Map<String, double[]> profiles) {
 		List<XYSeries> seriesList = new ArrayList<>(profiles.size());
 		profiles.forEach((name, profile) -> {
 			XYSeries series = new XYSeries(name, true, false);
-			timeDiscretizer.forEach((bin, time) -> series.add(((double)time) / 3600, profile[bin]));
+			for (int i = 0; i < times.length; i++) {
+				series.add((double)times[i] / 3600, profile[i]);
+			}
 			seriesList.add(series);
 		});
 

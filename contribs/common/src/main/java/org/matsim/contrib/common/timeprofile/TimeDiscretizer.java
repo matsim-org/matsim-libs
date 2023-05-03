@@ -22,6 +22,8 @@ package org.matsim.contrib.common.timeprofile;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.util.stream.IntStream;
+
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 
 public class TimeDiscretizer {
@@ -57,6 +59,10 @@ public class TimeDiscretizer {
 
 	public int getIntervalCount() {
 		return intervalCount;
+	}
+
+	public int[] getTimes() {
+		return IntStream.range(0, intervalCount).map(i -> i * timeInterval).toArray();
 	}
 
 	public interface TimeBinConsumer {
