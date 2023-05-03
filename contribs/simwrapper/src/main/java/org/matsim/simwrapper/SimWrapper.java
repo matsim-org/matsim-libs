@@ -33,7 +33,7 @@ public final class SimWrapper {
 
 	private static final Logger log = LogManager.getLogger(SimWrapper.class);
 
-	private final Data data = new Data();
+	private final Data data;
 
 	private final Config config = new Config();
 
@@ -47,6 +47,7 @@ public final class SimWrapper {
 	 */
 	private SimWrapper(SimWrapperConfigGroup configGroup) {
 		this.configGroup = configGroup;
+		this.data = new Data(configGroup);
 	}
 
 	/**

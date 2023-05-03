@@ -15,6 +15,11 @@ import java.util.Map;
 public final class Data {
 
 	/**
+	 * Configured Simwrapper config.
+	 */
+	private final SimWrapperConfigGroup config;
+
+	/**
 	 * Maps context to command runners.
 	 */
 	private final Map<String, CommandRunner> runners = new HashMap<>();
@@ -30,10 +35,17 @@ public final class Data {
 	private Path path;
 	private CommandRunner currentContext;
 
-	public Data() {
-
+	Data(SimWrapperConfigGroup config) {
 		// path needed, but not available yet
-		currentContext = runners.computeIfAbsent("", CommandRunner::new);
+		this.currentContext = runners.computeIfAbsent("", CommandRunner::new);
+		this.config = config;
+	}
+
+	/**
+	 * Returns the config that was given to {@link SimWrapper}.
+	 */
+	public SimWrapperConfigGroup config() {
+		return config;
 	}
 
 	/**
@@ -115,9 +127,9 @@ public final class Data {
 	}
 
 	/**
-	 * Returns the unix path. Otherwise paths might be Windows paths, which are not compatible to simwrapper.
-	 * */
-	private String getUnixPath(Path p){
+	 * Returns the unix path. Otherwise, paths might be Windows paths, which are not compatible to simwrapper.
+	 */
+	private String getUnixPath(Path p) {
 		return p.toString().replace('\\', '/');
 	}
 
