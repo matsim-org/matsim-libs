@@ -448,103 +448,103 @@ public final class Config implements MatsimExtensionPoint {
 	// ////////////////////////////////////////////////////////////////////
 
 	public final GlobalConfigGroup global() {
-		return this.global;
+		return (GlobalConfigGroup) this.getModule(GlobalConfigGroup.GROUP_NAME);
 	}
 
 	public final ControlerConfigGroup controler() {
-		return this.controler;
+		return (ControlerConfigGroup) this.getModule(ControlerConfigGroup.GROUP_NAME);
 	}
 
 	public final CountsConfigGroup counts() {
-		return this.counts;
+		return (CountsConfigGroup) this.getModule(CountsConfigGroup.GROUP_NAME);
 	}
 
 	public final PlanCalcScoreConfigGroup planCalcScore() {
-		return this.charyparNagelScoring;
+		return (PlanCalcScoreConfigGroup) this.getModule(PlanCalcScoreConfigGroup.GROUP_NAME);
 	}
 
 	public final NetworkConfigGroup network() {
-		return this.network;
+		return (NetworkConfigGroup) this.getModule(NetworkConfigGroup.GROUP_NAME);
 	}
 
 	public final PlansConfigGroup plans() {
-		return this.plans;
+		return (PlansConfigGroup) this.getModule(PlansConfigGroup.GROUP_NAME);
 	}
 
 	public final HouseholdsConfigGroup households() {
-		return this.households;
+		return (HouseholdsConfigGroup) this.getModule(HouseholdsConfigGroup.GROUP_NAME);
 	}
 
 	public final FacilitiesConfigGroup facilities() {
-		return this.facilities;
+		return (FacilitiesConfigGroup) this.getModule(FacilitiesConfigGroup.GROUP_NAME);
 	}
 
     public final StrategyConfigGroup strategy() {
-		return this.strategy;
+		return (StrategyConfigGroup) this.getModule(StrategyConfigGroup.GROUP_NAME);
 	}
 
 	public TravelTimeCalculatorConfigGroup travelTimeCalculator() {
-		return this.travelTimeCalculatorConfigGroup;
+		return (TravelTimeCalculatorConfigGroup) this.getModule(TravelTimeCalculatorConfigGroup.GROUPNAME);
 	}
 
 	public ScenarioConfigGroup scenario() {
-		return this.scenarioConfigGroup;
+		return (ScenarioConfigGroup) this.getModule(ScenarioConfigGroup.GROUP_NAME);
 	}
 
 	public PlansCalcRouteConfigGroup plansCalcRoute() {
-		return this.plansCalcRoute;
+		return (PlansCalcRouteConfigGroup) this.getModule(PlansCalcRouteConfigGroup.GROUP_NAME);
 	}
 
 	public VspExperimentalConfigGroup vspExperimental() {
-		return this.vspExperimentalGroup;
+		return (VspExperimentalConfigGroup) this.getModule(VspExperimentalConfigGroup.GROUP_NAME);
 	}
 
 	public QSimConfigGroup qsim() {
-		return this.qSimConfigGroup;
+		return (QSimConfigGroup) this.getModule(QSimConfigGroup.GROUP_NAME);
 	}
 
 	public PtCountsConfigGroup ptCounts() {
-		return this.ptCounts;
+		return (PtCountsConfigGroup) this.getModule(PtCountsConfigGroup.GROUP_NAME);
 	}
 
 	public TransitConfigGroup transit() {
-		return this.transit;
+		return (TransitConfigGroup) this.getModule(TransitConfigGroup.GROUP_NAME);
 	}
 
 	public TransitRouterConfigGroup transitRouter() {
-		return this.transitRouter;
+		return (TransitRouterConfigGroup) this.getModule(TransitRouterConfigGroup.GROUP_NAME);
 	}
 
 	public LinkStatsConfigGroup linkStats() {
-		return this.linkStats;
+		return (LinkStatsConfigGroup) this.getModule(LinkStatsConfigGroup.GROUP_NAME);
 	}
 
 	public TimeAllocationMutatorConfigGroup timeAllocationMutator() {
-		return this.timeAllocationMutator;
+		return (TimeAllocationMutatorConfigGroup) this.getModule(TimeAllocationMutatorConfigGroup.GROUP_NAME);
 	}
 
 	public ParallelEventHandlingConfigGroup parallelEventHandling() {
-		return this.parallelEventHandling;
+		return (ParallelEventHandlingConfigGroup) this.getModule(ParallelEventHandlingConfigGroup.GROUP_NAME);
 	}
 
 	public SubtourModeChoiceConfigGroup subtourModeChoice() {
-		return this.subtourModeChoice;
+		return (SubtourModeChoiceConfigGroup) this.getModule(SubtourModeChoiceConfigGroup.GROUP_NAME);
 	}
 
 	public ChangeModeConfigGroup changeMode() {
-		return this.changeMode;
+		return (ChangeModeConfigGroup) this.getModule(ChangeModeConfigGroup.CONFIG_MODULE);
 	}
 
 	public JDEQSimConfigGroup jdeqSim() {
-		return this.jdeqSim;
+		return (JDEQSimConfigGroup) this.getModule(JDEQSimConfigGroup.NAME);
 	}
 
 	public HermesConfigGroup hermes() {
-		return this.hermes;
+		return (HermesConfigGroup) this.getModule(HermesConfigGroup.NAME);
 	}
 
 	public ReplanningAnnealerConfigGroup replanningAnnealer() {
-		return replanningAnnealer;
+		return (ReplanningAnnealerConfigGroup) this.getModule(ReplanningAnnealerConfigGroup.GROUP_NAME);
 	}
 
 	// other:
