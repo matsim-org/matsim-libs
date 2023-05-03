@@ -4,22 +4,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Links extends Viz {
 
-	public Links() {
-		super("links");
-	}
-
-	public Datasets datasets = new Datasets();
 
 	@JsonProperty(required = true)
 	public String network;
 
+	public Datasets datasets = new Datasets();
+
 	public String projection;
-
 	public String center;
-
 	public Display display = new Display();
 
-	public static final class Datasets{
+	public Links() {
+		super("links");
+	}
+
+	public static final class Datasets {
 
 		@JsonProperty(required = true)
 		public String csvFile;
@@ -27,11 +26,11 @@ public class Links extends Viz {
 		public String csvBase;
 	}
 
-	public static final class Display{
+	public static final class Display {
 
 		public Color color = new Color();
 
-		public static final class Color{
+		public static final class Color {
 
 			public String dataset;
 

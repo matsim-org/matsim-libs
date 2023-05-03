@@ -20,6 +20,17 @@ public class CountComparisonDashboard implements Dashboard {
 		header.title = "Count Comparsion Dashboard";
 		header.description = "Comparsion of observed and simulated daily traffic volumes";
 
+		layout.row("map")
+			.el(Links.class, (viz, data) -> {
+
+				viz.title = "Relative traffic volumes";
+				viz.height = 8d;
+
+				viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
+
+				viz.datasets.csvFile = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+			});
+
 		layout.row("scatterplot").el(Scatter.class, ((viz, data) -> {
 					viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
 
@@ -32,20 +43,7 @@ public class CountComparisonDashboard implements Dashboard {
 
 					viz.xAxisName = "Observed traffic volume";
 					viz.yAxisName = "Simulated traffic volume";
-				}))
-				.el(Links.class, (viz, data) -> {
+				}));
 
-					String csvFile = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
-
-					viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
-					viz.projection = "EPSG:4326";
-
-					viz.datasets.csvFile = csvFile;
-
-					viz.title = "Relative traffic volumes";
-
-					viz.display.color.dataset = csvFile;
-					viz.display.color.columnName = "rel_error";
-				});
 	}
 }
