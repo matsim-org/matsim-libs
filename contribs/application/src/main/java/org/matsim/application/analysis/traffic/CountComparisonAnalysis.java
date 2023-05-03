@@ -1,6 +1,5 @@
 package org.matsim.application.analysis.traffic;
 
-import org.apache.commons.csv.CSVPrinter;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -8,8 +7,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.analysis.population.StuckAgentAnalysis;
-import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -20,12 +17,16 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
 import picocli.CommandLine;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.StringColumn;
+import tech.tablesaw.api.Table;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 @CommandLine.Command(name = "todo", description = "todo")
-@CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true, produces = {"count_comparison.csv"})
+@CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true, produces = {"count_comparison_by_hour.csv", "count_comparison_total.csv"})
 public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
@@ -34,8 +35,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(CountComparisonAnalysis.class);
 
-	@CommandLine.Mixin
-	private CsvOptions csv;
+	@CommandLine.Option(names = "--sample-size", description = "Sample size of scenario", defaultValue = "0.25")
+	private double sampleSize;
 
 	public static void main(String[] args) {
 		new CountComparisonAnalysis().execute(args);
@@ -48,7 +49,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 
 		Network network = input.getNetwork();
 
-		VolumesAnalyzer volume = new VolumesAnalyzer(86400, 86400, network, true);
+		VolumesAnalyzer volume = new VolumesAnalyzer(3600, 86400, network, true);
 
 		eventsManager.addHandler(volume);
 
@@ -67,38 +68,75 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		return 0;
 	}
 
-	private void writeOutput(Counts<Link> counts, Network network, VolumesAnalyzer volumes) throws IOException {
+	private void writeOutput(Counts<Link> counts, Network network, VolumesAnalyzer volumes) {
 
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 
-		try (CSVPrinter printer = csv.createPrinter(output.getPath("count_comparison.csv"))) {
+		Table byHour = Table.create(
+				StringColumn.create("link_id"),
+				StringColumn.create("name"),
+				StringColumn.create("road_type"),
+				DoubleColumn.create("hour"),
+				DoubleColumn.create("observed_traffic_volume"),
+				DoubleColumn.create("simulated_traffic_volume")
+		);
 
-			printer.printRecord("link_id", "name", "road_type", "observed_traffic_volume", "simulated_traffic_volume");
+		Table dailyTrafficVolume = Table.create(StringColumn.create("link_id"),
+				StringColumn.create("name"),
+				StringColumn.create("road_type"),
+				DoubleColumn.create("observed_traffic_volume"),
+				DoubleColumn.create("simulated_traffic_volume")
+		);
 
-			for (Map.Entry<Id<Link>, Count<Link>> entry : counts.getCounts().entrySet()) {
-				Id<Link> key = entry.getKey();
-				Map<Integer, Volume> countVolume = entry.getValue().getVolumes();
-				String name = entry.getValue().getCsLabel();
+		for (Map.Entry<Id<Link>, Count<Link>> entry : counts.getCounts().entrySet()) {
+			Id<Link> key = entry.getKey();
+			Map<Integer, Volume> countVolume = entry.getValue().getVolumes();
+			String name = entry.getValue().getCsLabel();
 
-				if (countVolume.isEmpty())
-					continue;
+			Link link = links.get(key);
+			String type = NetworkUtils.getType(link);
 
-				Double observedTrafficVolume = countVolume.values().stream().map(Volume::getValue).reduce(Double::sum).get();
-				int[] volumesForLink = volumes.getVolumesForLink(key, TransportMode.car);
+			if (type == null || type.isBlank())
+				type = "unclassified";
 
-				Integer simulatedTrafficVolume;
+			if (countVolume.isEmpty())
+				continue;
 
-				if (volumesForLink == null) {
-					simulatedTrafficVolume = 0;
-				} else {
-					simulatedTrafficVolume = volumesForLink[0];
+			int[] volumesForLink = volumes.getVolumesForLink(key, TransportMode.car);
+
+			if (countVolume.isEmpty())
+				continue;
+
+			if (countVolume.size() == 24) {
+
+				for (int hour = 1; hour < 25; hour++) {
+
+					double observedTrafficVolumeAtHour = countVolume.get(hour).getValue();
+					double simulatedTrafficVolumeAtHour = volumesForLink == null ? 0.0 :
+							((double) volumesForLink[hour - 1]) / sampleSize;
+
+					Row row = byHour.appendRow();
+					row.setString("link_id", key.toString());
+					row.setString("name", name);
+					row.setString("road_type", type);
+					row.setDouble("hour", hour);
+					row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
+					row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
 				}
-
-				Link link = links.get(key);
-				String type = NetworkUtils.getType(link);
-
-				printer.printRecord(key, name, type, observedTrafficVolume, simulatedTrafficVolume);
 			}
+
+			double observedTrafficVolumeByDay = countVolume.values().stream().map(Volume::getValue).reduce(Double::sum).orElse(0.0);
+			double simulatedTrafficVolumeByDay = volumesForLink != null ? Arrays.stream(volumesForLink).sum() : 0.0;
+
+			Row row = dailyTrafficVolume.appendRow();
+			row.setString("link_id", key.toString());
+			row.setString("name", name);
+			row.setString("road_type", type);
+			row.setDouble("observed_traffic_volume", observedTrafficVolumeByDay);
+			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
+
+			dailyTrafficVolume.write().csv(output.getPath("count_comparison_total.csv").toFile());
+			byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
 		}
 	}
 }

@@ -6,6 +6,10 @@ import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Scatter;
 
+
+/**
+ * Creates a dashboard for comparison of simulated and observed traffic volumes.
+ * */
 public class CountCamparisonDashboard implements Dashboard {
 
 	@Override
@@ -15,7 +19,7 @@ public class CountCamparisonDashboard implements Dashboard {
 		header.description = "Comparsion of observed and simulated daily traffic volumes";
 
 		layout.row("scatterplot").el(Scatter.class, ((viz, data) -> {
-			viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison.csv");
+			viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
 
 			viz.title = "Observed and simulated daily traffic volumes";
 
