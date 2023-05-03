@@ -44,7 +44,7 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 	private String matchId;
 
 	@CommandLine.Option(names = "--mode-filter", split = ",", defaultValue = "car",
-			description = "Only keep links if they have one of the specified modes. Specify 'none' to disable.")
+		description = "Only keep links if they have one of the specified modes. Specify 'none' to disable.")
 	private Set<String> modes;
 
 	@CommandLine.Option(names = "--with-properties", description = "Put network attributes as properties into the geojson.")
@@ -73,6 +73,12 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 
 		json.put("type", "FeatureCollection");
 
+		// Default CRS assumed to be 4326
+		if (!networkCrs.equalsIgnoreCase("epsg:4326")) {
+			ObjectNode crs = json.putObject("crs");
+			putCrs(crs, networkCrs);
+		}
+
 		Predicate<Link> filter = link -> true;
 
 		if (shp.isDefined()) {
@@ -80,7 +86,7 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 			CoordinateTransformation ct = shp.createTransformation(networkCrs);
 
 			filter = link -> geom.contains(MGC.coord2Point(ct.transform(link.getFromNode().getCoord()))) ||
-					geom.contains(MGC.coord2Point(ct.transform(link.getToNode().getCoord())));
+				geom.contains(MGC.coord2Point(ct.transform(link.getToNode().getCoord())));
 		}
 
 		if (matchId != null) {
@@ -93,11 +99,17 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 			filter = filter.and(link -> modes.stream().anyMatch(m -> link.getAllowedModes().contains(m)));
 		}
 
-		convert(json, network, TransformationFactory.getCoordinateTransformation(networkCrs, crs.getTargetCRS()), filter);
+		convert(json, network, TransformationFactory.getCoordinateTransformation(networkCrs, this.crs.getTargetCRS()), filter);
 
 		mapper.writerFor(JsonNode.class).writeValue(output.getPath().toFile(), json);
 
 		return 0;
+	}
+
+	private void putCrs(ObjectNode crs, String networkCrs) {
+		crs.put("type", "name");
+		ObjectNode prop = crs.putObject("properties");
+		prop.put("name", networkCrs);
 	}
 
 	private void convert(ObjectNode json, Network network, CoordinateTransformation ct, Predicate<Link> filter) {

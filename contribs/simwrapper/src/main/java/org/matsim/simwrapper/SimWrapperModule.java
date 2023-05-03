@@ -1,5 +1,9 @@
 package org.matsim.simwrapper;
 
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
 /**
@@ -20,21 +24,20 @@ public final class SimWrapperModule extends AbstractModule {
 	 * Constructor with a newly initialized {@link SimWrapper} instance.
 	 */
 	public SimWrapperModule() {
-		this(SimWrapper.create());
-	}
-
-	/**
-	 * Get the {@link SimWrapper} instance.
-	 */
-	public SimWrapper getInstance() {
-		return simWrapper;
+		this.simWrapper = null;
 	}
 
 	@Override
 	public void install() {
-		bind(SimWrapper.class).toInstance(simWrapper);
-
 		addControlerListenerBinding().to(SimWrapperListener.class);
+	}
 
+	@Provides
+	@Singleton
+	public SimWrapper getSimWrapper(Config config) {
+		if (simWrapper == null)
+			return SimWrapper.create(ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class));
+
+		return simWrapper;
 	}
 }

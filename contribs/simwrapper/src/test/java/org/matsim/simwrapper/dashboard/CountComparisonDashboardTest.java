@@ -15,6 +15,7 @@ import org.matsim.counts.CountsModule;
 import org.matsim.counts.CountsWriter;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.simwrapper.SimWrapper;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
 import tech.tablesaw.api.Table;
@@ -40,7 +41,7 @@ public class CountComparisonDashboardTest {
 
 		generateDummyCounts(config);
 
-		SimWrapper sw = SimWrapper.create()
+		SimWrapper sw = SimWrapper.create(new SimWrapperConfigGroup())
 				.addDashboard(new CountComparisonDashboard());
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
