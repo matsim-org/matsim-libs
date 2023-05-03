@@ -42,6 +42,7 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -154,6 +155,8 @@ import java.util.*;
 		} );
 
 		log.info("Run MATSim");
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		//print the schedules for the assigned LSPShipments

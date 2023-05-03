@@ -38,6 +38,7 @@ import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -145,6 +146,9 @@ final class ExampleTwoEchelonGrid {
 
 		log.info("Run MATSim");
 		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
+		
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		log.info("Some results ....");
