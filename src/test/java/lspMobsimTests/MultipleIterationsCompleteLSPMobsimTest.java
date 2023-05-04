@@ -25,7 +25,6 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,6 +39,7 @@ import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -59,7 +59,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class MultipleItreationsCompleteLSPMobsimTest {
+public class MultipleIterationsCompleteLSPMobsimTest {
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -102,17 +102,14 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionResourceId, network);
-		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionResourceBuilder.setCarrier(collectionCarrier);
-		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionResource = collectionResourceBuilder.build();
+		LSPResource collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
-		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(collectionElementId);
-		collectionBuilder.setResource(collectionResource);
-		LogisticChainElement collectionElement = collectionBuilder.build();
+		LogisticChainElement collectionElement  = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(collectionResource)
+				.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
@@ -156,18 +153,15 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunResourceBuilder.setCarrier(mainRunCarrier);
-		LSPResource mainRunResource = mainRunResourceBuilder.build();
+		LSPResource mainRunResource  = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
+				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
+				.build();
 
-		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunResource);
-		LogisticChainElement mainRunElement = mainRunBuilder.build();
+		LogisticChainElement mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
+				.setResource(mainRunResource)
+				.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
@@ -208,32 +202,29 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 		Carrier carrier = CarrierUtils.createCarrier(distributionCarrierId);
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
-
-		Id<LSPResource> distributionResourceId = Id.create("DistributionCarrierResource", LSPResource.class);
-		UsecaseUtils.DistributionCarrierResourceBuilder distributionResourceBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionResourceId, network);
-		distributionResourceBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		distributionResourceBuilder.setCarrier(carrier);
-		distributionResourceBuilder.setLocationLinkId(distributionLinkId);
-		LSPResource distributionResource = distributionResourceBuilder.build();
+		LSPResource distributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
+				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+				.setLocationLinkId(distributionLinkId)
+				.build();
 
 		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder distributionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(distributionElementId);
-		distributionBuilder.setResource(distributionResource);
-		LogisticChainElement distributionElement = distributionBuilder.build();
+		LogisticChainElement distributionElement = LSPUtils.LogisticChainElementBuilder.newInstance(distributionElementId)
+				.setResource(distributionResource)
+				.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);
 		firstHubElement.connectWithNextElement(mainRunElement);
 		mainRunElement.connectWithNextElement(secondHubElement);
 		secondHubElement.connectWithNextElement(distributionElement);
 
-		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
-		completeSolutionBuilder.addLogisticChainElement(collectionElement);
-		completeSolutionBuilder.addLogisticChainElement(firstHubElement);
-		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
-		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
-		completeSolutionBuilder.addLogisticChainElement(distributionElement);
-		LogisticChain completeSolution = completeSolutionBuilder.build();
+		final Id<LogisticChain> chainId = Id.create("SolutionId", LogisticChain.class);
+		LogisticChain completeSolution  = LSPUtils.LogisticChainBuilder.newInstance(chainId)
+				.addLogisticChainElement(collectionElement)
+				.addLogisticChainElement(firstHubElement)
+				.addLogisticChainElement(mainRunElement)
+				.addLogisticChainElement(secondHubElement)
+				.addLogisticChainElement(distributionElement)
+				.build();
 
 		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
@@ -326,6 +317,8 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 		config.controler().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {

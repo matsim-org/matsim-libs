@@ -37,6 +37,7 @@ import org.matsim.contrib.freight.events.FreightServiceEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -74,21 +75,26 @@ import java.util.*;
 
 		//The Resource i.e. the Resource is created
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
-		LSPResource lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(
-						Id.create("CollectionCarrierResource", LSPResource.class), network)
+		LSPResource lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
 				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
-				.setCarrier(carrier).setLocationLinkId(collectionLinkId).build();
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
 		//The adapter is now inserted into the only LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		LogisticChainElement logisticChainElement = LSPUtils.LogisticChainElementBuilder.newInstance(
-				Id.create("CollectionElement", LogisticChainElement.class)).setResource(lspResource).build();
+				Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(lspResource)
+				.build();
 
 		//The LogisticsSolutionElement is now inserted into the only LogisticsSolution of the LSP
 		LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("CollectionSolution", LogisticChain.class))
-				.addLogisticChainElement(logisticChainElement).build();
+				.addLogisticChainElement(logisticChainElement)
+				.build();
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
-		LSPPlan lspPlan = LSPUtils.createLSPPlan().setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner()).addLogisticChain(logisticChain);
+		LSPPlan lspPlan = LSPUtils.createLSPPlan()
+				.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner())
+				.addLogisticChain(logisticChain);
 
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
 
@@ -143,6 +149,8 @@ import java.util.*;
 
 		Controler controler = prepareControler(scenario);
 
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		for (LSP lsp2 : LSPUtils.getLSPs(scenario).getLSPs().values()) {

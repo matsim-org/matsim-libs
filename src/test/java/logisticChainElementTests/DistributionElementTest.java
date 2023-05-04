@@ -79,11 +79,10 @@ public class DistributionElementTest {
 
 
 		Id<LSPResource> adapterId = Id.create("DistributionCarrierResource", LSPResource.class);
-		UsecaseUtils.DistributionCarrierResourceBuilder builder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(adapterId, network);
-		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		builder.setCarrier(carrier);
-		builder.setLocationLinkId(distributionLinkId);
-		adapter = builder.build();
+		adapter = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
+				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+				.setLocationLinkId(distributionLinkId)
+				.build();
 
 		Id<LogisticChainElement> elementId = Id.create("DistributionElement", LogisticChainElement.class);
 		LSPUtils.LogisticChainElementBuilder distributionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);

@@ -42,18 +42,18 @@ import java.util.Comparator;
 public abstract class LSPResourceScheduler {
 
 	protected LSPResource resource;
-	protected ArrayList<ShipmentWithTime> shipments;
+	protected ArrayList<LspShipmentWithTime> lspShipmentsWithTime;
 
 
 	public final void scheduleShipments(LSPResource resource, int bufferTime) {
 		this.resource = resource;
-		this.shipments = new ArrayList<>();
+		this.lspShipmentsWithTime = new ArrayList<>();
 		initializeValues(resource);
 		presortIncomingShipments();
 		scheduleResource();
 		updateShipments();
 		switchHandeledShipments(bufferTime);
-		shipments.clear();
+		lspShipmentsWithTime.clear();
 	}
 
 	/**
@@ -82,18 +82,18 @@ public abstract class LSPResourceScheduler {
 	protected abstract void updateShipments();
 
 	public final void presortIncomingShipments() {
-		this.shipments = new ArrayList<>();
+		this.lspShipmentsWithTime = new ArrayList<>();
 		for (LogisticChainElement element : resource.getClientElements()) {
-			shipments.addAll(element.getIncomingShipments().getShipments());
+			lspShipmentsWithTime.addAll(element.getIncomingShipments().getShipments());
 		}
-		shipments.sort(Comparator.comparingDouble(ShipmentWithTime::getTime));
+		lspShipmentsWithTime.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
 	}
 
 
 	public final void switchHandeledShipments(int bufferTime) {
-		for (ShipmentWithTime shipment : shipments) {
+		for (LspShipmentWithTime shipment : lspShipmentsWithTime) {
 			double endOfTransportTime = shipment.getShipment().getShipmentPlan().getMostRecentEntry().getEndTime() + bufferTime;
-			ShipmentWithTime outgoingTuple = new ShipmentWithTime(endOfTransportTime, shipment.getShipment());
+			LspShipmentWithTime outgoingTuple = new LspShipmentWithTime(endOfTransportTime, shipment.getShipment());
 			for (LogisticChainElement element : resource.getClientElements()) {
 				if (element.getIncomingShipments().getShipments().contains(shipment)) {
 					element.getOutgoingShipments().getShipments().add(outgoingTuple);

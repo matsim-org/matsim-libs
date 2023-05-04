@@ -72,31 +72,27 @@ public class AssignerRequirementsTest {
 		Id<Vehicle> redVehicleId = Id.createVehicleId("RedVehicle");
 		CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionType);
 
-		CarrierCapabilities.Builder redCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		redCapabilitiesBuilder.addType(collectionType);
-		redCapabilitiesBuilder.addVehicle(redVehicle);
-		redCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-		CarrierCapabilities redCapabilities = redCapabilitiesBuilder.build();
+		CarrierCapabilities redCapabilities  = CarrierCapabilities.Builder.newInstance()
+				.addType(collectionType)
+				.addVehicle(redVehicle)
+				.setFleetSize(FleetSize.INFINITE)
+				.build();
 		Carrier redCarrier = CarrierUtils.createCarrier(redCarrierId);
 		redCarrier.setCarrierCapabilities(redCapabilities);
 
-		Id<LSPResource> redResourceId = Id.create("RedCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder redResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(redResourceId, network);
-		redResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		redResourceBuilder.setCarrier(redCarrier);
-		redResourceBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource redCollectionResource = redResourceBuilder.build();
+		LSPResource redCollectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
 		Id<LogisticChainElement> redElementId = Id.create("RedCollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder redCollectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(redElementId);
-		redCollectionElementBuilder.setResource(redCollectionResource);
-		LogisticChainElement redCollectionElement = redCollectionElementBuilder.build();
+		LogisticChainElement redCollectionElement = LSPUtils.LogisticChainElementBuilder.newInstance(redElementId)
+				.setResource(redCollectionResource)
+				.build();
 
-		Id<LogisticChain> redCollectionSolutionId = Id.create("RedCollectionSolution", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder redCollectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(redCollectionSolutionId);
-		redCollectionSolutionBuilder.addLogisticChainElement(redCollectionElement);
-		redChain = redCollectionSolutionBuilder.build();
-//		redSolution.getAttributes().add(new RedInfo() );
+		redChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("RedCollectionSolution", LogisticChain.class))
+				.addLogisticChainElement(redCollectionElement)
+				.build();
 		redChain.getAttributes().putAttribute("color", "red");
 
 		ShipmentAssigner assigner = new RequirementsAssigner();
@@ -108,31 +104,27 @@ public class AssignerRequirementsTest {
 		Id<Vehicle> blueVehicleId = Id.createVehicleId("BlueVehicle");
 		CarrierVehicle blueVehicle = CarrierVehicle.newInstance(blueVehicleId, collectionLinkId, collectionType);
 
-		CarrierCapabilities.Builder blueCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		blueCapabilitiesBuilder.addType(collectionType);
-		blueCapabilitiesBuilder.addVehicle(blueVehicle);
-		blueCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-		CarrierCapabilities blueCapabilities = blueCapabilitiesBuilder.build();
+		CarrierCapabilities blueCapabilities = CarrierCapabilities.Builder.newInstance()
+				.addType(collectionType)
+				.addVehicle(blueVehicle)
+				.setFleetSize(FleetSize.INFINITE)
+				.build();
 		Carrier blueCarrier = CarrierUtils.createCarrier(blueCarrierId);
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 
-		Id<LSPResource> blueResourceId = Id.create("BlueCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder blueResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(blueResourceId, network);
-		blueResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		blueResourceBuilder.setCarrier(blueCarrier);
-		blueResourceBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource blueCollectionResource = blueResourceBuilder.build();
+		LSPResource blueCollectionResource  = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
 		Id<LogisticChainElement> blueElementId = Id.create("BlueCollectionElement", LogisticChainElement.class);
 		LSPUtils.LogisticChainElementBuilder blueCollectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(blueElementId);
 		blueCollectionElementBuilder.setResource(blueCollectionResource);
 		LogisticChainElement blueCollectionElement = blueCollectionElementBuilder.build();
 
-		Id<LogisticChain> blueCollectionSolutionId = Id.create("BlueCollectionSolution", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder blueCollectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(blueCollectionSolutionId);
-		blueCollectionSolutionBuilder.addLogisticChainElement(blueCollectionElement);
-		blueChain = blueCollectionSolutionBuilder.build();
-//		blueSolution.getAttributes().add(new BlueInfo() );
+		blueChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("BlueCollectionSolution", LogisticChain.class))
+				.addLogisticChainElement(blueCollectionElement)
+				.build();
 		blueChain.getAttributes().putAttribute("color", "blue");
 		collectionPlan.addLogisticChain(blueChain);
 

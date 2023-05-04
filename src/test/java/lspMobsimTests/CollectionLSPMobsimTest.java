@@ -26,7 +26,6 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +38,7 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -109,12 +109,10 @@ public class CollectionLSPMobsimTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		CollectionCarrierResourceBuilder adapterBuilder = CollectionCarrierResourceBuilder.newInstance(adapterId, scenario.getNetwork());
-		adapterBuilder.setCollectionScheduler(createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(carrier);
-		adapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionResource = adapterBuilder.build();
+
+		collectionResource  = CollectionCarrierResourceBuilder.newInstance(carrier, scenario.getNetwork())
+				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setLocationLinkId(collectionLinkId)
+				.build();
 
 		final LogisticChainElement collectionElement;
 		{
@@ -201,6 +199,8 @@ public class CollectionLSPMobsimTest {
 		});
 
 		LSPUtils.addLSPs(scenario, lsps);
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 	}
 

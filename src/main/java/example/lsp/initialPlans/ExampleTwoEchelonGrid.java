@@ -38,6 +38,7 @@ import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -145,6 +146,9 @@ final class ExampleTwoEchelonGrid {
 
 		log.info("Run MATSim");
 		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
+		
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		log.info("Some results ....");
@@ -209,8 +213,7 @@ final class ExampleTwoEchelonGrid {
 			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
-					.setCarrier(directCarrier)
+			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier, network)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
@@ -237,8 +240,7 @@ final class ExampleTwoEchelonGrid {
 			mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource mainCarrierRessource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(Id.create("mainCarrierRes", LSPResource.class), network)
-					.setCarrier(mainCarrier)
+			LSPResource mainCarrierRessource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
 					.setFromLinkId(DEPOT_LINK_ID)
 					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 					.setToLinkId(HUB_LINK_ID)
@@ -275,8 +277,7 @@ final class ExampleTwoEchelonGrid {
 				default -> throw new IllegalStateException("Unexpected value: " + costSetting);
 			}
 			CarrierUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, vehType));
-			LSPResource distributionCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("distributionCarrierRes", LSPResource.class), network)
-					.setCarrier(distributionCarrier)
+			LSPResource distributionCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 

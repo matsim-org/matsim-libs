@@ -71,26 +71,20 @@ import java.util.Random;
 		carrier.setCarrierCapabilities(capabilities);
 
 		//The Resource i.e. the Resource is created
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
-
-		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
-		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(carrier);
-		adapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionResource = adapterBuilder.build();
+		LSPResource collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
 		//The adapter is now inserted into the only LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
-		collectionElementBuilder.setResource(collectionResource);
-		LogisticChainElement collectionElement = collectionElementBuilder.build();
+		LogisticChainElement collectionElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(collectionResource)
+				.build();
 
 		//The LogisticsSolutionElement is now inserted into the only LogisticsSolution of the LSP
-		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
-		LogisticChain collectionSolution = collectionSolutionBuilder.build();
+		LogisticChain collectionSolution  = LSPUtils.LogisticChainBuilder.newInstance(Id.create("CollectionSolution", LogisticChain.class))
+				.addLogisticChainElement(collectionElement)
+				.build();
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();

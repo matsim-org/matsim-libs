@@ -42,6 +42,7 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -154,6 +155,8 @@ import java.util.*;
 		} );
 
 		log.info("Run MATSim");
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		//print the schedules for the assigned LSPShipments
@@ -230,13 +233,12 @@ import java.util.*;
 							.build());
 
 			//The scheduler for the main run Resource is created and added to the Resource
-			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(
-							Id.create("MainRunResource", LSPResource.class), network)
+			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
 					.setFromLinkId(depotLinkId)
 					.setToLinkId(hubLinkId)
-					.setCarrier(mainRunCarrier)
 					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 					.build();
+
 			mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
 					.setResource(mainRunResource)
 					.build();
@@ -283,9 +285,8 @@ import java.util.*;
 							.build());
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource distributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(
-							Id.create("DistributionCarrierResource", LSPResource.class), network)
-					.setCarrier(distributionCarrier).setLocationLinkId(hubLinkId)
+			LSPResource distributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+					.setLocationLinkId(hubLinkId)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 			// (The scheduler is where jsprit comes into play.)
@@ -318,9 +319,8 @@ import java.util.*;
 			directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource directDistributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(
-							Id.create("DirectDistributionCarrierResource", LSPResource.class), network)
-					.setCarrier(directDistributionCarrier).setLocationLinkId(depotLinkId)
+			LSPResource directDistributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(directDistributionCarrier, network)
+					.setLocationLinkId(depotLinkId)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 			// (The scheduler is where jsprit comes into play.)
