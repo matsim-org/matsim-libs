@@ -1,4 +1,4 @@
-package lsp.usecase;
+package example.lsp.multipleChains;
 
 import lsp.LSP;
 import lsp.LogisticChain;

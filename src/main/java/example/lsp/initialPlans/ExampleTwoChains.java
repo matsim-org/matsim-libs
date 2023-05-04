@@ -1,5 +1,6 @@
 package example.lsp.initialPlans;
 
+import example.lsp.multipleChains.Utils;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
@@ -90,7 +91,7 @@ public class ExampleTwoChains {
 				});
 				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
 			}
-		} );
+		});
 
 		log.info("Run MATSim");
 		controler.run();
@@ -226,7 +227,7 @@ public class ExampleTwoChains {
 					.addLogisticChainElement(southCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = UsecaseUtils.createAnyNumberLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = Utils.createAnyNumberLogisticChainShipmentAssigner();
 			lspPlan_twoChains = LSPUtils.createLSPPlan()
 					.addLogisticChain(southChain)
 					.addLogisticChain(northChain)

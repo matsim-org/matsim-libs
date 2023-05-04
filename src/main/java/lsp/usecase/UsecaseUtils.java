@@ -63,10 +63,6 @@ public class UsecaseUtils {
 		return new SingleLogisticChainShipmentAssigner();
 	}
 
-	public static AnyNumberLogisticChainShipmentAssigner createAnyNumberLogisticChainShipmentAssigner() {
-		return new AnyNumberLogisticChainShipmentAssigner();
-	}
-
 	/**
 	 * Collects all the vehicleTyps from the different Vehicle of the carrier.
 	 * This is needed since we do not use carrier.getCarrierCapabilities().getVehicleTypes() any more as second field to safe vehicleTypes ...
