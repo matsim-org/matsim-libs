@@ -34,6 +34,8 @@ import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.pt.DefaultTransitDriverAgentFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -58,7 +60,7 @@ public class SBBTransitQSimEngineTest {
 
         EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
         QSim qSim = new QSimBuilder(f.config).useDefaults().build(f.scenario, eventsManager);
-        SBBTransitQSimEngine trEngine = new SBBTransitQSimEngine(qSim, null);
+        SBBTransitQSimEngine trEngine = new SBBTransitQSimEngine(qSim, null, new TransitStopAgentTracker(eventsManager), new DefaultTransitDriverAgentFactory());
         qSim.addMobsimEngine(trEngine);
 
         trEngine.insertAgentsIntoMobsim();

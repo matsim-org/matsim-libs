@@ -19,9 +19,12 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import com.google.inject.multibindings.OptionalBinder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+import org.matsim.core.mobsim.qsim.pt.DefaultTransitDriverAgentFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
 
 public class RailsimQSimModule extends AbstractQSimModule implements QSimComponentsConfigurator {
@@ -30,10 +33,6 @@ public class RailsimQSimModule extends AbstractQSimModule implements QSimCompone
 
 	@Override
 	public void configure(QSimComponentsConfig components) {
-		if (components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME)) {
-			components.removeNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME);
-		}
-
 		components.addNamedComponent(COMPONENT_NAME);
 	}
 
@@ -41,5 +40,8 @@ public class RailsimQSimModule extends AbstractQSimModule implements QSimCompone
 	protected void configureQSim() {
 		bind(RailsimQSimEngine.class).asEagerSingleton();
 		addQSimComponentBinding(COMPONENT_NAME).to(RailsimQSimEngine.class);
+
+		OptionalBinder.newOptionalBinder(binder(), TransitDriverAgentFactory.class)
+			.setBinding().to( RailsimDriverAgentFactory.class );
 	}
 }

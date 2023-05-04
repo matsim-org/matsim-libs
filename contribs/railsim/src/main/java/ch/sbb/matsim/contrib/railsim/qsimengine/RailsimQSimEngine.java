@@ -19,18 +19,121 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
-import org.matsim.pt.UmlaufBuilder;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
+import org.matsim.core.population.routes.NetworkRoute;
 
-public class RailsimQSimEngine extends TransitQSimEngine {
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-	public RailsimQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory, UmlaufBuilder umlaufBuilder) {
-		super(queueSimulation, stopHandlerFactory, umlaufBuilder);
+/**
+ * QSim Engine to integrate microscopically simulated train movement.
+ */
+public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
+
+	private final QSim qsim;
+	private final RailsimConfigGroup config;
+	private final Set<String> modes;
+	private final TransitStopAgentTracker agentTracker;
+	private InternalInterface internalInterface;
+
+	private RailsimEngine engine;
+
+	@Inject
+	public RailsimQSimEngine(QSim qsim, TransitStopAgentTracker agentTracker) {
+		this.qsim = qsim;
+		this.config = ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
+		this.modes = config.getRailNetworkModes();
+		this.agentTracker = agentTracker;
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
+	}
+
+	@Override
+	public void onPrepareSim() {
+
+		Map<Id<Link>, Link> links = new IdMap<>(Link.class);
+
+		for (Link link : qsim.getScenario().getNetwork().getLinks().values()) {
+			if (link.getAllowedModes().stream().anyMatch(modes::contains))
+				links.put(link.getId(), link);
+		}
+
+		engine = new RailsimEngine(links);
+	}
+
+	@Override
+	public void afterSim() {
+
+	}
+
+	@Override
+	public void doSimStep(double time) {
+		engine.doSimStep(time);
+	}
+
+	@Override
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+
+		if (!modes.contains(agent.getMode()))
+			return false;
+
+		NetsimLink link = qsim.getNetsimNetwork().getNetsimLink(linkId);
+
+		// Lots of implicit type checking here to get the required information from the agent
+		if (!(agent instanceof MobsimDriverAgent driver)) {
+			throw new IllegalStateException("Departing agent " + agent.getId() + " is not a DriverAgent");
+		}
+		if (!(agent instanceof PlanAgent plan)) {
+			throw new IllegalStateException("Agent " + agent + " is not of type PlanAgent and therefore incompatible.");
+		}
+		PlanElement el = plan.getCurrentPlanElement();
+		if (!(el instanceof Leg leg)) {
+			throw new IllegalStateException("Plan element of agent " + agent + " is not a leg with a route.");
+		}
+		Route route = leg.getRoute();
+		if (!(route instanceof NetworkRoute networkRoute)) {
+			throw new IllegalStateException("A network route is required for agent " + agent + ".");
+		}
+
+		// Vehicles were inserted into the qsim as parked
+		// Remove them as soon as we depart
+		if (link instanceof QLinkI qLink) {
+			qLink.unregisterAdditionalAgentOnLink(agent.getId());
+			qLink.removeParkedVehicle(driver.getVehicle().getId());
+		}
+
+		return engine.handleDeparture(now, driver, linkId, networkRoute);
 	}
 
 	// Get inspiration from SBBTransitQSimEngine on what methods to overwrite
+
+	// TODO: Questions
+	// Is the rail engine a passenger engine in itself ?
+	// Should maybe be lower level like qsim ?
 
 	/* some implementation notes and ideas:
 	   - data structure to store a track-state per link (or multiple track-state if a link depicts multiple parallel tracks)

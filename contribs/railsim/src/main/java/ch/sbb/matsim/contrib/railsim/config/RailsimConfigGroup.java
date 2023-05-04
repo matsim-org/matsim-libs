@@ -21,12 +21,25 @@ package ch.sbb.matsim.contrib.railsim.config;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import java.util.Set;
+
+/**
+ * Config of the Railsim contrib.
+ */
 public class RailsimConfigGroup extends ReflectiveConfigGroup {
 
-	public final static String GROUP_NAME = "railsim";
+	public static final String GROUP_NAME = "railsim";
+
+	@Parameter
+	@Comment("Comma separated set of modes that are handled by the rail simulation. Defaults to 'rail'.")
+	public String railNetworkModes = "rail";
 
 	public RailsimConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+	public Set<String> getRailNetworkModes() {
+		return Set.of(railNetworkModes.split(","));
 	}
 
 	// TODO: add config parameters

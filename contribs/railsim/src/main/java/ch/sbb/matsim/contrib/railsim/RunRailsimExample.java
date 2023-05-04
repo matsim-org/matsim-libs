@@ -20,10 +20,12 @@
 package ch.sbb.matsim.contrib.railsim;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -31,20 +33,27 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunRailsimExample {
 
-		public static void main(String[] args) {
-				String configFilename = args[0];
-				Config config = ConfigUtils.loadConfig(configFilename);
+	public static void main(String[] args) {
 
-				Scenario scenario = ScenarioUtils.loadScenario(config);
-				Controler controler = new Controler(scenario);
-
-				controler.addOverridingModule(new RailsimModule());
-				controler.configureQSimComponents(components -> {
-						new RailsimQSimModule().configure(components);
-						// if you have other extensions that provide QSim components, call their configure-method here
-				});
-
-				controler.run();
+		if (args.length == 0) {
+			System.err.println("Path to config is required as first argument.");
+			System.exit(2);
 		}
+
+		String configFilename = args[0];
+		Config config = ConfigUtils.loadConfig(configFilename);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+
+		controler.addOverridingModule(new RailsimModule());
+		controler.configureQSimComponents(components -> {
+			new RailsimQSimModule().configure(components);
+			// if you have other extensions that provide QSim components, call their configure-method here
+		});
+
+		controler.run();
+	}
 
 }
