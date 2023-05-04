@@ -31,6 +31,7 @@ import org.matsim.contrib.freight.controler.CarrierAgentTracker;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
@@ -42,7 +43,7 @@ import java.util.List;
 
 
 class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
-							  ReplanningListener, IterationStartsListener{
+							  ReplanningListener, IterationStartsListener, IterationEndsListener{
 	private static final Logger log = LogManager.getLogger( LSPControlerListener.class );
 	private final Scenario scenario;
 
@@ -171,5 +172,11 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		var io = new OutputDirectoryHierarchy(scenario.getConfig());
+		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(io.getIterationFilename(event.getIteration(), "lsps.xml"));
 	}
 }
