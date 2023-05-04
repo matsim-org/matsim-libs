@@ -23,11 +23,11 @@ Attributes:
 
 - `state`: `free`, `reserved`, or `blocked`
 - `vehicleId`: if `state=reserved|blocked`, the id of the vehicle blocking or reserving this link
-- ` `: a number (0-based or 1-based?) if the link has multiple tracks
+- `track`: a number (0-based or 1-based?) if the link has multiple tracks
 
 ### railsimTrainLeavesLinkEvent
 
 Similar to the existing `trainLeavesLinkEvent`.
 One could argue that setting the link state to `free` would imply the same. I (mr) would still
 say it makes sense to have it separate, because depending on the implementation, a link could
-remain blocked for a longer time even if the train has already passed (e.g. minimum headway).
+remain blocked for a longer time even if the train has already passed (e.g. minimum headway time).
