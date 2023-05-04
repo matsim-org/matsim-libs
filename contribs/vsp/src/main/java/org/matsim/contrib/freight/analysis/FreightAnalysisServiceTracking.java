@@ -30,9 +30,14 @@ import org.matsim.contrib.freight.events.FreightServiceStartEvent;
 import java.util.LinkedHashMap;
 
 /**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ *
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
+@Deprecated(since = "apr23", forRemoval = true)
 class FreightAnalysisServiceTracking {
 
 	private final LinkedHashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers = new LinkedHashMap<>();
@@ -128,6 +133,12 @@ class FreightAnalysisServiceTracking {
 	}
 }
 
+/**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ */
+@Deprecated(since = "apr23")
 class ServiceTracker {
 	public CarrierService service;
 	public Double calculatedArrival =0.0;

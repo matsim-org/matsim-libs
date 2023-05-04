@@ -82,9 +82,9 @@ public class JointPlanRouter implements PlanAlgorithm {
 		assert newRoute == null;
 	}
 
-	public TripRouter getTripRouter() {
-		return delegate.getTripRouter();
-	}
+//	public TripRouter getTripRouter() {
+//		return delegate.getTripRouter();
+//	}
 
 	private static class JointRouteIterator {
 		private final Iterator<PlanElement> pes;
