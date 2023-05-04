@@ -63,7 +63,7 @@ import java.util.List;
 
 	public static LSPPlan copyPlan(LSPPlan plan2copy) {
 		List<LogisticChain> copiedSolutions = new ArrayList<>();
-		for (LogisticChain solution : plan2copy.getLogisticChain()) {
+		for (LogisticChain solution : plan2copy.getLogisticChains()) {
 			LogisticChain copiedSolution = LSPUtils.LogisticChainBuilder.newInstance(solution.getId()).build();
 			copiedSolution.getLogisticChainElements().addAll(solution.getLogisticChainElements());
 			copiedSolutions.add(copiedSolution);
@@ -72,7 +72,7 @@ import java.util.List;
 		copiedPlan.setAssigner(plan2copy.getAssigner());
 		copiedPlan.setLSP(plan2copy.getLSP());
 		copiedPlan.setScore( plan2copy.getScore() );
-		copiedPlan.getLogisticChain().addAll(copiedSolutions);
+		copiedPlan.getLogisticChains().addAll(copiedSolutions);
 		return copiedPlan;
 	}
 
@@ -83,7 +83,7 @@ import java.util.List;
 
 	@Override
 	public boolean addPlan(LSPPlan plan) {
-		for (LogisticChain solution : plan.getLogisticChain()) {
+		for (LogisticChain solution : plan.getLogisticChains()) {
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				if (!resources.contains(element.getResource())) {
 					resources.add(element.getResource());

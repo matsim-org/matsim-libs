@@ -205,7 +205,7 @@ import java.util.Random;
 //				System.out.println( entry.getKey() + " " + entry.getValue() );
 //			}
 //		}
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			System.out.println(solution.getAttributes().getAttribute("cost_function"));
 		}
 

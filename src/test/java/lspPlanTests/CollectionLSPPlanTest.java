@@ -100,8 +100,8 @@ public class CollectionLSPPlanTest {
 		assertSame(collectionPlan.getAssigner(), assigner);
 		assertEquals(0, (double) collectionPlan.getScore(), 0.0);
 		assertNull(collectionPlan.getLSP());
-		assertEquals(1, collectionPlan.getLogisticChain().size());
-		assertSame(collectionPlan.getLogisticChain().iterator().next(), logisticChain);
+		assertEquals(1, collectionPlan.getLogisticChains().size());
+		assertSame(collectionPlan.getLogisticChains().iterator().next(), logisticChain);
 	}
 
 }

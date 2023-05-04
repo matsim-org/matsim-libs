@@ -388,7 +388,7 @@ final class ExampleTwoEchelonGrid {
 		log.info("Collecting all LSPResources from the LSPPlans");
 		List<LSPResource> resourcesList = new ArrayList<>();            //TODO: Mache daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
 		for (LSPPlan lspPlan : lspPlans) {
-			for (LogisticChain solution : lspPlan.getLogisticChain()) {
+			for (LogisticChain solution : lspPlan.getLogisticChains()) {
 				for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
 					resourcesList.add(solutionElement.getResource());
 				}

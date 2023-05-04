@@ -300,7 +300,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 			System.out.println();
 		}
 
-		ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements());
+		ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements());
 		ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 
 		for (LSPShipment shipment : lsp.getShipments()) {
@@ -590,7 +590,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 
 		}
 
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
 				if (element.getNextElement() != null) {

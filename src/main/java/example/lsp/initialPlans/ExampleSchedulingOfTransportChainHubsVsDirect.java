@@ -397,7 +397,7 @@ import java.util.*;
 	private static List<LSPResource> createResourcesListFromLSPPlan(LSPPlan lspPlanWithReloading) {
 		log.info("Collecting all LSPResources from the LSPPlan");
 		List<LSPResource> resourcesList = new ArrayList<>();            //TODO: Mahe daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
-		for (LogisticChain solution : lspPlanWithReloading.getLogisticChain()) {
+		for (LogisticChain solution : lspPlanWithReloading.getLogisticChains()) {
 			for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
 				resourcesList.add(solutionElement.getResource());
 			}

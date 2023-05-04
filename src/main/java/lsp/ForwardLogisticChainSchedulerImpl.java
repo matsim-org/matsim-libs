@@ -126,7 +126,7 @@ import java.util.ArrayList;
 	}
 
 	private void insertShipmentsAtBeginning() {
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			LogisticChainElement firstElement = getFirstElement(solution);
 			for (LSPShipment shipment : solution.getShipments()) {
 				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment);

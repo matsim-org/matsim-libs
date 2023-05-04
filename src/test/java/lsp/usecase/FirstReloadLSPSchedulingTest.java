@@ -287,7 +287,7 @@ public class FirstReloadLSPSchedulingTest {
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			assertSame(endHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
 			assertSame(endHandler.getElement(), planElements.get(2).getLogisticChainElement());
-			assertSame(endHandler.getElement(), lsp.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements().iterator().next());
+			assertSame(endHandler.getElement(), lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(endHandler.getLspShipment(), shipment);
 			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
 			assertSame(endHandler.getResourceId(), lsp.getResources().iterator().next().getId());
@@ -299,13 +299,13 @@ public class FirstReloadLSPSchedulingTest {
 			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			assertSame(serviceHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
 			assertSame(serviceHandler.getElement(), planElements.get(0).getLogisticChainElement());
-			assertSame(serviceHandler.getElement(), lsp.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements().iterator().next());
+			assertSame(serviceHandler.getElement(), lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(serviceHandler.getLspShipment(), shipment);
 			assertSame(serviceHandler.getResourceId(), planElements.get(0).getResourceId());
 			assertSame(serviceHandler.getResourceId(), lsp.getResources().iterator().next().getId());
 		}
 
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			assertEquals(1, solution.getShipments().size());
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());

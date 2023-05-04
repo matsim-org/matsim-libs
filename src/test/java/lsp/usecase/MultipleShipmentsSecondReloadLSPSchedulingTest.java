@@ -414,7 +414,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			planElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
-			ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements());
+			ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements());
 			ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
@@ -484,7 +484,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertSame(mainRunEndHandler.getResource().getId(), resources.get(2).getId());
 		}
 
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
 				if (element.getNextElement() != null) {
