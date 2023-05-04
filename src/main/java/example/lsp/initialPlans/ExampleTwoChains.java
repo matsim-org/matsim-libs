@@ -159,8 +159,7 @@ public class ExampleTwoChains {
 			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
-					.setCarrier(directCarrier)
+			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier, network)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
@@ -185,33 +184,35 @@ public class ExampleTwoChains {
 		{
 			log.info("Create lspPlan with two chains");
 
-			// Building a south and north carrier
-			Carrier carrierSouth = CarrierUtils.createCarrier(Id.create("carrierSouth", Carrier.class));
-			carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+			LogisticChainElement southCarrierElement;
+			{
+				Carrier carrierSouth = CarrierUtils.createCarrier(Id.create("carrierSouth", Carrier.class));
+				carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource carrierSouthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("southCarrierRes", LSPResource.class), network)
-					.setCarrier(carrierSouth)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-					.build();
+				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
+				LSPResource carrierSouthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
+						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+						.build();
 
-			LogisticChainElement southCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("southCarrierLSE", LogisticChainElement.class))
-					.setResource(carrierSouthResource)
-					.build();
+				southCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("southCarrierLSE", LogisticChainElement.class))
+						.setResource(carrierSouthResource)
+						.build();
+			}
 
+			LogisticChainElement northCarrierElement;
+			{
+				Carrier carrierNorth = CarrierUtils.createCarrier(Id.create("CarrierNorth", Carrier.class));
+				carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			Carrier carrierNorth = CarrierUtils.createCarrier(Id.create("CarrierNorth", Carrier.class));
-			carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_LARGE_50));
+				LSPResource carrierNorthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
+						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+						.build();
 
-			CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource carrierNorthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("northCarrierRes", LSPResource.class), network)
-					.setCarrier(carrierNorth)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-					.build();
-
-			LogisticChainElement northCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("northCarrierLSE", LogisticChainElement.class))
-					.setResource(carrierNorthResource)
-					.build();
+				northCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("northCarrierLSE", LogisticChainElement.class))
+						.setResource(carrierNorthResource)
+						.build();
+			}
 
 
 			// Building a south and north Logistic chain
