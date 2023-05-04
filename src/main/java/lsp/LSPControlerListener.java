@@ -176,7 +176,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		var io = new OutputDirectoryHierarchy(scenario.getConfig());
-		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(io.getIterationFilename(event.getIteration(), "lsps.xml"));
+//		var io = new OutputDirectoryHierarchy(scenario.getConfig());
+//		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(io.getIterationFilename(event.getIteration(), "lsps.xml"));
 	}
 }
