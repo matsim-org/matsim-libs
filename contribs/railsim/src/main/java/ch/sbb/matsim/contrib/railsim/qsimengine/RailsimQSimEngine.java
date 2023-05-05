@@ -144,10 +144,10 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	     - length of the train
 	     - current speed of the train
 	     - current acceleration/deceleration of the train
-	     - additional attributes as required, e.g. required stopping distance ("bremsweg") given the current speed
+	     - additional attributes as required, e.g. required stopping distance ("bremsweg", emergency braking distance, maxDeceleration) given the current speed
 	   - in each simStep (may be optimized later to a lower interval), the position of each train is updated
 	   - each train tries to block as many links in front of the train to cover the stopping distance
-	     - if not enough links can be blocked, the train must decelerate accordingly
+	     - if not enough links can be blocked, the train must decelerate accordingly (normal braking distance, deceleration)
 	   - a train can only accelerate, if the complete train is on links with the higher allowed speed
 	     (e.g. train cannot accelerate if only the engine is on a faster link, but the rest of the train are still on links with lower freespeed)
 
