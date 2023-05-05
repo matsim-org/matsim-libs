@@ -19,6 +19,7 @@
 
 package ch.sbb.matsim.contrib.railsim.config;
 
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Set;
@@ -33,6 +34,14 @@ public class RailsimConfigGroup extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("Comma separated set of modes that are handled by the rail simulation. Defaults to 'rail'.")
 	public String railNetworkModes = "rail";
+
+	@Parameter
+	@Comment("Global acceleration in meters per second^2 which is used if there is no value provided in the vehicle attributes (" + RailsimUtils.VEHICLE_ATTRIBUTE_MAX_ACCELERATION + ");" + " used to compute the train velocity per link.")
+	public double accelerationGlobalDefault = 0.5;
+
+	@Parameter
+	@Comment("Maximum Global deceleration in meters per second^2 which is used if there is no value provided in the vehicle attributes (" + RailsimUtils.VEHICLE_ATTRIBUTE_MAX_DECELERATION + ");" + " used to compute the reserved train path and the train velocity per link.")
+	public double maxDecelerationGlobalDefault = 0.5;
 
 	public RailsimConfigGroup() {
 		super(GROUP_NAME);

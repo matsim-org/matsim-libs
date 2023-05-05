@@ -76,13 +76,12 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	public void onPrepareSim() {
 
 		Map<Id<Link>, Link> links = new IdMap<>(Link.class);
-
 		for (Link link : qsim.getScenario().getNetwork().getLinks().values()) {
 			if (link.getAllowedModes().stream().anyMatch(modes::contains))
 				links.put(link.getId(), link);
 		}
 
-		engine = new RailsimEngine(links);
+		engine = new RailsimEngine(qsim.getEventsManager(), config, links);
 	}
 
 	@Override
