@@ -19,6 +19,7 @@ import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -94,6 +95,9 @@ public class ExampleTwoChains {
 		});
 
 		log.info("Run MATSim");
+
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		new LSPPlanXmlWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
@@ -124,7 +128,7 @@ public class ExampleTwoChains {
 			config.controler().setLastIteration(2);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setWriteEventsInterval(1);
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
