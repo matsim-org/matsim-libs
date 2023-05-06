@@ -30,11 +30,26 @@ public class Links extends Viz {
 
 		public Color color = new Color();
 
+		public Width width = new Width();
+
+		public static final class Width {
+
+			@JsonProperty(required = true)
+			public String dataset;
+
+			@JsonProperty(required = true)
+			public String columnName;
+
+		}
+
 		public static final class Color {
 
 			public String dataset;
 
 			public String columnName;
+
+			@JsonProperty(required = true)
+			public String fixedColors;
 		}
 	}
 }

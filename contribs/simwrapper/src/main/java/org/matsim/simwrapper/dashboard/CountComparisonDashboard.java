@@ -29,6 +29,12 @@ public class CountComparisonDashboard implements Dashboard {
 				viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
 
 				viz.datasets.csvFile = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+
+				viz.display.color.fixedColors = "#00ff00";
+
+				viz.display.width.dataset = "csvFile";
+
+				viz.display.width.columnName = "observed_traffic_volume";
 			});
 
 		layout.row("scatterplot").el(Scatter.class, ((viz, data) -> {
