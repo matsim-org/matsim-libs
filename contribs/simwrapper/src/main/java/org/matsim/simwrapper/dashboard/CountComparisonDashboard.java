@@ -31,19 +31,20 @@ public class CountComparisonDashboard implements Dashboard {
 				viz.datasets.csvFile = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
 			});
 
-		layout.row("scatterplot").el(Scatter.class, ((viz, data) -> {
-					viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+		layout.row("scatterplot")
+			.el(Scatter.class, ((viz, data) -> {
+				viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
 
-					viz.title = "Observed and simulated daily traffic volumes";
+				viz.title = "Observed and simulated daily traffic volumes";
 
-					viz.legendName = "Road type";
+				viz.legendName = "Road type";
 
-					viz.x = "observed_traffic_volume";
-					viz.y = "simulated_traffic_volume";
+				viz.x = "observed_traffic_volume";
+				viz.y = "simulated_traffic_volume";
 
-					viz.xAxisName = "Observed traffic volume";
-					viz.yAxisName = "Simulated traffic volume";
-				}));
+				viz.xAxisName = "Observed traffic volume";
+				viz.yAxisName = "Simulated traffic volume";
+			}));
 
 	}
 }

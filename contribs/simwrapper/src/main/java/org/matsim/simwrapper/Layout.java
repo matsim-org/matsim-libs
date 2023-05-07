@@ -94,9 +94,9 @@ public final class Layout {
 		/**
 		 * Adds a viz element to the row with default context.
 		 *
-		 * @see #el(String, Class, RowElement)
+		 * @see #el(String, Class, VizElement)
 		 */
-		public <T extends Viz> Row el(Class<T> type, RowElement<T> el) {
+		public <T extends Viz> Row el(Class<T> type, VizElement<T> el) {
 			return el(null, type, el);
 		}
 
@@ -108,14 +108,14 @@ public final class Layout {
 		 * @param el      setup of the viz element
 		 * @param <T>     type of the element
 		 */
-		public <T extends Viz> Row el(String context, Class<T> type, RowElement<T> el) {
-			elements.add(new Holder(context, type, (RowElement<Viz>) el));
+		public <T extends Viz> Row el(String context, Class<T> type, VizElement<T> el) {
+			elements.add(new Holder(context, type, (VizElement<Viz>) el));
 			return this;
 		}
 
 	}
 
-	private record Holder(String context, Class<?> type, RowElement<Viz> el) {
+	private record Holder(String context, Class<?> type, VizElement<Viz> el) {
 	}
 
 }
