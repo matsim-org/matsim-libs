@@ -22,10 +22,10 @@ package org.matsim.core.trafficmonitoring;
 
 final class TimeSlotComputation{
 
-	private final int travelTimeBinSize;
+	private final double travelTimeBinSize;
 	private final int numSlots;
 
-	 TimeSlotComputation( final int numSlots, final int travelTimeBinSize ) {
+	 TimeSlotComputation( final int numSlots, final double travelTimeBinSize ) {
 		this.numSlots = numSlots;
 		this.travelTimeBinSize = travelTimeBinSize;
 	}
