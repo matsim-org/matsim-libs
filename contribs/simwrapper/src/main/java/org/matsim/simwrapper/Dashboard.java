@@ -22,7 +22,7 @@ public interface Dashboard {
 	 * Dashboards are ordered by priority, while higher priority means they appear in the front.
 	 * Default ist 0.
 	 */
-	default int priority() {
+	default double priority() {
 		return 0;
 	}
 
@@ -39,7 +39,7 @@ public interface Dashboard {
 	final class Customizable implements Dashboard {
 
 		private final Dashboard delegate;
-		private Integer priority;
+		private Double priority;
 		private String context;
 
 		private Customizable(Dashboard delegate) {
@@ -52,7 +52,7 @@ public interface Dashboard {
 		}
 
 		@Override
-		public int priority() {
+		public double priority() {
 			if (priority != null)
 				return priority;
 			return delegate.priority();
@@ -61,7 +61,7 @@ public interface Dashboard {
 		/**
 		 * Overwrite priority setting.
 		 */
-		public Customizable priority(int priority) {
+		public Customizable priority(double priority) {
 			this.priority = priority;
 			return this;
 		}

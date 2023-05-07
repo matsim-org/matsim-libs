@@ -14,9 +14,9 @@ import org.matsim.core.controler.listener.StartupListener;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Listener to execute {@link SimWrapper} when simulation starts or ends.
@@ -73,7 +73,12 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	}
 
 	private void addFromProvider(SimWrapperConfigGroup config, Iterable<DashboardProvider> providers) {
-		for (DashboardProvider provider : providers) {
+
+		List<DashboardProvider> list = StreamSupport.stream(providers.spliterator(), false)
+			.sorted(Comparator.comparingDouble(DashboardProvider::priority).reversed())
+			.toList();
+
+		for (DashboardProvider provider : list) {
 			log.info("Creating dashboards for {}", provider);
 			for (Dashboard d : provider.getDashboards(this.config, this.simWrapper)) {
 

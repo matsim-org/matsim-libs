@@ -126,7 +126,7 @@ public final class SimWrapper {
 		// TODO: copy config, css, and other auxiliary files
 		// from resources
 
-		dashboards.sort(Comparator.comparingInt(Dashboard::priority));
+		dashboards.sort(Comparator.comparingDouble(Dashboard::priority).reversed());
 
 		int i = 0;
 		for (Dashboard d : dashboards) {
@@ -173,6 +173,10 @@ public final class SimWrapper {
 			SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
 
 			runner.setSampleSize(ctx.sampleSize);
+
+			if (ctx.shp != null) {
+				runner.setShp(ctx.shp);
+			}
 
 			runner.run(dir);
 		}

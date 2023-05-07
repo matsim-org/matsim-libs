@@ -11,7 +11,7 @@ public class Links extends Viz {
 	public Datasets datasets = new Datasets();
 
 	public String projection;
-	public String center;
+	public double[] center;
 	public Display display = new Display();
 
 	public Links() {

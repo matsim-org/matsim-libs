@@ -57,7 +57,7 @@ public class StuckAgentDashboard implements Dashboard {
 	}
 
 	@Override
-	public int priority() {
+	public double priority() {
 		return -1;
 	}
 }
