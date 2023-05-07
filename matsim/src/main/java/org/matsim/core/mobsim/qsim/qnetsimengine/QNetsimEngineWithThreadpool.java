@@ -20,6 +20,9 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -27,9 +30,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import org.apache.commons.csv.CSVFormat;
 import org.matsim.core.mobsim.qsim.QSim;
 
 /**
@@ -46,6 +54,12 @@ import org.matsim.core.mobsim.qsim.QSim;
 final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEngineRunnerForThreadpool> {
 
 	private final int numOfRunners;
+	private final Timing overallTiming = new Timing( "NetsimeEngine_overall");
+	private final Timing nodesTiming = new Timing("NetsimeEngine_nodes");
+	private final Timing linksTiming = new Timing("NetsimeEngine_links");
+	private final DoubleList times = new DoubleArrayList();
+	private final String timingOutuputPath;
+	private final String runId;
 	private ExecutorService pool;
 	
 	public QNetsimEngineWithThreadpool(final QSim sim) {
@@ -55,7 +69,49 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	@Inject
 	public QNetsimEngineWithThreadpool(final QSim sim, QNetworkFactory netsimNetworkFactory) {
 		super(sim, netsimNetworkFactory);
+		timingOutuputPath = sim.getScenario().getConfig().controler().getOutputDirectory();
+		runId = sim.getScenario().getConfig().controler().getRunId();
 		this.numOfRunners = this.numOfThreads;
+	}
+
+	@Override
+	public void afterSim() {
+
+		var timings = this.getQnetsimEngineRunner().stream()
+				.flatMap(runner -> Stream.of(runner.getLinksTiming(), runner.getNodesTiming()))
+				.collect(Collectors.toList());
+
+		var ownTimings = List.of(overallTiming, nodesTiming, linksTiming);
+		timings.addAll(ownTimings);
+		var outputPath = Paths.get(timingOutuputPath).resolve(runId + "_timings.csv");
+
+		try (var writer = Files.newBufferedWriter(outputPath); var printer = CSVFormat.Builder.create().build().print(writer)) {
+
+			// print the header
+			printer.print("time");
+			for(var timing : timings) {
+				printer.print(timing.getName());
+			}
+			printer.println();
+
+			// now all the values
+			// assuming that all the timings have the same number of values
+			var firstTimingSize = timings.get(0).getDurations().size();
+			for(int i = 0; i < firstTimingSize; i++) {
+				// first the time step
+				printer.print(times.getDouble(i));
+				for (var timing : timings) {
+					var duration = timing.getDurations().getLong(i);
+					printer.print(duration);
+				}
+				printer.println();
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		super.afterSim();
 	}
 
 	@Override
@@ -89,23 +145,39 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 		// as input for the domain decomposition under (b).
 
 		// set current Time
+		times.add(time);
 		for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 			engine.setTime(time);
 		}
 
 		try {
+			var overallStartTime = System.nanoTime();
 			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(true);
 			}
+
+			var nodesStartTime = System.nanoTime();
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
+
 			}
+			var nodesDuration = System.nanoTime() - nodesStartTime;
+			nodesTiming.addDuration(nodesDuration);
+
 			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(false);
 			}
+
+			var linksStartTime = System.nanoTime();
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
 			}
+			var afterLinksTime = System.nanoTime();
+			var linksDuration = afterLinksTime - linksStartTime;
+			linksTiming.addDuration(linksDuration);
+
+			var overallDuration = afterLinksTime - overallStartTime;
+			overallTiming.addDuration(overallDuration);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e) ;
 		} catch (ExecutionException e) {
@@ -126,7 +198,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	protected List<QNetsimEngineRunnerForThreadpool> initQSimEngineRunners() {
 		List<QNetsimEngineRunnerForThreadpool> engines = new ArrayList<>();
 		for (int i = 0; i < numOfRunners; i++) {
-			QNetsimEngineRunnerForThreadpool engine = new QNetsimEngineRunnerForThreadpool();
+			QNetsimEngineRunnerForThreadpool engine = new QNetsimEngineRunnerForThreadpool("Runner_" + i);
 			engines.add(engine);
 		}
 		return engines;

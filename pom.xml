@@ -12,6 +12,7 @@
         <module>examples</module>
         <module>benchmark</module>
         <module>contribs</module>
+        <module>runnable</module>
     </modules>
 
     <licenses>

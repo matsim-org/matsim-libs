@@ -38,6 +38,8 @@ import org.matsim.core.mobsim.qsim.QSim;
  */
 abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry {
 
+
+
 	private double time = 0.0;
 
 	/*
@@ -80,6 +82,7 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	/*package*/ final void setTime(final double t) {
 		time = t;
 	}
+	final double getTime() { return time; }
 
 	public abstract void afterSim() ;
 
@@ -103,7 +106,6 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 		ListIterator<QLinkI> simLinks = this.linksList.listIterator();
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
-
 			remainsActive = link.doSimStep();
 
 			if (!remainsActive) simLinks.remove();
