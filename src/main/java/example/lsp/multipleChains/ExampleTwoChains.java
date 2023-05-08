@@ -1,6 +1,5 @@
-package example.lsp.initialPlans;
+package example.lsp.multipleChains;
 
-import example.lsp.multipleChains.Utils;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
@@ -218,7 +217,7 @@ public class ExampleTwoChains {
 					.addLogisticChainElement(northCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = Utils.createRandomLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = Utils.createConsecutiveLogisticChainShipmentAssigner();
 			lspPlan_twoChains = LSPUtils.createLSPPlan()
 					.addLogisticChain(southChain)
 					.addLogisticChain(northChain)
