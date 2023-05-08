@@ -1,5 +1,8 @@
 package org.matsim.simwrapper.viz;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Bar extends Chart{
 
 	/**
@@ -7,7 +10,7 @@ public class Bar extends Chart{
 	 */
 	public boolean stacked;
 
-	public String ignoredColumns;
+	public List<String> ignoredColumns = new ArrayList<>();
 
 	public Bar() {
 		super("bar");
