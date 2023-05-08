@@ -7,6 +7,8 @@ public class Bar extends Chart{
 	 */
 	public boolean stacked;
 
+	public String ignoredColumns;
+
 	public Bar() {
 		super("bar");
 	}
