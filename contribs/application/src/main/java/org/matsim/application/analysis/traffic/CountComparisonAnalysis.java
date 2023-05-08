@@ -21,6 +21,8 @@ import picocli.CommandLine;
 import tech.tablesaw.api.*;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @CommandLine.Command(name = "count-comparison", description = "Produces comparisons of observed and simulated counts.")
@@ -65,6 +67,17 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		writeOutput(counts, network, volume);
 
 		return 0;
+	}
+
+	private static String cut(double relError, List<Double> errorGroups, List<String> labels) {
+
+		int idx = Collections.binarySearch(errorGroups, relError);
+
+		if (idx >= 0)
+			return labels.get(idx);
+
+		int ins = -(idx + 1);
+		return labels.get(ins - 1);
 	}
 
 	private void writeOutput(Counts<Link> counts, Network network, VolumesAnalyzer volumes) {
@@ -147,7 +160,11 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
 			.setName("rel_error");
 
-		dailyTrafficVolume.addColumns(relError);
+		StringColumn qualityLabel = relError.copy()
+				.map(aDouble -> cut(aDouble, List.of(0.0, 0.8, 1.2, Double.MAX_VALUE), List.of("major under", "under", "exact", "over", "major over")), ColumnType.STRING::create)
+				.setName("quality");
+
+		dailyTrafficVolume.addColumns(relError, qualityLabel);
 
 		dailyTrafficVolume.write().csv(output.getPath("count_comparison_total.csv").toFile());
 		byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
