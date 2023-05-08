@@ -9,6 +9,8 @@ import org.matsim.simwrapper.viz.PieChart;
 import org.matsim.simwrapper.viz.Table;
 import org.matsim.simwrapper.viz.TextBlock;
 
+import java.util.List;
+
 // TODO: doc
 public class StuckAgentDashboard implements Dashboard {
 
@@ -44,7 +46,7 @@ public class StuckAgentDashboard implements Dashboard {
 					viz.x = "hour";
 					viz.xAxisName = "Hour";
 					viz.yAxisName = "# Stuck";
-					viz.ignoredColumns.add("Total");
+					viz.ignoredColumns = List.of("Total");
 				})
 				.el(Table.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Hour";

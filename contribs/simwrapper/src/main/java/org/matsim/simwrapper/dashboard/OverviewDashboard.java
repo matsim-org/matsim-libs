@@ -42,6 +42,7 @@ public class OverviewDashboard implements Dashboard {
 		layout.row("second")
 			.el(PieChart.class, (viz, data) -> {
 				viz.title = "Mode Share";
+				viz.description = "at final Iteration";
 				viz.dataset = data.output("*.modestats.txt");
 				viz.ignoreColumns = List.of("Iteration");
 				viz.useLastRow = true;
@@ -53,6 +54,8 @@ public class OverviewDashboard implements Dashboard {
 				viz.description = "per Iteration";
 				viz.dataset = data.output("*.modestats.txt");
 				viz.x = "Iteration";
+				viz.xAxisName = "Iteration";
+				viz.yAxisName = "Share";
 				viz.width = 2d;
 			});
 
@@ -69,6 +72,7 @@ public class OverviewDashboard implements Dashboard {
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Memory Usage";
 				viz.x = "timestamp";
+				viz.yAxisName = "MB";
 				viz.dataset = data.compute(LogFileAnalysis.class, "memory_stats.csv");
 			});
 	}
