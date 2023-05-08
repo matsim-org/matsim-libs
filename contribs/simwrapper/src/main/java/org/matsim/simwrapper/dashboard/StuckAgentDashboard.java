@@ -37,18 +37,19 @@ public class StuckAgentDashboard implements Dashboard {
 			});
 
 		layout.row("third")
-			.el(Bar.class, (viz, data) -> {
-				viz.title = "Stuck Agents per Hour";
-				viz.stacked = true;
-				viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
-				viz.x = "hour";
-				viz.xAxisName = "Hour";
-				viz.yAxisName = "# Stuck";
-			})
-			.el(Table.class, (viz, data) -> {
-				viz.title = "Stuck Agents per Hour";
-				viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
-			});
+				.el(Bar.class, (viz, data) -> {
+					viz.title = "Stuck Agents per Hour";
+					viz.stacked = true;
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
+					viz.x = "hour";
+					viz.xAxisName = "Hour";
+					viz.yAxisName = "# Stuck";
+					viz.ignoredColumns.add("Total");
+				})
+				.el(Table.class, (viz, data) -> {
+					viz.title = "Stuck Agents per Hour";
+					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
+				});
 
 		layout.row("four").el(Table.class, (viz, data) -> {
 			viz.title = "Stuck Agents per Link (Top 20)";
