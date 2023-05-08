@@ -1,7 +1,7 @@
 package org.matsim.simwrapper;
 
 import org.matsim.core.config.Config;
-import org.matsim.simwrapper.dashboard.CountComparisonDashboard;
+import org.matsim.simwrapper.dashboard.TrafficCountsDashboard;
 import org.matsim.simwrapper.dashboard.StuckAgentDashboard;
 import org.matsim.simwrapper.dashboard.TripDashboard;
 
@@ -20,7 +20,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 		));
 
 		if (config.counts().getCountsFileName() != null) {
-			result.add(new CountComparisonDashboard());
+			result.add(new TrafficCountsDashboard());
 		}
 
 		return result;

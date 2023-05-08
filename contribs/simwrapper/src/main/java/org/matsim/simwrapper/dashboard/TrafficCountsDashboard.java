@@ -12,13 +12,13 @@ import org.matsim.simwrapper.viz.Scatter;
 /**
  * Creates a dashboard for comparison of simulated and observed traffic volumes.
  */
-public class CountComparisonDashboard implements Dashboard {
+public class TrafficCountsDashboard implements Dashboard {
 
 	@Override
 	public void configure(Header header, Layout layout) {
 
-		header.title = "Count Comparsion Dashboard";
-		header.description = "Comparsion of observed and simulated daily traffic volumes";
+		header.title = "Traffic Counts";
+		header.description = "Comparison of observed and simulated daily traffic volumes";
 
 		layout.row("map")
 			.el(Links.class, (viz, data) -> {

@@ -29,7 +29,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.SplittableRandom;
 
-public class CountComparisonDashboardTest {
+public class TrafficCountsDashboardTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -42,7 +42,7 @@ public class CountComparisonDashboardTest {
 		generateDummyCounts(config);
 
 		SimWrapper sw = SimWrapper.create(new SimWrapperConfigGroup())
-				.addDashboard(new CountComparisonDashboard());
+				.addDashboard(new TrafficCountsDashboard());
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
