@@ -50,7 +50,7 @@ import java.util.TreeMap;
 		//temporarily store some information, because ActivityEndEvent does not have any information about the person's vehicle.
 		if((event instanceof ActivityEndEvent endEvent) && FreightConstants.START.equals(endEvent.getActType()) ) {
 			final Id<Person> personId = endEvent.getPersonId();
-			endEventMap.putIfAbsent(personId, endEvent);
+			endEventMap.put(personId, endEvent);
 
 			//it is unclear in which order the events arrive in the events stream, when they have the same time step ->Check if TourStartsEvent should be thrown now.
 			if (personEntersVehicleEventMap.containsKey(personId) && endEventMap.containsKey(personId)) {
@@ -60,7 +60,7 @@ import java.util.TreeMap;
 
 		if (event instanceof PersonEntersVehicleEvent personEntersVehicleEvent) { //now we have the persons vehicle
 			final Id<Person> personId = personEntersVehicleEvent.getPersonId();
-			personEntersVehicleEventMap.putIfAbsent(personId, personEntersVehicleEvent);
+			personEntersVehicleEventMap.put(personId, personEntersVehicleEvent);
 
 			//it is unclear in which order the events arrive in the events stream, when they have the same time step ->Check if TourStartsEvent should be thrown now.
 			if (personEntersVehicleEventMap.containsKey(personId) && endEventMap.containsKey(personId)) {
