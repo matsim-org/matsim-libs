@@ -34,6 +34,7 @@ public final class Data {
 	 */
 	private Path path;
 	private CommandRunner currentContext;
+	private SimWrapperConfigGroup.ContextParams context;
 
 	Data(SimWrapperConfigGroup config) {
 		// path needed, but not available yet
@@ -46,6 +47,13 @@ public final class Data {
 	 */
 	public SimWrapperConfigGroup config() {
 		return config;
+	}
+
+	/**
+	 * The current active context configuration.
+	 */
+	public SimWrapperConfigGroup.ContextParams context() {
+		return context;
 	}
 
 	/**
@@ -93,7 +101,7 @@ public final class Data {
 	}
 
 	/**
-	 * Copies and references are file bundled in the classpath.
+	 * Copies and references file bundled in the classpath.
 	 *
 	 * @param name name of the resource
 	 */
@@ -139,6 +147,7 @@ public final class Data {
 	void setCurrentContext(String name) {
 		currentContext = runners.computeIfAbsent(name, CommandRunner::new);
 		currentContext.setOutput(path);
+		context = config.get(name);
 	}
 
 	void setPath(Path path) {

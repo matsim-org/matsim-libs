@@ -12,13 +12,13 @@ import org.matsim.simwrapper.viz.Scatter;
 /**
  * Creates a dashboard for comparison of simulated and observed traffic volumes.
  */
-public class CountComparisonDashboard implements Dashboard {
+public class TrafficCountsDashboard implements Dashboard {
 
 	@Override
 	public void configure(Header header, Layout layout) {
 
-		header.title = "Count Comparsion Dashboard";
-		header.description = "Comparsion of observed and simulated daily traffic volumes";
+		header.title = "Traffic Counts";
+		header.description = "Comparison of observed and simulated daily traffic volumes";
 
 		layout.row("map")
 			.el(Links.class, (viz, data) -> {
@@ -37,19 +37,20 @@ public class CountComparisonDashboard implements Dashboard {
 				viz.display.width.columnName = "observed_traffic_volume";
 			});
 
-		layout.row("scatterplot").el(Scatter.class, ((viz, data) -> {
-					viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+		layout.row("scatterplot")
+			.el(Scatter.class, ((viz, data) -> {
+				viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
 
-					viz.title = "Observed and simulated daily traffic volumes";
+				viz.title = "Observed and simulated daily traffic volumes";
 
-					viz.legendName = "Road type";
+				viz.legendName = "Road type";
 
-					viz.x = "observed_traffic_volume";
-					viz.y = "simulated_traffic_volume";
+				viz.x = "observed_traffic_volume";
+				viz.y = "simulated_traffic_volume";
 
-					viz.xAxisName = "Observed traffic volume";
-					viz.yAxisName = "Simulated traffic volume";
-				}));
+				viz.xAxisName = "Observed traffic volume";
+				viz.yAxisName = "Simulated traffic volume";
+			}));
 
 	}
 }

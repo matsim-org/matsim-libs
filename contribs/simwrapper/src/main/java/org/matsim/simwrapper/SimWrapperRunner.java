@@ -1,21 +1,52 @@
 package org.matsim.simwrapper;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import picocli.CommandLine;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Set;
+
 @CommandLine.Command(
-		name = "simwrapper",
-		description = "Run SimWrapper on existing folders and generate dashboard files"
+	name = "simwrapper",
+	description = "Run SimWrapper on existing folders and generate dashboard files."
 )
 public class SimWrapperRunner implements MATSimAppCommand {
 
+	private static final Logger log = LogManager.getLogger(SimWrapper.class);
+
+	@CommandLine.Parameters(arity = "1..*", description = "Path to folders for which dashboards should be generated.")
+	private List<Path> inputPaths;
+
+	@CommandLine.Option(names = "--config", description = "Path to MATSim config.", required = true)
+	private String configPath;
+
+	@CommandLine.Option(names = "--exclude", split = ",", description = "Exclusion that will be added to the config.")
+	private Set<String> exclude;
+
 	@Override
 	public Integer call() throws Exception {
-		// TODO: implementation
+		Config config = ConfigUtils.loadConfig(configPath);
+		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 
-		// TODO: configuration of dashboards
+		if (exclude != null)
+			simWrapperConfigGroup.exclude.addAll(exclude);
 
-		//
+		for (Path input : inputPaths) {
+			log.info("Running on {}", input);
+
+			SimWrapperListener listener = new SimWrapperListener(SimWrapper.create(simWrapperConfigGroup), config);
+			try {
+				listener.run(input);
+			} catch (IOException e) {
+				log.error("Error creating dashboards on {}", input, e);
+			}
+		}
 
 		return 0;
 	}

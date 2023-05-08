@@ -377,6 +377,11 @@ public class Plotly extends Viz {
 			return this;
 		}
 
+		public Data aggregate() {
+			// TODO
+			return this;
+		}
+
 	}
 
 	/**
@@ -389,6 +394,13 @@ public class Plotly extends Viz {
 		public static Column transform(String columnName, String function) {
 			return null;
 		}
+
+		public static Column constant(Object value) { return null; }
+
+		// TODO: value needs to be an enum
+		// reduce needs to be on a different level
+		// separate entry in data, probably with different API
+		public static Column reduce(String columnName, Object value) { return null; }
 
 	}
 

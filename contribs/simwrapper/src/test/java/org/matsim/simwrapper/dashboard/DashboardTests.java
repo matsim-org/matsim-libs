@@ -31,6 +31,18 @@ public class DashboardTests {
 	}
 
 	@Test
+	public void defaults() {
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+
+		run();
+
+		// Ensure default dashboards have been added
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**stuck_agents.md");
+	}
+
+	@Test
 	public void stuckAgents() {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
@@ -48,7 +60,6 @@ public class DashboardTests {
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
 		run(new TripDashboard());
-
 		Assertions.assertThat(out)
 				.isDirectoryContaining("glob:**trip_stats.csv")
 				.isDirectoryContaining("glob:**mode_share.csv");

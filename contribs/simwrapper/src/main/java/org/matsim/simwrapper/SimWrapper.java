@@ -21,9 +21,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class to define and generate SimWrapper dashboards.
@@ -40,7 +38,6 @@ public final class SimWrapper {
 	private final SimWrapperConfigGroup configGroup;
 
 	private final List<Dashboard> dashboards = new ArrayList<>();
-	private final List<String> context = new ArrayList<>();
 
 	/**
 	 * Use {@link #create(SimWrapperConfigGroup)}.
@@ -90,19 +87,15 @@ public final class SimWrapper {
 	 * This only stores the specification, the actual code is executed during {@link #generate(Path)}.
 	 */
 	public SimWrapper addDashboard(Dashboard d) {
-		return addDashboard(d, "");
+		dashboards.add(d);
+		return this;
 	}
 
 	/**
-	 * Adds a dashboard definition to SimWrapper.
-	 * This only stores the specification, the actual code is executed during {@link #generate(Path)}.
-	 *
-	 * @param context context name, which allows to add multiple dashboards of the same kind.
+	 * Check if dashboard of same type is present already.
 	 */
-	public SimWrapper addDashboard(Dashboard d, String context) {
-		dashboards.add(d);
-		this.context.add(context);
-		return this;
+	boolean hasDashboard(Class<? extends Dashboard> d, String context) {
+		return dashboards.stream().anyMatch(o -> d.isAssignableFrom(o.getClass()) && Objects.equals(o.context(), context));
 	}
 
 	/**
@@ -133,11 +126,13 @@ public final class SimWrapper {
 		// TODO: copy config, css, and other auxiliary files
 		// from resources
 
+		dashboards.sort(Comparator.comparingDouble(Dashboard::priority).reversed());
+
 		int i = 0;
 		for (Dashboard d : dashboards) {
 
 			YAML yaml = new YAML();
-			Layout layout = new Layout(context.get(i));
+			Layout layout = new Layout(d.context());
 
 			d.configure(yaml.header, layout);
 			yaml.layout = layout.create(data);
@@ -175,7 +170,13 @@ public final class SimWrapper {
 
 		for (CommandRunner runner : data.getRunners().values()) {
 
-			runner.setSampleSize(configGroup.sampleSize);
+			SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
+
+			runner.setSampleSize(ctx.sampleSize);
+
+			if (ctx.shp != null) {
+				runner.setShp(ctx.shp);
+			}
 
 			runner.run(dir);
 		}
