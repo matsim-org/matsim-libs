@@ -6,6 +6,7 @@ import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Links;
+import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Scatter;
 
 
@@ -21,36 +22,41 @@ public class TrafficCountsDashboard implements Dashboard {
 		header.description = "Comparison of observed and simulated daily traffic volumes";
 
 		layout.row("map")
-			.el(Links.class, (viz, data) -> {
+				.el(MapPlot.class, (viz, data) -> {
+					viz.title = "Relative traffic volumes";
+					viz.height = 8.0;
 
-				viz.title = "Relative traffic volumes";
-				viz.height = 8d;
+					viz.center = data.context().getCenter();
+					viz.shapes = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
 
-				viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
+					viz.datasets.counts = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
 
-				viz.datasets.csvFile = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+					viz.display.lineWidth.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+					viz.display.lineWidth.columnName = "rel_error";
+					viz.display.lineWidth.join = "link_id";
+					viz.display.lineWidth.scaleFactor = 1000;
 
-				viz.display.color.fixedColors = "#00ff00";
+					viz.display.fill.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+					viz.display.fill.columnName = "rel_error";
+					viz.display.fill.colorRamp.steps = 3;
+					viz.display.fill.colorRamp.ramp = "Viridis";
 
-				viz.display.width.dataset = "csvFile";
-
-				viz.display.width.columnName = "observed_traffic_volume";
-			});
+				});
 
 		layout.row("scatterplot")
-			.el(Scatter.class, ((viz, data) -> {
-				viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+				.el(Scatter.class, (viz, data) -> {
+					viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
 
-				viz.title = "Observed and simulated daily traffic volumes";
+					viz.title = "Observed and simulated daily traffic volumes";
 
-				viz.legendName = "Road type";
+					viz.legendName = "Road type";
 
-				viz.x = "observed_traffic_volume";
-				viz.y = "simulated_traffic_volume";
+					viz.x = "observed_traffic_volume";
+					viz.y = "simulated_traffic_volume";
 
-				viz.xAxisName = "Observed traffic volume";
-				viz.yAxisName = "Simulated traffic volume";
-			}));
+					viz.xAxisName = "Observed traffic volume";
+					viz.yAxisName = "Simulated traffic volume";
+				});
 
 	}
 }

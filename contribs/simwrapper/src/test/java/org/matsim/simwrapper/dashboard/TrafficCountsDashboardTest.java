@@ -41,7 +41,13 @@ public class TrafficCountsDashboardTest {
 
 		generateDummyCounts(config);
 
-		SimWrapper sw = SimWrapper.create(new SimWrapperConfigGroup())
+		SimWrapperConfigGroup simWrapperConfigGroup = new SimWrapperConfigGroup();
+		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.get("");
+		contextParams.mapCenter = "12, 48.95";
+		contextParams.sampleSize = "0.01";
+		contextParams.mapZoomLevel = 9.0;
+
+		SimWrapper sw = SimWrapper.create(simWrapperConfigGroup)
 				.addDashboard(new TrafficCountsDashboard());
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
@@ -75,7 +81,7 @@ public class TrafficCountsDashboardTest {
 
 			Count<Link> count = counts.createAndAddCount(link.getId(), link.getId().toString() + "_count_station");
 			for (int hour = 1; hour < 25; hour++)
-				count.createVolume(hour, random.nextInt(1000));
+				count.createVolume(hour, random.nextInt(10));
 		}
 
 		try {
