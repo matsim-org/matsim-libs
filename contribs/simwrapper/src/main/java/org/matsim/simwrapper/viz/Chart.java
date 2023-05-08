@@ -1,9 +1,10 @@
 package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import scala.util.parsing.combinator.testing.Str;
 
-public abstract class Chart extends Viz{
+import java.util.List;
+
+public abstract class Chart extends Viz {
 
 	/**
 	 * The filepath containing the data
@@ -23,7 +24,7 @@ public abstract class Chart extends Viz{
 	 * be its own line/color. Example: ['distance', 'duration']
 	 */
 	@JsonProperty(required = true)
-	public String columns;
+	public List<String> columns;
 
 	/**
 	 * If set to true, only the last row of the datafile will be

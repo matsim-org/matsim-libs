@@ -200,5 +200,10 @@ public final class SimWrapper {
 		public boolean hideLeftBar = false;
 		public boolean fullWidth = true;
 
+		public String header;
+		public String footer_en;
+		public String footer_de;
+		public String css;
+
 	}
 }

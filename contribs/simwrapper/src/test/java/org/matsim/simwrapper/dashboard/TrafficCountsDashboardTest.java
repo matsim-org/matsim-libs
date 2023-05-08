@@ -42,7 +42,7 @@ public class TrafficCountsDashboardTest {
 		generateDummyCounts(config);
 
 		SimWrapper sw = SimWrapper.create(new SimWrapperConfigGroup())
-				.addDashboard(new TrafficCountsDashboard());
+			.addDashboard(new TrafficCountsDashboard());
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
@@ -70,7 +70,7 @@ public class TrafficCountsDashboardTest {
 		for (int i = 0; i <= 100; i++) {
 			Link link = links.get(random.nextInt(size));
 
-			if(counts.getCounts().containsKey(link.getId()))
+			if (counts.getCounts().containsKey(link.getId()))
 				continue;
 
 			Count<Link> count = counts.createAndAddCount(link.getId(), link.getId().toString() + "_count_station");
@@ -80,10 +80,12 @@ public class TrafficCountsDashboardTest {
 
 		try {
 			Files.createDirectories(Path.of(utils.getPackageInputDirectory()));
-			String absolutPath = Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml";
+			Path absolutPath = Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath().resolve("dummy_counts.xml");
 
-			config.counts().setInputFile(absolutPath);
-			new CountsWriter(counts).write(absolutPath);
+			if (!Files.exists(absolutPath))
+				new CountsWriter(counts).write(absolutPath.toString());
+
+			config.counts().setInputFile(absolutPath.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

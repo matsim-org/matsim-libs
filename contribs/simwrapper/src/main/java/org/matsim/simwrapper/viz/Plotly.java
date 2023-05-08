@@ -400,6 +400,7 @@ public class Plotly extends Viz {
 		// TODO: value needs to be an enum
 		// reduce needs to be on a different level
 		// separate entry in data, probably with different API
+		// TODO: think about how to handle wide formats, where each group is part of an axis
 		public static Column reduce(String columnName, Object value) { return null; }
 
 	}

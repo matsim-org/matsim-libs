@@ -1,6 +1,39 @@
 package org.matsim.simwrapper.viz;
 
-public class Table extends Chart{
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
+
+/**
+ * Table plugin
+ */
+public class Table extends Viz {
+
+	/**
+	 * The filepath containing the data.
+	 */
+	@JsonProperty(required = true)
+	public String dataset;
+
+	/**
+	 * This option could be used to filter columns. This option adds a filter mask to each column. The default setting is false.
+	 */
+	public boolean enableFilter;
+
+	/**
+	 * Array of strings. List of column names that should be ignored.
+	 */
+	public List<String> hide;
+
+	/**
+	 * Array of strings. List of column names that should be displayed. If the hide and show option are in the .yaml file the hide option will be ignored
+	 */
+	public List<String> show;
+
+	/**
+	 * This option defines whether the whole table should be displayed or if there are several pages. The default setting is false.
+	 */
+	public boolean showAllRows;
 
 	public Table() {
 		super("csv");

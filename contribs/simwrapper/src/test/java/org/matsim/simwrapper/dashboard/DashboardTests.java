@@ -20,6 +20,7 @@ public class DashboardTests {
 	private void run(Dashboard... dashboards) {
 
 		Config config = TestScenario.loadConfig(utils);
+		config.controler().setLastIteration(2);
 
 		SimWrapper sw = SimWrapper.create();
 		for (Dashboard d : dashboards) {
