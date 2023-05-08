@@ -10,7 +10,8 @@ public class Bar extends Chart{
 	 */
 	public boolean stacked;
 
-	public List<String> ignoredColumns = new ArrayList<>();
+	// TODO: docs
+	public List<String> ignoredColumns;
 
 	public Bar() {
 		super("bar");
