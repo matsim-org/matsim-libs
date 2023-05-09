@@ -132,7 +132,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	// ---
 	private static final String MAIN_MODE = "mainMode";
-	private TrafficDynamics trafficDynamics = TrafficDynamics.queue;
+	private TrafficDynamics trafficDynamics = TrafficDynamics.kinematicWaves;
 
 
 	// ---
