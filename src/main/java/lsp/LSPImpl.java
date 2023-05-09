@@ -146,7 +146,7 @@ import java.util.List;
 
 	@Override
 	public void assignShipmentToLSP(LSPShipment shipment) {
-		shipment.setLspId(this.getId()); // und rückweg dann auch darüber und dann lsp.getselectedPlan.getShipment...
+//		shipment.setLspId(this.getId()); // und rückweg dann auch darüber und dann lsp.getselectedPlan.getShipment...
 		shipments.add(shipment);
 		selectedPlan.getAssigner().assignToLogisticChain(shipment);
 	}

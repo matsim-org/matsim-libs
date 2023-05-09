@@ -345,7 +345,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				}
 
 				for (LSPShipment lspShipment : currentLsp.getShipments()) {
-					logisticChain.getShipments().add(lspShipment);
+					logisticChain.getShipmentIds().add(lspShipment.getId());
 				}
 
 				final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();

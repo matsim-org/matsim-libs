@@ -20,6 +20,7 @@
 
 package lsp;
 
+import lsp.shipment.LSPShipment;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -213,6 +214,22 @@ public final class LSPUtils {
 		public LogisticChainElement build() {
 			return new LogisticChainElementImpl(this);
 		}
+	}
+
+	/**
+	 * Gives back the LspShipment object of the LSP, which matches to the shipmentId
+	 * TODO: This is a workaround. In futuire it is maybe uefull, that the LSP does contains a map instead if a Collection of its shipments.
+	 * @param lsp
+	 * @param shipmentId
+	 * @return The lspShipment object.
+	 */
+	public static LSPShipment findLspShipment(LSP lsp, Id<LSPShipment> shipmentId){
+		for (LSPShipment lspShipment : lsp.getShipments()) {
+			if (lspShipment.getId().equals(shipmentId)) {
+				return lspShipment;
+			}
+		}
+		return null;
 	}
 
 }

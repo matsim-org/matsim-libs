@@ -220,8 +220,8 @@ public class CollectionLSPReplanningTest {
 
 	@Test
 	public void testCollectionLSPReplanning() {
-		System.out.println(collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getShipments().size());
-		assertTrue(collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getShipments().size() < 20);
+		System.out.println(collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getShipmentIds().size());
+		assertTrue(collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getShipmentIds().size() < 20);
 	}
 
 	@Test

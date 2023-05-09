@@ -20,6 +20,7 @@
 
 package lsp.shipment;
 
+import lsp.LSP;
 import lsp.LSPDataObject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -41,6 +42,7 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 	private final ShipmentPlan schedule;
 	private final ShipmentPlan log;
 	private final List<Requirement> requirements;
+//	private Id<LSP> lspId;
 
 	LSPShipmentImpl(ShipmentUtils.LSPShipmentBuilder builder) {
 		super(builder.id);
@@ -102,10 +104,19 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 		return requirements;
 	}
 
+
 	@Override
 	public double getPickupServiceTime() {
 		return pickupServiceTime;
 	}
+
+//	@Override public void setLspId(Id<LSP> lspId) {
+//		this.lspId = lspId;
+//	}
+//
+//	@Override public Id<LSP> getLspId() {
+//		return this.lspId;
+//	}
 
 	@Override public String toString() {
 		return "LSPShipmentImpl{" +
