@@ -247,7 +247,6 @@ public class ExampleTwoChains_10Shipments {
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
 		List<LSPShipment> shipmentList = new ArrayList<>();
 
-		Random rand1 = MatsimRandom.getLocalInstance();
 		Random rand2 = MatsimRandom.getLocalInstance();
 
 
@@ -265,7 +264,7 @@ public class ExampleTwoChains_10Shipments {
 			Id<LSPShipment> id = Id.create("Shipment_" + i, LSPShipment.class);
 			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 
-			int capacityDemand = rand1.nextInt(5) +1; //Random is drawn from 0 (incl) to b0und (excl) -> adding 1.
+			int capacityDemand = 1;
 			builder.setCapacityDemand(capacityDemand);
 
 			builder.setFromLinkId(DEPOT_SOUTH_LINK_ID);
