@@ -43,7 +43,7 @@ class RequirementsAssigner implements ShipmentAssigner {
 		feasibleLogisticChains.clear();
 
 		label:
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			for (Requirement requirement : shipment.getRequirements()) {
 				if (!requirement.checkRequirement(solution)) {
 

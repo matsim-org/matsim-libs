@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -214,14 +215,16 @@ import java.util.*;
 		config.controler().setLastIteration(4);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		System.out.println("Shipments delivered today:");
-		for (LSPShipment shipment : lsp.getSelectedPlan().getLogisticChain().iterator().next().getShipments()) {
+		for (LSPShipment shipment : lsp.getSelectedPlan().getLogisticChains().iterator().next().getShipments()) {
 			System.out.println(shipment.getId());
 		}
 
-		lsp.getShipments().removeAll(lsp.getSelectedPlan().getLogisticChain().iterator().next().getShipments());
+		lsp.getShipments().removeAll(lsp.getSelectedPlan().getLogisticChains().iterator().next().getShipments());
 
 		System.out.println("Shipments delivered tomorrow:");
 		for (LSPShipment shipment : lsp.getShipments()) {

@@ -38,6 +38,7 @@ import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -145,6 +146,9 @@ final class ExampleTwoEchelonGrid {
 
 		log.info("Run MATSim");
 		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
+		
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		log.info("Some results ....");
@@ -384,7 +388,7 @@ final class ExampleTwoEchelonGrid {
 		log.info("Collecting all LSPResources from the LSPPlans");
 		List<LSPResource> resourcesList = new ArrayList<>();            //TODO: Mache daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
 		for (LSPPlan lspPlan : lspPlans) {
-			for (LogisticChain solution : lspPlan.getLogisticChain()) {
+			for (LogisticChain solution : lspPlan.getLogisticChains()) {
 				for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
 					resourcesList.add(solutionElement.getResource());
 				}
