@@ -56,9 +56,8 @@ train tries to enter the destination station and no track is available.
 ==To Discuss:== this case is probably rather rare and negligible for the time being? If we model the stations as
 segments too, then this case should be automatically solved?
 
-#### Solution approach
-
 **Key idea**
+
 We have agents who want to navigate through resources. In the context of railsim, agents are individual vehicles,
 resources are `RailLink`s (?), and the full path of an agent is the transit route it takes from the origin to the
 destination station. A vehicle can have several transit routes on a simulation day.
@@ -98,10 +97,12 @@ deadlock state from occurring.
     5. Continue railsim iteration (here the actual movement of the agent happens) and repeat.
 
 **Key benefits**
+
 The algorithm described above can be fully parallelized. The computation time depends only on the number of agents (n)
 and number of resources (m). The computation complexity is O(n2 * m) in the worst case.
 
 **References**
+
 This algorithm was designed and implemented by Adrian Egli (SBB) as part of the Flatland project.
 
 **Railsim context**
