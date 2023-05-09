@@ -20,10 +20,13 @@
 
 package org.matsim.contrib.ev.stats;
 
+import com.google.inject.Provider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Inject;
@@ -58,9 +61,9 @@ public class EvStatsModule extends AbstractModule {
 					addMobsimScopeEventHandlerBinding().to(EnergyConsumptionCollector.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EnergyConsumptionCollector.class);
 					// add more time profiles if necessary
-					bind(ChargerPowerTimeProfileCollectorProvider.class).asEagerSingleton();
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerPowerTimeProfileCollectorProvider.class);
-					addMobsimScopeEventHandlerBinding().to(ChargerPowerTimeProfileCollectorProvider.class);
+					bind(ChargerPowerTimeProfileCalculator.class).asEagerSingleton();
+					addMobsimListenerBinding().to(ChargerPowerTimeProfileCalculator.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargerPowerTimeProfileCalculator.class);
 				}
 			}
 		});
