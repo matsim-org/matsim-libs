@@ -218,7 +218,7 @@ public final class LSPUtils {
 
 	/**
 	 * Gives back the LspShipment object of the LSP, which matches to the shipmentId
-	 * TODO: This is a workaround. In futuire it is maybe uefull, that the LSP does contains a map instead if a Collection of its shipments.
+	 * TODO: This is a workaround. In future it is maybe useful, that the LSP contains a map instead if a Collection to store its shipments.
 	 * @param lsp
 	 * @param shipmentId
 	 * @return The lspShipment object.
