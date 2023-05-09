@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@CommandLine.Command(name = "log-file", description = "Analyses MATSim log files.")
+@CommandLine.Command(name = "log-file", description = "Analyses MATSim log files to gather run information.")
 @CommandSpec(
 	requires = "logfile.log",
 	produces = {"run_info.csv", "memory_stats.csv", "runtime_stats.csv"},

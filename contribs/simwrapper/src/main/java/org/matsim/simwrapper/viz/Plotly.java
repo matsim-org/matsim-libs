@@ -409,10 +409,10 @@ public class Plotly extends Viz {
 		}
 
 		/**
-		 * Aggregate data within each trace. Uses all unmapped columns or only the given columns if not empty.
+		 * Aggregate data within each trace on the {@code targetColumn}. Uses all unmapped columns or only the given columns if not empty.
 		 */
 		@Deprecated
-		public Data aggregate(AggrFunc func, String... columns) {
+		public Data aggregate(ColumnType target, AggrFunc func, String... columns) {
 			// TODO
 			return this;
 		}
