@@ -277,6 +277,28 @@ public class Plotly extends Viz {
 	}
 
 	/**
+	 * The available column types in plotly.
+	 */
+	enum ColumnType {
+		X,
+		X2,
+		Y,
+		LABELS,
+		VALUES,
+		TEXT,
+		SIZE,
+		COLOR,
+		OPACITY
+	}
+
+	/**
+	 * Available aggregate function for {@link Data#aggregate(List)}.
+	 */
+	enum AggrFunc {
+		SUM
+	}
+
+	/**
 	 * Class to specify input path and map column names to their meaning.
 	 */
 	public static final class Data {
@@ -368,8 +390,7 @@ public class Plotly extends Viz {
 		}
 
 		/**
-		 * Split into multiple traces and group by this name.
-		 * TODO: Unstable API don't use yet.
+		 * Takes all values from the specified colum and splits data into separate traces.
 		 */
 		@Deprecated
 		public Data groupBy(String columnName) {
@@ -377,7 +398,21 @@ public class Plotly extends Viz {
 			return this;
 		}
 
-		public Data aggregate() {
+		/**
+		 * Indicates that each column beside the already mapped ones contain one data group. This is also known as 'wide-format'.
+		 * Defining this will map each new column to the specified target array.
+		 */
+		@Deprecated
+		public Data pivot(ColumnType type) {
+			// TODO
+			return this;
+		}
+
+		/**
+		 * Aggregate data within each trace. Uses all unmapped columns or only the given columns if not empty.
+		 */
+		@Deprecated
+		public Data aggregate(AggrFunc func, String... columns) {
 			// TODO
 			return this;
 		}
@@ -385,8 +420,7 @@ public class Plotly extends Viz {
 	}
 
 	/**
-	 * Don't use yet, unfinished API.
-	 * TODO
+	 * Column specification that go beyond simple mapping to name.
 	 */
 	@Deprecated
 	public static final class Column {
@@ -395,14 +429,9 @@ public class Plotly extends Viz {
 			return null;
 		}
 
-		public static Column constant(Object value) { return null; }
-
-		// TODO: value needs to be an enum
-		// reduce needs to be on a different level
-		// separate entry in data, probably with different API
-		// TODO: think about how to handle wide formats, where each group is part of an axis
-		public static Column reduce(String columnName, Object value) { return null; }
-
+		public static Column constant(Object value) {
+			return null;
+		}
 	}
 
 }
