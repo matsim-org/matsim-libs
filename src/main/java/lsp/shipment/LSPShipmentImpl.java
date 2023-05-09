@@ -53,8 +53,8 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 		this.capacityDemand = builder.capacityDemand;
 		this.deliveryServiceTime = builder.deliveryServiceTime;
 		this.pickupServiceTime = builder.pickupServiceTime;
-		this.shipmentPlan = new ShipmentPlanImpl(this);
-		this.shipmentLog = new ShipmentPlanImpl(this);
+		this.shipmentPlan = new ShipmentPlanImpl(this.getId());
+		this.shipmentLog = new ShipmentPlanImpl(this.getId());
 		this.requirements = new ArrayList<>();
 		this.requirements.addAll(builder.requirements);
 	}

@@ -26,22 +26,22 @@ import java.util.*;
 
 /*package-private*/ class ShipmentPlanImpl implements ShipmentPlan {
 
-	private final LSPShipment shipment;
+	private final Id<LSPShipment> lspShipmentId;
 	private final LinkedHashMap<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements;
 
-	ShipmentPlanImpl(LSPShipment shipment) {
-		this.shipment = shipment;
+	ShipmentPlanImpl(Id<LSPShipment> lspShipmentId) {
+		this.lspShipmentId = lspShipmentId;
 		this.planElements = new LinkedHashMap<>();
 	}
 
 	@Override
-	public void setEmbeddingContainer(LSPShipment pointer) {
+	public void setEmbeddingContainer(Id<LSPShipment> pointer) {
 		throw new RuntimeException("not implemented");
 	}
 
 	@Override
-	public LSPShipment getEmbeddingContainer() {
-		return shipment;
+	public Id<LSPShipment> getEmbeddingContainer() {
+		return lspShipmentId;
 	}
 
 	@Override
