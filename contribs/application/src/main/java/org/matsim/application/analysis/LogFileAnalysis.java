@@ -59,6 +59,7 @@ public class LogFileAnalysis implements MATSimAppCommand {
 
 		Pattern gbl = Pattern.compile(".+INFO Gbl:\\d+(.+):(.+)");
 		Pattern mem = Pattern.compile(".+MemoryObserver:\\d+ used RAM: (\\d+) MB\\s+free: (\\d+) MB\\s+total: (\\d+) MB");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 		Map<String, String> info = new LinkedHashMap<>();
 
@@ -112,8 +113,6 @@ public class LogFileAnalysis implements MATSimAppCommand {
 			LocalDateTime start = parseDate(first);
 			LocalDateTime end = parseDate(last);
 
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
 			info.put("Start", formatter.format(start));
 			info.put("End", formatter.format(end));
 			info.put("Duration", DurationFormatUtils.formatDurationWords(Duration.between(start, end).toMillis(), true, true));
@@ -128,9 +127,9 @@ public class LogFileAnalysis implements MATSimAppCommand {
 		}
 
 		try (CSVPrinter printer = csv.createPrinter(output.getPath("memory_stats.csv"))) {
-			printer.printRecord("timestamp", "used", "free");
+			printer.printRecord("time", "used", "free");
 			for (Memory m : memory) {
-				printer.printRecord(m.date.toEpochSecond(ZoneOffset.UTC), m.used, m.free);
+				printer.printRecord(formatter.format(m.date), m.used, m.free);
 			}
 		}
 
