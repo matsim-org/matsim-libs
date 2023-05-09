@@ -21,7 +21,6 @@
 package adapterTests;
 
 import lsp.LSPCarrierResource;
-import lsp.LSPResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,10 +84,8 @@ public class DistributionResourceTest {
 		distributionCarrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("DistributionCarrierResource", LSPResource.class);
-		UsecaseUtils.DistributionCarrierResourceBuilder builder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(adapterId, network);
+		UsecaseUtils.DistributionCarrierResourceBuilder builder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network);
 		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		builder.setCarrier(distributionCarrier);
 		builder.setLocationLinkId(distributionLinkId);
 		distributionResource = builder.build();
 	}

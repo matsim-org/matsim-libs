@@ -43,7 +43,7 @@ import java.util.Collection;
 	}
 
 	@Override
-	public Collection<LogisticChain> getLogisticChain() {
+	public Collection<LogisticChain> getLogisticChains() {
 		return logisticChains;
 	}
 

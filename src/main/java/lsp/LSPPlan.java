@@ -35,7 +35,7 @@ public interface LSPPlan extends BasicPlan, KnowsLSP {
 
 	LSPPlan addLogisticChain(LogisticChain solution);
 
-	Collection<LogisticChain> getLogisticChain();
+	Collection<LogisticChain> getLogisticChains();
 
 	/**
 	 * yy My intuition would be to replace lspPlan#getAssigner().assignToSolution( shipment ) by lspPlan.addShipment( shipment ).  kai, may'22

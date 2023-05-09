@@ -80,9 +80,8 @@ public class CollectionLSPShipmentAssigmentTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
+				UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
 
@@ -146,7 +145,7 @@ public class CollectionLSPShipmentAssigmentTest {
 	public void testCollectionLSPShipmentAssignment() {
 		assertSame(collectionLSP.getSelectedPlan(), collectionPlan);
 		assertFalse(collectionLSP.getShipments().isEmpty());
-		ArrayList<LogisticChain> solutions = new ArrayList<>(collectionLSP.getSelectedPlan().getLogisticChain());
+		ArrayList<LogisticChain> solutions = new ArrayList<>(collectionLSP.getSelectedPlan().getLogisticChains());
 
 		for (LogisticChain solution : solutions) {
 			if (solutions.indexOf(solution) == 0) {

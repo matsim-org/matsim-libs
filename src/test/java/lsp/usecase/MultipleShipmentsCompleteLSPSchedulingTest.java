@@ -93,17 +93,14 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionResourceId, network);
-		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionResourceBuilder.setCarrier(collectionCarrier);
-		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
-		collectionResource = collectionResourceBuilder.build();
+		collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
-		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(collectionElementId);
-		collectionBuilder.setResource(collectionResource);
-		collectionElement = collectionBuilder.build();
+		collectionElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(collectionResource)
+				.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
@@ -148,18 +145,15 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunResourceBuilder.setFromLinkId(fromLinkId);
-		mainRunResourceBuilder.setToLinkId(toLinkId);
-		mainRunResourceBuilder.setCarrier(mainRunCarrier);
-		mainRunResource = mainRunResourceBuilder.build();
+		mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setFromLinkId(fromLinkId)
+				.setToLinkId(toLinkId)
+				.build();
 
-		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunResource);
-		mainRunElement = mainRunBuilder.build();
+		mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
+				.setResource(mainRunResource)
+				.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
@@ -201,17 +195,15 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 
-		Id<LSPResource> distributionResourceId = Id.create("DistributionCarrierResource", LSPResource.class);
-		UsecaseUtils.DistributionCarrierResourceBuilder distributionResourceBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionResourceId, network);
-		distributionResourceBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		distributionResourceBuilder.setCarrier(distributionCarrier);
-		distributionResourceBuilder.setLocationLinkId(distributionLinkId);
-		distributionResource = distributionResourceBuilder.build();
+		distributionResource  = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+				.setLocationLinkId(distributionLinkId)
+				.build();
 
 		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder distributionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(distributionElementId);
-		distributionBuilder.setResource(distributionResource);
-		distributionElement = distributionBuilder.build();
+		distributionElement = LSPUtils.LogisticChainElementBuilder.newInstance(distributionElementId)
+				.setResource(distributionResource)
+				.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);
 		firstHubElement.connectWithNextElement(mainRunElement);
@@ -219,13 +211,13 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		secondHubElement.connectWithNextElement(distributionElement);
 
 		Id<LogisticChain> solutionId = Id.create("SolutionId", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder completeSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(solutionId);
-		completeSolutionBuilder.addLogisticChainElement(collectionElement);
-		completeSolutionBuilder.addLogisticChainElement(firstHubElement);
-		completeSolutionBuilder.addLogisticChainElement(mainRunElement);
-		completeSolutionBuilder.addLogisticChainElement(secondHubElement);
-		completeSolutionBuilder.addLogisticChainElement(distributionElement);
-		LogisticChain completeSolution = completeSolutionBuilder.build();
+		LogisticChain completeSolution = LSPUtils.LogisticChainBuilder.newInstance(solutionId)
+				.addLogisticChainElement(collectionElement)
+				.addLogisticChainElement(firstHubElement)
+				.addLogisticChainElement(mainRunElement)
+				.addLogisticChainElement(secondHubElement)
+				.addLogisticChainElement(distributionElement)
+				.build();
 
 		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
@@ -308,7 +300,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 			System.out.println();
 		}
 
-		ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements());
+		ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements());
 		ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 
 		for (LSPShipment shipment : lsp.getShipments()) {
@@ -598,7 +590,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 
 		}
 
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
 				if (element.getNextElement() != null) {

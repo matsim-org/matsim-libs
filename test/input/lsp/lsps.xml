@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<lspsDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/lspsDefinitions_v1.xsd">
+
+	<LSPs>
+		<lsp id="myLSP">
+			<resources>
+				<carrier id="directCarrier"/>
+				<carrier id="mainCarrier"/>
+				<hub id="Hub" location="j(5,3)" fixedCost="100.0">
+					<scheduler capacityNeedFixed="10.0" capacityNeedLinear="1.0"/>
+				</hub>
+				<carrier id="distributionCarrier"/>
+			</resources>
+
+			<shipments>
+				<shipment id="Shipment_1" from="i(5,0)" to="j(4,6)R" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
+				<shipment id="Shipment_2" from="i(5,0)" to="i(4,5)R" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
+				<shipment id="Shipment_3" from="i(5,0)" to="i(5,6)" size="3" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="180.0"/>
+				<shipment id="Shipment_4" from="i(5,0)" to="j(5,5)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
+				<shipment id="Shipment_5" from="i(5,0)" to="j(3,6)" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
+				<shipment id="Shipment_6" from="i(5,0)" to="j(6,5)R" size="3" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="180.0"/>
+				<shipment id="Shipment_7" from="i(5,0)" to="i(5,5)R" size="1" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="60.0"/>
+				<shipment id="Shipment_8" from="i(5,0)" to="i(5,6)" size="5" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="300.0"/>
+				<shipment id="Shipment_9" from="i(5,0)" to="j(3,6)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
+				<shipment id="Shipment_10" from="i(5,0)" to="i(6,6)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
+			</shipments>
+
+			<LSPPlans>
+				<plan score="-1476.2" selected="false">
+					<logisticChains>
+						<logisticChain id="directSolution">
+							<logisticChainElement id="directCarrierLSE" resourceId="directCarrier"/>
+						</logisticChain>
+					</logisticChains>
+					<shipmentPlans>
+						<shipmentPlan shipmentId="Shipment_1">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2891.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2891.0" endTime="3131.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3131.0" endTime="4151.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4151.0" endTime="4211.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_2">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2891.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2891.0" endTime="3131.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3131.0" endTime="3671.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3671.0" endTime="3731.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_3">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2893.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2893.0" endTime="3193.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3193.0" endTime="4033.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4033.0" endTime="4213.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_4">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2892.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2892.0" endTime="3132.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3132.0" endTime="3372.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3372.0" endTime="3492.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_5">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2891.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2891.0" endTime="3131.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3131.0" endTime="3851.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3851.0" endTime="3911.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_6">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2893.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2893.0" endTime="3073.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3073.0" endTime="3793.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3793.0" endTime="3973.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_7">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2891.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2891.0" endTime="3131.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3131.0" endTime="3491.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3491.0" endTime="3551.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_8">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2895.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2895.0" endTime="3195.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3195.0" endTime="4035.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4035.0" endTime="4335.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_9">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2892.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2892.0" endTime="3132.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3132.0" endTime="3852.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3852.0" endTime="3972.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_10">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2892.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2893.0" endTime="3193.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3193.0" endTime="4333.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4333.0" endTime="4453.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+					</shipmentPlans>
+				</plan>
+				<plan score="-492.33" selected="true">
+					<logisticChains>
+						<logisticChain id="hubSolution">
+							<logisticChainElement id="mainCarrierLSE" resourceId="mainCarrier"/>
+							<logisticChainElement id="HubLSE" resourceId="Hub"/>
+							<logisticChainElement id="distributionCarrierLSE" resourceId="distributionCarrier"/>
+						</logisticChain>
+					</logisticChains>
+					<shipmentPlans>
+						<shipmentPlan shipmentId="Shipment_1">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2891.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2891.0" endTime="3131.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3131.0" endTime="4151.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4151.0" endTime="4211.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_2">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2891.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2891.0" endTime="3131.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3131.0" endTime="3671.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3671.0" endTime="3731.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_3">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2893.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2893.0" endTime="3193.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3193.0" endTime="4033.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4033.0" endTime="4213.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_4">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2892.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2892.0" endTime="3132.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3132.0" endTime="3372.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3372.0" endTime="3492.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_5">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2891.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2891.0" endTime="3131.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3131.0" endTime="3851.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3851.0" endTime="3911.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_6">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2893.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2893.0" endTime="3073.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3073.0" endTime="3793.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3793.0" endTime="3973.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_7">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2891.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2891.0" endTime="3131.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3131.0" endTime="3491.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3491.0" endTime="3551.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_8">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2895.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2895.0" endTime="3195.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3195.0" endTime="4035.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4035.0" endTime="4335.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_9">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2892.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2892.0" endTime="3132.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3132.0" endTime="3852.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="3852.0" endTime="3972.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+						<shipmentPlan shipmentId="Shipment_10">
+							<element id="mainCarrierResmainCarrierLSELOAD" type="LOAD" startTime="0.0" endTime="1260.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSETRANSPORT" type="TRANSPORT" startTime="1260.0" endTime="1620.0" resourceId="mainCarrierRes"/>
+							<element id="mainCarrierResmainCarrierLSEUNLOAD" type="UNLOAD" startTime="1620.0" endTime="2880.0" resourceId="mainCarrierRes"/>
+							<element id="HubHubLSEHANDLE" type="HANDLE" startTime="2880.0" endTime="2892.0" resourceId="Hub"/>
+							<element id="distributionCarrierResdistributionCarrierLSELOAD" type="LOAD" startTime="2893.0" endTime="3193.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSETRANSPORT" type="TRANSPORT" startTime="3193.0" endTime="4333.0" resourceId="distributionCarrierRes"/>
+							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4333.0" endTime="4453.0" resourceId="distributionCarrierRes"/>
+						</shipmentPlan>
+					</shipmentPlans>
+				</plan>
+			</LSPPlans>
+
+		</lsp>
+	</LSPs>
+
+</lspsDefinitions>

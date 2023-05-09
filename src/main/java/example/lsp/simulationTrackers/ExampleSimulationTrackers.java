@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -73,26 +74,22 @@ import java.util.Random;
 		carrier.setCarrierCapabilities(capabilities);
 
 		//The Resource i.e. the Resource is created
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, scenario.getNetwork());
 
-		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
-		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(carrier);
-		adapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionResource = adapterBuilder.build();
+		LSPResource collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, scenario.getNetwork())
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
 		//The adapter is now inserted into the only LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		Id<LogisticChainElement> elementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionElementBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(elementId);
-		collectionElementBuilder.setResource(collectionResource);
-		LogisticChainElement collectionElement = collectionElementBuilder.build();
+		LogisticChainElement collectionElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(collectionResource)
+				.build();
 
 		//The LogisticsSolutionElement is now inserted into the only LogisticsSolution of the LSP
 		Id<LogisticChain> collectionSolutionId = Id.create("CollectionSolution", LogisticChain.class);
-		LSPUtils.LogisticChainBuilder collectionSolutionBuilder = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId);
-		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
-		LogisticChain collectionSolution = collectionSolutionBuilder.build();
+		LogisticChain collectionSolution = LSPUtils.LogisticChainBuilder.newInstance(collectionSolutionId)
+				.addLogisticChainElement(collectionElement)
+				.build();
 
 		//Create cost tracker and add it to solution
 		example.lsp.simulationTrackers.LinearCostTracker tracker = new example.lsp.simulationTrackers.LinearCostTracker(0.2);
@@ -191,6 +188,8 @@ import java.util.Random;
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
+		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
 		//Retrieve cost info from lsp
@@ -206,7 +205,7 @@ import java.util.Random;
 //				System.out.println( entry.getKey() + " " + entry.getValue() );
 //			}
 //		}
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			System.out.println(solution.getAttributes().getAttribute("cost_function"));
 		}
 

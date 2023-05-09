@@ -86,17 +86,14 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
-		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionResourceId, network);
-		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionResourceBuilder.setCarrier(collectionCarrier);
-		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
-		collectionResource = collectionResourceBuilder.build();
+		collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
-		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(collectionElementId);
-		collectionBuilder.setResource(collectionResource);
-		collectionElement = collectionBuilder.build();
+		collectionElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(collectionResource)
+				.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
@@ -138,18 +135,15 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		Carrier mainRunCarrier = CarrierUtils.createCarrier(mainRunCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
-		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunResourceBuilder.setFromLinkId(fromLinkId);
-		mainRunResourceBuilder.setToLinkId(toLinkId);
-		mainRunResourceBuilder.setCarrier(mainRunCarrier);
-		mainRunResource = mainRunResourceBuilder.build();
+		mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setFromLinkId(fromLinkId)
+				.setToLinkId(toLinkId)
+				.build();
 
-		Id<LogisticChainElement> mainRunElementId = Id.create("MainRunElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder mainRunBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunResource);
-		mainRunElement = mainRunBuilder.build();
+		mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
+				.setResource(mainRunResource)
+				.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);
 		firstHubElement.connectWithNextElement(mainRunElement);
@@ -352,7 +346,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			planElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
-			ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements());
+			ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements());
 			ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
@@ -422,7 +416,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			assertSame(mainRunEndHandler.getResource().getId(), resources.get(2).getId());
 		}
 
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
 				if (element.getNextElement() != null) {

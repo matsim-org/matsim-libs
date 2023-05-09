@@ -27,9 +27,9 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
-import org.matsim.contrib.freight.utils.FreightUtils;
 
 import java.util.Collection;
 

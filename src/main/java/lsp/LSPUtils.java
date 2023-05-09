@@ -23,7 +23,7 @@ package lsp;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 import java.util.ArrayList;
@@ -142,7 +142,7 @@ public final class LSPUtils {
 
 		public LSPBuilder setInitialPlan(LSPPlan plan) {
 			this.initialPlan = plan;
-			for (LogisticChain solution : plan.getLogisticChain()) {
+			for (LogisticChain solution : plan.getLogisticChains()) {
 				for (LogisticChainElement element : solution.getLogisticChainElements()) {
 					if (!resources.contains(element.getResource())) {
 						resources.add(element.getResource());

@@ -74,7 +74,7 @@ import java.util.List;
 
 
 	private void insertShipmentsAtBeginning() {
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			LogisticChainElement firstElement = getFirstElement(solution);
 			for (LSPShipment shipment : solution.getShipments()) {
 				assert firstElement != null;

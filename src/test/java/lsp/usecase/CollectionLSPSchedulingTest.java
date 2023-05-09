@@ -82,9 +82,8 @@ public class CollectionLSPSchedulingTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
+				UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionResource = adapterBuilder.build();
 
@@ -201,7 +200,7 @@ public class CollectionLSPSchedulingTest {
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			assertSame(endHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
 			assertSame(endHandler.getElement(), planElements.get(2).getLogisticChainElement());
-			assertSame(endHandler.getElement(), collectionLSP.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements().iterator().next());
+			assertSame(endHandler.getElement(), collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(endHandler.getLspShipment(), shipment);
 			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
 			assertSame(endHandler.getResourceId(), collectionLSP.getResources().iterator().next().getId());
@@ -213,13 +212,13 @@ public class CollectionLSPSchedulingTest {
 			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			assertSame(serviceHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
 			assertSame(serviceHandler.getElement(), planElements.get(1).getLogisticChainElement());
-			assertSame(serviceHandler.getElement(), collectionLSP.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements().iterator().next());
+			assertSame(serviceHandler.getElement(), collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(serviceHandler.getLspShipment(), shipment);
 			assertSame(serviceHandler.getResourceId(), planElements.get(1).getResourceId());
 			assertSame(serviceHandler.getResourceId(), collectionLSP.getResources().iterator().next().getId());
 		}
 
-		for (LogisticChain solution : collectionLSP.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : collectionLSP.getSelectedPlan().getLogisticChains()) {
 			assertEquals(1, solution.getShipments().size());
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());

@@ -78,9 +78,8 @@ public class CollectionLSPCreationTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
+				UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
 
@@ -118,8 +117,8 @@ public class CollectionLSPCreationTest {
 		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
 		assertSame(selectedPlan.getLSP(), collectionLSP);
 		assertSame(selectedPlan.getAssigner(), assigner);
-		assertSame(selectedPlan.getLogisticChain().iterator().next(), logisticChain);
-		assertSame(selectedPlan.getLogisticChain().iterator().next().getLSP(), collectionLSP);
+		assertSame(selectedPlan.getLogisticChains().iterator().next(), logisticChain);
+		assertSame(selectedPlan.getLogisticChains().iterator().next().getLSP(), collectionLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== collectionLSP);
 		assertSame(selectedPlan.getLSP(), collectionLSP);
 	}

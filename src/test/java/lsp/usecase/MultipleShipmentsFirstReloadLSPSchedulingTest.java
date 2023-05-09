@@ -84,18 +84,14 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
+		collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				.setLocationLinkId(collectionLinkId)
+				.build();
 
-		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionResourceId, network);
-		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionResourceBuilder.setCarrier(collectionCarrier);
-		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
-		collectionResource = collectionResourceBuilder.build();
-
-		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement", LogisticChainElement.class);
-		LSPUtils.LogisticChainElementBuilder collectionBuilder = LSPUtils.LogisticChainElementBuilder.newInstance(collectionElementId);
-		collectionBuilder.setResource(collectionResource);
-		collectionElement = collectionBuilder.build();
+		collectionElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
+				.setResource(collectionResource)
+				.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
@@ -290,7 +286,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			assertSame(endHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
 			assertSame(endHandler.getElement(), planElements.get(2).getLogisticChainElement());
-			assertSame(endHandler.getElement(), lsp.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements().iterator().next());
+			assertSame(endHandler.getElement(), lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(endHandler.getLspShipment(), shipment);
 			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
 			assertSame(endHandler.getResourceId(), lsp.getResources().iterator().next().getId());
@@ -302,13 +298,13 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			assertSame(serviceHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
 			assertSame(serviceHandler.getElement(), planElements.get(0).getLogisticChainElement());
-			assertSame(serviceHandler.getElement(), lsp.getSelectedPlan().getLogisticChain().iterator().next().getLogisticChainElements().iterator().next());
+			assertSame(serviceHandler.getElement(), lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(serviceHandler.getLspShipment(), shipment);
 			assertSame(serviceHandler.getResourceId(), planElements.get(0).getResourceId());
 			assertSame(serviceHandler.getResourceId(), lsp.getResources().iterator().next().getId());
 		}
 
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
 				if (element.getNextElement() != null) {

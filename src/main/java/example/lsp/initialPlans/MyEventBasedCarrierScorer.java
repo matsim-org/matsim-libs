@@ -56,7 +56,6 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 
 		final Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private double score;
-
 		private final double MAX_SHIFT_DURATION = 8 * 3600;
 		private final Map<VehicleType, Double>  vehicleType2TourDuration = new LinkedHashMap<>();
 		private final Map<VehicleType, Integer>  vehicleType2ScoredFixCosts = new LinkedHashMap<>();

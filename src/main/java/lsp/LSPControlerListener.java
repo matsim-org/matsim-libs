@@ -28,9 +28,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
@@ -42,7 +43,7 @@ import java.util.List;
 
 
 class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
-							  ReplanningListener, IterationStartsListener{
+							  ReplanningListener, IterationStartsListener, IterationEndsListener{
 	private static final Logger log = LogManager.getLogger( LSPControlerListener.class );
 	private final Scenario scenario;
 
@@ -53,6 +54,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	@Inject private MatsimServices matsimServices;
 	@Inject private LSPScorerFactory lspScoringFunctionFactory;
 	@Inject @Nullable private LSPStrategyManager strategyManager;
+	@Inject private OutputDirectoryHierarchy controlerIO;
 
 	@Inject private CarrierAgentTracker carrierAgentTracker;
 
@@ -85,7 +87,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 			}
 
 			// simulation trackers of solutions:
-			for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChain()) {
+			for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 				registerSimulationTrackers(solution );
 
 				// simulation trackers of solution elements:
@@ -161,7 +163,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		Carriers carriers = new Carriers();
 		for (LSP lsp : lsps.getLSPs().values()) {
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
-			for (LogisticChain solution : selectedPlan.getLogisticChain()) {
+			for (LogisticChain solution : selectedPlan.getLogisticChains()) {
 				for (LogisticChainElement element : solution.getLogisticChainElements()) {
 					if( element.getResource() instanceof LSPCarrierResource carrierResource ) {
 						Carrier carrier = carrierResource.getCarrier();
@@ -177,5 +179,10 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getIterationFilename(event.getIteration(), "lsps.xml"));
 	}
 }
