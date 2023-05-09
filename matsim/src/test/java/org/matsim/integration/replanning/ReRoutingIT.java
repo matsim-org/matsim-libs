@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeGetterType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -64,7 +65,7 @@ public class ReRoutingIT {
 		 * some not (see MATSim-730), which is why we decided to test the linear interpolated travel time data here (which does not 
 		 * contain this artifacts). theresa, sep'17
 		 * */
-		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+		config.travelTimeCalculator().setTravelTimeGetterType(TravelTimeGetterType.linearinterpolation);
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap

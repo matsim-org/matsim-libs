@@ -85,10 +85,19 @@ public class CalcLinkStats {
 		this(network);
 		this.volScaleFactor = vol_scale_factor;
 	}
-
+	
 	public void addData(final VolumesAnalyzer analyzer, final TravelTime ttimes) {
+		log.info("Assuming time bin size of one hour.");
+		addData(analyzer, ttimes, 3600);
+	}
+
+	public void addData(final VolumesAnalyzer analyzer, final TravelTime ttimes, int timeBinSize) {
+		if (3600 % timeBinSize != 0) {
+			log.warn("There is no whole number of timebins in one hour. The results for travel times are likely wrong!");
+		}
+		int timeBinsPerHour = 3600 / timeBinSize;
+		
 		this.count++;
-		// TODO verify ttimes has hourly timeBin-Settings
 
 		// go through all links
 		for (Id<Link> linkId : this.linkData.keySet()) {
@@ -108,8 +117,21 @@ public class CalcLinkStats {
 			// go through all hours:
 			for (int hour = 0; hour < this.nofHours; hour++) {
 				
-				// get travel time for hour
-				double ttime = ttimes.getLinkTravelTime(link, hour*3600, null, null);
+				// get travel time for hour. If we have more than one bin per hour, take the average.
+				double ttTimeBinSum = 0;
+				int divisor = 0;
+				for (int bin = 0; bin < timeBinsPerHour; bin++) {
+					// always take the time in the middle of the bin. Right now beginning or middle shouldn't make a difference but who knows what will change ~~tkohl 02/2020
+					double now = hour*3600 + (bin + 0.5) * timeBinSize;
+					double freespeed = link.getLength() / link.getFreespeed(now);
+					double returnedTT = ttimes.getLinkTravelTime(link, now, null, null);
+					if (returnedTT != freespeed) {
+						// if no vehicle passed during the bin, freespeed is returned. We want to ignore this for hourly calculation
+						ttTimeBinSum += returnedTT;
+						divisor++;
+					}
+				}
+				double ttime = divisor==0 ? link.getLength() / link.getFreespeed((hour + 0.5 * 3600)) : ttTimeBinSum / divisor;
 				
 				// add for daily sum:
 				sumVolumes += volumes[hour];
@@ -376,10 +398,10 @@ public class CalcLinkStats {
 	 * @param linkId
 	 * @return if no data is available, an array with length 0 is returned.
 	 * 
-	 * The method reflects the (wrong) logic of what is done when writing the output and should eventually be deleted or modified.
+	 * Calculates the average travel time on a link analogous to what is happening in {@linkplain #writeFile(String)}.
 	 * 
+	 * Unfortunately it's not super easy to make wrote use this method, so I'll keep it like this for now...
 	 */
-	@Deprecated
 	protected double[] getAvgTravelTimes(final Id<Link> linkId) {
 		LinkData data = this.linkData.get(linkId);
 		if (data == null) {
@@ -396,7 +418,7 @@ public class CalcLinkStats {
 		
 		for (int i = 0; i < this.nofHours; i++) {
 			volumes[i] = (data.volumes[SUM][i]) / (this.count);
-			ttimesMin[i] = (data.ttimes[MIN][i]) / (this.count);
+			ttimesMin[i] = (data.ttimes[MIN][i]);
 			ttimesSum[i] = (data.ttimes[SUM][i]) / (this.count);
 
 			if (volumes[i] == 0.) {
