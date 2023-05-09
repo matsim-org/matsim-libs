@@ -98,12 +98,12 @@ public class CollectionShipmentBuilderTest {
 			assertNotNull(shipment.getTo());
 			assertNotNull(shipment.getPickupTimeWindow());
 			assertNotNull(shipment.getShipmentPlan());
-			assertNotNull(shipment.getLog());
+			assertNotNull(shipment.getShipmentLog());
 			assertNotNull(shipment.getSimulationTrackers());
 
 			assertTrue(shipment.getSimulationTrackers().isEmpty());
-			assertEquals(shipment.getLog().getEmbeddingContainer(), shipment);
-			assertTrue(shipment.getLog().getPlanElements().isEmpty());
+			assertEquals(shipment.getShipmentLog().getEmbeddingContainer(), shipment);
+			assertTrue(shipment.getShipmentLog().getPlanElements().isEmpty());
 
 			assertEquals(shipment.getShipmentPlan().getEmbeddingContainer(), shipment);
 			assertTrue(shipment.getShipmentPlan().getPlanElements().isEmpty());

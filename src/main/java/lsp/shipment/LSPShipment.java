@@ -55,7 +55,7 @@ public interface LSPShipment extends Identifiable<LSPShipment>, Attributable, Ha
 
 	ShipmentPlan getShipmentPlan();
 
-	ShipmentPlan getLog();
+	ShipmentPlan getShipmentLog();
 
 	Collection<Requirement> getRequirements();
 

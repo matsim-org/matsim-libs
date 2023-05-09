@@ -85,7 +85,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
+		lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
 
 	private double getCumulatedLoadingTime(Tour tour) {
@@ -109,7 +109,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		ShipmentLeg transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().addPlanElement(transportId, transport);
+		lspShipment.getShipmentLog().addPlanElement(transportId, transport);
 	}
 
 

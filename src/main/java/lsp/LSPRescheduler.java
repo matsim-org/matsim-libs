@@ -72,7 +72,7 @@ final class LSPRescheduler {
 
 				for (LSPShipment shipment : lsp.getShipments()) {
 					shipment.getShipmentPlan().clear();
-					shipment.getLog().clear();
+					shipment.getShipmentLog().clear();
 					lsp.getSelectedPlan().getAssigner().assignToLogisticChain(shipment);
 				}
 				lsp.scheduleLogisticChains();
