@@ -20,6 +20,7 @@ public class DashboardTests {
 	private void run(Dashboard... dashboards) {
 
 		Config config = TestScenario.loadConfig(utils);
+		config.controler().setLastIteration(2);
 
 		SimWrapper sw = SimWrapper.create();
 		for (Dashboard d : dashboards) {
@@ -39,7 +40,7 @@ public class DashboardTests {
 
 		// Ensure default dashboards have been added
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**stuck_agents.md");
+				.isDirectoryContaining("glob:**stuck_agents.md");
 	}
 
 	@Test
@@ -63,6 +64,18 @@ public class DashboardTests {
 		Assertions.assertThat(out)
 				.isDirectoryContaining("glob:**trip_stats.csv")
 				.isDirectoryContaining("glob:**mode_share.csv");
+
+	}
+
+	@Test
+	public void populationAttribute() {
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+
+		run(new PopulationAttributeDashboard());
+		Assertions.assertThat(out)
+				.isDirectoryContaining("glob:**amount_per_age_group.csv");
+
 
 	}
 

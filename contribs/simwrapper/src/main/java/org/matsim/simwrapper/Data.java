@@ -79,7 +79,7 @@ public final class Data {
 	 * @param path  don't use path separators, but multiple arguments
 	 */
 	public String output(String first, String... path) {
-		return this.path.getParent().resolve(Path.of(first, path)).toString();
+		return this.getUnixPath(Path.of(first, path));
 	}
 
 	/**

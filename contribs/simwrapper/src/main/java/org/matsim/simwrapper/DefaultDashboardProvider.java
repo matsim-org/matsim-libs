@@ -1,6 +1,7 @@
 package org.matsim.simwrapper;
 
 import org.matsim.core.config.Config;
+import org.matsim.simwrapper.dashboard.OverviewDashboard;
 import org.matsim.simwrapper.dashboard.TrafficCountsDashboard;
 import org.matsim.simwrapper.dashboard.StuckAgentDashboard;
 import org.matsim.simwrapper.dashboard.TripDashboard;
@@ -15,6 +16,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 	@Override
 	public List<Dashboard> getDashboards(Config config, SimWrapper simWrapper) {
 		List<Dashboard> result = new ArrayList<>(List.of(
+			new OverviewDashboard(),
 			new TripDashboard(),
 			new StuckAgentDashboard()
 		));

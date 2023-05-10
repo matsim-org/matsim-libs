@@ -2,6 +2,8 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public class PieChart extends Viz {
 
 	@JsonProperty(required = true)
@@ -13,15 +15,14 @@ public class PieChart extends Viz {
 	 * this is useful for MATSim outputs which list every
 	 * iteration's output, if you are only in the final iteration.
 	 */
-	@JsonProperty(required = true)
-	public boolean useLastRow;
+	public Boolean useLastRow;
 
 	/**
 	 * Array of strings. List the column names of any columns
 	 * that should be left out of the pie chart (e.g. Iteration).
 	 * Example: ['Iteration']
 	 */
-	public String ignoreColumns;
+	public List<String> ignoreColumns;
 
 	public PieChart() {
 		super("pie");
