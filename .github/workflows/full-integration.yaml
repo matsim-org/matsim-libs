@@ -8,9 +8,18 @@ jobs:
   code-coverage:
     name: run full integration
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
+      - name: Prepare git
+        # turn off CRLF conversion (necessary on Windows)
+        run: git config --global core.autocrlf false
+
       - name: Checkout git repo
         uses: actions/checkout@v3
 
@@ -23,7 +32,8 @@ jobs:
 
       # Run unit and integration tests
       - name: Run verify - release profile
-        run: mvn verify -P release --batch-mode --fail-at-end -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+        # arguments containing dots (.) need to be quoted ('') so that PowerShell (Windows) does not parse them
+        run: mvn verify -P release --batch-mode --fail-at-end -D'maven.test.redirectTestOutputToFile' -D'matsim.preferLocalDtds=true'
 
     env:
       MAVEN_OPTS: -Xmx2g
