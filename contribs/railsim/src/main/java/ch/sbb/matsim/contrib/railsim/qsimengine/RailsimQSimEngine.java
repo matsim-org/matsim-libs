@@ -171,13 +171,14 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	   1. RailsimQSimEngine extracts all "rail"-links (depending on config) and builds a data structure to store track-states
 	   2. RailsimQSimEngine handles all "rail"-vehicles (also depending on config) and moves the trains each second
 	      First implementation can be very basic, e.g. constant speed per link according to freespeed, no checks if track is free
-	   3. Each train blocks the links it currently occupies, plus 1 link in front of it if possible
-	   4. A train can only move to the next link it that link is blocked by that train
-	   5. Each train tries to block as many link in front of it along the route as it needs for the stopping distance
-	   6. Trains accelerate smoothly when entering links with a higher freespeed
-	   7. Trains decelerate smoothly before entering links with a lower freespeed
-	   8. Trains decelerate smoothly if they cannot block enough links in front of them
-	   9. Deadlock Prevention
+	   3. Handle passengers at stops, see SBBTransitQSimEngine how to do this
+	   4. Each train blocks the links it currently occupies, plus 1 link in front of it if possible
+	   5. A train can only move to the next link it that link is blocked by that train
+	   6. Each train tries to block as many link in front of it along the route as it needs for the stopping distance
+	   7. Trains accelerate smoothly when entering links with a higher freespeed
+	   8. Trains decelerate smoothly before entering links with a lower freespeed
+	   9. Trains decelerate smoothly if they cannot block enough links in front of them
+	   10. Deadlock Prevention
 
 	 */
 }

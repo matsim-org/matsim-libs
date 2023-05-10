@@ -13,6 +13,8 @@ a mesoscopic level of modelling, where a link may represent multiple tracks.
 
 ## Specification
 
+We try to use the prefix `railsim` where it is appropriate.
+
 ### Link Attributes
 
 #### grade
@@ -41,12 +43,10 @@ TODO
 The minimum time ("minimum train headway time") for the switch at the end of the link (toNode).
 If no link attribute is provided, a default of 0 is used.
 
-#### vehicle type
+#### railsimSpeed_ + vehicle type
 
 The vehicle-specific freespeed on this link.
-Please note that the actual vehicle-type must be used as attribute name, see example.
-
-==Should there be a prefix, like `railsimspeed_`? we might want to add more vehicle-dependent attributes later.==
+Please note that the actual vehicle-type must be used as part of the attribute name, see example.
 
 Example:
 
@@ -54,18 +54,12 @@ Example:
 
 <link id="A_B" from="A" to="B" length="200.0" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
     <attributes>
-        <attribute name="ic2000" class="java.lang.Integer">44.444</attribute>
-        <attribute name="fvdosto" class="java.lang.Integer">50.0</attribute>
+        <attribute name="railsimSpeed_ic2000" class="java.lang.Integer">44.444</attribute>
+        <attribute name="railsimSpeed_fvdosto" class="java.lang.Integer">50.0</attribute>
     </attributes>
 </link>
 
 ```
-
-==Note:== The class `RailsimUtils` has additional getters, e.g. to get the freespeed depending on transit line and
-route.
-Do we keep these? If yes, we should document these as well, and a prefix would make even more sense in this case.
-
-(ik, mu): We don't think we have to keep this feature, speed limits per vehicle type should be sufficient.
 
 ### Node Attributes
 
@@ -84,21 +78,19 @@ states to avoid collisions. Do we really want that?
     <link id="A_B" from="A" to="B" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
           modes="rail">
         <attributes>
-            <attribute name="trainCapacity" class="java.lang.Integer">1</attribute>
-            <attribute name="trainOppositeDirectionLink" class="java.lang.String">B_A</attribute>
+            <attribute name="railsimCapacity" class="java.lang.Integer">1</attribute>
+            <attribute name="railsimOppositeDirectionLink" class="java.lang.String">B_A</attribute>
         </attributes>
     </link>
     <link id="B_A" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
           modes="rail">
         <attributes>
-            <attribute name="trainCapacity" class="java.lang.Integer">1</attribute>
-            <attribute name="trainOppositeDirectionLink" class="java.lang.String">A_B</attribute>
+            <attribute name="railsimCapacity" class="java.lang.Integer">1</attribute>
+            <attribute name="railsimOppositeDirectionLink" class="java.lang.String">A_B</attribute>
         </attributes>
     </link>
 </links>
 ```
-
-(ik, mu): General remark: If we use a prefix for attributes, should we just go with `railsim` everywhere.
 
 ### Two tracks, each with a single direction
 
@@ -114,6 +106,7 @@ microscopic modelling approach.
 If two tracks cross each other, e.g. like in the form of the letter `X` or a plus `+`, a train driving in one direction
 effectively also blocks the intersecting tracks, even if they only share a common node, but not a common link.
 
-TODO
+There should be no additional link- or node-attributes necessary. The simulation should block the node in the case of 
+`railsimCapacity = 1`, but not if the capacity is larger than 1. If the node is blocked, no other trains must be able
+to cross this node/intersection.
 
-(ik, mu): See discussion about node states.
