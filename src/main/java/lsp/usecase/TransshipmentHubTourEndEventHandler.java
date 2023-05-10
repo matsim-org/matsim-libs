@@ -20,6 +20,7 @@
 
 package lsp.usecase;
 
+import com.google.inject.Inject;
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
 import lsp.LogisticChainElement;
@@ -59,7 +60,7 @@ import java.util.Map;
 	private final TransshipmentHub transshipmentHub;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
-	private EventsManager eventsManager;
+	@Inject private EventsManager eventsManager;
 
 	/**
 	 * What is a TranshipmentHubTour ??? KMT, Sep 22
@@ -203,7 +204,7 @@ import java.util.Map;
 	}
 
 	@Override public void notifyBeforeMobsim(BeforeMobsimEvent beforeMobsimEvent) {
-		eventsManager = beforeMobsimEvent.getServices().getEvents();
+//		eventsManager = beforeMobsimEvent.getServices().getEvents();
 	}
 
 	static class TransshipmentHubEventHandlerPair {
