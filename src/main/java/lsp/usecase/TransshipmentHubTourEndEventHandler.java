@@ -54,7 +54,7 @@ import java.util.Map;
 
 /*package-private*/  class TransshipmentHubTourEndEventHandler implements BeforeMobsimListener, AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
 
-//	@Inject Scenario scenario;
+	//	@Inject Scenario scenario;
 	private final Scenario scenario;
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
 	private final TransshipmentHub transshipmentHub;
@@ -148,21 +148,27 @@ import java.util.Map;
 
 	private void logHandlingInHub(CarrierService carrierService, double startTime) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
-		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
-		builder.setLinkId(linkId);
-		builder.setResourceId(resourceId);
-		builder.setStartTime(startTime);
+
 		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
-		builder.setEndTime(startTime + handlingTime);
-		builder.setLogisticsChainElement(servicesWaitedFor.get(carrierService).element);
-		ShipmentPlanElement handle = builder.build();
-		String idString = handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType();
-		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-			lspShipment.getLog().addPlanElement(loadId, handle);
+		double endTime = startTime + handlingTime;
+
+		{ //Old logging approach - will be removed at some point in time
+			ShipmentPlanElement handle = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance()
+					.setLinkId(linkId)
+					.setResourceId(resourceId)
+					.setStartTime(startTime)
+					.setEndTime(endTime)
+					.setLogisticsChainElement(servicesWaitedFor.get(carrierService).element)
+					.build();
+			Id<ShipmentPlanElement> loadId = Id.create(handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType(), ShipmentPlanElement.class);
+			if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
+				lspShipment.getLog().addPlanElement(loadId, handle);
+			}
 		}
-		eventsManager.processEvent(new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId));
-		eventsManager.processEvent(new HandlingInHubEndsEvent(startTime + handlingTime, linkId, lspShipment.getId(), resourceId));
+		{ // New event-based approach //TODO: This throws currently a null pointer exception, because eventsHandler is null -> why???
+			eventsManager.processEvent(new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId));
+			eventsManager.processEvent(new HandlingInHubEndsEvent(endTime, linkId, lspShipment.getId(), resourceId));
+		}
 
 	}
 

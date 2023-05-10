@@ -43,11 +43,11 @@ public final class ShipmentUtils {
 	}
 
 	public static final class LoggedShipmentHandleBuilder {
-		private double startTime;
-		private double endTime;
-		private LogisticChainElement element;
-		private Id<LSPResource> resourceId;
-		private Id<Link> linkId;
+		double startTime;
+		double endTime;
+		LogisticChainElement element;
+		Id<LSPResource> resourceId;
+		Id<Link> linkId;
 
 		private LoggedShipmentHandleBuilder() {
 		}
@@ -56,51 +56,56 @@ public final class ShipmentUtils {
 			return new LoggedShipmentHandleBuilder();
 		}
 
-		public void setStartTime(double startTime){
+		public LoggedShipmentHandleBuilder setStartTime(double startTime){
 			this.startTime = startTime;
+			return this;
 		}
 
-		public void setEndTime(double endTime){
+		public LoggedShipmentHandleBuilder setEndTime(double endTime){
 			this.endTime = endTime;
+			return this;
 		}
 
-		public void setLogisticsChainElement(LogisticChainElement element){
+		public LoggedShipmentHandleBuilder setLogisticsChainElement(LogisticChainElement element){
 			this.element = element;
+			return this;
 		}
 
-		public void setResourceId(Id<LSPResource> resourceId){
+		public LoggedShipmentHandleBuilder setResourceId(Id<LSPResource> resourceId){
 			this.resourceId = resourceId;
+			return this;
 		}
 
-		public void setLinkId(Id<Link> linkId){
+		public LoggedShipmentHandleBuilder setLinkId(Id<Link> linkId){
 			this.linkId = linkId;
+			return this;
 		}
 
 		public ShipmentPlanElement build(){
 			return new LoggedShipmentHandle(this);
 		}
 
-		// --- Getters --- //
-
-		public double getStartTime() {
-			return startTime;
-		}
-
-		public double getEndTime() {
-			return endTime;
-		}
-
-		public LogisticChainElement getElement() {
-			return element;
-		}
-
-		public Id<LSPResource> getResourceId() {
-			return resourceId;
-		}
-
-		public Id<Link> getLinkId() {
-			return linkId;
-		}
+//		// --- Getters --- //
+//
+//		public double getStartTime() {
+//			return startTime;
+//		}
+//
+//		public double getEndTime() {
+//			return endTime;
+//		}
+//
+//		public LogisticChainElement getElement() {
+//			return element;
+//		}
+//
+//		public Id<LSPResource> getResourceId() {
+//			return resourceId;
+//		}
+//
+//		public Id<Link> getLinkId() {
+//			return linkId;
+//		}
 	}
 
 	public static final class LoggedShipmentLoadBuilder {

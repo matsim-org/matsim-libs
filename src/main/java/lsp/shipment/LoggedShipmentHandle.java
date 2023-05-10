@@ -33,10 +33,10 @@ import org.matsim.api.core.v01.Id;
 	private final Id<LSPResource> resourceId;
 
 	LoggedShipmentHandle(ShipmentUtils.LoggedShipmentHandleBuilder builder) {
-		this.startTime = builder.getStartTime();
-		this.endTime = builder.getEndTime();
-		this.element = builder.getElement();
-		this.resourceId = builder.getResourceId();
+		this.startTime = builder.startTime;
+		this.endTime = builder.endTime;
+		this.element = builder.element;
+		this.resourceId = builder.resourceId;
 	}
 
 	@Override
