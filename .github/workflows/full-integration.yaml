@@ -1,16 +1,27 @@
 name: full-integration
 
 on:
-  schedule:
-    - cron: '30 0 * * *' # daily at 0:30 UTC
+  push:
+    branches-ignore:
+      - 'master' # no need to run after merging to master
+    tags-ignore:
+      - '*' # do not run on pushing tags (see deploy-on-release-created)
 
 jobs:
   code-coverage:
     name: run full integration
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
+      - name: Prepare git # necessary to turn off CRLF conversion when running on windows
+        run: git config --global core.autocrlf false
+
       - name: Checkout git repo
         uses: actions/checkout@v3
 
@@ -23,7 +34,7 @@ jobs:
 
       # Run unit and integration tests
       - name: Run verify - release profile
-        run: mvn verify -P release --batch-mode --fail-at-end -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+        run: mvn verify -P release --batch-mode --fail-at-end -D'maven.test.redirectTestOutputToFile' -D'matsim.preferLocalDtds=true'
 
     env:
       MAVEN_OPTS: -Xmx2g
