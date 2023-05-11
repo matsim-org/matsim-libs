@@ -35,7 +35,7 @@ public class TripDashboard implements Dashboard {
 					viz.title = "Modal split";
 
 					viz.addTrace(PieTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-							Plotly.fromFile(data.compute(TripAnalysis.class, "mode_share.csv"))
+							viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv")).mapping()
 									.text("main_mode")
 									.x("share")
 					);
@@ -48,7 +48,7 @@ public class TripDashboard implements Dashboard {
 					// ignores main_mode
 
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-							Plotly.fromFile(data.compute(TripAnalysis.class, "mode_share.csv"))
+							viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv")).mapping()
 									.x("dist_group")
 									.y("share")
 					);
@@ -65,9 +65,8 @@ public class TripDashboard implements Dashboard {
 
 			// TODO: how to setup, each mode should be one trace ?
 			// difficult to create even with simple transformations
-
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					Plotly.fromFile(data.compute(TripAnalysis.class, "mode_share.csv"))
+					viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv")).mapping()
 							.x("dist_group")
 							.y("share")
 			);
@@ -83,8 +82,8 @@ public class TripDashboard implements Dashboard {
 		layout.row("arrivals").el(Plotly.class, (viz, data) -> {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					Plotly.fromFile(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv"))
-							.groupBy("main_mode")
+					viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
+							.name("main_mode")
 							.x("dist_group")
 							.y("share")
 			);
@@ -94,8 +93,8 @@ public class TripDashboard implements Dashboard {
 		layout.row("departure").el(Plotly.class, (viz, data) -> {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					Plotly.fromFile(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv"))
-							.groupBy("main_mode")
+					viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
+							.name("main_mode")
 							.x("dist_group")
 							.y("share")
 			);

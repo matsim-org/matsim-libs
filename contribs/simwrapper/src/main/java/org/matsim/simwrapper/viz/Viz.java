@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public abstract class Viz {
 
+	@JsonProperty(index = 0)
 	protected final String type;
 
 	@JsonProperty(required = true)

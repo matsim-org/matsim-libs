@@ -84,7 +84,7 @@ public class PlotlyTest {
 
 		Plotly plotly = new Plotly();
 
-		plotly.addTrace(trace.build(), Plotly.fromFile("test.csv")
+		plotly.addTrace(trace.build(), plotly.addDataset("test.csv").mapping()
 				.x("xColumn")
 				.y("yColumn")
 				.text("labelColumn")
