@@ -41,11 +41,17 @@ public class RailsimEngineTest {
 
 		RailsimTest.Holder test = getTestEngine("network0.xml");
 
-		RailsimTest.createDeparture(test, 0, "t1_OUT-t2_IN", "t3_IN-t3_OUT");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "t1_OUT-t2_IN", "t3_IN-t3_OUT");
 
-		test.engine().doSimStep(0);
+		for (int i = 0; i < 120; i++) {
+			test.engine().updateAllStates(i);
+		}
 
-		System.out.println(collector.events);
+		collector.events.forEach(System.out::println);
+
+		RailsimTest.assertThat(collector)
+			.hasSizeGreaterThan(5)
+			.hasTrainState("train", 59, 870.25, 29.5);
 
 		// TODO: Add assertions when more logic is implemented
 

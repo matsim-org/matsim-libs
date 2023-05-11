@@ -62,14 +62,13 @@ public final class RailsimUtils {
 		double acceleration = railsimConfigGroup.accelerationGlobalDefault;
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_MAX_ACCELERATION);
 		return attr != null ? (double) attr : acceleration;
-
 	}
 
 	/**
 	 * @return the vehicle-specific freespeed or 0 if there is no vehicle-specific freespeed provided in the link attributes
 	 */
-	public static double getLinkFreespeedForVehicleType(Id<VehicleType> type, Link link) {
-		Object attribute = link.getAttributes().getAttribute(type.toString());
+	public static double getLinkFreespeedForVehicleType(VehicleType type, Link link) {
+		Object attribute = link.getAttributes().getAttribute(type.getId().toString());
 		if (attribute == null) {
 			return 0.;
 		} else {
@@ -101,13 +100,12 @@ public final class RailsimUtils {
 		}
 	}
 
+	/**
+	 * Id of opposite link or null if there is none.
+	 */
 	public static Id<Link> getOppositeDirectionLink(Link link) {
-		if (link.getAttributes().getAttribute(LINK_ATTRIBUTE_OPPOSITE_DIRECTION) == null) {
-			return null;
-		} else {
-			String oppositeLink = (String) link.getAttributes().getAttribute(LINK_ATTRIBUTE_OPPOSITE_DIRECTION);
-			return Id.createLinkId(oppositeLink);
-		}
+		String oppositeLink = (String) link.getAttributes().getAttribute(LINK_ATTRIBUTE_OPPOSITE_DIRECTION);
+		return oppositeLink != null ?  Id.createLinkId(oppositeLink) : null;
 	}
 
 }

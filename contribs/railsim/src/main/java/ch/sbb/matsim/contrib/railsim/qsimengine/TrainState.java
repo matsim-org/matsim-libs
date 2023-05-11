@@ -3,6 +3,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -18,9 +19,15 @@ final class TrainState {
 	final MobsimDriverAgent driver;
 
 	/**
+	 * Transit agent, if this is a pt transit.
+	 */
+	@Nullable
+	final TransitDriverAgent pt;
+
+	/**
 	 * Train specific parameters.
 	 */
-	final TrainInfo info;
+	final TrainInfo train;
 
 	/**
 	 * Route of this train.
@@ -50,6 +57,11 @@ final class TrainState {
 	Id<Link> tailLink;
 
 	/**
+	 * Trains target speed.
+	 */
+	double targetSpeed;
+
+	/**
 	 * Current allowed speed, which depends on train type, links, but not on other trains or speed needed to stop.
 	 */
 	double allowedMaxSpeed;
@@ -60,13 +72,24 @@ final class TrainState {
 	double headPosition;
 
 	/**
+	 * * Distance in meters away from the {@code tailLink}s {@code toNode}.
+	 */
+	double tailPosition;
+
+	/**
 	 * Speed in m/s.
 	 */
 	double speed;
 
-	TrainState(MobsimDriverAgent driver, TrainInfo info, double timestamp, @Nullable Id<Link> linkId, List<RailLink> route) {
+	/**
+	 * Current Acceleration, (or deceleration if negative)
+	 */
+	double acceleration;
+
+	TrainState(MobsimDriverAgent driver, TrainInfo train, double timestamp, @Nullable Id<Link> linkId, List<RailLink> route) {
 		this.driver = driver;
-		this.info = info;
+		this.pt = driver instanceof TransitDriverAgent ptDriver ? ptDriver : null;
+		this.train = train;
 		this.route = route;
 		this.timestamp = timestamp;
 		this.headLink = linkId;
@@ -80,9 +103,12 @@ final class TrainState {
 			", timestamp=" + timestamp +
 			", headLink=" + headLink +
 			", tailLink=" + tailLink +
+			", targetSpeed=" + targetSpeed +
 			", allowedMaxSpeed=" + allowedMaxSpeed +
 			", headPosition=" + headPosition +
+			", tailPosition=" + tailPosition +
 			", speed=" + speed +
+			", acceleration=" + acceleration +
 			'}';
 	}
 }

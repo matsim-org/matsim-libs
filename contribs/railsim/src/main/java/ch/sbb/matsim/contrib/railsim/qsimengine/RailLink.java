@@ -2,17 +2,23 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 
 /**
- * Rail tracks in railsim, which corresponds to a MATSim link, but with additional states.
+ * Rail tracks in railsim, which may corresponds to multiple MATSim links (if there are opposing links).
+ * Therefor this kind of track is bidirectional.
  */
-class RailLink {
+final class RailLink implements HasLinkId {
 
 	private final Id<Link> id;
+
+	@Nullable
+	private final Id<Link> oppositeId;
 
 	/**
 	 * States per track.
@@ -25,38 +31,37 @@ class RailLink {
 	private final MobsimDriverAgent[] reservations;
 
 	final double length;
+	final double freeSpeed;
 	final double minimumHeadwayTime;
 
-	public RailLink(Link link) {
+	// TODO: from and to node most likely needed at some point
+	// A node can be blocked if a train is crossing the path
+
+	public RailLink(Link link, @Nullable Id<Link> opposite) {
 		id = link.getId();
+		oppositeId = opposite;
 		state = new TrackState[RailsimUtils.getTrainCapacity(link)];
 		Arrays.fill(state, TrackState.FREE);
 		reservations = new MobsimDriverAgent[state.length];
 		length = link.getLength();
+		freeSpeed = link.getFreespeed();
 		minimumHeadwayTime = RailsimUtils.getMinimumTrainHeadwayTime(link);
 	}
 
-	public Id<Link> getId() {
+	@Override
+	public Id<Link> getLinkId() {
 		return id;
 	}
-
-	/**
-	 * Number of tracks on this segment.
-	 */
-	public int getTracks() {
-		return state.length;
-	}
-
 
 	/**
 	 * Returns the allowed freespeed, depending on the context, which is given via driver.
 	 */
 	public double getAllowedFreespeed(MobsimDriverAgent driver) {
 
-		// TODO: every context information such as vehicle, or transit line is stored in the driver
-		// can be retrieved here using the utils
+		// TODO: additional context information such as transit line is stored in the driver
+		// TODO: speed depending on vehicle type
 
-		return 30;
+		return Math.min(freeSpeed, driver.getVehicle().getVehicle().getType().getMaximumVelocity());
 	}
 
 	/**
@@ -72,6 +77,8 @@ class RailLink {
 
 	/**
 	 * Reserve a track for a specific driver.
+	 *
+	 * @return -1 if not track was free, otherwise track number.
 	 */
 	public int reserveTrack(MobsimDriverAgent driver) {
 		for (int i = 0; i < state.length; i++) {
@@ -81,7 +88,19 @@ class RailLink {
 				return i;
 			}
 		}
-		throw new IllegalStateException("No track was free.");
+
+		return -1;
+	}
+
+	/**
+	 * Check if driver has already reserved this link.
+	 */
+	public boolean isReserved(MobsimDriverAgent driver) {
+		for (MobsimDriverAgent reservation : reservations) {
+			if (reservation == driver)
+				return true;
+		}
+		return false;
 	}
 
 	/**

@@ -14,7 +14,7 @@ record TrainInfo(
 	double acceleration,
 	double deceleration,
 	double maxDeceleration
-	) {
+) {
 
 	public TrainInfo(VehicleType vehicle, RailsimConfigGroup config) {
 		// TODO:
