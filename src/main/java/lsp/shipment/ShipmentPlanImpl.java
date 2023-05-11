@@ -34,11 +34,13 @@ import java.util.*;
 		this.planElements = new LinkedHashMap<>();
 	}
 
+	//TODO: Ist kein embedding container!
 	@Override
 	public void setEmbeddingContainer(Id<LSPShipment> pointer) {
 		throw new RuntimeException("not implemented");
 	}
 
+	//TODO: Ist kein embedding container!
 	@Override
 	public Id<LSPShipment> getEmbeddingContainer() {
 		return lspShipmentId;
