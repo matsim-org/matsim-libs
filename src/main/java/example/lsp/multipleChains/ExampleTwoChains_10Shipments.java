@@ -33,7 +33,6 @@ import java.util.*;
 
 public class ExampleTwoChains_10Shipments {
 
-	//TODO: Run Settings
 	private static final double TOLL_VALUE = 0;
 
 	private static final Logger log = LogManager.getLogger(ExampleTwoChains_10Shipments.class);

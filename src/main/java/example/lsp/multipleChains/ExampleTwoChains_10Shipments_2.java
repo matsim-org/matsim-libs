@@ -31,12 +31,11 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 
-public class ExampleTwoChains_10Shipments_2Plans {
+public class ExampleTwoChains_10Shipments_2 {
 
-	//TODO: Run Settings
 	private static final double TOLL_VALUE = 0;
 
-	private static final Logger log = LogManager.getLogger(ExampleTwoChains_10Shipments_2Plans.class);
+	private static final Logger log = LogManager.getLogger(ExampleTwoChains_10Shipments_2.class);
 
 	private static final Id<Link> DEPOT_SOUTH_LINK_ID = Id.createLinkId("i(1,0)");
 	private static final Id<Link> DEPOT_NORTH_LINK_ID = Id.createLinkId("i(1,8)");
@@ -49,7 +48,7 @@ public class ExampleTwoChains_10Shipments_2Plans {
 			.setCostPerTimeUnit(0.01)
 			.build();
 
-	private ExampleTwoChains_10Shipments_2Plans() {
+	private ExampleTwoChains_10Shipments_2() {
 	}
 
 	public static void main(String[] args) {
@@ -118,7 +117,7 @@ public class ExampleTwoChains_10Shipments_2Plans {
 			}
 			ConfigUtils.applyCommandline(config,args);
 		} else {
-			config.controler().setOutputDirectory("output/2chains10shipments2plans");
+			config.controler().setOutputDirectory("output/2chains10shipments_2");
 			config.controler().setLastIteration(2);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));

@@ -35,7 +35,6 @@ import java.util.List;
 
 public class ExampleTwoChains {
 
-	//TODO: Run Settings
 	private static final double TOLL_VALUE = 0;
 
 	private static final Logger log = LogManager.getLogger(ExampleTwoChains.class);
