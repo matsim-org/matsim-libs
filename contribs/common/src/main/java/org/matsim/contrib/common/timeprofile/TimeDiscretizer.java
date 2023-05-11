@@ -25,35 +25,36 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.stream.IntStream;
 
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.trafficmonitoring.TimeBinUtils;
 
 public class TimeDiscretizer {
 	private final int intervalCount;
-	private final int timeInterval;
+	private final double timeInterval;
 	private final int maxTime;
 
 	public TimeDiscretizer(TravelTimeCalculatorConfigGroup ttcConfig) {
 		this(ttcConfig.getMaxTime(), ttcConfig.getTraveltimeBinSize());
 	}
 
-	public TimeDiscretizer(int maxTime, int timeInterval) {
+	public TimeDiscretizer(int maxTime, double timeInterval) {
 		checkArgument(timeInterval > 0, "interval size must be positive");
 		checkArgument(maxTime >= 0, "maxTime must not be negative");
 		this.timeInterval = timeInterval;
 		this.maxTime = maxTime;
-		intervalCount = maxTime / timeInterval + 1;
+		intervalCount = TimeBinUtils.getTimeBinCount(maxTime, timeInterval);
 	}
 
 	public int getIdx(double time) {
 		checkArgument(time >= 0);
 		checkArgument(time <= maxTime);
-		return (int)time / timeInterval;
+		return TimeBinUtils.getTimeBinIndex(time, timeInterval, intervalCount);
 	}
 
-	public int discretize(double time) {
+	public double discretize(double time) {
 		return getIdx(time) * timeInterval;
 	}
 
-	public int getTimeInterval() {
+	public double getTimeInterval() {
 		return timeInterval;
 	}
 
@@ -61,12 +62,12 @@ public class TimeDiscretizer {
 		return intervalCount;
 	}
 
-	public int[] getTimes() {
-		return IntStream.range(0, intervalCount).map(i -> i * timeInterval).toArray();
+	public double[] getTimes() {
+		return IntStream.range(0, intervalCount).mapToDouble(i -> i * timeInterval).toArray();
 	}
 
 	public interface TimeBinConsumer {
-		void accept(int bin, int time);
+		void accept(int bin, double time);
 	}
 
 	public void forEach(TimeBinConsumer consumer) {

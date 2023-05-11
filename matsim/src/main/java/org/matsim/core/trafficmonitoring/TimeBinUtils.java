@@ -21,7 +21,7 @@ package org.matsim.core.trafficmonitoring;
 
 public class TimeBinUtils {
 	public static int getTimeBinIndex(double time, double travelTimeBinSize, int travelTimeBinCount) {
-		return Math.min((int)Math.floor(time / travelTimeBinSize), travelTimeBinCount - 1);
+		return Math.max(0, Math.min((int)Math.floor(time / travelTimeBinSize), travelTimeBinCount - 1));
 	}
 
 	public static int getTimeBinCount(int maxTime, double travelTimeBinSize) {

@@ -38,6 +38,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -48,12 +49,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * Analyzes the average link travel times and writes them to files (absolute and
  * relative values; txt and shp files).
- * 
+ *
  * When added as ControlerListener, car travel times are collected and written
  * based on the TravelTimeCalculator provided by the services.
- * 
+ *
  * For other modes, first call collectTravelTimes(...) and then the writer methods.
- * 
+ *
  * @author cdobler
  */
 public class TravelTimesWriter implements IterationEndsListener {
@@ -62,30 +63,30 @@ public class TravelTimesWriter implements IterationEndsListener {
 	public static String travelTimesRelativeFile = "travelTimesRelative.txt.gz";
 	public static String travelTimesAbsoluteSHPFile = "travelTimesAbsolute.shp";
 	public static String travelTimesRelativeSHPFile = "travelTimesRelative.shp";
-	
+
 	public static final String newLine = "\n";
 	public static final String delimiter = "\t";
-	
+
 	private TravelTime travelTime;
 	private Network network;
-	private int timeSlice;
+	private double timeSlice;
 	private int numSlots;
-	
+
 	private boolean writeTXTFiles = true;
 	private boolean writeSHPFiles = true;
-	
+
 	private final Map<Link, double[]> travelTimes = new HashMap<Link, double[]>();
 
 	private String crsString = "EPSG:21781";
-	
+
 	public TravelTimesWriter() {
 	}
-	
+
 	public TravelTimesWriter(boolean writeTXTFiles, boolean writeSHPFiles) {
 		this.writeTXTFiles = writeTXTFiles;
 		this.writeSHPFiles = writeSHPFiles;
 	}
-	
+
 	public String getCrsString() {
 		return crsString;
 	}
@@ -93,13 +94,13 @@ public class TravelTimesWriter implements IterationEndsListener {
 	public void setCrsString(String crsString) {
 		this.crsString = crsString;
 	}
-	
+
 	private void initBuffer(Network network) {
 
 		for (Link link : network.getLinks().values()) {
 			double[] travelTimeArray = new double[numSlots];
 
-			int time = 0;
+			double time = 0;
 			for (int i = 0; i < numSlots; i++) {
 //				travelTimeArray[i] = link.getLength() / link.getFreespeed(time);
 				travelTimeArray[i] = Double.NaN;
@@ -110,14 +111,14 @@ public class TravelTimesWriter implements IterationEndsListener {
 		}
 	}
 
-	private void collectTravelTimes(TravelTime travelTime, Network network, int timeSlice, int numSlots) {
+	private void collectTravelTimes(TravelTime travelTime, Network network, double timeSlice, int numSlots) {
 
 		this.initBuffer(network);
-		
+
 		for (Entry<Link, double[]> entry : travelTimes.entrySet()) {
 			double[] travelTimeArray = entry.getValue();
 
-			int time = 0;
+			double time = 0;
 			for (int i = 0; i < this.numSlots; i++) {
 				travelTimeArray[i] = this.travelTime.getLinkTravelTime(entry.getKey(), time, null, null);
 				time = time + this.timeSlice;
@@ -126,53 +127,53 @@ public class TravelTimesWriter implements IterationEndsListener {
 	}
 
 	public void writeAbsoluteTravelTimes(final String file) {
-		
+
 		try {
 			BufferedWriter timesWriter = IOUtils.getBufferedWriter(file);
-			
+
 			writeHeader(timesWriter);
 			writeRows(timesWriter, true);
-			
+
 			timesWriter.flush();
-			timesWriter.close();			
+			timesWriter.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public void writeRelativeTravelTimes(final String file) {
-		
+
 		try {
 			BufferedWriter timesWriter = IOUtils.getBufferedWriter(file);
-			
+
 			writeHeader(timesWriter);
 			writeRows(timesWriter, false);
-			
+
 			timesWriter.flush();
-			timesWriter.close();			
+			timesWriter.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private void writeHeader(BufferedWriter timesWriter) throws IOException {
 		timesWriter.write("linkId");
-		
-		for (int i = 0; i < this.numSlots; i++) {		
+
+		for (int i = 0; i < this.numSlots; i++) {
 			timesWriter.write(delimiter);
 			timesWriter.write(String.valueOf(i * this.timeSlice));
-		}		
+		}
 		timesWriter.write(newLine);
 	}
-	
+
 	private void writeRows(BufferedWriter timesWriter, boolean absolute) throws IOException {
-		
+
 		for (Link link : this.network.getLinks().values()) {
-			
+
 			timesWriter.write(link.getId().toString());
-			
+
 			double[] travelTimeArray = this.travelTimes.get(link);
-			for (int i = 0; i < this.numSlots; i++) {		
+			for (int i = 0; i < this.numSlots; i++) {
 				timesWriter.write(delimiter);
 				if (absolute) {
 					timesWriter.write(String.valueOf(travelTimeArray[i]));
@@ -181,15 +182,15 @@ public class TravelTimesWriter implements IterationEndsListener {
 					double relativeTravelTime = travelTimeArray[i] / freeSpeedTravelTime;
 					timesWriter.write(String.valueOf(relativeTravelTime));
 				}
-			}		
+			}
 			timesWriter.write(newLine);
 		}
 	}
-		
+
 	public void writeAbsoluteSHPTravelTimes(String file, CoordinateReferenceSystem crs, boolean ignoreExitLinks) {
 		try {
 			Collection<SimpleFeature> ft = generateSHPFileData(crs, this.network, true, ignoreExitLinks);
-			ShapeFileWriter.writeGeometries(ft, file);			
+			ShapeFileWriter.writeGeometries(ft, file);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -198,16 +199,16 @@ public class TravelTimesWriter implements IterationEndsListener {
 	public void writeRelativeSHPTravelTimes(String file, CoordinateReferenceSystem crs, boolean ignoreExitLinks) {
 		try {
 			Collection<SimpleFeature> ft = generateSHPFileData(crs, this.network, false, ignoreExitLinks);
-			ShapeFileWriter.writeGeometries(ft, file);			
+			ShapeFileWriter.writeGeometries(ft, file);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private Collection<SimpleFeature> generateSHPFileData(CoordinateReferenceSystem crs, Network network, boolean absolute, boolean ignoreExitLinks) throws Exception {
 
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
+
 		PolylineFeatureFactory.Builder builder = new PolylineFeatureFactory.Builder()
 			.setCrs(crs)
 			.setName("links")
@@ -216,19 +217,19 @@ public class TravelTimesWriter implements IterationEndsListener {
 			.addAttribute("toID", String.class)
 			.addAttribute("length", Double.class)
 			.addAttribute("fstt", Double.class);
-		
+
 		for (int i = 0; i < this.numSlots; i++) {
 			builder.addAttribute(String.valueOf(i * this.timeSlice), Double.class);
 		}
 
 		PolylineFeatureFactory factory = builder.create();
 		for (Link link : network.getLinks().values()) {
-			
+
 			if (ignoreExitLinks) {
 				String string = link.getId().toString().toLowerCase();
 				if (string.contains("rescue") || string.contains("exit")) continue;
 			}
-			
+
 			Coordinate[] coordArray = new Coordinate[] {coord2Coordinate(link.getFromNode().getCoord()), coord2Coordinate(link.getCoord()), coord2Coordinate(link.getToNode().getCoord())};
 
 			Object[] attributes = new Object[5 + this.numSlots];
@@ -240,7 +241,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 
 			double[] travelTimeArray = this.travelTimes.get(link);
 			for (int i = 0; i < this.numSlots; i++) {
-				
+
 				if (absolute) {
 					attributes[5 + i] = travelTimeArray[i];
 				} else {
@@ -253,10 +254,10 @@ public class TravelTimesWriter implements IterationEndsListener {
 			SimpleFeature ft = factory.createPolyline(coordArray, attributes, link.getId().toString());
 			features.add(ft);
 		}
-				
+
 		return features;
 	}
-	
+
 	/**
 	 * Converts a MATSim {@link org.matsim.api.core.v01.Coord} into a Geotools <code>Coordinate</code>
 	 * @param coord MATSim coordinate
@@ -275,13 +276,13 @@ public class TravelTimesWriter implements IterationEndsListener {
         this.network = controler.getScenario().getNetwork();
 		this.timeSlice = config.travelTimeCalculator().getTraveltimeBinSize();
 		int maxTime = 30 * 3600;	// default value from TravelTimeCalculator
-		this.numSlots = (maxTime / timeSlice) + 1;	
-		
+		this.numSlots = TimeBinUtils.getTimeBinCount(maxTime, timeSlice);
+
 		this.collectTravelTimes(travelTime, network, timeSlice, numSlots);
-		
+
 		OutputDirectoryHierarchy controlerIO = event.getServices().getControlerIO();
 		int iteration = event.getIteration();
-		
+
 		String absoluteFile = TravelTimesWriter.travelTimesAbsoluteFile;
 		String relativeFile = TravelTimesWriter.travelTimesRelativeFile;
 		if (absoluteFile.toLowerCase().endsWith(".gz")) {
@@ -290,21 +291,21 @@ public class TravelTimesWriter implements IterationEndsListener {
 		if (relativeFile.toLowerCase().endsWith(".gz")) {
 			relativeFile = relativeFile.substring(0, relativeFile.length() - 3);
 		}
-		
+
 		if (writeTXTFiles) {
 			String absoluteTravelTimesFile = controlerIO.getIterationFilename(iteration, absoluteFile);
 			String relativeTravelTimesFile = controlerIO.getIterationFilename(iteration, relativeFile);
 			this.writeAbsoluteTravelTimes(absoluteTravelTimesFile);
-			this.writeRelativeTravelTimes(relativeTravelTimesFile);			
+			this.writeRelativeTravelTimes(relativeTravelTimesFile);
 		}
-		
+
 		if (writeSHPFiles) {
 			String absoluteSHPTravelTimesFile = controlerIO.getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteSHPFile);
 			String relativeSHPTravelTimesFile = controlerIO.getIterationFilename(0, TravelTimesWriter.travelTimesRelativeSHPFile);
 			this.writeAbsoluteSHPTravelTimes(absoluteSHPTravelTimesFile, MGC.getCRS(crsString), true);
-			this.writeRelativeSHPTravelTimes(relativeSHPTravelTimesFile, MGC.getCRS(crsString), true);			
+			this.writeRelativeSHPTravelTimes(relativeSHPTravelTimesFile, MGC.getCRS(crsString), true);
 		}
-		
+
 		this.travelTimes.clear();
 	}
 

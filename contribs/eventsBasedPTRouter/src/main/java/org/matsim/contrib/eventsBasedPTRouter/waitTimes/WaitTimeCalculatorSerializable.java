@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.Config;
+import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -68,6 +69,7 @@ public class WaitTimeCalculatorSerializable implements
 	private static int waitTimeCalls;
 	//Attributes
 	private final double timeSlot;
+	private final int totalTime;
 	private final Map<Tuple<String, String>, Map<String, WaitTimeData>> waitTimes = new HashMap<Tuple<String, String>, Map<String, WaitTimeData>>(1000);
 	private final Map<Tuple<String, String>, Map<String, double[]>> scheduledWaitTimes = new HashMap<Tuple<String, String>, Map<String, double[]>>(1000);
 	private final Map<String, Double> agentsWaitingData = new HashMap<String, Double>();
@@ -86,8 +88,9 @@ public class WaitTimeCalculatorSerializable implements
 		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds() - config.qsim().getStartTime().seconds()));
 	}
 
-	public WaitTimeCalculatorSerializable(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
+	public WaitTimeCalculatorSerializable(final TransitSchedule transitSchedule, final double timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
+		this.totalTime = totalTime;
 		for (TransitLine line : transitSchedule.getTransitLines().values())
 			for (TransitRoute route : line.getRoutes().values()) {
 				double[] sortedDepartures = new double[route.getDepartures().size()];
@@ -98,8 +101,8 @@ public class WaitTimeCalculatorSerializable implements
 				Map<String, WaitTimeData> stopsMap = new HashMap<String, WaitTimeData>(100);
 				Map<String, double[]> stopsScheduledMap = new HashMap<String, double[]>(100);
 				for (TransitRouteStop stop : route.getStops()) {
-					stopsMap.put(stop.getStopFacility().getId().toString(), new WaitTimeDataArray((int) (totalTime / timeSlot) + 1));
-					double[] cacheWaitTimes = new double[(int) (totalTime / timeSlot) + 1];
+					stopsMap.put(stop.getStopFacility().getId().toString(), new WaitTimeDataArray(TimeBinUtils.getTimeBinCount(totalTime , timeSlot)));
+					double[] cacheWaitTimes = new double[TimeBinUtils.getTimeBinCount(totalTime , timeSlot)];
 					for (int i = 0; i < cacheWaitTimes.length; i++) {
 						double endTime = timeSlot * (i + 1);
 						if (endTime > 24 * 3600)
@@ -144,12 +147,13 @@ public class WaitTimeCalculatorSerializable implements
 		Tuple<String, String> key = new Tuple<String, String>(lineId.toString(), routeId.toString());
 		waitTimeCalls++;
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId.toString());
-		if (waitTimeData.getNumData((int) (time / timeSlot)) == 0) {
+		int timeBinIndex = TimeBinUtils.getTimeBinIndex(time, timeSlot, TimeBinUtils.getTimeBinCount(totalTime, timeSlot));
+		if (waitTimeData.getNumData(timeBinIndex) == 0) {
 			scheduleCalls++;
 			double[] waitTimes = scheduledWaitTimes.get(key).get(stopId.toString());
-			return waitTimes[(int) (time / timeSlot) < waitTimes.length ? (int) (time / timeSlot) : (waitTimes.length - 1)];
+			return waitTimes[timeBinIndex < waitTimes.length ? timeBinIndex : (waitTimes.length - 1)];
 		} else {
-			return waitTimeData.getWaitTime((int) (time / timeSlot));
+			return waitTimeData.getWaitTime(timeBinIndex);
 		}
 	}
 
@@ -177,7 +181,8 @@ public class WaitTimeCalculatorSerializable implements
 		if (startWaitingTime != null) {
 			Tuple<String, String> lineRoute = linesRoutesOfVehicle.get(event.getVehicleId().toString());
 			WaitTimeData data = waitTimes.get(lineRoute).get(stopOfVehicle.get(event.getVehicleId().toString()));
-			data.addWaitTime((int) (startWaitingTime / timeSlot), event.getTime() - startWaitingTime);
+			data.addWaitTime(TimeBinUtils.getTimeBinIndex(startWaitingTime, timeSlot, TimeBinUtils.getTimeBinCount(totalTime, timeSlot)),
+					event.getTime() - startWaitingTime);
 			agentsWaitingData.remove(event.getPersonId().toString());
 		}
 	}

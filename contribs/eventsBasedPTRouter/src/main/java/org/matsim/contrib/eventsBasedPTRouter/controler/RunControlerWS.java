@@ -34,7 +34,7 @@ import org.matsim.pt.router.TransitRouter;
 
 /**
  * A run Controler for a transit router that depends on the travel times and wait times
- * 
+ *
  * @author sergioo
  */
 
@@ -45,17 +45,22 @@ public class RunControlerWS {
 		ConfigUtils.loadConfig(config, args[0]);
 		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
+		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(),
+				controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
+				(int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
 		controler.getEvents().addHandler(waitTimeCalculator);
-		final StopStopTimeCalculatorImpl stopStopTimeCalculator = new StopStopTimeCalculatorImpl(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
+		final StopStopTimeCalculatorImpl stopStopTimeCalculator = new StopStopTimeCalculatorImpl(controler.getScenario().getTransitSchedule(),
+				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
+				(int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.get(), stopStopTimeCalculator.get()));
+				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.get(),
+						stopStopTimeCalculator.get()));
 			}
 		});
 		controler.run();
 	}
-	
+
 }

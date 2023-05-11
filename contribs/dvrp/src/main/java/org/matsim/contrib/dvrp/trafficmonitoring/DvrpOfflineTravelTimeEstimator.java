@@ -35,6 +35,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -57,7 +58,7 @@ public class DvrpOfflineTravelTimeEstimator
 
 	private final TimeDiscretizer timeDiscretizer;
 	private final int intervalCount;
-	private final int timeInterval;
+	private final double timeInterval;
 
 	private final double[][] linkTravelTimes;
 	private final double alpha;
@@ -103,15 +104,7 @@ public class DvrpOfflineTravelTimeEstimator
 	}
 
 	private int getIdx(double time) {
-		//handle negative times (e.g. in backward shortest path search)
-		if (time < 0) {
-			return 0;
-		}
-		int idx = (int)time / timeInterval;// rounding down
-		if (idx < intervalCount) {
-			return idx;
-		}
-		return intervalCount - 1;
+		return TimeBinUtils.getTimeBinIndex(time, timeInterval, intervalCount);
 	}
 
 	@Override

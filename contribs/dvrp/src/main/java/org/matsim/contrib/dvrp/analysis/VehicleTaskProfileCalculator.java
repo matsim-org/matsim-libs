@@ -127,7 +127,7 @@ public class VehicleTaskProfileCalculator implements TaskStartedEventHandler,
 		}
 		endTime = Math.min(endTime, analysisEndTime);
 
-		int timeInterval = timeDiscretizer.getTimeInterval();
+		double timeInterval = timeDiscretizer.getTimeInterval();
 		int fromIdx = timeDiscretizer.getIdx(beginTime);
 		int toIdx = timeDiscretizer.getIdx(endTime);
 

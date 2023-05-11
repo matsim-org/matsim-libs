@@ -58,7 +58,7 @@ public class DvrpOfflineTravelTimes {
 		//header row
 		writer.append("linkId" + DELIMITER);
 		for (int i = 0; i < intervalCount; i++) {
-			int time = i * timeDiscretizer.getTimeInterval();
+			double time = i * timeDiscretizer.getTimeInterval();
 			writer.append(time + DELIMITER);
 		}
 		writer.append('\n');

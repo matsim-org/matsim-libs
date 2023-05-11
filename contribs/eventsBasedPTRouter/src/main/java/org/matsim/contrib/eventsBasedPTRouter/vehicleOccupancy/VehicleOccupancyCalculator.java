@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.config.Config;
+import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -26,23 +27,25 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 
 	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, VehicleOccupancyData>> vehicleOccupancy = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, VehicleOccupancyData>>(1000);
 	private double timeSlot;
+	private int totalTime;
 	private Map<Id<Vehicle>, Integer> ptVehicles = new HashMap<Id<Vehicle>, Integer>();
 	private Map<Id<Vehicle>, Integer> capacities = new HashMap<Id<Vehicle>, Integer>();
 	private Map<Id<Vehicle>, Tuple<Id<TransitLine>, Id<TransitRoute>>> linesRoutesOfVehicle = new HashMap<Id<Vehicle>, Tuple<Id<TransitLine>, Id<TransitRoute>>>();
 	private final Vehicles vehicles;
-	
+
 	//Constructors
 	public VehicleOccupancyCalculator(final TransitSchedule transitSchedule, final Vehicles vehicles, final Config config) {
 		this(transitSchedule, vehicles, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds()-config.qsim().getStartTime().seconds()));
 	}
-	public VehicleOccupancyCalculator(final TransitSchedule transitSchedule, final Vehicles vehicles, final int timeSlot, final int totalTime) {
+	public VehicleOccupancyCalculator(final TransitSchedule transitSchedule, final Vehicles vehicles, final double timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
+		this.totalTime = totalTime;
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
 				Map<Id<TransitStopFacility>, VehicleOccupancyData> routeMap = new HashMap<Id<TransitStopFacility>, VehicleOccupancyData>(100);
 				vehicleOccupancy.put(new Tuple<Id<TransitLine>, Id<TransitRoute>>(line.getId(), route.getId()), routeMap);
 				for(int s=0; s<route.getStops().size()-1; s++) {
-					routeMap.put(route.getStops().get(s).getStopFacility().getId(), new VehicleOccupancyDataArray((int) (totalTime/timeSlot)+1));
+					routeMap.put(route.getStops().get(s).getStopFacility().getId(), new VehicleOccupancyDataArray(TimeBinUtils.getTimeBinCount(totalTime, timeSlot)));
 				}
 			}
 		this.vehicles = vehicles;
@@ -58,7 +61,7 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 		};
 	}
 	private double getVehicleOccupancy(Id<TransitStopFacility> stopOId, Id<TransitLine> lineId, Id<TransitRoute> routeId, double time) {
-		return vehicleOccupancy.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, routeId)).get(stopOId).getVehicleOccupancy((int) (time/timeSlot));
+		return vehicleOccupancy.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, routeId)).get(stopOId).getVehicleOccupancy(TimeBinUtils.getTimeBinIndex(time, timeSlot, totalTime));
 	}
 	@Override
 	public void reset(int iteration) {
@@ -73,7 +76,10 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 		if(num!=null) {
 			VehicleOccupancyData vehicleOccupancyData = vehicleOccupancy.get(linesRoutesOfVehicle.get(event.getVehicleId())).get(event.getFacilityId());
 			if(vehicleOccupancyData!=null)
-				vehicleOccupancyData.addVehicleOccupancy((int) (event.getTime()/timeSlot), num/(double)capacities.get(event.getVehicleId()));
+				vehicleOccupancyData.addVehicleOccupancy(
+						TimeBinUtils.getTimeBinIndex(event.getTime(), timeSlot,
+								TimeBinUtils.getTimeBinCount(totalTime, timeSlot)),
+						num/(double)capacities.get(event.getVehicleId()));
 		}
 	}
 	@Override
@@ -95,6 +101,6 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 		this.capacities.put(event.getVehicleId(), vehicleCapacity.getSeats()+vehicleCapacity.getStandingRoom());
 		linesRoutesOfVehicle.put(event.getVehicleId(), new Tuple<Id<TransitLine>, Id<TransitRoute>>(event.getTransitLineId(), event.getTransitRouteId()));
 	}
-	
+
 
 }

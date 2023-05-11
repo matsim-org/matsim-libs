@@ -35,7 +35,7 @@ import org.matsim.pt.router.TransitRouter;
 
 /**
  * A run Controler for a transit router that depends on the travel times and wait times
- * 
+ *
  * @author sergioo
  */
 
@@ -45,25 +45,33 @@ public class RunControlerWSV {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, args[0]);
 		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
+		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(),
+				controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
+				(int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
 		controler.getEvents().addHandler(waitTimeCalculator);
-		final StopStopTimeCalculatorImpl stopStopTimeCalculator = new StopStopTimeCalculatorImpl(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
+		final StopStopTimeCalculatorImpl stopStopTimeCalculator = new StopStopTimeCalculatorImpl(controler.getScenario().getTransitSchedule(),
+				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
+				(int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
-		final VehicleOccupancyCalculator vehicleOccupancyCalculator = new VehicleOccupancyCalculator(controler.getScenario().getTransitSchedule(), ((MutableScenario)controler.getScenario()).getTransitVehicles(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
+		final VehicleOccupancyCalculator vehicleOccupancyCalculator = new VehicleOccupancyCalculator(controler.getScenario().getTransitSchedule(),
+				((MutableScenario)controler.getScenario()).getTransitVehicles(),
+				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
+				(int) (controler.getConfig().qsim().getEndTime().seconds()-controler.getConfig().qsim().getStartTime().seconds()));
 		controler.getEvents().addHandler(vehicleOccupancyCalculator);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSVFactory(controler.getScenario(), waitTimeCalculator.get(), stopStopTimeCalculator.get(), vehicleOccupancyCalculator.getVehicleOccupancy()));
+				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSVFactory(controler.getScenario(), waitTimeCalculator.get(),
+						stopStopTimeCalculator.get(), vehicleOccupancyCalculator.getVehicleOccupancy()));
 			}
 		});
-		
+
 		// yyyyyy note that in the above script only the router is modified, but not the scoring.  With standard matsim, a slower bu
-		// less crowded pt route will only be accepted by the agent when the faster but more crowded option was never presented 
-		// to the agent.  (Alternatively, e.g. with the Singapore scenario, there may be boarding denials, in which case 
+		// less crowded pt route will only be accepted by the agent when the faster but more crowded option was never presented
+		// to the agent.  (Alternatively, e.g. with the Singapore scenario, there may be boarding denials, in which case
 		// routes that avoid crowded sections may also be beneficial.)  kai, jul'15
-		
+
 		controler.run();
 	}
-	
+
 }

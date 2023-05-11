@@ -64,7 +64,7 @@ public class VehicleTaskProfileView implements ProfileWriter.ProfileView {
 	}
 
 	@Override
-	public int[] times() {
+	public double[] times() {
 		return calculator.getTimeDiscretizer().getTimes();
 	}
 }
