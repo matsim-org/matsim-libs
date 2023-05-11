@@ -6,6 +6,7 @@ import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 import org.matsim.core.gbl.Gbl;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -20,6 +21,9 @@ import java.util.Map;
 public class ConsecutiveLogisticChainShipmentAssigner implements ShipmentAssigner {
 
 	private LSP lsp;
+
+	// map of logistic chains and their number of assigned shipments in order of addition
+	Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
 
 	ConsecutiveLogisticChainShipmentAssigner() {
 	}
@@ -36,29 +40,17 @@ public class ConsecutiveLogisticChainShipmentAssigner implements ShipmentAssigne
 	@Override
 	public void assignToLogisticChain(LSPShipment shipment) {
 		Gbl.assertIf(lsp.getSelectedPlan().getLogisticChains().size() > 0);
-
-		// map of logistic chains and their number of assigned shipments in order of addition
-		Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
-
-		for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
-			shipmentCountByChain.put(logisticChain, logisticChain.getShipments().size());
-		}
-
-		// variables for key and value to find logistic chain with the smallest number of assigned shipments
-		LogisticChain minChain = null;
-		Integer minSize = Integer.MAX_VALUE;
-
-		for (Map.Entry<LogisticChain, Integer> e : shipmentCountByChain.entrySet()) {
-			if (e.getValue() < minSize) {
-				minChain = e.getKey();
-				minSize = e.getValue();
+		//prepare the map if empty for the first time with each number of assigned shipments being zero
+		if(shipmentCountByChain.isEmpty()) {
+			for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+				shipmentCountByChain.put(chain, 0);
 			}
 		}
 
-		// assign the shipment to the logisticChain with the least number of assigner shipments so far
-		if (minChain != null) {
-			minChain.assignShipment(shipment);
-		}
+		//assign the shipment to the chain with the least number of assigned shipments so far, increase its value by one
+		LogisticChain minChain = Collections.min(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue()).getKey();
+		minChain.assignShipment(shipment);
+		shipmentCountByChain.merge(minChain, 1, Integer::sum);
 	}
 
 }
