@@ -198,7 +198,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 	public void testCollectionLSPScoring() {
 		System.out.println("score=" + collectionLSP.getSelectedPlan().getScore());
 		assertEquals(numberOfShipments, collectionLSP.getShipments().size());
-		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getShipments().size());
+		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getShipmentIds().size());
 		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <= (numberOfShipments * 5));
 	}

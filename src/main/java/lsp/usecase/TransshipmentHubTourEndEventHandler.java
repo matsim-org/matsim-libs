@@ -150,8 +150,8 @@ import java.util.Map;
 		ShipmentPlanElement handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-			lspShipment.getLog().addPlanElement(loadId, handle);
+		if (!lspShipment.getShipmentLog().getPlanElements().containsKey(loadId)) {
+			lspShipment.getShipmentLog().addPlanElement(loadId, handle);
 		}
 
 	}

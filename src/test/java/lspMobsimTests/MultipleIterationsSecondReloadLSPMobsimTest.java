@@ -289,11 +289,11 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 	@Test
 	public void testFirstReloadLSPMobsim() {
 		for (LSPShipment shipment : lsp.getShipments()) {
-			assertFalse(shipment.getLog().getPlanElements().isEmpty());
-			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getLog().getPlanElements().size());
+			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
+			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
-			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
 			for (ShipmentPlanElement scheduleElement : scheduleElements) {

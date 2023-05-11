@@ -417,7 +417,7 @@ public class MainRunLSPSchedulingTest {
 		}
 
 		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-			assertEquals(1, solution.getShipments().size());
+			assertEquals(1, solution.getShipmentIds().size());
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
 				if (element.getNextElement() != null) {

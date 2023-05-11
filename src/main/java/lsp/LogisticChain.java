@@ -21,6 +21,7 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
@@ -39,7 +40,7 @@ public interface LogisticChain extends Identifiable<LogisticChain>, KnowsLSP, Ha
 
 	Collection<LogisticChainElement> getLogisticChainElements();
 
-	Collection<LSPShipment> getShipments();
+	Collection<Id<LSPShipment>> getShipmentIds();
 
 	void assignShipment(LSPShipment shipment);
 

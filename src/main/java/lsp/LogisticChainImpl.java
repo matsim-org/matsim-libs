@@ -23,6 +23,7 @@ package lsp;
 import lsp.shipment.LSPShipment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +32,7 @@ import java.util.Collection;
 	private static final Logger log = LogManager.getLogger(LogisticChainImpl.class);
 
 	private final Collection<LogisticChainElement> logisticChainElements;
-	private final Collection<LSPShipment> shipments;
+	private final Collection<Id<LSPShipment>> shipmentIds;
 	private LSP lsp;
 
 	LogisticChainImpl(LSPUtils.LogisticChainBuilder builder) {
@@ -40,7 +41,7 @@ import java.util.Collection;
 		for (LogisticChainElement element : this.logisticChainElements) {
 			element.setEmbeddingContainer(this);
 		}
-		this.shipments = new ArrayList<>();
+		this.shipmentIds = new ArrayList<>();
 	}
 
 	@Override
@@ -59,13 +60,13 @@ import java.util.Collection;
 	}
 
 	@Override
-	public Collection<LSPShipment> getShipments() {
-		return shipments;
+	public Collection<Id<LSPShipment>> getShipmentIds() {
+		return shipmentIds;
 	}
 
 	@Override
 	public void assignShipment(LSPShipment shipment) {
-		shipments.add(shipment);
+		shipmentIds.add(shipment.getId());
 	}
 
 	@Override public String toString() {
@@ -79,11 +80,11 @@ import java.util.Collection;
 			}
 			strb.append("}");
 		}
-		strb.append("[No of Shipments=").append(shipments.size()).append("] \n");
-		if (!shipments.isEmpty()){
+		strb.append("[No of Shipments=").append(shipmentIds.size()).append("] \n");
+		if (!shipmentIds.isEmpty()){
 			strb.append("{ShipmentIds=");
-			for (LSPShipment shipment : shipments) {
-				strb.append("[" + shipment.getId().toString() + "]");
+			for (Id<LSPShipment> lspShipmentId : shipmentIds) {
+				strb.append("[" + lspShipmentId.toString() + "]");
 			}
 			strb.append("}");
 		}
