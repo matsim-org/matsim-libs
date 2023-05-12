@@ -6,42 +6,59 @@
 		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
 	</attributes>
 
-	<!-- Simple network with default attributes -->
+	<!-- Simple bidirectional network with default attributes
+
+	n1 <======> n2 <=======> n3 <==> n4 <==> n5 <=======> n6
+
+	 -->
 
 <!-- ====================================================================== -->
 
 	<nodes>
-		<node id="t1_IN" x="-1000.0" y="-8000.0" >
-		</node>
-		<node id="t1_OUT" x="0.0" y="-8000.0" >
-		</node>
-		<node id="t2_IN" x="49500.0" y="0.0" >
-		</node>
-		<node id="t2_OUT" x="50500.0" y="0.0" >
-		</node>
-		<node id="t3_IN" x="100000" y="-8000.0" >
-		</node>
-		<node id="t3_OUT" x="101000.0" y="-8000.0" >
-		</node>
+		<node id="n1" x="0" y="0"/>
+		<node id="n2" x="0" y="5000"/>
+		<node id="n3" x="0" y="10000"/>
+		<node id="n4" x="0" y="10200"/>
+		<node id="n5" x="0" y="10400"/>
+		<node id="n6" x="0" y="15400"/>
 	</nodes>
 
 <!-- ====================================================================== -->
 
 	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
-		<link id="t1_OUT-t2_IN" from="t1_OUT" to="t2_IN" length="5000" freespeed="100" capacity="3600"
+		<link id="l1-2" from="n1" to="n2" length="5000" freespeed="100" capacity="3600"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="l2-1" from="n2" to="n1" length="5000" freespeed="100" capacity="3600"
 			  permlanes="1.0" oneway="1" modes="rail"/>
 
-		<link id="t2_OUT-t3_IN" from="t2_OUT" to="t3_IN" length="5000" freespeed="100" capacity="3600"
+		<link id="l2-3" from="n2" to="n3" length="5000" freespeed="100" capacity="3600"
+			  permlanes="1.0" oneway="1" modes="rail"/>
+		<link id="l3-2" from="n3" to="n2" length="5000" freespeed="100" capacity="3600"
 			  permlanes="1.0" oneway="1" modes="rail"/>
 
-		<link id="t1_IN-t1_OUT" from="t1_IN" to="t1_OUT" length="200.0" freespeed="100" capacity="3600.0"
+		<link id="l3-4" from="n3" to="n4" length="200.0" freespeed="100" capacity="3600.0"
+			  permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainOppositeDirectionLink" class="java.lang.String">l4-3</attribute>
+			</attributes>
+		</link>
+		<link id="l4-3" from="n4" to="n3" length="200.0" freespeed="100" capacity="3600.0"
+			  permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainOppositeDirectionLink" class="java.lang.String">l3-4</attribute>
+			</attributes>
+		</link>
+
+		<link id="l4-5" from="n4" to="n5" length="200.0" freespeed="100" capacity="3600.0"
+			  permlanes="1" oneway="1" modes="rail"/>
+		<link id="l5-4" from="n5" to="n4" length="200.0" freespeed="100" capacity="3600.0"
 			  permlanes="1" oneway="1" modes="rail"/>
 
-		<link id="t2_IN-t2_OUT" from="t2_IN" to="t2_OUT" length="200.0" freespeed="100" capacity="3600.0"
+		<link id="l5-6" from="n5" to="n6" length="5000.0" freespeed="100" capacity="3600.0"
+			  permlanes="1" oneway="1" modes="rail"/>
+		<link id="l6-5" from="n6" to="n5" length="5000.0" freespeed="100" capacity="3600.0"
 			  permlanes="1" oneway="1" modes="rail"/>
 
-		<link id="t3_IN-t3_OUT" from="t3_IN" to="t3_OUT" length="200.0" freespeed="100" capacity="3600.0"
-			  permlanes="1" oneway="1" modes="rail"/>
 	</links>
 
 <!-- ====================================================================== -->

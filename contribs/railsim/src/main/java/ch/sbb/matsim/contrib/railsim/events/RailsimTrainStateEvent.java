@@ -3,6 +3,7 @@ package ch.sbb.matsim.contrib.railsim.events;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.HasVehicleId;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
@@ -15,17 +16,23 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 	public static final String EVENT_TYPE = "railsimTrainStateEvent";
 
 	private final Id<Vehicle> vehicleId;
+	private final Id<Link> headLink;
 	private final double headPosition;
+	private final Id<Link> tailLink;
 	private final double tailPosition;
 	private final double speed;
 	private final double acceleration;
 	private final double targetSpeed;
 
-	public RailsimTrainStateEvent(double time, Id<Vehicle> vehicleId, double headPosition, double tailPosition,
+	public RailsimTrainStateEvent(double time, Id<Vehicle> vehicleId,
+								  Id<Link> headLink, double headPosition,
+								  Id<Link> tailLink, double tailPosition,
 								  double speed, double acceleration, double targetSpeed) {
 		super(time);
 		this.vehicleId = vehicleId;
+		this.headLink = headLink;
 		this.headPosition = headPosition;
+		this.tailLink = tailLink;
 		this.tailPosition = tailPosition;
 		this.speed = speed;
 		this.acceleration = acceleration;
@@ -62,7 +69,9 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		attr.put("headLink", String.valueOf(headLink));
 		attr.put("headPosition", Double.toString(headPosition));
+		attr.put("tailLink", String.valueOf(tailLink));
 		attr.put("tailPosition", Double.toString(tailPosition));
 		attr.put("speed", Double.toString(speed));
 		attr.put("acceleration", Double.toString(acceleration));

@@ -33,6 +33,8 @@ public class RailsimEngineTest {
 	private RailsimTest.Holder getTestEngine(String network) {
 		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), network).toString());
 
+		collector.clear();
+
 		return new RailsimTest.Holder(new RailsimEngine(eventsManager, new RailsimConfigGroup(), net.getLinks()), net);
 	}
 
@@ -40,21 +42,50 @@ public class RailsimEngineTest {
 	public void simple() {
 
 		RailsimTest.Holder test = getTestEngine("network0.xml");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l4-5");
 
-		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "t1_OUT-t2_IN", "t3_IN-t3_OUT");
-
-		for (int i = 0; i < 120; i++) {
-			test.engine().updateAllStates(i);
+		for (int i = 0; i < 400; i++) {
+			test.engine().doSimStep(i);
 		}
-
-		collector.events.forEach(System.out::println);
 
 		RailsimTest.assertThat(collector)
 			.hasSizeGreaterThan(5)
-			.hasTrainState("train", 59, 870.25, 29.5);
+			.hasTrainState("train", 169, 500, 44)
+			.hasTrainState("train", 319.818181481007, 200, 0);
 
-		// TODO: Add assertions when more logic is implemented
+		test = getTestEngine("network0.xml");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l4-5");
+
+		for (int i = 0; i < 400; i++) {
+			test.engine().updateAllStates(i);
+		}
+
+		RailsimTest.assertThat(collector)
+			.hasSizeGreaterThan(5)
+			.hasTrainState("train", 169, 500, 44)
+			.hasTrainState("train", 319.818181481007, 200, 0);
 
 	}
 
+	@Test
+	public void congested() {
+
+		RailsimTest.Holder test = getTestEngine("network0.xml");
+
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l4-5");
+		RailsimTest.createDeparture(test, TestVehicle.Sprinter, "train", 120, "l1-2", "l4-5");
+
+	}
+
+
+	@Test
+	public void opposite() {
+
+		RailsimTest.Holder test = getTestEngine("network0.xml");
+
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l4-5");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l4-5", "l1-2");
+
+
+	}
 }

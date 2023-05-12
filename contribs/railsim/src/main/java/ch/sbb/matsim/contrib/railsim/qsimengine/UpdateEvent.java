@@ -11,6 +11,8 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	double plannedTime;
 	Type type;
 
+	double newSpeed = -1;
+
 	public UpdateEvent(TrainState state, Type type) {
 		this.state = state;
 		this.plannedTime = state.timestamp;
@@ -46,17 +48,13 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	enum Type {
 
 		IDLE,
-
 		DEPARTURE,
-
 		POSITION,
-
 		ENTER_LINK,
-
 		LEAVE_LINK,
 		TRACK_RESERVATION,
-
-		SPEED_CHANGE;
+		WAIT_FOR_RESERVATION,
+		SPEED_CHANGE
 
 	}
 

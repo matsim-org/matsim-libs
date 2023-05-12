@@ -119,12 +119,12 @@ final class RailLink implements HasLinkId {
 	/**
 	 * Release a non-free track to be free again.
 	 */
-	public void releaseTrack(MobsimDriverAgent driver) {
+	public int releaseTrack(MobsimDriverAgent driver) {
 		for (int i = 0; i < state.length; i++) {
 			if (reservations[i] == driver) {
 				state[i] = TrackState.FREE;
 				reservations[i] = null;
-				return;
+				return i;
 			}
 		}
 		throw new IllegalStateException("Driver " + driver + " has not reserved the track.");

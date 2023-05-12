@@ -43,4 +43,11 @@ public class RailsimStateTest {
 			.isEqualTo(5);
 
 	}
+
+	@Test
+	public void deccelDist() {
+
+		Assertions.fail("Implement.");
+
+	}
 }

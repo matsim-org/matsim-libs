@@ -1,5 +1,6 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -111,4 +112,17 @@ final class TrainState {
 			", acceleration=" + acceleration +
 			'}';
 	}
+
+
+	boolean isRouteAtEnd() {
+		return routeIdx == route.size();
+	}
+
+	RailsimTrainStateEvent asEvent(double time) {
+		return new RailsimTrainStateEvent(time, driver.getVehicle().getId(),
+			headLink, headPosition,
+			tailLink, tailPosition,
+			speed, acceleration, targetSpeed);
+	}
+
 }

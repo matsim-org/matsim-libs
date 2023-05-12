@@ -54,6 +54,8 @@ public class RailsimTest {
 		LeastCostPathCalculator.Path path = lcp.calcLeastCostPath(fromLink.getFromNode(), toLink.getToNode(), 0, null, null);
 		NetworkRoute route = RouteUtils.createNetworkRoute(path.links.stream().map(Link::getId).toList());
 
+		System.out.println("Creating departure with route " + route);
+
 		// Setup mocks for driver and vehicle
 		Id<Vehicle> vehicleId = Id.createVehicleId(veh);
 
@@ -79,8 +81,14 @@ public class RailsimTest {
 
 		@Override
 		public void handleEvent(Event event) {
+			System.out.println(event);
 			events.add(event);
 		}
+
+		public void clear() {
+			events.clear();
+		}
+
 	}
 
 	public record Holder(RailsimEngine engine, Network network) {
