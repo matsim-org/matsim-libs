@@ -48,7 +48,7 @@ public class TrafficCountsDashboardTest {
 		contextParams.mapZoomLevel = 9.0;
 
 		SimWrapper sw = SimWrapper.create(simWrapperConfigGroup)
-				.addDashboard(new TrafficCountsDashboard());
+				.addDashboard(new TrafficCountsDashboard(0.2, 1.8));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
@@ -81,7 +81,7 @@ public class TrafficCountsDashboardTest {
 
 			Count<Link> count = counts.createAndAddCount(link.getId(), link.getId().toString() + "_count_station");
 			for (int hour = 1; hour < 25; hour++)
-				count.createVolume(hour, random.nextInt(10));
+				count.createVolume(hour, random.nextInt(75));
 		}
 
 		try {

@@ -20,6 +20,8 @@ import org.matsim.counts.Volume;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
 
+import static tech.tablesaw.aggregate.AggregateFunctions.*;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +29,7 @@ import java.util.Map;
 
 @CommandLine.Command(name = "count-comparison", description = "Produces comparisons of observed and simulated counts.")
 @CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true,
-	produces = {"count_comparison_by_hour.csv", "count_comparison_total.csv"})
+	produces = {"count_comparison_by_hour.csv", "count_comparison_total.csv", "estimation_quality.csv"})
 public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
@@ -38,6 +40,12 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
 	private SampleOptions sample;
+
+	@CommandLine.Option(names = "--lower-limit", description = "lower limit of quality laber 'exact'", defaultValue = "0.8")
+	private double lowerLimit;
+
+	@CommandLine.Option(names = "--upper-limit", description = "upper limit of quality laber 'exact'", defaultValue = "1.2")
+	private double upperLimit;
 
 	public static void main(String[] args) {
 		new CountComparisonAnalysis().execute(args);
@@ -122,6 +130,9 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			if (countVolume.isEmpty())
 				continue;
 
+			double simulatedTrafficVolumeByDay = 0;
+			double observedTrafficVolumeByDay = 0;
+
 			if (countVolume.size() == 24) {
 
 				// FIXME : why does it start at hour 1 ?
@@ -130,7 +141,10 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 
 					double observedTrafficVolumeAtHour = countVolume.get(hour).getValue();
 					double simulatedTrafficVolumeAtHour = volumesForLink == null ? 0.0 :
-						((double) volumesForLink[hour - 1]) / sample.getSample();
+						((double) volumesForLink[hour - 1]) / this.sample.getSample();
+
+					simulatedTrafficVolumeByDay += simulatedTrafficVolumeAtHour;
+					observedTrafficVolumeByDay += observedTrafficVolumeAtHour;
 
 					Row row = byHour.appendRow();
 					row.setString("link_id", key.toString());
@@ -140,10 +154,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 					row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
 					row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
 				}
-			}
-
-			double observedTrafficVolumeByDay = countVolume.values().stream().mapToDouble(Volume::getValue).sum();
-			double simulatedTrafficVolumeByDay = volumesForLink != null ? Arrays.stream(volumesForLink).sum() : 0.0;
+			} else
+				observedTrafficVolumeByDay = countVolume.values().stream().mapToDouble(Volume::getValue).sum();
 
 			Row row = dailyTrafficVolume.appendRow();
 			row.setString("link_id", key.toString());
@@ -153,20 +165,20 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
 		}
 
-		// TODO: add the classification as another column to count comparison
-		// major under, under, exact, over, major over
-
 		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")
 			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
 			.setName("rel_error");
 
 		StringColumn qualityLabel = relError.copy()
-				.map(aDouble -> cut(aDouble, List.of(0.0, 0.8, 1.2, Double.MAX_VALUE), List.of("major under", "under", "exact", "over", "major over")), ColumnType.STRING::create)
+				.map(aDouble -> cut(aDouble, List.of(0.0, lowerLimit, upperLimit, Double.MAX_VALUE), List.of("under", "exact", "over")), ColumnType.STRING::create)
 				.setName("quality");
 
 		dailyTrafficVolume.addColumns(relError, qualityLabel);
 
 		dailyTrafficVolume.write().csv(output.getPath("count_comparison_total.csv").toFile());
 		byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
+
+		Table byQuality = dailyTrafficVolume.summarize("quality", count).by("quality");
+		byQuality.write().csv(output.getPath("estimation_quality.csv").toFile());
 	}
 }
