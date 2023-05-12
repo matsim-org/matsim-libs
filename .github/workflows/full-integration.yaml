@@ -5,7 +5,7 @@ on:
     - cron: '30 0 * * *' # daily at 0:30 UTC
 
 jobs:
-  code-coverage:
+  run-full-integration:
     name: run full integration
 
     runs-on: ${{ matrix.os }}
@@ -37,3 +37,15 @@ jobs:
 
     env:
       MAVEN_OPTS: -Xmx2g
+
+  verify-full-integration-successful:
+    # always() - to ensure this job is executed (regardless of the status of the previous job)
+    # run if push or pull_requests from fork
+    if: always()
+    needs: run-full-integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: check if the whole job matrix is successful
+        if: needs.run-full-integration.result != 'success'
+        run: exit 1 # fail if "test" was not successful
