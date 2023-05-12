@@ -1,14 +1,10 @@
 type: plotly
+dataset: test.csv
 traces:
-- dataset:
-    file: test.csv
-    x: xColumn
-    "y": yColumn
-    text: labelColumn
-    size: sizeColumn
-    color: colorColumn
-    opacity: opacityColumn
-  fill: none
+- fill: none
+  "y": $dataset.yColumn
+  x: $dataset.xColumn
+  text: $dataset.labelColumn
   mode: markers
   marker:
     cauto: true
@@ -17,3 +13,6 @@ traces:
     sizemode: diameter
   whiskerwidth: 0.0
   type: scatter
+  size: $dataset.sizeColumn
+  color: $dataset.colorColumn
+  opacity: $dataset.opacityColumn

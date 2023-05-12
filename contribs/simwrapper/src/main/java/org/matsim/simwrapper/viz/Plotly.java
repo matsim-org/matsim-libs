@@ -2,6 +2,7 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import tech.tablesaw.plotly.components.Config;
@@ -41,12 +42,17 @@ public class Plotly extends Viz {
 	@Nullable
 	@JsonIgnore
 	public Layout layout;
+
+	@JsonProperty(index = 4)
 	@Nullable
 	public Config config;
+
 	@JsonIgnore
-	private List<Data> data = new ArrayList<>();
+	private List<DataSet> data = new ArrayList<>();
 	@JsonIgnore
 	private List<Trace> traces = new ArrayList<>();
+	@JsonIgnore
+	private List<DataMapping> mappings = new ArrayList<>();
 
 
 	public Plotly() {
@@ -81,22 +87,13 @@ public class Plotly extends Viz {
 	}
 
 	/**
-	 * Create a new data mapping.
-	 *
-	 * @param path path to input csv.
-	 */
-	public static Data fromFile(String path) {
-		return new Data(path);
-	}
-
-	/**
 	 * Add a trace to the figure.
 	 *
 	 * @param trace trace object, specifying one data set.
-	 * @param data  data mapping for the given trace.
+	 * @param d     data mapping for the given trace.
 	 */
-	public Plotly addTrace(Trace trace, @Nullable Data data) {
-		this.data.add(data);
+	public Plotly addTrace(Trace trace, @Nullable DataMapping d) {
+		this.mappings.add(d);
 		traces.add(trace);
 		return this;
 	}
@@ -108,6 +105,19 @@ public class Plotly extends Viz {
 	 */
 	public Plotly addTrace(Trace trace) {
 		return addTrace(trace, null);
+	}
+
+	/**
+	 * Adds a dataset definition to the plot that can be referenced in the traces.
+	 */
+	public DataSet addDataset(String path) {
+
+		Objects.requireNonNull(path, "Path argument can not be null");
+
+		String name = data.size() == 0 ? "dataset" : FilenameUtils.removeExtension(FilenameUtils.getName(path));
+		DataSet ds = new DataSet(path, name);
+		data.add(ds);
+		return ds;
 	}
 
 	/**
@@ -129,14 +139,22 @@ public class Plotly extends Viz {
 		config = figure.getConfig();
 	}
 
-	@JsonProperty("traces")
+	@JsonProperty(value = "dataset", index = 2)
+	Object getDataSet() {
+		if (data.size() == 0)
+			return null;
+
+		return data.size() == 1 && data.get(0).isSimple() ? data.get(0).file : data;
+	}
+
+	@JsonProperty(value = "traces", index = 3)
 	List<Map<String, Object>> getTraces() {
 
 		List<Map<String, Object>> result = new ArrayList<>();
 
 		for (int i = 0; i < traces.size(); i++) {
 			Trace t = traces.get(i);
-			Data d = data.get(i);
+			DataMapping d = mappings.get(i);
 
 			Map<String, Object> object = convertTrace(t, d, i);
 
@@ -146,13 +164,9 @@ public class Plotly extends Viz {
 		return result;
 	}
 
-	private Map<String, Object> convertTrace(Trace t, Data d, int i) {
+	private Map<String, Object> convertTrace(Trace t, DataMapping d, int i) {
 
 		Map<String, Object> object = new LinkedHashMap<>();
-
-		if (d != null && d.file != null) {
-			object.put("dataset", d);
-		}
 
 		List<Field> fields = getAllFields(t.getClass());
 
@@ -201,28 +215,12 @@ public class Plotly extends Viz {
 		// Pie charts have an API that is quite confusing because the column names are different
 		// This codes fixes some errors
 		if ("pie".equals(type) && d != null) {
-
-			// Swap text and label column
-			if (d.text != null && d.labels == null) {
-				d.labels = d.text;
-				d.text = null;
-			}
-
-			d.values = d.x;
-			if (d.values == null)
-				d.values = d.y;
-
-			// x and y can not be used in this context
-			d.x = null;
-			d.y = null;
+			d.normalizePieTrace();
 		}
 
 		// Remove data entries that should be loaded from resources
-		if (d != null && d.x != null) object.remove("x");
-		if (d != null && d.y != null) object.remove("y");
-		if (d != null && d.text != null) object.remove("text");
-		if (d != null && d.labels != null) object.remove("labels");
-		if (d != null && d.values != null) object.remove("values");
+		if (d != null)
+			d.insert(object);
 
 		return object;
 	}
@@ -280,6 +278,7 @@ public class Plotly extends Viz {
 	 * The available column types in plotly.
 	 */
 	enum ColumnType {
+		NAME,
 		X,
 		X2,
 		Y,
@@ -292,108 +291,42 @@ public class Plotly extends Viz {
 	}
 
 	/**
-	 * Available aggregate function for {@link Data#aggregate(List)}.
+	 * Available aggregate function for {@link DataSet#aggregate(List)}.
 	 */
 	enum AggrFunc {
 		SUM
 	}
 
 	/**
-	 * Class to specify input path and map column names to their meaning.
+	 * Class to specify a single dataset.
 	 */
-	public static final class Data {
+	public static final class DataSet {
+
+		private final String name;
 		private final String file;
-		private String x;
-		private String x2;
-
-		private String y;
-
-		/**
-		 * Only used for pie charts.
-		 * This is not settable and will be taken from x or y.
-		 */
-		private String values;
-
-		private String text;
-		private String labels;
-		private String size;
-		private String color;
-		private String opacity;
 		private String groupBy;
 
-		private Data(String file) {
+		private DataSet(String file, String name) {
 			this.file = file;
+			this.name = name;
+		}
+
+		private boolean isSimple() {
+			return name.equals("dataset");
 		}
 
 		/**
-		 * Mapping for the x column.
+		 * Return dataset mapping which can be modified and passed as argument to traces.
 		 */
-		public Data x(String columnName) {
-			x = columnName;
-			return this;
-		}
-
-		/**
-		 * Additional x column, which will create an array of values.
-		 */
-		public Data x2(String columnName) {
-			x2 = columnName;
-			return this;
-		}
-
-		/**
-		 * Mapping for the y column.
-		 */
-		public Data y(String columnName) {
-			y = columnName;
-			return this;
-		}
-
-		/**
-		 * Mapping for text (label) column.
-		 */
-		public Data text(String columnName) {
-			text = columnName;
-			return this;
-		}
-
-		/**
-		 * Labels are used for piecharts.
-		 */
-		public Data labels(String columnName) {
-			labels = labels;
-			return this;
-		}
-
-		/**
-		 * Mapping for size column.
-		 */
-		public Data size(String columnName) {
-			size = columnName;
-			return this;
-		}
-
-		/**
-		 * Mapping for color column.
-		 */
-		public Data color(String columnName) {
-			color = columnName;
-			return this;
-		}
-
-		/**
-		 * Mapping for opacity column.
-		 */
-		public Data opacity(String columnName) {
-			opacity = columnName;
-			return this;
+		public DataMapping mapping() {
+			return new DataMapping(name);
 		}
 
 		/**
 		 * Takes all values from the specified colum and splits data into separate traces.
 		 */
 		@Deprecated
-		public Data groupBy(String columnName) {
+		public DataSet groupBy(String columnName) {
 			groupBy = columnName;
 			return this;
 		}
@@ -403,7 +336,7 @@ public class Plotly extends Viz {
 		 * Defining this will map each new column to the specified target array.
 		 */
 		@Deprecated
-		public Data pivot(ColumnType type) {
+		public DataSet pivot(String namesTo, String valuesTo) {
 			// TODO
 			return this;
 		}
@@ -412,11 +345,118 @@ public class Plotly extends Viz {
 		 * Aggregate data within each trace on the {@code targetColumn}. Uses all unmapped columns or only the given columns if not empty.
 		 */
 		@Deprecated
-		public Data aggregate(ColumnType target, AggrFunc func, String... columns) {
+		public DataSet aggregate(ColumnType target, AggrFunc func, String... columns) {
 			// TODO
 			return this;
 		}
 
+	}
+
+	/**
+	 * Defines how columns are mapped to data sources.
+	 */
+	public static final class DataMapping {
+
+		private final String ref;
+		private Map<ColumnType, String> columns = new EnumMap<>(ColumnType.class);
+
+		public DataMapping(String name) {
+			this.ref = name;
+		}
+
+		public DataMapping name(String columnName) {
+			columns.put(ColumnType.NAME, columnName);
+			return this;
+		}
+
+		/**
+		 * Mapping for the x column.
+		 */
+		public DataMapping x(String columnName) {
+			columns.put(ColumnType.X, columnName);
+			return this;
+		}
+
+		/**
+		 * Additional x column, which will create an array of values.
+		 */
+		public DataMapping x2(String columnName) {
+			columns.put(ColumnType.X2, columnName);
+			return this;
+		}
+
+		/**
+		 * Mapping for the y column.
+		 */
+		public DataMapping y(String columnName) {
+			columns.put(ColumnType.Y, columnName);
+			return this;
+		}
+
+		/**
+		 * Mapping for text (label) column.
+		 */
+		public DataMapping text(String columnName) {
+			columns.put(ColumnType.TEXT, columnName);
+			return this;
+		}
+
+		/**
+		 * Labels are used for piecharts.
+		 */
+		public DataMapping labels(String columnName) {
+			columns.put(ColumnType.LABELS, columnName);
+			return this;
+		}
+
+		/**
+		 * Mapping for size column.
+		 */
+		public DataMapping size(String columnName) {
+			columns.put(ColumnType.SIZE, columnName);
+			return this;
+		}
+
+		/**
+		 * Mapping for color column.
+		 */
+		public DataMapping color(String columnName) {
+			columns.put(ColumnType.COLOR, columnName);
+			return this;
+		}
+
+		/**
+		 * Mapping for opacity column.
+		 */
+		public DataMapping opacity(String columnName) {
+			columns.put(ColumnType.OPACITY, columnName);
+			return this;
+		}
+
+		private void insert(Map<String, Object> obj) {
+			for (ColumnType value : ColumnType.values()) {
+				if (columns.containsKey(value))
+					obj.put(value.name().toLowerCase(), "$" + ref + "." + columns.get(value));
+			}
+		}
+
+		private void normalizePieTrace() {
+
+			// Swap text and label column
+			if (columns.containsKey(ColumnType.TEXT) && !columns.containsKey(ColumnType.LABELS)) {
+				columns.put(ColumnType.LABELS, columns.get(ColumnType.TEXT));
+				columns.remove(ColumnType.TEXT);
+			}
+
+			if (columns.containsKey(ColumnType.X))
+				columns.put(ColumnType.VALUES, columns.get(ColumnType.X));
+			else if (columns.containsKey(ColumnType.Y))
+				columns.put(ColumnType.VALUES, columns.get(ColumnType.Y));
+
+			// x and y can not be used in this context
+			columns.remove(ColumnType.X);
+			columns.remove(ColumnType.Y);
+		}
 	}
 
 	/**

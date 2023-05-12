@@ -1,26 +1,4 @@
 type: plotly
-config:
-  responsive: true
-layout:
-  hoverdistance: 5
-  margin:
-    left: 5
-    right: 80
-    top: 100
-    bottom: 80
-    autoexpand: true
-  paperbgcolor: black
-  grid:
-    rows: 80
-    roworder: top to bottom
-    pattern: coupled
-    columns: 80
-    xgap: 100.0
-    ygap: 80.0
-    xside: bottom
-    yside: left
-  width: 700
-  height: 450
 traces:
 - fill: none
   "y": []
@@ -86,3 +64,25 @@ traces:
   histnorm: density
   histfunc: count
   type: histogram
+config:
+  responsive: true
+layout:
+  hoverdistance: 5
+  margin:
+    left: 5
+    right: 80
+    top: 100
+    bottom: 80
+    autoexpand: true
+  paperbgcolor: black
+  grid:
+    rows: 80
+    roworder: top to bottom
+    pattern: coupled
+    columns: 80
+    xgap: 100.0
+    ygap: 80.0
+    xside: bottom
+    yside: left
+  width: 700
+  height: 450
