@@ -244,13 +244,15 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	}
 
 	public static URL getInputFileURL(URL context, String filename) {
-		if (filename.startsWith("~" + File.separator)) {
+		if (filename.startsWith("~/")) {
 			filename = System.getProperty("user.home") + filename.substring(1);
 			return IOUtils.getFileUrl(filename) ;
 		}
-		if ( filename.startsWith( File.separator ) ) {
+		if ( filename.startsWith("/") ) {
 			// (= filename is absolute)
 			// (yyyy this may possibly fail on win systems. kai, sep.18)
+
+			// Absolute filename on Windows, when obtained through URL.toURI().getPath() starts with `/`, like on Unix.
 			return IOUtils.getFileUrl(filename) ;
 		}
 		return IOUtils.extendUrl(context, filename);
