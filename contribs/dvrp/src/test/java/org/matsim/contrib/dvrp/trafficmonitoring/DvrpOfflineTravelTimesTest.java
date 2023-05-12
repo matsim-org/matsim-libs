@@ -64,14 +64,14 @@ public class DvrpOfflineTravelTimesTest {
 
 		var lines = stringWriter.toString().split("\n");
 		assertThat(lines).hasSize(3);
-		assertThat(lines[0].split(";")).containsExactly("linkId", "0", "900", "1800", "2700", "3600");
+		assertThat(lines[0].split(";")).containsExactly("linkId", "0.0", "900.0", "1800.0", "2700.0", "3600.0");
 		assertThat(lines[1].split(";")).containsExactly("A", "1", "2", "3", "4", "5");
 		assertThat(lines[2].split(";")).containsExactly("B", "6", "7", "8", "9", "10");
 	}
 
 	@Test
 	public void loadLinkTravelTimes() throws IOException {
-		var line0 = String.join(";", "linkId", "0", "900", "1800", "2700", "3600");
+		var line0 = String.join(";", "linkId", "0.0", "900.0", "1800.0", "2700.0", "3600.0");
 		var line1 = String.join(";", "A", 0.1 + "", 1.1 + "", 2.2 + "", 3.3 + "", 4.4 + "");
 		var line2 = String.join(";", "B", 5.5 + "", 6.6 + "", 7.7 + "", 8.8 + "", 9.9 + "");
 		var lines = String.join("\n", line0, line1, line2);

@@ -118,7 +118,7 @@ public class DvrpOfflineTravelTimes {
 		String[] headerLine = reader.readLine().split(";");
 		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1);
 		verify(headerLine[0].equals("linkId"));
-		timeDiscretizer.forEach((bin, time) -> verify(Integer.parseInt(headerLine[bin + 1]) == time));
+		timeDiscretizer.forEach((bin, time) -> verify(Double.parseDouble(headerLine[bin + 1]) == time));
 
 		//regular rows
 		reader.lines().map(line -> line.split(DELIMITER)).forEach(cells -> {
