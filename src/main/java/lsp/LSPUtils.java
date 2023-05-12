@@ -217,11 +217,10 @@ public final class LSPUtils {
 	}
 
 	/**
-	 * Gives back the LspShipment object of the LSP, which matches to the shipmentId
-	 * TODO: This is a workaround. In future it is maybe useful, that the LSP contains a map instead if a Collection to store its shipments.
-	 * @param lsp
-	 * @param shipmentId
-	 * @return The lspShipment object.
+	 * Gives back the {@link LSPShipment} object of the {@link LSP}, which matches to the shipmentId
+	 * @param lsp In this LSP this method tries to find the shipment.
+	 * @param shipmentId Id of the shipment that should be found.
+	 * @return the lspShipment object or null, if it is not found.
 	 */
 	public static LSPShipment findLspShipment(LSP lsp, Id<LSPShipment> shipmentId){
 		for (LSPShipment lspShipment : lsp.getShipments()) {
