@@ -11,7 +11,7 @@ public class Bar extends Chart{
 	public Boolean stacked;
 
 	// TODO: docs
-	public List<String> ignoredColumns;
+	public List<String> ignoreColumns;
 
 	public Bar() {
 		super("bar");
