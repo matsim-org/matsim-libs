@@ -38,7 +38,7 @@ public abstract class Chart extends Viz {
 	 * Array of strings. Legend titles for each line. The column
 	 * names will be used if this is omitted.
 	 */
-	public String legendName;
+	public List<String> legendName;
 
 	/**
 	 * Label for the x-axes.

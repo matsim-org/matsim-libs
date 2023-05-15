@@ -1,14 +1,16 @@
 package org.matsim.simwrapper;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.matsim.simwrapper.dashboard.StuckAgentDashboard;
 import org.matsim.simwrapper.viz.*;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 public class SimWrapperTest {
 
@@ -16,105 +18,99 @@ public class SimWrapperTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void dashboard() throws IOException {
+	public void vizElementsTest() throws IOException {
 
 		SimWrapper simWrapper = SimWrapper.create();
 
-		simWrapper.addDashboard(new StuckAgentDashboard());
-
 		simWrapper.addDashboard((header, layout) -> {
-			header.title = "Area Header";
-			header.tab = "Area Tab";
-			header.description = "Area Description";
 
-			layout.row("first").el(Area.class, (viz, data) -> {
-				viz.title = "Stats";
-			});
+			header.title = "Simwrapper Test Dashboard";
+			header.description = "Test All Simwrapper Plug-Ins Dashboard";
+			header.tab = "Header Tab";
+
+			layout.row("first")
+					.el(Area.class, (viz, data) -> {
+						viz.title = "Area";
+						viz.dataset = "example.csv";
+						viz.x = "column with x-values";
+						viz.columns = List.of("column1", "column2");
+					});
+
+			layout.row("second")
+					.el(Bubble.class, (viz, data) -> {
+						viz.title = "Bubble";
+						viz.dataset = "example.csv";
+					});
+
+			layout.row("third")
+					.el(CalculationTable.class, ((viz, data) -> {
+						viz.title = "CalculationTable";
+						viz.configFile = "example.csv";
+					}));
+
+			layout.row("fourth")
+					.el(Heatmap.class, ((viz, data) -> {
+						viz.title = "Heatmap";
+						viz.dataset = "example.csv";
+						viz.y = "column1";
+						viz.columns = List.of("column1", "column2");
+					}));
+
+			layout.row("fifth")
+					.el(Line.class, ((viz, data) -> {
+						viz.title = "Line";
+						viz.dataset = "example.csv";
+						viz.x = "column1";
+						viz.columns = List.of("column1", "column2");
+					}));
+
+			layout.row("sixth")
+					.el(Links.class, ((viz, data) -> {
+						viz.title = "Links";
+						viz.network = "network_example.xml.gz";
+						viz.datasets.csvFile = "example.csv";
+						viz.display.width.dataset = "example2.csv";
+						viz.display.width.columnName = "column1";
+						viz.display.color.fixedColors = "red";
+					}));
+
+			layout.row("seventh")
+					.el(PieChart.class, ((viz, data) -> {
+						viz.title = "PieChart";
+						viz.dataset = "example.csv";
+					}));
+
+			layout.row("eighth")
+					.el(Scatter.class, ((viz, data) -> {
+						viz.title = "Scatter";
+						viz.dataset = "example.csv";
+					}));
+
+			layout.row("nineth")
+					.el(Table.class, ((viz, data) -> {
+						viz.title = "Table";
+						viz.dataset = "example.csv";
+					}));
+
+			layout.row("nineth")
+					.el(TextBlock.class, ((viz, data) -> {
+						viz.title = "TextBlock";
+						viz.file = "example.csv";
+					}));
+
+			layout.row("nineth")
+					.el(Tile.class, ((viz, data) -> {
+						viz.title = "Tile";
+						viz.dataset = "example.csv";
+					}));
 		});
 
-		simWrapper.addDashboard((header, layout) -> {
-			header.title = "Bar Header";
-			header.tab = "Bar Tab";
-			header.description = "Bar Description";
+		String outputDirectory = utils.getOutputDirectory();
 
-			layout.row("first").el( Bar.class, (viz, data) -> {
-				viz.title = "Stats";
-			});
-		});
+		simWrapper.generate(Path.of(outputDirectory));
 
-		simWrapper.addDashboard((header, layout) -> {
-			header.title = "Bubble Header";
-			header.tab = "Bubble Tab";
-			header.description = "Bubble Description";
-
-			layout.row("first").el( Bubble.class, (viz, data) -> {
-				viz.title = "Stats";
-			});
-		});
-
-		simWrapper.addDashboard((header, layout) -> {
-			header.title = "CalculationTable Header";
-			header.tab = "CalculationTable Tab";
-			header.description = "CalculationTable Description";
-
-			layout.row("first").el( CalculationTable.class, (viz, data) -> {
-				viz.title = "CalculationTable";
-			});
-		});
-
-		simWrapper.addDashboard((header, layout) -> {
-			header.title = "Heatmap Header";
-			header.tab = "Heatmap Tab";
-			header.description = "Heatmap Description";
-
-			layout.row("first").el( Heatmap.class, (viz, data) -> {
-				viz.title = "Heatmap";
-			});
-		});
-
-		simWrapper.addDashboard((header, layout) -> {
-			header.title = "Line Header";
-			header.tab = "Line Tab";
-			header.description = "Line Description";
-
-			layout.row("first").el( Line.class, (viz, data) -> {
-				viz.title = "Line";
-			});
-		});
-
-		simWrapper.addDashboard((header, layout) -> {
-			header.title = "PieChart Header";
-			header.tab = "PieChart Tab";
-			header.description = "PieChart Description";
-
-			layout.row("first").el( PieChart.class, (viz, data) -> {
-				viz.title = "PieChart";
-			});
-		});
-
-		simWrapper.addDashboard((header, layout) -> {
-			header.title = "Scatter Header";
-			header.tab = "Scatter Tab";
-			header.description = "Scatter Description";
-
-			layout.row("first").el( Scatter.class, (viz, data) -> {
-				viz.title = "Scatter";
-			});
-		});
-
-		simWrapper.addDashboard((header, layout) -> {
-			header.title = "TextBlock Header";
-			header.tab = "TextBlock Tab";
-			header.description = "TextBlock Description";
-
-			layout.row("first").el( TextBlock.class, (viz, data) -> {
-				viz.title = "TextBlock";
-			});
-		});
-
-		simWrapper.generate(Path.of(utils.getOutputDirectory()));
-
-		// TODO: assert in the test
+		Assertions.assertThat(new File(outputDirectory, "dashboard-0.yaml"))
+				.hasSameTextualContentAs(new File(utils.getPackageInputDirectory(), "dashboard-0.yaml"));
 
 	}
 }
