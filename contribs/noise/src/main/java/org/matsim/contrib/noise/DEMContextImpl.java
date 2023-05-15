@@ -7,7 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.opengis.geometry.DirectPosition;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 

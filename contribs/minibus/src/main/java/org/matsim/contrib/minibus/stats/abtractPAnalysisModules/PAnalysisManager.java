@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,13 +46,13 @@ import org.matsim.vehicles.Vehicles;
 
 /**
  * Plugs in all analysis.
- * 
+ *
  * @author aneumann
  *
  */
 public final class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
 	private final static Logger log = LogManager.getLogger(PAnalysisManager.class);
-	
+
 	private final String pIdentifier;
 	private final List<PAnalysisModule> pAnalyzesList = new LinkedList<>();
 	private final HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<>();
@@ -84,7 +84,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
         CountCapacityMeterPerMode countCapacityMeterPerMode = new CountCapacityMeterPerMode(event.getServices().getScenario().getNetwork());
 		this.pAnalyzesList.add(countCapacityMeterPerMode);
 		this.pAnalyzesList.add(new AverageLoadPerDistancePerMode(countPassengerMeterPerMode, countCapacityMeterPerMode));
-		
+
 		// register all analyzes
 		for (PAnalysisModule ana : this.pAnalyzesList) {
 			event.getServices().getEvents().addHandler(ana);
@@ -104,7 +104,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 			// create the output folder for this module
 			String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + PAnalysisManager.class.getSimpleName() + "/";
 			new File(outFilename).mkdir();
-			
+
 			// create one output stream for each analysis
 			for (PAnalysisModule ana : this.pAnalyzesList) {
 				try {
@@ -120,7 +120,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 			}
 			this.firstIteration = false;
 		}
-		
+
 		// write results to corresponding files
 		for (PAnalysisModule ana : this.pAnalyzesList) {
 			BufferedWriter writer = this.pAnalyis2Writer.get(ana.getName());
@@ -138,7 +138,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 	private void updateLineId2ptModeMap(TransitSchedule transitSchedule) {
 		this.lineSetter.setPtModesForEachLine(transitSchedule, this.pIdentifier);
 		HashMap<Id<TransitLine>, String> lineIds2ptModeMap = this.lineSetter.getLineId2ptModeMap();
-		
+
 		for (PAnalysisModule ana : this.pAnalyzesList) {
 			ana.setLineId2ptModeMap(lineIds2ptModeMap);
 		}
@@ -147,6 +147,6 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 	private void updateVehicleTypes(Vehicles vehicles) {
 		for (PAnalysisModule ana : this.pAnalyzesList) {
 			ana.updateVehicles(vehicles);
-		}		
+		}
 	}
 }

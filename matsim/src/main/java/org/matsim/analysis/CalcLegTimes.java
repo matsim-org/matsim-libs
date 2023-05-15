@@ -37,7 +37,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
@@ -51,7 +51,7 @@ import java.util.TreeMap;
  * Also calculates the average leg duration.
  * Legs ended because of vehicles being stuck are not counted.
  */
-public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
+public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 	ActivityEndEventHandler, ActivityStartEventHandler {
 
 	private final static Logger log = LogManager.getLogger(CalcLegTimes.class);
@@ -79,7 +79,7 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	public void handleEvent(ActivityEndEvent event) {
 		this.previousActivityTypes.put(event.getPersonId(), event.getActType());
 	}
-	
+
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
@@ -115,7 +115,7 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 		}
 	}
 
-	
+
 	@Override
 	public void reset(final int iteration) {
 		this.previousActivityTypes.clear();

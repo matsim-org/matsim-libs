@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;

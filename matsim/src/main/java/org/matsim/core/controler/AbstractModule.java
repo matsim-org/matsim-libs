@@ -252,7 +252,7 @@ public abstract class AbstractModule implements Module {
 		return binder;
 	}
 
-	protected final <T> javax.inject.Provider<T> getProvider(TypeLiteral<T> typeLiteral) {
+	protected final <T> jakarta.inject.Provider<T> getProvider(TypeLiteral<T> typeLiteral) {
 		return binder.getProvider(Key.get(typeLiteral));
 	}
 

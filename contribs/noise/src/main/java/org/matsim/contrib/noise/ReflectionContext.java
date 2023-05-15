@@ -7,7 +7,7 @@ import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.util.AffineTransformation;
 import org.matsim.core.config.Config;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.*;
 
 /**
