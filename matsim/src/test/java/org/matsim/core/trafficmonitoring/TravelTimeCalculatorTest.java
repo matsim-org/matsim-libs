@@ -291,6 +291,43 @@ public class TravelTimeCalculatorTest {
 	}
 
 	/**
+	 * This method tests the functionality of the consolidateData-method in TravelTimeCalculator
+	 * in combination with double time bins
+	 *
+	 * @author tthunig
+	 */
+	@Test public void testLongTravelTimeInEmptySlotWithDoubleTimeBins() {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
+		network.setCapacityPeriod(3600.0);
+		final Node fromNode = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
+		final Node toNode = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(1000, 0));
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1000.0, 100.0, 3600.0, 1.0 );
+		double freeSpeedTT = NetworkUtils.getFreespeedTravelTime(link1);
+		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
+
+		double timeBinSize = 0.5; // time bin of 0.5 seconds
+		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
+		double firstTimeBinStart = 7.0 * 3600;
+
+		// generate some events that suggest a really long travel time
+		double linkTravelTime1 = 11.5; // 11.5 seconds in first time bin
+		double linkTravelTime2 = 10.2; // 10.2 seconds in forth time bin
+		ttcalc.handleEvent(new LinkEnterEvent(firstTimeBinStart, vehId, link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEvent(firstTimeBinStart + linkTravelTime1, vehId, link1.getId()));
+		ttcalc.handleEvent(new LinkEnterEvent(firstTimeBinStart + 3*timeBinSize, vehId, link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEvent(firstTimeBinStart + 3*timeBinSize + linkTravelTime2, vehId, link1.getId()));
+
+		double offset = 0.2; // offset of 0.2 seconds to test another time in the same time bin
+		assertEquals(linkTravelTime1, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(linkTravelTime1-timeBinSize, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 1*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(linkTravelTime1-2*timeBinSize, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 2*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(linkTravelTime2, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 3*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 4*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 5*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+	}
+
+	/**
 	 * Test linear interpolation of aggregated travel times at different positions of a time bin. (Previous tests only test the midpoint of each time bin.)
 	 *
 	 * @author tthunig
