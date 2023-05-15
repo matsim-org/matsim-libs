@@ -27,7 +27,7 @@ import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * @author thibautd

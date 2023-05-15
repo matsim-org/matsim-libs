@@ -27,8 +27,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -167,7 +167,7 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	public void handleEvent(LinkLeaveEvent event) {
 		this.removeEarliestLinkExitTimesAtTime(delegate.getDriverOfVehicle(event.getVehicleId()));
 	}
-	
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		this.transportModeProvider.handleEvent(event);

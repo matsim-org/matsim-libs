@@ -19,7 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -62,7 +62,7 @@ public final class HybridNetworkFactory implements QNetworkFactory {
 		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = AbstractQNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
 		this.context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, snapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
-		
+
 		this.netsimEngine = arg2 ;
 
 	}
@@ -90,7 +90,7 @@ public final class HybridNetworkFactory implements QNetworkFactory {
 		}
 		return ret;
 	}
-	
+
 	public void setExternalEngine(ExternalEngine externalEngine) {
 		this.externalEngine = externalEngine;
 	}

@@ -20,7 +20,7 @@ import org.matsim.contrib.simulatedannealing.perturbation.Perturbator;
 import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

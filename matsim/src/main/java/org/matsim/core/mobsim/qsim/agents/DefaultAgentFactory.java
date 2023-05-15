@@ -27,7 +27,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 
 import java.sql.Time;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Design decisions:<ul>
@@ -48,9 +48,9 @@ public final class DefaultAgentFactory implements AgentFactory {
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
 
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), this.simulation, this.timeInterpretation); 
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), this.simulation, this.timeInterpretation);
 		// ( BasicPlanAgentImpl (inside PersonDriverAgentImpl) makes the plan unmodifiable. )
-		
+
 		return agent;
 	}
 

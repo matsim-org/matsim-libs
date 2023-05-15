@@ -23,7 +23,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.KeepSelected;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 public class KeepLastSelected implements Provider<PlanStrategy> {
 

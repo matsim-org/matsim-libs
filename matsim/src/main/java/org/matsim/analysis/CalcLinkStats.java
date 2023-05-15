@@ -30,7 +30,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class CalcLinkStats {
 	/**
 	 * @param network
 	 * @param vol_scale_factor scaling factor when reading in values from a file
-	 * 
+	 *
 	 * @see #readFile(String)
 	 */
 	public CalcLinkStats(final Network network, double vol_scale_factor) {
@@ -92,25 +92,25 @@ public class CalcLinkStats {
 
 		// go through all links
 		for (Id<Link> linkId : this.linkData.keySet()) {
-			
+
 			// retrieve link from link ID
 			Link link = this.network.getLinks().get(linkId);
-			
+
 			// get the volumes for the link ID from the analyzier
 			double[] volumes = analyzer.getVolumesPerHourForLink(linkId);
-			
+
 			// get the destination container for the data from link data (could have gotten this through iterator right away)
 			LinkData data = this.linkData.get(linkId);
-			
+
 			// prepare the sum variables (for volumes);
 			long sumVolumes = 0; // daily (0-24) sum
-			
+
 			// go through all hours:
 			for (int hour = 0; hour < this.nofHours; hour++) {
-				
+
 				// get travel time for hour
 				double ttime = ttimes.getLinkTravelTime(link, hour*3600, null, null);
-				
+
 				// add for daily sum:
 				sumVolumes += volumes[hour];
 
@@ -127,7 +127,7 @@ public class CalcLinkStats {
 					if (ttime < data.ttimes[MIN][hour]) data.ttimes[MIN][hour] = ttime;
 					if (ttime > data.ttimes[MAX][hour]) data.ttimes[MAX][hour] = ttime;
 				}
-				
+
 				// this is the regular summing up for each hour
 				data.volumes[SUM][hour] += volumes[hour];
 				data.ttimes[SUM][hour] += volumes[hour] * ttime;
@@ -371,13 +371,13 @@ public class CalcLinkStats {
 		}
 		return volumes;
 	}
-	
+
 	/**
 	 * @param linkId
 	 * @return if no data is available, an array with length 0 is returned.
-	 * 
+	 *
 	 * The method reflects the (wrong) logic of what is done when writing the output and should eventually be deleted or modified.
-	 * 
+	 *
 	 */
 	@Deprecated
 	protected double[] getAvgTravelTimes(final Id<Link> linkId) {
@@ -391,9 +391,9 @@ public class CalcLinkStats {
 		double[] ttimesMin = new double[this.nofHours];
 		double[] ttimesSum = new double[this.nofHours];
 		double[] volumes = new double[this.nofHours];
-		
+
 		double[] avgTTimes = new double[this.nofHours];
-		
+
 		for (int i = 0; i < this.nofHours; i++) {
 			volumes[i] = (data.volumes[SUM][i]) / (this.count);
 			ttimesMin[i] = (data.ttimes[MIN][i]) / (this.count);

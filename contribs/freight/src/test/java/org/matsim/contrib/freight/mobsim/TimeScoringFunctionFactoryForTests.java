@@ -3,7 +3,7 @@ package org.matsim.contrib.freight.mobsim;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +39,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 			private final Set<CarrierVehicle> employedVehicles;
 			private Leg currentLeg = null;
 			private double currentLegStartTime;
-			
+
 			public DriverLegScoring(Carrier carrier, Network network) {
 				super();
 				this.network = network;
@@ -47,10 +47,10 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 				employedVehicles = new HashSet<>();
 			}
 
-			
+
 			@Override
 			public void finish() {
-				
+
 			}
 
 
@@ -70,7 +70,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 			@Override
 			public void startLeg(double time, Leg leg) {
 				currentLeg = leg;
-				currentLegStartTime = time; 
+				currentLegStartTime = time;
 			}
 
 
@@ -100,9 +100,9 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 					score += (-1)*distance*getDistanceParameter(vehicle,null);
 					score += (-1)*toll;
 				}
-				
+
 			}
-			
+
 			private double getFixEmploymentCost(CarrierVehicle vehicle) {
 				return 0.0;
 			}
@@ -127,28 +127,28 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 //				return null;
 //			}
 		}
-	
+
 	 static class DriverActScoring implements BasicScoring, ActivityScoring{
 
 		 boolean firstEnd = true;
-		 
+
 		 double startTime;
-		 
-		 double startTimeOfEnd; 
-		 
+
+		 double startTimeOfEnd;
+
 		 double timeAtActivities = 0.0;
-		 
+
 		 double amountPerHour = 20.0;
-		 
+
 		 double startCurrentAct;
-		 
+
 		 double time_at_activities = 0.0;
-		 
+
 		@Override
 		public void startActivity(double time, Activity act) {
 			if(!act.getType().equals(FreightConstants.END)){
 				System.out.println("act_start="+ Time.writeTime(time)+" act="+act);
-				startCurrentAct = time;				
+				startCurrentAct = time;
 			}
 		}
 
@@ -158,7 +158,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 				System.out.println("act_end="+Time.writeTime(time)+" act="+act);
 				time_at_activities += time - startCurrentAct;
 				System.out.println("time_at_activities="+time_at_activities);
-			}		
+			}
 		}
 
 		@Override
@@ -177,13 +177,13 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 			time_at_activities = 0.0;
 			firstEnd = true;
 		}
-		 
+
 	 }
-	 
+
 	static class NumberOfToursAward implements BasicScoring{
 
 		private Carrier carrier;
-		
+
 		public NumberOfToursAward(Carrier carrier) {
 			super();
 			this.carrier = carrier;
@@ -204,11 +204,11 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 		@Override
 		public void reset() {
 		}
-		
+
 	}
-	 
+
 	@Inject private Network network;
-	
+
 	@Override
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();
