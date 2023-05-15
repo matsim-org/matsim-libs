@@ -40,7 +40,7 @@ public class DashboardTests {
 
 		// Ensure default dashboards have been added
 		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**stuck_agents.md");
+				.isDirectoryContaining("glob:**stuck_agents.csv");
 	}
 
 	@Test
@@ -51,7 +51,7 @@ public class DashboardTests {
 		run(new StuckAgentDashboard());
 
 		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**stuck_agents.md");
+				.isDirectoryContaining("glob:**stuck_agents.csv");
 
 	}
 
@@ -74,7 +74,9 @@ public class DashboardTests {
 
 		run(new PopulationAttributeDashboard());
 		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**amount_per_age_group.csv");
+				.isDirectoryContaining("glob:**amount_per_age_group.csv")
+				.isDirectoryContaining("glob:**amount_per_sex_group.csv")
+				.isDirectoryContaining("glob:**total_agents.csv");
 
 
 	}

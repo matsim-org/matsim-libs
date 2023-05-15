@@ -26,13 +26,14 @@ import picocli.CommandLine;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @CommandLine.Command(name = "stuck-agents", description = "Generates statistics for stuck agents.")
-@CommandSpec(requireEvents = true, produces = {"stuck_agents_per_hour.csv", "stuck_agents_per_mode.csv", "stuck_agents_per_link.csv", "stuckAgentsPerModePieChart.csv", "stuck_agents.md"})
+@CommandSpec(requireEvents = true, produces = {"stuck_agents_per_hour.csv", "stuck_agents_per_mode.csv", "stuck_agents_per_link.csv", "stuckAgentsPerModePieChart.csv", "stuck_agents.csv"})
 public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHandler, ActivityStartEventHandler {
 	private static final Logger log = LogManager.getLogger(StuckAgentAnalysis.class);
 	private final Object2IntMap<String> stuckAgentsPerMode = new Object2IntOpenHashMap<>();
@@ -63,40 +64,15 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		manager.finishProcessing();
 
 		// Total stats
-		PrintWriter printWriter = new PrintWriter(IOUtils.getBufferedWriter(output.getPath("stuck_agents.md").toString()));
-		String markdown = """
-					<div class='stack-agents-table'>
-
-					|**Total Agents**|**Stuck Agents**|**Proportion of stuck agents**|
-					|:-------:|:-------:|:-------:|
-					|**${totalAgents}**|**${stuckAgents}**|**${stuckAgentsProportion} %**|
-
-					</div>
-
-					<style>
-					    .stack-agents-table {
-					        font-size:20pt;
-					    }
-
-					    .stack-agents-table table {
-					        width: 100%
-					    }
-
-					    .stack-agents-table table tbody tr * {
-					        margin-bottom: 100px;
-					    }
-					</style>""";
-		Map<String, String> data = new HashMap<String, String>();
-		data.put("totalAgents", String.valueOf(allAgents.size()));
-		data.put("stuckAgents", String.valueOf(allStuckedLinks.keySet().size()));
-		data.put("stuckAgentsProportion", String.valueOf((Math.round((100.0 / allAgents.size() * allStuckedLinks.keySet().size()) * 100))/100.0));
-		String formattedString = StrSubstitutor.replace(markdown, data);
-		printWriter.println(formattedString);
-		printWriter.close();
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents.csv").toString()), CSVFormat.DEFAULT)) {
+			printer.printRecord("Total Agents","Stuck Agents", "Proportion of stuck agents");
+			printer.printRecord(allAgents.size(), allStuckedLinks.keySet().size(), new DecimalFormat("#.0#").format(((Math.round((100.0 / allAgents.size() * allStuckedLinks.keySet().size()) * 100))/100.0)) + '%');
+		} catch (IOException ex) {
+			log.error(ex);
+		}
 
 		// Per hour
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents_per_hour.csv").toString()), CSVFormat.DEFAULT)) {
-
 			List<String> header = new ArrayList<>(stuckAgentsPerHour.keySet());
 			header.add(0, "hour");
 			header.add(1, "Total");

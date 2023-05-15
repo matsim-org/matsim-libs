@@ -4,10 +4,7 @@ import org.matsim.application.analysis.population.StuckAgentAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
-import org.matsim.simwrapper.viz.Bar;
-import org.matsim.simwrapper.viz.PieChart;
-import org.matsim.simwrapper.viz.Table;
-import org.matsim.simwrapper.viz.TextBlock;
+import org.matsim.simwrapper.viz.*;
 
 import java.util.List;
 
@@ -20,10 +17,10 @@ public class StuckAgentDashboard implements Dashboard {
 		header.title = "Stuck Agents";
 		header.description = "Analyze agents that are 'stuck' i.e. could not finish their daily plan.";
 
-		layout.row("first").el(TextBlock.class, (viz, data) -> {
+		layout.row("first").el(Tile.class, (viz, data) -> {
 			viz.title = "";
-			viz.file = data.compute(StuckAgentAnalysis.class, "stuck_agents.md");
-			viz.height = 1.;
+			viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents.csv");
+			viz.height = 0.1;
 		});
 
 		layout.row("second")
@@ -46,7 +43,7 @@ public class StuckAgentDashboard implements Dashboard {
 					viz.x = "hour";
 					viz.xAxisName = "Hour";
 					viz.yAxisName = "# Stuck";
-					viz.ignoredColumns = List.of("Total");
+					viz.ignoreColumns = List.of("Total");
 				})
 				.el(Table.class, (viz, data) -> {
 					viz.title = "Stuck Agents per Hour";
