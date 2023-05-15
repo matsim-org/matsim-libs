@@ -20,16 +20,15 @@ import org.matsim.counts.Volume;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
 
-import static tech.tablesaw.aggregate.AggregateFunctions.*;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static tech.tablesaw.aggregate.AggregateFunctions.count;
+
 @CommandLine.Command(name = "count-comparison", description = "Produces comparisons of observed and simulated counts.")
 @CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true,
-	produces = {"count_comparison_by_hour.csv", "count_comparison_total.csv", "estimation_quality.csv"})
+		produces = {"count_comparison_by_hour.csv", "count_comparison_total.csv", "estimation_quality.csv"})
 public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
@@ -41,11 +40,11 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private SampleOptions sample;
 
-	@CommandLine.Option(names = "--lower-limit", description = "lower limit of quality laber 'exact'", defaultValue = "0.8")
-	private double lowerLimit;
+	@CommandLine.Option(names = "--limits", description = "Limits for quality label categories", required = true)
+	private List<Double> limits;
 
-	@CommandLine.Option(names = "--upper-limit", description = "upper limit of quality laber 'exact'", defaultValue = "1.2")
-	private double upperLimit;
+	@CommandLine.Option(names = "--labels", description = "Labels for quality categories", required = true)
+	private List<String> labels;
 
 	public static void main(String[] args) {
 		new CountComparisonAnalysis().execute(args);
@@ -93,19 +92,19 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 
 		Table byHour = Table.create(
-			StringColumn.create("link_id"),
-			StringColumn.create("name"),
-			StringColumn.create("road_type"),
-			IntColumn.create("hour"),
-			DoubleColumn.create("observed_traffic_volume"),
-			DoubleColumn.create("simulated_traffic_volume")
+				StringColumn.create("link_id"),
+				StringColumn.create("name"),
+				StringColumn.create("road_type"),
+				IntColumn.create("hour"),
+				DoubleColumn.create("observed_traffic_volume"),
+				DoubleColumn.create("simulated_traffic_volume")
 		);
 
 		Table dailyTrafficVolume = Table.create(StringColumn.create("link_id"),
-			StringColumn.create("name"),
-			StringColumn.create("road_type"),
-			DoubleColumn.create("observed_traffic_volume"),
-			DoubleColumn.create("simulated_traffic_volume")
+				StringColumn.create("name"),
+				StringColumn.create("road_type"),
+				DoubleColumn.create("observed_traffic_volume"),
+				DoubleColumn.create("simulated_traffic_volume")
 		);
 
 		for (Map.Entry<Id<Link>, Count<Link>> entry : counts.getCounts().entrySet()) {
@@ -135,13 +134,12 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 
 			if (countVolume.size() == 24) {
 
-				// FIXME : why does it start at hour 1 ?
 
 				for (int hour = 1; hour < 25; hour++) {
 
 					double observedTrafficVolumeAtHour = countVolume.get(hour).getValue();
 					double simulatedTrafficVolumeAtHour = volumesForLink == null ? 0.0 :
-						((double) volumesForLink[hour - 1]) / this.sample.getSample();
+							((double) volumesForLink[hour - 1]) / this.sample.getSample();
 
 					simulatedTrafficVolumeByDay += simulatedTrafficVolumeAtHour;
 					observedTrafficVolumeByDay += observedTrafficVolumeAtHour;
@@ -166,11 +164,11 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		}
 
 		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")
-			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
-			.setName("rel_error");
+				.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
+				.setName("rel_error");
 
 		StringColumn qualityLabel = relError.copy()
-				.map(aDouble -> cut(aDouble, List.of(0.0, lowerLimit, upperLimit, Double.MAX_VALUE), List.of("under", "exact", "over")), ColumnType.STRING::create)
+				.map(aDouble -> cut(aDouble, limits, labels), ColumnType.STRING::create)
 				.setName("quality");
 
 		dailyTrafficVolume.addColumns(relError, qualityLabel);

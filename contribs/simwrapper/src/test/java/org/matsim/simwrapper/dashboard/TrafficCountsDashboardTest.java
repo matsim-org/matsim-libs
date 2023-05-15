@@ -48,7 +48,8 @@ public class TrafficCountsDashboardTest {
 		contextParams.mapZoomLevel = 9.0;
 
 		SimWrapper sw = SimWrapper.create(simWrapperConfigGroup)
-				.addDashboard(new TrafficCountsDashboard(0.2, 1.8));
+				.addDashboard(new TrafficCountsDashboard(List.of(0.0, 0.3, 1.7, 2.5, Double.MAX_VALUE), List.of("less", "exact", "too much", "way too much")))
+				.addDashboard(new PlotlyDashboard());
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());

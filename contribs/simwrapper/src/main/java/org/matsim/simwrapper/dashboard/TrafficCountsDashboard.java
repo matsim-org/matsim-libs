@@ -9,23 +9,41 @@ import org.matsim.simwrapper.viz.Bar;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Scatter;
 
+import java.util.Collection;
+import java.util.List;
+
 
 /**
  * Creates a dashboard for comparison of simulated and observed traffic volumes.
  */
 public class TrafficCountsDashboard implements Dashboard {
 
-	private final String optionLowerLimit;
-	private String optionUpperLimit;
+	private String[] args;
 
 	public TrafficCountsDashboard() {
-		optionLowerLimit = "--lower-limit=" + 0.8;
-		optionUpperLimit = "--upper-limit=" + 1.2;
+		List<Double> limits = List.of(0.0, 0.8, 1.2, Double.MAX_VALUE);
+		List<String> labels = List.of("under", "exact", "over");
+
+		this.generateArguments(limits, labels);
 	}
 
-	public TrafficCountsDashboard(double lowerLimit, double upperLimit) {
-		optionLowerLimit = "--lower-limit=" + lowerLimit;
-		optionUpperLimit = "--upper-limit=" + upperLimit;
+	public TrafficCountsDashboard(Collection<Double> limits, Collection<String> labels) {
+		if (limits.size() != labels.size() + 1)
+			throw new RuntimeException("There must be one more limit than labels!");
+
+		this.generateArguments(limits, labels);
+	}
+
+	private void generateArguments(Collection<Double> limits, Collection<String> labels) {
+
+		args = new String[limits.size() + labels.size()];
+		int index = 0;
+
+		for (Double l : limits)
+			args[index++] = "--limits=" + l;
+
+		for (String l : labels)
+			args[index++] = "--labels=" + l;
 	}
 
 	@Override
@@ -42,7 +60,7 @@ public class TrafficCountsDashboard implements Dashboard {
 					viz.center = data.context().getCenter();
 					viz.shapes = data.compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties");
 
-					viz.datasets.counts = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv", optionUpperLimit, optionLowerLimit);
+					viz.datasets.counts = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv", args);
 
 					viz.display.fill.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
 					viz.display.fill.columnName = "quality";
