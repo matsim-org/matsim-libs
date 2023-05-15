@@ -16,20 +16,16 @@ import picocli.CommandLine;
 import java.io.BufferedReader;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @CommandLine.Command(name = "log-file", description = "Analyses MATSim log files to gather run information.")
 @CommandSpec(
 	requires = "logfile.log",
-	produces = {"run_info.csv", "memory_stats.csv", "runtime_stats.csv"},
+	produces = {"run_info.csv", "memory_stats.csv", "runtime_stats.csv", "warnings.csv"},
 	group = "general"
 )
 public class LogFileAnalysis implements MATSimAppCommand {
@@ -59,12 +55,15 @@ public class LogFileAnalysis implements MATSimAppCommand {
 
 		Pattern gbl = Pattern.compile(".+INFO Gbl:\\d+(.+):(.+)");
 		Pattern mem = Pattern.compile(".+MemoryObserver:\\d+ used RAM: (\\d+) MB\\s+free: (\\d+) MB\\s+total: (\\d+) MB");
+		Pattern warn = Pattern.compile(".+(WARN|ERROR) (\\S+(ConfigGroup|ConsistencyCheck).*):[0-9]+ (.+)");
+
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 		Map<String, String> info = new LinkedHashMap<>();
 
 		List<Memory> memory = new ArrayList<>();
 		List<Iteration> iterations = new ArrayList<>();
+		Set<Warning> warnings = warnings = new LinkedHashSet<>();
 
 		String first = null;
 		String last = null;
@@ -84,6 +83,10 @@ public class LogFileAnalysis implements MATSimAppCommand {
 					m = mem.matcher(line);
 					if (m.find()) {
 						memory.add(new Memory(parseDate(line), Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3))));
+					}
+					m = warn.matcher(line);
+					if (m.find()) {
+						warnings.add(new Warning(m.group(2), m.group(4)));
 					}
 
 					if (line.contains("### ITERATION")) {
@@ -141,11 +144,24 @@ public class LogFileAnalysis implements MATSimAppCommand {
 			}
 		}
 
+		try (CSVPrinter printer = csv.createPrinter(output.getPath("warnings.csv"))) {
+			printer.printRecord("Module", "Message");
+			for (Warning warning : warnings) {
+				printer.printRecord(warning.module, warning.msg);
+			}
+		}
+
 		return 0;
 	}
 
-	private record Memory(LocalDateTime date, int used, int free, int total) {}
+	private record Memory(LocalDateTime date, int used, int free, int total) {
+	}
 
-	private record Iteration(LocalDateTime begin, LocalDateTime end) {}
+	private record Iteration(LocalDateTime begin, LocalDateTime end) {
+	}
+
+	private record Warning(String module, String msg) {
+
+	}
 
 }

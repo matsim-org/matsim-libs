@@ -1,5 +1,6 @@
 package org.matsim.simwrapper;
 
+import org.apache.commons.io.FilenameUtils;
 import org.matsim.application.CommandRunner;
 import org.matsim.application.MATSimAppCommand;
 
@@ -79,7 +80,15 @@ public final class Data {
 	 * @param path  don't use path separators, but multiple arguments
 	 */
 	public String output(String first, String... path) {
-		return this.getUnixPath(Path.of(first, path));
+
+		// Must use unix separators and not use Path because * might be used as part of the path
+		StringBuilder p = new StringBuilder(first);
+		for (String s : path) {
+			p.append("/");
+			p.append(s);
+		}
+
+		return p.toString();
 	}
 
 	/**
@@ -138,7 +147,7 @@ public final class Data {
 	 * Returns the unix path. Otherwise, paths might be Windows paths, which are not compatible to simwrapper.
 	 */
 	private String getUnixPath(Path p) {
-		return p.toString().replace('\\', '/');
+		return FilenameUtils.separatorsToUnix(p.toString());
 	}
 
 	/**
