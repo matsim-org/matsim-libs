@@ -47,7 +47,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,10 +69,10 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 	public ParkingPopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim ) {
 		Vehicles vehicles = qsim.getScenario().getVehicles() ;
 		QSimConfigGroup qsimConfig = qsim.getScenario().getConfig().qsim() ;
-		
+
 		this.population = population;
 		this.agentFactory = agentFactory;
-		this.qsim = qsim;  
+		this.qsim = qsim;
 		this.modeVehicleTypes = new HashMap<>();
 		this.mainModes = new HashSet<>(qsim.getScenario().getConfig().qsim().getMainModes());
 		switch ( qsimConfig.getVehiclesSource() ) {
@@ -93,11 +93,11 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 			break;
 		default:
 			break;
-		
+
 		}
-		
-		
-		
+
+
+
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 						Route route = leg.getRoute();
 						Id<Vehicle> vehicleId = null ;
 						if (route != null) {
-							if (route instanceof NetworkRoute)	
+							if (route instanceof NetworkRoute)
 							vehicleId = ((NetworkRoute) route).getVehicleId(); // may be null!
 						}
 						if (vehicleId == null) {
@@ -152,22 +152,22 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 							throw new RuntimeException("not implemented") ;
 						}
 						Id<Link> vehicleLinkId = findVehicleLink(p);
-						
+
 						// Checking if the vehicle has been seen before:
 						Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
 						if ( result != null ) {
 							// if seen before, but placed on same link, then it is ok:
 							log.info( "have seen vehicle with id " + vehicleId + " before; not placing it again." );
 							if ( result != vehicleLinkId ) {
-								throw new RuntimeException("vehicle placement error: vehicleId=" + vehicleId + 
-										"; previous placement link=" + vehicleLinkId + "; current placement link=" + result ) ; 
+								throw new RuntimeException("vehicle placement error: vehicleId=" + vehicleId +
+										"; previous placement link=" + vehicleLinkId + "; current placement link=" + result ) ;
 							}
 						} else {
 							this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
 //							qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
 							QVehicle qVehicle = new QVehicleImpl( vehicle ) ; // yyyyyy should use factory.  kai, nov'18
 							qsim.addParkedVehicle( qVehicle, vehicleLinkId );
-							
+
 							// yyyy in fact, should rather try to use central method since the central method has moved on.  kai, nov'18
 						}
 						seenModes.add(leg.getMode());
@@ -184,7 +184,7 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 	 */
 	private Id<Link> findVehicleLink(Person p ) {
 		/* Cases that come to mind:
-		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.  
+		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.
 		 *      This is treated by the following algo.
 		 * (2) person starts day with non-car leg and has car parked somewhere else.  This is NOT treated by the following algo.
 		 *      It could be treated by placing the vehicle at the beginning of the first link where it is needed, but this would not

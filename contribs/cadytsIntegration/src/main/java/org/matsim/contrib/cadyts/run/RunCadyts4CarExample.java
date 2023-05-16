@@ -38,13 +38,13 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.ScoringParameters;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Script-in-java to include cadyts into a matsim run.
  * <p></p>
  * For the listing click on the class name above.
- * 
+ *
  * @author nagel
  *
  */
@@ -54,7 +54,7 @@ public class RunCadyts4CarExample {
 		final Config config = ConfigUtils.loadConfig( args[0], new CadytsConfigGroup() ) ;
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
+
 		// ---
 
 		final Controler controler = new Controler( scenario ) ;
@@ -67,7 +67,7 @@ public class RunCadyts4CarExample {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final ScoringParameters params = parameters.getScoringParameters(person);
-				
+
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork(), config.transit().getTransitModes()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
@@ -81,7 +81,7 @@ public class RunCadyts4CarExample {
 			}
 		}) ;
 
-		
+
 		controler.run() ;
 	}
 

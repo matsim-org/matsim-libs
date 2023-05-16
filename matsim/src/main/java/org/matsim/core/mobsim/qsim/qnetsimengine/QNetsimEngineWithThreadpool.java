@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.core.mobsim.qsim.QSim;
 
@@ -38,7 +38,7 @@ import org.matsim.core.mobsim.qsim.QSim;
  * 2 different approaches parallel.
  *
  * @author droeder@Senozon after
- * 
+ *
  * @author mrieser
  * @author dgrether
  * @author dstrippgen
@@ -47,7 +47,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 
 	private final int numOfRunners;
 	private ExecutorService pool;
-	
+
 	public QNetsimEngineWithThreadpool(final QSim sim) {
 		this(sim, null);
 	}
@@ -66,7 +66,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	protected void run(double time) {
 		// yy Acceleration options to try out (kai, jan'15):
 
-		// (a) Try to do without barriers.  With our 
+		// (a) Try to do without barriers.  With our
 		// message-based experiments a decade ago, it was better to let each runner decide locally when to proceed.  For intuition, imagine that
 		// one runner is slowest on the links, and some other runner slowest on the nodes.  With the barriers, this cannot overlap.
 		// With message passing, this was achieved by waiting for all necessary messages.  Here, it could (for example) be achieved with runner-local
@@ -84,7 +84,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 
 		// (b) Do deliberate domain decomposition rather than round robin (fewer runners to wait for at (*) and (**)).
 
-		// (c) One thread that is much faster than all others is much more efficient than one thread that is much slower than all others. 
+		// (c) One thread that is much faster than all others is much more efficient than one thread that is much slower than all others.
 		// So make sure that no thread sticks out in terms of slowness.  Difficult to achieve, though.  A decade back, we used a "typical" run
 		// as input for the domain decomposition under (b).
 
@@ -112,7 +112,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 			throw new RuntimeException(e.getCause());
 		}
 	}
-	
+
 	private static class NamedThreadFactory implements ThreadFactory {
 		private int count = 0;
 
@@ -136,6 +136,6 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	protected void initMultiThreading() {
 		this.pool = Executors.newFixedThreadPool(
 				this.numOfThreads,
-				new NamedThreadFactory());		
+				new NamedThreadFactory());
 	}
 }

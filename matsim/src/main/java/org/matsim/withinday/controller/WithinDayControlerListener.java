@@ -39,8 +39,8 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,9 +50,9 @@ import java.util.Set;
 /**
  * Attempt to realize functionality provided by WithinDayController by
  * a ControlerListener (similar to what is done by the MultiModalControlerListener).
- * 
+ *
  * Note: this class has to be registered as Controller Listener!
- * 
+ *
  * @author cdobler
  */
 public class WithinDayControlerListener implements StartupListener {
@@ -88,21 +88,21 @@ public class WithinDayControlerListener implements StartupListener {
 	public void setTransitRouterFactory(Provider<TransitRouter> transitRouterFactory) {
 		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 	}
-	
+
 	public void setModesAnalyzedByWithinDayTravelTime(Set<String> modes) {
 		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 	}
-	
+
 	public Map<String, TravelTime> getMultiModalTravelTimes() {
 		return Collections.unmodifiableMap(this.multiModalTravelTimes);
 	}
-	
+
 	public void addMultiModalTravelTimes(Map<String, TravelTime> multiModalTravelTimes) {
 		for (Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
 			this.addMultiModalTravelTime(entry.getKey(), entry.getValue());
 		}
 	}
-	
+
 	public void addMultiModalTravelTime(String mode, TravelTime travelTime) {
 		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 	}
@@ -144,7 +144,7 @@ public class WithinDayControlerListener implements StartupListener {
 	 * creation and initialization methods
 	 * ===================================================================
 	 */
-	
+
 	/*
 	 * TODO: Add a Within-Day Group to the Config. Then this method
 	 * can be called on startup.
@@ -160,7 +160,7 @@ public class WithinDayControlerListener implements StartupListener {
 	private void createAndInitActivityReplanningMap() {
 		fosl.addSimulationListener(activityReplanningMap);
 	}
-	
+
 	private void createAndInitLinkReplanningMap() {
 		this.fosl.addSimulationListener(linkReplanningMap);
 	}

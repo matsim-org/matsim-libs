@@ -65,7 +65,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 
 	private final Collection<Id<Person>> driverIds = new ArrayList<>();
 
-	private int nextId = 0;
+	private int nextId = 1; //used to generate unique driver Ids. First agent should have the 1 and not 0.
 
 	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
@@ -164,7 +164,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 	private void clear() {
 		carrierDriverAgents.clear();
 		driverIds.clear();
-		nextId = 0;
+		nextId = 1;  //first agent should have the 1 and not 0.
 	}
 
 	Collection<Id<Person>> getDriverIds() {

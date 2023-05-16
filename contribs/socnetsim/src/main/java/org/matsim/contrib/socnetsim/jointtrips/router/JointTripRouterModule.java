@@ -26,8 +26,8 @@ import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.RoutingModule;
 
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 
 /**
  * @author thibautd
