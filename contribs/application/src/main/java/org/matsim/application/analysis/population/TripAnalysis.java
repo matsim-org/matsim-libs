@@ -44,11 +44,11 @@ public class TripAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--dist-groups", split = ",", description = "List of distances for binning", defaultValue = "0,1000,2000,5000,10000,20000")
 	private List<Integer> distGroups;
 
-	@CommandLine.Mixin
-	private ShpOptions shp;
-
 	@CommandLine.Option(names = "--modes", split = ",", description = "List of considered modes, if not set all will be used")
 	private List<String> modeOrder;
+
+	@CommandLine.Mixin
+	private ShpOptions shp;
 
 	public static void main(String[] args) {
 		new TripAnalysis().execute(args);
@@ -334,5 +334,16 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		table.write().csv(output.getPath("trip_purposes_by_hour.csv").toFile());
 
+	}
+
+	/**
+	 * How shape file filtering should be applied.
+	 */
+	enum LocationFilter {
+		// TODO: shp file support and option
+		trip_start_and_end,
+		trip_start_or_end,
+		home,
+		none
 	}
 }

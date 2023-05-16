@@ -44,26 +44,23 @@ public class Plotly extends Viz {
 	@JsonIgnore
 	public Layout layout;
 
-	@JsonProperty(index = 4)
+	@JsonProperty(index = 26)
 	@Nullable
 	public Config config;
-
+	/**
+	 * Set the color ramp that is applied if multiple traces are present.
+	 */
+	public String colorRamp;
+	/**
+	 * Merge all given datasets into one.
+	 */
+	public Boolean mergeDatasets;
 	@JsonIgnore
 	private List<Trace> traces = new ArrayList<>();
 	@JsonIgnore
 	private List<DataSet> data = new ArrayList<>();
 	@JsonIgnore
 	private List<DataMapping> mappings = new ArrayList<>();
-
-	/**
-	 * Predefined color ramps.
-	 */
-	private String colorRamp;
-
-	/**
-	 * Merge all given datasets into one.
-	 */
-	private Boolean mergeDatasets;
 
 	public Plotly() {
 		super("plotly");
@@ -140,24 +137,18 @@ public class Plotly extends Viz {
 	/**
 	 * Fill content from a given {@link Figure}.
 	 */
-	public void fromFigure(Figure figure) {
+	public Plotly fromFigure(Figure figure) {
 		for (Trace t : figure.getTraces()) {
 			addTrace(t, null);
 		}
 
 		layout = figure.getLayout();
 		config = figure.getConfig();
-	}
 
-	/**
-	 * Specify that all datasets should be merged into one.
-	 */
-	public Plotly setMergeDatasets(boolean mergeDatasets) {
-		this.mergeDatasets = mergeDatasets;
 		return this;
 	}
 
-	@JsonProperty(value = "datasets", index = 2)
+	@JsonProperty(value = "datasets", index = 20)
 	Map<String, Object> getDataSets() {
 		if (data.size() == 0)
 			return null;
@@ -169,7 +160,7 @@ public class Plotly extends Viz {
 		return result;
 	}
 
-	@JsonProperty(value = "traces", index = 3)
+	@JsonProperty(value = "traces", index = 25)
 	List<Map<String, Object>> getTraces() {
 
 		List<Map<String, Object>> result = new ArrayList<>();
@@ -249,7 +240,7 @@ public class Plotly extends Viz {
 		return object;
 	}
 
-	@JsonProperty("layout")
+	@JsonProperty(value = "layout", index = 30)
 	@SuppressWarnings("unchecked")
 	Map<String, Object> getLayout() {
 
@@ -334,8 +325,7 @@ public class Plotly extends Viz {
 		private final String file;
 
 		private Map<String, Object> pivot;
-		private Map<String, Object> multiIndex;
-
+		private Map<String, Object> constant;
 		private Map<String, Object> aggregate;
 
 		private DataSet(String file, String name) {
@@ -345,7 +335,7 @@ public class Plotly extends Viz {
 
 		private Object toJSON() {
 			if (pivot == null &&
-				multiIndex == null &&
+				constant == null &&
 				aggregate == null)
 				return file;
 
@@ -379,16 +369,25 @@ public class Plotly extends Viz {
 		}
 
 		/**
-		 * Transform column into multi index together with a constant. This function should probably be used to annotate multiple datasets.
+		 * Take all entries y from {@code withColumn} and merge them into tuples (x,y) in {@code columnName}
+		 * This is useful for multi indices.
 		 *
-		 * @param columnName column to transform
-		 * @param constant   constant level name to add
+		 * @param columnName merge column
+		 * @param withColumn column that is merged onto the first
 		 */
-		public DataSet multiIndex(String columnName, String constant) {
-			multiIndex = Map.of(
-				"columnName", columnName,
-				"constant", constant
-			);
+		public DataSet merge(String columnName, String withColumn) {
+
+			return this;
+		}
+
+		/**
+		 * Adds a column with constant values. May be useful for multi index and stacking bar charts.
+		 */
+		public DataSet constant(String columnName, Object constant) {
+			if (this.constant == null)
+				this.constant = new LinkedHashMap<>();
+
+			this.constant.put(columnName, constant);
 			return this;
 		}
 
@@ -419,8 +418,22 @@ public class Plotly extends Viz {
 			this.ref = name;
 		}
 
+		/**
+		 * Group this data by categorical variable in column.
+		 */
 		public DataMapping name(String columnName) {
 			columns.put(ColumnType.NAME, columnName);
+			return this;
+		}
+
+		/**
+		 * Group this data by categorical variable in column.
+		 *
+		 * @param colorRamp color ramp to use
+		 */
+		public DataMapping name(String columnName, String colorRamp) {
+			columns.put(ColumnType.NAME, columnName);
+			this.colorRamp = colorRamp;
 			return this;
 		}
 
@@ -480,14 +493,6 @@ public class Plotly extends Viz {
 			return this;
 		}
 
-		/**
-		 * Set color ramp for this dataset.
-		 */
-		public DataMapping colorRamp(String name) {
-			this.colorRamp = name;
-			return this;
-		}
-
 		private void insert(Map<String, Object> obj) {
 
 			// TODO: some attributes are at marker level
@@ -515,6 +520,38 @@ public class Plotly extends Viz {
 			// x and y can not be used in this context
 			columns.remove(ColumnType.X);
 			columns.remove(ColumnType.Y);
+		}
+	}
+
+	/**
+	 * Utility class that holds some, but not all available color schemes.
+	 * See {@link <a href="https://github.com/d3/d3-scale-chromatic/tree/main">here</a>}
+	 */
+	public static final class ColorScheme {
+
+		public static final String Accent = "Accent";
+		public static final String Dark2 = "Dark2";
+		public static final String Paired = "Paired";
+		public static final String Pastel1 = "Pastel1";
+		public static final String Pastel2 = "Pastel2";
+		public static final String Set1 = "Set1";
+		public static final String Set2 = "Set2";
+		public static final String Set3 = "Set3";
+		public static final String Tableau10 = "Tableau10";
+		public static final String RdGy = "RdGy";
+		public static final String RdYlBu = "RdYlBu";
+		public static final String PiYG = "PiYG";
+		public static final String RdYlGn = "RdYlGn";
+		public static final String Spectral = "Spectral";
+		public static final String Turbo = "Turbo";
+		public static final String CubehelixDefault = "CubehelixDefault";
+		public static final String Viridis = "Viridis";
+		public static final String Inferne = "Inferne";
+		public static final String Cividis = "Cividis";
+		public static final String Rainbow = "Rainbow";
+
+
+		private ColorScheme() {
 		}
 	}
 

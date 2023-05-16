@@ -25,6 +25,8 @@ public class TripDashboard implements Dashboard {
 	@Nullable
 	private final String modeUsersRefCsv;
 
+	private String[] args;
+
 	/**
 	 * Default trip dashboard constructor.
 	 */
@@ -45,7 +47,19 @@ public class TripDashboard implements Dashboard {
 		this.modeShareRefCsv = modeShareRefCsv;
 		this.modeShareDistRefCsv = modeShareDistRefCsv;
 		this.modeUsersRefCsv = modeUsersRefCsv;
+		args = new String[0];
 	}
+
+	/**
+	 * Only include agents that match this id. See {@link TripAnalysis}.
+	 */
+	public TripDashboard setMatchAgentId(String pattern) {
+		// TODO: needs to be changed if there are more args
+		args = new String[]{"--match-id", pattern};
+		return this;
+	}
+
+	// TODO: dist groups configurable
 
 	@Override
 	public void configure(Header header, Layout layout) {
@@ -56,46 +70,59 @@ public class TripDashboard implements Dashboard {
 		Layout.Row first = layout.row("first");
 		first.el(Plotly.class, (viz, data) -> {
 			viz.title = "Modal split";
-			viz.description = "simulated";
 
-			viz.addTrace(PieTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv")).mapping()
-					.text("main_mode")
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+				.build();
+
+			Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
+				.constant("source", "Simulated")
+				.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
+
+			if (modeShareRefCsv != null) {
+				viz.addDataset(data.resource(modeShareRefCsv))
+					.constant("source", "Reference")
+					.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
+
+				viz.mergeDatasets = true;
+			}
+
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
+				ds.mapping()
+					.name("main_mode")
+					.y("source")
 					.x("share")
 			);
 		});
 
-		if (modeShareRefCsv != null) {
-
-			// TODO: vertical barchart might look better
-			// TODO: colors are also inconsistent
-
-			first.el(Plotly.class, (viz, data) -> {
-				viz.title = "Modal split";
-				viz.description = "reference";
-
-				viz.addTrace(PieTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(data.resource(modeShareRefCsv)).mapping()
-						.text("main_mode")
-						.x("share")
-				);
-			});
-		}
-
 		first.el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Trip distance distribution";
+			viz.colorRamp = Plotly.ColorScheme.Viridis;
 
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("simulated").build(),
+			// TODO: some color as static fields
+
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
 					.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
 					.mapping()
-					.colorRamp("Set2")
 					.x("dist_group")
 					.y("share")
 			);
 
-			// TODO: second trace with the reference data should work fine
+			if (modeShareRefCsv != null) {
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Reference").build(),
+					viz.addDataset(data.resource(modeShareRefCsv))
+						.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
+						.mapping()
+						.x("dist_group")
+						.y("share")
+				);
+
+			}
+
+				// TODO: second trace with the reference data should work fine
 		});
 
 		// TODO: can probably be in the same plot together with reference data
@@ -162,8 +189,7 @@ public class TripDashboard implements Dashboard {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
-					.name("purpose")
-					.colorRamp("Turbo")
+					.name("purpose", Plotly.ColorScheme.Spectral)
 					.x("h")
 					.y("arrival")
 			);
@@ -182,8 +208,7 @@ public class TripDashboard implements Dashboard {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
-					.name("purpose")
-					.colorRamp("Turbo")
+					.name("purpose", Plotly.ColorScheme.Spectral)
 					.x("h")
 					.y("departure")
 			);
