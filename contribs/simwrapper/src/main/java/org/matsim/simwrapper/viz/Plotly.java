@@ -39,6 +39,7 @@ public class Plotly extends Viz {
 	public static final String[] TEXT_INPUT = new String[0];
 
 	private static final Logger log = LogManager.getLogger(Plotly.class);
+
 	@Nullable
 	@JsonIgnore
 	public Layout layout;
@@ -48,12 +49,21 @@ public class Plotly extends Viz {
 	public Config config;
 
 	@JsonIgnore
-	private List<DataSet> data = new ArrayList<>();
-	@JsonIgnore
 	private List<Trace> traces = new ArrayList<>();
+	@JsonIgnore
+	private List<DataSet> data = new ArrayList<>();
 	@JsonIgnore
 	private List<DataMapping> mappings = new ArrayList<>();
 
+	/**
+	 * Predefined color ramps.
+	 */
+	private String colorRamp;
+
+	/**
+	 * Merge all given datasets into one.
+	 */
+	private Boolean mergeDatasets;
 
 	public Plotly() {
 		super("plotly");
@@ -139,12 +149,24 @@ public class Plotly extends Viz {
 		config = figure.getConfig();
 	}
 
-	@JsonProperty(value = "dataset", index = 2)
-	Object getDataSet() {
+	/**
+	 * Specify that all datasets should be merged into one.
+	 */
+	public Plotly setMergeDatasets(boolean mergeDatasets) {
+		this.mergeDatasets = mergeDatasets;
+		return this;
+	}
+
+	@JsonProperty(value = "datasets", index = 2)
+	Map<String, Object> getDataSets() {
 		if (data.size() == 0)
 			return null;
 
-		return data.size() == 1 && data.get(0).isSimple() ? data.get(0).file : data;
+		Map<String, Object> result = new LinkedHashMap<>();
+		for (DataSet d : data) {
+			result.put(d.name, d.toJSON());
+		}
+		return result;
 	}
 
 	@JsonProperty(value = "traces", index = 3)
@@ -215,6 +237,8 @@ public class Plotly extends Viz {
 		// Pie charts have an API that is quite confusing because the column names are different
 		// This codes fixes some errors
 		if ("pie".equals(type) && d != null) {
+			// Never sort pie charts, attribute is also not settable via API
+			object.put("sort", false);
 			d.normalizePieTrace();
 		}
 
@@ -291,9 +315,9 @@ public class Plotly extends Viz {
 	}
 
 	/**
-	 * Available aggregate function for {@link DataSet#aggregate(List)}.
+	 * Available aggregate function for {@link DataSet#aggregate(List, String, AggrFunc)}.
 	 */
-	enum AggrFunc {
+	public enum AggrFunc {
 		SUM
 	}
 
@@ -302,17 +326,27 @@ public class Plotly extends Viz {
 	 */
 	public static final class DataSet {
 
+		@JsonIgnore
 		private final String name;
 		private final String file;
-		private String groupBy;
+
+		private Map<String, Object> pivot;
+		private Map<String, Object> multiIndex;
+
+		private Map<String, Object> aggregate;
 
 		private DataSet(String file, String name) {
 			this.file = file;
 			this.name = name;
 		}
 
-		private boolean isSimple() {
-			return name.equals("dataset");
+		private Object toJSON() {
+			if (pivot == null &&
+				multiIndex == null &&
+				aggregate == null)
+				return file;
+
+			return this;
 		}
 
 		/**
@@ -323,33 +357,49 @@ public class Plotly extends Viz {
 		}
 
 		/**
-		 * Takes all values from the specified colum and splits data into separate traces.
+		 * Indicates that each column beside the already mapped ones contain one data group. This is also known as 'wide-format'.
+		 * Defining this will map each new column to the specified target array.
+		 *
+		 * @param exclude columns not to pivot, typical x-axis.
 		 */
-		@Deprecated
-		public DataSet groupBy(String columnName) {
-			groupBy = columnName;
+		public DataSet pivot(List<String> exclude, String namesTo, String valuesTo) {
+
+			if (exclude.isEmpty())
+				throw new IllegalArgumentException("Exclude list can not be empty");
+
+			pivot = Map.of(
+				"exclude", exclude,
+				"namesTo", namesTo,
+				"valuesTo", valuesTo
+			);
 			return this;
 		}
 
 		/**
-		 * Indicates that each column beside the already mapped ones contain one data group. This is also known as 'wide-format'.
-		 * Defining this will map each new column to the specified target array.
+		 * Transform column into multi index together with a constant. This function should probably be used to annotate multiple datasets.
+		 *
+		 * @param columnName column to transform
+		 * @param constant   constant level name to add
 		 */
-		@Deprecated
-		public DataSet pivot(String namesTo, String valuesTo) {
-			// TODO
+		public DataSet multiIndex(String columnName, String constant) {
+			multiIndex = Map.of(
+				"columnName", columnName,
+				"constant", constant
+			);
 			return this;
 		}
 
 		/**
 		 * Aggregate data within each trace on the {@code targetColumn}. Uses all unmapped columns or only the given columns if not empty.
 		 */
-		@Deprecated
-		public DataSet aggregate(ColumnType target, AggrFunc func, String... columns) {
-			// TODO
+		public DataSet aggregate(List<String> groupBy, String target, AggrFunc func) {
+			aggregate = Map.of(
+				"groupBy", groupBy,
+				"target", target,
+				"func", func.toString()
+			);
 			return this;
 		}
-
 	}
 
 	/**
@@ -359,6 +409,8 @@ public class Plotly extends Viz {
 
 		private final String ref;
 		private Map<ColumnType, String> columns = new EnumMap<>(ColumnType.class);
+
+		private String colorRamp;
 
 		public DataMapping(String name) {
 			this.ref = name;
@@ -374,14 +426,6 @@ public class Plotly extends Viz {
 		 */
 		public DataMapping x(String columnName) {
 			columns.put(ColumnType.X, columnName);
-			return this;
-		}
-
-		/**
-		 * Additional x column, which will create an array of values.
-		 */
-		public DataMapping x2(String columnName) {
-			columns.put(ColumnType.X2, columnName);
 			return this;
 		}
 
@@ -433,11 +477,23 @@ public class Plotly extends Viz {
 			return this;
 		}
 
+		/**
+		 * Set color ramp for this dataset.
+		 */
+		public DataMapping colorRamp(String name) {
+			this.colorRamp = name;
+			return this;
+		}
+
 		private void insert(Map<String, Object> obj) {
+
+			// TODO: some attributes are at marker level
 			for (ColumnType value : ColumnType.values()) {
 				if (columns.containsKey(value))
 					obj.put(value.name().toLowerCase(), "$" + ref + "." + columns.get(value));
 			}
+
+			obj.put("colorRamp", colorRamp);
 		}
 
 		private void normalizePieTrace() {
@@ -456,21 +512,6 @@ public class Plotly extends Viz {
 			// x and y can not be used in this context
 			columns.remove(ColumnType.X);
 			columns.remove(ColumnType.Y);
-		}
-	}
-
-	/**
-	 * Column specification that go beyond simple mapping to name.
-	 */
-	@Deprecated
-	public static final class Column {
-
-		public static Column transform(String columnName, String function) {
-			return null;
-		}
-
-		public static Column constant(Object value) {
-			return null;
 		}
 	}
 
