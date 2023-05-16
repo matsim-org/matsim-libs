@@ -10,6 +10,7 @@ import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.PieTrace;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -17,12 +18,33 @@ import java.util.List;
  */
 public class TripDashboard implements Dashboard {
 
+	@Nullable
+	private final String modeShareRefCsv;
+	@Nullable
+	private final String modeShareDistRefCsv;
+	@Nullable
+	private final String modeUsersRefCsv;
+
+	/**
+	 * Default trip dashboard constructor.
+	 */
 	public TripDashboard() {
+		this(null, null, null);
+	}
 
-		// TODO: path to reference data
-		// SHP file and filtering
-		// mode filter
-
+	/**
+	 * Create a dashboard containing reference data. If any of the reference data is not available it can also be null
+	 * Data format needs to be the same as produced by the analysis. Please refer to the dashboard output.
+	 * All given argument must be resources in the classpath.
+	 *
+	 * @param modeShareRefCsv     resource containing the mode share per distance group and mode, summing to a total of one
+	 * @param modeShareDistRefCsv resource with mode share, where each group sums to 1.
+	 * @param modeUsersRefCsv     resource with mode users data
+	 */
+	public TripDashboard(@Nullable String modeShareRefCsv, @Nullable String modeShareDistRefCsv, @Nullable String modeUsersRefCsv) {
+		this.modeShareRefCsv = modeShareRefCsv;
+		this.modeShareDistRefCsv = modeShareDistRefCsv;
+		this.modeUsersRefCsv = modeUsersRefCsv;
 	}
 
 	@Override
@@ -31,34 +53,50 @@ public class TripDashboard implements Dashboard {
 		header.title = "Trips";
 		header.description = "General information about modal share and trip distributions.";
 
-		// TODO: cmp to reference data?, via arguments and separate dashboard?
+		Layout.Row first = layout.row("first");
+		first.el(Plotly.class, (viz, data) -> {
+			viz.title = "Modal split";
+			viz.description = "simulated";
 
-		layout.row("first")
-			.el(Plotly.class, (viz, data) -> {
+			viz.addTrace(PieTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv")).mapping()
+					.text("main_mode")
+					.x("share")
+			);
+		});
 
+		if (modeShareRefCsv != null) {
+
+			// TODO: vertical barchart might look better
+			// TODO: colors are also inconsistent
+
+			first.el(Plotly.class, (viz, data) -> {
 				viz.title = "Modal split";
-				viz.description = "simulated";
+				viz.description = "reference";
 
 				viz.addTrace(PieTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv")).mapping()
+					viz.addDataset(data.resource(modeShareRefCsv)).mapping()
 						.text("main_mode")
 						.x("share")
 				);
-			})
-			.el(Plotly.class, (viz, data) -> {
-
-				viz.title = "Trip distance distribution";
-
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("simulated").build(),
-					viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
-						.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
-						.mapping()
-						.x("dist_group")
-						.y("share")
-				);
-
-				// TODO: second trace with the reference data should work fine
 			});
+		}
+
+		first.el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Trip distance distribution";
+
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("simulated").build(),
+				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
+					.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
+					.mapping()
+					.colorRamp("Set2")
+					.x("dist_group")
+					.y("share")
+			);
+
+			// TODO: second trace with the reference data should work fine
+		});
 
 		// TODO: can probably be in the same plot together with reference data
 
@@ -73,8 +111,12 @@ public class TripDashboard implements Dashboard {
 
 				viz.title = "Modal distance distribution";
 
-				// TODO: how to setup, each mode should be one trace ?
-				// difficult to create even with simple transformations
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Distance group").build())
+					.yAxis(Axis.builder().title("Share").build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+					.build();
+
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 					viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv")).mapping()
 						.name("main_mode")
@@ -121,6 +163,7 @@ public class TripDashboard implements Dashboard {
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
 					.name("purpose")
+					.colorRamp("Turbo")
 					.x("h")
 					.y("arrival")
 			);
@@ -140,6 +183,7 @@ public class TripDashboard implements Dashboard {
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
 					.name("purpose")
+					.colorRamp("Turbo")
 					.x("h")
 					.y("departure")
 			);

@@ -124,7 +124,7 @@ public class Plotly extends Viz {
 
 		Objects.requireNonNull(path, "Path argument can not be null");
 
-		String name = data.size() == 0 ? "dataset" : FilenameUtils.removeExtension(FilenameUtils.getName(path));
+		String name = data.size() == 0 ? "dataset" : FilenameUtils.removeExtension(FilenameUtils.getName(path)).replace("_", "");
 		DataSet ds = new DataSet(path, name);
 		data.add(ds);
 		return ds;
@@ -275,7 +275,6 @@ public class Plotly extends Viz {
 	 */
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> clean(Map<String, Object> object) {
-
 		Iterator<Map.Entry<String, Object>> it = object.entrySet().iterator();
 
 		Map<String, Object> copy = new LinkedHashMap<>();
@@ -293,6 +292,10 @@ public class Plotly extends Viz {
 			copy.put(e.getKey().toLowerCase(), e.getValue());
 			it.remove();
 		}
+
+		// Attributes that cause problems and should not be set
+		copy.remove("width");
+		copy.remove("height");
 
 		object.putAll(copy);
 		return object;
