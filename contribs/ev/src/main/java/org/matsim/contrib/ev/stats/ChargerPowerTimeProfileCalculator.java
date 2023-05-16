@@ -29,105 +29,81 @@ import java.util.*;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 
-public class ChargerPowerTimeProfileCalculator implements  ChargingStartEventHandler,ChargingEndEventHandler,
-		 MobsimAfterSimStepListener {
+public class ChargerPowerTimeProfileCalculator implements  ChargingStartEventHandler,ChargingEndEventHandler
+		  {
 
-	private Map<Id<Charger>, List<Double>> chargerProfiles;
+	private Map<Id<Charger>, double[]> chargerProfiles = new HashMap<>();
+	private Map<Id<Vehicle>,Double> chargingStartTime = new HashMap<>();
+	private Map<Id<Vehicle>,Double> chargingStartEnergy = new HashMap<>();
+
 	private final TimeDiscretizer timeDiscretizer;
-	private final ElectricFleet evFleet;
-	private final ChargingInfrastructure chargingInfrastructure;
-	private final MatsimServices matsimServices;
+	private final double qsimEndTime;
 	private final int chargeTimeStep;
 
 	@Inject
-	public ChargerPowerTimeProfileCalculator(ElectricFleet evFleet, ChargingInfrastructure chargingInfrastructure,
-											 MatsimServices matsimServices, Config config) {
-		this.evFleet = evFleet;
-		this.chargingInfrastructure = chargingInfrastructure;
-		this.matsimServices = matsimServices;
+	public ChargerPowerTimeProfileCalculator(Config config) {
 		chargeTimeStep = ConfigUtils.addOrGetModule(config, EvConfigGroup.class).chargeTimeStep;
-		double qsimEndTime = ConfigUtils.addOrGetModule(config, QSimConfigGroup.class).getEndTime().orElse(0.0);
+		qsimEndTime = ConfigUtils.addOrGetModule(config, QSimConfigGroup.class).getEndTime().orElse(0.0);
 		timeDiscretizer = new TimeDiscretizer((int)Math.ceil(qsimEndTime), chargeTimeStep);
 	}
-
-	private static final Map<Id<Charger>, Double> chargerEnergy = new HashMap<>();
 
 	private static final Map<Id<Charger>, List<Id<Vehicle>>> vehiclesAtCharger = new HashMap<>();
 	private static final Map<Id<Vehicle>, Double> vehiclesEnergyPreviousTimeStep = new HashMap<>();
 
-	//public static ProfileCalculator createChargerEnergyCalculator(final ChargingInfrastructure chargingInfrastructure) {
-	//	List<Charger> allChargers = new ArrayList<>(chargingInfrastructure.getChargers().values());
-
-	//	ImmutableList<String> header = allChargers.stream().map(charger -> charger.getId() + "").collect(toImmutableList());
-
-	//	return TimeProfiles.createProfileCalculator(header, () -> allChargers.stream()
-	//			.collect(toImmutableMap(charger -> charger.getId() + "",
-	//					charger -> chargerEnergy.getOrDefault(charger.getId(), 0.0)
-	//			)));
-	//}
 	private void normalizeProfile(double[] profile) {
 		for (int i = 0; i < profile.length; i++) {
 			profile[i] /= timeDiscretizer.getTimeInterval();
 		}
 	}
 	public Map<Id<Charger>, double[]> getChargerProfiles() {
-		Map<Id<Charger>,double[]> chargerProfilesArray = new HashMap<>();
-		this.chargerProfiles.forEach((chargerId, doubles) -> {
-			double[] doubleArray = doubles.stream().mapToDouble(Double::doubleValue).toArray();
-			chargerProfilesArray.put(chargerId,doubleArray);
-		});
-		chargerProfilesArray.values().forEach(this::normalizeProfile);
-		return chargerProfilesArray;
+//		Map<Id<Charger>,double[]> chargerProfilesArray = new HashMap<>();
+//		this.chargerProfiles.forEach((chargerId, doubles) -> {
+//			double[] doubleArray = doubles.stream().mapToDouble(Double::doubleValue).toArray();
+//			chargerProfilesArray.put(chargerId,doubleArray);
+//		});
+		chargerProfiles.values().forEach(this::normalizeProfile);
+		return chargerProfiles;
 	}
-//	@Override
-//	public MobsimListener get() {
-//		ProfileCalculator calc = createChargerEnergyCalculator(chargingInfrastructure);
-//		return new TimeProfileCollector(calc, 300, "individual_chargers_charge_time_profiles", matsimServices);
-//	}
 
 	@Override
 	public void handleEvent(ChargingStartEvent event) {
-		vehiclesEnergyPreviousTimeStep.put(event.getVehicleId(), event.getCharge());
-		List<Id<Vehicle>> presentVehicles = vehiclesAtCharger.get(event.getChargerId());
-		if (presentVehicles == null) {
-			ArrayList<Id<Vehicle>> firstVehicle = new ArrayList<>();
-			firstVehicle.add(event.getVehicleId());
-			vehiclesAtCharger.put(event.getChargerId(), firstVehicle);
-		} else {
-			presentVehicles.add(event.getVehicleId());
-			vehiclesAtCharger.put(event.getChargerId(), presentVehicles);
-		}
+//		vehiclesEnergyPreviousTimeStep.put(event.getVehicleId(), event.getCharge());
+//		List<Id<Vehicle>> presentVehicles = vehiclesAtCharger.get(event.getChargerId());
+//		if (presentVehicles == null) {
+//			ArrayList<Id<Vehicle>> firstVehicle = new ArrayList<>();
+//			firstVehicle.add(event.getVehicleId());
+//			vehiclesAtCharger.put(event.getChargerId(), firstVehicle);
+//		} else {
+//			presentVehicles.add(event.getVehicleId());
+//			vehiclesAtCharger.put(event.getChargerId(), presentVehicles);
+//		}
+		chargingStartTime.put(event.getVehicleId(),event.getTime());
+		chargingStartEnergy.put(event.getVehicleId(),EvUnits.J_to_kWh(event.getCharge()));
 	}
 
 	@Override
 	public void handleEvent(ChargingEndEvent event) {
-		List<Id<Vehicle>> presentVehicles = vehiclesAtCharger.get(event.getChargerId());
-		presentVehicles.remove(event.getVehicleId());
-		vehiclesEnergyPreviousTimeStep.remove(event.getVehicleId());
-		vehiclesAtCharger.put(event.getChargerId(), presentVehicles);
+//		List<Id<Vehicle>> presentVehicles = vehiclesAtCharger.get(event.getChargerId());
+//		presentVehicles.remove(event.getVehicleId());
+//		vehiclesEnergyPreviousTimeStep.remove(event.getVehicleId());
+//		vehiclesAtCharger.put(event.getChargerId(), presentVehicles);
+		double chargingTimeIn_h = (event.getTime() - chargingStartTime.get(event.getVehicleId()))/3600.0;
+		double averagePowerIn_kW = (EvUnits.J_to_kWh(event.getCharge())-chargingStartEnergy.get(event.getVehicleId()))/chargingTimeIn_h;
+		increment(averagePowerIn_kW,event.getChargerId(),chargingStartTime.get(event.getVehicleId()),event.getTime());
 	}
+	private void increment(double averagePower,Id<Charger> chargerId, double beginTime, double endTime){
+		if (beginTime == endTime && beginTime >= qsimEndTime) {
+			return;
+		}
+		endTime = Math.min(endTime, qsimEndTime);
 
+		int fromIdx = timeDiscretizer.getIdx(beginTime);
+		int toIdx = timeDiscretizer.getIdx(endTime);
 
-	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
-		if ((event.getSimulationTime() + 1) % chargeTimeStep == 0) {
-			vehiclesAtCharger.forEach((charger, vehicleList) -> {
-				List<Double> previousValues = chargerProfiles.get(charger);
-				if (!vehicleList.isEmpty()) {
-					double energy = vehicleList.stream().mapToDouble(vehicleId -> EvUnits.J_to_kWh((Objects.requireNonNull(evFleet.getElectricVehicles().get(vehicleId)).getBattery()
-							.getCharge() - vehiclesEnergyPreviousTimeStep.get(vehicleId)) * (3600.0 / chargeTimeStep))).sum();
-					if (!Double.isNaN(energy) && !(energy == 0.0)) {
-						previousValues.add(energy);
-						chargerProfiles.put(charger, previousValues);
-						vehicleList.forEach(vehicleId -> vehiclesEnergyPreviousTimeStep.put(vehicleId, Objects.requireNonNull(evFleet.getElectricVehicles().get(vehicleId)).getBattery().getCharge()));
-					} else {
-						previousValues.add(0.0);
-						chargerProfiles.put(charger, previousValues);
-					}
-				} else {
-					previousValues.add(0.0);
-					chargerProfiles.put(charger,previousValues);
-				}
-			});
+		for (int i = fromIdx; i < toIdx; i++) {
+			double[] chargingVector = chargerProfiles.get(chargerId);
+			chargingVector[i] += averagePower;
+			chargerProfiles.put(chargerId,chargingVector);
 		}
 	}
 

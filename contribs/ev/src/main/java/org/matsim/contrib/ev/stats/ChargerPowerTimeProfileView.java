@@ -14,15 +14,9 @@ import one.util.streamex.EntryStream;
 
 public class ChargerPowerTimeProfileView implements ProfileWriter.ProfileView {
 	private final ChargerPowerTimeProfileCalculator calculator;
-	private final Comparator<Id<Charger>> comparator;
 
-	private final Map<String, Paint> seriesPaints;
-
-	public ChargerPowerTimeProfileView(ChargerPowerTimeProfileCalculator calculator, Comparator<Id<Charger>> comparator,
-									   Map<Id<Charger>, Paint> chargerPaint) {
+	public ChargerPowerTimeProfileView(ChargerPowerTimeProfileCalculator calculator) {
 		this.calculator = calculator;
-		this.comparator = comparator;
-		seriesPaints = EntryStream.of(chargerPaint).mapKeys(Id<Charger>::toString).toMap();
 
 	}
 	@Override
@@ -35,14 +29,14 @@ public class ChargerPowerTimeProfileView implements ProfileWriter.ProfileView {
 		return calculator.getChargerProfiles()
 				.entrySet()
 				.stream()
-				.sorted(Map.Entry.comparingByKey(comparator))
+				.sorted(Map.Entry.comparingByKey(Id::compareTo))
 				.map(e -> Pair.of(e.getKey().toString(), e.getValue()))
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	@Override
 	public Map<String, Paint> seriesPaints() {
-		return seriesPaints;
+		return Map.of();
 	}
 
 
