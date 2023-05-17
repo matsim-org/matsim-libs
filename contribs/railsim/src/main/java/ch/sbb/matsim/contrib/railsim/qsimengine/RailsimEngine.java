@@ -3,6 +3,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -223,6 +224,11 @@ final class RailsimEngine implements Steppable {
 
 		updatePosition(time, event);
 
+		// On route departure the head link is null
+		if (state.headLink != null) {
+			eventsManager.processEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
+		}
+
 		// Get link and increment
 		state.headPosition = 0;
 		state.headLink = state.route.get(state.routeIdx++).getLinkId();
@@ -288,8 +294,9 @@ final class RailsimEngine implements Steppable {
 		state.tailLink = link.getLinkId();
 		state.tailPosition = link.length + state.train.length();
 
-		eventsManager.processEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.tailLink));
+		eventsManager.processEvent(new RailsimTrainLeavesLinkEvent(time, state.driver.getVehicle().getId(), state.tailLink));
 
+		// TODO: link is released after headway time
 		int track = link.releaseTrack(state.driver);
 		eventsManager.processEvent(new RailsimLinkStateChangeEvent(time, state.tailLink, state.driver.getVehicle().getId(),
 			TrackState.FREE, track));
