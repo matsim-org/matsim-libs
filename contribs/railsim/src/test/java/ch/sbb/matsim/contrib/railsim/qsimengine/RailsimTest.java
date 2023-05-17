@@ -92,6 +92,25 @@ public class RailsimTest {
 	}
 
 	public record Holder(RailsimEngine engine, Network network) {
+
+		/**
+		 * Step at one second until time is reached.
+		 */
+		public void doSimStepUntil(double time) {
+			for (double t = 0; t < time; t++) {
+				engine().doSimStep(t);
+			}
+		}
+
+		/**
+		 * Call state updates until time is reached with fixed interval.
+		 */
+		public void doStateUpdatesUntil(double time, double interval) {
+
+			for (double t = 0; t < time; t += interval) {
+				engine().updateAllStates(t);
+			}
+		}
 	}
 
 	/**

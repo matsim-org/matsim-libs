@@ -42,28 +42,24 @@ public class RailsimEngineTest {
 	public void simple() {
 
 		RailsimTest.Holder test = getTestEngine("network0.xml");
-		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l4-5");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l5-6");
 
-		for (int i = 0; i < 400; i++) {
-			test.engine().doSimStep(i);
-		}
+		test.doSimStepUntil(400);
 
 		RailsimTest.assertThat(collector)
 			.hasSizeGreaterThan(5)
-			.hasTrainState("train", 169, 500, 44)
-			.hasTrainState("train", 319.818181481007, 200, 0);
+			.hasTrainState("train", 148, 0, 20)
+			.hasTrainState("train", 188, 200, 0);
 
 		test = getTestEngine("network0.xml");
-		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l4-5");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l5-6");
 
-		for (int i = 0; i < 400; i++) {
-			test.engine().updateAllStates(i);
-		}
+		test.doStateUpdatesUntil(400, 1);
 
 		RailsimTest.assertThat(collector)
 			.hasSizeGreaterThan(5)
-			.hasTrainState("train", 169, 500, 44)
-			.hasTrainState("train", 319.818181481007, 200, 0);
+			.hasTrainState("train", 148, 0, 20)
+			.hasTrainState("train", 188, 200, 0);
 
 	}
 
@@ -72,8 +68,10 @@ public class RailsimEngineTest {
 
 		RailsimTest.Holder test = getTestEngine("network0.xml");
 
-		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l4-5");
-		RailsimTest.createDeparture(test, TestVehicle.Sprinter, "train", 120, "l1-2", "l4-5");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "regio", 0, "l1-2", "l5-6");
+		RailsimTest.createDeparture(test, TestVehicle.Sprinter, "sprinter", 60, "l1-2", "l5-6");
+
+		test.doSimStepUntil(400);
 
 	}
 
@@ -83,9 +81,10 @@ public class RailsimEngineTest {
 
 		RailsimTest.Holder test = getTestEngine("network0.xml");
 
-		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l4-5");
-		RailsimTest.createDeparture(test, TestVehicle.Regio, "train", 0, "l4-5", "l1-2");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "regio1", 0, "l1-2", "l5-6");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l6-5", "l2-1");
 
+		test.doSimStepUntil(400);
 
 	}
 }
