@@ -8,10 +8,10 @@ import org.matsim.simwrapper.viz.Plotly;
 import org.matsim.simwrapper.viz.Table;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
-import tech.tablesaw.plotly.traces.PieTrace;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Shows trip information, optionally against reference data.
@@ -51,15 +51,12 @@ public class TripDashboard implements Dashboard {
 	}
 
 	/**
-	 * Only include agents that match this id. See {@link TripAnalysis}.
+	 * Set argument that will be passed to the analysis script. See {@link TripAnalysis}.
 	 */
-	public TripDashboard setMatchAgentId(String pattern) {
-		// TODO: needs to be changed if there are more args
-		args = new String[]{"--match-id", pattern};
+	public TripDashboard setAnalysisArgs(String... args) {
+		this.args = args;
 		return this;
 	}
-
-	// TODO: dist groups configurable
 
 	@Override
 	public void configure(Header header, Layout layout) {
@@ -100,8 +97,6 @@ public class TripDashboard implements Dashboard {
 			viz.title = "Trip distance distribution";
 			viz.colorRamp = Plotly.ColorScheme.Viridis;
 
-			// TODO: some color as static fields
-
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
 				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
 					.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
@@ -111,7 +106,6 @@ public class TripDashboard implements Dashboard {
 			);
 
 			if (modeShareRefCsv != null) {
-
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Reference").build(),
 					viz.addDataset(data.resource(modeShareRefCsv))
 						.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
@@ -119,13 +113,8 @@ public class TripDashboard implements Dashboard {
 						.x("dist_group")
 						.y("share")
 				);
-
 			}
-
-				// TODO: second trace with the reference data should work fine
 		});
-
-		// TODO: can probably be in the same plot together with reference data
 
 		layout.row("second")
 			.el(Table.class, (viz, data) -> {
@@ -144,19 +133,31 @@ public class TripDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 
+				Plotly.DataSet sim = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv"))
+					.constant("source", "Sim");
+
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv")).mapping()
+					sim.mapping()
 						.name("main_mode")
 						.x("dist_group")
 						.y("share")
 				);
+
+				if (modeShareDistRefCsv != null) {
+
+					Plotly.DataSet ref = viz.addDataset(data.resource(modeShareDistRefCsv))
+						.constant("source", "Ref");
+
+					viz.multiIndex = Map.of("dist_group", "source");
+					viz.mergeDatasets = true;
+				}
 
 			});
 
 		layout.row("third")
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Population statistics";
-				viz.description = "over all simulated persons (not scaled by sample size)";
+				viz.description = "over simulated persons (not scaled by sample size)";
 				viz.showAllRows = true;
 				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
 			})
@@ -167,12 +168,21 @@ public class TripDashboard implements Dashboard {
 				viz.width = 2d;
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_users.csv"));
-
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
 					.x("main_mode")
 					.y("user")
 					.name("main_mode")
 				);
+
+				if (modeUsersRefCsv != null) {
+					ds.constant("source", "sim");
+
+					viz.addDataset(data.resource(modeUsersRefCsv))
+						.constant("source", "ref");
+
+					viz.multiIndex = Map.of("main_mode", "source");
+					viz.mergeDatasets = true;
+				}
 
 			});
 

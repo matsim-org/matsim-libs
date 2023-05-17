@@ -55,6 +55,13 @@ public class Plotly extends Viz {
 	 * Merge all given datasets into one.
 	 */
 	public Boolean mergeDatasets;
+
+	/**
+	 * Merge two column as index. Column name as key will be merged with the column name value.
+	 * This allows to build level multi indices for certain plot types.
+	 */
+	public Map<String, String> multiIndex;
+
 	@JsonIgnore
 	private List<Trace> traces = new ArrayList<>();
 	@JsonIgnore
@@ -365,18 +372,6 @@ public class Plotly extends Viz {
 				"namesTo", namesTo,
 				"valuesTo", valuesTo
 			);
-			return this;
-		}
-
-		/**
-		 * Take all entries y from {@code withColumn} and merge them into tuples (x,y) in {@code columnName}
-		 * This is useful for multi indices.
-		 *
-		 * @param columnName merge column
-		 * @param withColumn column that is merged onto the first
-		 */
-		public DataSet merge(String columnName, String withColumn) {
-
 			return this;
 		}
 
