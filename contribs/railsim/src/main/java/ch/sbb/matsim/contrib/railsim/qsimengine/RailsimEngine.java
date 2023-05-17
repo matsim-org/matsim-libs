@@ -441,7 +441,7 @@ final class RailsimEngine implements Steppable {
 
 			// The required distance is reached during acceleration
 			if (d > dist) {
-				return solveTraveledDist(state.speed, d, state.acceleration);
+				return solveTraveledDist(state.speed, dist, state.acceleration);
 
 			} else
 				// Time for accel plus remaining dist at max speed
