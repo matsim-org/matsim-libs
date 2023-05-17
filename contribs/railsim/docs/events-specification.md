@@ -2,15 +2,7 @@
 
 railsim introduces additional, custom events. This document describes these event types.
 
-==Note:== I'm not sure we really need this. I was inspired by the fact that the prototype
-has custom events like `trainPathEntersLinkEvent`, `trainEntersLinkEvent` and `trainLeavesLinkEvent`.
-Thus the following event types are currently **to be discussed**.
-
-==To Discuss:== should all event types start with `railsim`?
-
-(ik, mu): We do not insist on an additional trainPathEntersLink events. The combination of `vehicleEntersLinkEvent` plus
-`TrainLeavesLinkEvent` and `railsimLinkStateChangeEvent` should be fine.
-Cosmetic suggestion: A `trainEntersLinkEvent` instead of a default MATSim `vehicleEntersLinkEvent` would be helpful.
+All the additional events use the prefix `railsim`.
 
 ## Event Types
 
@@ -31,6 +23,9 @@ Similar to the existing `trainLeavesLinkEvent`.
 One could argue that setting the link state to `free` would imply the same. I (mr) would still
 say it makes sense to have it separate, because depending on the implementation, a link could
 remain blocked for a longer time even if the train has already passed (e.g. minimum headway time).
+
+There is **no** railsimTrainEntersLinkEvent. The regular `LinkEnterEvent` is used to provide the highest
+compatibility with existing analysis and visualization tools.
 
 ### railsimTrainStateEvent
 
