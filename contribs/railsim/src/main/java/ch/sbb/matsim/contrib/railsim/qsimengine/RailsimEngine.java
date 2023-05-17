@@ -43,6 +43,8 @@ final class RailsimEngine implements Steppable {
 
 	private final Queue<UpdateEvent> updateQueue = new PriorityQueue<>();
 
+	private final TrackReservationStrategy reservation;
+
 	public RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, Map<Id<Link>, ? extends Link> network) {
 		this.eventsManager = eventsManager;
 		this.config = config;
@@ -59,6 +61,8 @@ final class RailsimEngine implements Steppable {
 				this.links.put(e.getKey(), new RailLink(e.getValue(), opposite));
 			}
 		}
+
+		this.reservation = new ReservationAtLatestChance();
 	}
 
 	@Override
@@ -197,12 +201,8 @@ final class RailsimEngine implements Steppable {
 		TrainState state = event.state;
 		state.timestamp = time;
 
-		RailLink firstLink = state.route.get(0);
-
 		// for departure only the track has to be free and no tracks in advance
-		if (firstLink.hasFreeTrack()) {
-
-			reserveLinkTracks(time, 0, state);
+		if (reserveLinkTracks(time, 0, state)) {
 
 			state.timestamp = time;
 
@@ -219,29 +219,17 @@ final class RailsimEngine implements Steppable {
 	 */
 	private boolean reserveLinkTracks(double time, int idx, TrainState state) {
 
-		double stopTime = state.targetSpeed / state.train.deceleration();
-		// safety distance
-		double safety = calcTraveledDist(state.targetSpeed, stopTime, -state.train.deceleration());
+		List<RailLink> links = reservation.retrieveLinksToReserve(time, idx, state);
 
-		double reserved = 0;
+		// All links must be able to be reserved
+		if (!links.stream().allMatch(RailLink::hasFreeTrack))
+			return false;
 
-
-		// TODO: could reserve some links or no links at all if only some can not be reserved
-
-		do {
-			RailLink nextLink = state.route.get(idx++);
-			int track = nextLink.reserveTrack(state.driver);
-
-			if (track > -1) {
-				reserved += nextLink.length;
-				eventsManager.processEvent(new RailsimLinkStateChangeEvent(time, nextLink.getLinkId(),
-					state.driver.getVehicle().getId(), TrackState.RESERVED, track));
-
-			} else {
-				return false;
-			}
-
-		} while (reserved < safety && idx < state.route.size());
+		for (RailLink link : links) {
+			int track = link.reserveTrack(state.driver);
+			eventsManager.processEvent(new RailsimLinkStateChangeEvent(time, link.getLinkId(),
+				state.driver.getVehicle().getId(), TrackState.RESERVED, track));
+		}
 
 		return true;
 	}
@@ -352,11 +340,11 @@ final class RailsimEngine implements Steppable {
 		} else if (accelTime < elapsed) {
 
 			// Travelled distance under constant acceleration
-			dist = calcTraveledDist(state.speed, accelTime, state.acceleration);
+			dist = RailsimCalc.calcTraveledDist(state.speed, accelTime, state.acceleration);
 
 			// Remaining time at constant speed
 			if (state.acceleration > 0)
-				dist += calcTraveledDist(state.targetSpeed, elapsed - accelTime, 0);
+				dist += RailsimCalc.calcTraveledDist(state.targetSpeed, elapsed - accelTime, 0);
 
 			// Target speed was reached
 			state.speed = state.targetSpeed;
@@ -365,7 +353,7 @@ final class RailsimEngine implements Steppable {
 		} else {
 
 			// Acceleration was constant the whole time
-			dist = calcTraveledDist(state.speed, elapsed, state.acceleration);
+			dist = RailsimCalc.calcTraveledDist(state.speed, elapsed, state.acceleration);
 			state.speed = state.speed + elapsed * state.acceleration;
 
 		}
@@ -395,7 +383,7 @@ final class RailsimEngine implements Steppable {
 		double accelDist = Double.POSITIVE_INFINITY;
 		if (state.acceleration > 0 && state.targetSpeed > state.speed) {
 
-			accelDist = calcTraveledDist(state.speed, (state.targetSpeed - state.speed) / state.acceleration, state.acceleration);
+			accelDist = RailsimCalc.calcTraveledDist(state.speed, (state.targetSpeed - state.speed) / state.acceleration, state.acceleration);
 		}
 
 		// (2) start deceleration
@@ -405,16 +393,8 @@ final class RailsimEngine implements Steppable {
 
 		// (3) next link needs reservation
 		double reserveDist = Double.POSITIVE_INFINITY;
-		if (!state.isRouteAtEnd() && !state.route.get(state.routeIdx).isReserved(state.driver)) {
-			// time needed for full stop
-			double stopTime = state.allowedMaxSpeed / state.train.deceleration();
-
-			assert stopTime > 0 : "Stop time can not be negative";
-
-			// Distance for full stop
-			double safetyDist = calcTraveledDist(state.allowedMaxSpeed, stopTime, -state.train.deceleration());
-
-			reserveDist = currentLink.length - safetyDist - state.headPosition;
+		if (!state.isRouteAtEnd()) {
+			reserveDist = reservation.nextUpdate(currentLink, state);
 		}
 
 		// (4) tail link changes
@@ -448,62 +428,9 @@ final class RailsimEngine implements Steppable {
 		assert FuzzyUtils.greaterEqualThan(dist, 0) : "Distance for next update must be positive";
 
 		// dist is the minimum of all supplied distances
-		event.plannedTime = time + calcRequiredTime(state, dist);
+		event.plannedTime = time + RailsimCalc.calcRequiredTime(state, dist);
 	}
 
-	/**
-	 * Calculate time needed to advance distance {@code dist}. Depending on acceleration and max speed.
-	 */
-	private static double calcRequiredTime(TrainState state, double dist) {
-
-		if (state.acceleration == 0)
-			return state.speed == 0 ? Double.POSITIVE_INFINITY : dist / state.speed;
-
-		if (state.acceleration > 0) {
-
-			double accelTime = (state.targetSpeed - state.speed) / state.acceleration;
-
-			double d = calcTraveledDist(state.speed, accelTime, state.acceleration);
-
-			// The required distance is reached during acceleration
-			if (d > dist) {
-				return solveTraveledDist(state.speed, dist, state.acceleration);
-
-			} else
-				// Time for accel plus remaining dist at max speed
-				return accelTime + (dist - d) / state.targetSpeed;
-
-		} else {
-
-			double deccelTime = -(state.speed - state.targetSpeed) / state.acceleration;
-
-			// max distance that can be reached
-			double max = calcTraveledDist(state.speed, deccelTime, state.acceleration);
-
-			if (dist < max) {
-				return solveTraveledDist(state.speed, dist, state.acceleration);
-			} else
-				return deccelTime;
-		}
-	}
-
-
-	/**
-	 * Calculate traveled distance given initial speed and constant acceleration.
-	 */
-	static double calcTraveledDist(double speed, double elapsedTime, double acceleration) {
-		return speed * elapsedTime + (elapsedTime * elapsedTime * acceleration / 2);
-	}
-
-	/**
-	 * Inverse of {@link #calcTraveledDist(double, double, double)}, solves for distance.
-	 */
-	static double solveTraveledDist(double speed, double dist, double acceleration) {
-		if (acceleration == 0)
-			return dist / speed;
-
-		return (Math.sqrt(2 * acceleration * dist + speed * speed) - speed) / acceleration;
-	}
 
 	/**
 	 * Calc when deceleration needs to start.
@@ -520,7 +447,7 @@ final class RailsimEngine implements Steppable {
 		double assumedSpeed = state.speed;
 
 		// Lookahead window
-		double window = calcTraveledDist(assumedSpeed, assumedSpeed / state.train.deceleration(),
+		double window = RailsimCalc.calcTraveledDist(assumedSpeed, assumedSpeed / state.train.deceleration(),
 			-state.train.deceleration()) + links.get(state.headLink).length;
 
 		// Distance to the next speed change point (link)
@@ -542,7 +469,7 @@ final class RailsimEngine implements Steppable {
 
 			if (allowed < assumedSpeed) {
 				double timeDeccel = (assumedSpeed - allowed) / state.train.deceleration();
-				double newDeccelDist = calcTraveledDist(assumedSpeed, timeDeccel, -state.train.deceleration());
+				double newDeccelDist = RailsimCalc.calcTraveledDist(assumedSpeed, timeDeccel, -state.train.deceleration());
 
 				if ((dist - newDeccelDist) < deccelDist) {
 					deccelDist = dist - newDeccelDist;
