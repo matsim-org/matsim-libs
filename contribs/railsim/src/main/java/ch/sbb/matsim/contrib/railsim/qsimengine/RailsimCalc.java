@@ -60,4 +60,60 @@ public class RailsimCalc {
 				return deccelTime;
 		}
 	}
+
+	/**
+	 * Calc the distance deceleration needs to start and the target speed.
+	 */
+	static double calcDeccelDistanceAndSpeed(RailLink currentLink, UpdateEvent event) {
+
+		// TODO: ignores acceleration that happens
+
+		TrainState state = event.state;
+
+		if (state.speed == 0)
+			return Double.POSITIVE_INFINITY;
+
+		double assumedSpeed = state.speed;
+
+		// Lookahead window
+		double window = RailsimCalc.calcTraveledDist(assumedSpeed, assumedSpeed / state.train.deceleration(),
+			-state.train.deceleration()) + currentLink.length;
+
+		// Distance to the next speed change point (link)
+		double dist = currentLink.length - state.headPosition;
+
+		double deccelDist = Double.POSITIVE_INFINITY;
+		double speed = 0;
+
+		for (int i = state.routeIdx; i < state.route.size(); i++) {
+
+			RailLink link = state.route.get(i);
+			double allowed;
+			// Last track where train comes to halt
+			if (i == state.route.size() - 1)
+				allowed = 0;
+			else {
+				allowed = link.getAllowedFreespeed(state.driver);
+			}
+
+			if (allowed < assumedSpeed) {
+				double timeDeccel = (assumedSpeed - allowed) / state.train.deceleration();
+				double newDeccelDist = RailsimCalc.calcTraveledDist(assumedSpeed, timeDeccel, -state.train.deceleration());
+
+				if ((dist - newDeccelDist) < deccelDist) {
+					deccelDist = dist - newDeccelDist;
+					speed = allowed;
+				}
+			}
+
+			dist += link.length;
+
+			// don't need to look further than distance needed for full stop
+			if (dist >= window)
+				break;
+		}
+
+		event.newSpeed = speed;
+		return deccelDist;
+	}
 }

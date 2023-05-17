@@ -18,6 +18,6 @@ public interface TrackReservationStrategy {
 	double nextUpdate(RailLink currentLink, TrainState state);
 
 
-	List<RailLink> retrieveLinksToReserve(double time, int idx, TrainState state) ;
+	List<RailLink> retrieveLinksToReserve(double time, UpdateEvent.Type type, int idx, TrainState state) ;
 
 }

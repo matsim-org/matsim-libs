@@ -68,8 +68,8 @@ public class RailsimEngineTest {
 
 		RailsimTest.Holder test = getTestEngine("network0.xml");
 
-		RailsimTest.createDeparture(test, TestVehicle.Regio, "regio", 0, "l1-2", "l5-6");
-		RailsimTest.createDeparture(test, TestVehicle.Sprinter, "sprinter", 60, "l1-2", "l5-6");
+		RailsimTest.createDeparture(test, TestVehicle.Cargo, "cargo", 0, "l1-2", "l5-6");
+		RailsimTest.createDeparture(test, TestVehicle.Regio, "regio", 60, "l1-2", "l5-6");
 
 		test.doSimStepUntil(400);
 

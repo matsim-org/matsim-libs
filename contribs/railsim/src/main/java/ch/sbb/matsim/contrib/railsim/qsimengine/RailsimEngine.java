@@ -151,6 +151,10 @@ final class RailsimEngine implements Steppable {
 		else if (state.targetSpeed > state.speed)
 			state.acceleration = state.train.acceleration();
 
+		// Remove update information
+		// TODO: check if needed or not
+		// event.newSpeed = -1;
+
 		eventsManager.processEvent(state.asEvent(time));
 
 		decideNextUpdate(time, event);
@@ -162,9 +166,7 @@ final class RailsimEngine implements Steppable {
 
 		updatePosition(time, event);
 
-		// TODO: reservation strategy might be put behind interface
-
-		if (!reserveLinkTracks(time, state.routeIdx, state)) {
+		if (!reserveLinkTracks(time, event.type, state.routeIdx, state)) {
 			// Break when reservation is not possible
 			state.targetSpeed = 0;
 			state.acceleration = -state.train.deceleration();
@@ -179,7 +181,7 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 
-		if (reserveLinkTracks(time, state.routeIdx, state)) {
+		if (reserveLinkTracks(time, event.type, state.routeIdx, state)) {
 
 			// TODO: maximum speed could be lower
 			// see enterLink as well
@@ -202,7 +204,7 @@ final class RailsimEngine implements Steppable {
 		state.timestamp = time;
 
 		// for departure only the track has to be free and no tracks in advance
-		if (reserveLinkTracks(time, 0, state)) {
+		if (reserveLinkTracks(time, event.type, 0, state)) {
 
 			state.timestamp = time;
 
@@ -217,9 +219,9 @@ final class RailsimEngine implements Steppable {
 	/**
 	 * Reserve links in advance as necessary.
 	 */
-	private boolean reserveLinkTracks(double time, int idx, TrainState state) {
+	private boolean reserveLinkTracks(double time, UpdateEvent.Type type, int idx, TrainState state) {
 
-		List<RailLink> links = reservation.retrieveLinksToReserve(time, idx, state);
+		List<RailLink> links = reservation.retrieveLinksToReserve(time, type, idx, state);
 
 		// All links must be able to be reserved
 		if (!links.stream().allMatch(RailLink::hasFreeTrack))
@@ -279,7 +281,7 @@ final class RailsimEngine implements Steppable {
 			TrackState.BLOCKED, track));
 
 		// TODO: this probably needs to be a separate function to calculate possible target speed more accurately
-		if (calcDeccelDistance(event) == Double.POSITIVE_INFINITY) {
+		if (RailsimCalc.calcDeccelDistanceAndSpeed(link, event) == Double.POSITIVE_INFINITY) {
 			state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
 			state.targetSpeed = state.allowedMaxSpeed;
 			state.acceleration = state.train.acceleration();
@@ -382,12 +384,13 @@ final class RailsimEngine implements Steppable {
 		// (1) max speed reached
 		double accelDist = Double.POSITIVE_INFINITY;
 		if (state.acceleration > 0 && state.targetSpeed > state.speed) {
-
 			accelDist = RailsimCalc.calcTraveledDist(state.speed, (state.targetSpeed - state.speed) / state.acceleration, state.acceleration);
 		}
 
 		// (2) start deceleration
-		double deccelDist = event.newSpeed == state.targetSpeed ? Double.POSITIVE_INFINITY : calcDeccelDistance(event);
+		double deccelDist = (event.newSpeed == state.targetSpeed) ?
+			Double.POSITIVE_INFINITY :
+			RailsimCalc.calcDeccelDistanceAndSpeed(currentLink, event);
 
 		assert FuzzyUtils.greaterEqualThan(deccelDist, 0) : "Deceleration distance must be larger than 0";
 
@@ -431,62 +434,6 @@ final class RailsimEngine implements Steppable {
 		event.plannedTime = time + RailsimCalc.calcRequiredTime(state, dist);
 	}
 
-
-	/**
-	 * Calc when deceleration needs to start.
-	 */
-	private double calcDeccelDistance(UpdateEvent event) {
-
-		// TODO: pure calculations without updates can probably be put into separate classes
-
-		TrainState state = event.state;
-
-		if (state.speed == 0)
-			return Double.POSITIVE_INFINITY;
-
-		double assumedSpeed = state.speed;
-
-		// Lookahead window
-		double window = RailsimCalc.calcTraveledDist(assumedSpeed, assumedSpeed / state.train.deceleration(),
-			-state.train.deceleration()) + links.get(state.headLink).length;
-
-		// Distance to the next speed change point (link)
-		double dist = links.get(state.headLink).length - state.headPosition;
-
-		double deccelDist = Double.POSITIVE_INFINITY;
-		double speed = 0;
-
-		for (int i = state.routeIdx; i < state.route.size(); i++) {
-
-			RailLink link = state.route.get(i);
-			double allowed;
-			// Last track where train comes to halt
-			if (i == state.route.size() - 1)
-				allowed = 0;
-			else {
-				allowed = link.getAllowedFreespeed(state.driver);
-			}
-
-			if (allowed < assumedSpeed) {
-				double timeDeccel = (assumedSpeed - allowed) / state.train.deceleration();
-				double newDeccelDist = RailsimCalc.calcTraveledDist(assumedSpeed, timeDeccel, -state.train.deceleration());
-
-				if ((dist - newDeccelDist) < deccelDist) {
-					deccelDist = dist - newDeccelDist;
-					speed = allowed;
-				}
-			}
-
-			dist += link.length;
-
-			// don't need to look further than distance needed for full stop
-			if (dist >= window)
-				break;
-		}
-
-		event.newSpeed = speed;
-		return deccelDist;
-	}
 
 	/**
 	 * Allowed speed for the train.

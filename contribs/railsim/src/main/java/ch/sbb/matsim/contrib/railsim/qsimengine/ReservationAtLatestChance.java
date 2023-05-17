@@ -1,8 +1,5 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
-
-import javax.measure.quantity.Pressure;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,13 +26,15 @@ public class ReservationAtLatestChance implements TrackReservationStrategy {
 	}
 
 	@Override
-	public List<RailLink> retrieveLinksToReserve(double time, int idx, TrainState state) {
+	public List<RailLink> retrieveLinksToReserve(double time, UpdateEvent.Type type, int idx, TrainState state) {
 
 		List<RailLink> result = new ArrayList<>();
 
-		double stopTime = state.targetSpeed / state.train.deceleration();
+		double assumedSpeed = type == UpdateEvent.Type.DEPARTURE ? state.train.maxVelocity() : state.targetSpeed;
+
+		double stopTime = assumedSpeed / state.train.deceleration();
 		// safety distance
-		double safety = RailsimCalc.calcTraveledDist(state.targetSpeed, stopTime, -state.train.deceleration());
+		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration());
 
 		double reserved = 0;
 
