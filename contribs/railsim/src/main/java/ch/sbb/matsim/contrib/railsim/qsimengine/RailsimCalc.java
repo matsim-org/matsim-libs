@@ -25,6 +25,11 @@ public class RailsimCalc {
 		return (Math.sqrt(2 * acceleration * dist + speed * speed) - speed) / acceleration;
 	}
 
+	static double solveOptimalSpeed(double dist, double acceleration, double deceleration,
+									double currentSpeed, double targetSpeed) {
+		return 0;
+	}
+
 	/**
 	 * Calculate time needed to advance distance {@code dist}. Depending on acceleration and max speed.
 	 */
@@ -49,22 +54,22 @@ public class RailsimCalc {
 
 		} else {
 
-			double deccelTime = -(state.speed - state.targetSpeed) / state.acceleration;
+			double decelTime = -(state.speed - state.targetSpeed) / state.acceleration;
 
 			// max distance that can be reached
-			double max = calcTraveledDist(state.speed, deccelTime, state.acceleration);
+			double max = calcTraveledDist(state.speed, decelTime, state.acceleration);
 
 			if (dist < max) {
 				return solveTraveledDist(state.speed, dist, state.acceleration);
 			} else
-				return deccelTime;
+				return decelTime;
 		}
 	}
 
 	/**
 	 * Calc the distance deceleration needs to start and the target speed.
 	 */
-	static double calcDeccelDistanceAndSpeed(RailLink currentLink, UpdateEvent event) {
+	static double calcDecelDistanceAndSpeed(RailLink currentLink, UpdateEvent event) {
 
 		// TODO: ignores acceleration that happens
 

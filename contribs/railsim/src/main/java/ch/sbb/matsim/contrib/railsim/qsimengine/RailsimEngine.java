@@ -181,11 +181,9 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 
-		// TODO: May not be needed
-		updatePosition(time, event);
-
 		if (reserveLinkTracks(time, event.type, state.routeIdx, state)) {
 
+			updatePosition(time, event);
 			// TODO: maximum speed could be lower
 			// see enterLink as well
 
@@ -261,7 +259,7 @@ final class RailsimEngine implements Steppable {
 		if (state.isRouteAtEnd()) {
 
 			// TODO: comment back in later
-//			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end but was " + state.speed;
+			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end but was " + state.speed;
 
 			// Free all reservations
 			for (RailLink link : state.route) {
@@ -297,7 +295,7 @@ final class RailsimEngine implements Steppable {
 			TrackState.BLOCKED, track));
 
 		// TODO: this probably needs to be a separate function to calculate possible target speed more accurately
-		if (RailsimCalc.calcDeccelDistanceAndSpeed(link, event) == Double.POSITIVE_INFINITY) {
+		if (RailsimCalc.calcDecelDistanceAndSpeed(link, event) == Double.POSITIVE_INFINITY) {
 			state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
 			state.targetSpeed = state.allowedMaxSpeed;
 			state.acceleration = state.train.acceleration();
@@ -404,11 +402,11 @@ final class RailsimEngine implements Steppable {
 		}
 
 		// (2) start deceleration
-		double deccelDist = (event.newSpeed == state.targetSpeed) ?
+		double decelDist = (event.newSpeed == state.targetSpeed) ?
 			Double.POSITIVE_INFINITY :
-			RailsimCalc.calcDeccelDistanceAndSpeed(currentLink, event);
+			RailsimCalc.calcDecelDistanceAndSpeed(currentLink, event);
 
-		assert FuzzyUtils.greaterEqualThan(deccelDist, 0) : "Deceleration distance must be larger than 0";
+		assert FuzzyUtils.greaterEqualThan(decelDist, 0) : "Deceleration distance must be larger than 0";
 
 		// (3) next link needs reservation
 		double reserveDist = Double.POSITIVE_INFINITY;
@@ -430,16 +428,16 @@ final class RailsimEngine implements Steppable {
 		// Find the earliest required update
 
 		double dist;
-		if (accelDist <= deccelDist && accelDist <= reserveDist && accelDist <= tailDist && accelDist <= headDist) {
+		if (accelDist <= decelDist && accelDist <= reserveDist && accelDist <= tailDist && accelDist <= headDist) {
 			dist = accelDist;
 			event.type = UpdateEvent.Type.POSITION;
-		} else if (deccelDist <= accelDist && deccelDist <= reserveDist && deccelDist <= tailDist && deccelDist <= headDist) {
-			dist = deccelDist;
+		} else if (decelDist <= accelDist && decelDist <= reserveDist && decelDist <= tailDist && decelDist <= headDist) {
+			dist = decelDist;
 			event.type = UpdateEvent.Type.SPEED_CHANGE;
-		} else if (reserveDist <= accelDist && reserveDist <= deccelDist && reserveDist <= tailDist && reserveDist <= headDist) {
+		} else if (reserveDist <= accelDist && reserveDist <= decelDist && reserveDist <= tailDist && reserveDist <= headDist) {
 			dist = reserveDist;
 			event.type = UpdateEvent.Type.TRACK_RESERVATION;
-		} else if (tailDist <= deccelDist && tailDist <= reserveDist && tailDist <= headDist) {
+		} else if (tailDist <= decelDist && tailDist <= reserveDist && tailDist <= headDist) {
 			dist = tailDist;
 			event.type = UpdateEvent.Type.LEAVE_LINK;
 		} else {

@@ -42,7 +42,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
