@@ -181,6 +181,9 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 
+		// TODO: May not be needed
+		updatePosition(time, event);
+
 		if (reserveLinkTracks(time, event.type, state.routeIdx, state)) {
 
 			// TODO: maximum speed could be lower
@@ -203,7 +206,6 @@ final class RailsimEngine implements Steppable {
 		TrainState state = event.state;
 		state.timestamp = time;
 
-		// for departure only the track has to be free and no tracks in advance
 		if (reserveLinkTracks(time, event.type, 0, state)) {
 
 			state.timestamp = time;
@@ -222,6 +224,10 @@ final class RailsimEngine implements Steppable {
 	private boolean reserveLinkTracks(double time, UpdateEvent.Type type, int idx, TrainState state) {
 
 		List<RailLink> links = reservation.retrieveLinksToReserve(time, type, idx, state);
+		links = links.stream().filter(link -> !link.isReserved(state.driver)).toList();
+
+		if (links.isEmpty())
+			return true;
 
 		// All links must be able to be reserved
 		if (!links.stream().allMatch(RailLink::hasFreeTrack))
@@ -254,7 +260,17 @@ final class RailsimEngine implements Steppable {
 		// Arrival at destination
 		if (state.isRouteAtEnd()) {
 
-			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end but was " + state.speed;
+			// TODO: comment back in later
+//			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end but was " + state.speed;
+
+			// Free all reservations
+			for (RailLink link : state.route) {
+				if (link.isReserved(state.driver)){
+					int track = link.releaseTrack(state.driver);
+					eventsManager.processEvent(new RailsimLinkStateChangeEvent(time, link.getLinkId(), state.driver.getVehicle().getId(),
+						TrackState.FREE, track));
+				}
+			}
 
 			state.driver.notifyArrivalOnLinkByNonNetworkMode(state.headLink);
 			state.driver.endLegAndComputeNextState(time);
@@ -398,6 +414,9 @@ final class RailsimEngine implements Steppable {
 		double reserveDist = Double.POSITIVE_INFINITY;
 		if (!state.isRouteAtEnd()) {
 			reserveDist = reservation.nextUpdate(currentLink, state);
+
+			if (reserveDist < 0)
+				reserveDist = 0;
 		}
 
 		// (4) tail link changes

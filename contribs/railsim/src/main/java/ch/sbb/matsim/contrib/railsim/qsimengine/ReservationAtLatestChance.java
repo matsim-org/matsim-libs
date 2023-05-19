@@ -10,10 +10,6 @@ public class ReservationAtLatestChance implements TrackReservationStrategy {
 	@Override
 	public double nextUpdate(RailLink currentLink, TrainState state) {
 
-		// TODO: only having the next link reserved might not be sufficient
-		if (state.route.get(state.routeIdx).isReserved(state.driver))
-			return Double.POSITIVE_INFINITY;
-
 		// time needed for full stop
 		double stopTime = state.allowedMaxSpeed / state.train.deceleration();
 
@@ -22,7 +18,20 @@ public class ReservationAtLatestChance implements TrackReservationStrategy {
 		// Distance for full stop
 		double safetyDist = RailsimCalc.calcTraveledDist(state.allowedMaxSpeed, stopTime, -state.train.deceleration());
 
-		return currentLink.length - safetyDist - state.headPosition;
+		double dist = -state.headPosition - safetyDist;
+		int idx = state.routeIdx;
+		do {
+			RailLink nextLink = state.route.get(idx++);
+			dist += nextLink.length;
+
+			if (nextLink.isReserved(state.driver))
+				continue;
+
+			return dist;
+		} while (dist <= safetyDist && idx < state.route.size());
+
+		// No need to reserve yet
+		return Double.POSITIVE_INFINITY;
 	}
 
 	@Override
@@ -30,11 +39,11 @@ public class ReservationAtLatestChance implements TrackReservationStrategy {
 
 		List<RailLink> result = new ArrayList<>();
 
-		double assumedSpeed = type == UpdateEvent.Type.DEPARTURE ? state.train.maxVelocity() : state.targetSpeed;
+		double assumedSpeed = state.train.maxVelocity();
 
 		double stopTime = assumedSpeed / state.train.deceleration();
 		// safety distance
-		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration());
+		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration()) + state.headPosition;
 
 		double reserved = 0;
 

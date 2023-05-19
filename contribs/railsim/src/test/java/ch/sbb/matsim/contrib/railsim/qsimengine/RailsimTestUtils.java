@@ -22,7 +22,7 @@ import java.util.*;
 /**
  * Helper class for test cases.
  */
-public class RailsimTest {
+public class RailsimTestUtils {
 
 
 	static Map<TestVehicle, VehicleType> vehicles = new EnumMap<>(TestVehicle.class);
@@ -32,7 +32,7 @@ public class RailsimTest {
 		Vehicles veh = VehicleUtils.createVehiclesContainer();
 
 		MatsimVehicleReader reader = new MatsimVehicleReader(veh);
-		reader.readURL(RailsimTest.class.getResource("/trainVehicleTypes.xml"));
+		reader.readURL(RailsimTestUtils.class.getResource("/trainVehicleTypes.xml"));
 
 		vehicles.put(TestVehicle.Sprinter, veh.getVehicleTypes().get(Id.create("Sprinter", VehicleType.class)));
 		vehicles.put(TestVehicle.Express, veh.getVehicleTypes().get(Id.create("Express", VehicleType.class)));

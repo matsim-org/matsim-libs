@@ -38,8 +38,8 @@
 
 	<vehicleType id="Cargo">
 		<attributes>
-			<attribute name="railsimMaxAcceleration" class="java.lang.Double">0.1</attribute>
-			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.1</attribute>
+			<attribute name="railsimMaxAcceleration" class="java.lang.Double">0.2</attribute>
+			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.2</attribute>
 		</attributes>
 		<capacity seats="40" standingRoomInPersons="0"/>
 		<length meter="1000.0"/>

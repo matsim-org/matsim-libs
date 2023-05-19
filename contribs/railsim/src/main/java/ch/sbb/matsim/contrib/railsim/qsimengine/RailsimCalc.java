@@ -98,10 +98,10 @@ public class RailsimCalc {
 
 			if (allowed < assumedSpeed) {
 				double timeDeccel = (assumedSpeed - allowed) / state.train.deceleration();
-				double newDeccelDist = RailsimCalc.calcTraveledDist(assumedSpeed, timeDeccel, -state.train.deceleration());
+				double newDeccelDist = dist - RailsimCalc.calcTraveledDist(assumedSpeed, timeDeccel, -state.train.deceleration());
 
-				if ((dist - newDeccelDist) < deccelDist) {
-					deccelDist = dist - newDeccelDist;
+				if (newDeccelDist < deccelDist) {
+					deccelDist = newDeccelDist;
 					speed = allowed;
 				}
 			}
