@@ -25,11 +25,6 @@ public class RailsimCalc {
 		return (Math.sqrt(2 * acceleration * dist + speed * speed) - speed) / acceleration;
 	}
 
-	static double solveOptimalSpeed(double dist, double acceleration, double deceleration,
-									double currentSpeed, double targetSpeed) {
-		return 0;
-	}
-
 	/**
 	 * Calculate time needed to advance distance {@code dist}. Depending on acceleration and max speed.
 	 */
@@ -67,11 +62,44 @@ public class RailsimCalc {
 	}
 
 	/**
+	 * Calculate the maximum speed that can be reached under the condition that speed must be reduced to {@code allowedSpeed}
+	 * again after traveled {@code dist}.
+	 */
+	static SpeedTarget calcTargetSpeed(double dist, double acceleration, double deceleration,
+								   double currentSpeed, double targetSpeed, double finalSpeed) {
+
+		assert FuzzyUtils.greaterEqualThan(targetSpeed, finalSpeed) : "Final speed must be smaller than target";
+
+		double timeDecel = (targetSpeed- finalSpeed) / deceleration;
+		double distDecel = calcTraveledDist(targetSpeed, timeDecel, -deceleration);
+
+		// This code below only works during deceleration
+		if (acceleration <= 0 || currentSpeed >= targetSpeed)
+			return new SpeedTarget(targetSpeed, distDecel);
+
+		double timeAccel = (targetSpeed - currentSpeed) / acceleration;
+		double distAccel = calcTraveledDist(currentSpeed, timeAccel, acceleration);
+
+		// there is enough distance to accelerate to the target speed
+		if (distAccel + distDecel < dist)
+			return new SpeedTarget(targetSpeed, distDecel);
+
+		double nom = 2 * acceleration * deceleration * dist
+			+ acceleration * finalSpeed * finalSpeed
+			+ deceleration * currentSpeed * currentSpeed;
+
+		double v = Math.sqrt(nom / (acceleration + deceleration));
+
+		timeDecel = (v- finalSpeed) / deceleration;
+		distDecel = calcTraveledDist(v, timeDecel, -deceleration);
+
+		return new SpeedTarget(v, distDecel);
+	}
+
+	/**
 	 * Calc the distance deceleration needs to start and the target speed.
 	 */
 	static double calcDecelDistanceAndSpeed(RailLink currentLink, UpdateEvent event) {
-
-		// TODO: ignores acceleration that happens
 
 		TrainState state = event.state;
 
@@ -87,7 +115,8 @@ public class RailsimCalc {
 		// Distance to the next speed change point (link)
 		double dist = currentLink.length - state.headPosition;
 
-		double deccelDist = Double.POSITIVE_INFINITY;
+		double decelDist = Double.POSITIVE_INFINITY;
+		double targetSpeed = state.targetSpeed;
 		double speed = 0;
 
 		for (int i = state.routeIdx; i < state.route.size(); i++) {
@@ -102,11 +131,14 @@ public class RailsimCalc {
 			}
 
 			if (allowed < assumedSpeed) {
-				double timeDeccel = (assumedSpeed - allowed) / state.train.deceleration();
-				double newDeccelDist = dist - RailsimCalc.calcTraveledDist(assumedSpeed, timeDeccel, -state.train.deceleration());
 
-				if (newDeccelDist < deccelDist) {
-					deccelDist = newDeccelDist;
+				SpeedTarget target = calcTargetSpeed(dist, state.acceleration, state.train.deceleration(), state.speed, state.targetSpeed, allowed);
+
+				double newDecelDist = dist - target.decelDist;
+
+				if (newDecelDist < decelDist) {
+					decelDist = newDecelDist;
+					targetSpeed = target.targetSpeed;
 					speed = allowed;
 				}
 			}
@@ -118,7 +150,18 @@ public class RailsimCalc {
 				break;
 		}
 
+		state.targetSpeed = targetSpeed;
+
 		event.newSpeed = speed;
-		return deccelDist;
+		return decelDist;
 	}
+
+	record SpeedTarget(double targetSpeed, double decelDist) implements Comparable<SpeedTarget> {
+
+		@Override
+		public int compareTo(SpeedTarget o) {
+			return Double.compare(decelDist, o.decelDist);
+		}
+	}
+
 }

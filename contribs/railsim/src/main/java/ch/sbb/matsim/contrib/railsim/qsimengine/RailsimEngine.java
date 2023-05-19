@@ -258,7 +258,6 @@ final class RailsimEngine implements Steppable {
 		// Arrival at destination
 		if (state.isRouteAtEnd()) {
 
-			// TODO: comment back in later
 			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end but was " + state.speed;
 
 			// Free all reservations

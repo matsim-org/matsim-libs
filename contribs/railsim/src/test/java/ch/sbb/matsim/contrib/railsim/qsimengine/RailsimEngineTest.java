@@ -86,13 +86,21 @@ public class RailsimEngineTest {
 
 		test.doSimStepUntil(600);
 
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio2", 210.7272722504356, 2000, 0)
+			.hasTrainState("regio1", 348.49615180280205, 200, 0);
+
 
 		test = getTestEngine("network0.xml");
 
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "l1-2", "l5-6");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l6-5", "l2-1");
 
-//		test.doStateUpdatesUntil(600, 1);
+		test.doStateUpdatesUntil(600, 1);
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio2", 210.7272722504356, 2000, 0)
+			.hasTrainState("regio1", 348.49615180280205, 200, 0);
 
 	}
 }

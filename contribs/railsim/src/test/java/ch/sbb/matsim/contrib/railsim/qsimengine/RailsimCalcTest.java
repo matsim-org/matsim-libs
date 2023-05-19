@@ -1,6 +1,6 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Offset;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,6 +41,30 @@ public class RailsimCalcTest {
 
 		assertThat(t)
 			.isEqualTo(5);
+
+	}
+
+	@Test
+	public void maxSpeed() {
+
+		double dist = 1000;
+
+		double current = 5;
+		double f = 0;
+
+		RailsimCalc.SpeedTarget res = RailsimCalc.calcTargetSpeed(dist, 0.5, 0.5,
+			5, 30, 0);
+
+		System.out.println(res);
+
+		double timeDecel = (res.targetSpeed() - f) / 0.5;
+		double distDecel = RailsimCalc.calcTraveledDist(res.targetSpeed(), timeDecel, -0.5);
+
+		double timeAccel = (res.targetSpeed() - current) / 0.5;
+		double distAccel = RailsimCalc.calcTraveledDist(5, timeAccel, 0.5);
+
+		assertThat(distDecel + distAccel)
+			.isCloseTo(dist, Offset.offset(0.001));
 
 	}
 }
