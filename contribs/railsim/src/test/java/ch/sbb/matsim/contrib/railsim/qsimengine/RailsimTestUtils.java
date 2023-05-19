@@ -10,8 +10,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DijkstraFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.*;
 import org.mockito.Answers;
@@ -46,7 +46,7 @@ public class RailsimTestUtils {
 	public static void createDeparture(Holder test, TestVehicle type,  String veh, double time, String from, String to) {
 
 		DijkstraFactory f = new DijkstraFactory();
-		LeastCostPathCalculator lcp = f.createPathCalculator(test.network(), Mockito.mock(TravelDisutility.class), new FreeSpeedTravelTime());
+		LeastCostPathCalculator lcp = f.createPathCalculator(test.network(), new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()), new FreeSpeedTravelTime());
 
 		Link fromLink = test.network.getLinks().get(Id.createLinkId(from));
 		Link toLink = test.network.getLinks().get(Id.createLinkId(to));
