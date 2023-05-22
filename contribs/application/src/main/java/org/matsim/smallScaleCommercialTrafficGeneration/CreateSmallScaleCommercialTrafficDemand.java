@@ -142,6 +142,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	@CommandLine.Option(names = "--nameOutputPopulation", description = "Name of the output Population")
 	private String nameOutputPopulation;
 
+	@CommandLine.Option(names = "--numberOfPlanVariantsPerAgent", description = "If an agent should have variant plans, you should set this paramter.", defaultValue = "1")
+	private int numberOfPlanVariantsPerAgent;
+
 	@CommandLine.Option(names = "--PathOutput", description = "Path for the output")
 	private Path output;
 
@@ -236,7 +239,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		Controler controler = prepareControler(scenario);
 		controler.run();
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
-				usedTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation);
+				usedTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
 		return 0;
 	}
 

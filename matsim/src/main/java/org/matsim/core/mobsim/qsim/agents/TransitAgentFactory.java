@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 
 public class TransitAgentFactory implements AgentFactory {

@@ -42,8 +42,8 @@ import java.io.IOException;
  * A first approach for some analysis based on the freight events introduced in 2022/23.
  * This class comes from teaching SimGV in the winter term 2022/23.
  * <p>
- * This class should get extended and prepared as a standadized analysis for freight output.
- * This should also get aligned with the current development in simwrapper.
+ * This class should get extended and prepared as a standardized analysis for freight output.
+ * This should also get aligned with the current development in Simwrapper.
  * Todo: Add some tests.
  *
  * @author kturner (Kai Martins-Turner)
@@ -53,9 +53,19 @@ public class RunFreightAnalysisEventbased {
 	private static final Logger log = LogManager.getLogger(RunFreightAnalysisEventbased.class);
 
 	//Were is your simulation output, that should be analysed?
-	private static final String SIM_OUTPUT_PATH = "output/";
+	private final String SIM_OUTPUT_PATH ;
+	private final String ANALYSIS_OUTPUT_PATH;
 
-	public static void main(String[] args) throws IOException {
+	/**
+	 * @param simOutputPath The output directory of the simulation run
+	 * @param analysisOutputPath The directory where the result of the analysis should go to
+	 */
+	public RunFreightAnalysisEventbased(String simOutputPath, String analysisOutputPath) {
+		this.SIM_OUTPUT_PATH = simOutputPath;
+		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
+	}
+
+	public void runAnalysis() throws IOException {
 
 		Config config = ConfigUtils.createConfig();
 		config.vehicles().setVehiclesFile(SIM_OUTPUT_PATH + "output_allVehicles.xml.gz");
@@ -70,9 +80,10 @@ public class RunFreightAnalysisEventbased {
 		freightConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_carriersVehicleTypes.xml.gz");
 
 		//Were to store the analysis output?
-		String analysisOutputDirectory = SIM_OUTPUT_PATH + "Analysis/";
-		if (!analysisOutputDirectory.endsWith("/")) analysisOutputDirectory = analysisOutputDirectory + "/";
-
+		String analysisOutputDirectory = ANALYSIS_OUTPUT_PATH;
+		if (!analysisOutputDirectory.endsWith("/")) {
+			analysisOutputDirectory = analysisOutputDirectory + "/";
+		}
 		File folder = new File(analysisOutputDirectory);
 		folder.mkdirs();
 
@@ -83,7 +94,12 @@ public class RunFreightAnalysisEventbased {
 		//load carriers according to freight config
 		FreightUtils.loadCarriersAccordingToFreightConfig( scenario );
 
-		// the following is copy paste from the example...
+
+		// CarrierPlanAnalysis
+		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(FreightUtils.getCarriers(scenario));
+		carrierPlanAnalysis.runAnalysisAndWriteStats(analysisOutputDirectory);
+
+		// Prepare eventsManager - start of event based Analysis;
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(scenario);
@@ -100,8 +116,9 @@ public class RunFreightAnalysisEventbased {
 
 		log.info("Analysis completed.");
 		log.info("Writing output...");
-		FreightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistance(analysisOutputDirectory, scenario, freightTimeAndDistanceAnalysisEventsHandler);
-		CarrierLoadAnalysis.writeLoadPerVehicle(analysisOutputDirectory, scenario, carrierLoadAnalysis);
+		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistance(analysisOutputDirectory, scenario);
+		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(analysisOutputDirectory, scenario);
+		carrierLoadAnalysis.writeLoadPerVehicle(analysisOutputDirectory, scenario);
 	}
 
 }

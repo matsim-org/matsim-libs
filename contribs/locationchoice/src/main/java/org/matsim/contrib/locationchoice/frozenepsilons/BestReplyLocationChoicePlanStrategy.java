@@ -40,8 +40,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.Map;
 
 class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
@@ -93,7 +93,7 @@ class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		}
 		delegate.addStrategyModule(new BestReplyLocationChoiceStrategymodule(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities, timeInterpretation) );
 		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider, timeInterpretation));
-		
+
 		delegate.init(replanningContext);
 	}
 

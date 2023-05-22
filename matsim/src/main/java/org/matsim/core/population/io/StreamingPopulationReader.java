@@ -32,11 +32,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class StreamingPopulationReader implements MatsimReader {
@@ -45,6 +47,7 @@ public final class StreamingPopulationReader implements MatsimReader {
 	private PopulationReader reader ;
 	private final StreamingPopulation pop ;
 	private int cnt;
+	private final Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<>();
@@ -63,15 +66,26 @@ public final class StreamingPopulationReader implements MatsimReader {
 			throw new RuntimeException("scenario given into this class needs to be an instance of MutableScenario.") ;
 		}
 	}
+
+	public void putAttributeConverter(final Class<?> clazz, AttributeConverter<?> converter) {
+		this.attributeConverters.put(clazz, converter);
+	}
+
+	public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
+		this.attributeConverters.putAll(converters);
+	}
+
 	Population getStreamingPopulation() {
 		return pop ;
 	}
 	@Override public void readFile(String filename) {
+		reader.putAttributeConverters(this.attributeConverters);
 		reader.readFile(filename);
 	}
 
 	@Override
 	public void readURL( URL url ) {
+		reader.putAttributeConverters(this.attributeConverters);
 		reader.parse( url ) ;
 	}
 

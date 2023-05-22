@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.*;
+import jakarta.inject.*;
 
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Scenario;
@@ -69,7 +69,7 @@ public class LinkToLinkRouting
 
     @Inject
     NetworkTurnInfoBuilderI networkTurnInfoBuilder;
-    
+
     @Inject
     TimeInterpretation timeInterpretation;
 

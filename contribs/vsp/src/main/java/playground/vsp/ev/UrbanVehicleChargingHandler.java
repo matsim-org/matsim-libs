@@ -35,7 +35,7 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.*;
 
 

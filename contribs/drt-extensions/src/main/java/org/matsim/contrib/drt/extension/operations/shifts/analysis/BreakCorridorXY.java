@@ -12,7 +12,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;

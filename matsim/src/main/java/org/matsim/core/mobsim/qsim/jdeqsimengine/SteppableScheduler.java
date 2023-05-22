@@ -26,7 +26,7 @@ import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class SteppableScheduler extends Scheduler implements Steppable {
 

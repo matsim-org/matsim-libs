@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.pseudosimulation.replanning.modules.ReplacePlanFromSlave;
 import org.matsim.core.replanning.PlanStrategy;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.HashMap;
 
 class ReplacePlanFromSlaveFactory implements Provider<PlanStrategy> {

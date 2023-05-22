@@ -21,8 +21,8 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.name.Named;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -64,11 +64,11 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 
 	@Inject
 	LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	
+
 	@Inject
 	@Named(TransportMode.walk)
 	RoutingModule walkRouter;
-	
+
 	@Inject
 	TimeInterpretation timeInterpretation;
 

@@ -9,6 +9,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.InformedModeChoiceModule;
@@ -24,6 +25,7 @@ public class SelectSingleTripModeStrategyTest extends ScenarioTest {
 		Config config = TestScenario.loadConfig(utils);
 
 		config.controler().setLastIteration(10);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.strategy().addStrategySettings(new StrategyConfigGroup.StrategySettings()
 				.setStrategyName(InformedModeChoiceModule.SELECT_SINGLE_TRIP_MODE_STRATEGY)
 				.setSubpopulation("person")
