@@ -35,10 +35,22 @@ public class Video extends Viz{
 	 * Sets the Video MIME Type and the associated filepath
 	 */
 	@JsonProperty(required = true)
-	public Map<VideoMIMETypes, String> sources;
+	public Map<MIMETypes, String> sources;
 
 	public Video() {
 		super("video");
 	}
+
+	private enum MIMETypes {
+
+		MP4("video/mp4"),
+		MPEG("video/mpeg"),
+		WEBM("video/webm"),
+		;
+
+		MIMETypes(String type) {
+		}
+	}
+
 
 }
