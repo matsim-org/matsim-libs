@@ -14,7 +14,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.router.TripRouter;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class RunReplaceAgentFactoryExampleTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;

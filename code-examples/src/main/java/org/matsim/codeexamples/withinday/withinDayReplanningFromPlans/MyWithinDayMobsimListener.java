@@ -58,7 +58,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.utils.EditRoutes;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 /**
  * @author nagel

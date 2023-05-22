@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 /**

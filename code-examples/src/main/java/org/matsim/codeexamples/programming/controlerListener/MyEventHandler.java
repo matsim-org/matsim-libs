@@ -1,6 +1,6 @@
 package org.matsim.codeexamples.programming.controlerListener;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
