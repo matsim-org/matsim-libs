@@ -21,6 +21,8 @@
 
  package org.matsim.core.router;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -39,13 +41,11 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.name.Named;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class NetworkRoutingProvider implements Provider<RoutingModule> {
+public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
 
 	private final String routingMode;

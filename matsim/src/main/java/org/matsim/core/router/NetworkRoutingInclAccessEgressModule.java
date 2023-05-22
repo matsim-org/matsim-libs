@@ -225,7 +225,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			egressLeg.setTravelTime(egressTime);
 			egressLeg.getRoute().setTravelTime(egressTime);
 			egressTrip.add(egressLeg);
-		} else {
+		} else if ( accessEgressType==AccessEgressType.accessEgressModeToLink || accessEgressType==AccessEgressType.accessEgressModeToLinkPlusTimeConstant ) {
 			Facility fromFacility = FacilitiesUtils.wrapLinkAndCoord(egressActLink,startCoord);
 			List<? extends PlanElement> networkRoutedEgressTrip = egressFromNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person, routingAttributes));
 			if(networkRoutedEgressTrip == null) return null;
@@ -237,6 +237,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				leg0.getRoute().setTravelTime(travelTime);
 			}
 			egressTrip.addAll(networkRoutedEgressTrip);
+		} else {
+			throw new RuntimeException( "should not happen" );
 		}
 		return egressTrip;
 	}
@@ -291,7 +293,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			accessLeg.getRoute().setTravelTime(accessTime);
 			accessTrip.add(accessLeg);
 //			now += accessTime;
-		} else {
+		} else if ( accessEgressType==AccessEgressType.accessEgressModeToLink || accessEgressType==AccessEgressType.accessEgressModeToLinkPlusTimeConstant ) {
 			Facility toFacility = FacilitiesUtils.wrapLinkAndCoord(accessActLink,endCoord);
 			List<? extends PlanElement> networkRoutedAccessTrip = accessToNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person, routingAttributes));
 			if (networkRoutedAccessTrip == null) return null; //no access trip could be computed for accessMode
@@ -303,6 +305,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				leg0.getRoute().setTravelTime(travelTime);
 			}
 			accessTrip.addAll(networkRoutedAccessTrip);
+		} else {
+			throw new RuntimeException( "should not happen" );
 		}
 
 		final Activity interactionActivity = createInteractionActivity(endCoord, accessActLink.getId(), stageActivityType);
