@@ -54,7 +54,6 @@ import java.util.Map;
 
 /*package-private*/  class TransshipmentHubTourEndEventHandler implements BeforeMobsimListener, AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
 
-	//	@Inject Scenario scenario;
 	private final Scenario scenario;
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
 	private final TransshipmentHub transshipmentHub;
@@ -63,10 +62,10 @@ import java.util.Map;
 	@Inject private EventsManager eventsManager;
 
 	/**
-	 * What is a TranshipmentHubTour ??? KMT, Sep 22
+	 * This is a TourEndEvent-Handler, doing some stuff regarding the {@link TransshipmentHub}.
 	 *
-	 * @param transshipmentHub
-	 * @param scenario
+	 * @param transshipmentHub hub
+	 * @param scenario The scenario. Is used to get the Carrier(s).
 	 */
 	TransshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub, Scenario scenario) {
 		this.transshipmentHub = transshipmentHub;
@@ -160,7 +159,7 @@ import java.util.Map;
 					.setEndTime(endTime)
 					.setLogisticsChainElement(servicesWaitedFor.get(carrierService).element)
 					.build();
-			Id<ShipmentPlanElement> loadId = Id.create(handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType(), ShipmentPlanElement.class);
+			Id<ShipmentPlanElement> loadId = Id.create(handle.getResourceId() + String.valueOf(handle.getLogisticChainElement().getId()) + handle.getElementType(), ShipmentPlanElement.class);
 			if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
 				lspShipment.getLog().addPlanElement(loadId, handle);
 			}
