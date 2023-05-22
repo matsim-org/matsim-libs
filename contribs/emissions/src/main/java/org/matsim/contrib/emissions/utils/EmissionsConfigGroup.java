@@ -190,7 +190,6 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 		} else {
 			log.warn( messageFalse );
 		}
-		throw new RuntimeException( );
 	}
 	// ===============
 	// ===============

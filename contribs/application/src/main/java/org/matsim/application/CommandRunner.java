@@ -155,7 +155,7 @@ public final class CommandRunner {
 
 			// Look for this file on the input
 			if (!depFile) {
-				String path = ApplicationUtils.matchInput(require, input);
+				String path = ApplicationUtils.matchInput(require, input).toString();
 				args.add(arg);
 				args.add(path);
 			}
@@ -163,19 +163,19 @@ public final class CommandRunner {
 
 		if (spec.requireEvents() && !ArrayUtils.contains(existingArgs, "--events")) {
 			args.add("--events");
-			args.add(ApplicationUtils.matchInput("events.xml", input));
+			args.add(ApplicationUtils.matchInput("events.xml", input).toString());
 		}
 		if (spec.requirePopulation() && !ArrayUtils.contains(existingArgs, "--population")) {
 			args.add("--population");
-			args.add(ApplicationUtils.matchInput("plans.xml", input));
+			args.add(ApplicationUtils.matchInput("plans.xml", input).toString());
 		}
 		if (spec.requireNetwork() && !ArrayUtils.contains(existingArgs, "--network")) {
 			args.add("--network");
-			args.add(ApplicationUtils.matchInput("network.xml", input));
+			args.add(ApplicationUtils.matchInput("network.xml", input).toString());
 		}
 		if (spec.requireCounts() && !ArrayUtils.contains(existingArgs, "--counts")) {
 			args.add("--counts");
-			args.add(ApplicationUtils.matchInput("counts.xml", input));
+			args.add(ApplicationUtils.matchInput("counts.xml", input).toString());
 		}
 		if (spec.requireRunDirectory() && !ArrayUtils.contains(existingArgs, "--run-directory")) {
 			args.add("--run-directory");

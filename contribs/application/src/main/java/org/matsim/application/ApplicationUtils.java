@@ -167,33 +167,33 @@ public class ApplicationUtils {
 	 *
 	 * @throws IllegalArgumentException if no file could be found.
 	 */
-	public static String matchInput(String name, Path dir) {
+	public static Path matchInput(String name, Path dir) {
 
 		Path possibility = dir.resolve(name);
 		if (Files.exists(possibility))
-			return possibility.toString();
+			return possibility;
 
 		possibility = dir.resolve(name + ".gz");
 		if (Files.exists(possibility))
-			return possibility.toString();
+			return possibility;
 
 		// Match files that could be matsim output files
 		Optional<Path> path = matchSuffix("output_" + name, dir);
 		if (path.isPresent())
-			return path.get().toString();
+			return path.get();
 
 		path = matchSuffix("output_" + name + ".gz", dir);
 		if (path.isPresent())
-			return path.get().toString();
+			return path.get();
 
 		path = matchSuffix(name, dir);
 		if (path.isPresent())
-			return path.get().toString();
+			return path.get();
 
 		// Match more general pattern at last
 		path = matchPattern( ".+\\.[a-zA-Z0-9]*_" + name + "\\..+", dir);
 		if (path.isPresent())
-			return path.get().toString();
+			return path.get();
 
 		throw new IllegalArgumentException("Could not match input file: " + name);
 	}

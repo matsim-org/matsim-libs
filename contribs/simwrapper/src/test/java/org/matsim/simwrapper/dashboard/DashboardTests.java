@@ -4,7 +4,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.MATSimApplication;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
@@ -84,6 +86,18 @@ public class DashboardTests {
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
 		run(new PopulationAttributeDashboard());
+		Assertions.assertThat(out)
+				.isDirectoryContaining("glob:**amount_per_age_group.csv")
+				.isDirectoryContaining("glob:**amount_per_sex_group.csv")
+				.isDirectoryContaining("glob:**total_agents.csv");
+
+
+	}
+	public void emissions() {
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+
+		run(new EmissionsDashboard());
 		Assertions.assertThat(out)
 				.isDirectoryContaining("glob:**amount_per_age_group.csv")
 				.isDirectoryContaining("glob:**amount_per_sex_group.csv")

@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.MATSimApplication;
+import org.matsim.contrib.emissions.HbefaVehicleCategory;
 import org.matsim.contrib.vsp.scenario.SnzActivities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -12,6 +13,9 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.EngineInformation;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.net.URL;
 import java.util.HashSet;

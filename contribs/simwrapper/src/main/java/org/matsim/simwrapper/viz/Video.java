@@ -51,6 +51,4 @@ public class Video extends Viz{
 		MIMETypes(String type) {
 		}
 	}
-
-
 }

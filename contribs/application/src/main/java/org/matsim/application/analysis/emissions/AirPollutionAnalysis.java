@@ -15,13 +15,11 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.HbefaRoadTypeMapping;
-import org.matsim.contrib.emissions.OsmHbefaMapping;
-import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.contrib.emissions.*;
 import org.matsim.contrib.emissions.analysis.EmissionsOnLinkEventHandler;
 import org.matsim.contrib.emissions.analysis.FastEmissionGridAnalyzer;
 import org.matsim.contrib.emissions.analysis.Raster;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -101,12 +99,14 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 			}
 		};
 
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+
 		com.google.inject.Injector injector = Injector.createInjector(config, module);
 
 		// Emissions module will be installed to the event handler
 		injector.getInstance(EmissionModule.class);
 
-		String eventsFile = ApplicationUtils.matchInput("events", input.getRunDirectory());
+		String eventsFile = ApplicationUtils.matchInput("events", input.getRunDirectory()).toString();
 
 		EmissionsOnLinkEventHandler emissionsEventHandler = new EmissionsOnLinkEventHandler(3600);
 		eventsManager.addHandler(emissionsEventHandler);
@@ -126,12 +126,13 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 	}
 
 	private Config prepareConfig() {
-		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()));
+		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString());
+//		EmissionsConfigGroup emissionsConfigGroup
 
-		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("vehicles", input.getRunDirectory()));
-		config.network().setInputFile(ApplicationUtils.matchInput("network", input.getRunDirectory()));
-		config.transit().setTransitScheduleFile(ApplicationUtils.matchInput("transitSchedule", input.getRunDirectory()));
-		config.transit().setVehiclesFile(ApplicationUtils.matchInput("transitVehicles", input.getRunDirectory()));
+		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("vehicles", input.getRunDirectory()).toAbsolutePath().toString());
+		config.network().setInputFile(ApplicationUtils.matchInput("network", input.getRunDirectory()).toAbsolutePath().toString());
+		config.transit().setTransitScheduleFile(ApplicationUtils.matchInput("transitSchedule", input.getRunDirectory()).toAbsolutePath().toString());
+		config.transit().setVehiclesFile(ApplicationUtils.matchInput("transitVehicles", input.getRunDirectory()).toAbsolutePath().toString());
 		config.plans().setInputFile(null);
 		config.parallelEventHandling().setNumberOfThreads(null);
 		config.parallelEventHandling().setEstimatedNumberOfEvents(null);

@@ -34,7 +34,7 @@ public class LogFileAnalysisTest {
 
 		Path out = Path.of(config.controler().getOutputDirectory());
 		new LogFileAnalysis().execute(
-			"--input", ApplicationUtils.matchInput("logfile.log", out),
+			"--input", ApplicationUtils.matchInput("logfile.log", out).toString(),
 			"--output-memory-stats", out.resolve("mem_stats.csv").toString(),
 			"--output-run-info", out.resolve("run_info.csv").toString(),
 			"--output-runtime-stats", out.resolve("runtime_stats.csv").toString()
