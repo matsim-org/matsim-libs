@@ -59,9 +59,6 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
 
-	@CommandLine.Option(names = "--use-default-road-types", description = "Add default hbefa_road_type link attributes to the network", defaultValue = "false")
-	private boolean useDefaultRoadTypes;
-
 	@CommandLine.Option(names = "--grid-size", description = "Grid size in meter", defaultValue = "100")
 	private double gridSize;
 
@@ -74,9 +71,6 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		Config config = prepareConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		if (useDefaultRoadTypes)
-			addDefaultHbefaTypes(scenario);
 
 		Network filteredNetwork;
 		if (shp.isDefined()) {
@@ -141,22 +135,6 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		return config;
 	}
 
-	/**
-	 * changes/adds link attributes of the network in the given scenario.
-	 *
-	 * @param scenario for which to prepare the network
-	 */
-	private void addDefaultHbefaTypes(Scenario scenario) {
-		HbefaRoadTypeMapping roadTypeMapping = OsmHbefaMapping.build();
-//		the type attribute in our network has the prefix "highway" for all links but pt links. we need to delete that because OsmHbefaMapping does not handle that.
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			//pt links can be disregarded
-			if (!link.getAllowedModes().contains("pt")) {
-				NetworkUtils.setType(link, NetworkUtils.getType(link).replaceFirst("highway\\.", ""));
-			}
-		}
-		roadTypeMapping.addHbefaMappings(scenario.getNetwork());
-	}
 
 	private void writeOutput(Network network, EmissionsOnLinkEventHandler emissionsEventHandler) throws IOException {
 
@@ -169,7 +147,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		nf.setGroupingUsed(false);
 
 		CSVPrinter absolute = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_link.csv")), CSVFormat.DEFAULT);
-		CSVPrinter perMeter = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_link_per_m")), CSVFormat.DEFAULT);
+		CSVPrinter perMeter = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_link_per_m.csv")), CSVFormat.DEFAULT);
 
 		absolute.print("linkId");
 		perMeter.print("linkId");
