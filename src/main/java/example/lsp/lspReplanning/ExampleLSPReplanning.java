@@ -20,7 +20,7 @@
 
 package example.lsp.lspReplanning;
 
-import com.google.inject.Provider;
+import jakarta.inject.Provider;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
