@@ -49,7 +49,7 @@ public class TrafficCountsDashboardTest {
 
 		SimWrapper sw = SimWrapper.create(simWrapperConfigGroup)
 				.addDashboard(new TrafficCountsDashboard(List.of(0.0, 0.3, 1.7, 2.5, Double.MAX_VALUE), List.of("less", "exact", "too much", "way too much")))
-				.addDashboard(new PlotlyDashboard());
+				.addDashboard(new OverviewDashboard());
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
