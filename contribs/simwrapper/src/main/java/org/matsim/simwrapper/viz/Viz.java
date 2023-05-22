@@ -10,8 +10,10 @@ public abstract class Viz {
 	@JsonProperty(index = 0)
 	protected final String type;
 
-	@JsonProperty(required = true)
+	@JsonProperty(index = 1, required = true)
 	public String title;
+
+	@JsonProperty(index = 2)
 	public String description;
 	public Double height;
 	public Double width;

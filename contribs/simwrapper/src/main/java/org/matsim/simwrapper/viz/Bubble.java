@@ -1,6 +1,9 @@
 package org.matsim.simwrapper.viz;
 
-public class Bubble extends Plot{
+/**
+ * Creates a Bubble Plot for simwrapper.
+ */
+public class Bubble extends Plot {
 
 	/**
 	 * The column containing bubble size values.

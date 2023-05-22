@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * Table plugin
+ * The Table Plug-In generates a table from a .csv file.
  */
 public class Table extends Viz {
 

@@ -2,7 +2,12 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Heatmap extends Viz{
+import java.util.List;
+
+/**
+ * Creates a heatmap for simwrapper
+ */
+public class Heatmap extends Viz {
 
 	/**
 	 * The filepath containing the data
@@ -21,7 +26,7 @@ public class Heatmap extends Viz{
 	 * be categorized on the x-axis.
 	 */
 	@JsonProperty(required = true)
-	public String columns;
+	public List<String> columns;
 
 	/**
 	 * Descriptive titles for the x-axis
@@ -36,7 +41,7 @@ public class Heatmap extends Viz{
 	/**
 	 * Transpose the heatmap matrix, thus flipping the x
 	 * and y axes. Can be useful if your data is stored
-	 * one way but you want it displayed the other.
+	 * one way, but you want it displayed the other.
 	 */
 	public String flipAxes;
 

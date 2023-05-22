@@ -118,8 +118,12 @@ public final class Data {
 
 		URL resource = this.getClass().getResource(name);
 
-		if (resource == null)
-			throw new IllegalArgumentException("Resource '" + name + "' not found!");
+		if (resource == null) {
+			// Try to prefix / automatically
+			resource = this.getClass().getResource("/" + name);
+			if (resource == null)
+				throw new IllegalArgumentException("Resource '" + name + "' not found!");
+		}
 
 		Path res = Path.of(resource.getPath());
 
@@ -140,6 +144,7 @@ public final class Data {
 			throw new RuntimeException("Illegal URL", e);
 		}
 
+		resources.put(resolved, resource);
 		return this.getUnixPath(this.path.getParent().relativize(resolved));
 	}
 

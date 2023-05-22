@@ -39,21 +39,35 @@ public class Plotly extends Viz {
 	public static final String[] TEXT_INPUT = new String[0];
 
 	private static final Logger log = LogManager.getLogger(Plotly.class);
+
 	@Nullable
 	@JsonIgnore
 	public Layout layout;
 
-	@JsonProperty(index = 4)
+	@JsonProperty(index = 26)
 	@Nullable
 	public Config config;
+	/**
+	 * Set the color ramp that is applied if multiple traces are present.
+	 */
+	public String colorRamp;
+	/**
+	 * Merge all given datasets into one.
+	 */
+	public Boolean mergeDatasets;
 
-	@JsonIgnore
-	private List<DataSet> data = new ArrayList<>();
+	/**
+	 * Merge two column as index. Column name as key will be merged with the column name value.
+	 * This allows to build level multi indices for certain plot types.
+	 */
+	public Map<String, String> multiIndex;
+
 	@JsonIgnore
 	private List<Trace> traces = new ArrayList<>();
 	@JsonIgnore
+	private List<DataSet> data = new ArrayList<>();
+	@JsonIgnore
 	private List<DataMapping> mappings = new ArrayList<>();
-
 
 	public Plotly() {
 		super("plotly");
@@ -114,7 +128,7 @@ public class Plotly extends Viz {
 
 		Objects.requireNonNull(path, "Path argument can not be null");
 
-		String name = data.size() == 0 ? "dataset" : FilenameUtils.removeExtension(FilenameUtils.getName(path));
+		String name = data.size() == 0 ? "dataset" : FilenameUtils.removeExtension(FilenameUtils.getName(path)).replace("_", "");
 		DataSet ds = new DataSet(path, name);
 		data.add(ds);
 		return ds;
@@ -130,24 +144,30 @@ public class Plotly extends Viz {
 	/**
 	 * Fill content from a given {@link Figure}.
 	 */
-	public void fromFigure(Figure figure) {
+	public Plotly fromFigure(Figure figure) {
 		for (Trace t : figure.getTraces()) {
 			addTrace(t, null);
 		}
 
 		layout = figure.getLayout();
 		config = figure.getConfig();
+
+		return this;
 	}
 
-	@JsonProperty(value = "dataset", index = 2)
-	Object getDataSet() {
+	@JsonProperty(value = "datasets", index = 20)
+	Map<String, Object> getDataSets() {
 		if (data.size() == 0)
 			return null;
 
-		return data.size() == 1 && data.get(0).isSimple() ? data.get(0).file : data;
+		Map<String, Object> result = new LinkedHashMap<>();
+		for (DataSet d : data) {
+			result.put(d.name, d.toJSON());
+		}
+		return result;
 	}
 
-	@JsonProperty(value = "traces", index = 3)
+	@JsonProperty(value = "traces", index = 25)
 	List<Map<String, Object>> getTraces() {
 
 		List<Map<String, Object>> result = new ArrayList<>();
@@ -215,6 +235,8 @@ public class Plotly extends Viz {
 		// Pie charts have an API that is quite confusing because the column names are different
 		// This codes fixes some errors
 		if ("pie".equals(type) && d != null) {
+			// Never sort pie charts, attribute is also not settable via API
+			object.put("sort", false);
 			d.normalizePieTrace();
 		}
 
@@ -225,7 +247,7 @@ public class Plotly extends Viz {
 		return object;
 	}
 
-	@JsonProperty("layout")
+	@JsonProperty(value = "layout", index = 30)
 	@SuppressWarnings("unchecked")
 	Map<String, Object> getLayout() {
 
@@ -251,7 +273,6 @@ public class Plotly extends Viz {
 	 */
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> clean(Map<String, Object> object) {
-
 		Iterator<Map.Entry<String, Object>> it = object.entrySet().iterator();
 
 		Map<String, Object> copy = new LinkedHashMap<>();
@@ -269,6 +290,10 @@ public class Plotly extends Viz {
 			copy.put(e.getKey().toLowerCase(), e.getValue());
 			it.remove();
 		}
+
+		// Attributes that cause problems and should not be set
+		copy.remove("width");
+		copy.remove("height");
 
 		object.putAll(copy);
 		return object;
@@ -291,9 +316,9 @@ public class Plotly extends Viz {
 	}
 
 	/**
-	 * Available aggregate function for {@link DataSet#aggregate(List)}.
+	 * Available aggregate function for {@link DataSet#aggregate(List, String, AggrFunc)}.
 	 */
-	enum AggrFunc {
+	public enum AggrFunc {
 		SUM
 	}
 
@@ -302,17 +327,26 @@ public class Plotly extends Viz {
 	 */
 	public static final class DataSet {
 
+		@JsonIgnore
 		private final String name;
 		private final String file;
-		private String groupBy;
+
+		private Map<String, Object> pivot;
+		private Map<String, Object> constant;
+		private Map<String, Object> aggregate;
 
 		private DataSet(String file, String name) {
 			this.file = file;
 			this.name = name;
 		}
 
-		private boolean isSimple() {
-			return name.equals("dataset");
+		private Object toJSON() {
+			if (pivot == null &&
+				constant == null &&
+				aggregate == null)
+				return file;
+
+			return this;
 		}
 
 		/**
@@ -323,33 +357,46 @@ public class Plotly extends Viz {
 		}
 
 		/**
-		 * Takes all values from the specified colum and splits data into separate traces.
+		 * Indicates that each column beside the already mapped ones contain one data group. This is also known as 'wide-format'.
+		 * Defining this will map each new column to the specified target array.
+		 *
+		 * @param exclude columns not to pivot, typical x-axis.
 		 */
-		@Deprecated
-		public DataSet groupBy(String columnName) {
-			groupBy = columnName;
+		public DataSet pivot(List<String> exclude, String namesTo, String valuesTo) {
+
+			if (exclude.isEmpty())
+				throw new IllegalArgumentException("Exclude list can not be empty");
+
+			pivot = Map.of(
+				"exclude", exclude,
+				"namesTo", namesTo,
+				"valuesTo", valuesTo
+			);
 			return this;
 		}
 
 		/**
-		 * Indicates that each column beside the already mapped ones contain one data group. This is also known as 'wide-format'.
-		 * Defining this will map each new column to the specified target array.
+		 * Adds a column with constant values. May be useful for multi index and stacking bar charts.
 		 */
-		@Deprecated
-		public DataSet pivot(String namesTo, String valuesTo) {
-			// TODO
+		public DataSet constant(String columnName, Object constant) {
+			if (this.constant == null)
+				this.constant = new LinkedHashMap<>();
+
+			this.constant.put(columnName, constant);
 			return this;
 		}
 
 		/**
 		 * Aggregate data within each trace on the {@code targetColumn}. Uses all unmapped columns or only the given columns if not empty.
 		 */
-		@Deprecated
-		public DataSet aggregate(ColumnType target, AggrFunc func, String... columns) {
-			// TODO
+		public DataSet aggregate(List<String> groupBy, String target, AggrFunc func) {
+			aggregate = Map.of(
+				"groupBy", groupBy,
+				"target", target,
+				"func", func.toString()
+			);
 			return this;
 		}
-
 	}
 
 	/**
@@ -360,12 +407,28 @@ public class Plotly extends Viz {
 		private final String ref;
 		private Map<ColumnType, String> columns = new EnumMap<>(ColumnType.class);
 
+		private String colorRamp;
+
 		public DataMapping(String name) {
 			this.ref = name;
 		}
 
+		/**
+		 * Group this data by categorical variable in column.
+		 */
 		public DataMapping name(String columnName) {
 			columns.put(ColumnType.NAME, columnName);
+			return this;
+		}
+
+		/**
+		 * Group this data by categorical variable in column.
+		 *
+		 * @param colorRamp color ramp to use
+		 */
+		public DataMapping name(String columnName, String colorRamp) {
+			columns.put(ColumnType.NAME, columnName);
+			this.colorRamp = colorRamp;
 			return this;
 		}
 
@@ -374,14 +437,6 @@ public class Plotly extends Viz {
 		 */
 		public DataMapping x(String columnName) {
 			columns.put(ColumnType.X, columnName);
-			return this;
-		}
-
-		/**
-		 * Additional x column, which will create an array of values.
-		 */
-		public DataMapping x2(String columnName) {
-			columns.put(ColumnType.X2, columnName);
 			return this;
 		}
 
@@ -434,10 +489,14 @@ public class Plotly extends Viz {
 		}
 
 		private void insert(Map<String, Object> obj) {
+
+			// TODO: some attributes are at marker level
 			for (ColumnType value : ColumnType.values()) {
 				if (columns.containsKey(value))
 					obj.put(value.name().toLowerCase(), "$" + ref + "." + columns.get(value));
 			}
+
+			obj.put("colorRamp", colorRamp);
 		}
 
 		private void normalizePieTrace() {
@@ -460,17 +519,34 @@ public class Plotly extends Viz {
 	}
 
 	/**
-	 * Column specification that go beyond simple mapping to name.
+	 * Utility class that holds some, but not all available color schemes.
+	 * See {@link <a href="https://github.com/d3/d3-scale-chromatic/tree/main">here</a>}
 	 */
-	@Deprecated
-	public static final class Column {
+	public static final class ColorScheme {
 
-		public static Column transform(String columnName, String function) {
-			return null;
-		}
+		public static final String Accent = "Accent";
+		public static final String Dark2 = "Dark2";
+		public static final String Paired = "Paired";
+		public static final String Pastel1 = "Pastel1";
+		public static final String Pastel2 = "Pastel2";
+		public static final String Set1 = "Set1";
+		public static final String Set2 = "Set2";
+		public static final String Set3 = "Set3";
+		public static final String Tableau10 = "Tableau10";
+		public static final String RdGy = "RdGy";
+		public static final String RdYlBu = "RdYlBu";
+		public static final String PiYG = "PiYG";
+		public static final String RdYlGn = "RdYlGn";
+		public static final String Spectral = "Spectral";
+		public static final String Turbo = "Turbo";
+		public static final String CubehelixDefault = "CubehelixDefault";
+		public static final String Viridis = "Viridis";
+		public static final String Inferne = "Inferne";
+		public static final String Cividis = "Cividis";
+		public static final String Rainbow = "Rainbow";
 
-		public static Column constant(Object value) {
-			return null;
+
+		private ColorScheme() {
 		}
 	}
 

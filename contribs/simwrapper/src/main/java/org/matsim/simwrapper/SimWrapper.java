@@ -158,7 +158,7 @@ public final class SimWrapper {
 
 		for (Map.Entry<Path, URL> e : data.getResources().entrySet()) {
 			try {
-				Files.createDirectories(e.getKey());
+				Files.createDirectories(e.getKey().getParent());
 				try (InputStream is = e.getValue().openStream()) {
 					Files.copy(is, e.getKey());
 				}

@@ -5,6 +5,8 @@ import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
+import tech.tablesaw.plotly.components.Axis;
+import tech.tablesaw.plotly.traces.BarTrace;
 
 import java.util.List;
 
@@ -59,7 +61,6 @@ public class OverviewDashboard implements Dashboard {
 				viz.width = 2d;
 			});
 
-		// TODO: these plots needs to be adapted, maybe changed to plotly plugin
 		layout.row("third")
 			.el(Bar.class, (viz, data) -> {
 				viz.title = "Runtime";
@@ -69,11 +70,23 @@ public class OverviewDashboard implements Dashboard {
 				viz.dataset = data.compute(LogFileAnalysis.class, "runtime_stats.csv");
 
 			})
-			.el(Area.class, (viz, data) -> {
+			.el(Plotly.class, (viz, data) -> {
 				viz.title = "Memory Usage";
-				viz.x = "timestamp";
-				viz.yAxisName = "MB";
-				viz.dataset = data.compute(LogFileAnalysis.class, "memory_stats.csv");
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Time").build())
+					.yAxis(Axis.builder().title("MB").build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+					.build();
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+					viz.addDataset(data.compute(LogFileAnalysis.class, "memory_stats.csv"))
+						.pivot(List.of("time"), "names", "values")
+						.mapping()
+						.name("names")
+						.x("time")
+						.y("values")
+				);
 			});
 	}
 

@@ -1,6 +1,9 @@
 package org.matsim.simwrapper.viz;
 
-public class Scatter extends Plot{
+/**
+ * The Scatter Plug-In generates a scatter plot.
+ */
+public class Scatter extends Plot {
 	public Scatter() {
 		super("scatter");
 	}

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * The PieChart generates a pie chart plot for simwrapper.
+ */
 public class PieChart extends Viz {
 
 	@JsonProperty(required = true)

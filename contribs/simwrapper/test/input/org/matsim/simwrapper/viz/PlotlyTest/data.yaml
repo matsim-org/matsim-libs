@@ -1,5 +1,6 @@
 type: plotly
-dataset: test.csv
+datasets:
+  dataset: test.csv
 traces:
 - fill: none
   "y": $dataset.yColumn
