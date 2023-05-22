@@ -36,14 +36,14 @@ public class TrafficCountsDashboard implements Dashboard {
 
 	private void generateArguments(Collection<Double> limits, Collection<String> labels) {
 
-		args = new String[limits.size() + labels.size()];
+		this.args = new String[limits.size() + labels.size()];
 		int index = 0;
 
 		for (Double l : limits)
-			args[index++] = "--limits=" + l;
+			this.args[index++] = "--limits=" + l;
 
 		for (String l : labels)
-			args[index++] = "--labels=" + l;
+			this.args[index++] = "--labels=" + l;
 	}
 
 	@Override
