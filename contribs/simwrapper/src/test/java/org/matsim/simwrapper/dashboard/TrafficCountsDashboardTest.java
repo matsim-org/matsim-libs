@@ -41,8 +41,15 @@ public class TrafficCountsDashboardTest {
 
 		generateDummyCounts(config);
 
-		SimWrapper sw = SimWrapper.create(new SimWrapperConfigGroup())
-			.addDashboard(new TrafficCountsDashboard());
+		SimWrapperConfigGroup simWrapperConfigGroup = new SimWrapperConfigGroup();
+		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.get("");
+		contextParams.mapCenter = "12, 48.95";
+		contextParams.sampleSize = "0.01";
+		contextParams.mapZoomLevel = 9.0;
+
+		SimWrapper sw = SimWrapper.create(simWrapperConfigGroup)
+				.addDashboard(new TrafficCountsDashboard(List.of(0.0, 0.3, 1.7, 2.5, Double.MAX_VALUE), List.of("less", "exact", "too much", "way too much")))
+				.addDashboard(new PlotlyDashboard());
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
@@ -70,22 +77,20 @@ public class TrafficCountsDashboardTest {
 		for (int i = 0; i <= 100; i++) {
 			Link link = links.get(random.nextInt(size));
 
-			if (counts.getCounts().containsKey(link.getId()))
+			if(counts.getCounts().containsKey(link.getId()))
 				continue;
 
 			Count<Link> count = counts.createAndAddCount(link.getId(), link.getId().toString() + "_count_station");
 			for (int hour = 1; hour < 25; hour++)
-				count.createVolume(hour, random.nextInt(1000));
+				count.createVolume(hour, random.nextInt(75));
 		}
 
 		try {
 			Files.createDirectories(Path.of(utils.getPackageInputDirectory()));
-			Path absolutPath = Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath().resolve("dummy_counts.xml");
+			String absolutPath = Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml";
 
-			if (!Files.exists(absolutPath))
-				new CountsWriter(counts).write(absolutPath.toString());
-
-			config.counts().setInputFile(absolutPath.toString());
+			config.counts().setInputFile(absolutPath);
+			new CountsWriter(counts).write(absolutPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

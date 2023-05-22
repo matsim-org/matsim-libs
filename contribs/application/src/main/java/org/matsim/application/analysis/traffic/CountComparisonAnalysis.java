@@ -20,12 +20,15 @@ import org.matsim.counts.Volume;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+
+import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
 @CommandLine.Command(name = "count-comparison", description = "Produces comparisons of observed and simulated counts.")
 @CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true,
-	produces = {"count_comparison_by_hour.csv", "count_comparison_total.csv"})
+		produces = {"count_comparison_by_hour.csv", "count_comparison_total.csv", "estimation_quality.csv"})
 public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
@@ -36,6 +39,12 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
 	private SampleOptions sample;
+
+	@CommandLine.Option(names = "--limits", description = "Limits for quality label categories", required = true)
+	private List<Double> limits;
+
+	@CommandLine.Option(names = "--labels", description = "Labels for quality categories", required = true)
+	private List<String> labels;
 
 	public static void main(String[] args) {
 		new CountComparisonAnalysis().execute(args);
@@ -67,24 +76,35 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		return 0;
 	}
 
+	private static String cut(double relError, List<Double> errorGroups, List<String> labels) {
+
+		int idx = Collections.binarySearch(errorGroups, relError);
+
+		if (idx >= 0)
+			return labels.get(idx);
+
+		int ins = -(idx + 1);
+		return labels.get(ins - 1);
+	}
+
 	private void writeOutput(Counts<Link> counts, Network network, VolumesAnalyzer volumes) {
 
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 
 		Table byHour = Table.create(
-			StringColumn.create("link_id"),
-			StringColumn.create("name"),
-			StringColumn.create("road_type"),
-			IntColumn.create("hour"),
-			DoubleColumn.create("observed_traffic_volume"),
-			DoubleColumn.create("simulated_traffic_volume")
+				StringColumn.create("link_id"),
+				StringColumn.create("name"),
+				StringColumn.create("road_type"),
+				IntColumn.create("hour"),
+				DoubleColumn.create("observed_traffic_volume"),
+				DoubleColumn.create("simulated_traffic_volume")
 		);
 
 		Table dailyTrafficVolume = Table.create(StringColumn.create("link_id"),
-			StringColumn.create("name"),
-			StringColumn.create("road_type"),
-			DoubleColumn.create("observed_traffic_volume"),
-			DoubleColumn.create("simulated_traffic_volume")
+				StringColumn.create("name"),
+				StringColumn.create("road_type"),
+				DoubleColumn.create("observed_traffic_volume"),
+				DoubleColumn.create("simulated_traffic_volume")
 		);
 
 		for (Map.Entry<Id<Link>, Count<Link>> entry : counts.getCounts().entrySet()) {
@@ -109,15 +129,20 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			if (countVolume.isEmpty())
 				continue;
 
+			double simulatedTrafficVolumeByDay = 0;
+			double observedTrafficVolumeByDay = 0;
+
 			if (countVolume.size() == 24) {
 
-				// FIXME : why does it start at hour 1 ?
 
 				for (int hour = 1; hour < 25; hour++) {
 
 					double observedTrafficVolumeAtHour = countVolume.get(hour).getValue();
 					double simulatedTrafficVolumeAtHour = volumesForLink == null ? 0.0 :
-						((double) volumesForLink[hour - 1]) / sample.getSample();
+							((double) volumesForLink[hour - 1]) / this.sample.getSample();
+
+					simulatedTrafficVolumeByDay += simulatedTrafficVolumeAtHour;
+					observedTrafficVolumeByDay += observedTrafficVolumeAtHour;
 
 					Row row = byHour.appendRow();
 					row.setString("link_id", key.toString());
@@ -127,10 +152,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 					row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
 					row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
 				}
-			}
-
-			double observedTrafficVolumeByDay = countVolume.values().stream().mapToDouble(Volume::getValue).sum();
-			double simulatedTrafficVolumeByDay = volumesForLink != null ? Arrays.stream(volumesForLink).sum() : 0.0;
+			} else
+				observedTrafficVolumeByDay = countVolume.values().stream().mapToDouble(Volume::getValue).sum();
 
 			Row row = dailyTrafficVolume.appendRow();
 			row.setString("link_id", key.toString());
@@ -140,16 +163,20 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
 		}
 
-		// TODO: add the classification as another column to count comparison
-		// major under, under, exact, over, major over
-
 		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")
-			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
-			.setName("rel_error");
+				.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
+				.setName("rel_error");
 
-		dailyTrafficVolume.addColumns(relError);
+		StringColumn qualityLabel = relError.copy()
+				.map(aDouble -> cut(aDouble, limits, labels), ColumnType.STRING::create)
+				.setName("quality");
+
+		dailyTrafficVolume.addColumns(relError, qualityLabel);
 
 		dailyTrafficVolume.write().csv(output.getPath("count_comparison_total.csv").toFile());
 		byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
+
+		Table byQuality = dailyTrafficVolume.summarize("quality", count).by("quality");
+		byQuality.write().csv(output.getPath("estimation_quality.csv").toFile());
 	}
 }
