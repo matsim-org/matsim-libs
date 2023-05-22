@@ -268,7 +268,7 @@ public final class CommandRunner {
 
 		if (args.length != 0) {
 			String[] existing = this.args.get(command);
-			if (existing != null && !Arrays.equals(existing, args)) {
+			if (existing != null && existing.length > 0 && !Arrays.equals(existing, args)) {
 				throw new IllegalArgumentException(String.format("Command %s already registered with args %s, can not define different args as %s",
 						command.toString(), Arrays.toString(existing), Arrays.toString(args)));
 			}

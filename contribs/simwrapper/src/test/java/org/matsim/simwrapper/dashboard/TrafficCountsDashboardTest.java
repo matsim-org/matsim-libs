@@ -49,7 +49,7 @@ public class TrafficCountsDashboardTest {
 			.addDashboard(new TrafficCountsDashboard())
 			.addDashboard(Dashboard.customize(new TrafficCountsDashboard(
 				List.of(0.0, 0.3, 1.7, 2.5),
-				List.of("less", "exact", "too much", "way too much"))
+				List.of("way too few", "fewer", "exact", "too much", "way too much"))
 			).context("custom"));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
@@ -59,7 +59,7 @@ public class TrafficCountsDashboardTest {
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
 
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**count_comparison_total.csv")
+			.isDirectoryContaining("glob:**count_comparison_daily.csv")
 			.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
 
 	}

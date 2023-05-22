@@ -19,8 +19,10 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
+import tech.tablesaw.selection.Selection;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +30,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
 @CommandLine.Command(name = "count-comparison", description = "Produces comparisons of observed and simulated counts.")
 @CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true,
-		produces = {"count_comparison_by_hour.csv", "count_comparison_total.csv", "estimation_quality.csv"})
+		produces = {"count_comparison_by_hour.csv", "count_comparison_daily.csv", "count_comparison_quality.csv"})
 public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
@@ -40,7 +42,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private SampleOptions sample;
 
-	@CommandLine.Option(names = "--limits", split = ",", description = "Limits for quality label categories", defaultValue = "0.6,0.8,1,1.2,1.4")
+	@CommandLine.Option(names = "--limits", split = ",", description = "Limits for quality label categories", defaultValue = "0.6,0.8,1.2,1.4")
 	private List<Double> limits;
 
 	@CommandLine.Option(names = "--labels", split = ",", description = "Labels for quality categories", defaultValue = "major under,under,ok,over,major over")
@@ -84,11 +86,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			return labels.get(idx);
 
 		int ins = -(idx + 1);
-
-		if (ins <= 0)
-			return labels.get(0);
-
-		return labels.get(ins - 1);
+		return labels.get(ins);
 	}
 
 	private void writeOutput(Counts<Link> counts, Network network, VolumesAnalyzer volumes) {
@@ -171,15 +169,33 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 				.setName("rel_error");
 
 		StringColumn qualityLabel = relError.copy()
-				.map(aDouble -> cut(aDouble, limits, labels), ColumnType.STRING::create)
+				.map(err -> cut(err, limits, labels), ColumnType.STRING::create)
 				.setName("quality");
 
 		dailyTrafficVolume.addColumns(relError, qualityLabel);
 
-		dailyTrafficVolume.write().csv(output.getPath("count_comparison_total.csv").toFile());
+		dailyTrafficVolume.write().csv(output.getPath("count_comparison_daily.csv").toFile());
 		byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
 
-		Table byQuality = dailyTrafficVolume.summarize("quality", count).by("quality");
-		byQuality.write().csv(output.getPath("estimation_quality.csv").toFile());
+		Table byQuality = dailyTrafficVolume.summarize("quality", count).by("quality", "road_type");
+		byQuality.column(2).setName("n");
+
+		Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("quality")));
+		byQuality = byQuality.sortOn(cmp.thenComparing(row -> row.getNumber("n")));
+		byQuality.addColumns(byQuality.doubleColumn("n").copy().setName("share"));
+
+		List<String> roadTypes = byQuality.stringColumn("road_type").unique().asList();
+
+		// Norm within each road type
+		for (String roadType : roadTypes) {
+			DoubleColumn share = byQuality.doubleColumn("share");
+			Selection sel = byQuality.stringColumn("road_type").isEqualTo(roadType);
+
+			double total = share.where(sel).sum();
+			if (total > 0)
+				share.set(sel, share.divide(total));
+		}
+
+		byQuality.write().csv(output.getPath("count_comparison_quality.csv").toFile());
 	}
 }
