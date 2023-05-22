@@ -97,6 +97,29 @@ public abstract class FastEmissionGridAnalyzer {
                 .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
     }
 
+	/**
+	 * Processes emissions that have been read by the {@link EmissionsOnLinkEventHandler}.
+	 */
+	public static Map<Pollutant, Raster> processHandlerEmissions(Map<Id<Link>, Map<Pollutant, Double>> link2pollutants, Network network, double cellSize, int radius) {
+
+		Map<Pollutant, TObjectDoubleHashMap<Id<Link>>> linkEmissionsByPollutant = new HashMap<>();
+
+		// Transpose the map
+		for (Map.Entry<Id<Link>, Map<Pollutant, Double>> perLink : link2pollutants.entrySet()) {
+			for (Map.Entry<Pollutant, Double> e : perLink.getValue().entrySet()) {
+				var linkMap = linkEmissionsByPollutant.computeIfAbsent(e.getKey(), key -> new TObjectDoubleHashMap<>());
+				linkMap.put(perLink.getKey(), e.getValue());
+			}
+		}
+
+		return linkEmissionsByPollutant.entrySet().stream()
+			.map(entry -> {
+				logger.info("Smoothing of: " + entry.getKey());
+				return Tuple.of(entry.getKey(), processLinkEmissions(entry.getValue(), network, cellSize, radius));
+			})
+			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+	}
+
     /**
      * Works as {@link FastEmissionGridAnalyzer#processEventsFile(String, Network, double, int)} but without events parsing
      * The emissions per link have to be supplied.
@@ -271,7 +294,7 @@ public abstract class FastEmissionGridAnalyzer {
         return result;
     }
 
-    @FunctionalInterface
+	@FunctionalInterface
     private interface GetValue {
         double forIndex(int fixedIndex, int volatileIndex);
     }
