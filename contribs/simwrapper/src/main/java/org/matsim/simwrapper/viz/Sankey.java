@@ -3,7 +3,7 @@ package org.matsim.simwrapper.viz;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * The plug-in creates an sankey/alluvial diagram.
+ * The plug-in creates a sankey/alluvial diagram.
  */
 public class Sankey extends Viz {
 

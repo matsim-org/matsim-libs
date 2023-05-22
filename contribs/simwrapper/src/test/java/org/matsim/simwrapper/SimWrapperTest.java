@@ -103,6 +103,14 @@ public class SimWrapperTest {
 						viz.title = "Tile";
 						viz.dataset = "example.csv";
 					}));
+
+			layout.row("tenth")
+					.el(Hexagons.class, ((viz, data) -> {
+						viz.title = "Hexagon";
+						viz.file = "drt_trips_drt.csv.gz";
+						viz.projection = "EPSG:31468";
+						viz.addAggregation("O/D Summary", "Origins", "fromX", "fromY", "Destinations", "toX", "toY");
+					}));
 		});
 
 		String outputDirectory = utils.getOutputDirectory();
