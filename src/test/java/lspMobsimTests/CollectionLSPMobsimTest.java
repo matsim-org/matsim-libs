@@ -207,7 +207,7 @@ public class CollectionLSPMobsimTest {
 	@Test
 	public void testCollectionLSPMobsim() {
 		for (LSPShipment shipment : collectionLSP.getShipments()) {
-			assertFalse(shipment.getLog().getPlanElements().isEmpty());
+			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
 
 			log.warn("");
 			log.warn("shipment schedule plan elements:");
@@ -216,15 +216,15 @@ public class CollectionLSPMobsimTest {
 			}
 			log.warn("");
 			log.warn("shipment log plan elements:");
-			for (ShipmentPlanElement planElement : shipment.getLog().getPlanElements().values()) {
+			for (ShipmentPlanElement planElement : shipment.getShipmentLog().getPlanElements().values()) {
 				log.warn(planElement);
 			}
 			log.warn("");
 
-			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getLog().getPlanElements().size());
+			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
-			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
 			//Das muss besser in den SchedulingTest rein

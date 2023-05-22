@@ -219,7 +219,7 @@ public class CollectionLSPSchedulingTest {
 		}
 
 		for (LogisticChain solution : collectionLSP.getSelectedPlan().getLogisticChains()) {
-			assertEquals(1, solution.getShipments().size());
+			assertEquals(1, solution.getShipmentIds().size());
 			for (LogisticChainElement element : solution.getLogisticChainElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
 				if (element.getNextElement() != null) {

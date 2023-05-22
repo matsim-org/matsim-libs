@@ -160,8 +160,8 @@ import java.util.Map;
 					.setLogisticsChainElement(servicesWaitedFor.get(carrierService).element)
 					.build();
 			Id<ShipmentPlanElement> loadId = Id.create(handle.getResourceId() + String.valueOf(handle.getLogisticChainElement().getId()) + handle.getElementType(), ShipmentPlanElement.class);
-			if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-				lspShipment.getLog().addPlanElement(loadId, handle);
+			if (!lspShipment.getShipmentLog().getPlanElements().containsKey(loadId)) {
+				lspShipment.getShipmentLog().addPlanElement(loadId, handle);
 			}
 		}
 		{ // New event-based approach //TODO: This throws currently a null pointer exception, because eventsHandler is null -> why???

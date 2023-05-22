@@ -26,32 +26,32 @@ import java.util.*;
 
 /*package-private*/ class ShipmentPlanImpl implements ShipmentPlan {
 
-	private final LSPShipment shipment;
-	private final LinkedHashMap<Id<ShipmentPlanElement>, ShipmentPlanElement> logElements;
+	private final Id<LSPShipment> lspShipmentId;
+	private final LinkedHashMap<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements;
 
-	ShipmentPlanImpl(LSPShipment shipment) {
-		this.shipment = shipment;
-		this.logElements = new LinkedHashMap<>();
+	ShipmentPlanImpl(Id<LSPShipment> lspShipmentId) {
+		this.lspShipmentId = lspShipmentId;
+		this.planElements = new LinkedHashMap<>();
 	}
 
 	@Override
-	public void setEmbeddingContainer(LSPShipment pointer) {
+	public void setEmbeddingContainer(Id<LSPShipment> pointer) {
 		throw new RuntimeException("not implemented");
 	}
 
 	@Override
-	public LSPShipment getEmbeddingContainer() {
-		return shipment;
+	public Id<LSPShipment> getEmbeddingContainer() {
+		return lspShipmentId;
 	}
 
 	@Override
 	public void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element) {
-		logElements.put(id, element);
+		planElements.put(id, element);
 	}
 
 	@Override
 	public Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements() {
-		return Collections.unmodifiableMap(logElements);
+		return Collections.unmodifiableMap(planElements);
 	}
 
 	@Override
@@ -61,7 +61,7 @@ import java.util.*;
 		// the method here is indeed there to find the plan element that was added most recently, to figure out how the next one can be added.  However, this then
 		// should be sorted by sequence of addition, not by timing.  ???   kai/kai, apr'21
 
-		ArrayList<ShipmentPlanElement> logList = new ArrayList<>(logElements.values());
+		ArrayList<ShipmentPlanElement> logList = new ArrayList<>(planElements.values());
 		logList.sort(new LogElementComparator());
 		Collections.reverse(logList);
 		return logList.get(0);
@@ -69,7 +69,7 @@ import java.util.*;
 
 	@Override
 	public void clear() {
-		logElements.clear();
+		planElements.clear();
 	}
 
 	static class LogElementComparator implements Comparator<ShipmentPlanElement> {

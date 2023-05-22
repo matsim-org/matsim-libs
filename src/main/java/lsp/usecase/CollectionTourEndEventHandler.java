@@ -85,13 +85,13 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		ShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().addPlanElement(unloadId, unload);
+		lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
 	}
 
 	private void logTransport(FreightTourEndEvent event, Tour tour) {
 		String idString = resource.getId() + "" + logisticChainElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
+		ShipmentPlanElement abstractPlanElement = lspShipment.getShipmentLog().getPlanElements().get(id);
 		if (abstractPlanElement instanceof ShipmentLeg transport) {
 			transport.setEndTime(event.getTime());
 			transport.setToLinkId(tour.getEndLinkId());

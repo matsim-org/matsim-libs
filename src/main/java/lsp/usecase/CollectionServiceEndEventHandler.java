@@ -75,7 +75,7 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightSe
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
+		lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
 
 	private void logTransport(FreightServiceEndEvent event) {
@@ -88,7 +88,7 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightSe
 		ShipmentLeg transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().addPlanElement(transportId, transport);
+		lspShipment.getShipmentLog().addPlanElement(transportId, transport);
 	}
 
 

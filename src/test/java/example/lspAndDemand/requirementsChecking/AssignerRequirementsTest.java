@@ -180,10 +180,12 @@ public class AssignerRequirementsTest {
 
 	@Test
 	public void testAssignerRequirements() {
-		for (LSPShipment shipment : blueChain.getShipments()) {
+		for (Id<LSPShipment> shipmentId : blueChain.getShipmentIds()) {
+			LSPShipment shipment = LSPUtils.findLspShipment(blueChain.getLSP(), shipmentId);
 			assertTrue(shipment.getRequirements().iterator().next() instanceof BlueRequirement);
 		}
-		for (LSPShipment shipment : redChain.getShipments()) {
+		for (Id<LSPShipment> shipmentId : redChain.getShipmentIds()) {
+			LSPShipment shipment = LSPUtils.findLspShipment(redChain.getLSP(), shipmentId);
 			assertTrue(shipment.getRequirements().iterator().next() instanceof RedRequirement);
 		}
 	}

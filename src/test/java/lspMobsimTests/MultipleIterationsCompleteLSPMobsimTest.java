@@ -330,10 +330,10 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 	@Test
 	public void testCompleteLSPMobsim() {
 		for (LSPShipment shipment : completeLSP.getShipments()) {
-			assertFalse(shipment.getLog().getPlanElements().isEmpty());
+			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
-			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
 			for (ShipmentPlanElement scheduleElement : scheduleElements) {
