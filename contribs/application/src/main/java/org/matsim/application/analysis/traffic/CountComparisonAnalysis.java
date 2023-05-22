@@ -40,10 +40,10 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private SampleOptions sample;
 
-	@CommandLine.Option(names = "--limits", description = "Limits for quality label categories", required = true)
+	@CommandLine.Option(names = "--limits", split = ",", description = "Limits for quality label categories", defaultValue = "0.6,0.8,1,1.2,1.4")
 	private List<Double> limits;
 
-	@CommandLine.Option(names = "--labels", description = "Labels for quality categories", required = true)
+	@CommandLine.Option(names = "--labels", split = ",", description = "Labels for quality categories", defaultValue = "major under,under,ok,over,major over")
 	private List<String> labels;
 
 	public static void main(String[] args) {
@@ -84,6 +84,10 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			return labels.get(idx);
 
 		int ins = -(idx + 1);
+
+		if (ins <= 0)
+			return labels.get(0);
+
 		return labels.get(ins - 1);
 	}
 
@@ -133,7 +137,6 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			double observedTrafficVolumeByDay = 0;
 
 			if (countVolume.size() == 24) {
-
 
 				for (int hour = 1; hour < 25; hour++) {
 

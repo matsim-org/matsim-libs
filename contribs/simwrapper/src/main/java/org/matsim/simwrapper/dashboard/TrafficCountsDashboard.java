@@ -7,10 +7,12 @@ import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Bar;
 import org.matsim.simwrapper.viz.MapPlot;
-import org.matsim.simwrapper.viz.Scatter;
+import org.matsim.simwrapper.viz.Plotly;
+import tech.tablesaw.plotly.components.Axis;
+import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -20,30 +22,22 @@ public class TrafficCountsDashboard implements Dashboard {
 
 	private String[] args;
 
+	/**
+	 * Constructor with default arguments.
+	 */
 	public TrafficCountsDashboard() {
-		List<Double> limits = List.of(0.0, 0.8, 1.2, Double.MAX_VALUE);
-		List<String> labels = List.of("under", "exact", "over");
-
-		this.generateArguments(limits, labels);
+		args = new String[0];
 	}
 
+	/**
+	 * Constructor with custom limits and categories.
+	 */
 	public TrafficCountsDashboard(Collection<Double> limits, Collection<String> labels) {
-		if (limits.size() != labels.size() + 1)
-			throw new RuntimeException("There must be one more limit than labels!");
 
-		this.generateArguments(limits, labels);
-	}
-
-	private void generateArguments(Collection<Double> limits, Collection<String> labels) {
-
-		this.args = new String[limits.size() + labels.size()];
-		int index = 0;
-
-		for (Double l : limits)
-			this.args[index++] = "--limits=" + l;
-
-		for (String l : labels)
-			this.args[index++] = "--labels=" + l;
+		args = new String[] {
+			"--limits", limits.stream().map(String::valueOf).collect(Collectors.joining(",")),
+			"--labels", String.join(",", labels)
+		};
 	}
 
 	@Override
@@ -52,46 +46,54 @@ public class TrafficCountsDashboard implements Dashboard {
 		header.title = "Traffic Counts";
 		header.description = "Comparison of observed and simulated daily traffic volumes";
 
+		// TODO: generate description for labels and limits
+
 		layout.row("map")
-				.el(MapPlot.class, (viz, data) -> {
-					viz.title = "Relative traffic volumes";
-					viz.height = 8.0;
+			.el(MapPlot.class, (viz, data) -> {
+				viz.title = "Relative traffic volumes";
+				viz.height = 8.0;
 
-					viz.center = data.context().getCenter();
-					viz.shapes = data.compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties");
+				viz.center = data.context().getCenter();
+				viz.shapes = data.compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties");
 
-					viz.datasets.counts = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv", args);
+				viz.datasets.counts = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv", args);
 
-					viz.display.fill.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
-					viz.display.fill.columnName = "quality";
-					viz.display.fill.colorRamp.steps = 5;
-					viz.display.fill.colorRamp.ramp = "Viridis";
+				viz.display.fill.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+				viz.display.fill.columnName = "quality";
+				viz.display.fill.colorRamp.steps = 5;
+				viz.display.fill.colorRamp.ramp = "Viridis";
 
-				});
+			});
 
 		layout.row("scatterplot")
-				.el(Scatter.class, (viz, data) -> {
-					viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv");
+			.el(Plotly.class, (viz, data) -> {
 
-					viz.title = "Observed and simulated daily traffic volumes";
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_total.csv"));
 
-					viz.legendName = "Road type";
+				viz.title = "Daily traffic volumes";
+				viz.description = "simulated vs. observed";
 
-					viz.x = "observed_traffic_volume";
-					viz.y = "simulated_traffic_volume";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Observed traffic count").build())
+					.yAxis(Axis.builder().title("Simulated traffic count").build())
+					.build();
 
-					viz.xAxisName = "Observed traffic volume";
-					viz.yAxisName = "Simulated traffic volume";
-				})
-				.el(Bar.class, (viz, data) -> {
-					viz.dataset = data.compute(CountComparisonAnalysis.class, "estimation_quality.csv");
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(), ds.mapping()
+					.x("observed_traffic_volume")
+					.y("simulated_traffic_volume")
+					.name("road_type")
+				);
 
-					viz.title = "Model estimation quality";
+			})
+			.el(Bar.class, (viz, data) -> {
+				viz.dataset = data.compute(CountComparisonAnalysis.class, "estimation_quality.csv");
 
-					viz.x = "quality";
-					viz.stacked = false;
+				viz.title = "Model estimation quality";
 
-					viz.yAxisName = "Number";
-				});
+				viz.x = "quality";
+				viz.stacked = false;
+
+				viz.yAxisName = "Number";
+			});
 	}
 }

@@ -27,7 +27,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -93,7 +92,6 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 			}
 		};
 
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
 
 		com.google.inject.Injector injector = Injector.createInjector(config, module);
 
@@ -121,7 +119,6 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 	private Config prepareConfig() {
 		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString());
-//		EmissionsConfigGroup emissionsConfigGroup
 
 		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("vehicles", input.getRunDirectory()).toAbsolutePath().toString());
 		config.network().setInputFile(ApplicationUtils.matchInput("network", input.getRunDirectory()).toAbsolutePath().toString());

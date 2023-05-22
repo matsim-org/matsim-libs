@@ -1,6 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
-import org.junit.Assert;
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
@@ -14,13 +14,11 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsModule;
 import org.matsim.counts.CountsWriter;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
-import tech.tablesaw.api.Table;
-import tech.tablesaw.io.DataFrameReader;
-import tech.tablesaw.io.ReaderRegistry;
 
 import java.io.IOException;
 import java.net.URL;
@@ -48,18 +46,22 @@ public class TrafficCountsDashboardTest {
 		contextParams.mapZoomLevel = 9.0;
 
 		SimWrapper sw = SimWrapper.create(simWrapperConfigGroup)
-				.addDashboard(new TrafficCountsDashboard(List.of(0.0, 0.3, 1.7, 2.5, Double.MAX_VALUE), List.of("less", "exact", "too much", "way too much")))
-				.addDashboard(new OverviewDashboard());
+			.addDashboard(new TrafficCountsDashboard())
+			.addDashboard(Dashboard.customize(new TrafficCountsDashboard(
+				List.of(0.0, 0.3, 1.7, 2.5),
+				List.of("less", "exact", "too much", "way too much"))
+			).context("custom"));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
 		controler.run();
 
-		Table total = new DataFrameReader(new ReaderRegistry()).csv(utils.getOutputDirectory() + "analysis/traffic/count_comparison_total.csv");
-		Assert.assertFalse(total.isEmpty());
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
 
-		Table byHour = new DataFrameReader(new ReaderRegistry()).csv(utils.getOutputDirectory() + "analysis/traffic/count_comparison_by_hour.csv");
-		Assert.assertFalse(byHour.isEmpty());
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**count_comparison_total.csv")
+			.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
+
 	}
 
 	public void generateDummyCounts(Config config) {
@@ -77,7 +79,7 @@ public class TrafficCountsDashboardTest {
 		for (int i = 0; i <= 100; i++) {
 			Link link = links.get(random.nextInt(size));
 
-			if(counts.getCounts().containsKey(link.getId()))
+			if (counts.getCounts().containsKey(link.getId()))
 				continue;
 
 			Count<Link> count = counts.createAndAddCount(link.getId(), link.getId().toString() + "_count_station");
