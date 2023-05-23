@@ -80,8 +80,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final RoutingModule accessToNetworkRouter;
 	private final RoutingModule egressFromNetworkRouter;
 	private final Config config;
-	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
-	public static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
+
 	private static boolean hasWarnedAccessEgress = false;
 	private PlansCalcRouteConfigGroup.AccessEgressType accessEgressType;
 	private final TimeInterpretation timeInterpretation;
@@ -132,7 +131,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	public synchronized List<? extends PlanElement> calcRoute(RoutingRequest request) {
 		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
 		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
-		
+
 		final Facility fromFacility = request.getFromFacility();
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
