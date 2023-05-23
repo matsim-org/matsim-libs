@@ -85,6 +85,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT))
 			.separator(';').build());
 
+		int total = persons.rowCount();
 
 		if (matchId != null) {
 			log.info("Using id filter {}", matchId);
@@ -95,7 +96,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			throw new UnsupportedOperationException("Shp filtering not implemented yet.");
 		}
 
-		log.info("Filtered {} persons", persons.rowCount());
+		log.info("Filtered {} out of {} persons", persons.rowCount(), total);
 
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT, "trav_time", ColumnType.STRING,
@@ -110,7 +111,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		Table joined = new DataFrameJoiner(trips, "person").inner(persons);
 
-		log.info("Filtered {}", joined.rowCount());
+		log.info("Filtered {} out of {} trips", joined.rowCount(), trips.rowCount());
 
 		List<String> labels = new ArrayList<>();
 		for (int i = 0; i < distGroups.size() - 1; i++) {
