@@ -15,6 +15,14 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 
 	public static final String EVENT_TYPE = "railsimTrainStateEvent";
 
+	public static final String ATTRIBUTE_HEADLINK = "headLink";
+	public static final String ATTRIBUTE_HEADPOSITION = "headPosition";
+	public static final String ATTRIBUTE_TAILLINK = "tailLink";
+	public static final String ATTRIBUTE_TAILPOSITION = "tailPosition";
+	public static final String ATTRIBUTE_SPEED = "speed";
+	public static final String ATTRIBUTE_ACCELERATION = "acceleration";
+	public static final String ATTRIBUTE_TARGETSPEED = "targetSpeed";
+
 	private final Id<Vehicle> vehicleId;
 	private final Id<Link> headLink;
 	private final double headPosition;
@@ -61,21 +69,33 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 		return speed;
 	}
 
+	public double getTargetSpeed() {
+		return this.targetSpeed;
+	}
+
 	public double getAcceleration() {
-		return acceleration;
+		return this.acceleration;
+	}
+
+	public Id<Link> getHeadLink() {
+		return this.headLink;
+	}
+
+	public Id<Link> getTailLink() {
+		return this.tailLink;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put("headLink", String.valueOf(headLink));
-		attr.put("headPosition", Double.toString(headPosition));
-		attr.put("tailLink", String.valueOf(tailLink));
-		attr.put("tailPosition", Double.toString(tailPosition));
-		attr.put("speed", Double.toString(speed));
-		attr.put("acceleration", Double.toString(acceleration));
-		attr.put("targetSpeed", Double.toString(targetSpeed));
+		attr.put(ATTRIBUTE_HEADLINK, String.valueOf(headLink));
+		attr.put(ATTRIBUTE_HEADPOSITION, Double.toString(headPosition));
+		attr.put(ATTRIBUTE_TAILLINK, String.valueOf(tailLink));
+		attr.put(ATTRIBUTE_TAILPOSITION, Double.toString(tailPosition));
+		attr.put(ATTRIBUTE_SPEED, Double.toString(speed));
+		attr.put(ATTRIBUTE_ACCELERATION, Double.toString(acceleration));
+		attr.put(ATTRIBUTE_TARGETSPEED, Double.toString(targetSpeed));
 		return attr;
 	}
 }

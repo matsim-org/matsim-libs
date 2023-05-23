@@ -17,6 +17,9 @@ public class RailsimLinkStateChangeEvent extends Event implements HasLinkId, Has
 
 	public static final String EVENT_TYPE = "railsimLinkStateChangeEvent";
 
+	public static final String ATTRIBUTE_STATE = "state";
+	public static final String ATTRIBUTE_TRACK = "track";
+
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 	private final TrackState state;
@@ -42,7 +45,15 @@ public class RailsimLinkStateChangeEvent extends Event implements HasLinkId, Has
 
 	@Override
 	public Id<Vehicle> getVehicleId() {
-		return null;
+		return this.vehicleId;
+	}
+
+	public TrackState getState() {
+		return state;
+	}
+
+	public int getTrack() {
+		return track;
 	}
 
 	@Override
@@ -50,8 +61,8 @@ public class RailsimLinkStateChangeEvent extends Event implements HasLinkId, Has
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put("state", this.state.toString());
-		attr.put("track", String.valueOf(track));
+		attr.put(ATTRIBUTE_STATE, this.state.toString());
+		attr.put(ATTRIBUTE_TRACK, String.valueOf(track));
 		return attr;
 	}
 }
