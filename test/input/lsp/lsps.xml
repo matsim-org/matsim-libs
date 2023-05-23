@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<lspsDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/lspsDefinitions_v2.xsd">
+<lspsDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd file:///Users/niclasrichter/git-svn/matsim-libs/matsim/src/main/resources/dtd/lspsDefinitions_v2.xsd">
 
 	<LSPs>
 		<lsp id="myLSP">
