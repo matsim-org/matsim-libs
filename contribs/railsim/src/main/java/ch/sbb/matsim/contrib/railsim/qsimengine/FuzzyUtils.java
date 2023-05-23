@@ -26,12 +26,26 @@ class FuzzyUtils {
 		return equals(a, b) || a - b > EPSILON;
 	}
 
+	/**
+	 * Returns true if the first double is certainly greater than the second.
+	 */
+	public static boolean greaterThan(double a, double b) {
+		return a - b > EPSILON;
+	}
+
 
 	/**
 	 * Returns true if the first double is approximately less than the second.
 	 */
 	public static boolean lessEqualThan(double a, double b) {
 		return equals(a, b) || b - a > EPSILON;
+	}
+
+	/**
+	 * Returns true if the first double is approximately less than the second.
+	 */
+	public static boolean lessThan(double a, double b) {
+		return b - a > EPSILON;
 	}
 
 }

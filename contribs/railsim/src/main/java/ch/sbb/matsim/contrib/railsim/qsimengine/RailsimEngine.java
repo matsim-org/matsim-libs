@@ -378,6 +378,11 @@ final class RailsimEngine implements Steppable {
 			dist = RailsimCalc.calcTraveledDist(state.speed, elapsed, state.acceleration);
 			state.speed = state.speed + elapsed * state.acceleration;
 
+			if (FuzzyUtils.equals(state.speed, state.targetSpeed)) {
+				state.speed = state.targetSpeed;
+				state.acceleration = 0;
+			}
+
 		}
 
 		assert FuzzyUtils.greaterEqualThan(dist, 0) : "Travel distance must be positive, but was" + dist;
@@ -403,7 +408,7 @@ final class RailsimEngine implements Steppable {
 
 		// (1) max speed reached
 		double accelDist = Double.POSITIVE_INFINITY;
-		if (state.acceleration > 0 && state.targetSpeed > state.speed) {
+		if (state.acceleration > 0 && FuzzyUtils.greaterThan(state.targetSpeed, state.speed)) {
 			accelDist = RailsimCalc.calcTraveledDist(state.speed, (state.targetSpeed - state.speed) / state.acceleration, state.acceleration);
 		}
 
