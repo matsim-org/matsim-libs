@@ -6,6 +6,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
@@ -32,6 +34,8 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 	produces = {"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv"}
 )
 public class TripAnalysis implements MATSimAppCommand {
+
+	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
 
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(TripAnalysis.class);
@@ -83,12 +87,15 @@ public class TripAnalysis implements MATSimAppCommand {
 
 
 		if (matchId != null) {
+			log.info("Using id filter {}", matchId);
 			persons = persons.where(persons.textColumn("person").matchesRegex(matchId));
 		}
 
 		if (shp.isDefined()) {
 			throw new UnsupportedOperationException("Shp filtering not implemented yet.");
 		}
+
+		log.info("Filtered {} persons", persons.rowCount());
 
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT, "trav_time", ColumnType.STRING,
@@ -102,6 +109,8 @@ public class TripAnalysis implements MATSimAppCommand {
 
 
 		Table joined = new DataFrameJoiner(trips, "person").inner(persons);
+
+		log.info("Filtered {}", joined.rowCount());
 
 		List<String> labels = new ArrayList<>();
 		for (int i = 0; i < distGroups.size() - 1; i++) {
