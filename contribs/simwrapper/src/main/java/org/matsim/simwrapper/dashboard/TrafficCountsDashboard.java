@@ -95,16 +95,17 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.title = "Relative traffic volumes";
 				viz.height = 8.0;
 
+				viz.setShape(data.compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties"), "id");
+				viz.addDataset("counts", data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
+
 				viz.center = data.context().getCenter();
-				viz.shapes = data.compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties");
+				viz.display.lineColor.dataset = "counts";
+				viz.display.lineColor.columnName = "quality";
+				viz.display.lineColor.join = "link_id";
+				viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlGn, 5, false);
 
-				viz.datasets.counts = data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args);
-
-				viz.display.fill.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv");
-				viz.display.fill.columnName = "quality";
-				viz.display.fill.colorRamp.steps = 5;
-				viz.display.fill.colorRamp.ramp = "Viridis";
-
+				// 8px
+				viz.display.lineWidth.dataset = "@8";
 			})
 			.el(Plotly.class, (viz, data) -> {
 

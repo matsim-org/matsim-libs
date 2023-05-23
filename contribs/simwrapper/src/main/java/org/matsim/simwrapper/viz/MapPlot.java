@@ -2,67 +2,96 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MapPlot extends Viz{
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Provide map based plots.
+ */
+public final class MapPlot extends Viz {
+
+	public double[] center;
+	public Display display = new Display();
+	@JsonProperty(required = true)
+	private Object shapes;
+	private Map<String, String> datasets = new HashMap<>();
 
 	public MapPlot() {
 		super("map");
 	}
 
-	@JsonProperty(required = true)
-	public String shapes;
-
-	public double[] center;
-
-	public Datasets datasets = new Datasets();
-
-	public Display display = new Display();
-
-	public class Datasets {
-
-		@JsonProperty(required = true)
-		public String counts;
+	/**
+	 * Set the shape url, providing the path.
+	 */
+	public MapPlot setShapes(String file) {
+		shapes = file;
+		return this;
 	}
 
-	public class Display {
+	/**
+	 * Set shape url and join path for dataset.
+	 */
+	public MapPlot setShape(String file, String join) {
+		shapes = Map.of("file", file, "join", join);
+		return this;
+	}
 
-		public LineWidth lineWidth = new LineWidth();
+	/**
+	 * Add named dataset to the map. This name can be referenced in the display section.
+	 */
+	public MapPlot addDataset(String name, String file) {
+		datasets.put(name, file);
+		return this;
+	}
 
-		public Fill fill = new Fill();
+	/**
+	 * Display section for various attributes.
+	 */
+	public static final class Display {
 
-		public class LineWidth {
+		public DisplaySettings lineWidth = new DisplaySettings();
 
-			@JsonProperty(required = true)
-			public String dataset;
+		public DisplaySettings lineColor = new DisplaySettings();
 
-			@JsonProperty(required = true)
-			public String columnName;
+		public DisplaySettings fill = new DisplaySettings();
 
-			@JsonProperty(required = true)
-			public String join;
+		public DisplaySettings fillHeight = new DisplaySettings();
 
-			public int scaleFactor;
+	}
+
+
+	/**
+	 * Generalized display settings.
+	 */
+	public static final class DisplaySettings {
+
+		@JsonProperty(required = true)
+		public String dataset;
+
+		@JsonProperty(required = true)
+		public String columnName;
+
+		@JsonProperty(required = true)
+		public String join;
+
+		public Double scaleFactor;
+
+		private Map<String, Object> colorRamp;
+
+		/**
+		 * Set the color ramp name.
+		 */
+		public DisplaySettings setColorRamp(String ramp) {
+			colorRamp = Map.of("ramp", ramp);
+			return this;
 		}
 
-		public class Fill{
-
-			@JsonProperty(required = true)
-			public String dataset;
-
-			@JsonProperty(required = true)
-			public String columnName;
-
-			public String filters;
-
-			public ColorRamp colorRamp = new ColorRamp();
-
-			public class ColorRamp{
-
-				public String ramp;
-
-				public boolean reversed;
-
-				public int steps;
-			}
+		/**
+		 * Sets the full color ramps settings
+		 */
+		public DisplaySettings setColorRamp(String ramp, int steps, boolean reversed) {
+			colorRamp = Map.of("ramp", ramp, "reversed", reversed, "steps", steps);
+			return this;
 		}
 	}
 }
