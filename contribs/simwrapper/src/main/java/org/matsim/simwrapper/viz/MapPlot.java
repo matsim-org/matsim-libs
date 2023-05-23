@@ -11,6 +11,8 @@ import java.util.Map;
 public final class MapPlot extends Viz {
 
 	public double[] center;
+	public Double zoom;
+
 	public Display display = new Display();
 	@JsonProperty(required = true)
 	private Object shapes;
