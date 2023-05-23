@@ -37,7 +37,7 @@ import static lsp.events.LogisticEventAttributes.ATTRIBUTE_HUB_ID;
  *
  * @author Kai Martins-Turner (kturner)
  */
-public final class HandlingInHubEndsEvent extends AbstractLogisticEvent implements LogisticEventCreator {
+public final class HandlingInHubEndsEvent extends AbstractLogisticEvent {
 
 	public static final String EVENT_TYPE = "Handling_ended";
 	private final Id<LSPResource> hubId;
@@ -63,14 +63,4 @@ public final class HandlingInHubEndsEvent extends AbstractLogisticEvent implemen
 		return attr;
 	}
 
-	@Override public Event createEvent(Event event, Id<LSPShipment> lspShipmentId, Activity activity) {
-		//TODO: Needs to be implemented.
-//		if(event instanceof ActivityEndEvent endEvent && FreightConstants.SERVICE.equals(endEvent.getActType())) {
-//			Tour.TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-//			if(element instanceof Tour.ServiceActivity serviceActivity) {
-//				return new FreightServiceEndEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), vehicleId);
-//			}
-//		}
-		return null;
-	}
 }
