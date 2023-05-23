@@ -9,11 +9,11 @@ import org.matsim.api.core.v01.population.Activity;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-public class HandlinInHubEndEventCreator implements LogisticEventCreator{
+public class HandlingInHubStartsEventCreator implements LogisticEventCreator{
 
     @Override
     public Event createEvent(Event event, Id<LSPShipment> lspShipmentId, Activity activity) {
         //TODO: This is just a first dummy implementation, KMT May'23
-        return new HandlingInHubEndsEvent(event.getTime(), activity.getLinkId(), lspShipmentId, Id.create("DummyHubId", LSPResource.class));
+        return new HandlingInHubStartsEvent(event.getTime(), activity.getLinkId(), lspShipmentId, Id.create("DummyHubId", LSPResource.class));
     }
 }

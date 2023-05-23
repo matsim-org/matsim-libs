@@ -21,8 +21,6 @@
 
 package lsp.events;
 
-import org.matsim.contrib.freight.events.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,8 +40,8 @@ public final class LogisticsEventCreatorUtils {
 	 */
 	public static Collection<LogisticEventCreator> getStandardEventCreators(){
 		List<LogisticEventCreator> creators = new ArrayList<>();
-		creators.add(new HandlinInHubStartEventCreator());
-		creators.add(new HandlinInHubEndEventCreator());
+		creators.add(new HandlingInHubStartsEventCreator());
+		creators.add(new HandlingInHubEndsEventCreator());
 		return creators;
 	}
 	
