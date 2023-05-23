@@ -63,7 +63,7 @@ public class LogFileAnalysis implements MATSimAppCommand {
 
 		List<Memory> memory = new ArrayList<>();
 		List<Iteration> iterations = new ArrayList<>();
-		Set<Warning> warnings = warnings = new LinkedHashSet<>();
+		Set<Warning> warnings = new LinkedHashSet<>();
 
 		String first = null;
 		String last = null;
