@@ -72,7 +72,7 @@ public class TripDashboard implements Dashboard {
 				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 				.build();
 
-			Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
+			Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args))
 				.constant("source", "Simulated")
 				.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
 
@@ -98,7 +98,7 @@ public class TripDashboard implements Dashboard {
 			viz.colorRamp = Plotly.ColorScheme.Viridis;
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
-				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv"))
+				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args))
 					.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
 					.mapping()
 					.x("dist_group")
@@ -120,7 +120,7 @@ public class TripDashboard implements Dashboard {
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics";
 				viz.description = "by main mode, over whole trip (including access & egress)";
-				viz.dataset = data.compute(TripAnalysis.class, "trip_stats.csv");
+				viz.dataset = data.compute(TripAnalysis.class, "trip_stats.csv", args);
 				viz.showAllRows = true;
 			})
 			.el(Plotly.class, (viz, data) -> {

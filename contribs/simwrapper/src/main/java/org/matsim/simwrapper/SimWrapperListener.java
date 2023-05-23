@@ -80,13 +80,16 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 
 		for (DashboardProvider provider : list) {
 			log.info("Creating dashboards for {}", provider);
+
 			for (Dashboard d : provider.getDashboards(this.config, this.simWrapper)) {
 
 				if (config.exclude.contains(d.getClass().getSimpleName()) || config.exclude.contains(d.getClass().getName()))
 					continue;
 
-				if (!simWrapper.hasDashboard(d.getClass(), d.context()) || d instanceof Dashboard.Customizable)
+				if (!simWrapper.hasDashboard(d.getClass(), d.context()) || d instanceof Dashboard.Customizable) {
+					log.info("Adding dashboard {}", d);
 					simWrapper.addDashboard(d);
+				}
 				else
 					log.warn("Skipping dashboard {} with context {}, because it is already present", d, d.context());
 			}
