@@ -53,7 +53,7 @@ public class LogFileAnalysis implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		Pattern gbl = Pattern.compile(".+INFO Gbl:\\d+(.+):(.+)");
+		Pattern gbl = Pattern.compile(".+INFO Gbl:\\d+ (.+?):(.+)");
 		Pattern mem = Pattern.compile(".+MemoryObserver:\\d+ used RAM: (\\d+) MB\\s+free: (\\d+) MB\\s+total: (\\d+) MB");
 		Pattern warn = Pattern.compile(".+(WARN|ERROR) (\\S+(ConfigGroup|ConsistencyCheck).*):[0-9]+ (.+)");
 
