@@ -543,7 +543,7 @@ public final class Config implements MatsimExtensionPoint {
 	}
 
 	public final VehiclesConfigGroup vehicles() {
-		return vehicles;
+		return (VehiclesConfigGroup) this.getModule(VehiclesConfigGroup.GROUP_NAME);
 	}
 	
 	public void setContext(URL context) {
