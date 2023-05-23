@@ -10,6 +10,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -106,6 +108,11 @@ final class RailsimEngine implements Steppable {
 	public boolean handleDeparture(double now, MobsimDriverAgent agent, Id<Link> linkId, NetworkRoute route) {
 
 		log.info("Train {} is departing", agent.getVehicle());
+
+		this.eventsManager.processEvent(new PersonEntersVehicleEvent(now, agent.getId(), agent.getVehicle().getId()));
+//		if (this.createLinkEvents) {
+			this.eventsManager.processEvent(new VehicleEntersTrafficEvent(now, agent.getId(), linkId, agent.getVehicle().getId(), agent.getMode(), 1.0));
+//		}
 
 		List<RailLink> list = route.getLinkIds().stream().map(links::get).collect(Collectors.toList());
 		list.add(0, links.get(linkId));
