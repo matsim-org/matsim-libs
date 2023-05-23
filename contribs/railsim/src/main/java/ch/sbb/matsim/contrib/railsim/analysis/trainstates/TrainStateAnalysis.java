@@ -17,22 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim;
+package ch.sbb.matsim.contrib.railsim.analysis.trainstates;
 
-import ch.sbb.matsim.contrib.railsim.analysis.linkstates.RailsimLinkStateAnalysisModule;
-import ch.sbb.matsim.contrib.railsim.analysis.trainstates.RailsimTrainStateAnalysisModule;
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import ch.sbb.matsim.contrib.railsim.eventhandlers.RailsimTrainStateEventHandler;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 
-public class RailsimModule extends AbstractModule {
+import java.util.ArrayList;
+import java.util.List;
+
+public class TrainStateAnalysis implements RailsimTrainStateEventHandler {
+
+	final List<RailsimTrainStateEvent> events = new ArrayList<>(1000);
 
 	@Override
-	public void install() {
-		installQSimModule(new RailsimQSimModule());
-		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
-		install(new RailsimLinkStateAnalysisModule());
-		install(new RailsimTrainStateAnalysisModule());
+	public void handleEvent(RailsimTrainStateEvent event) {
+		this.events.add(event);
 	}
+
 }

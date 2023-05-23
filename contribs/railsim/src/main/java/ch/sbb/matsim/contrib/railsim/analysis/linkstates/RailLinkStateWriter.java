@@ -17,22 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim;
+package ch.sbb.matsim.contrib.railsim.analysis.linkstates;
 
-import ch.sbb.matsim.contrib.railsim.analysis.linkstates.RailsimLinkStateAnalysisModule;
-import ch.sbb.matsim.contrib.railsim.analysis.trainstates.RailsimTrainStateAnalysisModule;
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.matsim.core.utils.io.IOUtils;
 
-public class RailsimModule extends AbstractModule {
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
-	@Override
-	public void install() {
-		installQSimModule(new RailsimQSimModule());
-		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
-		install(new RailsimLinkStateAnalysisModule());
-		install(new RailsimTrainStateAnalysisModule());
+public class RailLinkStateWriter {
+
+	public static void writeCsv(RailLinkStateAnalysis analysis, String filename) throws UncheckedIOException {
+		String[] header = {"link", "time", "state", "vehicle", "track"};
+
+		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(filename), CSVFormat.DEFAULT.builder().setHeader(header).build())) {
+			for (RailsimLinkStateChangeEvent event : analysis.events) {
+				csv.print(event.getLinkId().toString());
+				csv.print(event.getTime());
+				csv.print(event.getState().toString());
+				csv.print(event.getVehicleId() != null ? event.getVehicleId().toString() : "");
+				csv.print(event.getTrack());
+				csv.println();
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
 	}
 }
