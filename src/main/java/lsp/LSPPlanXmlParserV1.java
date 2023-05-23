@@ -20,6 +20,7 @@
 
 package lsp;
 
+import example.lsp.multipleChains.Utils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -70,6 +71,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 	private final Map<String, String> elementIdResourceIdMap = new LinkedHashMap<>();
 	private final Map<String, ShipmentPlanElement> planElements = new LinkedHashMap<>();
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
+	private final List<LogisticChain> logisticChains = new LinkedList<>();
+	private final List<LSPShipment> shipments = new LinkedList<>();
 
 
 	LSPPlanXmlParserV1( LSPs lsPs, Carriers carriers ) {
@@ -316,6 +319,32 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			case ATTRIBUTE -> attributesReader.endTag(name, content, context);
 			case SHIPMENT -> this.currentShipment = null;
 			case LSP_PLAN -> {
+				ShipmentAssigner consecutiveLogisticChainShipmentAssigner = Utils.createConsecutiveLogisticChainShipmentAssigner();
+
+				//create LspPlan
+				LSPPlan currentPlan = LSPUtils.createLSPPlan();
+
+						for (LogisticChain logisticChain : logisticChains) {
+							currentPlan.addLogisticChain(logisticChain);
+						}
+						currentPlan.setAssigner(consecutiveLogisticChainShipmentAssigner);
+
+				currentPlan.setScore(score);
+				currentPlan.setLSP(currentLsp);
+//				if (selected.equals("true")) {
+					currentLsp.setSelectedPlan(currentPlan);
+//				} else {
+//					currentLsp.addPlan(currentPlan);
+//				}
+
+				for (LSPShipment lspShipment : currentLsp.getShipments()) {
+					consecutiveLogisticChainShipmentAssigner.assignToLogisticChain(lspShipment);
+				}
+
+				logisticChains.clear();
+			}
+
+			case LOGISTIC_CHAIN -> {
 				LSPResource resource;
 				List<LogisticChainElement> logisticChainElements = new LinkedList<>();
 
@@ -334,37 +363,20 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
 				elementIdResourceIdMap.clear();
 
-				//create logisticChain
-				LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
+				//create logisticChains
+				LogisticChain currentLogisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
 						.addLogisticChainElement(logisticChainElements.get(0))
 						.build();
 
 				for (int i = 1; i < logisticChainElements.size(); i++) { // element 0 was already added in Builder as first element.
 					logisticChainElements.get(i - 1).connectWithNextElement(logisticChainElements.get(i));
-					logisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
+					currentLogisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
 				}
 
-				for (LSPShipment lspShipment : currentLsp.getShipments()) {
-					logisticChain.getShipmentIds().add(lspShipment.getId());
-				}
-
-				final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-
-				//create LspPlan
-				LSPPlan currentPlan = LSPUtils.createLSPPlan()
-						.addLogisticChain(logisticChain)
-						.setAssigner(singleSolutionShipmentAssigner);
-
-
-				currentPlan.setScore(score);
-				currentPlan.setLSP(currentLsp);
-				if (selected.equals("true")) {
-					currentLsp.setSelectedPlan(currentPlan);
-				} else {
-					currentLsp.addPlan(currentPlan);
-				}
-
+				logisticChains.add(currentLogisticChain);
 			}
+
+
 			case SHIPMENT_PLAN -> {
 				for (LSPShipment shipment : currentLsp.getShipments()) {
 					if (shipment.getId().toString().equals(shipmentPlanId)) {
