@@ -8,13 +8,14 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
@@ -25,12 +26,8 @@ import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @CommandLine.Command(name = "stuck-agents", description = "Generates statistics for stuck agents.")
 @CommandSpec(requireEvents = true, produces = {"stuck_agents_per_hour.csv", "stuck_agents_per_mode.csv", "stuck_agents_per_link.csv", "stuckAgentsPerModePieChart.csv", "stuck_agents.csv"})
@@ -65,8 +62,8 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 
 		// Total stats
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents.csv").toString()), CSVFormat.DEFAULT)) {
-			printer.printRecord("Total mobile Agents","Stuck Agents", "Proportion of stuck agents");
-			printer.printRecord(allAgents.size(), allStuckedLinks.keySet().size(), new DecimalFormat("#.0#").format(((Math.round((100.0 / allAgents.size() * allStuckedLinks.keySet().size()) * 100))/100.0)) + '%');
+			printer.printRecord("Total mobile Agents", "Stuck Agents", "Proportion of stuck agents");
+			printer.printRecord(allAgents.size(), allStuckedLinks.keySet().size(), new DecimalFormat("#.0#").format(((Math.round((100.0 / allAgents.size() * allStuckedLinks.keySet().size()) * 100)) / 100.0)) + '%');
 		} catch (IOException ex) {
 			log.error(ex);
 		}
@@ -171,9 +168,10 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 
 		// Stuck Agents per Link
 		Object2DoubleMap<String> perLink = stuckAgentsPerLink.computeIfAbsent(event.getLegMode(), (k) -> new Object2DoubleOpenHashMap<>());
-		String link = event.getLinkId().toString();
-		allStuckedLinks.merge(link, 1., Double::sum);
-		perLink.mergeDouble(link, 1, Double::sum);
+
+		Id<Link> link = Objects.requireNonNullElseGet(event.getLinkId(), () -> Id.createLinkId("unknown"));
+		allStuckedLinks.merge(link.toString(), 1., Double::sum);
+		perLink.mergeDouble(link.toString(), 1, Double::sum);
 	}
 
 	@Override
