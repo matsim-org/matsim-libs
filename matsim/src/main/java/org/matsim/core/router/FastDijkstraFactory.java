@@ -23,8 +23,8 @@ package org.matsim.core.router;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.ArrayRoutingNetworkFactory;

@@ -23,7 +23,7 @@ package org.matsim.contrib.roadpricing;
 import java.util.TreeMap;
 import java.util.stream.Collector;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,11 +43,11 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
- * Calculates the toll agents pay during a simulation by analyzing events. 
+ * Calculates the toll agents pay during a simulation by analyzing events.
  * Add an instance of this class as an EventHandler.
- * 
- * Users of this class can get to the amounts which have to be paid by the 
- * agents by using the getter methods and/or by asking for a stream of 
+ *
+ * Users of this class can get to the amounts which have to be paid by the
+ * agents by using the getter methods and/or by asking for a stream of
  * AgentMoneyEvent instances.
  *
  * @author mrieser
@@ -111,7 +111,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	@Override
 	public void handleEvent(final VehicleEntersTrafficEvent event) {
 		delegate.handleEvent(event);
-		
+
 		Link link = this.network.getLinks().get(event.getLinkId());
 		if (handler instanceof DistanceTollBehaviour || handler instanceof LinkTollBehaviour) {
 			/* we do not handle wait2link-events for these tolls, because the agent
@@ -226,7 +226,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 		}
 	}
 
-	
+
 	private class LinkTollBehaviour implements TollBehaviourI {
 		private final EventsManager events;
 		/**
@@ -254,10 +254,10 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	 * <br>
 	 * Design comments:
 	 * <ul>
-	 * 		<li> This implementation becomes a problem if someone tries to 
-	 * 			 implement more than one area which do not share the same flat 
+	 * 		<li> This implementation becomes a problem if someone tries to
+	 * 			 implement more than one area which do not share the same flat
 	 * 			 fee.  kai, mar'12
-	 * </ul> 
+	 * </ul>
 	 */
 	private class AreaTollBehaviour implements TollBehaviourI {
 		private final EventsManager events;
@@ -283,7 +283,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 					/* Register it. */
 					RoadPricingTollCalculator.this.agents.put(driverId, info);
 
-					/* The toll amount comes from the current link, but should 
+					/* The toll amount comes from the current link, but should
 					 * be the same for all links. */
 					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
 

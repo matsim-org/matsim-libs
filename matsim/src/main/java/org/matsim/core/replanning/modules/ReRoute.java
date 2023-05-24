@@ -29,16 +29,16 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
- * Uses the routing algorithm provided by the {@linkplain Controler} for 
+ * Uses the routing algorithm provided by the {@linkplain Controler} for
  * calculating the routes of plans during Replanning.
  *
  * @author mrieser
  */
 public class ReRoute extends AbstractMultithreadedModule {
-	
+
 	private ActivityFacilities facilities;
 	private final TimeInterpretation timeInterpretation;
 

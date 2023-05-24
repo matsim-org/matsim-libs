@@ -25,8 +25,8 @@ package org.matsim.core.replanning.strategies;
 import com.google.inject.TypeLiteral;
 import java.util.HashSet;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -141,7 +141,7 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 	    String SelectRandom="SelectRandom";
 	    String SelectPathSizeLogit="SelectPathSizeLogit" ;
     }
-    
+
 
     public interface DefaultStrategy {
         String ReRoute="ReRoute";
@@ -154,10 +154,10 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
     	String ChangeTripMode = "ChangeTripMode" ;
     	@Deprecated String TripSubtourModeChoice = "TripSubtourModeChoice" ;
     }
-    
-    // yyyy Why are the following always implementing Providers of the full implementations, and not just the interface 
+
+    // yyyy Why are the following always implementing Providers of the full implementations, and not just the interface
     // (i.e. Provider<GenericPlanSelector<Plan,Person>)?  kai, jan'15
-    
+
     private static class ExpBetaPlanSelectorForRemoval implements Provider<ExpBetaPlanSelector<Plan, Person>> {
 
         @Inject private PlanCalcScoreConfigGroup config;

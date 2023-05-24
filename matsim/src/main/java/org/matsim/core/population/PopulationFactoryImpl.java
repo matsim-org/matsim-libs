@@ -19,7 +19,7 @@
 
 package org.matsim.core.population;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -59,14 +59,14 @@ import org.matsim.facilities.ActivityFacility;
 	@Override
 	public Activity createActivityFromCoord(final String actType, final Coord coord) {
         Activity act = new ActivityImpl(actType) ;
-        act.setCoord(coord); 
+        act.setCoord(coord);
         return act ;
 	}
 
 	@Override
 	public Activity createInteractionActivityFromCoord(final String actType, final Coord coord) {
         Activity act = new InteractionActivity(actType) ;
-        act.setCoord(coord); 
+        act.setCoord(coord);
         return act ;
 	}
 

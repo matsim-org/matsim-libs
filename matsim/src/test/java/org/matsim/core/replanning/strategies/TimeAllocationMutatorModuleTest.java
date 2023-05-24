@@ -22,7 +22,7 @@ package org.matsim.core.replanning.strategies;
 
 import static org.junit.Assert.assertTrue;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import org.junit.Rule;
 import org.junit.Test;

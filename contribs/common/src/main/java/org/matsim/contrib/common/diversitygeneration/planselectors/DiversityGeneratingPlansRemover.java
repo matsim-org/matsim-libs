@@ -33,7 +33,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,23 +41,23 @@ import java.util.Map;
 /**
  * The idea, as the name says, is to not remove the worst plan, but remove plans such that diversity is maintained.
  * The design idea stems from path size logit, which reduces the probability to select alternatives which are similar
- * to other alternatives by adding a penalty to their utility.  
+ * to other alternatives by adding a penalty to their utility.
  * <p></p>
- * So if you have, for example, 4 similar plans with high scores and one other plan with a lower score, then the scores of 
- * the similar plans are artificially reduced, and one of them will in consequence be removed. 
+ * So if you have, for example, 4 similar plans with high scores and one other plan with a lower score, then the scores of
+ * the similar plans are artificially reduced, and one of them will in consequence be removed.
  * In the present incarnation, we make sure that not the best of those 4 will be removed.
  * <p></p>
  * Note that once all similar plans are removed, the remaining best plan will not be similar to any other plan any more, and
  * thus no longer incur a similarity penalty.  So it will never be removed.
  * <p></p>
  * This class has <i>not</i> yet been extensively tested and so it is not clear if it contains bugs, how well it works, or if parameters
- * should be set differently.  If someone wants to experiment, the class presumably should be made configurable (or copied before 
+ * should be set differently.  If someone wants to experiment, the class presumably should be made configurable (or copied before
  * modification).
  * <p></p>
  * There is also material in playground.vsp .
  * <p></p>
  * There are also some hints to literature at {@link PopulationUtils#calculateSimilarity}
- * 
+ *
  * @author nagel, ikaddoura
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
@@ -173,7 +173,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 					if ( Double.isNaN(utils[rr]) ) {
 						log.warn( "utils is NaN; id: " + plan1.getPerson().getId() ) ;
 					}
-				}	
+				}
 			}
 //			for ( PlanElement pe : plan1.getPlanElements() ) {
 //				log.info( pe.toString() ) ;
@@ -230,7 +230,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 	/* package-private, for testing */ double similarity( Plan plan1, Plan plan2 ) {
 		double simil = 0. ;
 		{
-			// TODO: Is StageActivityHandling.ExcludeStageActivities always right here or should we allow to pass 
+			// TODO: Is StageActivityHandling.ExcludeStageActivities always right here or should we allow to pass
 			// the StageActivityHandling setting via get() / constructor?
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, StageActivityHandling.ExcludeStageActivities) ;
 			List<Activity> activities2 = TripStructureUtils.getActivities(plan2, StageActivityHandling.ExcludeStageActivities) ;
@@ -246,7 +246,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
 			}
-		}		
+		}
 
 		return simil ;
 	}

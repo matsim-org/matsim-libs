@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,7 +55,7 @@ class PQSimProvider implements Provider<Mobsim> {
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		
+
 		return new QSimBuilder(config) //
 				.useDefaults()
 				.addOverridingQSimModule(new MinibusPopulationModule())

@@ -23,7 +23,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;

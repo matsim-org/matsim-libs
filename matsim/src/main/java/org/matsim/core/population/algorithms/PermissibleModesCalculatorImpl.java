@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -55,7 +55,7 @@ public final class PermissibleModesCalculatorImpl implements PermissibleModesCal
 
 	@Override
 	public Collection<String> getPermissibleModes(final Plan plan) {
-		if (!considerCarAvailability) return availableModes; 
+		if (!considerCarAvailability) return availableModes;
 
 		final Person person;
 		try {

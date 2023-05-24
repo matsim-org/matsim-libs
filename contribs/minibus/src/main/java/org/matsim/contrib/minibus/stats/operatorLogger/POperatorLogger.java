@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,9 +64,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public final class POperatorLogger implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private final static Logger log = LogManager.getLogger(POperatorLogger.class);
-	
+
 	public final static String FILESUFFIX = "pOperatorLogger.txt";
-	
+
 	private BufferedWriter pOperatorLoggerWriter;
 
 	@Inject private POperators pBox;
@@ -75,7 +75,7 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		MatsimServices controler = event.getServices();
-		
+
 		if(this.pConfig.getLogOperators()){
 			log.info("enabled");
 			this.pOperatorLoggerWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename(FILESUFFIX));
@@ -86,57 +86,57 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 			}
 		} else {
 			this.pOperatorLoggerWriter = null;
-		}		
+		}
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(this.pConfig.getLogOperators()){
-			
+
 			// get operators
 			for (Operator operator : this.pBox.getOperators()) {
 				// get all plans
 				List<PPlan> plans = operator.getAllPlans();
-				
+
 				LogElement total = new LogElement();
 				total.setIteration(event.getIteration());
 				total.setOperatorId(operator.getId());
 				total.setStatus(operator.getOperatorState());
 				total.setnVeh(operator.getNumberOfVehiclesOwned());
 				total.setBudget(operator.getBudget());
-				
+
 				total.setnPax(0);
 				total.setScore(0.0);
-				
+
 				for (PPlan plan : plans) {
 					LogElement local = new LogElement();
 					local.setIteration(event.getIteration());
 					local.setOperatorId(operator.getId());
 					local.setStatus(operator.getOperatorState());
-					
+
 					local.setPlanId(plan.getId());
 					local.setCreatorId(plan.getCreator());
 					local.setParentId(plan.getParentId());
-					
+
 					local.setnVeh(plan.getNVehicles());
-					
+
 					local.setnPax(plan.getTripsServed());
 					total.setnPax(total.getnPax() + local.getnPax());
-					
+
 					local.setScore(plan.getScore());
 					total.setScore(total.getScore() + local.getScore());
-					
+
 					local.setBudget(operator.getBudget());
-					
+
 					local.setStartTime(plan.getStartTime());
 					local.setEndTime(plan.getEndTime());
-					
+
 					ArrayList<Id<TransitStopFacility>> stopsServed = new ArrayList<>();
 					for (TransitStopFacility stop : plan.getStopsToBeServed()) {
 						stopsServed.add(stop.getId());
 					}
 					local.setStopsToBeServed(stopsServed);
-					
+
 					ArrayList<Id<Link>> linksServed = new ArrayList<>();
 					for (TransitRoute route : plan.getLine().getRoutes().values()) {
 						linksServed.add(route.getRoute().getStartLinkId());
@@ -148,7 +148,7 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 						break;
 					}
 					local.setLinksServed(linksServed);
-					
+
 					try {
 						this.pOperatorLoggerWriter.newLine();
 						this.pOperatorLoggerWriter.write(local.toString());
@@ -157,7 +157,7 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 						e.printStackTrace();
 					}
 				}
-				
+
 				try {
 					this.pOperatorLoggerWriter.newLine();
 					this.pOperatorLoggerWriter.write(total.getTotalString());
@@ -165,9 +165,9 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 			}
-			
+
 			try {
 				this.pOperatorLoggerWriter.flush();
 			} catch (IOException e) {

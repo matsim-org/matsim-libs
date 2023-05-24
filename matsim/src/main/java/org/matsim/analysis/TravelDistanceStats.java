@@ -35,7 +35,7 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.DoubleSummaryStatistics;
@@ -71,7 +71,7 @@ public class TravelDistanceStats {
 	@Inject
 	TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy controlerIO) {
 		this(controlerConfigGroup, controlerIO.getOutputFilename("traveldistancestats"),
-				controlerIO.getOutputFilename("traveldistancestats") + "legs", 
+				controlerIO.getOutputFilename("traveldistancestats") + "legs",
 				controlerIO.getOutputFilename("traveldistancestats") + "trips", controlerConfigGroup.isCreateGraphs());
 	}
 
@@ -84,7 +84,7 @@ public class TravelDistanceStats {
         this(config.controler(), filename, filename + "legs", filename + "trips", createPNG);
     }
 
-    private TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, String travelDistanceStatsFileName, 
+    private TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, String travelDistanceStatsFileName,
     		String legStatsPngName, String tripStatsPngName, boolean createPNG) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.legStatsPngName = legStatsPngName;
@@ -140,7 +140,7 @@ public class TravelDistanceStats {
                 // the following means trips with infinite distance are silently ignored.
                 .filter(Double::isFinite)
                 .summaryStatistics();
-        
+
         log.info("-- average leg distance per plan (executed plans only): " + legStats.getAverage() + " meters");
         log.info("average leg distance per Person (executed plans only): " + legStats.getSum() / map.size() + " meters (statistic on all " + legStats.getCount() + " legs which have a finite distance)");
         log.info("-- average trip distance per plan (executed plans only): " + tripStats.getAverage() + " meters");
@@ -177,7 +177,7 @@ public class TravelDistanceStats {
 				this.legStatsHistory = null;
 			}
 		}
-		
+
 		if (this.tripStatsHistory != null) {
 			int index = iteration - controlerConfigGroup.getFirstIteration();
             this.tripStatsHistory[index] = tripStats.getAverage();
@@ -211,5 +211,5 @@ public class TravelDistanceStats {
 
 	}
 
-	
+
 }
