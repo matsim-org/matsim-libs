@@ -23,32 +23,31 @@ package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
 
-import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
+import static org.matsim.contrib.freight.events.CarrierEventAttributes.*;
 
 /**
- * An event, that informs that a Freight {@link CarrierService} activity has started.
+ * An event, that informs that a Freight {@link CarrierShipment} delivery-activity has started.
  *
- * @author Tilman Matteis  - creating it for the use in Logistics / LogisticServiceProviders (LSP)s
- * @author Kai Martins-Turner (kturner) - integrating and adapting it into/for the MATSim freight contrib
+ * @author Kai Martins-Turner (kturner)
+ *
  */
-public final class FreightServiceStartEvent extends AbstractFreightEvent {
+public class CarrierShipmentDeliveryStartEvent extends AbstractCarrierEvent {
 
-	public static final String EVENT_TYPE = "Freight service starts";
+	public static final String EVENT_TYPE = "Freight shipment delivered starts";
 
-	private final Id<CarrierService> serviceId;
-	private final double serviceDuration;
+	private final Id<CarrierShipment> shipmentId;
+	private final double deliveryDuration;
 	private final int capacityDemand;
-
-	public FreightServiceStartEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
-		super(time, carrierId, service.getLocationLinkId(), vehicleId);
-		this.serviceId = service.getId();
-		this.serviceDuration = service.getServiceDuration();
-		this.capacityDemand = service.getCapacityDemand();
+	public CarrierShipmentDeliveryStartEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+		super(time, carrierId, shipment.getTo(), vehicleId);
+		this.shipmentId = shipment.getId();
+		this.deliveryDuration = shipment.getDeliveryServiceTime();
+		this.capacityDemand = shipment.getSize();
 	}
 
 	@Override
@@ -56,25 +55,24 @@ public final class FreightServiceStartEvent extends AbstractFreightEvent {
 		return EVENT_TYPE;
 	}
 
-	public Id<CarrierService> getServiceId() {
-		return serviceId;
+	public Id<CarrierShipment> getShipmentId() {
+		return shipmentId;
 	}
 
-
-	public double getServiceDuration() {
-		return serviceDuration;
+	public double getDeliveryDuration() {
+		return deliveryDuration;
 	}
 
 	public int getCapacityDemand() {
-		return this.capacityDemand;
+		return capacityDemand;
 	}
 
-	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_SERVICE_ID, serviceId.toString());
-		attr.put(ATTRIBUTE_SERVICE_DURATION, String.valueOf(serviceDuration));
+		attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
+		attr.put(ATTRIBUTE_DROPOFF_DURATION, String.valueOf(this.deliveryDuration));
 		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;
 	}
+
 }

@@ -30,16 +30,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeMap;
 
-/*package-private*/  final class FreightTourStartEventCreator implements FreightEventCreator{
+/*package-private*/  final class CarrierTourStartEventCreator implements CarrierEventCreator {
 
 	TreeMap<Id<Person>, ActivityEndEvent> endEventMap = new TreeMap<>();
 	TreeMap<Id<Person>, PersonEntersVehicleEvent> personEntersVehicleEventMap = new TreeMap<>();
@@ -77,9 +72,9 @@ import java.util.TreeMap;
 	 * @param personId
 	 * @param carrier
 	 * @param scheduledTour
-	 * @return FreightTourStartEvent
+	 * @return CarrierTourStartEvent
 	 */
-	private FreightTourStartEvent createFreightTourStartsEvent(Id<Person> personId, Carrier carrier, ScheduledTour scheduledTour) {
+	private CarrierTourStartEvent createFreightTourStartsEvent(Id<Person> personId, Carrier carrier, ScheduledTour scheduledTour) {
 		assert endEventMap.containsKey(personId);
 		final var endEvent = endEventMap.get(personId);
 
@@ -92,7 +87,7 @@ import java.util.TreeMap;
 			endEventMap.remove(personId);
 			personEntersVehicleEventMap.remove(personId);
 			// TODO: If we have the tourId, we do not need to store the link here, kmt sep 22
-			return new FreightTourStartEvent(endEvent.getTime(), carrier.getId(), scheduledTour.getTour().getStartLinkId(), entersVehicleEvent.getVehicleId(), scheduledTour.getTour().getId());
+			return new CarrierTourStartEvent(endEvent.getTime(), carrier.getId(), scheduledTour.getTour().getStartLinkId(), entersVehicleEvent.getVehicleId(), scheduledTour.getTour().getId());
 		}
 		return null;
 	}

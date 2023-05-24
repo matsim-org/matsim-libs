@@ -26,18 +26,18 @@ import org.matsim.core.events.MatsimEventsReader;
 import java.util.Map;
 
 /**
- *  Creates an {@link MatsimEventsReader} that also handles the freight specific events.
+ *  Creates an {@link MatsimEventsReader} that also handles the carrier specific events.
  *  <p>
  *  This is a quickfix for teaching and thus _not_ complete. Needs to get completed and secured by unit-testing later (KMT, feb'23)
  *
  * @author kturner (Kai Martins-Turner)
  */
-public class FreightEventsReaders {
+public class CarrierEventsReaders {
 
 	public static Map<String, MatsimEventsReader.CustomEventMapper> createCustomEventMappers() {
 		return Map.of(
-				FreightTourStartEvent.EVENT_TYPE, FreightTourStartEvent::convert, //
-				FreightTourEndEvent.EVENT_TYPE, FreightTourEndEvent::convert
+				CarrierTourStartEvent.EVENT_TYPE, CarrierTourStartEvent::convert, //
+				CarrierTourEndEvent.EVENT_TYPE, CarrierTourEndEvent::convert
 				// more will follow later, KMT feb'23
 		);
 	}

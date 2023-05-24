@@ -6,8 +6,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.contrib.freight.events.FreightServiceStartEvent;
+import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
 import org.matsim.vehicles.Vehicles;
@@ -37,12 +37,12 @@ import org.matsim.vehicles.Vehicles;
     }
 
     @Override
-    public void handleEvent(FreightServiceEndEvent event) {
+    public void handleEvent(CarrierServiceEndEvent event) {
         serviceTracking.handleEndEvent(event);
     }
 
     @Override
-    public void handleEvent(FreightServiceStartEvent event) {
+    public void handleEvent(CarrierServiceStartEvent event) {
         serviceTracking.handleStartEvent(event);
     }
 
