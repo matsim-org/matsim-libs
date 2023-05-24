@@ -94,10 +94,6 @@ public class ExampleTwoChains_10Shipments {
 		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
-		new LSPPlanXmlWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/lsps.xml");
-		new LSPPlanXmlReader(LSPUtils.getLSPs(controler.getScenario()), FreightUtils.getCarriers(controler.getScenario()));
-		new CarrierPlanWriter(FreightUtils.getCarriers(controler.getScenario())).write(controler.getConfig().controler().getOutputDirectory() + "/carriers.xml");
-
 		log.info("Some results ....");
 
 		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
