@@ -21,6 +21,7 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
+import org.matsim.api.core.v01.Id;
 
 import java.util.ArrayList;
 
@@ -128,7 +129,10 @@ import java.util.ArrayList;
 	private void insertShipmentsAtBeginning() {
 		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			LogisticChainElement firstElement = getFirstElement(solution);
-			for (LSPShipment shipment : solution.getShipments()) {
+			assert firstElement != null;
+			for (Id<LSPShipment> lspShipmentId : solution.getShipmentIds()) {
+				var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
+				assert shipment != null;
 				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment);
 			}
 		}

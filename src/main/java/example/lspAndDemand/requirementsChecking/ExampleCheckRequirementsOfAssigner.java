@@ -199,7 +199,8 @@ class ExampleCheckRequirementsOfAssigner {
 
 		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
 			if (solution.getId().toString().equals("RedSolution")) {
-				for (LSPShipment shipment : solution.getShipments()) {
+				for (Id<LSPShipment> shipmentId : solution.getShipmentIds()) {
+					LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
 					if (!(shipment.getRequirements().iterator().next() instanceof RedRequirement)) {
 						break;
 					}
@@ -207,7 +208,8 @@ class ExampleCheckRequirementsOfAssigner {
 				System.out.println("All shipments in " + solution.getId() + " are red");
 			}
 			if (solution.getId().toString().equals("BlueSolution")) {
-				for (LSPShipment shipment : solution.getShipments()) {
+				for (Id<LSPShipment> shipmentId : solution.getShipmentIds()) {
+					LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
 					if (!(shipment.getRequirements().iterator().next() instanceof BlueRequirement)) {
 						break;
 					}

@@ -63,7 +63,7 @@ final class LSPRescheduler {
 		if (event.getIteration() != 0) {
 			for (LSP lsp : lsps.getLSPs().values()) {
 				for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-					solution.getShipments().clear();
+					solution.getShipmentIds().clear();
 					for (LogisticChainElement element : solution.getLogisticChainElements()) {
 						element.getIncomingShipments().clear();
 						element.getOutgoingShipments().clear();
@@ -72,7 +72,7 @@ final class LSPRescheduler {
 
 				for (LSPShipment shipment : lsp.getShipments()) {
 					shipment.getShipmentPlan().clear();
-					shipment.getLog().clear();
+					shipment.getShipmentLog().clear();
 					lsp.getSelectedPlan().getAssigner().assignToLogisticChain(shipment);
 				}
 				lsp.scheduleLogisticChains();
