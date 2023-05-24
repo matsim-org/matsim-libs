@@ -22,17 +22,26 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour.Delivery;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.vehicles.Vehicle;
 
-public interface FreightEventCreator {
+/*package-private*/  final class CarrierShipmentDeliveryStartEventCreator implements CarrierEventCreator {
 
-	Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId);
-	// activityCounter is currently needed to get the correct "service" or "pickup" / "delivery" activity out auf the scheduled plan.
-	// It is well integrated in the {@link CarrierEventTracker}.
-	// Maybe it can be replaced by the correct freight-activity here --> move the getTourElement ... up
-	// kmt, Jun22
+	@Override
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
+		if(event instanceof ActivityStartEvent startEvent && FreightConstants.DELIVERY.equals(startEvent.getActType()) ) {
+			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+			if (element instanceof Delivery deliveryActivity) {
+				return new CarrierShipmentDeliveryStartEvent(event.getTime(), carrier.getId(), deliveryActivity.getShipment(), vehicleId );
+			}
+		}
+		return null;
+	}
 }

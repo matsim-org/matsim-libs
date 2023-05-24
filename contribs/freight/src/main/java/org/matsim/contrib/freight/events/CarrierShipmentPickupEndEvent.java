@@ -28,14 +28,14 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
 
-import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
+import static org.matsim.contrib.freight.events.CarrierEventAttributes.*;
 
 /**
  *  An event, that informs that a Freight {@link CarrierShipment} pickup-activity has ended.
  *
  * @author kturner
  */
-public class FreightShipmentPickupEndEvent extends AbstractFreightEvent {
+public class CarrierShipmentPickupEndEvent extends AbstractCarrierEvent {
 
 	public static final String EVENT_TYPE = "Freight shipment pickup ends";
 
@@ -43,8 +43,8 @@ public class FreightShipmentPickupEndEvent extends AbstractFreightEvent {
 	private final double pickupDuration;
 	private final int capacityDemand;
 
-	
-	public FreightShipmentPickupEndEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+
+	public CarrierShipmentPickupEndEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
 		super(time, carrierId, shipment.getFrom(), vehicleId);
 		this.shipmentId = shipment.getId();
 		this.pickupDuration = shipment.getPickupServiceTime();

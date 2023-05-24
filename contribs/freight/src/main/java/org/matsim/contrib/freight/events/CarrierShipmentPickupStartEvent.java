@@ -22,22 +22,51 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.vehicles.Vehicle;
 
-/*package-private*/ final class FreightTourEndEventCreator implements FreightEventCreator {
+import java.util.Map;
+
+import static org.matsim.contrib.freight.events.CarrierEventAttributes.*;
+
+/**
+ *  An event, that informs that a Freight {@link CarrierShipment} pickup-activity has started.
+ *
+ * @author Kai Martins-Turner (kturner)
+ */
+public class CarrierShipmentPickupStartEvent extends AbstractCarrierEvent {
+
+	public static final String EVENT_TYPE = "Freight shipment pickup starts";
+
+	private final Id<CarrierShipment> shipmentId;
+	private final double pickupDuration;
+	private final int capacityDemand;
+
+
+	public CarrierShipmentPickupStartEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+		super(time, carrierId, shipment.getFrom(), vehicleId);
+		this.shipmentId = shipment.getId();
+		this.pickupDuration = shipment.getPickupServiceTime();
+		this.capacityDemand = shipment.getSize();
+	}
+
 
 	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if(event instanceof ActivityStartEvent startEvent && FreightConstants.END.equals(startEvent.getActType()) ) {
-				return new FreightTourEndEvent(startEvent.getTime(), carrier.getId(), scheduledTour.getTour().getEndLinkId(), // TODO: If we have the tourId, we do not need to store the link here, kmt sep 22
-						vehicleId, scheduledTour.getTour().getId());
-		}	
-		return null;
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	public Id<CarrierShipment> getShipmentId() {
+		return shipmentId;
+	}
+
+
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
+		attr.put(ATTRIBUTE_PICKUP_DURATION, String.valueOf(this.pickupDuration));
+		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
+		return attr;
 	}
 }

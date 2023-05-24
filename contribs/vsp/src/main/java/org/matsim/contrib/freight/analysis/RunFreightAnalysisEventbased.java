@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.events.FreightEventsReaders;
+import org.matsim.contrib.freight.events.CarrierEventsReaders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -109,7 +109,7 @@ public class RunFreightAnalysisEventbased {
 		eventsManager.addHandler(carrierLoadAnalysis);
 
 		eventsManager.initProcessing();
-		MatsimEventsReader matsimEventsReader = FreightEventsReaders.createEventsReader(eventsManager);
+		MatsimEventsReader matsimEventsReader = CarrierEventsReaders.createEventsReader(eventsManager);
 
 		matsimEventsReader.readFile(eventsFile);
 		eventsManager.finishProcessing();
