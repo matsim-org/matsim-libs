@@ -111,6 +111,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 				eventsManager.addHandler(simulationTracker);
 				registeredHandlers.add(simulationTracker);
 				matsimServices.addControlerListener(simulationTracker);
+				simulationTracker.setEventsManager( eventsManager );
 			} else {
 				log.warn("not adding eventsHandler since already added: " + simulationTracker);
 			}

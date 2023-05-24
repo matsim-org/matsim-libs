@@ -20,9 +20,11 @@
 
 package lsp;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface LSPSimulationTracker<T> extends ControlerListener, EventHandler, HasBackpointer<T> {
 	// In general, we set backpointers when we add to the container.  So specifically, we set the backpointer to which the tracker points when the tracker is added.
+	default void setEventsManager( EventsManager eventsManager ){};
 }

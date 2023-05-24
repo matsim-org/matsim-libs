@@ -59,7 +59,7 @@ import java.util.Map;
 	private final TransshipmentHub transshipmentHub;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
-	@Inject private EventsManager eventsManager;
+	private EventsManager eventsManager;
 
 	/**
 	 * This is a TourEndEvent-Handler, doing some stuff regarding the {@link TransshipmentHub}.
@@ -78,6 +78,10 @@ import java.util.Map;
 
 	@Override
 	public void setEmbeddingContainer(LSPResource pointer) {
+	}
+
+	@Override public void setEventsManager( EventsManager eventsManager ) {
+		this.eventsManager = eventsManager;
 	}
 
 	@Override
@@ -165,6 +169,7 @@ import java.util.Map;
 			}
 		}
 		{ // New event-based approach //TODO: This throws currently a null pointer exception, because eventsHandler is null -> why???
+			//  Könnte sein, dass das jetzt funktioniert.  kai, may'23
 			eventsManager.processEvent(new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId));
 			eventsManager.processEvent(new HandlingInHubEndsEvent(endTime, linkId, lspShipment.getId(), resourceId));
 		}

@@ -72,13 +72,15 @@ public class LSPModule extends AbstractModule {
 		bind( CarrierAgentTracker.class ).in( Singleton.class );
 		addEventHandlerBinding().to( CarrierAgentTracker.class );
 
-		Multibinder<FreightEventCreator> freightEventCreatorMultibinder = Multibinder.newSetBinder( this.binder(), FreightEventCreator.class );
-		for( FreightEventCreator freightEventCreator : FreightEventCreatorUtils.getStandardEventCreators() ){
-			freightEventCreatorMultibinder.addBinding().toInstance( freightEventCreator );
-		}
-		for( LogisticEventCreator logisticEventCreator : LogisticsEventCreatorUtils.getStandardEventCreators() ){
-			freightEventCreatorMultibinder.addBinding().toInstance( logisticEventCreator );
-		}
+//		Multibinder<FreightEventCreator> freightEventCreatorMultibinder = Multibinder.newSetBinder( this.binder(), FreightEventCreator.class );
+//		for( FreightEventCreator freightEventCreator : FreightEventCreatorUtils.getStandardEventCreators() ){
+//			freightEventCreatorMultibinder.addBinding().toInstance( freightEventCreator );
+//		}
+//
+//		Multibinder<LogisticEventCreator> logisticEventCreatorMultibinder = Multibinder.newSetBinder( this.binder(), LogisticEventCreator.class );
+//		for( LogisticEventCreator logisticEventCreator : LogisticsEventCreatorUtils.getStandardEventCreators() ){
+//			logisticEventCreatorMultibinder.addBinding().toInstance( logisticEventCreator );
+//		}
 
 		// this switches on certain qsim components:
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule(getConfig(), QSimComponentsConfigGroup.class);
