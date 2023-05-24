@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Activity;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-public class HandlingInHubEndsEventCreator implements LogisticEventCreator{
+public class HandlingInHubEndsEventCreator implements LspEventCreator {
 
     @Override
     public Event createEvent(Event event, Id<LSPShipment> lspShipmentId, Activity activity) {

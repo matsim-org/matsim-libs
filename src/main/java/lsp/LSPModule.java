@@ -23,10 +23,6 @@ package lsp;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.google.inject.multibindings.Multibinder;
-import lsp.events.HandlingInHubEndsEventCreator;
-import lsp.events.LogisticEventCreator;
-import lsp.events.LogisticsEventCreatorUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -38,8 +34,6 @@ import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.*;
-import org.matsim.contrib.freight.events.FreightEventCreator;
-import org.matsim.contrib.freight.events.FreightEventCreatorUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -77,8 +71,8 @@ public class LSPModule extends AbstractModule {
 //			freightEventCreatorMultibinder.addBinding().toInstance( freightEventCreator );
 //		}
 //
-//		Multibinder<LogisticEventCreator> logisticEventCreatorMultibinder = Multibinder.newSetBinder( this.binder(), LogisticEventCreator.class );
-//		for( LogisticEventCreator logisticEventCreator : LogisticsEventCreatorUtils.getStandardEventCreators() ){
+//		Multibinder<LspEventCreator> logisticEventCreatorMultibinder = Multibinder.newSetBinder( this.binder(), LspEventCreator.class );
+//		for( LspEventCreator logisticEventCreator : LspEventCreatorUtils.getStandardEventCreators() ){
 //			logisticEventCreatorMultibinder.addBinding().toInstance( logisticEventCreator );
 //		}
 

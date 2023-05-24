@@ -26,20 +26,20 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Utils for {@link LogisticEventCreator}s
+ * Utils for {@link LspEventCreator}s
  *
  * @author kturner
  */
-public final class LogisticsEventCreatorUtils {
+public final class LspEventCreatorUtils {
 
-	private LogisticsEventCreatorUtils(){
+	private LspEventCreatorUtils(){
 	}
 
 	/**
 	 * @return a collection of the standard freightEvent creators
 	 */
-	public static Collection<LogisticEventCreator> getStandardEventCreators(){
-		List<LogisticEventCreator> creators = new ArrayList<>();
+	public static Collection<LspEventCreator> getStandardEventCreators(){
+		List<LspEventCreator> creators = new ArrayList<>();
 		creators.add(new HandlingInHubStartsEventCreator());
 		creators.add(new HandlingInHubEndsEventCreator());
 		return creators;

@@ -19,12 +19,12 @@ import java.util.Map;
  *
  * @author Kai Martins-Turner (kturner)
  */
-public abstract class AbstractLogisticEvent extends Event implements HasLinkId, HasLspShipmentId {
+public abstract class AbstractLspEvent extends Event implements HasLinkId, HasLspShipmentId {
 
 	private final Id<Link> linkId;
 	private final Id<LSPShipment> lspShipmentId;
 
-	public AbstractLogisticEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId) {
+	public AbstractLspEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId) {
 		super(time);
 		this.linkId = linkId;
 		this.lspShipmentId = lspShipmentId;

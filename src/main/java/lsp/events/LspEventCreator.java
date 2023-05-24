@@ -21,12 +21,18 @@
 
 package lsp.events;
 
-/**
- *  Some constants, that are used for the Attributes of different logistic events.
- *
- *  @author Kai Martins-Turner (kturner)
- */
-public class LogisticEventAttributes {
-	public static final String ATTRIBUTE_HUB_ID = "hubId";
+import lsp.shipment.LSPShipment;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
 
+/**
+ *
+ * @author Kai Martins-Turner (kturner)
+ */
+
+public interface LspEventCreator {
+
+	// I am unsure, if I need the activity or not. kmt 'dec22
+	Event createEvent(Event event, Id<LSPShipment> lspShipmentId, Activity activity);
 }

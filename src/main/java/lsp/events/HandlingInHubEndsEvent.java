@@ -24,20 +24,18 @@ package lsp.events;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 
 import java.util.Map;
 
-import static lsp.events.LogisticEventAttributes.ATTRIBUTE_HUB_ID;
+import static lsp.events.LspEventAttributes.ATTRIBUTE_HUB_ID;
 
 /**
  * An event, that informs that the handling of a {@link LSPShipment}  in a hub has ended.
  *
  * @author Kai Martins-Turner (kturner)
  */
-public final class HandlingInHubEndsEvent extends AbstractLogisticEvent {
+public final class HandlingInHubEndsEvent extends AbstractLspEvent {
 
 	public static final String EVENT_TYPE = "Handling_ended";
 	private final Id<LSPResource> hubId;
