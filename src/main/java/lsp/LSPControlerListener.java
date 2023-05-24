@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
 import org.matsim.contrib.freight.controler.FreightUtils;
@@ -43,7 +44,7 @@ import java.util.List;
 
 
 class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
-							  ReplanningListener, IterationStartsListener, IterationEndsListener{
+							  ReplanningListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private static final Logger log = LogManager.getLogger( LSPControlerListener.class );
 	private final Scenario scenario;
 
@@ -178,5 +179,11 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getIterationFilename(event.getIteration(), "lsps.xml"));
+	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getOutputPath() + "/lsps.xml");
+		new CarrierPlanWriter(FreightUtils.getCarriers(scenario)).write(controlerIO.getOutputPath() + "/carriers.xml");
 	}
 }
