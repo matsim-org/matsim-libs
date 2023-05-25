@@ -69,11 +69,11 @@ public class RailsimCalc {
 	 * again after traveled {@code dist}.
 	 */
 	static SpeedTarget calcTargetSpeed(double dist, double acceleration, double deceleration,
-								   double currentSpeed, double targetSpeed, double finalSpeed) {
+									   double currentSpeed, double targetSpeed, double finalSpeed) {
 
 		assert FuzzyUtils.greaterEqualThan(targetSpeed, finalSpeed) : "Final speed must be smaller than target";
 
-		double timeDecel = (targetSpeed- finalSpeed) / deceleration;
+		double timeDecel = (targetSpeed - finalSpeed) / deceleration;
 		double distDecel = calcTraveledDist(targetSpeed, timeDecel, -deceleration);
 
 		// This code below only works during deceleration
@@ -93,7 +93,7 @@ public class RailsimCalc {
 
 		double v = Math.sqrt(nom / (acceleration + deceleration));
 
-		timeDecel = (v- finalSpeed) / deceleration;
+		timeDecel = (v - finalSpeed) / deceleration;
 		distDecel = calcTraveledDist(v, timeDecel, -deceleration);
 
 		return new SpeedTarget(v, distDecel);
@@ -122,14 +122,17 @@ public class RailsimCalc {
 		double targetSpeed = state.targetSpeed;
 		double speed = 0;
 
-		for (int i = state.routeIdx; i < state.route.size(); i++) {
+		for (int i = state.routeIdx; i <= state.route.size(); i++) {
 
-			RailLink link = state.route.get(i);
+			RailLink link;
 			double allowed;
 			// Last track where train comes to halt
-			if (i == state.route.size() - 1)
+			if (i == state.route.size()) {
+				link = null;
 				allowed = 0;
+			}
 			else {
+				link = state.route.get(i);
 				allowed = link.getAllowedFreespeed(state.driver);
 			}
 
@@ -146,7 +149,8 @@ public class RailsimCalc {
 				}
 			}
 
-			dist += link.length;
+			if (link != null)
+				dist += link.length;
 
 			// don't need to look further than distance needed for full stop
 			if (dist >= window)
@@ -178,7 +182,8 @@ public class RailsimCalc {
 
 		double dist = -state.headPosition - safetyDist;
 		int idx = state.routeIdx;
-		do {
+
+		while (dist <= safetyDist && idx < state.route.size()) {
 			RailLink nextLink = state.route.get(idx++);
 			dist += nextLink.length;
 
@@ -186,7 +191,7 @@ public class RailsimCalc {
 				continue;
 
 			return dist;
-		} while (dist <= safetyDist && idx < state.route.size());
+		}
 
 		// No need to reserve yet
 		return Double.POSITIVE_INFINITY;

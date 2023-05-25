@@ -105,6 +105,8 @@ final class RailsimEngine implements Steppable {
 
 		activeTrains.add(state);
 
+		disposition.onDeparture(now, state.driver, state.route);
+
 		updateQueue.add(new UpdateEvent(state, UpdateEvent.Type.DEPARTURE));
 
 		return true;
@@ -196,8 +198,6 @@ final class RailsimEngine implements Steppable {
 		TrainState state = event.state;
 		state.timestamp = time;
 
-		disposition.onDeparture(time, state.driver, state.route);
-
 		state.headPosition = resources.getLink(state.headLink).length;
 		state.tailPosition = resources.getLink(state.headLink).length - state.train.length();
 
@@ -250,13 +250,6 @@ final class RailsimEngine implements Steppable {
 
 		updatePosition(time, event);
 
-		// On route departure the head link is null
-		eventsManager.processEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
-
-		// Get link and increment
-		state.headPosition = 0;
-		state.headLink = state.route.get(state.routeIdx++).getLinkId();
-
 		// Arrival at destination
 		if (state.isRouteAtEnd()) {
 
@@ -282,6 +275,13 @@ final class RailsimEngine implements Steppable {
 			event.type = UpdateEvent.Type.IDLE;
 			return;
 		}
+
+		// On route departure the head link is null
+		eventsManager.processEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
+
+		// Get link and increment
+		state.headPosition = 0;
+		state.headLink = state.route.get(state.routeIdx++).getLinkId();
 
 
 		state.driver.notifyMoveOverNode(state.headLink);

@@ -115,7 +115,7 @@ final class TrainState {
 
 
 	boolean isRouteAtEnd() {
-		return routeIdx == route.size();
+		return routeIdx >= route.size();
 	}
 
 	RailsimTrainStateEvent asEvent(double time) {
