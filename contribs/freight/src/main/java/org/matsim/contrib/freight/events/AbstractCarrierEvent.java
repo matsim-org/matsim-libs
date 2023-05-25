@@ -21,13 +21,13 @@ import java.util.Map;
  *
  * @author Kai Martins-Turner (kturner)
  */
-public abstract class AbstractFreightEvent extends Event implements HasCarrierId, HasLinkId, HasVehicleId {
+public abstract class AbstractCarrierEvent extends Event implements HasCarrierId, HasLinkId, HasVehicleId {
 
 	private final Id<Carrier> carrierId;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 
-	public AbstractFreightEvent(double time, Id<Carrier> carrierId, Id<Link> linkId, Id<Vehicle> vehicleId) {
+	public AbstractCarrierEvent(double time, Id<Carrier> carrierId, Id<Link> linkId, Id<Vehicle> vehicleId) {
 		super(time);
 		this.carrierId = carrierId;
 		this.linkId = linkId;

@@ -28,20 +28,20 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
+import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.vehicles.Vehicle;
 
-/*package-private*/  final class FreightServiceStartEventCreator implements FreightEventCreator {
+/*package-private*/  final class CarrierShipmentPickupStartEventCreator implements CarrierEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if( event instanceof ActivityStartEvent startEvent && FreightConstants.SERVICE.equals(startEvent.getActType()) ){
+		if(event instanceof ActivityStartEvent startEvent && FreightConstants.PICKUP.equals((startEvent).getActType()) ) {
 			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-			if( element instanceof ServiceActivity serviceActivity ) {
-				return new FreightServiceStartEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), vehicleId);
+			if (element instanceof Pickup pickupActivity) {
+				return new CarrierShipmentPickupStartEvent(event.getTime(), carrier.getId(), pickupActivity.getShipment(), vehicleId );
 			}
 		}
 		return null;
 	}
-}	
+}

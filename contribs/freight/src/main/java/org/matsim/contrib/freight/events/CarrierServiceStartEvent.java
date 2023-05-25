@@ -22,34 +22,33 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.GenericEvent;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
-import java.util.Objects;
 
-import static org.matsim.contrib.freight.events.FreightEventAttributes.ATTRIBUTE_TOUR_ID;
+import static org.matsim.contrib.freight.events.CarrierEventAttributes.*;
 
 /**
- * An event, that informs when a Freight {@link Tour} has started.
- * There are NO specific information of the tour given, because the {@link Tour} is determined by the {@link Vehicle} and its {@link Carrier}.
+ * An event, that informs that a Freight {@link CarrierService} activity has started.
  *
  * @author Tilman Matteis  - creating it for the use in Logistics / LogisticServiceProviders (LSP)s
  * @author Kai Martins-Turner (kturner) - integrating and adapting it into/for the MATSim freight contrib
  */
-public final class FreightTourStartEvent extends AbstractFreightEvent {
+public final class CarrierServiceStartEvent extends AbstractCarrierEvent {
 
-	public static final String EVENT_TYPE = "Freight tour starts";
+	public static final String EVENT_TYPE = "Freight service starts";
 
-	private final Id<Tour> tourId;
+	private final Id<CarrierService> serviceId;
+	private final double serviceDuration;
+	private final int capacityDemand;
 
-	public FreightTourStartEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId, Id<Tour> tourId) {
-		super(time, carrierId, linkId, vehicleId);
-		this.tourId = tourId;
+	public CarrierServiceStartEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
+		super(time, carrierId, service.getLocationLinkId(), vehicleId);
+		this.serviceId = service.getId();
+		this.serviceDuration = service.getServiceDuration();
+		this.capacityDemand = service.getCapacityDemand();
 	}
 
 	@Override
@@ -57,26 +56,25 @@ public final class FreightTourStartEvent extends AbstractFreightEvent {
 		return EVENT_TYPE;
 	}
 
-	public Id<Tour> getTourId() {
-		return tourId;
+	public Id<CarrierService> getServiceId() {
+		return serviceId;
+	}
+
+
+	public double getServiceDuration() {
+		return serviceDuration;
+	}
+
+	public int getCapacityDemand() {
+		return this.capacityDemand;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_TOUR_ID, this.tourId.toString());
+		attr.put(ATTRIBUTE_SERVICE_ID, serviceId.toString());
+		attr.put(ATTRIBUTE_SERVICE_DURATION, String.valueOf(serviceDuration));
+		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;
-	}
-
-	public static FreightTourStartEvent convert(GenericEvent event) {
-		Map<String, String> attributes = event.getAttributes();
-		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
-		Id<Carrier> carrierId = Id.create(attributes.get(ATTRIBUTE_CARRIER_ID), Carrier.class);
-		Id<Vehicle> vehicleId = null;
-		if ( attributes.get(ATTRIBUTE_VEHICLE) != null ) {
-			vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), Vehicle.class);}
-		Id<Link> linkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
-		Id<Tour> tourId = Id.create(attributes.get(ATTRIBUTE_TOUR_ID), Tour.class);
-		return new FreightTourStartEvent(time, carrierId, linkId, vehicleId, tourId);
 	}
 }

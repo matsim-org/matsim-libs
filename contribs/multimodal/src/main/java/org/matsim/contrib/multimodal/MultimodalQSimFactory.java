@@ -22,7 +22,7 @@ package org.matsim.contrib.multimodal;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;

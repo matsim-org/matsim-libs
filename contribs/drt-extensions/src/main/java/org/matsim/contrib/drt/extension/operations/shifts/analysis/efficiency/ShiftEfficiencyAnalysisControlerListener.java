@@ -27,7 +27,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
