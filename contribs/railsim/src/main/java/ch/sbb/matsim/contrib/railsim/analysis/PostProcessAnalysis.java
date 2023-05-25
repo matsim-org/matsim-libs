@@ -20,9 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.analysis;
 
 import ch.sbb.matsim.contrib.railsim.analysis.linkstates.RailLinkStateAnalysis;
-import ch.sbb.matsim.contrib.railsim.analysis.linkstates.RailLinkStateWriter;
 import ch.sbb.matsim.contrib.railsim.analysis.trainstates.TrainStateAnalysis;
-import ch.sbb.matsim.contrib.railsim.analysis.trainstates.TrainStateWriter;
 import ch.sbb.matsim.contrib.railsim.eventmappers.RailsimLinkStateChangeEventMapper;
 import ch.sbb.matsim.contrib.railsim.eventmappers.RailsimTrainStateEventMapper;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
@@ -71,7 +69,7 @@ public class PostProcessAnalysis {
 
 		events.finishProcessing();
 
-		RailLinkStateWriter.writeCsv(linkStateAnalysis, "railsimLinkStates.csv");
-		TrainStateWriter.writeCsv(trainStateAnalysis, scenario.getNetwork(), "railsimTrainStates.csv");
+		RailsimCsvWriter.writeLinkStatesCsv(linkStateAnalysis.getEvents(), "railsimLinkStates.csv");
+		RailsimCsvWriter.writeTrainStatesCsv(trainStateAnalysis.getEvents(), scenario.getNetwork(), "railsimTrainStates.csv");
 	}
 }

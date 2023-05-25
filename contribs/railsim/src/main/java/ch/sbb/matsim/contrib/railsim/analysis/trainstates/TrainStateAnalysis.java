@@ -34,4 +34,7 @@ public class TrainStateAnalysis implements RailsimTrainStateEventHandler {
 		this.events.add(event);
 	}
 
+	public List<RailsimTrainStateEvent> getEvents() {
+		return events;
+	}
 }

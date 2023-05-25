@@ -34,4 +34,7 @@ public class RailLinkStateAnalysis implements RailsimLinkStateChangeEventHandler
 		this.events.add(event);
 	}
 
+	public List<RailsimLinkStateChangeEvent> getEvents() {
+		return events;
+	}
 }

@@ -39,13 +39,13 @@
 		<link id="l3-4" from="n3" to="n4" length="200.0" freespeed="100" capacity="3600.0"
 			  permlanes="1" oneway="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainOppositeDirectionLink" class="java.lang.String">l4-3</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l43</attribute>
 			</attributes>
 		</link>
 		<link id="l4-3" from="n4" to="n3" length="200.0" freespeed="100" capacity="3600.0"
 			  permlanes="1" oneway="1" modes="rail">
 			<attributes>
-				<attribute name="railsimTrainOppositeDirectionLink" class="java.lang.String">l3-4</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l43</attribute>
 			</attributes>
 		</link>
 

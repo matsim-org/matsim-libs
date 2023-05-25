@@ -21,13 +21,11 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -36,13 +34,11 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
-import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import javax.inject.Inject;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -73,14 +69,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-
-		Map<Id<Link>, Link> links = new IdMap<>(Link.class);
-		for (Link link : qsim.getScenario().getNetwork().getLinks().values()) {
-			if (link.getAllowedModes().stream().anyMatch(modes::contains))
-				links.put(link.getId(), link);
-		}
-
-		engine = new RailsimEngine(qsim.getEventsManager(), config, links);
+		engine = new RailsimEngine(qsim.getEventsManager(), config, new RailResourceManager(config, qsim.getScenario().getNetwork()));
 	}
 
 	@Override

@@ -33,6 +33,30 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunRailsimExample {
 
+	// TODO: Vehicle
+	// vehicle should start on link end and go directly to next
+	// vehicle drives the last link completely
+
+	// TODO: Zwischenebene mit Segmenten
+
+	// TODO: blockId attribute für links
+
+	// TODO: Kreuzungsweiche, Knoten mit Belegungslogik
+
+	// TODO: Alle x Sekunden links vorreservieren
+
+	// 1 extrem fall Reservation für ganze strecke im vorraus
+
+	// bei train departure wird zukünftiger fahrweg mit übergeben
+
+	// Disposition interface
+
+	// TODO: tail link umstellen auf entfernung from node
+	// head position = 0, link länge - zug länge
+
+	// TODO: erste link darf auch negativ sein
+	// run railsim example
+
 	public static void main(String[] args) {
 
 		if (args.length == 0) {

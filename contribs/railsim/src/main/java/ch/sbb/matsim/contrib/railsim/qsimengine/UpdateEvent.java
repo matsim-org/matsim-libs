@@ -52,8 +52,8 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		POSITION,
 		ENTER_LINK,
 		LEAVE_LINK,
-		FREE_RESERVATION,
-		TRACK_RESERVATION,
+		RELEASE_TRACK,
+		BLOCK_TRACK,
 		WAIT_FOR_RESERVATION,
 		SPEED_CHANGE
 

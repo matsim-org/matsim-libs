@@ -21,24 +21,30 @@ We try to use the prefix `railsim` where it is appropriate.
 
 TODO
 
-#### trainCapacity
+#### railsimTrainCapacity
 
 The number of trains that can be on this link at the same time.
 If the attribute is not provided, a default of 1 is used.
 
-#### trainOppositeDirectionLink
+#### railsimResourceId
 
-The id of a link leading in the opposite direction of this link.
+The id of a resource, i.e. a segment of links that share a constant capacity.
 
+This can be used to denote certain blocks of links that can only be reserved as a whole.
+One use-case is the modelling of bidirectional links, where one train blocks both directions.
 MATSim uses uni-directional links. While on a road, cars might usually be able to pass each other
 even on small roads by going very slow and near the edge, but trains cannot.
-In order to correctly simulate the simulation where a train blocks a bidirectional track
 
-#### maxSpeed
+This can also be used to model intersections as one resource, which will restrict crossing trains.
+
+The train capacity will be derived as the minimum of all included links of this resource. 
+Links that have no resource id will be handled as individual resource.
+
+#### railsimMaxSpeed
 
 TODO
 
-#### minimumTime
+#### railsimMinimumTime
 
 The minimum time ("minimum train headway time") for the switch at the end of the link (toNode).
 If no link attribute is provided, a default of 0 is used.
@@ -79,14 +85,14 @@ states to avoid collisions. Do we really want that?
           modes="rail">
         <attributes>
             <attribute name="railsimCapacity" class="java.lang.Integer">1</attribute>
-            <attribute name="railsimOppositeDirectionLink" class="java.lang.String">B_A</attribute>
+            <attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
         </attributes>
     </link>
     <link id="B_A" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
           modes="rail">
         <attributes>
             <attribute name="railsimCapacity" class="java.lang.Integer">1</attribute>
-            <attribute name="railsimOppositeDirectionLink" class="java.lang.String">A_B</attribute>
+            <attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
         </attributes>
     </link>
 </links>

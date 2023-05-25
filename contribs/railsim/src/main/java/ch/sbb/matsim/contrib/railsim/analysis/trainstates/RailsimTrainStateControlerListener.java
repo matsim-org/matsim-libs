@@ -19,6 +19,7 @@
 
 package ch.sbb.matsim.contrib.railsim.analysis.trainstates;
 
+import ch.sbb.matsim.contrib.railsim.analysis.RailsimCsvWriter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -52,7 +53,7 @@ public final class RailsimTrainStateControlerListener implements IterationEndsLi
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		String railLinkStatesCsvFilename = this.controlerIO.getIterationFilename(event.getIteration(), "trainStates.csv", this.scenario.getConfig().controler().getCompressionType());
-		TrainStateWriter.writeCsv(this.analysis, this.scenario.getNetwork(), railLinkStatesCsvFilename);
+		RailsimCsvWriter.writeTrainStatesCsv(this.analysis.events, this.scenario.getNetwork(), railLinkStatesCsvFilename);
 	}
 
 }

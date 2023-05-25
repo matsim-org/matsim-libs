@@ -1,13 +1,13 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.diposition.SimpleDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.diposition.TrainDisposition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -36,35 +36,19 @@ final class RailsimEngine implements Steppable {
 	private final EventsManager eventsManager;
 	private final RailsimConfigGroup config;
 
-	/**
-	 * Rail links
-	 */
-	private final Map<Id<Link>, RailLink> links;
-
 	private final List<TrainState> activeTrains = new ArrayList<>();
 
 	private final Queue<UpdateEvent> updateQueue = new PriorityQueue<>();
 
-	private final TrackReservationStrategy reservation;
+	private final RailResourceManager resources;
 
-	public RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, Map<Id<Link>, ? extends Link> network) {
+	private final TrainDisposition disposition;
+
+	public RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, RailResourceManager resources) {
 		this.eventsManager = eventsManager;
 		this.config = config;
-		this.links = new IdMap<>(Link.class, network.size());
-		for (Map.Entry<Id<Link>, ? extends Link> e : network.entrySet()) {
-
-			// This link and the opposite need to have the same attributes
-
-			Id<Link> opposite = RailsimUtils.getOppositeDirectionLink(e.getValue());
-			// Use existing instead of creating a new one
-			if (links.containsKey(opposite)) {
-				this.links.put(e.getKey(), links.get(opposite));
-			} else {
-				this.links.put(e.getKey(), new RailLink(e.getValue(), opposite));
-			}
-		}
-
-		this.reservation = new ReservationAtLatestChance();
+		this.resources = resources;
+		this.disposition = new SimpleDisposition(resources);
 	}
 
 	@Override
@@ -111,12 +95,12 @@ final class RailsimEngine implements Steppable {
 
 		this.eventsManager.processEvent(new PersonEntersVehicleEvent(now, agent.getId(), agent.getVehicle().getId()));
 //		if (this.createLinkEvents) {
-			this.eventsManager.processEvent(new VehicleEntersTrafficEvent(now, agent.getId(), linkId, agent.getVehicle().getId(), agent.getMode(), 1.0));
+		this.eventsManager.processEvent(new VehicleEntersTrafficEvent(now, agent.getId(), linkId, agent.getVehicle().getId(), agent.getMode(), 1.0));
 //		}
 
-		List<RailLink> list = route.getLinkIds().stream().map(links::get).collect(Collectors.toList());
-		list.add(0, links.get(linkId));
-		list.add(links.get(route.getEndLinkId()));
+		List<RailLink> list = route.getLinkIds().stream().map(resources::getLink).collect(Collectors.toList());
+		list.add(0, resources.getLink(linkId));
+		list.add(resources.getLink(route.getEndLinkId()));
 
 		TrainState state = new TrainState(agent, new TrainInfo(agent.getVehicle().getVehicle().getType(), config),
 			now, null, list);
@@ -140,7 +124,7 @@ final class RailsimEngine implements Steppable {
 			case SPEED_CHANGE -> updateSpeed(time, event);
 			case ENTER_LINK -> enterLink(time, event);
 			case LEAVE_LINK -> leaveLink(time, event);
-			case TRACK_RESERVATION -> reserveTrack(time, event);
+			case BLOCK_TRACK -> blockTrack(time, event);
 			case WAIT_FOR_RESERVATION -> checkTrackReservation(time, event);
 			default -> throw new IllegalStateException("Unhandled update type " + event.type);
 		}
@@ -167,13 +151,16 @@ final class RailsimEngine implements Steppable {
 		decideNextUpdate(time, event);
 	}
 
-	private void reserveTrack(double time, UpdateEvent event) {
+	private void blockTrack(double time, UpdateEvent event) {
 
 		TrainState state = event.state;
 
 		updatePosition(time, event);
 
-		if (!reserveLinkTracks(time, event.type, state.routeIdx, state)) {
+		if (!blockLinkTracks(time, state.routeIdx, state)) {
+
+			// TODO: calculate speed to arrival at the last blocked link
+
 			// Break when reservation is not possible
 			state.targetSpeed = 0;
 			state.acceleration = -state.train.deceleration();
@@ -188,7 +175,7 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 
-		if (reserveLinkTracks(time, event.type, state.routeIdx, state)) {
+		if (blockLinkTracks(time, state.routeIdx, state)) {
 
 			updatePosition(time, event);
 			// TODO: maximum speed could be lower
@@ -211,7 +198,9 @@ final class RailsimEngine implements Steppable {
 		TrainState state = event.state;
 		state.timestamp = time;
 
-		if (reserveLinkTracks(time, event.type, 0, state)) {
+		disposition.onDeparture(time, state.driver, state.route);
+
+		if (blockLinkTracks(time, 0, state)) {
 
 			state.timestamp = time;
 
@@ -226,25 +215,27 @@ final class RailsimEngine implements Steppable {
 	/**
 	 * Reserve links in advance as necessary.
 	 */
-	private boolean reserveLinkTracks(double time, UpdateEvent.Type type, int idx, TrainState state) {
+	private boolean blockLinkTracks(double time, int idx, TrainState state) {
 
-		List<RailLink> links = reservation.retrieveLinksToReserve(time, type, idx, state);
-		links = links.stream().filter(link -> !link.isReserved(state.driver)).toList();
+		List<RailLink> links = RailsimCalc.calcLinksToBlock(idx, state);
 
 		if (links.isEmpty())
 			return true;
 
-		// All links must be able to be reserved
-		if (!links.stream().allMatch(RailLink::hasFreeTrack))
-			return false;
+		List<RailLink> blocked = disposition.blockRailSegment(time, state.driver, links);
 
-		for (RailLink link : links) {
-			int track = link.reserveTrack(state.driver);
+		// Block the approved links
+		for (RailLink link : blocked) {
+			if (link.isBlockedBy(state.driver))
+				continue;
+
+			int track = link.blockTrack(state.driver);
 			eventsManager.processEvent(new RailsimLinkStateChangeEvent(time, link.getLinkId(),
-				state.driver.getVehicle().getId(), TrackState.RESERVED, track));
+				state.driver.getVehicle().getId(), TrackState.BLOCKED, track));
 		}
 
-		return true;
+		// Only continue successfully if all requested link have been blocked
+		return links.size() == blocked.size();
 	}
 
 	private void enterLink(double time, UpdateEvent event) {
@@ -269,10 +260,13 @@ final class RailsimEngine implements Steppable {
 
 			// Free all reservations
 			for (RailLink link : state.route) {
-				if (link.isReserved(state.driver)){
+				if (link.isBlockedBy(state.driver)) {
+
 					int track = link.releaseTrack(state.driver);
 					eventsManager.processEvent(new RailsimLinkStateChangeEvent(time, link.getLinkId(), state.driver.getVehicle().getId(),
 						TrackState.FREE, track));
+
+					disposition.unblockRailLink(time, state.driver, link);
 				}
 			}
 
@@ -288,17 +282,13 @@ final class RailsimEngine implements Steppable {
 		// On departure tail link is the same head link
 		if (state.tailLink == null) {
 			state.tailLink = state.headLink;
-			state.tailPosition = links.get(state.tailLink).length + state.train.length();
+			state.tailPosition = resources.getLink(state.tailLink).length + state.train.length();
 		}
 
 		state.driver.notifyMoveOverNode(state.headLink);
 		eventsManager.processEvent(new LinkEnterEvent(time, state.driver.getVehicle().getId(), state.headLink));
 
-		RailLink link = links.get(state.headLink);
-
-		int track = link.blockTrack(state.driver);
-		eventsManager.processEvent(new RailsimLinkStateChangeEvent(time, state.headLink, state.driver.getVehicle().getId(),
-			TrackState.BLOCKED, track));
+		RailLink link = resources.getLink(state.headLink);
 
 		// TODO: this probably needs to be a separate function to calculate possible target speed more accurately
 		if (RailsimCalc.calcDecelDistanceAndSpeed(link, event) == Double.POSITIVE_INFINITY) {
@@ -316,7 +306,7 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 
-		RailLink tailLink = links.get(state.tailLink);
+		RailLink tailLink = resources.getLink(state.tailLink);
 		RailLink nextTailLink = null;
 		// Find the next link in the route
 		for (int i = state.routeIdx; i >= 1; i--) {
@@ -334,6 +324,8 @@ final class RailsimEngine implements Steppable {
 		int track = tailLink.releaseTrack(state.driver);
 		eventsManager.processEvent(new RailsimLinkStateChangeEvent(time, state.tailLink, state.driver.getVehicle().getId(),
 			TrackState.FREE, track));
+
+		disposition.unblockRailLink(time, state.driver, resources.getLink(state.tailLink));
 
 		state.tailLink = nextTailLink.getLinkId();
 		state.tailPosition = nextTailLink.length + state.train.length();
@@ -392,7 +384,7 @@ final class RailsimEngine implements Steppable {
 		state.timestamp = time;
 
 		assert FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
-		assert FuzzyUtils.lessEqualThan(state.headPosition, links.get(state.headLink).length) : "Illegal state update. Head position must be smaller than link length";
+		assert FuzzyUtils.lessEqualThan(state.headPosition, resources.getLink(state.headLink).length) : "Illegal state update. Head position must be smaller than link length";
 		assert FuzzyUtils.greaterEqualThan(state.headPosition, 0) : "Head position must be positive";
 
 		eventsManager.processEvent(state.asEvent(time));
@@ -404,7 +396,7 @@ final class RailsimEngine implements Steppable {
 	private void decideNextUpdate(double time, UpdateEvent event) {
 
 		TrainState state = event.state;
-		RailLink currentLink = links.get(state.headLink);
+		RailLink currentLink = resources.getLink(state.headLink);
 
 		// (1) max speed reached
 		double accelDist = Double.POSITIVE_INFINITY;
@@ -422,7 +414,7 @@ final class RailsimEngine implements Steppable {
 		// (3) next link needs reservation
 		double reserveDist = Double.POSITIVE_INFINITY;
 		if (!state.isRouteAtEnd()) {
-			reserveDist = reservation.nextUpdate(currentLink, state);
+			reserveDist = RailsimCalc.nextLinkReservation(state);
 
 			if (reserveDist < 0)
 				reserveDist = 0;
@@ -447,7 +439,7 @@ final class RailsimEngine implements Steppable {
 			event.type = UpdateEvent.Type.SPEED_CHANGE;
 		} else if (reserveDist <= accelDist && reserveDist <= decelDist && reserveDist <= tailDist && reserveDist <= headDist) {
 			dist = reserveDist;
-			event.type = UpdateEvent.Type.TRACK_RESERVATION;
+			event.type = UpdateEvent.Type.BLOCK_TRACK;
 		} else if (tailDist <= decelDist && tailDist <= reserveDist && tailDist <= headDist) {
 			dist = tailDist;
 			event.type = UpdateEvent.Type.LEAVE_LINK;
@@ -470,8 +462,8 @@ final class RailsimEngine implements Steppable {
 		// TODO: needs to check the whole part of current route
 
 		return Math.min(
-			links.get(state.headLink).getAllowedFreespeed(state.driver),
-			links.get(state.tailLink).getAllowedFreespeed(state.driver)
+			resources.getLink(state.headLink).getAllowedFreespeed(state.driver),
+			resources.getLink(state.tailLink).getAllowedFreespeed(state.driver)
 		);
 	}
 

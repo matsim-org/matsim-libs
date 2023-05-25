@@ -1,9 +1,13 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.analysis.RailsimCsvWriter;
+import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -89,6 +93,12 @@ public class RailsimTestUtils {
 			events.clear();
 		}
 
+		public void dump(String out) {
+			EventWriterXML writer = new EventWriterXML(out);
+			events.forEach(writer::handleEvent);
+			writer.closeFile();
+		}
+
 	}
 
 	public record Holder(RailsimEngine engine, Network network) {
@@ -110,6 +120,23 @@ public class RailsimTestUtils {
 			for (double t = 0; t < time; t += interval) {
 				engine().updateAllStates(t);
 			}
+		}
+
+		public void debug(EventCollector collector, String out) {
+			RailsimCsvWriter.writeTrainStatesCsv(
+				collector.events.stream().filter(ev -> ev instanceof RailsimTrainStateEvent)
+					.map(ev -> (RailsimTrainStateEvent) ev)
+					.toList(),
+				network,
+				out + "_trainStates.csv"
+			);
+
+			RailsimCsvWriter.writeLinkStatesCsv(
+				collector.events.stream().filter(ev -> ev instanceof RailsimLinkStateChangeEvent)
+					.map(ev -> (RailsimLinkStateChangeEvent) ev)
+					.toList(),
+				out + "_linkStates.csv"
+			);
 		}
 	}
 

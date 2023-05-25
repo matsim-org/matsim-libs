@@ -17,7 +17,7 @@ public final class RailsimUtils {
 
 	// link
 	public static final String LINK_ATTRIBUTE_GRADE = "railsimGrade";
-	public static final String LINK_ATTRIBUTE_OPPOSITE_DIRECTION = "railsimTrainOppositeDirectionLink";
+	public static final String LINK_ATTRIBUTE_RESOURCE_ID = "railsimResourceId";
 	public static final String LINK_ATTRIBUTE_CAPACITY = "railsimTrainCapacity";
 	public static final String LINK_ATTRIBUTE_MAX_SPEED = "railsimMaxSpeed";
 	public static final String LINK_ATTRIBUTE_MINIMUM_TIME = "railsimMinimumTime";
@@ -65,6 +65,13 @@ public final class RailsimUtils {
 	}
 
 	/**
+	 * Resource id or null if there is none.
+	 */
+	public static String getResourceId(Link link) {
+		return  (String) link.getAttributes().getAttribute(LINK_ATTRIBUTE_RESOURCE_ID);
+	}
+
+	/**
 	 * @return the vehicle-specific freespeed or 0 if there is no vehicle-specific freespeed provided in the link attributes
 	 */
 	public static double getLinkFreespeedForVehicleType(VehicleType type, Link link) {
@@ -98,14 +105,6 @@ public final class RailsimUtils {
 		} else {
 			return (double) attribute;
 		}
-	}
-
-	/**
-	 * Id of opposite link or null if there is none.
-	 */
-	public static Id<Link> getOppositeDirectionLink(Link link) {
-		String oppositeLink = (String) link.getAttributes().getAttribute(LINK_ATTRIBUTE_OPPOSITE_DIRECTION);
-		return oppositeLink != null ?  Id.createLinkId(oppositeLink) : null;
 	}
 
 }

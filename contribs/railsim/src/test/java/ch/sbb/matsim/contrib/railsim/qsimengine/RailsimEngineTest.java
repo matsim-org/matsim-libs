@@ -1,6 +1,8 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.analysis.RailsimCsvWriter;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,10 +34,12 @@ public class RailsimEngineTest {
 
 	private RailsimTestUtils.Holder getTestEngine(String network) {
 		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), network).toString());
+		RailsimConfigGroup config = new RailsimConfigGroup();
 
 		collector.clear();
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, new RailsimConfigGroup(), net.getLinks()), net);
+		return new RailsimTestUtils.Holder(new RailsimEngine(
+			eventsManager, config, new RailResourceManager(config, net)), net);
 	}
 
 	@Test
@@ -85,6 +89,8 @@ public class RailsimEngineTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l6-5", "l2-1");
 
 		test.doSimStepUntil(600);
+
+		test.debug(collector, "opposite");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio2", 210.7272722504356, 2000, 0)

@@ -8,17 +8,14 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
- * Rail tracks in railsim, which may corresponds to multiple MATSim links (if there are opposing links).
- * Therefor this kind of track is bidirectional.
+ * Rail links which can has multiple tracks and corresponds to exactly one link.
  */
-final class RailLink implements HasLinkId {
+public final class RailLink implements HasLinkId {
 
 	private final Id<Link> id;
-
-	@Nullable
-	private final Id<Link> oppositeId;
 
 	/**
 	 * States per track.
@@ -34,23 +31,39 @@ final class RailLink implements HasLinkId {
 	final double freeSpeed;
 	final double minimumHeadwayTime;
 
-	// TODO: from and to node most likely needed at some point
-	// A node can be blocked if a train is crossing the path
+	/**
+	 * Id of the resource this link belongs to.
+	 */
+	@Nullable
+	final Id<RailResource> resource;
 
-	public RailLink(Link link, @Nullable Id<Link> opposite) {
+	public RailLink(Link link) {
 		id = link.getId();
-		oppositeId = opposite;
 		state = new TrackState[RailsimUtils.getTrainCapacity(link)];
 		Arrays.fill(state, TrackState.FREE);
 		reservations = new MobsimDriverAgent[state.length];
 		length = link.getLength();
 		freeSpeed = link.getFreespeed();
 		minimumHeadwayTime = RailsimUtils.getMinimumTrainHeadwayTime(link);
+		String resourceId = RailsimUtils.getResourceId(link);
+		resource = resourceId != null ? Id.create(resourceId, RailResource.class) : null;
 	}
 
 	@Override
 	public Id<Link> getLinkId() {
 		return id;
+	}
+
+	@Nullable
+	public Id<RailResource> getResourceId() {
+		return resource;
+	}
+
+	/**
+	 * Number of tracks on this link.
+	 */
+	public int getNumberOfTracks(){
+		return state.length;
 	}
 
 	/**
@@ -76,26 +89,9 @@ final class RailLink implements HasLinkId {
 	}
 
 	/**
-	 * Reserve a track for a specific driver.
-	 *
-	 * @return -1 if not track was free, otherwise track number.
-	 */
-	public int reserveTrack(MobsimDriverAgent driver) {
-		for (int i = 0; i < state.length; i++) {
-			if (state[i] == TrackState.FREE) {
-				state[i] = TrackState.RESERVED;
-				reservations[i] = driver;
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	/**
 	 * Check if driver has already reserved this link.
 	 */
-	public boolean isReserved(MobsimDriverAgent driver) {
+	public boolean isBlockedBy(MobsimDriverAgent driver) {
 		for (MobsimDriverAgent reservation : reservations) {
 			if (reservation == driver)
 				return true;
@@ -108,12 +104,13 @@ final class RailLink implements HasLinkId {
 	 */
 	public int blockTrack(MobsimDriverAgent driver) {
 		for (int i = 0; i < state.length; i++) {
-			if (reservations[i] == driver) {
+			if (state[i] == TrackState.FREE) {
+				reservations[i] = driver;
 				state[i] = TrackState.BLOCKED;
 				return i;
 			}
 		}
-		throw new IllegalStateException("No track was reserved to be blocked.");
+		throw new IllegalStateException("No track was free.");
 	}
 
 	/**
@@ -128,5 +125,26 @@ final class RailLink implements HasLinkId {
 			}
 		}
 		throw new IllegalStateException("Driver " + driver + " has not reserved the track.");
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		RailLink link = (RailLink) o;
+		return Objects.equals(id, link.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public String toString() {
+		return "RailLink{" +
+			"id=" + id +
+			", resource=" + resource +
+			'}';
 	}
 }
