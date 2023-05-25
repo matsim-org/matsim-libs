@@ -22,7 +22,7 @@ package org.matsim.contrib.locationchoice;
 
 import static org.junit.Assert.*;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -111,7 +111,7 @@ public class LocationChoiceIT {
 			@Override
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding("MyLocationChoice").toProvider(new jakarta.inject.Provider<PlanStrategy>() {
 					@Inject TimeInterpretation timeInterpretation;
 
 					@Override

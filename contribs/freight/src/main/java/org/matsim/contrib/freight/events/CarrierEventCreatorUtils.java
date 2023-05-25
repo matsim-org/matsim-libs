@@ -21,23 +21,34 @@
 
 package org.matsim.contrib.freight.events;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.vehicles.Vehicle;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-/*package-private*/ final class FreightTourEndEventCreator implements FreightEventCreator {
+/**
+ * Utils for {@link CarrierEventCreator}s
+ *
+ * @author kturner
+ */
+public final class CarrierEventCreatorUtils {
 
-	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if(event instanceof ActivityStartEvent startEvent && FreightConstants.END.equals(startEvent.getActType()) ) {
-				return new FreightTourEndEvent(startEvent.getTime(), carrier.getId(), scheduledTour.getTour().getEndLinkId(), // TODO: If we have the tourId, we do not need to store the link here, kmt sep 22
-						vehicleId, scheduledTour.getTour().getId());
-		}	
-		return null;
+	private CarrierEventCreatorUtils(){
 	}
+
+	/**
+	 * @return a collection of the standard freightEvent creators
+	 */
+	public static Collection<CarrierEventCreator> getStandardEventCreators(){
+		List<CarrierEventCreator> creators = new ArrayList<>();
+		creators.add(new CarrierServiceEndEventCreator());
+		creators.add(new CarrierServiceStartEventCreator());
+		creators.add(new CarrierShipmentDeliveryStartEventCreator());
+		creators.add(new CarrierShipmentDeliveryEndEventCreator());
+		creators.add(new CarrierShipmentPickupStartEventCreator());
+		creators.add(new CarrierShipmentPickupEndEventCreator());
+		creators.add(new CarrierTourEndEventCreator());
+		creators.add(new CarrierTourStartEventCreator());
+		return creators;
+	}
+
 }

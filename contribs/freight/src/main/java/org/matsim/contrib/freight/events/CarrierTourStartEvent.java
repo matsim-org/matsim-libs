@@ -21,8 +21,6 @@
 
 package org.matsim.contrib.freight.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -30,22 +28,24 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.vehicles.Vehicle;
 
-import static org.matsim.contrib.freight.events.FreightEventAttributes.ATTRIBUTE_TOUR_ID;
+import java.util.Map;
+
+import static org.matsim.contrib.freight.events.CarrierEventAttributes.ATTRIBUTE_TOUR_ID;
 
 /**
- * An event, that informs when a Freight {@link Tour} has ended.
+ * An event, that informs when a Freight {@link Tour} has started.
  * There are NO specific information of the tour given, because the {@link Tour} is determined by the {@link Vehicle} and its {@link Carrier}.
  *
  * @author Tilman Matteis  - creating it for the use in Logistics / LogisticServiceProviders (LSP)s
  * @author Kai Martins-Turner (kturner) - integrating and adapting it into/for the MATSim freight contrib
  */
-public final class FreightTourEndEvent extends AbstractFreightEvent {
+public final class CarrierTourStartEvent extends AbstractCarrierEvent {
 
-	public static final String EVENT_TYPE = "Freight tour ends";
+	public static final String EVENT_TYPE = "Freight tour starts";
 
 	private final Id<Tour> tourId;
 
-	public FreightTourEndEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId, Id<Tour> tourId) {
+	public CarrierTourStartEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId, Id<Tour> tourId) {
 		super(time, carrierId, linkId, vehicleId);
 		this.tourId = tourId;
 	}
@@ -66,13 +66,15 @@ public final class FreightTourEndEvent extends AbstractFreightEvent {
 		return attr;
 	}
 
-	public static FreightTourEndEvent convert(GenericEvent event) {
+	public static CarrierTourStartEvent convert(GenericEvent event) {
 		Map<String, String> attributes = event.getAttributes();
 		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
 		Id<Carrier> carrierId = Id.create(attributes.get(ATTRIBUTE_CARRIER_ID), Carrier.class);
-		Id<Vehicle> vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), Vehicle.class);
+		Id<Vehicle> vehicleId = null;
+		if ( attributes.get(ATTRIBUTE_VEHICLE) != null ) {
+			vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), Vehicle.class);}
 		Id<Link> linkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
 		Id<Tour> tourId = Id.create(attributes.get(ATTRIBUTE_TOUR_ID), Tour.class);
-		return new FreightTourEndEvent(time, carrierId, linkId, vehicleId, tourId);
+		return new CarrierTourStartEvent(time, carrierId, linkId, vehicleId, tourId);
 	}
 }

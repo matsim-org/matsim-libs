@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -102,7 +102,7 @@ CadytsContextI<TransitStopFacility> {
 
 		// === prepare the structure which extracts the measurements from the simulation:
 		// since there is already some other method, we just need to write a wrapper.
-		
+
 //		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedItems()), cadytsConfig.getTimeBinSize() );
 		events.addHandler(this.cadytsPtOccupAnalyzer);
 
@@ -210,10 +210,10 @@ CadytsContextI<TransitStopFacility> {
 			return ;
 			// yyyy there are some conceptual problems behind this which are not resolved:
 			// () There should reasonably be two methods: one describing what cadyts _thinks_ it is comparing, and one that just
-			// compares the output.  There is one methods writing simCountCompare..., and then this one here 
+			// compares the output.  There is one methods writing simCountCompare..., and then this one here
 			// writing cadytsSimCountCompare... .  It is not clarified which one is doing which.
 			// () The method that just compares the output should not rely on cadyts but compute its own observations. --
-			// Unfortunately, this collides with the fact that the time bin size is part of the cadyts configuration.  This is, in the end, a 
+			// Unfortunately, this collides with the fact that the time bin size is part of the cadyts configuration.  This is, in the end, a
 			// consequence of the fact that the Counts format assumes hourly counts (other than cadyts, which reasonably allows the
 			// specify the time span for every observation separately).
 			// kai, feb'13
@@ -245,7 +245,7 @@ CadytsContextI<TransitStopFacility> {
 		if (outputFormat.contains("txt") || outputFormat.contains("all")) {
 			//  As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
 			//  yyyyyy As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13
-			//  See near beginning of method.  kai, feb'13 
+			//  See near beginning of method.  kai, feb'13
 			ccaOccupancy.write(controlerIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
 		}
 

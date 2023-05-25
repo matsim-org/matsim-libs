@@ -41,7 +41,7 @@ import org.matsim.contrib.socnetsim.jointtrips.qsim.JointQSimFactory;
 import org.matsim.contrib.socnetsim.jointtrips.router.JointPlanRouterFactory;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * @author thibautd
