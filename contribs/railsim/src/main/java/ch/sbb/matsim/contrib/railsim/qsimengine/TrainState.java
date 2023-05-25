@@ -73,7 +73,7 @@ final class TrainState {
 	double headPosition;
 
 	/**
-	 * * Distance in meters away from the {@code tailLink}s {@code toNode}.
+	 * * Distance in meters away from the {@code tailLink}s {@code fromNode}.
 	 */
 	double tailPosition;
 

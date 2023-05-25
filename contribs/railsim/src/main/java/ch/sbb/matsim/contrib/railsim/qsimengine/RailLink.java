@@ -124,7 +124,7 @@ public final class RailLink implements HasLinkId {
 				return i;
 			}
 		}
-		throw new IllegalStateException("Driver " + driver + " has not reserved the track.");
+		throw new AssertionError("Driver " + driver + " has not reserved the track.");
 	}
 
 	@Override

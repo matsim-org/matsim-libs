@@ -94,16 +94,14 @@ final class RailsimEngine implements Steppable {
 		log.info("Train {} is departing", agent.getVehicle());
 
 		this.eventsManager.processEvent(new PersonEntersVehicleEvent(now, agent.getId(), agent.getVehicle().getId()));
-//		if (this.createLinkEvents) {
 		this.eventsManager.processEvent(new VehicleEntersTrafficEvent(now, agent.getId(), linkId, agent.getVehicle().getId(), agent.getMode(), 1.0));
-//		}
 
 		List<RailLink> list = route.getLinkIds().stream().map(resources::getLink).collect(Collectors.toList());
 		list.add(0, resources.getLink(linkId));
 		list.add(resources.getLink(route.getEndLinkId()));
 
 		TrainState state = new TrainState(agent, new TrainInfo(agent.getVehicle().getVehicle().getType(), config),
-			now, null, list);
+			now, linkId, list);
 
 		activeTrains.add(state);
 
@@ -200,9 +198,17 @@ final class RailsimEngine implements Steppable {
 
 		disposition.onDeparture(time, state.driver, state.route);
 
+		state.headPosition = resources.getLink(state.headLink).length;
+		state.tailPosition = resources.getLink(state.headLink).length - state.train.length();
+
 		if (blockLinkTracks(time, 0, state)) {
 
 			state.timestamp = time;
+
+			eventsManager.processEvent(state.asEvent(time));
+
+			// Train departs at the very end of the first link
+			state.routeIdx = 1;
 
 			// Call enter link logic immediately
 			enterLink(time, event);
@@ -245,9 +251,7 @@ final class RailsimEngine implements Steppable {
 		updatePosition(time, event);
 
 		// On route departure the head link is null
-		if (state.headLink != null) {
-			eventsManager.processEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
-		}
+		eventsManager.processEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
 
 		// Get link and increment
 		state.headPosition = 0;
@@ -279,11 +283,6 @@ final class RailsimEngine implements Steppable {
 			return;
 		}
 
-		// On departure tail link is the same head link
-		if (state.tailLink == null) {
-			state.tailLink = state.headLink;
-			state.tailPosition = resources.getLink(state.tailLink).length + state.train.length();
-		}
 
 		state.driver.notifyMoveOverNode(state.headLink);
 		eventsManager.processEvent(new LinkEnterEvent(time, state.driver.getVehicle().getId(), state.headLink));
@@ -328,7 +327,7 @@ final class RailsimEngine implements Steppable {
 		disposition.unblockRailLink(time, state.driver, resources.getLink(state.tailLink));
 
 		state.tailLink = nextTailLink.getLinkId();
-		state.tailPosition = nextTailLink.length + state.train.length();
+		state.tailPosition = 0;
 
 		decideNextUpdate(time, event);
 	}
@@ -380,10 +379,10 @@ final class RailsimEngine implements Steppable {
 		assert FuzzyUtils.greaterEqualThan(dist, 0) : "Travel distance must be positive, but was" + dist;
 
 		state.headPosition += dist;
-		state.tailPosition -= dist;
+		state.tailPosition += dist;
 		state.timestamp = time;
 
-		assert FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
+		assert state.routeIdx <= 1 || FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
 		assert FuzzyUtils.lessEqualThan(state.headPosition, resources.getLink(state.headLink).length) : "Illegal state update. Head position must be smaller than link length";
 		assert FuzzyUtils.greaterEqualThan(state.headPosition, 0) : "Head position must be positive";
 
@@ -421,7 +420,8 @@ final class RailsimEngine implements Steppable {
 		}
 
 		// (4) tail link changes
-		double tailDist = state.tailPosition;
+		double tailDist = resources.getLink(state.tailLink).length - state.tailPosition;
+
 		// (5) head link changes
 		double headDist = currentLink.length - state.headPosition;
 
