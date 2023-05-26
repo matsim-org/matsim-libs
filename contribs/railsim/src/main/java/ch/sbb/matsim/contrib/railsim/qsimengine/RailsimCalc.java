@@ -33,6 +33,9 @@ public class RailsimCalc {
 	 */
 	static double calcRequiredTime(TrainState state, double dist) {
 
+		if (dist == 0)
+			return 0;
+
 		if (state.acceleration == 0)
 			return state.speed == 0 ? Double.POSITIVE_INFINITY : dist / state.speed;
 
@@ -57,7 +60,9 @@ public class RailsimCalc {
 			// max distance that can be reached
 			double max = calcTraveledDist(state.speed, decelTime, state.acceleration);
 
-			if (dist <= max) {
+			if (FuzzyUtils.equals(dist, max)) {
+				return decelTime;
+			} else if (dist <= max) {
 				return solveTraveledDist(state.speed, dist, state.acceleration);
 			} else
 				return Double.POSITIVE_INFINITY;
@@ -130,8 +135,7 @@ public class RailsimCalc {
 			if (i == state.route.size()) {
 				link = null;
 				allowed = 0;
-			}
-			else {
+			} else {
 				link = state.route.get(i);
 				allowed = link.getAllowedFreespeed(state.driver);
 			}

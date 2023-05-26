@@ -11,14 +11,10 @@
 			<attribute name="railsimMaxAcceleration" class="java.lang.Double">0.5</attribute>
 			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.5</attribute>
 		</attributes>
-		<capacity seats="40" standingRoomInPersons="0">
-
-		</capacity>
+		<capacity seats="40" standingRoomInPersons="0"/>
 		<length meter="200.0"/>
-		<width meter="1.0"/>
-		<costInformation>
+		<maximumVelocity meterPerSecond="55"/>
 
-		</costInformation>
 		<passengerCarEquivalents pce="0.0"/>
 		<networkMode networkMode="rail"/>
 		<flowEfficiencyFactor factor="1.0"/>

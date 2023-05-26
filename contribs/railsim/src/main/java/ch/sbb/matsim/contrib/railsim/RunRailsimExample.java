@@ -48,10 +48,9 @@ public class RunRailsimExample {
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new RailsimModule());
-		controler.configureQSimComponents(components -> {
-			new RailsimQSimModule().configure(components);
-			// if you have other extensions that provide QSim components, call their configure-method here
-		});
+
+		// if you have other extensions that provide QSim components, call their configure-method here
+		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
 
 		controler.run();
 	}

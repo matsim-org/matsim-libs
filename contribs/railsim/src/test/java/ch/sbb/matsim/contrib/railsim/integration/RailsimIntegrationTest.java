@@ -31,12 +31,7 @@ public class RailsimIntegrationTest {
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new RailsimModule());
-
-		/*
-		controler.configureQSimComponents(components -> {
-			new RailsimQSimModule().configure(components);
-		});
-		 */
+		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
 
 		controler.run();
 

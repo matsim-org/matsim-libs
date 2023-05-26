@@ -10,6 +10,7 @@
 	<module name="controler">
 		<param name="runId" value="test" />
 		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="1" />
 	</module>
 
 	<module name="qsim">
@@ -19,9 +20,6 @@
 
 		<param name="snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name="mainMode" value="car" />
-
-		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
-		<param name="stuckTime" value="999999." />
 	</module>
 
 	<module name="transit" >
@@ -33,7 +31,7 @@
 	</module>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="trainNetwork.xml" />
+		<param name="inputNetworkFile" value="../../qsimengine/network0.xml" />
 	</module>
 
 </config>

@@ -17,6 +17,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -91,7 +92,7 @@ final class RailsimEngine implements Steppable {
 	 */
 	public boolean handleDeparture(double now, MobsimDriverAgent agent, Id<Link> linkId, NetworkRoute route) {
 
-		log.info("Train {} is departing", agent.getVehicle());
+		log.debug("Train {} is departing at {}", agent.getVehicle(), now);
 
 		this.eventsManager.processEvent(new PersonEntersVehicleEvent(now, agent.getId(), agent.getVehicle().getId()));
 		this.eventsManager.processEvent(new VehicleEntersTrafficEvent(now, agent.getId(), linkId, agent.getVehicle().getId(), agent.getMode(), 1.0));
@@ -100,8 +101,10 @@ final class RailsimEngine implements Steppable {
 		list.add(0, resources.getLink(linkId));
 		list.add(resources.getLink(route.getEndLinkId()));
 
-		TrainState state = new TrainState(agent, new TrainInfo(agent.getVehicle().getVehicle().getType(), config),
-			now, linkId, list);
+		VehicleType type = agent.getVehicle().getVehicle().getType();
+		TrainState state = new TrainState(agent, new TrainInfo(type, config), now, linkId, list);
+
+		state.train.checkConsistency();
 
 		activeTrains.add(state);
 
@@ -465,6 +468,8 @@ final class RailsimEngine implements Steppable {
 			event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
 			event.plannedTime = event.checkReservation;
 		}
+
+		assert Double.isFinite(event.plannedTime) : "Planned update time must be finite, but was " + event.plannedTime;
 	}
 
 

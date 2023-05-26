@@ -74,7 +74,6 @@ public class RailsimEngineTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 60, "l1-2", "l5-6");
 
 		test.doSimStepUntil(600);
-
 	}
 
 
@@ -88,7 +87,7 @@ public class RailsimEngineTest {
 
 		test.doSimStepUntil(600);
 
-		test.debug(collector, "opposite");
+//		test.debug(collector, "opposite");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 292.5454533774468, 600, 0)
@@ -102,8 +101,7 @@ public class RailsimEngineTest {
 
 		test.doStateUpdatesUntil(600, 1);
 
-		test.debug(collector, "opposite_detailed");
-
+//		test.debug(collector, "opposite_detailed");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 292.5454533774468, 600, 0)
