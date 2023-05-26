@@ -73,7 +73,7 @@ final class ExampleTwoEchelonGrid {
 
 	//Run Settings
 	static final double HUBCOSTS_FIX = 100;
-	private static final DemandSetting demandSetting = DemandSetting.tenCustomers;
+	private static final DemandSetting demandSetting = DemandSetting.oneCustomer;
 	private static final CarrierCostSetting costSetting = CarrierCostSetting.lowerCost4LastMile;
 	private static final double TOLL_VALUE = 1000;
 

@@ -129,7 +129,7 @@ import java.util.Map;
 								&& (tour.getStartLinkId() != transshipmentHub.getStartLinkId())) {
 							logHandlingInHub(serviceActivity.getService(), event.getTime());
 						} else {
-							logHandlingInHub(serviceActivity.getService(), event.getTime() + getUnloadEndTime(tour));
+//							logHandlingInHub(serviceActivity.getService(), event.getTime() + getUnloadEndTime(tour)); //TODO: Das liefert eine RunTimeException, weil es Events gibt, die in der Zwischenzeit stattfinden -> Eventsstream ist nicht chronologisch...
 						}
 					}
 				}
@@ -168,10 +168,10 @@ import java.util.Map;
 				lspShipment.getShipmentLog().addPlanElement(loadId, handle);
 			}
 		}
-		{ // New event-based approach //TODO: This throws currently a null pointer exception, because eventsHandler is null -> why???
+		{ // New event-based approach
 			//  Könnte sein, dass das jetzt funktioniert.  kai, may'23
 			eventsManager.processEvent(new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId));
-			eventsManager.processEvent(new HandlingInHubEndsEvent(endTime, linkId, lspShipment.getId(), resourceId));
+//			eventsManager.processEvent(new HandlingInHubEndsEvent(endTime, linkId, lspShipment.getId(), resourceId)); //TODO: vermutlich auch problematisch, weil in der Zwischenzeit noch weitere Events sind -> Chronologie ist nicht mehr gegeben :(
 		}
 
 	}
