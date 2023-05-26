@@ -28,22 +28,23 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
 
-import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
+import static org.matsim.contrib.freight.events.CarrierEventAttributes.*;
 
 /**
- * An event, that informs that a Freight {@link CarrierShipment} delivery-activity has started.
+ * An event, that informs that a Freight {@link CarrierShipment} delivery-activity has ended.
  *
- * @author Kai Martins-Turner (kturner)
+ * @author sschroeder
+ * @author kturner
  *
  */
-public class FreightShipmentDeliveryStartEvent extends AbstractFreightEvent {
+public class CarrierShipmentDeliveryEndEvent extends AbstractCarrierEvent {
 
-	public static final String EVENT_TYPE = "Freight shipment delivered starts";
+	public static final String EVENT_TYPE = "Freight shipment delivered ends";
 
 	private final Id<CarrierShipment> shipmentId;
 	private final double deliveryDuration;
 	private final int capacityDemand;
-	public FreightShipmentDeliveryStartEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+	public CarrierShipmentDeliveryEndEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
 		super(time, carrierId, shipment.getTo(), vehicleId);
 		this.shipmentId = shipment.getId();
 		this.deliveryDuration = shipment.getDeliveryServiceTime();
