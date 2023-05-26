@@ -165,10 +165,13 @@ final class RailsimEngine implements Steppable {
 			state.targetSpeed = 0;
 			state.acceleration = -state.train.deceleration();
 
-			event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
-			event.plannedTime += POLL_INTERVAL;
-		} else
+			event.checkReservation = time + POLL_INTERVAL;
 			decideNextUpdate(time, event);
+
+		} else {
+			event.checkReservation = -1;
+			decideNextUpdate(time, event);
+		}
 	}
 
 	private void checkTrackReservation(double time, UpdateEvent event) {
@@ -185,10 +188,14 @@ final class RailsimEngine implements Steppable {
 			state.targetSpeed = state.allowedMaxSpeed;
 			state.acceleration = state.train.acceleration();
 
+			event.checkReservation = -1;
 			decideNextUpdate(time, event);
 
 		} else {
-			event.plannedTime += POLL_INTERVAL;
+
+			event.checkReservation = time + POLL_INTERVAL;
+			decideNextUpdate(time, event);
+
 		}
 
 	}
@@ -412,7 +419,7 @@ final class RailsimEngine implements Steppable {
 
 		// (3) next link needs reservation
 		double reserveDist = Double.POSITIVE_INFINITY;
-		if (!state.isRouteAtEnd()) {
+		if (!state.isRouteAtEnd() && event.checkReservation < 0) {
 			reserveDist = RailsimCalc.nextLinkReservation(state);
 
 			if (reserveDist < 0)
@@ -452,6 +459,12 @@ final class RailsimEngine implements Steppable {
 
 		// dist is the minimum of all supplied distances
 		event.plannedTime = time + RailsimCalc.calcRequiredTime(state, dist);
+
+		// insert reservation event if necessary
+		if (event.checkReservation >= 0 && event.plannedTime > event.checkReservation) {
+			event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
+			event.plannedTime = event.checkReservation;
+		}
 	}
 
 

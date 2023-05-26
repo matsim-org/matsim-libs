@@ -12,6 +12,7 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	Type type;
 
 	double newSpeed = -1;
+	double checkReservation = -1;
 
 	public UpdateEvent(TrainState state, Type type) {
 		this.state = state;

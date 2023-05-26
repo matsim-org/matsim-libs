@@ -57,10 +57,10 @@ public class RailsimCalc {
 			// max distance that can be reached
 			double max = calcTraveledDist(state.speed, decelTime, state.acceleration);
 
-			if (dist < max) {
+			if (dist <= max) {
 				return solveTraveledDist(state.speed, dist, state.acceleration);
 			} else
-				return decelTime;
+				return Double.POSITIVE_INFINITY;
 		}
 	}
 

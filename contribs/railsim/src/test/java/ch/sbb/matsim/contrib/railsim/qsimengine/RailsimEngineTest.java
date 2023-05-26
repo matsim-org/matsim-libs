@@ -1,8 +1,6 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import ch.sbb.matsim.contrib.railsim.analysis.RailsimCsvWriter;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,8 +50,8 @@ public class RailsimEngineTest {
 
 		RailsimTestUtils.assertThat(collector)
 			.hasSizeGreaterThan(5)
-			.hasTrainState("train", 148, 0, 20)
-			.hasTrainState("train", 188, 200, 0);
+			.hasTrainState("train", 144, 0, 44)
+			.hasTrainState("train", 233.4545441058463, 2000, 0);
 
 		test = getTestEngine("network0.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l5-6");
@@ -62,8 +60,8 @@ public class RailsimEngineTest {
 
 		RailsimTestUtils.assertThat(collector)
 			.hasSizeGreaterThan(5)
-			.hasTrainState("train", 148, 0, 20)
-			.hasTrainState("train", 188, 200, 0);
+			.hasTrainState("train", 144, 0, 44)
+			.hasTrainState("train", 233.4545441058463, 2000, 0);
 
 	}
 
@@ -85,28 +83,31 @@ public class RailsimEngineTest {
 
 		RailsimTestUtils.Holder test = getTestEngine("network0.xml");
 
-		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "l1-2", "l5-6");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l6-5", "l2-1");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "l1-2", "l7-8");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l8-7", "l2-1");
 
 		test.doSimStepUntil(600);
 
 		test.debug(collector, "opposite");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio2", 210.7272722504356, 2000, 0)
-			.hasTrainState("regio1", 348.49615180280205, 200, 0);
+			.hasTrainState("regio1", 292.5454533774468, 600, 0)
+			.hasTrainState("regio2", 443.62677217662434, 1000, 0);
 
 
 		test = getTestEngine("network0.xml");
 
-		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "l1-2", "l5-6");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l6-5", "l2-1");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "l1-2", "l7-8");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l8-7", "l2-1");
 
 		test.doStateUpdatesUntil(600, 1);
 
+		test.debug(collector, "opposite_detailed");
+
+
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio2", 210.7272722504356, 2000, 0)
-			.hasTrainState("regio1", 348.49615180280205, 200, 0);
+			.hasTrainState("regio1", 292.5454533774468, 600, 0)
+			.hasTrainState("regio2", 443.62677217662434, 1000, 0);
 
 	}
 }
