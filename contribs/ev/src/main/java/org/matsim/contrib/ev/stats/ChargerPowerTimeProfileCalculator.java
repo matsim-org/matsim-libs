@@ -21,9 +21,11 @@ import com.google.inject.Inject;
 
 public class ChargerPowerTimeProfileCalculator implements ChargingStartEventHandler, ChargingEndEventHandler {
 
+	private record TimeEnergy(double time, double energy) {
+	}
+
 	private final Map<Id<Charger>, double[]> chargerProfiles = new HashMap<>();
-	private final Map<Id<Vehicle>, Double> chargingStartTime = new HashMap<>();
-	private final Map<Id<Vehicle>, Double> chargingStartEnergy = new HashMap<>();
+	private final Map<Id<Vehicle>, TimeEnergy> chargingStartTimeEnergy = new HashMap<>();
 
 	private final TimeDiscretizer timeDiscretizer;
 	private final double qsimEndTime;
@@ -48,15 +50,15 @@ public class ChargerPowerTimeProfileCalculator implements ChargingStartEventHand
 
 	@Override
 	public void handleEvent(ChargingStartEvent event) {
-		chargingStartTime.put(event.getVehicleId(), event.getTime());
-		chargingStartEnergy.put(event.getVehicleId(), EvUnits.J_to_kWh(event.getCharge()));
+		chargingStartTimeEnergy.put(event.getVehicleId(), new TimeEnergy(event.getTime(), EvUnits.J_to_kWh(event.getCharge())));
 	}
 
 	@Override
 	public void handleEvent(ChargingEndEvent event) {
-		double chargingTimeIn_h = (event.getTime() - chargingStartTime.get(event.getVehicleId())) / 3600.0;
-		double averagePowerIn_kW = (EvUnits.J_to_kWh(event.getCharge()) - chargingStartEnergy.get(event.getVehicleId())) / chargingTimeIn_h;
-		increment(averagePowerIn_kW, event.getChargerId(), chargingStartTime.get(event.getVehicleId()), event.getTime());
+		var timeEnergy = chargingStartTimeEnergy.get(event.getVehicleId());
+		double chargingTimeIn_h = (event.getTime() - timeEnergy.time) / 3600.0;
+		double averagePowerIn_kW = (EvUnits.J_to_kWh(event.getCharge()) - timeEnergy.time) / chargingTimeIn_h;
+		increment(averagePowerIn_kW, event.getChargerId(), timeEnergy.time, event.getTime());
 	}
 
 	private void increment(double averagePower, Id<Charger> chargerId, double beginTime, double endTime) {
