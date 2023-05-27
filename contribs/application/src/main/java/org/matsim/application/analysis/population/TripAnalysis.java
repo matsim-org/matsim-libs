@@ -4,6 +4,8 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -46,7 +48,7 @@ public class TripAnalysis implements MATSimAppCommand {
 	private String matchId;
 
 	@CommandLine.Option(names = "--dist-groups", split = ",", description = "List of distances for binning", defaultValue = "0,1000,2000,5000,10000,20000")
-	private List<Integer> distGroups;
+	private List<Long> distGroups;
 
 	@CommandLine.Option(names = "--modes", split = ",", description = "List of considered modes, if not set all will be used")
 	private List<String> modeOrder;
@@ -58,7 +60,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		new TripAnalysis().execute(args);
 	}
 
-	private static String cut(int dist, List<Integer> distGroups, List<String> labels) {
+	private static String cut(long dist, List<Long> distGroups, List<String> labels) {
 
 		int idx = Collections.binarySearch(distGroups, dist);
 
@@ -98,9 +100,17 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		log.info("Filtered {} out of {} persons", persons.rowCount(), total);
 
+		Map<String, ColumnType> columnTypes = new HashMap<>(Map.of("person", ColumnType.TEXT,
+			"trav_time", ColumnType.STRING, "wait_time", ColumnType.STRING, "dep_time", ColumnType.STRING,
+			"longest_distance_mode", ColumnType.STRING, "main_mode", ColumnType.STRING,
+			"start_activity_type", ColumnType.TEXT, "end_activity_type", ColumnType.TEXT,
+			"first_pt_boarding_stop", ColumnType.TEXT, "last_pt_egress_stop", ColumnType.TEXT));
+
+		// Map.of only has 10 argument max
+		columnTypes.put("traveled_distance", ColumnType.LONG);
+
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
-			.columnTypesPartial(Map.of("person", ColumnType.TEXT, "trav_time", ColumnType.STRING,
-				"longest_distance_mode", ColumnType.STRING, "main_mode", ColumnType.STRING, "end_activity_type", ColumnType.TEXT))
+			.columnTypesPartial(columnTypes)
 			.separator(';').build());
 
 		// Use longest_distance_mode where main_mode is not present
@@ -118,9 +128,9 @@ public class TripAnalysis implements MATSimAppCommand {
 			labels.add(String.format("%d - %d", distGroups.get(i), distGroups.get(i + 1)));
 		}
 		labels.add(distGroups.get(distGroups.size() - 1) + "+");
-		distGroups.add(Integer.MAX_VALUE);
+		distGroups.add(Long.MAX_VALUE);
 
-		StringColumn dist_group = joined.intColumn("traveled_distance")
+		StringColumn dist_group = joined.longColumn("traveled_distance")
 			.map(dist -> cut(dist, distGroups, labels), ColumnType.STRING::create).setName("dist_group");
 
 		joined.addColumns(dist_group);
@@ -177,15 +187,15 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		// Stats per mode
 		Object2IntMap<String> n = new Object2IntLinkedOpenHashMap<>();
-		Object2IntMap<String> travelTime = new Object2IntLinkedOpenHashMap<>();
-		Object2IntMap<String> travelDistance = new Object2IntLinkedOpenHashMap<>();
+		Object2LongMap<String> travelTime = new Object2LongOpenHashMap<>();
+		Object2LongMap<String> travelDistance = new Object2LongOpenHashMap<>();
 
 		for (Row trip : trips) {
 			String mainMode = trip.getString("main_mode");
 
 			n.mergeInt(mainMode, 1, Integer::sum);
-			travelTime.mergeInt(mainMode, durationToSeconds(trip.getString("trav_time")), Integer::sum);
-			travelDistance.mergeInt(mainMode, trip.getInt("traveled_distance"), Integer::sum);
+			travelTime.mergeLong(mainMode, durationToSeconds(trip.getString("trav_time")), Long::sum);
+			travelDistance.mergeLong(mainMode, trip.getLong("traveled_distance"), Long::sum);
 		}
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("trip_stats.csv")), CSVFormat.DEFAULT)) {
@@ -204,21 +214,21 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Total time traveled [h]");
 			for (String m : modeOrder) {
-				int seconds = travelTime.getInt(m);
+				long seconds = travelTime.getLong(m);
 				printer.print(new BigDecimal(seconds / (60d * 60d)).setScale(0, RoundingMode.HALF_UP));
 			}
 			printer.println();
 
 			printer.print("Total distance traveled [km]");
 			for (String m : modeOrder) {
-				double meter = travelDistance.getInt(m);
+				double meter = travelDistance.getLong(m);
 				printer.print(new BigDecimal(meter / 1000d).setScale(0, RoundingMode.HALF_UP));
 			}
 			printer.println();
 
 			printer.print("Avg. speed [km/h]");
 			for (String m : modeOrder) {
-				double speed = (travelDistance.getInt(m) / 1000d) / (travelTime.getInt(m) / (60d * 60d));
+				double speed = (travelDistance.getLong(m) / 1000d) / (travelTime.getLong(m) / (60d * 60d));
 				printer.print(new BigDecimal(speed).setScale(2, RoundingMode.HALF_UP));
 
 			}
@@ -226,7 +236,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Avg. distance per trip [km]");
 			for (String m : modeOrder) {
-				double avg = (travelDistance.getInt(m) / 1000d) / (n.getInt(m));
+				double avg = (travelDistance.getLong(m) / 1000d) / (n.getInt(m));
 				printer.print(new BigDecimal(avg).setScale(2, RoundingMode.HALF_UP));
 
 			}
