@@ -2,6 +2,8 @@ package org.matsim.contrib.drt.extension.fiss;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -20,6 +22,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
@@ -146,18 +149,43 @@ public class RunFissDrtScenarioIT {
 		final Controler run = DrtOperationsControlerCreator.createControler(config, false);
 
 		//FISS part
+		LinkCounter linkCounter = new LinkCounter();
 		{
 			FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
 			fissConfigGroup.sampleFactor = 0.1;
 			fissConfigGroup.sampledModes = Set.of(TransportMode.car);
+			fissConfigGroup.switchOffFISSLastIteration = true;
 			FISSConfigurator.configure(run);
 
 			QSimComponentsConfigurator qSimComponentsConfigurator = FISSConfigurator
 					.activateModes(List.of(), MultiModeDrtConfigGroup.get(config).modes().collect(Collectors.toList()));
 
 			run.configureQSimComponents(qSimComponentsConfigurator);
+
+			run.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addEventHandlerBinding().toInstance(linkCounter);
+				}
+			});
+
 		}
 
 		run.run();
+		assert(linkCounter.getLinkLeaveCount()==23961);
 	}
+
+	static class LinkCounter implements LinkLeaveEventHandler {
+		private int counts = 0;
+
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			this.counts++;
+		}
+
+		public int getLinkLeaveCount() {
+			return this.counts;
+		}
+	}
+
 }
