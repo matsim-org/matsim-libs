@@ -53,9 +53,9 @@ public interface LSPShipment extends Identifiable<LSPShipment>, Attributable, Ha
 
 	double getPickupServiceTime(); // same as in CarrierShipment
 
-	ShipmentPlan getShipmentPlan();
-
-	ShipmentPlan getShipmentLog();
+//	ShipmentPlan getShipmentPlan();
+//
+//	ShipmentPlan getShipmentLog();
 
 	Collection<Requirement> getRequirements();
 

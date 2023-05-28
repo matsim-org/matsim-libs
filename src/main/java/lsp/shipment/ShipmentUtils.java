@@ -22,6 +22,7 @@ package lsp.shipment;
 
 //import demand.UtilityFunction;
 
+import lsp.LSPPlan;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
@@ -40,6 +41,21 @@ public final class ShipmentUtils {
 
 	public static Comparator<ShipmentPlanElement> createShipmentPlanElementComparator() {
 		return new ShipmentPlanElementComparator();
+	}
+
+	/**
+	 * Gives back the {@link ShipmentPlan} object of the {@link LSPPlan}, which matches to the Id of the {@link LSPShipment}
+	 * @param lspPlan In this plan of the, this method tries to find the shipment.
+	 * @param shipmentId Id of the shipment that should be found.
+	 * @return the ShipmentPlan object or null, if it is not found.
+	 */
+	public static ShipmentPlan findPlanOfShipment(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
+		for (ShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
+			if (shipmentPlan.getEmbeddingContainer().equals(shipmentId)){
+				return  shipmentPlan;
+			}
+		}
+		return null;
 	}
 
 	public static final class LoggedShipmentHandleBuilder {

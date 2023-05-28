@@ -38,9 +38,9 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 	private final int capacityDemand;
 	private final double deliveryServiceTime;
 	private final double pickupServiceTime;
-	private final ShipmentPlan shipmentPlan;
-	@Deprecated //This will be removed in the future and replaced by using the events. KMT, Mai'23
-	private final ShipmentPlan shipmentLog;
+//	private final ShipmentPlan shipmentPlan;
+//	@Deprecated //This will be removed in the future and replaced by using the events. KMT, Mai'23
+//	private final ShipmentPlan shipmentLog;
 	private final List<Requirement> requirements;
 //	private Id<LSP> lspId;
 
@@ -53,8 +53,8 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 		this.capacityDemand = builder.capacityDemand;
 		this.deliveryServiceTime = builder.deliveryServiceTime;
 		this.pickupServiceTime = builder.pickupServiceTime;
-		this.shipmentPlan = new ShipmentPlanImpl(this.getId());
-		this.shipmentLog = new ShipmentPlanImpl(this.getId());
+//		this.shipmentPlan = new ShipmentPlanImpl(this.getId());
+//		this.shipmentLog = new ShipmentPlanImpl(this.getId());
 		this.requirements = new ArrayList<>();
 		this.requirements.addAll(builder.requirements);
 	}
@@ -79,16 +79,16 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 		return endTimeWindow;
 	}
 
-	@Override
-	public ShipmentPlan getShipmentPlan() {
-		return shipmentPlan;
-	}
-
-	@Deprecated //This will be removed in the future and replaced by using the events. KMT, Mai'23
-	@Override
-	public ShipmentPlan getShipmentLog() {
-		return shipmentLog;
-	}
+//	@Override
+//	public ShipmentPlan getShipmentPlan() {
+//		return shipmentPlan;
+//	}
+//
+//	@Deprecated //This will be removed in the future and replaced by using the events. KMT, Mai'23
+//	@Override
+//	public ShipmentPlan getShipmentLog() {
+//		return shipmentLog;
+//	}
 
 	@Override
 	public int getSize() {
