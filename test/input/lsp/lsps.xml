@@ -26,8 +26,8 @@
 				<shipment id="Shipment_10" from="i(5,0)" to="i(6,6)" size="2" startPickup="0.0" endPickup="86400.0" startDelivery="0.0" endDelivery="86400.0" pickupServiceTime="0.0" deliveryServiceTime="120.0"/>
 			</shipments>
 
-			<LSPPlans>
-				<plan score="-1476.2" selected="false">
+			<LspPlans>
+				<LspPlan score="-1476.2" selected="false">
 					<logisticChains>
 						<logisticChain id="directSolution">
 							<logisticChainElement id="directCarrierLSE" resourceId="directCarrier"/>
@@ -125,8 +125,8 @@
 							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4333.0" endTime="4453.0" resourceId="distributionCarrierRes"/>
 						</shipmentPlan>
 					</shipmentPlans>
-				</plan>
-				<plan score="-492.33" selected="true">
+				</LspPlan>
+				<LspPlan score="-492.33" selected="true">
 					<logisticChains>
 						<logisticChain id="hubSolution">
 							<logisticChainElement id="mainCarrierLSE" resourceId="mainCarrier"/>
@@ -226,8 +226,8 @@
 							<element id="distributionCarrierResdistributionCarrierLSEUNLOAD" type="UNLOAD" startTime="4333.0" endTime="4453.0" resourceId="distributionCarrierRes"/>
 						</shipmentPlan>
 					</shipmentPlans>
-				</plan>
-			</LSPPlans>
+				</LspPlan>
+			</LspPlans>
 
 		</lsp>
 	</LSPs>
