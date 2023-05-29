@@ -35,8 +35,8 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
+import org.matsim.contrib.freight.events.CarrierTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.config.CommandLine;
@@ -521,7 +521,7 @@ import java.util.*;
 		}
 
 		@Override
-		public void handleEvent(FreightTourEndEvent event) {
+		public void handleEvent(CarrierTourEndEvent event) {
 			score++;
 			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 		}
@@ -532,7 +532,7 @@ import java.util.*;
 		}
 
 		@Override
-		public void handleEvent(FreightServiceEndEvent event) {
+		public void handleEvent(CarrierServiceEndEvent event) {
 			score++;
 			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 		}
