@@ -10,6 +10,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
@@ -53,6 +57,9 @@ public class TripAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--modes", split = ",", description = "List of considered modes, if not set all will be used")
 	private List<String> modeOrder;
 
+	@CommandLine.Option(names = "--shp-filter", description = "Define how the shp file filtering should work", defaultValue = "home")
+	private LocationFilter filter;
+
 	@CommandLine.Mixin
 	private ShpOptions shp;
 
@@ -94,8 +101,23 @@ public class TripAnalysis implements MATSimAppCommand {
 			persons = persons.where(persons.textColumn("person").matchesRegex(matchId));
 		}
 
-		if (shp.isDefined()) {
-			throw new UnsupportedOperationException("Shp filtering not implemented yet.");
+
+		// Home filter by standard attribute
+		if (shp.isDefined() && filter == LocationFilter.home) {
+			Geometry geometry = shp.getGeometry();
+			GeometryFactory f = new GeometryFactory();
+
+			IntList idx = new IntArrayList();
+
+			for (int i = 0; i < persons.rowCount(); i++) {
+				Row row = persons.row(i);
+				Point p = f.createPoint(new Coordinate(row.getDouble("home_x"), row.getDouble("home_y")));
+				if (geometry.contains(p)) {
+					idx.add(i);
+				}
+			}
+
+			persons = persons.where(Selection.with(idx.toIntArray()));
 		}
 
 		log.info("Filtered {} out of {} persons", persons.rowCount(), total);
@@ -112,6 +134,25 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
 			.columnTypesPartial(columnTypes)
 			.separator(';').build());
+
+
+		// Trip filter with start and end
+		if (shp.isDefined() && filter == LocationFilter.trip_start_and_end) {
+			Geometry geometry = shp.getGeometry();
+			GeometryFactory f = new GeometryFactory();
+			IntList idx = new IntArrayList();
+
+			for (int i = 0; i < trips.rowCount(); i++) {
+				Row row = trips.row(i);
+				Point start = f.createPoint(new Coordinate(row.getDouble("start_x"), row.getDouble("start_y")));
+				Point end = f.createPoint(new Coordinate(row.getDouble("end_x"), row.getDouble("end_y")));
+				if (geometry.contains(start) && geometry.contains(end)) {
+					idx.add(i);
+				}
+			}
+
+			trips = trips.where(Selection.with(idx.toIntArray()));
+		}
 
 		// Use longest_distance_mode where main_mode is not present
 		trips.stringColumn("main_mode")
@@ -360,9 +401,7 @@ public class TripAnalysis implements MATSimAppCommand {
 	 * How shape file filtering should be applied.
 	 */
 	enum LocationFilter {
-		// TODO: shp file support and option
 		trip_start_and_end,
-		trip_start_or_end,
 		home,
 		none
 	}
