@@ -6,6 +6,7 @@ import java.util.List;
 
 /**
  * Interface for classes that provide default {@link Dashboard}s that should be added to simulation runs automatically.
+ * One dashboard is shown as one tab in the simwrapper interface.
  * <p>
  * Instances of this class will be created automatically using Java's SPI functionality. To make a service available, add the fully qualified
  * name to a file named:
@@ -17,6 +18,9 @@ import java.util.List;
  */
 public interface DashboardProvider {
 
+	/**
+	 * List of dashboards this provider will add to the output. Generally one {@link Dashboard} is represented as one tab.
+	 */
 	List<Dashboard> getDashboards(Config config, SimWrapper simWrapper);
 
 	/**

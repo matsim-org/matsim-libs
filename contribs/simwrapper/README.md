@@ -1,11 +1,10 @@
 # SimWrapper
 
 Contrib to provide [SimWrapper](https://simwrapper.github.io/) integration.
-SimWrapper offers a huge amount of visualization possibilities in the webbrowser and enables the user to analyze,
-evaluate and
-disseminate MATSim runs visually.
+SimWrapper offers a huge amount of visualization possibilities in the webbrowser and enables users to analyze,
+evaluate and  disseminate MATSim runs visually.
 
-This extension allows you to easily create SimWrapper dashboards after runs have finished automatically.
+This extension allows you to automatically create SimWrapper dashboards after runs have finished.
 
 To use it, simply install the module:
 
@@ -21,7 +20,7 @@ The existing dashboards in `org.matsim.simwrapper.dashboard` serve as good examp
 
 Internally SimWrapper works mostly with YAML files, but in the Java API all YAML files are generated automatically for
 you.
-During development, you only interact with type-safe Java API and set the necessary attributes.
+During development, you only interact with type-safe Java API and set the necessary attributes:
 
 ```java
 public class CustomDashboard implements Dashboard {
@@ -45,8 +44,7 @@ The philosophy of this module is to provide as much functionality as possible wi
 
 To define which dashboard are available you need to implement
 a [DashboardProvider](src%2Fmain%2Fjava%2Forg%2Fmatsim%2Fsimwrapper%2FDashboardProvider.java), which simply returns a
-list of
-dashboards.
+list of  dashboards.
 
 There are two preferred ways to add these providers by default:
 
@@ -57,15 +55,12 @@ classpath.
 Thus, dashboards added this way will be available as soon the maven dependency is imported. No other configuration is
 required from the users side.
 
-To use this method you need a file `META-INF/services/org.matsim.simwrapper.DashboardProvider`, which lists all your
-provider implementations.
+To use this method you need a file `META-INF/services/org.matsim.simwrapper.DashboardProvider`, which lists all your provider implementations.
 
 ### 2. Package Scanning
 
-If dashboards should not be added automatically without any configuration, then you still need to implement the
-provider, but not add it to the services file.
+If dashboards should not be added automatically without any configuration, then you still need to implement the provider, but not add it to the services file.
 
-The developer then needs to
-configure [SimWrapperConfigGroup](src%2Fmain%2Fjava%2Forg%2Fmatsim%2Fsimwrapper%2FSimWrapperConfigGroup.java) and add
+The developer then needs to configure [SimWrapperConfigGroup](src%2Fmain%2Fjava%2Forg%2Fmatsim%2Fsimwrapper%2FSimWrapperConfigGroup.java) and add
 the corresponding package name to `packages` in the config.
 The contrib will then pick it up from there only if configured correctly.
