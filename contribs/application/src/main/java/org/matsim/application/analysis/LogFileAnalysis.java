@@ -111,6 +111,8 @@ public class LogFileAnalysis implements MATSimAppCommand {
 
 		// Ignored attributes
 		info.remove("Thread performance");
+		info.remove("used RAM");
+		info.remove("### round time");
 
 		if (first != null) {
 			LocalDateTime start = parseDate(first);
