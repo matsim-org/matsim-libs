@@ -36,13 +36,13 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@Comment("charging will be simulated every 'chargeTimeStep'-th time step")
 	// no need to simulate with 1-second time step
 	@Positive
-	public int chargeTimeStep = 5; // 5 s ==> 0.35% SOC (fast charging, 50 kW)
+	public int chargeTimeStep = 15; // 15 s ==> 0.417% SOC when charging at 1C (i.e. full recharge in 1 hour)
 
 	@Parameter
 	@Comment("AUX discharging will be simulated every 'auxDischargeTimeStep'-th time step")
 	// only used if SeparateAuxDischargingHandler is used, otherwise ignored
 	@Positive
-	public int auxDischargeTimeStep = 60; // 1 min ==> 0.25% SOC (3 kW AUX power)
+	public int auxDischargeTimeStep = 60; // 1 min
 
 	@Parameter("minChargingTime")
 	@Comment("Minimum activity duration for charging. Used in EvNetwork Routing.")
