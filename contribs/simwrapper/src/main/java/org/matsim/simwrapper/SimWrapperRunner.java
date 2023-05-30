@@ -2,6 +2,7 @@ package org.matsim.simwrapper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.application.ApplicationUtils;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -23,7 +24,7 @@ public class SimWrapperRunner implements MATSimAppCommand {
 	@CommandLine.Parameters(arity = "1..*", description = "Path to folders for which dashboards should be generated.")
 	private List<Path> inputPaths;
 
-	@CommandLine.Option(names = "--config", description = "Path to MATSim config.", required = true)
+	@CommandLine.Option(names = "--config", description = "Path to MATSim config that used be used. If not given tries to use output config.", required = false)
 	private String configPath;
 
 	@CommandLine.Option(names = "--exclude", split = ",", description = "Exclusion that will be added to the config.")
@@ -31,14 +32,22 @@ public class SimWrapperRunner implements MATSimAppCommand {
 
 	@Override
 	public Integer call() throws Exception {
-		Config config = ConfigUtils.loadConfig(configPath);
-		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-
-		if (exclude != null)
-			simWrapperConfigGroup.exclude.addAll(exclude);
-
 		for (Path input : inputPaths) {
 			log.info("Running on {}", input);
+
+			Config config;
+			if (configPath != null)
+				config = ConfigUtils.loadConfig(configPath);
+			else {
+				Path path = ApplicationUtils.matchInput("config.xml", input);
+				config = ConfigUtils.loadConfig(path.toString());
+			}
+
+			SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+
+			if (exclude != null)
+				simWrapperConfigGroup.exclude.addAll(exclude);
+
 
 			SimWrapperListener listener = new SimWrapperListener(SimWrapper.create(simWrapperConfigGroup), config);
 			try {
