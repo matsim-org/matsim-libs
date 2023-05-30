@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
-	<carrier id="directCarrier">
-		<attributes>
-			<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
-		</attributes>
-		<capabilities fleetSize="INFINITE">
-			<vehicles>
-				<vehicle id="directTruck" depotLinkId="i(1,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
-			</vehicles>
-
-		</capabilities>
-
-	</carrier>
-
 	<carrier id="CarrierNorth">
 		<attributes>
 			<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
@@ -28,6 +15,19 @@
 	</carrier>
 
 	<carrier id="carrierSouth">
+		<attributes>
+			<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="directTruck" depotLinkId="i(1,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+			</vehicles>
+
+		</capabilities>
+
+	</carrier>
+
+	<carrier id="singleCarrier">
 		<attributes>
 			<attribute name="carrierType" class="lsp.usecase.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
 		</attributes>

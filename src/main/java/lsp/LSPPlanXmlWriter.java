@@ -86,7 +86,7 @@ public class LSPPlanXmlWriter  extends MatsimXmlWriter {
 		List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 		atts.add(createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		atts.add(createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
-		atts.add(createTuple("xsi:schemaLocation","http://www.matsim.org/files/dtd file:///Users/niclasrichter/git-svn/matsim-libs/matsim/src/main/resources/dtd/lspsDefinitions_v2.xsd"));
+		atts.add(createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "lspsDefinitions_v1.xsd"));
 		this.writeStartTag(LSPConstants.LSPS_DEFINITIONS, atts);
 		this.writer.write(NL);
 	}
