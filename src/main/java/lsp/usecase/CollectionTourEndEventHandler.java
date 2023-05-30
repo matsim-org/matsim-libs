@@ -33,7 +33,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.CarrierTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -62,7 +62,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 	}
 
 	@Override
-	public void handleEvent(FreightTourEndEvent event) {
+	public void handleEvent(CarrierTourEndEvent event) {
 		if (event.getTourId().equals(tour.getId())){
 			for (TourElement element : tour.getTourElements()) {
 				if (element instanceof ServiceActivity serviceActivity) {
@@ -75,7 +75,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		}
 	}
 
-	private void logUnload(FreightTourEndEvent event, Tour tour) {
+	private void logUnload(CarrierTourEndEvent event, Tour tour) {
 		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setEndTime(event.getTime() + getTotalUnloadingTime(tour));
@@ -88,7 +88,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
 	}
 
-	private void logTransport(FreightTourEndEvent event, Tour tour) {
+	private void logTransport(CarrierTourEndEvent event, Tour tour) {
 		String idString = resource.getId() + "" + logisticChainElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getShipmentLog().getPlanElements().get(id);
