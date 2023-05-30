@@ -57,6 +57,11 @@ public class Plotly extends Viz {
 	public Boolean mergeDatasets;
 
 	/**
+	 * Define a fixed ratio for x and y axes domain.
+	 */
+	public Boolean fixedRatio;
+
+	/**
 	 * Merge two column as index. Column name as key will be merged with the column name value.
 	 * This allows to build level multi indices for certain plot types.
 	 */

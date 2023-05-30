@@ -127,6 +127,7 @@ public class TrafficCountsDashboard implements Dashboard {
 
 				viz.title = "Daily traffic volumes";
 				viz.description = "simulated vs. observed";
+				viz.fixedRatio = true;
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Observed traffic count").build())

@@ -41,14 +41,12 @@ public class SimWrapperRunner implements MATSimAppCommand {
 			else {
 
 				try {
-
 					Path path = ApplicationUtils.matchInput("config.xml", input);
 					config = ConfigUtils.loadConfig(path.toString());
 				} catch (IllegalArgumentException e) {
 					log.warn("No output config found in {}, and no config given via --config", input);
 					continue;
 				}
-
 			}
 
 			SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
