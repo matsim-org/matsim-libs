@@ -11,8 +11,8 @@ import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 
@@ -21,33 +21,45 @@ import java.util.stream.Collectors;
  */
 public class TrafficCountsDashboard implements Dashboard {
 
-	private String[] args;
+	private final List<Double> limits;
+	private final List<String> labels;
 
 	/**
 	 * Constructor with default arguments.
 	 */
 	public TrafficCountsDashboard() {
-		args = new String[0];
+		this(List.of(0.6, 0.8, 1.2, 1.4), List.of("major under", "under", "ok", "over", "major over"));
 	}
 
 	/**
 	 * Constructor with custom limits and categories.
 	 */
-	public TrafficCountsDashboard(Collection<Double> limits, Collection<String> labels) {
+	public TrafficCountsDashboard(List<Double> limits, List<String> labels) {
+		this.limits = limits;
+		this.labels = labels;
 
-		args = new String[]{
-			"--limits", limits.stream().map(String::valueOf).collect(Collectors.joining(",")),
-			"--labels", String.join(",", labels)
-		};
 	}
 
 	@Override
 	public void configure(Header header, Layout layout) {
 
 		header.title = "Traffic Counts";
-		header.description = "Comparison of observed and simulated daily traffic volumes";
+		header.description = "Comparison of observed and simulated daily traffic volumes.\nError metrics: ";
 
-		// TODO: generate description for labels and limits
+
+		for (int i = 0; i < labels.size(); i++) {
+			if (i == 0)
+				header.description += String.format(Locale.US, "%s: < %.2f; ", labels.get(i), limits.get(i));
+			else if (i == labels.size() - 1)
+				header.description += String.format(Locale.US, "%s: > %.2f", labels.get(i), limits.get(i - 1));
+			else
+				header.description += String.format(Locale.US, "%s: %.2f - %.2f; ", labels.get(i), limits.get(i - 1), limits.get(i));
+		}
+
+		String[] args = new String[]{
+			"--limits", limits.stream().map(String::valueOf).collect(Collectors.joining(",")),
+			"--labels", String.join(",", labels)
+		};
 
 		layout.row("overview")
 			.el(Plotly.class, (viz, data) -> {
@@ -104,7 +116,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.display.lineColor.dataset = "counts";
 				viz.display.lineColor.columnName = "quality";
 				viz.display.lineColor.join = "link_id";
-				viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlGn, 5, false);
+				viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlBu, labels.size(), false);
 
 				// 8px
 				viz.display.lineWidth.dataset = "@8";
