@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
-import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.events.CarrierTourEndEvent;
+import org.matsim.contrib.freight.events.CarrierTourStartEvent;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.vehicles.Vehicle;
@@ -48,7 +48,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	/**
 	 * Calculate the carrier's score based on Events.
 	 * Currently, it includes:
-	 * - fixed costs (using FreightTourEndEvent)
+	 * - fixed costs (using CarrierTourEndEvent)
 	 * - time-dependent costs (using FreightTourStart- and -EndEvent)
 	 * - distance-dependent costs (using LinkEnterEvent)
 	 */
@@ -75,22 +75,22 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 
 		@Override public void handleEvent(Event event) {
 			log.warn(event.toString());
-			if (event instanceof FreightTourStartEvent freightTourStartEvent) {
+			if (event instanceof CarrierTourStartEvent freightTourStartEvent) {
 				handleEvent(freightTourStartEvent);
-			} else if (event instanceof FreightTourEndEvent freightTourEndEvent) {
+			} else if (event instanceof CarrierTourEndEvent freightTourEndEvent) {
 				handleEvent(freightTourEndEvent);
 			} else if (event instanceof LinkEnterEvent linkEnterEvent) {
 				handleEvent(linkEnterEvent);
 			}
 		}
 
-		private void handleEvent(FreightTourStartEvent event) {
+		private void handleEvent(CarrierTourStartEvent event) {
 			// Save time of freight tour start
 			tourStartTime.put(event.getTourId(), event.getTime());
 		}
 
 		//Fix costs for vehicle usage
-		private void handleEvent(FreightTourEndEvent event) {
+		private void handleEvent(CarrierTourEndEvent event) {
 			//Fix costs for vehicle usage
 			final VehicleType vehicleType = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
 

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -228,7 +228,7 @@ import java.util.*;
 			// backpointer not needed here, therefor not memorizing it.  kai, jun'22
 		}
 
-		@Override public void handleEvent( FreightServiceEndEvent event ) {
+		@Override public void handleEvent( CarrierServiceEndEvent event ) {
 			double tip = tipRandom.nextDouble() * 5;
 			log.warn("tipSum=" + tipSum + "; tip=" + tip);
 			tipSum += tip;
