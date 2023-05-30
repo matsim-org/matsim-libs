@@ -156,7 +156,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 		writer.write("\t\t\t<" + LSP_PLANS + ">\n");
 
 		for (LSPPlan plan : lsp.getPlans()) {
-			writer.write("\t\t\t\t<" + PLAN);
+			writer.write("\t\t\t\t<" + LSP_PLAN);
 			if (plan.getScore() != null) {
 				writer.write(" " + SCORE + "=\"" + plan.getScore() + "\"");
 			}
@@ -196,7 +196,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 				}
 				writer.write("\t\t\t\t\t</" + SHIPMENT_PLANS + ">\n");
 			}
-			writer.write("\t\t\t\t</"+ PLAN + ">\n");
+			writer.write("\t\t\t\t</"+ LSP_PLAN + ">\n");
 		}
 		writer.write("\t\t\t</" + LSP_PLANS + ">\n\n");
 	}
