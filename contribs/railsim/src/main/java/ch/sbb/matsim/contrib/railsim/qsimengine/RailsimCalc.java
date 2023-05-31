@@ -116,8 +116,10 @@ public class RailsimCalc {
 
 		double assumedSpeed = state.speed;
 
+		double maxSpeed = Math.max(assumedSpeed, state.allowedMaxSpeed);
+
 		// Lookahead window
-		double window = RailsimCalc.calcTraveledDist(assumedSpeed, assumedSpeed / state.train.deceleration(),
+		double window = RailsimCalc.calcTraveledDist(maxSpeed, maxSpeed / state.train.deceleration(),
 			-state.train.deceleration()) + currentLink.length;
 
 		// Distance to the next speed change point (link)
@@ -137,7 +139,13 @@ public class RailsimCalc {
 				allowed = 0;
 			} else {
 				link = state.route.get(i);
-				allowed = link.getAllowedFreespeed(state.driver);
+
+				// If the previous link is a transit stop the speed needs to be 0 at the next link
+				// train stops at the very end of a link
+				if (i > 0 && state.isStop(state.route.get(i-1).getLinkId()))
+					allowed = 0;
+				else
+					allowed = link.getAllowedFreespeed(state.driver);
 			}
 
 			if (allowed < assumedSpeed) {

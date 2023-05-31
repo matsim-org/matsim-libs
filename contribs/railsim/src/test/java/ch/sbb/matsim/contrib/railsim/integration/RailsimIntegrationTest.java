@@ -36,4 +36,24 @@ public class RailsimIntegrationTest {
 		controler.run();
 
 	}
+
+	@Test
+	public void scenario_genf() {
+
+		File dir = new File(utils.getPackageInputDirectory(), "test_genf");
+
+		Config config = ConfigUtils.loadConfig(new File(dir, "config.xml").toString());
+
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+
+		controler.addOverridingModule(new RailsimModule());
+		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
+
+		controler.run();
+
+	}
+
 }

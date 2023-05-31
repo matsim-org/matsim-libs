@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -24,6 +25,12 @@ final class TrainState {
 	 */
 	@Nullable
 	final TransitDriverAgent pt;
+
+	/**
+	 * Next transit stop.
+	 */
+	@Nullable
+	TransitStopFacility nextStop;
 
 	/**
 	 * Train specific parameters.
@@ -90,6 +97,7 @@ final class TrainState {
 	TrainState(MobsimDriverAgent driver, TrainInfo train, double timestamp, @Nullable Id<Link> linkId, List<RailLink> route) {
 		this.driver = driver;
 		this.pt = driver instanceof TransitDriverAgent ptDriver ? ptDriver : null;
+		this.nextStop = pt != null ? pt.getNextTransitStop() : null;
 		this.train = train;
 		this.route = route;
 		this.timestamp = timestamp;
@@ -116,6 +124,13 @@ final class TrainState {
 
 	boolean isRouteAtEnd() {
 		return routeIdx >= route.size();
+	}
+
+	/**
+	 * Check whether to stop at certain link.
+	 */
+	boolean isStop(Id<Link> link) {
+		return nextStop != null && nextStop.getLinkId().equals(link);
 	}
 
 	RailsimTrainStateEvent asEvent(double time) {

@@ -44,6 +44,13 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	}
 
 	/**
+	 * This train currently waits for an reservation for blocked tracks.
+	 */
+	boolean isAwaitingReservation() {
+		return checkReservation >= 0;
+	}
+
+	/**
 	 * The type of the requested update.
 	 */
 	enum Type {
