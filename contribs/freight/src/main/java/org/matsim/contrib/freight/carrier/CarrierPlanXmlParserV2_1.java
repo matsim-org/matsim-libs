@@ -51,6 +51,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	private static final String SHIPMENT = "shipment";
 	private static final String SERVICES = "services";
 	private static final String SERVICE = "service";
+	private static final String PLAN = "plan";
 	private static final String ID = "id";
 	private static final String FROM = "from";
 	private static final String TO = "to";
@@ -71,6 +72,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	private CarrierVehicle currentVehicle = null;
 	private CarrierService currentService = null;
 	private CarrierShipment currentShipment = null;
+	private CarrierPlan currentPlan = null;
 	private Tour.Builder currentTourBuilder = null;
 	private Id<Link> previousActLoc = null;
 	private String previousRouteContent;
@@ -246,6 +248,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				if (selected == null) this.selected = false;
 				else this.selected = selected.equals("true");
 				scheduledTours = new ArrayList<>();
+				currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
 				break;
 			case "tour":
 				String tourId = atts.getValue("tourId");
@@ -315,6 +318,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 					case CARRIER -> currAttributes = currentCarrier.getAttributes();
 					case SERVICE -> currAttributes = currentService.getAttributes();
 					case SHIPMENT -> currAttributes = currentShipment.getAttributes();
+					case PLAN -> currAttributes = currentPlan.getAttributes();
 					default ->
 							throw new RuntimeException("could not derive context for attributes. context=" + context.peek());
 				}
@@ -347,12 +351,12 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 			}
 			case "plans" -> {} //do nothing
 			case "plan" -> {
-				CarrierPlan currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
 				currentPlan.setScore(currentScore);
 				currentCarrier.getPlans().add(currentPlan);
 				if (this.selected) {
 					currentCarrier.setSelectedPlan(currentPlan);
 				}
+				currentPlan = null;
 			}
 			case "tour" -> {
 				ScheduledTour sTour = ScheduledTour.newInstance(currentTourBuilder.build(), currentVehicle, currentStartTime);
