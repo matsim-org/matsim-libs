@@ -36,6 +36,9 @@
 
 		<plans>
 			<plan score="-100.0" selected="false">
+				<attributes>
+					<attribute name="jspritScore" class="java.lang.Double">NaN</attribute>
+				</attributes>
 				<tour tourId="1" vehicleId="lightVehicle">
 					<act type="start" end_time="07:00:00"/>
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:30:00">
@@ -54,6 +57,9 @@
 			</plan>
 
 			<plan score="-100.0" selected="true">
+				<attributes>
+					<attribute name="jspritScore" class="java.lang.Double">100.00</attribute>
+				</attributes>
 				<tour tourId="42" vehicleId="lightVehicle">
 					<act type="start" end_time="07:00:00"/>
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:30:00">
@@ -80,6 +86,9 @@
 			</plan>
 
 			<plan score="-1000.0" selected="false">
+				<attributes>
+					<attribute name="jspritScore" class="java.lang.Double">100.00</attribute>
+				</attributes>
 				<tour tourId="tour42" vehicleId="mediumVehicle">
 					<act type="start" end_time="07:00:00"/>
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:30:00">
