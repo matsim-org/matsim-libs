@@ -18,7 +18,7 @@ import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.PlanModelService;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.*;
 import java.util.stream.Collectors;
 

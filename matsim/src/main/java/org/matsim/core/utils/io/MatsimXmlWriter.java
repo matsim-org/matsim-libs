@@ -142,6 +142,15 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * Convenience method to create XML Attributes written by startTag()
 	 */
 	protected static Tuple<String, String> createTuple(String one, double two) {
+		if (Double.isNaN(two)) {
+			return MatsimXmlWriter.createTuple(one, "NaN");
+		}
+		if (two == Double.POSITIVE_INFINITY) {
+			return MatsimXmlWriter.createTuple(one, "INF");
+		}
+		if (two == Double.NEGATIVE_INFINITY) {
+			return MatsimXmlWriter.createTuple(one, "-INF");
+		}
 		return MatsimXmlWriter.createTuple(one, Double.toString(two));
 	}
 

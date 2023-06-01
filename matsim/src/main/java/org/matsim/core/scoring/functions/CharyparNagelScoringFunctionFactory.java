@@ -28,17 +28,17 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A factory to create scoring functions as described by D. Charypar and K. Nagel.
- * 
+ *
  * <blockquote>
  *  <p>Charypar, D. und K. Nagel (2005) <br>
  *  Generating complete all-day activity plans with genetic algorithms,<br>
  *  Transportation, 32 (4) 369-397.</p>
  * </blockquote>
- * 
+ *
  * @author rashid_waraich
  */
 public final class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
@@ -69,11 +69,11 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
      * which depends on Person attributes. This implementation does not.
      *
 	 * <li>The fact that you have a person-specific scoring function does not mean that the "creative" modules
-	 * (such as route choice) are person-specific.  This is not a bug but a deliberate design concept in order 
+	 * (such as route choice) are person-specific.  This is not a bug but a deliberate design concept in order
 	 * to reduce the consistency burden.  Instead, the creative modules should generate a diversity of possible
 	 * solutions.  In order to do a better job, they may (or may not) use person-specific info.  kai, apr'11
 	 * </ul>
-	 * 
+	 *
 	 * @param person
 	 * @return new ScoringFunction
 	 */

@@ -9,8 +9,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
-import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.events.CarrierTourEndEvent;
+import org.matsim.contrib.freight.events.CarrierTourStartEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -48,14 +48,14 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		this.scenario = scenario;
 	}
 
-	private void handleEvent(FreightTourStartEvent event) {
+	private void handleEvent(CarrierTourStartEvent event) {
 		// Save time of freight tour start
 		final String key = event.getCarrierId().toString() + "_" + event.getTourId().toString();
 		tourStartTime.put(key, event.getTime());
 	}
 
 	//Fix costs for vehicle usage
-	private void handleEvent(FreightTourEndEvent event) {
+	private void handleEvent(CarrierTourEndEvent event) {
 		final String key = event.getCarrierId().toString() + "_" + event.getTourId().toString();
 		double tourDuration = event.getTime() - tourStartTime.get(key);
 		vehicleId2TourDuration.put(event.getVehicleId(), tourDuration);
@@ -79,10 +79,10 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 
 	@Override public void handleEvent(Event event) {
 
-		if (event instanceof FreightTourStartEvent freightTourStartEvent) {
-			handleEvent(freightTourStartEvent);
-		} else if (event instanceof FreightTourEndEvent freightTourEndEvent) {
-			handleEvent(freightTourEndEvent);
+		if (event instanceof CarrierTourStartEvent carrierTourStartEvent) {
+			handleEvent(carrierTourStartEvent);
+		} else if (event instanceof CarrierTourEndEvent carrierTourEndEvent) {
+			handleEvent(carrierTourEndEvent);
 		} else if (event instanceof LinkEnterEvent linkEnterEvent) {
 			handleEvent(linkEnterEvent);
 		}

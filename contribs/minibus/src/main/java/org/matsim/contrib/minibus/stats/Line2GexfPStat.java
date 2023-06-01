@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,32 +41,32 @@ import org.matsim.core.controler.listener.StartupListener;
 
 /**
  * GexfPStat stats for all lines. Each line is written separately to file
- *  
+ *
  * @author aneumann
  *
  */
 final class Line2GexfPStat implements StartupListener, IterationEndsListener, ShutdownListener{
-	
+
 	private static final Logger log = LogManager.getLogger(Line2GexfPStat.class);
 
     private CountPPaxHandler globalPaxHandler;
 	private CountPVehHandler vehHandler;
-	
+
 	private final PConfigGroup pConfig;
 	private final HashMap<String, SimpleGexfPStat> lineId2GexfPStat;
 	private Set<String> lastLineIds;
 
 	@Inject Line2GexfPStat(Config config){
 		this.pConfig = ConfigUtils.addOrGetModule(config,PConfigGroup.class) ;
-		
+
 		this.lineId2GexfPStat = new HashMap<>();
-		
+
 		this.lastLineIds = new TreeSet<>();
-		
+
 		if (this.pConfig.getGexfInterval() > 0) {
 			log.info("enabled");
 		}
-		
+
 	}
 
 	@Override
@@ -103,7 +103,7 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 				// for all active gexf call
 				this.lineId2GexfPStat.get(lineId).notifyIterationEnds(event);
 			}
-			
+
 			for (String lineId : lastLineIds) {
 				if (!currentLineIds.contains(lineId)) {
 					// this line died - terminate
@@ -111,7 +111,7 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 					this.lineId2GexfPStat.remove(lineId);
 				}
 			}
-			
+
 			this.lastLineIds = currentLineIds;
 		}
 	}

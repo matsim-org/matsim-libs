@@ -21,27 +21,50 @@
 
 package org.matsim.contrib.freight.events;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.vehicles.Vehicle;
 
-/*package-private*/  final class FreightServiceStartEventCreator implements FreightEventCreator {
+import static org.matsim.contrib.freight.events.CarrierEventAttributes.*;
+
+/**
+ * An event, that informs that a Freight {@link CarrierService} activity has ended.
+ *
+ * @author Tilman Matteis  - creating it for the use in Logistics / LogisticServiceProviders (LSP)s
+ * @author Kai Martins-Turner (kturner) - integrating and adapting it into/for the MATSim freight contrib
+ */
+public final class CarrierServiceEndEvent extends AbstractCarrierEvent {
+
+	public static final String EVENT_TYPE = "Freight service ends";
+	private final Id<CarrierService> serviceId;
+	private final double serviceDuration;
+
+	public CarrierServiceEndEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
+		super(time, carrierId, service.getLocationLinkId(), vehicleId);
+		this.serviceId = service.getId();
+		this.serviceDuration = service.getServiceDuration();
+	}
+
+	@Override public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	public Id<CarrierService> getServiceId() {
+		return serviceId;
+	}
+
+	public double getServiceDuration() {
+		return serviceDuration;
+	}
 
 	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if( event instanceof ActivityStartEvent startEvent && FreightConstants.SERVICE.equals(startEvent.getActType()) ){
-			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-			if( element instanceof ServiceActivity serviceActivity ) {
-				return new FreightServiceStartEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), vehicleId);
-			}
-		}
-		return null;
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_SERVICE_ID, serviceId.toString());
+		attr.put(ATTRIBUTE_SERVICE_DURATION, String.valueOf(serviceDuration));
+		return attr;
 	}
-}	
+}

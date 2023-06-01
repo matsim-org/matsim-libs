@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 
 import java.util.HashSet;
@@ -38,7 +39,7 @@ import java.util.Set;
  */
 public final class EmissionModule {
 	private static final Logger logger = LogManager.getLogger(EmissionModule.class);
-	
+
 	private final Scenario scenario;
 	private WarmEmissionHandler warmEmissionHandler;
 	private ColdEmissionHandler coldEmissionHandler;
@@ -64,7 +65,7 @@ public final class EmissionModule {
 	public EmissionModule(final Scenario scenario, final EventsManager eventsManager) {
 
 		this.scenario = scenario;
-		this.emissionConfigGroup = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+		this.emissionConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), EmissionsConfigGroup.class);
 		this.eventsManager = emissionConfigGroup.isWritingEmissionsEvents() ? eventsManager : EventsUtils.createEventsManager();
 
 		checkConfigConsistency();

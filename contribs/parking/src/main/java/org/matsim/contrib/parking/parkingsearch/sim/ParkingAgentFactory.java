@@ -18,11 +18,11 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.parking.parkingsearch.sim;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -58,7 +58,7 @@ import com.google.inject.name.Named;
 public class ParkingAgentFactory implements AgentFactory {
 
 	/**
-	 * 
+	 *
 	 */
 	@Inject
 	@Named(value = TransportMode.walk) RoutingModule walkRouter;
@@ -75,10 +75,10 @@ public class ParkingAgentFactory implements AgentFactory {
 	VehicleTeleportationLogic teleportationLogic;
 	QSim qsim;
 	@Inject
-	Config config; 
-	
+	Config config;
+
 	/**
-	 * 
+	 *
 	 */
 	@Inject
 	public ParkingAgentFactory(QSim qsim) {
@@ -90,26 +90,26 @@ public class ParkingAgentFactory implements AgentFactory {
 		ParkingSearchConfigGroup psConfigGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
 		ParkingSearchLogic parkingLogic;
 		ParkingAgentLogic agentLogic = null;
-		
+
 		switch(psConfigGroup.getParkingSearchStrategy()){
 		case Benenson:
 			parkingLogic  = new BenensonParkingSearchLogic(network,psConfigGroup);
 			agentLogic = new BenensonParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter, network,
 					parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, psConfigGroup);
 			break;
-			
+
 		case Random:
 			parkingLogic  = new RandomParkingSearchLogic(network);
 			agentLogic = new ParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter, network,
 					parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, psConfigGroup);
 			break;
-		
+
 		case DistanceMemory:
 			parkingLogic  = new DistanceMemoryParkingSearchLogic(network);
 			agentLogic = new MemoryBasedParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter, network,
 					parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, psConfigGroup);
 			break;
-			
+
 		}
 		Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
 		if (startLinkId == null) {

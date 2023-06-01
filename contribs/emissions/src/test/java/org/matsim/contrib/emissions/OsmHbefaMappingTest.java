@@ -55,6 +55,21 @@ public class OsmHbefaMappingTest {
     }
 
 	@Test
+	public void testMotorwayWithNoExactSpeedTag() {
+
+		var mapping = OsmHbefaMapping.build();
+
+		var link = getTestLink("motorway", 100.11 / 3.6);
+		var hbefaType = mapping.determineHebfaType(link);
+		assertEquals("URB/MW-Nat./100", hbefaType);
+
+		link = getTestLink("motorway", 86.11 / 3.6);
+		hbefaType = mapping.determineHebfaType(link);
+		assertEquals("URB/MW-Nat./90", hbefaType);
+
+	}
+
+	@Test
 	public void testFastMotorwayLink() {
 
 		var mapping = OsmHbefaMapping.build();
@@ -94,7 +109,7 @@ public class OsmHbefaMappingTest {
 
         var hbefaType = mapping.determineHebfaType(link);
 
-        assertEquals("URB/Trunk-City/60", hbefaType);
+        assertEquals("URB/Local/60", hbefaType);
     }
 
     @Test
