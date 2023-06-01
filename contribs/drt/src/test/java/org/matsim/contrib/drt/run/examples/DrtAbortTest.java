@@ -34,6 +34,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbortHandler;
@@ -56,10 +57,9 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.*;
 
 public class DrtAbortTest{
 	private static final Logger log = LogManager.getLogger(DrtAbortTest.class );
@@ -102,7 +102,7 @@ public class DrtAbortTest{
 			config.changeMode().setModes( new String[] { TransportMode.drt, TransportMode.bike });
 		}
 		{
-			PlanCalcScoreConfigGroup.ModeParams params = new PlanCalcScoreConfigGroup.ModeParams( TransportMode.bike );
+			ModeParams params = new ModeParams( TransportMode.bike );
 			params.setMarginalUtilityOfTraveling(-12.);
 			config.planCalcScore().addModeParams( params );
 		}
@@ -158,15 +158,8 @@ public class DrtAbortTest{
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
-		{
-			final PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams( TripStructureUtils.createStageActivityType( walkAfterRejectMode ) );
-			params.setScoringThisActivityAtAll( false );
-			config.planCalcScore().addActivityParams( params );
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams params = new PlanCalcScoreConfigGroup.ModeParams( walkAfterRejectMode );
-			config.planCalcScore().addModeParams( params );
-		}
+		config.planCalcScore().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walkAfterRejectMode ) ).setScoringThisActivityAtAll( false ) );
+		config.planCalcScore().addModeParams( new ModeParams( walkAfterRejectMode ) );
 
 		config.planCalcScore().setWriteExperiencedPlans( true );
 
@@ -190,24 +183,7 @@ public class DrtAbortTest{
 		controler.configureQSimComponents( DvrpQSimComponents.activateAllModes(multiModeDrtConfig ) );
 
 		if (rejectionModule){
-			QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
-			List<String> components = qsimComponents.getActiveComponents();
-			components.add( MyAbortHandler.COMPONENT_NAME );
-			qsimComponents.setActiveComponents( components );
-
-			controler.addOverridingQSimModule( new AbstractQSimModule(){
-				@Override protected void configureQSim(){
-					this.addQSimComponentBinding( MyAbortHandler.COMPONENT_NAME ).to( MyAbortHandler.class );
-				}
-			} );
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bind(DrtRejectionEventHandler.class).in(Singleton.class);
-					addEventHandlerBinding().to(DrtRejectionEventHandler.class);
-					addControlerListenerBinding().to(DrtRejectionEventHandler.class);
-				}
-			});
+			controler.addOverridingModule( new DrtRejectionModule() );
 		}
 
 		controler.run();
@@ -230,6 +206,8 @@ public class DrtAbortTest{
 	private static class MyAbortHandler implements AbortHandler, MobsimEngine{
 		public static final String COMPONENT_NAME = "DrtAbortHandler";
 		private static final String delimiter = "============";
+		private final double alpha;
+		private final double beta;
 		@Inject Network network;
 		@Inject Population population;
 		@Inject MobsimTimer mobsimTimer;
@@ -243,19 +221,38 @@ public class DrtAbortTest{
 		private InternalInterface internalInterface;
 		private final List<MobsimAgent> agents = new ArrayList<>();
 
-		@Inject MyAbortHandler(Network network, Map<String, TravelTime> travelTimeMap){
-			travelTime = travelTimeMap.get(TransportMode.car);
-			router =  new SpeedyALTFactory().createPathCalculator(network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
+		List<String> drtModes = new ArrayList<>();
+		Map<String,Double> alphas = new HashMap<>();
+		Map<String,Double> betas = new HashMap<>();
+
+		@Inject MyAbortHandler(Network network, Map<String, TravelTime> travelTimeMap, Config config ){
+			travelTime = travelTimeMap.get( TransportMode.car );
+			router = new SpeedyALTFactory().createPathCalculator( network, new OnlyTimeDependentTravelDisutility( travelTime ), travelTime );
+
+			for( DrtConfigGroup modalElement : MultiModeDrtConfigGroup.get( config ).getModalElements() ){
+				drtModes.add( modalElement.mode );
+				alphas.put( modalElement.mode, modalElement.maxTravelTimeAlpha );
+				betas.put( modalElement.mode, modalElement.maxTravelTimeBeta );
+			}
+
+
+			final Collection<DrtConfigGroup> modalElements = MultiModeDrtConfigGroup.get( config ).getModalElements();
+			Gbl.assertIf( modalElements.size() == 1 );
+			var drtCfg = modalElements.iterator().next();
+			this.alpha = drtCfg.maxTravelTimeAlpha;
+			this.beta = drtCfg.maxTravelTimeBeta;
 		}
 
 		@Override public boolean handleAbort( MobsimAgent agent ){
 			log.warn("need to handle abort of agent=" + agent );
 
-			final String drtMode = "drt";
+//			final String drtMode = "drt";
 
 			PopulationFactory pf = population.getFactory();
 
-			if ( agent.getMode().equals( drtMode ) ) {
+			if( drtModes.contains( agent.getMode() ) ) {
+
+//			if ( agent.getMode().equals( drtMode ) ) {
 				// yyyyyy this will have to work for all drt modes!!!
 
 				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
@@ -293,13 +290,14 @@ public class DrtAbortTest{
 
 				// (3) There needs to be a new teleportation leg from here to there.
 				{
+//					Leg secondLeg = pf.createLeg( walkAfterRejectMode+"_"+agent.getMode() );
 					Leg secondLeg = pf.createLeg( walkAfterRejectMode );
 					secondLeg.setDepartureTime( now );
 					double directTravelTime = VrpPaths.calcAndCreatePath
 							(network.getLinks().get(interactionLink), network.getLinks().get(originallyPlannedDestinationLink), now, router, travelTime).getTravelTime();
 					//TODO Chengqi: it would be better if we can get the alpha beta values from DRT config group directly
  					// double estimatedTravelTime = drtConfigGroup.maxTravelTimeAlpha * directTravelTime + drtConfigGroup.maxTravelTimeBeta;
-					double estimatedTravelTime = 1.5 * directTravelTime + 900;
+					double estimatedTravelTime = alphas.get( agent.getMode() ) * directTravelTime + betas.get( agent.getMode() );
 					secondLeg.setTravelTime( estimatedTravelTime );
 					secondLeg.setRoute( pf.getRouteFactories().createRoute( GenericRouteImpl.class, interactionLink, originallyPlannedDestinationLink ) );
 					plan.getPlanElements().add( index+2, secondLeg );
@@ -409,4 +407,19 @@ public class DrtAbortTest{
 
 	}
 
+	private static class DrtRejectionModule extends AbstractModule{
+		@Override public void install() {
+			ConfigUtils.addOrGetModule( this.getConfig(), QSimComponentsConfigGroup.class ).addActiveComponent( MyAbortHandler.COMPONENT_NAME );
+
+			bind( DrtRejectionEventHandler.class ).in( Singleton.class );
+			addEventHandlerBinding().to( DrtRejectionEventHandler.class );
+			addControlerListenerBinding().to( DrtRejectionEventHandler.class );
+
+			this.installQSimModule( new AbstractQSimModule(){
+				@Override protected void configureQSim(){
+					this.addQSimComponentBinding( MyAbortHandler.COMPONENT_NAME ).to( MyAbortHandler.class );
+				}
+			} );
+		}
+	}
 }
