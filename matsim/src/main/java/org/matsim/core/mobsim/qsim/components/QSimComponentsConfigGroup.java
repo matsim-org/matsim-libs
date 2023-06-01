@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
@@ -70,6 +71,14 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 		Set<String> activeComponentsAsSet = new LinkedHashSet<>( activeComponents ) ;
 		this.activeComponents = new ArrayList<>( activeComponentsAsSet ) ;
 	}
+
+	public final QSimComponentsConfigGroup addActiveComponent( String component ){
+		List<String> components = this.getActiveComponents();
+		components.add( component );
+		this.setActiveComponents( components );
+		return this;
+	}
+
 
 	@StringGetter(ACTIVE_COMPONENTS)
 	public String getActiveComponentsAsString() {
