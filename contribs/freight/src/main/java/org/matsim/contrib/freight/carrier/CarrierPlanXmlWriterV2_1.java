@@ -91,13 +91,13 @@ import java.util.*;
 			writeRootElement();
 			for (Carrier carrier : carriers) {
 				startCarrier(carrier, this.writer);
-				writeVehiclesAndTheirTypes(carrier, this.writer);
+				writeVehiclesAndTheirTypes(carrier);
 				writeServices(carrier,this.writer);
 				writeShipments(carrier, this.writer);
 				writePlans(carrier, this.writer);
-				endCarrier(this.writer);
+				endCarrier();
 			}
-			writeEndElement(this.writer);
+			writeEndElement();
 			close();
 			logger.info("done");
 		} catch (IOException e) {
@@ -113,93 +113,96 @@ import java.util.*;
 		atts.add(createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
 		atts.add(createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "carriersDefinitions_v2.1.xsd"));
 		this.writeStartTag("carriers", atts);
-		this.writer.write(NL);
 	}
 
 	private void startCarrier(Carrier carrier, BufferedWriter writer)
 			throws IOException {
-		writer.write("\t<carrier id=\"" + carrier.getId() + "\">\n");
-		attributesWriter.writeAttributes("\t\t", writer, carrier.getAttributes());
+		this.writeStartTag("carrier", List.of(
+				createTuple("id", carrier.getId().toString())), false, true
+		);
+		attributesWriter.writeAttributes("\t\t", writer, carrier.getAttributes(), false);
 	}
 
-	private void writeVehiclesAndTheirTypes(Carrier carrier, BufferedWriter writer)throws IOException {
-		writer.write("\t\t<capabilities fleetSize=\""+ carrier.getCarrierCapabilities().getFleetSize().toString() + "\">\n");
+	private void writeVehiclesAndTheirTypes(Carrier carrier)throws IOException {
+		this.writeStartTag("capabilities", List.of(
+				createTuple("fleetSize", carrier.getCarrierCapabilities().getFleetSize().toString())
+		));
 		//vehicles
-		writer.write("\t\t\t<vehicles>\n");
+		this.writeStartTag("vehicles", null);
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			Id<VehicleType> vehicleTypeId = v.getVehicleTypeId();
 			if(vehicleTypeId == null) vehicleTypeId = v.getType() == null ? null : v.getType().getId();
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			writer.write("\t\t\t\t<vehicle id=\"" + v.getId()
-					+ "\" depotLinkId=\"" + v.getLinkId()
-					+ "\" typeId=\"" + vehicleTypeId
-					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
-					+ "\" latestEnd=\"" + getTime(v.getLatestEndTime())
-					+ "\"/>\n");
+			this.writeStartTag("vehicle", List.of(
+					createTuple("id", v.getId().toString()),
+					createTuple("depotLinkId", v.getLinkId().toString()),
+					createTuple("typeId", vehicleTypeId.toString()),
+					createTuple("earliestStart", getTime(v.getEarliestStartTime())),
+					createTuple("latestEnd", getTime(v.getLatestEndTime()))), true
+			);
 		}
-		writer.write("\t\t\t</vehicles>\n\n");
-		writer.write("\t\t</capabilities>\n\n");
+		this.writeEndTag("vehicles");
+		this.writeEndTag("capabilities");
 	}
 
 	private void writeShipments(Carrier carrier, BufferedWriter writer) throws IOException {
 		if(carrier.getShipments().isEmpty()) return;
-		writer.write("\t\t<shipments>\n");
+		this.writeStartTag("shipments", null);
 		for (CarrierShipment s : carrier.getShipments().values()) {
 			Id<CarrierShipment> shipmentId = s.getId();
 			registeredShipments.put(s, shipmentId);
-			writer.write("\t\t\t<shipment ");
-			writer.write("id=\"" + shipmentId + "\" ");
-			writer.write("from=\"" + s.getFrom() + "\" ");
-			writer.write("to=\"" + s.getTo() + "\" ");
-			writer.write("size=\"" + s.getSize() + "\" ");
-			writer.write("startPickup=\""
-					+ getTime(s.getPickupTimeWindow().getStart()) + "\" ");
-			writer.write("endPickup=\""
-					+ getTime(s.getPickupTimeWindow().getEnd()) + "\" ");
-			writer.write("startDelivery=\""
-					+ getTime(s.getDeliveryTimeWindow().getStart()) + "\" ");
-			writer.write("endDelivery=\""
-					+ getTime(s.getDeliveryTimeWindow().getEnd()) + "\" ");
-			writer.write("pickupServiceTime=\""
-					+ getTime(s.getPickupServiceTime()) + "\" ");
-			writer.write("deliveryServiceTime=\""
-					+ getTime(s.getDeliveryServiceTime()));
-			if (s.getAttributes().isEmpty()){
-				writer.write("\"/>\n");
+			if (s.getAttributes().isEmpty()) {
+				writeShipment(s, shipmentId, true, false);
 			} else {
-				writer.write("\">\n");
-				this.attributesWriter.writeAttributes("\t\t\t\t", writer, s.getAttributes());
-				writer.write("\t\t\t</shipment>\n");
+				writeShipment(s, shipmentId, false, true);
+				this.attributesWriter.writeAttributes("\t\t\t\t", writer, s.getAttributes(), false);
+				this.writeEndTag("shipment");
 			}
 		}
-		writer.write("\t\t</shipments>\n\n");
+		this.writeEndTag("shipments");
+	}
+
+	private void writeShipment(CarrierShipment s, Id<CarrierShipment> shipmentId, boolean closeElement, boolean lineBreak) {
+		this.writeStartTag("shipment", List.of(
+				createTuple("id", shipmentId.toString()),
+				createTuple("from", s.getFrom().toString()),
+				createTuple("to", s.getTo().toString()),
+				createTuple("size", s.getSize()),
+				createTuple("startPickup", getTime(s.getPickupTimeWindow().getStart())),
+				createTuple("endPickup", getTime(s.getPickupTimeWindow().getEnd())),
+				createTuple("startDelivery", getTime(s.getDeliveryTimeWindow().getStart())),
+				createTuple("endDelivery", getTime(s.getDeliveryTimeWindow().getEnd())),
+				createTuple("pickupServiceTime", getTime(s.getPickupServiceTime())),
+				createTuple("deliveryServiceTime", getTime(s.getDeliveryServiceTime()))), closeElement, lineBreak
+		);
 	}
 
 	private void writeServices(Carrier carrier, BufferedWriter writer) throws IOException {
 		if(carrier.getServices().isEmpty()) return;
-		writer.write("\t\t<services>\n");
+		this.writeStartTag("services", null);
 		for (CarrierService s : carrier.getServices().values()) {
 			serviceMap.put(s, s.getId());
-			writer.write("\t\t\t<service ");
-			writer.write("id=\"" + s.getId().toString() + "\" ");
-			writer.write("to=\"" + s.getLocationLinkId() + "\" ");
-			// capacity which must be available when vehicle services this service.
-			// i.e. this is a pick-up service.
-			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" ");
-			writer.write("earliestStart=\"" + getTime(s.getServiceStartTimeWindow().getStart()) + "\" ");
-			writer.write("latestEnd=\"" + getTime(s.getServiceStartTimeWindow().getEnd()) + "\" ");
-			writer.write("serviceDuration=\"" + getTime(s.getServiceDuration()));
-			if (s.getAttributes().isEmpty()){
-				writer.write("\"/>\n");
+			if (s.getAttributes().isEmpty()) {
+				writeService(s, true, false);
 			} else {
-				writer.write("\">\n");
-				this.attributesWriter.writeAttributes("\t\t\t\t", writer, s.getAttributes());
-				writer.write("\t\t\t</service>\n");
+				writeService(s, false, true);
+				this.attributesWriter.writeAttributes("\t\t\t\t", writer, s.getAttributes(), false);
+				this.writeEndTag("service");
 			}
-
 		}
-		writer.write("\t\t</services>\n\n");
+		this.writeEndTag("services");
 
+	}
+
+	private void writeService(CarrierService s, boolean closeElement, boolean lineBreak) {
+		this.writeStartTag("service", List.of(
+				createTuple("id", s.getId().toString()),
+				createTuple("to", s.getLocationLinkId().toString()),
+				createTuple("capacityDemand", s.getCapacityDemand()),
+				createTuple("earliestStart", getTime(s.getServiceStartTimeWindow().getStart())),
+				createTuple("latestEnd", getTime(s.getServiceStartTimeWindow().getEnd())),
+				createTuple("serviceDuration", getTime(s.getServiceDuration()))), closeElement, lineBreak
+		);
 	}
 
 	private String getTime(double time) {
@@ -211,42 +214,47 @@ import java.util.*;
 		if (carrier.getSelectedPlan() == null) {
 			return;
 		}
-		writer.write("\t\t<plans>\n");
-		for(CarrierPlan plan : carrier.getPlans()){
-			writer.write("\t\t\t<plan");
-			if(plan.getScore() != null){
-				writer.write(" score=\"" + plan.getScore().toString() + "\"");
-			}
-			if(carrier.getSelectedPlan() != null){
-				if(plan == carrier.getSelectedPlan()){
-					writer.write(" selected=\"true\"");
+		this.writeStartTag("plans", null);
+		for (CarrierPlan plan : carrier.getPlans()){
+			if (plan.getScore() != null && carrier.getSelectedPlan() != null) {
+				if (plan == carrier.getSelectedPlan()) {
+					this.writeStartTag("plan", List.of(
+							createTuple("score", plan.getScore()),
+							createTuple("selected", "true")));
+				} else {
+					this.writeStartTag("plan", List.of(
+							createTuple("score", plan.getScore()),
+							createTuple("selected", "false")));
 				}
-				else{
-					writer.write(" selected=\"false\"");
-				}
+			} else {
+				this.writeStartTag("plan", List.of(
+						createTuple("selected", "false")));
 			}
-			else{
-				writer.write(" selected=\"false\"");
+
+			if (plan.getAttributes().isEmpty()) {
+				return;
+			} else {
+				writer.write("\n");
+				this.attributesWriter.writeAttributes("\t\t\t\t", writer, plan.getAttributes(),false);
 			}
-			writer.write(">\n");
 
 			for (ScheduledTour tour : plan.getScheduledTours()) {
-				writer.write("\t\t\t\t<tour ");
-				writer.write("tourId=\"" + tour.getTour().getId() + "\" ");
-				writer.write("vehicleId=\"" + tour.getVehicle().getId() +"\">\n");
-				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START
-						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())
-						+ "\"/>\n");
+				this.writeStartTag("tour", List.of(
+						createTuple("tourId", tour.getTour().getId().toString()),
+						createTuple("vehicleId",  tour.getVehicle().getId().toString())
+				));
+				this.writeStartTag("act", List.of(
+						createTuple("type", FreightConstants.START),
+						createTuple("end_time", Time.writeTime(tour.getDeparture()))), true
+				);
 				for (TourElement tourElement : tour.getTour().getTourElements()) {
 					if (tourElement instanceof Leg leg) {
-						writer.write("\t\t\t\t\t<leg expected_dep_time=\""
-								+ Time.writeTime(leg.getExpectedDepartureTime())
-								+ "\" expected_transp_time=\""
-								+ Time.writeTime(leg.getExpectedTransportTime())
-								+ "\">");
+						this.writeStartTag("leg", List.of(
+								createTuple("expected_dep_time", Time.writeTime(leg.getExpectedDepartureTime())),
+								createTuple("expected_transp_time", Time.writeTime(leg.getExpectedTransportTime()))
+						));
 						if (leg.getRoute() != null) {
-							writer.write("\n");
-							writer.write("\t\t\t\t\t\t<route>");
+							this.writeStartTag("route", null);
 							boolean firstLink = true;
 							for (Id<Link> id : ((NetworkRoute) leg.getRoute())
 									.getLinkIds()) {
@@ -257,42 +265,42 @@ import java.util.*;
 									writer.write(" " + id.toString());
 								}
 							}
-							writer.write("</route>\n");
-							writer.write("\t\t\t\t\t</leg>\n");
+							writer.write("</route>");
+							this.setIndentationLevel(6);
+							this.writeEndTag("leg");
 						} else {
-							writer.write("</leg>\n");
+							writeEndTag("leg");
 						}
 					}
 					else if (tourElement instanceof ShipmentBasedActivity act) {
-						writer.write("\t\t\t\t\t<act ");
-						writer.write("type=\"" + act.getActivityType() + "\" ");
-						writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\"");
-						writer.write("/>\n");
+						this.writeStartTag("act", List.of(
+								createTuple("type", act.getActivityType()),
+								createTuple("shipmentId", registeredShipments.get(act.getShipment()).toString())), true
+						);
 					}
-					else if (tourElement instanceof ServiceActivity act){
-						writer.write("\t\t\t\t\t<act ");
-						writer.write("type=\"" + act.getActivityType() + "\" ");
-						writer.write("serviceId=\"" + serviceMap.get(act.getService()) + "\"");
-						writer.write("/>\n");
+					else if (tourElement instanceof ServiceActivity act) {
+						this.writeStartTag("act", List.of(
+								createTuple("type", act.getActivityType()),
+								createTuple("serviceId", serviceMap.get(act.getService()).toString())), true
+						);
 					}
-
 				}
-				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.END
-						+ "\"/>\n");
-				writer.write("\t\t\t\t</tour>\n");
+				this.writeStartTag("act", List.of(
+						createTuple("type", FreightConstants.END)), true
+				);
+				this.writeEndTag("tour");
 			}
-			writer.write("\t\t\t</plan>\n\n");
+			this.writeEndTag("plan");
 		}
-		writer.write("\t\t</plans>\n\n");
+		this.writeEndTag("plans");
 	}
 
-	private void endCarrier(BufferedWriter writer) throws IOException {
-		writer.write("\t</carrier>\n\n");
+	private void endCarrier() throws IOException {
+		this.writeEndTag("carrier");
 		registeredShipments.clear();
 	}
 
-	private void writeEndElement(BufferedWriter writer) throws IOException {
-		writer.write("</carriers>\n");
-
+	private void writeEndElement() throws IOException {
+		this.writeEndTag("carriers");
 	}
 }
