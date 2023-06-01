@@ -142,5 +142,28 @@ public class TrafficCountsDashboard implements Dashboard {
 				);
 
 			});
+
+		layout.row("details")
+			.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Count stations";
+				viz.description = "hourly comparison";
+				viz.dropdownMenu = true;
+
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv"));
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(), ds.mapping()
+					.x("hour")
+					.y("simulated_traffic_volume")
+					.name("name")
+				);
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Observed").build(), ds.mapping()
+					.x("hour")
+					.y("observed_traffic_volume")
+					.name("name")
+				);
+
+			});
 	}
 }

@@ -62,6 +62,11 @@ public class Plotly extends Viz {
 	public Boolean fixedRatio;
 
 	/**
+	 * Create dropdown menu for individual traces.
+	 */
+	public Boolean dropdownMenu;
+
+	/**
 	 * Merge two column as index. Column name as key will be merged with the column name value.
 	 * This allows to build level multi indices for certain plot types.
 	 */
@@ -494,6 +499,10 @@ public class Plotly extends Viz {
 		}
 
 		private void insert(Map<String, Object> obj) {
+
+			// None standard attribute name to preserve its meaning
+			if (obj.containsKey("name"))
+				obj.put("original_name", obj.get("name"));
 
 			// TODO: some attributes are at marker level
 			for (ColumnType value : ColumnType.values()) {
