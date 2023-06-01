@@ -9,11 +9,8 @@
 			<vehicles>
 				<vehicle id="directTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
 			</vehicles>
-
 		</capabilities>
-
 	</carrier>
-
 	<carrier id="mainCarrier">
 		<attributes>
 			<attribute name="carrierType" class="java.lang.String">mainRunCarrier</attribute>
@@ -22,11 +19,8 @@
 			<vehicles>
 				<vehicle id="mainTruck" depotLinkId="i(5,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
 			</vehicles>
-
 		</capabilities>
-
 	</carrier>
-
 	<carrier id="distributionCarrier">
 		<attributes>
 			<attribute name="carrierType" class="java.lang.String">distributionCarrier</attribute>
@@ -35,9 +29,6 @@
 			<vehicles>
 				<vehicle id="distributionTruck" depotLinkId="j(5,3)" typeId="small05" earliestStart="00:00:00" latestEnd="596523:14:07"/>
 			</vehicles>
-
 		</capabilities>
-
 	</carrier>
-
 </carriers>
