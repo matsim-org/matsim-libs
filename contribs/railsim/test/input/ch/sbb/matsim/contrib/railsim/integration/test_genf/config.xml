@@ -9,6 +9,8 @@
 
 	<module name="controler">
 		<param name="runId" value="test" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="1" />
 	</module>
 
 	<module name="qsim">

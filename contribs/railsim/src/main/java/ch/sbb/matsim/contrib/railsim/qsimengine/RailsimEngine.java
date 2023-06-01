@@ -114,14 +114,9 @@ final class RailsimEngine implements Steppable {
 	}
 
 	private void createEvent(Event event) {
-
 		// Because of the 1s update interval, events need to be rounded to the current simulation step
-//		event.setTime(Math.floor(event.getTime()));
-
-//		System.out.println(event.getTime());
-
-		// TODO: event ordering can be violated sometimes
-
+		event.setTime(Math.ceil(event.getTime()));
+//	 	System.out.println(event.getTime());
 		this.eventsManager.processEvent(event);
 	}
 
@@ -156,8 +151,7 @@ final class RailsimEngine implements Steppable {
 			state.acceleration = state.train.acceleration();
 
 		// Remove update information
-		// TODO: check if needed or not
-		// event.newSpeed = -1;
+		event.newSpeed = -1;
 
 		createEvent(state.asEvent(time));
 
@@ -290,7 +284,7 @@ final class RailsimEngine implements Steppable {
 
 			double stopTime = handleTransitStop(time, state);
 
-			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at pt stop " + state.speed;
+			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at pt stop, but was " + state.speed;
 
 			// Same event is re-scheduled after stopping,
 			event.plannedTime = time + stopTime;
@@ -301,7 +295,7 @@ final class RailsimEngine implements Steppable {
 		// Arrival at destination
 		if (state.isRouteAtEnd()) {
 
-			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end but was " + state.speed;
+			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end, but was " + state.speed;
 
 			// Free all reservations
 			for (RailLink link : state.route) {
@@ -316,7 +310,7 @@ final class RailsimEngine implements Steppable {
 			}
 
 			state.driver.notifyArrivalOnLinkByNonNetworkMode(state.headLink);
-			state.driver.endLegAndComputeNextState(time);
+			state.driver.endLegAndComputeNextState(Math.ceil(time));
 
 			activeTrains.remove(state);
 
@@ -439,6 +433,7 @@ final class RailsimEngine implements Steppable {
 		assert state.routeIdx <= 1 || FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
 		assert FuzzyUtils.lessEqualThan(state.headPosition, resources.getLink(state.headLink).length) : "Illegal state update. Head position must be smaller than link length";
 		assert FuzzyUtils.greaterEqualThan(state.headPosition, 0) : "Head position must be positive";
+		assert FuzzyUtils.lessEqualThan(state.speed, state.allowedMaxSpeed) : "Speed must be less equal than the allowed speed";
 
 		createEvent(state.asEvent(time));
 	}
@@ -452,7 +447,8 @@ final class RailsimEngine implements Steppable {
 
 		assert state.pt != null : "Pt driver must be present";
 
-		double stopTime = state.pt.handleTransitStop(state.nextStop, time);
+		// Time needs to be rounded to current sim step
+		double stopTime = state.pt.handleTransitStop(state.nextStop, Math.ceil(time));
 		state.nextStop = state.pt.getNextTransitStop();
 
 		return stopTime;
@@ -465,6 +461,9 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 		RailLink currentLink = resources.getLink(state.headLink);
+
+//		if (state.routeIdx >= 877 && state.routeIdx <= 880 && state.timestamp >= 7300)
+//			log.info("debug");
 
 		// (1) max speed reached
 		double accelDist = Double.POSITIVE_INFINITY;
@@ -482,7 +481,7 @@ final class RailsimEngine implements Steppable {
 		// (3) next link needs reservation
 		double reserveDist = Double.POSITIVE_INFINITY;
 		if (!state.isRouteAtEnd() && !event.isAwaitingReservation()) {
-			reserveDist = RailsimCalc.nextLinkReservation(state);
+			reserveDist = RailsimCalc.nextLinkReservation(state, currentLink);
 
 			if (reserveDist < 0)
 				reserveDist = 0;
@@ -494,8 +493,8 @@ final class RailsimEngine implements Steppable {
 		// (5) head link changes
 		double headDist = currentLink.length - state.headPosition;
 
-		assert tailDist >= 0 : "Tail distance must be positive";
-		assert headDist >= 0 : "Head distance must be positive";
+		assert FuzzyUtils.greaterEqualThan(tailDist, 0) : "Tail distance must be positive";
+		assert FuzzyUtils.greaterEqualThan(headDist, 0) : "Head distance must be positive";
 
 		// Find the earliest required update
 

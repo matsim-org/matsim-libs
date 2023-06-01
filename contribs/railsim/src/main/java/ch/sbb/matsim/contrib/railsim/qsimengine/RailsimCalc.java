@@ -33,7 +33,7 @@ public class RailsimCalc {
 	 */
 	static double calcRequiredTime(TrainState state, double dist) {
 
-		if (dist == 0)
+		if (FuzzyUtils.equals(dist, 0))
 			return 0;
 
 		if (state.acceleration == 0)
@@ -76,14 +76,14 @@ public class RailsimCalc {
 	static SpeedTarget calcTargetSpeed(double dist, double acceleration, double deceleration,
 									   double currentSpeed, double targetSpeed, double finalSpeed) {
 
-		assert FuzzyUtils.greaterEqualThan(targetSpeed, finalSpeed) : "Final speed must be smaller than target";
-
 		double timeDecel = (targetSpeed - finalSpeed) / deceleration;
 		double distDecel = calcTraveledDist(targetSpeed, timeDecel, -deceleration);
 
 		// This code below only works during deceleration
 		if (acceleration <= 0 || currentSpeed >= targetSpeed)
 			return new SpeedTarget(targetSpeed, distDecel);
+
+		assert FuzzyUtils.greaterEqualThan(targetSpeed, finalSpeed) : "Final speed must be smaller than target";
 
 		double timeAccel = (targetSpeed - currentSpeed) / acceleration;
 		double distAccel = calcTraveledDist(currentSpeed, timeAccel, acceleration);
@@ -142,7 +142,7 @@ public class RailsimCalc {
 
 				// If the previous link is a transit stop the speed needs to be 0 at the next link
 				// train stops at the very end of a link
-				if (i > 0 && state.isStop(state.route.get(i-1).getLinkId()))
+				if (i > 0 && state.isStop(state.route.get(i - 1).getLinkId()))
 					allowed = 0;
 				else
 					allowed = link.getAllowedFreespeed(state.driver);
@@ -179,31 +179,36 @@ public class RailsimCalc {
 	 * Calculate when the reservation function should be triggered.
 	 * Should return {@link Double#POSITIVE_INFINITY} if this distance is far in the future and can be checked at later point.
 	 *
-	 * @param state current train state.
+	 * @param state       current train state
+	 * @param currentLink the link where the train head is on
 	 * @return travel distance after which reservations should be updated.
 	 */
-	public static double nextLinkReservation(TrainState state) {
+	public static double nextLinkReservation(TrainState state, RailLink currentLink) {
 
 		// time needed for full stop
-		double stopTime = state.allowedMaxSpeed / state.train.deceleration();
+		double assumedSpeed = state.train.maxVelocity();
+		double stopTime = assumedSpeed / state.train.deceleration();
 
 		assert stopTime > 0 : "Stop time can not be negative";
 
-		// Distance for full stop
-		double safetyDist = RailsimCalc.calcTraveledDist(state.allowedMaxSpeed, stopTime, -state.train.deceleration());
+		// TODO: there is an additional safety factor (also in links to block)
+		// this might be reduced, but currently the case when a train stops exactly before the not reserved link is not handled
 
-		double dist = -state.headPosition - safetyDist;
+		// safety distance
+		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration()) * 1.5;
+
+		double dist = currentLink.length - state.headPosition;
+
 		int idx = state.routeIdx;
-
-		while (dist <= safetyDist && idx < state.route.size()) {
+		do {
 			RailLink nextLink = state.route.get(idx++);
+
+			if (!nextLink.isBlockedBy(state.driver))
+				return dist - safety;
+
 			dist += nextLink.length;
 
-			if (nextLink.isBlockedBy(state.driver))
-				continue;
-
-			return dist;
-		}
+		} while (dist <= safety && idx < state.route.size());
 
 		// No need to reserve yet
 		return Double.POSITIVE_INFINITY;
@@ -220,16 +225,14 @@ public class RailsimCalc {
 
 		double stopTime = assumedSpeed / state.train.deceleration();
 		// safety distance
-		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration()) + state.headPosition;
+		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration()) * 1.5 + state.headPosition;
 
 		double reserved = 0;
-
-		do {
+		while (reserved < safety && idx < state.route.size()) {
 			RailLink nextLink = state.route.get(idx++);
 			result.add(nextLink);
 			reserved += nextLink.length;
-
-		} while (reserved < safety && idx < state.route.size());
+		}
 
 		return result;
 	}

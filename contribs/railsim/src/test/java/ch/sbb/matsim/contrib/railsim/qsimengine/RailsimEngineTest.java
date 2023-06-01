@@ -51,7 +51,7 @@ public class RailsimEngineTest {
 		RailsimTestUtils.assertThat(collector)
 			.hasSizeGreaterThan(5)
 			.hasTrainState("train", 144, 0, 44)
-			.hasTrainState("train", 233.4545441058463, 2000, 0);
+			.hasTrainState("train", 234, 2000, 0);
 
 		test = getTestEngine("network0.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l5-6");
@@ -61,7 +61,7 @@ public class RailsimEngineTest {
 		RailsimTestUtils.assertThat(collector)
 			.hasSizeGreaterThan(5)
 			.hasTrainState("train", 144, 0, 44)
-			.hasTrainState("train", 233.4545441058463, 2000, 0);
+			.hasTrainState("train", 234, 2000, 0);
 
 	}
 
@@ -90,8 +90,8 @@ public class RailsimEngineTest {
 //		test.debug(collector, "opposite");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio1", 292.5454533774468, 600, 0)
-			.hasTrainState("regio2", 443.62677217662434, 1000, 0);
+			.hasTrainState("regio1", 293, 600, 0)
+			.hasTrainState("regio2", 358, 1000, 0);
 
 
 		test = getTestEngine("network0.xml");
@@ -104,8 +104,8 @@ public class RailsimEngineTest {
 //		test.debug(collector, "opposite_detailed");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio1", 292.5454533774468, 600, 0)
-			.hasTrainState("regio2", 443.62677217662434, 1000, 0);
+			.hasTrainState("regio1", 293, 600, 0)
+			.hasTrainState("regio2", 358, 1000, 0);
 
 	}
 }
