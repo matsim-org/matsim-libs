@@ -243,7 +243,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				break ;
 			case "plan":
 				String score = atts.getValue("score");
-				if (score != null) currentScore = parseTimeToDouble(score);
+				if (score != null) currentScore = parseDouble(score);
 				String selected = atts.getValue("selected");
 				if (selected == null) this.selected = false;
 				else this.selected = selected.equals("true");
