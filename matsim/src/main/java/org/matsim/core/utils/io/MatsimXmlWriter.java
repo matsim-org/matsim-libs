@@ -181,10 +181,14 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @throws UncheckedIOException
 	 */
 	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes) throws UncheckedIOException{
-		this.writeStartTag(tagname, attributes, false);
+		this.writeStartTag(tagname, attributes, false, false);
 	}
 
-	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement) throws UncheckedIOException {
+	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement) throws UncheckedIOException{
+		this.writeStartTag(tagname, attributes, closeElement, false);
+	}
+
+	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement, boolean lineBreak) throws UncheckedIOException {
 		try {
 		if (doPrettyPrint) {
 			this.writer.write(NL);
@@ -205,6 +209,9 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 			}
 			else {
 				this.writer.write(">");
+			}
+			if (lineBreak) {
+				this.writer.write("\n");
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
