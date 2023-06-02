@@ -45,7 +45,7 @@ import java.util.Set;
 	mixinStandardHelpOptions = true, showDefaultValues = true
 )
 @CommandSpec(requireRunDirectory = true,
-	produces = {"emissions_footprint_csv", "emissions_grid_per_day.csv", "emissions_per_link.csv", "emissions_per_link_per_m.csv", "emissions_vehicle_info.csv"}
+	produces = {"emissions_footprint_csv", "emissions_grid_per_day.xyt.csv", "emissions_per_link.csv", "emissions_per_link_per_m.csv", "emissions_vehicle_info.csv"}
 )
 public class AirPollutionAnalysis implements MATSimAppCommand {
 
@@ -200,9 +200,12 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_grid_per_day.csv")), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_grid_per_day.xyt.csv")), CSVFormat.DEFAULT)) {
+
+			double time = 0;
 
 			// print header
+			printer.print("time");
 			printer.print("x");
 			printer.print("y");
 
@@ -217,6 +220,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 					Coord coord = raster.getCoordForIndex(xi, yi);
 
+					printer.print(time);
 					printer.print(coord.getX());
 					printer.print(coord.getY());
 
@@ -227,6 +231,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 					printer.println();
 				}
+				time += 60;
 			}
 
 		} catch (IOException e) {
