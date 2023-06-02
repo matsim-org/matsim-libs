@@ -340,7 +340,6 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 
-		RailLink tailLink = resources.getLink(state.tailLink);
 		RailLink nextTailLink = null;
 		// Find the next link in the route
 		for (int i = state.routeIdx; i >= 1; i--) {
@@ -447,6 +446,10 @@ final class RailsimEngine implements Steppable {
 
 //		if (state.routeIdx >= 877 && state.routeIdx <= 880 && state.timestamp >= 7300)
 //			log.info("debug");
+
+//		if (state.driver.getId().toString().equals("pt_Expresszug_BE_GE_train_0_train_Expresszug_BE_GE") && state.timestamp > 7000)
+//			log.info("debug");
+
 
 		// (1) max speed reached
 		double accelDist = Double.POSITIVE_INFINITY;

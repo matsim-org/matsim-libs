@@ -110,10 +110,6 @@ public class RailsimCalc {
 	static double calcDecelDistanceAndSpeed(RailLink currentLink, UpdateEvent event) {
 
 		TrainState state = event.state;
-
-		if (state.speed == 0)
-			return Double.POSITIVE_INFINITY;
-
 		double assumedSpeed = state.speed;
 
 		double maxSpeed = Math.max(assumedSpeed, state.allowedMaxSpeed);
@@ -148,7 +144,8 @@ public class RailsimCalc {
 					allowed = link.getAllowedFreespeed(state.driver);
 			}
 
-			if (allowed < assumedSpeed) {
+			// Special case when accelerating from 0 and reaching 0 again
+			if (allowed < assumedSpeed || (allowed == 0 && allowed == assumedSpeed)) {
 
 				SpeedTarget target = calcTargetSpeed(dist, state.acceleration, state.train.deceleration(), state.speed, state.targetSpeed, allowed);
 
@@ -170,8 +167,12 @@ public class RailsimCalc {
 		}
 
 		state.targetSpeed = targetSpeed;
-
 		event.newSpeed = speed;
+
+		// No update required
+		if (FuzzyUtils.equals(event.newSpeed, state.targetSpeed))
+			return Double.POSITIVE_INFINITY;
+
 		return decelDist;
 	}
 

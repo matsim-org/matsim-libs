@@ -24,6 +24,14 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<!-- Needed for the test scenario -->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>vsp</artifactId>
+			<version>16.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
