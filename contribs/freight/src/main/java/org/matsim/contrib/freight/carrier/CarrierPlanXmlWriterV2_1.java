@@ -245,7 +245,7 @@ import java.util.*;
 			}
 
 			if (!plan.getAttributes().isEmpty()) {
-				writer.write("\n");
+				writer.write(NL);
 				this.attributesWriter.writeAttributes("\t\t\t\t", writer, plan.getAttributes(),false);
 			}
 
