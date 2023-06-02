@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.parking.parkingsearch.manager;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,13 +39,13 @@ public class WalkLegFactory {
 	final Network network;
 	final double walkspeed;
 	final double beelinedistancefactor;
-	
+
 	@Inject
 	public WalkLegFactory(Network network, Config config) {
 		this.network = network;
 		this.beelinedistancefactor = config.plansCalcRoute().getBeelineDistanceFactors().get("walk");
 		this.walkspeed = config.plansCalcRoute().getTeleportedModeSpeeds().get("walk");
-		
+
 	}
 
 	public Leg createWalkLeg(Id<Link> from, Id<Link> to, double startTime, String walkMode){
@@ -59,6 +59,6 @@ public class WalkLegFactory {
 		leg.setDepartureTime(startTime);
 		return leg;
 	}
-	
-	
+
+
 }

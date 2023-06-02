@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.matrixbasedptrouter;
 
@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.*;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * @author thomas
@@ -60,5 +60,5 @@ public final class MatrixBasedPtRouterFactoryImpl implements Provider<TripRouter
 //		return tripRouter;
 		throw new RuntimeException("routing module should just be added to trip router; don't need this delegating indirection. kai, jun'18") ;
 	}
-	
+
 }

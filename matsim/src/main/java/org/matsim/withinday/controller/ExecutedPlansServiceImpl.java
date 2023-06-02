@@ -44,22 +44,22 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.Map;
 
 /**
  * Take the plans that the agents have after within-day replanning, and write them to file.
  * <br>
  * Not the same as the {@link ExperiencedPlansService}, since that is based on the events.
- * 
+ *
  * @author (of documentation) nagel
   */
 @Singleton
 public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPlansService {
 	// I renamed this from ExperiencedPlansWriter into ExecutedPlansWriter since we also have an ExperiencedPlansService that
 	// reconstructs experienced plans from events. kai, jun'16
-	
+
 	private static final Logger log = LogManager.getLogger( ExecutedPlansServiceImpl.class );
 
 	public static final String EXECUTEDPLANSFILE = "executedPlans.xml.gz";
@@ -71,34 +71,34 @@ public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPl
 	private MobsimDataProvider mobsimDataProvider;
 
 	private OutputDirectoryHierarchy controlerIO;
-	
+
 	@Inject
 	ExecutedPlansServiceImpl( Scenario scenario, MobsimDataProvider mobsimDataProvider, OutputDirectoryHierarchy controlerIO ) {
 		this.scenario = scenario;
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.controlerIO = controlerIO;
 	}
-	
+
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		Gbl.assertNotNull(scenario);
 		final Config config = scenario.getConfig();
 		Scenario experiencedScenario = ScenarioUtils.createScenario(config);
-		experiencedPopulation = experiencedScenario.getPopulation(); 
-				
+		experiencedPopulation = experiencedScenario.getPopulation();
+
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			
+
 			MobsimAgent agent = this.mobsimDataProvider.getAgent(person.getId());
-			
+
 			if (agent == null || !(agent instanceof PersonDriverAgentImpl)) experiencedPopulation.addPerson(person);
 			else {
 				Person experiencedPerson = experiencedPopulation.getFactory().createPerson(person.getId());
-				
+
 				// add experienced plan
 				final Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 				experiencedPerson.addPlan(plan);
 				experiencedPerson.setSelectedPlan(plan);
-				
+
 				// copy attributes
 				PersonUtils.setAge(experiencedPerson, PersonUtils.getAge(person));
 				PersonUtils.setCarAvail(experiencedPerson, PersonUtils.getCarAvail(person));

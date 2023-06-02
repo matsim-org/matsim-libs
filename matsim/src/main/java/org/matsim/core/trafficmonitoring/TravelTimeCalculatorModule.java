@@ -35,8 +35,8 @@ import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.Map;
 
 
@@ -57,7 +57,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			if (getConfig().travelTimeCalculator().isCalculateLinkToLinkTravelTimes()) {
 				throw new RuntimeException("separate modes together with link2link routing currently not implemented. doesn't look difficult, "
 						+ "but I cannot say if it would be picked up correctly by downstream modules.  kai, nov'16") ;
-			}			
+			}
 			// go through all modes:
 			//			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
 			for (final String mode : getConfig().plansCalcRoute().getNetworkModes() ) {
@@ -82,10 +82,10 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			}
 		} else {
 			// (all analyzed modes are measured together, and the same result is returned to each mode)
-			
+
 			// bind the TravelTimeCalculator, which is the observer and aggregator:
 			bind(TravelTimeCalculator.class).in(Singleton.class);
-			
+
 			// bind the TravelTime objects.  In this case, this just passes on the same information from TravelTimeCalculator to each individual mode:
 			if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
 //				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {

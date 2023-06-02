@@ -22,26 +22,51 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.vehicles.Vehicle;
 
-/*package-private*/  final class FreightServiceEndEventCreator implements FreightEventCreator {
+import java.util.Map;
+
+import static org.matsim.contrib.freight.events.CarrierEventAttributes.*;
+
+/**
+ *  An event, that informs that a Freight {@link CarrierShipment} pickup-activity has started.
+ *
+ * @author Kai Martins-Turner (kturner)
+ */
+public class CarrierShipmentPickupStartEvent extends AbstractCarrierEvent {
+
+	public static final String EVENT_TYPE = "Freight shipment pickup starts";
+
+	private final Id<CarrierShipment> shipmentId;
+	private final double pickupDuration;
+	private final int capacityDemand;
+
+
+	public CarrierShipmentPickupStartEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+		super(time, carrierId, shipment.getFrom(), vehicleId);
+		this.shipmentId = shipment.getId();
+		this.pickupDuration = shipment.getPickupServiceTime();
+		this.capacityDemand = shipment.getSize();
+	}
+
 
 	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if(event instanceof ActivityEndEvent endEvent && FreightConstants.SERVICE.equals(endEvent.getActType())) {
-			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-			if(element instanceof ServiceActivity serviceActivity) {
-				return new FreightServiceEndEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), vehicleId);
-			}
-		}
-		return null;
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	public Id<CarrierShipment> getShipmentId() {
+		return shipmentId;
+	}
+
+
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
+		attr.put(ATTRIBUTE_PICKUP_DURATION, String.valueOf(this.pickupDuration));
+		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
+		return attr;
 	}
 }
