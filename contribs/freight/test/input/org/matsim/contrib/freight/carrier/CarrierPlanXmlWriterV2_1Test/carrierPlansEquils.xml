@@ -51,9 +51,9 @@
 					<act type="end"/>
 				</tour>
 			</plan>
-			<plan score="-100.0" selected="true">
+			<plan score="NaN" selected="true">
 				<attributes>
-					<attribute name="jspritScore" class="java.lang.Double">100.0</attribute>
+					<attribute name="jspritScore" class="java.lang.Double">80.0</attribute>
 				</attributes>
 				<tour tourId="42" vehicleId="lightVehicle">
 					<act type="start" end_time="07:00:00"/>
@@ -79,9 +79,9 @@
 					<act type="end"/>
 				</tour>
 			</plan>
-			<plan score="-1000.0" selected="false">
+			<plan score="-INF" selected="false">
 				<attributes>
-					<attribute name="jspritScore" class="java.lang.Double">100.0</attribute>
+					<attribute name="jspritScore" class="java.lang.Double">105.0</attribute>
 				</attributes>
 				<tour tourId="tour42" vehicleId="mediumVehicle">
 					<act type="start" end_time="07:00:00"/>
