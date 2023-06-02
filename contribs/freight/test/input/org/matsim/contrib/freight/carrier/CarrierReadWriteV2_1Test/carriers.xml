@@ -30,7 +30,7 @@
 			<shipment id="s2" from="20" to="22" size="10" startPickup="06:01:00" endPickup="07:46:40" startDelivery="00:00:00" endDelivery="20:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
 		</shipments>
 		<plans>
-			<plan score="-100.0" selected="false">
+			<plan selected="false">
 				<attributes>
 					<attribute name="jspritScore" class="java.lang.Double">NaN</attribute>
 				</attributes>
