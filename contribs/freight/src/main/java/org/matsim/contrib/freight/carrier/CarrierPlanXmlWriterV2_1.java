@@ -231,9 +231,14 @@ import java.util.*;
 						createTuple("selected", "false")));
 			}
 
-			if (plan.getAttributes().isEmpty()) {
-				return;
-			} else {
+//			if (plan.getAttributes().isEmpty()) {
+//				return;
+//			} else {
+//				writer.write("\n");
+//				this.attributesWriter.writeAttributes("\t\t\t\t", writer, plan.getAttributes(),false);
+//			}
+
+			if (!plan.getAttributes().isEmpty()) {
 				writer.write("\n");
 				this.attributesWriter.writeAttributes("\t\t\t\t", writer, plan.getAttributes(),false);
 			}
