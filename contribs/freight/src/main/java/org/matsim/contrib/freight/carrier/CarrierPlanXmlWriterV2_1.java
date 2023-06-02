@@ -267,8 +267,7 @@ import java.util.*;
 						if (leg.getRoute() != null) {
 							this.writeStartTag("route", null);
 							boolean firstLink = true;
-							for (Id<Link> id : ((NetworkRoute) leg.getRoute())
-									.getLinkIds()) {
+							for (Id<Link> id : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 								if (firstLink) {
 									writer.write(id.toString());
 									firstLink = false;
