@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.analysis.linkstates;
 
 import ch.sbb.matsim.contrib.railsim.analysis.RailsimCsvWriter;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -28,7 +29,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import javax.inject.Inject;
 
 public final class RailsimLinkStateControlerListener implements IterationEndsListener, IterationStartsListener {
 

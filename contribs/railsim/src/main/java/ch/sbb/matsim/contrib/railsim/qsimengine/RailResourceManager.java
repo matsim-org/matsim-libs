@@ -1,10 +1,12 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
  */
 public final class RailResourceManager {
 
+	private final EventsManager eventsManager;
 	/**
 	 * Rail links
 	 */
@@ -28,7 +31,8 @@ public final class RailResourceManager {
 	/**
 	 * Construct resources from network.
 	 */
-	public RailResourceManager(RailsimConfigGroup config, Network network) {
+	public RailResourceManager(EventsManager eventsManager, RailsimConfigGroup config, Network network) {
+		this.eventsManager = eventsManager;
 		this.links = new IdMap<>(Link.class, network.getLinks().size());
 
 		Set<String> modes = config.getRailNetworkModes();
@@ -94,4 +98,32 @@ public final class RailResourceManager {
 
 		return false;
 	}
+
+	/**
+	 * Try to block a track and return whether it was successful.
+	 */
+	public boolean tryBlockTrack(double time, MobsimDriverAgent driver, RailLink link) {
+
+		if (link.isBlockedBy(driver))
+			return true;
+
+		if (link.hasFreeTrack()) {
+			int track = link.blockTrack(driver);
+			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
+				driver.getVehicle().getId(), TrackState.BLOCKED, track));
+
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Release a non-free track to be free again.
+	 */
+	public void releaseTrack(double time, MobsimDriverAgent driver, RailLink link) {
+		int track = link.releaseTrack(driver);
+		eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(), driver.getVehicle().getId(),
+			TrackState.FREE, track));
+	}
+
 }

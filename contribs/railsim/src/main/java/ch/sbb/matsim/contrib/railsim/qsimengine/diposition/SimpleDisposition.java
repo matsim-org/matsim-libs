@@ -52,7 +52,7 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 
 			// Check if single link can be reserved
-			if (link.hasFreeTrack()) {
+			if (resources.tryBlockTrack(time, driver, link)) {
 				blocked.add(link);
 			} else
 				break;
@@ -63,6 +63,7 @@ public class SimpleDisposition implements TrainDisposition {
 
 	@Override
 	public void unblockRailLink(double time, MobsimDriverAgent driver, RailLink link) {
+		resources.releaseTrack(time, driver, link);
 
 		// Release held resources
 		if (link.getResourceId() != null) {

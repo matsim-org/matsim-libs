@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,7 +39,6 @@ import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
 import org.matsim.core.population.routes.NetworkRoute;
 
-import javax.inject.Inject;
 import java.util.Set;
 
 /**
@@ -69,7 +69,8 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		engine = new RailsimEngine(qsim.getEventsManager(), config, new RailResourceManager(config, qsim.getScenario().getNetwork()));
+		engine = new RailsimEngine(qsim.getEventsManager(), config,
+			new RailResourceManager(qsim.getEventsManager(), config, qsim.getScenario().getNetwork()));
 	}
 
 	@Override

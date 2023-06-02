@@ -78,17 +78,6 @@ public final class RailLink implements HasLinkId {
 	}
 
 	/**
-	 * Whether at least one track is free.
-	 */
-	public boolean hasFreeTrack() {
-		for (TrackState trackState : state) {
-			if (trackState == TrackState.FREE)
-				return true;
-		}
-		return false;
-	}
-
-	/**
 	 * Check if driver has already reserved this link.
 	 */
 	public boolean isBlockedBy(MobsimDriverAgent driver) {
@@ -100,9 +89,20 @@ public final class RailLink implements HasLinkId {
 	}
 
 	/**
+	 * Whether at least one track is free.
+	 */
+	boolean hasFreeTrack() {
+		for (TrackState trackState : state) {
+			if (trackState == TrackState.FREE)
+				return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Block a track that was previously reserved.
 	 */
-	public int blockTrack(MobsimDriverAgent driver) {
+	int blockTrack(MobsimDriverAgent driver) {
 		for (int i = 0; i < state.length; i++) {
 			if (state[i] == TrackState.FREE) {
 				reservations[i] = driver;
@@ -116,7 +116,7 @@ public final class RailLink implements HasLinkId {
 	/**
 	 * Release a non-free track to be free again.
 	 */
-	public int releaseTrack(MobsimDriverAgent driver) {
+	int releaseTrack(MobsimDriverAgent driver) {
 		for (int i = 0; i < state.length; i++) {
 			if (reservations[i] == driver) {
 				state[i] = TrackState.FREE;

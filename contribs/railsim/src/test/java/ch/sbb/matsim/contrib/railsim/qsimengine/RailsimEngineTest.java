@@ -37,7 +37,7 @@ public class RailsimEngineTest {
 		collector.clear();
 
 		return new RailsimTestUtils.Holder(new RailsimEngine(
-			eventsManager, config, new RailResourceManager(config, net)), net);
+			eventsManager, config, new RailResourceManager(eventsManager, config, net)), net);
 	}
 
 	@Test

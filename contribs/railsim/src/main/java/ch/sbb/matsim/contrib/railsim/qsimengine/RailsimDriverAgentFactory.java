@@ -1,6 +1,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -11,7 +12,6 @@ import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.pt.Umlauf;
 
-import javax.inject.Inject;
 import java.util.Set;
 
 /**

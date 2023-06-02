@@ -212,6 +212,7 @@ final class RailsimEngine implements Steppable {
 		TrainState state = event.state;
 		state.timestamp = time;
 
+		state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
 		state.headPosition = resources.getLink(state.headLink).length;
 		state.tailPosition = resources.getLink(state.headLink).length - state.train.length();
 
@@ -259,15 +260,6 @@ final class RailsimEngine implements Steppable {
 
 		List<RailLink> blocked = disposition.blockRailSegment(time, state.driver, links);
 
-		// Block the approved links
-		for (RailLink link : blocked) {
-			if (link.isBlockedBy(state.driver))
-				continue;
-
-			int track = link.blockTrack(state.driver);
-			createEvent(new RailsimLinkStateChangeEvent(time, link.getLinkId(),
-				state.driver.getVehicle().getId(), TrackState.BLOCKED, track));
-		}
 
 		// Only continue successfully if all requested link have been blocked
 		return links.size() == blocked.size();
@@ -300,11 +292,6 @@ final class RailsimEngine implements Steppable {
 			// Free all reservations
 			for (RailLink link : state.route) {
 				if (link.isBlockedBy(state.driver)) {
-
-					int track = link.releaseTrack(state.driver);
-					createEvent(new RailsimLinkStateChangeEvent(time, link.getLinkId(), state.driver.getVehicle().getId(),
-						TrackState.FREE, track));
-
 					disposition.unblockRailLink(time, state.driver, link);
 				}
 			}
@@ -368,10 +355,6 @@ final class RailsimEngine implements Steppable {
 
 		createEvent(new RailsimTrainLeavesLinkEvent(time, state.driver.getVehicle().getId(), state.tailLink));
 		// TODO: link should be released after headway time
-		int track = tailLink.releaseTrack(state.driver);
-		createEvent(new RailsimLinkStateChangeEvent(time, state.tailLink, state.driver.getVehicle().getId(),
-			TrackState.FREE, track));
-
 		disposition.unblockRailLink(time, state.driver, resources.getLink(state.tailLink));
 
 		state.tailLink = nextTailLink.getLinkId();

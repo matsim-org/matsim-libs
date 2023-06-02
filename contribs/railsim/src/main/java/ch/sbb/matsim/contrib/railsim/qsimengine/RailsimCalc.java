@@ -186,7 +186,7 @@ public class RailsimCalc {
 	public static double nextLinkReservation(TrainState state, RailLink currentLink) {
 
 		// time needed for full stop
-		double assumedSpeed = state.train.maxVelocity();
+		double assumedSpeed = state.allowedMaxSpeed;
 		double stopTime = assumedSpeed / state.train.deceleration();
 
 		assert stopTime > 0 : "Stop time can not be negative";
@@ -221,7 +221,8 @@ public class RailsimCalc {
 
 		List<RailLink> result = new ArrayList<>();
 
-		double assumedSpeed = state.train.maxVelocity();
+		// safety distance
+		double assumedSpeed = state.allowedMaxSpeed;
 
 		double stopTime = assumedSpeed / state.train.deceleration();
 		// safety distance
