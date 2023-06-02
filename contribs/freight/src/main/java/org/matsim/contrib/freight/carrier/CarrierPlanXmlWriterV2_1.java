@@ -216,27 +216,33 @@ import java.util.*;
 		}
 		this.writeStartTag("plans", null);
 		for (CarrierPlan plan : carrier.getPlans()){
-			if (plan.getScore() != null && carrier.getSelectedPlan() != null) {
-				if (plan == carrier.getSelectedPlan()) {
+			if (plan.getScore() != null) {
+				if (carrier.getSelectedPlan() != null && plan == carrier.getSelectedPlan()) {
 					this.writeStartTag("plan", List.of(
 							createTuple("score", plan.getScore()),
 							createTuple("selected", "true")));
+				} else if (carrier.getSelectedPlan() != null && plan != carrier.getSelectedPlan()) {
+					this.writeStartTag("plan", List.of(
+							createTuple("score", plan.getScore()),
+							createTuple("selected", "false")));
 				} else {
 					this.writeStartTag("plan", List.of(
 							createTuple("score", plan.getScore()),
 							createTuple("selected", "false")));
 				}
-			} else {
-				this.writeStartTag("plan", List.of(
-						createTuple("selected", "false")));
 			}
-
-//			if (plan.getAttributes().isEmpty()) {
-//				return;
-//			} else {
-//				writer.write("\n");
-//				this.attributesWriter.writeAttributes("\t\t\t\t", writer, plan.getAttributes(),false);
-//			}
+			else {
+				if (carrier.getSelectedPlan() != null && plan == carrier.getSelectedPlan()) {
+					this.writeStartTag("plan", List.of(
+							createTuple("selected", "true")));
+				} else if (carrier.getSelectedPlan() != null && plan != carrier.getSelectedPlan()) {
+					this.writeStartTag("plan", List.of(
+							createTuple("selected", "false")));
+				} else {
+					this.writeStartTag("plan", List.of(
+							createTuple("selected", "false")));
+				}
+			}
 
 			if (!plan.getAttributes().isEmpty()) {
 				writer.write("\n");
