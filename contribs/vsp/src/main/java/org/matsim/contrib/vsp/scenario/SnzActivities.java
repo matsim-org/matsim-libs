@@ -11,7 +11,8 @@ public enum SnzActivities {
 	home,
 	other,
 	visit,
-
+	accomp_other,
+	accomp_children,
 	educ_kiga(7, 17),
 	educ_primary(7, 16),
 	educ_secondary(7, 17),
