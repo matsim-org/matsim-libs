@@ -21,27 +21,17 @@
 
 package org.matsim.contrib.freight.events;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour.Pickup;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.vehicles.Vehicle;
-
-/*package-private*/  final class FreightShipmentPickupEndEventCreator implements FreightEventCreator {
-
-	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if(event instanceof ActivityEndEvent endEvent && FreightConstants.PICKUP.equals((endEvent).getActType()) ) {
-			TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-			if (element instanceof Pickup pickupActivity) {
-				return new FreightShipmentPickupEndEvent(event.getTime(), carrier.getId(), pickupActivity.getShipment(), vehicleId );
-			}
-		}
-		return null;
-	}
+/**
+ *  Some constants, that are used for the Attributes of different FreightEvents.
+ *
+ *  @author Kai Martins-Turner (kturner)
+ */
+public class CarrierEventAttributes {
+	public static final String ATTRIBUTE_SERVICE_ID = "serviceId";
+	public static final String ATTRIBUTE_SHIPMENT_ID = "shipmentId";
+	public static final String ATTRIBUTE_TOUR_ID = "tourId";
+	public static final String ATTRIBUTE_SERVICE_DURATION = "serviceDuration";
+	public static final String ATTRIBUTE_PICKUP_DURATION = "pickupDuration";
+	public static final String ATTRIBUTE_DROPOFF_DURATION = "dropoffDuration";
+	public static final String ATTRIBUTE_CAPACITYDEMAND = "capacityDemand";
 }

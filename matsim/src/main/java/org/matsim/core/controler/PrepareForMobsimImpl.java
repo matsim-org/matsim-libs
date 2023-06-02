@@ -39,8 +39,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.HashSet;
 
 public final class PrepareForMobsimImpl implements PrepareForMobsim {
@@ -51,7 +51,7 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 	// bind( PrepareForSim.class ).to( MyPrepareForSimImpl.class ) ;
 
 	private static final  Logger log = LogManager.getLogger(PrepareForMobsimImpl.class);
-	
+
 	private final GlobalConfigGroup globalConfigGroup;
 	private final Scenario scenario;
 	private final Network network;
@@ -59,7 +59,7 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 	private final ActivityFacilities activityFacilities;
 	private final Provider<TripRouter> tripRouterProvider;
 	private final TimeInterpretation timeInterpretation;
-	
+
 	@Inject
 	PrepareForMobsimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
@@ -71,8 +71,8 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 		this.tripRouterProvider = tripRouterProvider;
 		this.timeInterpretation = timeInterpretation;
 	}
-	
-	
+
+
 	@Override
 	public void run() {
 		/*
@@ -93,22 +93,22 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 		} else {
 			carOnlyNetwork = network;
 		}
-		
+
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
 				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities, timeInterpretation), scenario, 
+						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities, timeInterpretation), scenario,
 								carOnlyNetwork );
 					}
 					// yyyyyy This prepared network is only used for computing the distance.  So the full network would
 					// actually be better than the car-only network, without doing damage elsewhere.  No?  kai, jul'18
 				}
 		);
-		
+
 		// yy Could now set the vehicle IDs in the routes.  But can as well also do this later (currently in PopulationAgentSource).  kai, jun'18
-		
+
 	}
-	
+
 }

@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,7 +73,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 	@Inject
 	private MultiModeCountsControlerListener(QSimConfigGroup qsimConfigGroup, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
 		this.controlerConfigGroup = controlerConfigGroup;
-		this.config = countsConfigGroup; 
+		this.config = countsConfigGroup;
 		this.volumesAnalyzer = volumesAnalyzer;
 		this.analyzedModes =   CollectionUtils.stringToSet(this.config.getAnalyzedModes());
 		Set<String> mainModes = new HashSet<>(qsimConfigGroup.getMainModes());
@@ -105,7 +105,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(counts==null) {
         }
-		else if ( event.getIteration() == controlerConfigGroup.getFirstIteration()){	
+		else if ( event.getIteration() == controlerConfigGroup.getFirstIteration()){
 			// write the data for first iteration too
 			addVolumes(volumesAnalyzer);
 			writeData(event, this.linkStats);
@@ -142,7 +142,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 				reset();
 				iterationStopwatch.endOperation(OPERATION_COMPARECOUNTS);
 			}
-		} 
+		}
 	}
 
 	private void writeData(final IterationEndsEvent event, Map<Id<Link>, Map<String, double[]>> averages) {
@@ -188,7 +188,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 
 	/*package*/
 	private boolean createCountsInIteration(final int iteration) {
-		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));		
+		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));
 	}
 
 	private void addVolumes(final VolumesAnalyzer volumes) {
@@ -197,14 +197,14 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 			Id<Link> linkId = e.getKey();
 			Map<String, double[]> mode2counts =  e.getValue();
 			for (String mode : mode2counts.keySet()) {
-				double[] volumesPerHour = mode2counts.get(mode); 
-				double[] newVolume = volumes.getVolumesPerHourForLink(linkId, mode); 
+				double[] volumesPerHour = mode2counts.get(mode);
+				double[] newVolume = volumes.getVolumesPerHourForLink(linkId, mode);
 				for (int i = 0; i < 24; i++) {
 					volumesPerHour[i] += newVolume[i];
 				}
 				mode2counts.put(mode, volumesPerHour);
 			}
-			this.linkStats.put(linkId, mode2counts);	
+			this.linkStats.put(linkId, mode2counts);
 		}
 	}
 

@@ -20,7 +20,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,22 +42,22 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * it us truly needed yet.
  * <li> Mobsim-specific objects, such as {@link AgentCounter} or {@link QNetsimEngineWithThreadpool}.  Since the mobsim is re-created in every
  * iteration, they cannot be injected via guice, at least not via the global inject mechanism that has the override facility.
- * <li> The last level are link- oder node-specific objects such as {@link Link}  or {@QNode}.  They are arguments to the 
+ * <li> The last level are link- oder node-specific objects such as {@link Link}  or {@QNode}.  They are arguments to the
  * creational methods.
  * <li> The main underlying implementations are {@link QueueWithBuffer}, the factory of which is inserted into {@link QLinkImpl}.  This
  * was the syntax that could subsume all other syntactic variants.  Builders are used to set defaults and to avoid overly long
  * constructors.
  * <li> {@link QLinkImpl} is essentially the container where vehicles are parked, agents perform activities, etc.  MATSim has some tendency to
- * have them centralized in the QSim (see, e.g., {@link TransitStopAgentTracker}), but both for parallel computing and for visualization, 
- * having agents on a decentralized location is helpful.  
+ * have them centralized in the QSim (see, e.g., {@link TransitStopAgentTracker}), but both for parallel computing and for visualization,
+ * having agents on a decentralized location is helpful.
  * <li> Most functionality of {@link QLinkImpl} is actually in {@link AbstractQLink}, which
- * can also be used as basic infrastructure by other qnetworks.  
- * <li> {@link QueueWithBuffer} is an instance of {@link QLaneI} and can be replaced accordingly.  
- * <li> One can also replace the {@link VehicleQ} that works inside {@link QueueWithBuffer}. 
+ * can also be used as basic infrastructure by other qnetworks.
+ * <li> {@link QueueWithBuffer} is an instance of {@link QLaneI} and can be replaced accordingly.
+ * <li> One can also replace the {@link VehicleQ} that works inside {@link QueueWithBuffer}.
  * </ul>
- * 
+ *
  * @author dgrether, knagel
- * 
+ *
  * @see ConfigurableQNetworkFactory
  */
 public final class DefaultQNetworkFactory implements QNetworkFactory {
@@ -82,7 +82,7 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
-		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(), 
+		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(),
 				mobsimTimer, linkWidthCalculator );
 	}
 	@Override
