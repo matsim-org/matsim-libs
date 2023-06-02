@@ -43,6 +43,10 @@ public class SimpleDisposition implements TrainDisposition {
 
 				RailResource resource = resources.getResource(resourceId);
 				if (resources.tryBlockResource(resource, driver)) {
+
+					boolean b = resources.tryBlockTrack(time, driver, link);
+					assert b : "Link blocked by resource must be free";
+
 					blocked.add(link);
 					continue;
 				}
