@@ -45,7 +45,7 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,10 +159,10 @@ BeforeMobsimListener, AfterMobsimListener  {
 
 			String distanceFilterStr = this.config.findParam(MODULE_NAME, "distanceFilter");
 			String distanceFilterCenterNodeId = this.config.findParam(MODULE_NAME, "distanceFilterCenterNode");
-			
+
 			if ((distanceFilterStr != null) && (distanceFilterCenterNodeId != null)) {
 
-				
+
 				for ( CountsComparisonAlgorithm algo : cca.values() ) {
 					algo.setCountCoordUsingDistanceFilter(Double.parseDouble(distanceFilterStr), distanceFilterCenterNodeId) ;
 				}
@@ -191,5 +191,5 @@ BeforeMobsimListener, AfterMobsimListener  {
 	    }
 	    return dest;
 	}
-	
+
 }

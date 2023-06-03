@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.FreightEventCreator;
-import org.matsim.contrib.freight.events.FreightEventCreatorUtils;
+import org.matsim.contrib.freight.events.CarrierEventCreator;
+import org.matsim.contrib.freight.events.CarrierEventCreatorUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -62,13 +62,13 @@ public final class CarrierAgentTracker implements BasicEventHandler
 	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler = new Vehicle2DriverEventHandler();
 	private final List<CarrierAgent> carrierAgents = new ArrayList<>();
 	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new LinkedHashMap<>();
-	private final Collection<FreightEventCreator> freightEventCreators;
+	private final Collection<CarrierEventCreator> carrierEventCreators;
 
 	@Inject CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
 		this.carriers = carriers;
 		this.carrierScoringFunctionFactory = carrierScoringFunctionFactory;
 		this.events = events;
-		this.freightEventCreators = FreightEventCreatorUtils.getStandardEventCreators();
+		this.carrierEventCreators = CarrierEventCreatorUtils.getStandardEventCreators();
 		this.reset(-1);
 	}
 
@@ -78,7 +78,7 @@ public final class CarrierAgentTracker implements BasicEventHandler
 		driverAgentMap.clear();
 		carrierAgents.clear();
 		for (Carrier carrier : this.carriers.getCarriers().values()) {
-			carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction( carrier ), events, freightEventCreators) );
+			carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction( carrier ), events, carrierEventCreators) );
 		}
 	}
 

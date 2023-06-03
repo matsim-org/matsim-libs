@@ -120,7 +120,7 @@ public final class NetworkUtils {
 		Arrays.sort(nodes, Comparator.comparing(Identifiable::getId));
 		return nodes;
 	}
-	
+
 	/**
 	 * @param nodes list of node ids, separated by one or multiple whitespace (space, \t, \n)
 	 * @return list containing the specified nodes.
@@ -155,7 +155,7 @@ public final class NetworkUtils {
 		Arrays.sort(links, Comparator.comparing(Identifiable::getId));
 		return links;
 	}
-	
+
 	/**
 	 * @param links list of link ids, separated by one or multiple whitespace (space, \t, \n)
 	 * @return list containing the specified links.
@@ -226,7 +226,7 @@ public final class NetworkUtils {
 	}
 
 	/**
-	 * @return formerly, the maximum of 1 and the mathematically rounded number of lanes 
+	 * @return formerly, the maximum of 1 and the mathematically rounded number of lanes
 	 * attribute's value at time "time" of the link given as parameter
 	 *	now, the number is truncated, but 0 is never returned.
 	 *	math.round is way, way too slow.
@@ -277,7 +277,7 @@ public final class NetworkUtils {
 			}
 		}
 		return false;
-		
+
 	}
 
 	public static Link getConnectingLink(final Node fromNode, final Node toNode) {
@@ -290,19 +290,19 @@ public final class NetworkUtils {
 	}
 
     /**
-	 * This method expects the nearest link to a given measure point. 
-	 * It calculates the euclidean distance for both nodes of the link, 
+	 * This method expects the nearest link to a given measure point.
+	 * It calculates the euclidean distance for both nodes of the link,
 	 * "fromNode" and "toNode" and returns the node with shorter distance
 	 */
 	public static Node getCloserNodeOnLink(Coord coord, Link link) {
 		// yyyy I don't think there is a test for this anywhere.  kai, mar'14
-		
+
 		Node toNode = link.getToNode();
 		Node fromNode= link.getFromNode();
-		
+
 		double distanceToNode = getEuclideanDistance(coord, toNode.getCoord());
 		double distanceFromNode= getEuclideanDistance(coord, fromNode.getCoord());
-		
+
 		if(distanceToNode < distanceFromNode)
 			return toNode;
 		return fromNode;
@@ -316,7 +316,7 @@ public final class NetworkUtils {
 		return CoordUtils.calcEuclideanDistance(origin, destination);
 	}
 
-	/** 
+	/**
 	 * returns the euclidean distance between two points (x1,y1) and (x2,y2)
 	 */
 	public static double getEuclideanDistance(double x1, double y1, double x2, double y2){
@@ -496,9 +496,9 @@ public final class NetworkUtils {
 	}
 
 	/**
-	 * Calculates the orientation of outgoing links for a given 
-	 * incoming link beginning from the right if the inLink goes 
-	 * north to south. The most 'left' outLink comes last. The link back to the 
+	 * Calculates the orientation of outgoing links for a given
+	 * incoming link beginning from the right if the inLink goes
+	 * north to south. The most 'left' outLink comes last. The link back to the
 	 * inLink's upstream Node is ignored.
 	 * <br><br>
 	 * Comments/questions:<ul>
@@ -658,7 +658,7 @@ public final class NetworkUtils {
 	}
 	public static String getType(Link link) {
 //		if ( link instanceof LinkImpl ) {
-//			return ((LinkImpl)link).getType2() ;	
+//			return ((LinkImpl)link).getType2() ;
 //		} else {
 //			throw new RuntimeException( "getType not possible for this implementation of interface Link" ) ;
 //		}
@@ -696,17 +696,17 @@ public final class NetworkUtils {
 			final double capacity, final double numLanes) {
 		return createAndAddLink(network, id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null ) ;
 	}
-	
+
 	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
 				final double capacity, final double numLanes, final String origId, final String type) {
 		if (network.getNodes().get(fromNode.getId()) == null) {
 			throw new IllegalArgumentException(network+"[from="+fromNode+" does not exist]");
 		}
-	
+
 		if (network.getNodes().get(toNode.getId()) == null) {
 			throw new IllegalArgumentException(network+"[to="+toNode+" does not exist]");
 		}
-	
+
 		Link link = network.getFactory().createLink(id, fromNode, toNode) ;
 		link.setLength(length);
 		link.setFreespeed(freespeed);
@@ -714,9 +714,9 @@ public final class NetworkUtils {
 		link.setNumberOfLanes(numLanes);
 		setType( link, type);
 		setOrigId( link, origId ) ;
-	
+
 		network.addLink( link ) ;
-	
+
 		return link;
 	}
 
@@ -785,7 +785,7 @@ public final class NetworkUtils {
 	}
 
 	public static final String ORIGID = "origid";
-	
+
 	public static void runNetworkCleaner( Network network ) {
 		new org.matsim.core.network.algorithms.NetworkCleaner().run( network );
 	}
@@ -805,8 +805,11 @@ public final class NetworkUtils {
 		return null;
 	}
 
+	private static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
+	private static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
+
 	public static OptionalTime getLinkAccessTime(Link link, String routingMode){
-		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
+		String attribute = ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
 		if (o!=null){
 			return OptionalTime.defined((double) o);
@@ -815,12 +818,12 @@ public final class NetworkUtils {
 	}
 
 	public static void setLinkAccessTime(Link link, String routingMode, double accessTime){
-		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
+		String attribute = ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
 		link.getAttributes().putAttribute(attribute,accessTime);
 	}
 
 	public static OptionalTime getLinkEgressTime(Link link, String routingMode) {
-		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
+		String attribute = EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
 		if (o != null) {
 			return OptionalTime.defined((double) o);
@@ -828,7 +831,7 @@ public final class NetworkUtils {
 	}
 
 	public static void setLinkEgressTime(Link link, String routingMode, double egressTime) {
-		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
+		String attribute = EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
 		link.getAttributes().putAttribute(attribute, egressTime);
 	}
 

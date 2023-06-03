@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.Vehicle;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Objects;
 
 public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCalculator {

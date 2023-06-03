@@ -12,8 +12,8 @@ import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 /**
  * Provider for {@link SelectFromGeneratorStrategy}.

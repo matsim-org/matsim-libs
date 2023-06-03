@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-//import javax.inject.Inject;
+//import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,7 +48,7 @@ import com.google.inject.Inject;
 
 /**
  * Black box for paratransit
- * 
+ *
  * @author aneumann
  *
  */
@@ -75,7 +75,7 @@ public final class PBox implements POperators {
 	private final TicketMachineI ticketMachine;
 
 	@Inject(optional=true) private SubsidyI subsidy;
-	// yy my intuition would be to pass an empty subsidy rather than making it optional. 
+	// yy my intuition would be to pass an empty subsidy rather than making it optional.
 
 	/**
 	 * Constructor that allows to set the ticketMachine.  Deliberately in constructor and not as setter to keep the variable final.  Might be
@@ -87,7 +87,7 @@ public final class PBox implements POperators {
 		this.scorePlansHandler = new PScorePlansHandler(this.ticketMachine);
 		this.stageCollectorHandler = new StageContainerCreator(this.pConfig.getPIdentifier());
 		this.operatorCostCollectorHandler = new OperatorCostCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getCostPerVehicleAndDay(), this.pConfig.getCostPerKilometer() / 1000.0, this.pConfig.getCostPerHour() / 3600.0);
-		this.franchise = new PFranchise(this.pConfig.getUseFranchise(), pConfig.getGridSize());	
+		this.franchise = new PFranchise(this.pConfig.getUseFranchise(), pConfig.getGridSize());
 	}
 
 	void notifyStartup(StartupEvent event) {
@@ -98,7 +98,7 @@ public final class PBox implements POperators {
 
 		// initialize strategy manager
 		this.strategyManager.init(this.pConfig, this.stageCollectorHandler, this.ticketMachine, timeProvider);
-		
+
 		// initialize route design scoring manager
 		this.routeDesignScoreManager.init(this.pConfig, event.getServices().getScenario().getNetwork());
 

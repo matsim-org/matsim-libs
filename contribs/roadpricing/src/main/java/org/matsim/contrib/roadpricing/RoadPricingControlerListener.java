@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.roadpricing;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,14 +37,14 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelDisutility;
 
 /**
- * Integrates the RoadPricing functionality into the MATSim Controler.  Does the 
+ * Integrates the RoadPricing functionality into the MATSim Controler.  Does the
  * following:
  * <p></p>
  * <strike>Initialization:
  * <ul>
  * 		<li> Adds the {@link RoadPricingTollCalculator} events listener (to calculate the
  * 			 toll per agent).
- * 		<li> Adds the toll to the {@link TravelDisutility} for the router (by 
+ * 		<li> Adds the toll to the {@link TravelDisutility} for the router (by
  * 			 wrapping the pre-existing {@link TravelDisutility} object).
  * </ul></strike>
  * After mobsim:
