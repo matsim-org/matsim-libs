@@ -209,6 +209,19 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 
+		// added may'23
+		for ( ModeParams params : config.planCalcScore().getModes().values() ){
+			if ( params.getMarginalUtilityOfTraveling() != 0. ) {
+				log.log( lvl, "You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
+							      + ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions.");
+			}
+			if ( params.getMode().equals( TransportMode.walk ) && params.getConstant() != 0. ) {
+				problem = true;
+				log.log( lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
+							      + ".  Values different from zero cause problems here because the ASC is also used for access/egress modes" );
+			}
+		}
+
 		// === plans:
 		
 		// added before nov'12
