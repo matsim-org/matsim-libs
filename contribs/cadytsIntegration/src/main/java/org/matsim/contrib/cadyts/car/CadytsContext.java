@@ -44,8 +44,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
@@ -62,7 +62,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
-	
+
 	private final double countsScaleFactor;
 	private final Counts<Link> calibrationCounts;
 	private final boolean writeAnalysisFile;
@@ -108,11 +108,11 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	public PlansTranslator<Link> getPlansTranslator() {
 		return this.plansTranslator;
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.simResults = new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor);
-		
+
 		// this collects events and generates cadyts plans from it
 		this.plansTranslator = new PlansTranslatorBasedOnEvents(scenario);
 		this.eventsManager.addHandler(plansTranslator);

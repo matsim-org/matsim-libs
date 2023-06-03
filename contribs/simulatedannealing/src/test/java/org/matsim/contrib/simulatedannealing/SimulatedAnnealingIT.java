@@ -23,8 +23,8 @@ import org.matsim.contrib.simulatedannealing.perturbation.ChainedPerturbatorFact
 import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 /**
  * @author nkuehnel / MOIA

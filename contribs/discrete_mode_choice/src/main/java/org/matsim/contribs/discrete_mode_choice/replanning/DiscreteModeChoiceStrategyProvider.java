@@ -1,6 +1,6 @@
 package org.matsim.contribs.discrete_mode_choice.replanning;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -20,7 +20,7 @@ import com.google.inject.Provider;
 /**
  * This defines the general choice strategy for the discrete mode choice
  * extension. It consists of three replanning modules:
- * 
+ *
  * <ul>
  * <li>TripsToLegs, which collapses all multi-stage trips into one leg</li>
  * <li>DiscreteModeChoiceReplanningModule, which creates a new discrete choice
@@ -28,7 +28,7 @@ import com.google.inject.Provider;
  * <li>Optionally, ReRoute if is is configured in the config, otherwise a check
  * is added that all routes are present after the mode choice</li>
  * </ul>
- * 
+ *
  * @author sebhoerl
  */
 public class DiscreteModeChoiceStrategyProvider implements Provider<PlanStrategy> {

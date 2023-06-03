@@ -48,7 +48,7 @@ import org.matsim.core.scoring.functions.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;

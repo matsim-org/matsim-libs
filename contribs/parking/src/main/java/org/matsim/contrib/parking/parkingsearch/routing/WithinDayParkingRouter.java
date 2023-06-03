@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.parking.parkingsearch.routing;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;

@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.events.FreightEventCreator;
+import org.matsim.contrib.freight.events.CarrierEventCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -65,20 +65,20 @@ final class CarrierAgent implements Identifiable<Carrier>
 
 	private final Collection<Id<Person>> driverIds = new ArrayList<>();
 
-	private int nextId = 0;
+	private int nextId = 1; //used to generate unique driver Ids. First agent should have the 1 and not 0.
 
 	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
 	private final ScoringFunction scoringFunction;
 	private final EventsManager events;
-	private final Collection<FreightEventCreator> freightEventCreators;
+	private final Collection<CarrierEventCreator> carrierEventCreators;
 
-	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, EventsManager events, Collection<FreightEventCreator> freightEventCreators) {
+	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, EventsManager events, Collection<CarrierEventCreator> carrierEventCreators) {
 		this.carrier = carrier;
 		this.id = carrier.getId();
 		this.scoringFunction = carrierScoringFunction;
 		this.events = events;
-		this.freightEventCreators = freightEventCreators;
+		this.carrierEventCreators = carrierEventCreators;
 	}
 
 	@Override public Id<Carrier> getId() {
@@ -108,7 +108,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 			CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 			Person driverPerson = createDriverPerson(driverId);
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
-			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour, scoringFunction, carrier, events, freightEventCreators);
+			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour, scoringFunction, carrier, events, carrierEventCreators);
 			Plan plan = PopulationUtils.createPlan();
 			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLinkId() );
 			startActivity.setEndTime(scheduledTour.getDeparture());
@@ -164,7 +164,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 	private void clear() {
 		carrierDriverAgents.clear();
 		driverIds.clear();
-		nextId = 0;
+		nextId = 1;  //first agent should have the 1 and not 0.
 	}
 
 	Collection<Id<Person>> getDriverIds() {

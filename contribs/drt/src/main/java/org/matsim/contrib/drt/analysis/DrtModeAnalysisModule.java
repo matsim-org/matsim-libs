@@ -38,11 +38,11 @@ import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.util.stats.ProfileWriter;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileView;
-import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleTaskProfileView;
+import org.matsim.contrib.common.timeprofile.ProfileWriter;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileView;
+import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileView;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -110,7 +110,6 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class), 300,
 						getter.get(QSimConfigGroup.class), passengerServingTaskTypes))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
-		addControlerListenerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(getter -> {
 			MatsimServices matsimServices = getter.get(MatsimServices.class);
@@ -124,7 +123,6 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 				getter -> new VehicleTaskProfileCalculator(getMode(), getter.getModal(FleetSpecification.class), 300,
 						getter.get(QSimConfigGroup.class)))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
-		addControlerListenerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(getter -> {
 			MatsimServices matsimServices = getter.get(MatsimServices.class);

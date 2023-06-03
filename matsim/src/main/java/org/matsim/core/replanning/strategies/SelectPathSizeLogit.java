@@ -25,8 +25,8 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 public class SelectPathSizeLogit implements Provider<PlanStrategy> {
 
@@ -37,5 +37,5 @@ public class SelectPathSizeLogit implements Provider<PlanStrategy> {
 	public PlanStrategy get() {
         return new PlanStrategyImpl(new PathSizeLogitSelector(config, network));
 	}
-	
+
 }

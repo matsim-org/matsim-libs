@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;

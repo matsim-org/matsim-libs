@@ -70,7 +70,19 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
-	public enum AccessEgressType {@Deprecated none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant}
+	public enum AccessEgressType {
+		@Deprecated none,
+		/**
+		 *
+		 */
+		accessEgressModeToLink,
+		/**
+		 * Euclidian distance from facility to nearest point on link; then teleported walk.  In normal cases, all activities that belong to the
+		 * same link are mapped into the same facility; in consequence, in that situation all will have the same walk time.  kai, may'23
+		 */
+		walkConstantTimeToLink,
+		accessEgressModeToLinkPlusTimeConstant
+	}
 
 	private static final String ACCESSEGRESSTYPE = "accessEgressType";
 	private static final String ACCESSEGRESSTYPE_CMT = "Defines how access and egress to main mode is simulated. Either of [none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant], Current default=none which means no access or egress trips are simulated.";

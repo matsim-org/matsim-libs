@@ -24,7 +24,7 @@ package org.matsim.contrib.ev.temperature;/*
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;

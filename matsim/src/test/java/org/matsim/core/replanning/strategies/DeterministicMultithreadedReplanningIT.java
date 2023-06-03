@@ -41,7 +41,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * Tests that the re-planning process of MATSim generates the same results every time, even when
@@ -147,20 +147,20 @@ public class DeterministicMultithreadedReplanningIT {
 		}
 
 		for (int i = 0; i <= lastIteration; i++) {
-			
+
 			long cksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 			long cksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
-			
+
 			Assert.assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
 		}
-		
+
 		for (int i = 0; i < 2; i++) {
 			long pcksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			long pcksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			Assert.assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
 		}
 	}
-	
+
 	/**
 	 * Tests that the generic {@link ReRoute} generates always the same results
 	 * REGARDLESS the number of threads using only one agent.
