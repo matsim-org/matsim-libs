@@ -20,6 +20,7 @@ package org.matsim.contrib.bicycle;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,6 +34,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultTurnAcceptanceLogic;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.withinday.mobsim.WithinDayQSimModule;
 
@@ -89,6 +91,9 @@ public final class BicycleModule extends AbstractModule {
 				// it in every iteration via the initializeFactory(...) method. kai, mar'16
 			}
 		} );
+
+		Multibinder<LinkSpeedCalculator> binder = Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class );
+		binder.addBinding().to(  BicycleLinkSpeedCalculatorDefaultImpl.class );
 	}
 
 	static class ConsistencyCheck implements StartupListener {
