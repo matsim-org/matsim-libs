@@ -63,7 +63,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 		while (!wakeUpList.isEmpty() && wakeUpList.peek().time <= now) {
 			final AgentEntry entry = wakeUpList.poll();
 			this.eventsManager.processEvent(new AgentWakeupEvent(now, entry.agent.getId()));
-			entry.agentWakeup.wakeUp(entry.agent, now);
+			entry.agentWakeup.executeOnWakeup(entry.agent, now );
 		}
 		delegate.doSimStep(now);
 	}
@@ -103,7 +103,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	}
 
 	public interface AgentWakeup {
-		void wakeUp(MobsimAgent agent, double now);
+		void executeOnWakeup( MobsimAgent agent, double now );
 	}
 
 	/**
@@ -164,7 +164,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 		@Override
 		public Map<String, String> getAttributes() {
 			Map<String, String> attr = super.getAttributes();
-			attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+//			attr.put(ATTRIBUTE_PERSON, this.personId.toString()); // already done in superclass.  kai, apr'23
 			return attr;
 		}
 	}
