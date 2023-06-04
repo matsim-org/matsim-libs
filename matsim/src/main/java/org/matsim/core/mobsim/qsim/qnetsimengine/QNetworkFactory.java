@@ -33,13 +33,13 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalIn
 /**
  * The current design idea of this is as follows:<ul>
  * <li> It is now possible to inject this.  See {@link QSimModule} for how the default is set up.   It can also be overridden in the usual way.
- * <li> For a specific example, see {@link DefaultQNetworkFactory}. 
+ * <li> For a specific example, see {@link DefaultQNetworkFactory}.
  * </ul>
- * 
+ *
  * <p></p>
- * 
+ *
  * @author dgrether, nagel
- * 
+ *
  * @see DefaultQNetworkFactory
  * @see ConfigurableQNetworkFactory
  *
@@ -52,7 +52,7 @@ public interface QNetworkFactory extends MatsimFactory {
 	 * is called by the mobsim to provide some info about itself (e.g. agentCounter).
 	 * <p></p>
 	 * This could be solved using custom scopes.  They do, however, for the time being only exist in the guice inject framework, not
-	 * in javax.inject, and thus we do not want to use them (yet?).
+	 * in jakarta.inject, and thus we do not want to use them (yet?).
 	 * <p></p>
 	 * (yy I think that the above has been changed with the separate QSimComponents, and thus one could attempt to fix it.  kai, jul'22)
 	 */

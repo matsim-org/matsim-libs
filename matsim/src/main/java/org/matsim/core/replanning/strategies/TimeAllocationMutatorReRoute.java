@@ -31,8 +31,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 /**
  * @author thibautd
@@ -45,7 +45,7 @@ public class TimeAllocationMutatorReRoute implements Provider<PlanStrategy> {
 	@Inject private ActivityFacilities activityFacilities;
 	@Inject private Population population;
 	@Inject private TimeInterpretation timeInterpretation;
-	
+
     @Override
 	public PlanStrategy get() {
 		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());

@@ -32,7 +32,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.TreeMap;

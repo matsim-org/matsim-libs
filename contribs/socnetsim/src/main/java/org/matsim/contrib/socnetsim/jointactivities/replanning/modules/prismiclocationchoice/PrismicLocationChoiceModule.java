@@ -29,7 +29,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import org.matsim.core.router.TripRouter;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * @author thibautd

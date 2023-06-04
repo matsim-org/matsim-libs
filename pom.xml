@@ -31,10 +31,10 @@
         <argLine></argLine>
 
         <log4j.version>2.20.0</log4j.version>
-        <geotools.version>29.0</geotools.version>
+        <geotools.version>29.1</geotools.version>
         <jts.version>1.19.0</jts.version>
-        <guice.version>5.1.0</guice.version>
-        <jackson.version>2.14.2</jackson.version>
+        <guice.version>7.0.0</guice.version>
+        <jackson.version>2.15.2</jackson.version>
     </properties>
 
     <scm>
@@ -93,7 +93,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>31.1-jre</version>
+                <version>32.0.0-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -185,7 +185,7 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
-                <version>2.18.0</version>
+                <version>2.19.1</version>
             </dependency>
 
             <dependency>
@@ -234,7 +234,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>3.5.1</version>
+                <version>4.0.0</version>
             </dependency>
 
             <dependency>
@@ -264,7 +264,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.33.0</version>
+                <version>3.35.0</version>
             </dependency>
 
 			<dependency>
@@ -289,14 +289,14 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.3.0</version>
+                <version>5.3.1</version>
                 <scope>test</scope>
             </dependency>
 
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.14.4</version>
+				<version>1.14.5</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -370,12 +370,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -385,7 +385,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -405,7 +405,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                     <executions>
                         <execution>
                             <phase>validate</phase>
@@ -457,7 +457,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.9</version>
+                        <version>0.8.10</version>
                         <executions>
                             <execution>
                                 <id>default-prepare-agent</id>

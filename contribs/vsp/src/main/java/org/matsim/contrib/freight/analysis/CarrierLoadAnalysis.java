@@ -6,8 +6,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.FreightShipmentDeliveryStartEvent;
-import org.matsim.contrib.freight.events.FreightShipmentPickupStartEvent;
+import org.matsim.contrib.freight.events.CarrierShipmentDeliveryStartEvent;
+import org.matsim.contrib.freight.events.CarrierShipmentPickupStartEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import static org.matsim.contrib.freight.events.FreightEventAttributes.ATTRIBUTE_CAPACITYDEMAND;
+import static org.matsim.contrib.freight.events.CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -39,12 +39,10 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 	}
 
 	@Override public void handleEvent(Event event) {
-		if (event.getEventType().equals(FreightShipmentPickupStartEvent.EVENT_TYPE)) {
+		if (event.getEventType().equals(CarrierShipmentPickupStartEvent.EVENT_TYPE)) {
 			handlePickup( event);
-		} if (event.getEventType().equals(FreightShipmentDeliveryStartEvent.EVENT_TYPE)) {
+		} if (event.getEventType().equals(CarrierShipmentDeliveryStartEvent.EVENT_TYPE)) {
 			handleDelivery(event);
-//		}  else if (event instanceof ActivityEndEvent activityEndEvent) {
-//			handleEvent(activityEndEvent);
 		}
 	}
 
@@ -73,11 +71,7 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 		vehicle2Load.put(vehicleId, list);
 	}
 
-	/*package-private*/ Map<Id<Vehicle>, LinkedList<Integer>> getVehicle2Load() {
-		return vehicle2Load;
-	}
-
-	static void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario, CarrierLoadAnalysis carrierLoadAnalysis) throws IOException {
+	void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out vehicle load analysis ...");
 		//Load per vehicle
 		String fileName = analysisOutputDirectory + "Load_perVehicle.tsv";
@@ -87,8 +81,6 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 		//Write headline:
 		bw1.write("vehicleId \t capacity \t maxLoad \t load state during tour");
 		bw1.newLine();
-
-		var vehicle2Load = carrierLoadAnalysis.getVehicle2Load();
 
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
 
