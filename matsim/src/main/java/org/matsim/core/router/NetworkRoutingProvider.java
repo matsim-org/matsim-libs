@@ -45,7 +45,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class NetworkRoutingProvider implements Provider<RoutingModule> {
+public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
 
 	private final String routingMode;
