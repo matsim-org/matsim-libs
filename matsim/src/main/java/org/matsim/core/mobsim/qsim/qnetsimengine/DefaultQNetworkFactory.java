@@ -31,8 +31,11 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+
+import java.util.Set;
 
 
 /**
@@ -65,6 +68,9 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 	private final Scenario scenario ;
 	private QLinkImpl.Builder linkBuilder;
 	private QNodeImpl.Builder nodeBuilder;
+	@Inject private Set<LinkSpeedCalculator> calculators;
+	private NetsimEngineContext context;
+	private NetsimInternalInterface netsimEngine1;
 	@Inject DefaultQNetworkFactory( EventsManager events, Scenario scenario ) {
 		this.events = events;
 		this.scenario = scenario;
@@ -79,14 +85,21 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
 		// (vis needs network and may need population attributes and config; in consequence, makes sense to have scenario here. kai, apr'16)
-		NetsimEngineContext context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(),
+		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(),
 				mobsimTimer, linkWidthCalculator );
 
-		this.linkBuilder = new QLinkImpl.Builder( context, netsimEngine1 ) ;
+		this.netsimEngine1 = netsimEngine1;
 
 		this.nodeBuilder = new QNodeImpl.Builder( netsimEngine1, context, scenario.getConfig().qsim() ) ;
+
 	}
 	@Override public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
+		this.linkBuilder = new QLinkImpl.Builder( context, netsimEngine1 ) ;
+		// it is not possible to construct the builder in the initializeFactory method.  I do not know why.  kai, jun'23
+
+		for( LinkSpeedCalculator calculator : calculators ){
+			this.linkBuilder.setLinkSpeedCalculator( calculator );
+		}
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override public QNodeI createNetsimNode( final Node node ) {

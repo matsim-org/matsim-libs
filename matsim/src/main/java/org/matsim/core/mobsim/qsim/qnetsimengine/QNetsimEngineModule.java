@@ -21,9 +21,11 @@
 
  package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 
-public class QNetsimEngineModule extends AbstractQSimModule {
+public final class QNetsimEngineModule extends AbstractQSimModule {
 	public final static String COMPONENT_NAME = "NetsimEngine";
 	
 	@Override
@@ -34,9 +36,17 @@ public class QNetsimEngineModule extends AbstractQSimModule {
 
 		if ( this.getConfig().qsim().isUseLanes() ) {
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
+			bind( DefaultQNetworkFactory.class );
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
 		}
+
+		// defining this here so we do not have to hedge against null:
+		Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class );
+
+		// specialized link speed calculators can be set via the syntax
+//			Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class ).addBinding().to...
+		// yyyy maybe move as generalized syntax to AbstractQSimModule
 
 		addQSimComponentBinding( COMPONENT_NAME ).to( VehicularDepartureHandler.class );
 		addQSimComponentBinding( COMPONENT_NAME ).to( QNetsimEngineI.class );

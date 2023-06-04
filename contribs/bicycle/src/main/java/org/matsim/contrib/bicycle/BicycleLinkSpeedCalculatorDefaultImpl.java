@@ -8,13 +8,8 @@ import jakarta.inject.Inject;
 import java.util.Objects;
 
 public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCalculator {
-
-	@Inject
-	private BicycleConfigGroup bicycleConfigGroup;
-
-	@Inject
-	private BicycleLinkSpeedCalculatorDefaultImpl() {
-	}
+	@Inject private BicycleConfigGroup bicycleConfigGroup;
+	@Inject private BicycleLinkSpeedCalculatorDefaultImpl() { }
 
 	/**
 	 * for unit testing

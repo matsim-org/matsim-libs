@@ -43,33 +43,22 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
 public final class QLanesNetworkFactory implements QNetworkFactory {
-
-	private Lanes laneDefinitions;
-
-	private QNetworkFactory delegate ;
-
+	private final Lanes laneDefinitions;
+	@Inject private DefaultQNetworkFactory delegate ;
 	private FlowEfficiencyCalculator flowEfficiencyCalculator;
-
 	private NetsimEngineContext context;
-
-	private QSimConfigGroup qsimConfig;
-
-	private EventsManager events;
-
-	private Network network;
-
-	private Scenario scenario;
-
+	private final QSimConfigGroup qsimConfig;
+	private final EventsManager events;
+	private final Network network;
+	private final Scenario scenario;
 	private NetsimInternalInterface netsimEngine;
-
-	@Inject
-	public QLanesNetworkFactory( EventsManager events, Scenario scenario ) {
+	@Inject QLanesNetworkFactory( EventsManager events, Scenario scenario ) {
 		this.qsimConfig = scenario.getConfig().qsim();
 		this.events = events ;
 		this.network = scenario.getNetwork() ;
 		this.scenario = scenario ;
 		this.laneDefinitions = scenario.getLanes();
-		this.delegate = new DefaultQNetworkFactory( events, scenario ) ;
+//		this.delegate = new DefaultQNetworkFactory( events, scenario ) ;
 	}
 
 	@Override
@@ -116,9 +105,9 @@ public final class QLanesNetworkFactory implements QNetworkFactory {
 	/**
 	 * Set factory to create QLinks that are not lanes.
 	 */
-	public void setDelegate(QNetworkFactory delegate) {
-		this.delegate = delegate;
-	}
+//	public void setDelegate(QNetworkFactory delegate) {
+//		this.delegate = delegate;
+//	}
 
 	/**
 	 * Flow efficiency calculator to use for lanes.

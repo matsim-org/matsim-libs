@@ -54,58 +54,43 @@ public final class BicycleModule extends AbstractModule {
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
 
-		// TODO: bicycle contrib can not be used with other scoring functions at the moment, as only one can be installed
-		// TODO: scoring should work via a score event so it can be used together with other scoring functions
-
 		switch ( bicycleConfigGroup.getBicycleScoringType() ) {
 			case legBased -> {
-
-//				yyyyyy the status here is that this seems to work.  but because of numerical imprecision the results are _slightly_
-//				different.  This needs to be documented diligently test by test.  kai, dec'22
-				// yyyyyy remember that the 10it test needs to be un-ignored.  kai, dec'22
-
 				this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
 			}
 			case linkBased -> {
+				// yyyy the leg based scoring was moved to score events, so that it does not change the scoring function.  For the
+				// link based scoring, this has not yet been done.  It seems to me that the link based scoring is needed for the
+				// motorized interaction.  However, from a technical point of vew it should be possible to use the score events as
+				// well, since they are computed link-by-link.  That is, optimally the link based scoring would go away completely,
+				// and only motorized interaction would be switched on or off.  kai, jun'23
+
 				bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
 			}
 			default -> throw new IllegalStateException( "Unexpected value: " + bicycleConfigGroup.getBicycleScoringType() );
 		}
 
 		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
+		// this is still needed because the bicycle travel time calculator needs to use the same bicycle speed as the mobsim.  kai, jun'23
 
 		if (bicycleConfigGroup.isMotorizedInteraction()) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
 		}
-		addControlerListenerBinding().to(ConsistencyCheck.class);
 
 		this.installOverridingQSimModule( new AbstractQSimModule(){
-			@Inject EventsManager events;
-			@Inject Scenario scenario;
-			@Inject BicycleLinkSpeedCalculator bicycleLinkSpeedCalculator;
 			@Override protected void configureQSim(){
-				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-				factory.setLinkSpeedCalculator( bicycleLinkSpeedCalculator );
-				bind( QNetworkFactory.class ).toInstance(factory );
-				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring
-				// it in every iteration via the initializeFactory(...) method. kai, mar'16
+				this.addLinkSpeedCalculator().to( BicycleLinkSpeedCalculator.class );
 			}
 		} );
 
-		Multibinder<LinkSpeedCalculator> binder = Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class );
-		binder.addBinding().to(  BicycleLinkSpeedCalculatorDefaultImpl.class );
+		addControlerListenerBinding().to(ConsistencyCheck.class);
 	}
 
 	static class ConsistencyCheck implements StartupListener {
+		@Inject private BicycleConfigGroup bicycleConfigGroup;
+		@Inject private Scenario scenario;
 
-		@Inject
-		private BicycleConfigGroup bicycleConfigGroup;
-
-		@Inject
-		private Scenario scenario;
-
-		@Override
-		public void notifyStartup(StartupEvent event) {
+		@Override public void notifyStartup(StartupEvent event) {
 
 			Id<VehicleType> bicycleVehTypeId = Id.create(bicycleConfigGroup.getBicycleMode(), VehicleType.class);
 			if (scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId) == null) {
