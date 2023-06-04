@@ -20,6 +20,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator;
 
 import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
@@ -35,7 +37,8 @@ import java.util.Collection;
  * @author mrieser / Senozon AG
  */
 public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
-	@Inject private Collection<LinkSpeedCalculator> calculators = new ArrayList<>();
+	private static final Logger log = LogManager.getLogger(DefaultLinkSpeedCalculator.class );
+	private final Collection<LinkSpeedCalculator> calculators = new ArrayList<>();
 
 	@Override public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
 		double speed = Double.NaN;

@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -97,9 +98,11 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 		this.linkBuilder = new QLinkImpl.Builder( context, netsimEngine1 ) ;
 		// it is not possible to construct the builder in the initializeFactory method.  I do not know why.  kai, jun'23
 
+		DefaultLinkSpeedCalculator theCalculator = new DefaultLinkSpeedCalculator();
 		for( LinkSpeedCalculator calculator : calculators ){
-			this.linkBuilder.setLinkSpeedCalculator( calculator );
+			theCalculator.addLinkSpeedCalculator( calculator );
 		}
+		this.linkBuilder.setLinkSpeedCalculator( theCalculator );
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override public QNodeI createNetsimNode( final Node node ) {

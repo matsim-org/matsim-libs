@@ -1,14 +1,22 @@
 package org.matsim.contrib.bicycle;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.Vehicle;
 
 import jakarta.inject.Inject;
+import org.matsim.vehicles.VehicleType;
+
 import java.util.Objects;
 
 public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCalculator {
+	private static final Logger log = LogManager.getLogger(BicycleLinkSpeedCalculatorDefaultImpl.class );
 	@Inject private BicycleConfigGroup bicycleConfigGroup;
+	@Inject private QSimConfigGroup qSimConfigGroup;
 	@Inject private BicycleLinkSpeedCalculatorDefaultImpl() { }
 	/**
 	 * for unit testing
@@ -19,7 +27,6 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 
 	@Override
 	public double getMaximumVelocity(QVehicle qVehicle, Link link, double time) {
-
 		if (isBike(qVehicle)){
 			return getMaximumVelocityForLink( link, qVehicle.getVehicle() );
 		} else{
@@ -134,6 +141,21 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 	}
 
 	private boolean isBike(QVehicle qVehicle) {
-		return qVehicle.getVehicle().getType().getId().toString().equals(bicycleConfigGroup.getBicycleMode());
+//		return qVehicle.getVehicle().getType().getId().toString().equals(bicycleConfigGroup.getBicycleMode());
+
+		// the above is what I found.  With mode vehicles, the vehicle ID is indeed abused for the model.  But we should not rely on this.
+		// Unfortunately, backwards compatibility may now fail ... I have seen mode vehicles different from car but having car as network
+		// mode.  kai, jun'23
+
+		final VehicleType vehicleType = qVehicle.getVehicle().getType();
+
+		if ( qSimConfigGroup.getVehiclesSource()== QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData ) {
+			if ( !vehicleType.getId().toString().equals( vehicleType.getNetworkMode() ) ) {
+				throw new RuntimeException( "You are using mode vehicles but the network mode of the vehicle type is wrong: vehType.id=" + vehicleType.getId()
+									    + "; vehType.mode=" + vehicleType.getNetworkMode() );
+			}
+		}
+
+		return vehicleType.getNetworkMode().equals(bicycleConfigGroup.getBicycleMode() );
 	}
 }

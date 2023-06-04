@@ -1,15 +1,23 @@
 package org.matsim.contrib.bicycle;
 
+import jakarta.validation.groups.Default;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -39,10 +47,19 @@ public class BicycleLinkSpeedCalculatorTest {
         type.setMaximumVelocity(link.getFreespeed() / 2); // less than the link's freespeed
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
         BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        {
+            double speed = calculator.getMaximumVelocity( vehicle, link, 1 );
+            assertTrue( Double.isNaN( speed ) );
+        }
+        {
+            var abc = new DefaultLinkSpeedCalculator();
+            abc.addLinkSpeedCalculator( calculator );
 
-        double speed = calculator.getMaximumVelocity(vehicle, link, 1);
+            var speed = abc.getMaximumVelocity( vehicle, link, 1 );
 
-        assertEquals(type.getMaximumVelocity(), speed, 0.0);
+            assertEquals( type.getMaximumVelocity(), speed, 0.0 );
+        }
+
     }
 
     @Test
@@ -52,10 +69,19 @@ public class BicycleLinkSpeedCalculatorTest {
         type.setMaximumVelocity(link.getFreespeed() * 10); // more than the link's freespeed
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
         BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        {
+            double speed = calculator.getMaximumVelocity( vehicle, link, 1 );
+            assertTrue( Double.isNaN( speed ) );
+        }
+        {
+            var abc = new DefaultLinkSpeedCalculator();
+            abc.addLinkSpeedCalculator( calculator );
 
-        double speed = calculator.getMaximumVelocity(vehicle, link, 1);
+            var speed = abc.getMaximumVelocity( vehicle, link, 1 );
 
-        assertEquals(link.getFreespeed(), speed, 0.0);
+            assertEquals( link.getFreespeed(1), speed, 0.0 );
+        }
+
     }
 
     private static Vehicle createVehicle(double maxVelocity, long id) {

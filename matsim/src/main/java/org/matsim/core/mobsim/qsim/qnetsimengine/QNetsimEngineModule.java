@@ -37,6 +37,7 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 		if ( this.getConfig().qsim().isUseLanes() ) {
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
 			bind( DefaultQNetworkFactory.class );
+			// (need this here because QLanesNetworkFactory uses it as a delegate.  maybe some other design would be better?  kai, jun'23)
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
 		}
