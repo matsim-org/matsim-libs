@@ -183,7 +183,7 @@ public class FixedCostsTest  {
 	@Test
 	public final void test_carrier1CostsAreCorrectly() {
 
-		Assert.assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
 	/*
@@ -191,7 +191,7 @@ public class FixedCostsTest  {
 	 */
 	@Test
 	public final void test_carrier2CostsAreCorrectly() {
-		Assert.assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
 	/*
@@ -200,7 +200,7 @@ public class FixedCostsTest  {
 	*/
 	@Test
 	public final void test_carrier3CostsAreCorrectly() {
-		Assert.assertEquals(-18.36, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier3", Carrier.class)).getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(-18.36, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier3", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
 	private static CarrierService createMatsimService(String id, String to, int size) {
