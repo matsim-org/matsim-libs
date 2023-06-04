@@ -25,6 +25,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -34,7 +35,7 @@ import java.util.Collection;
  * @author mrieser / Senozon AG
  */
 public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
-	@Inject private Collection<VehicleSpeedCalculator> calculators;
+	@Inject private Collection<VehicleSpeedCalculator> calculators = new ArrayList<>();
 
 	@Override
 	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
