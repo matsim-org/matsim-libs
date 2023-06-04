@@ -37,8 +37,8 @@ public class QNetsimEngineModule extends AbstractQSimModule {
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
 		}
-		
-		addNamedComponent(VehicularDepartureHandler.class, COMPONENT_NAME);
-		addNamedComponent(QNetsimEngineI.class, COMPONENT_NAME);
+
+		addQSimComponentBinding( COMPONENT_NAME ).to( VehicularDepartureHandler.class );
+		addQSimComponentBinding( COMPONENT_NAME ).to( QNetsimEngineI.class );
 	}
 }
