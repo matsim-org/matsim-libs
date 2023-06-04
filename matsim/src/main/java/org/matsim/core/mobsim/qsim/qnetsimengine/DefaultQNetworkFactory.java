@@ -66,13 +66,11 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 	// (vis needs network and may need population attributes and config; in consequence, makes sense to have scenario here. kai, apr'16)
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine ;
-	@Inject
-	DefaultQNetworkFactory( EventsManager events, Scenario scenario ) {
+	@Inject DefaultQNetworkFactory( EventsManager events, Scenario scenario ) {
 		this.events = events;
 		this.scenario = scenario;
 	}
-	@Override
-	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
+	@Override public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1;
 		double effectiveCellSize = scenario.getNetwork().getEffectiveCellSize() ;
 
@@ -85,13 +83,11 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(),
 				mobsimTimer, linkWidthCalculator );
 	}
-	@Override
-	public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
+	@Override public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
 		return linkBuilder.build(link, toQueueNode) ;
 	}
-	@Override
-	public QNodeI createNetsimNode( final Node node ) {
+	@Override public QNodeI createNetsimNode( final Node node ) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, scenario.getConfig().qsim() ) ;
 		return builder.build( node ) ;
 	}

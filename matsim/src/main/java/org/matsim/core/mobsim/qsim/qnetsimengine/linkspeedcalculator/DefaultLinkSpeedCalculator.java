@@ -35,12 +35,11 @@ import java.util.Collection;
  * @author mrieser / Senozon AG
  */
 public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
-	@Inject private Collection<VehicleSpeedCalculator> calculators = new ArrayList<>();
+	@Inject private Collection<LinkSpeedCalculator> calculators = new ArrayList<>();
 
-	@Override
-	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
+	@Override public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
 		double speed = Double.NaN;
-		for ( VehicleSpeedCalculator calculator : calculators ) {
+		for ( LinkSpeedCalculator calculator : calculators ) {
 			double tmp = calculator.getMaximumVelocity( vehicle, link, time ) ;
 			if ( !Double.isNaN( tmp ) ) {
 				if ( Double.isNaN( speed ) ){
@@ -58,8 +57,9 @@ public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
 		}
 	}
 
-	interface VehicleSpeedCalculator extends LinkSpeedCalculator {
-
+	public final DefaultLinkSpeedCalculator addLinkSpeedCalculator( LinkSpeedCalculator linkSpeedCalculator ){
+		this.calculators.add( linkSpeedCalculator );
+		return this;
 	}
-	
+
 }
