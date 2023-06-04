@@ -7,10 +7,9 @@ import org.matsim.vehicles.Vehicle;
 import jakarta.inject.Inject;
 import java.util.Objects;
 
-public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCalculator {
+public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCalculator {
 	@Inject private BicycleConfigGroup bicycleConfigGroup;
 	@Inject private BicycleLinkSpeedCalculatorDefaultImpl() { }
-
 	/**
 	 * for unit testing
 	 */
@@ -21,10 +20,14 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 	@Override
 	public double getMaximumVelocity(QVehicle qVehicle, Link link, double time) {
 
-		if (isBike(qVehicle))
-			return getMaximumVelocityForLink(link, qVehicle.getVehicle());
-		else
-			return getDefaultMaximumVelocity(qVehicle, link, time);
+		if (isBike(qVehicle)){
+			return getMaximumVelocityForLink( link, qVehicle.getVehicle() );
+		} else{
+			return Double.NaN;
+			// (this now works because the link speed calculator returns the default for all combinations of (vehicle, link, time) that
+			// are not answered by a specialized link speed calculator.  kai, jun'23)
+		}
+
 	}
 	@Override
 	public double getMaximumVelocityForLink(Link link, Vehicle vehicle) {
@@ -38,9 +41,9 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 		return Math.min(speed, link.getFreespeed());
 	}
 
-	private double getDefaultMaximumVelocity(QVehicle qVehicle, Link link, double time) {
-		return Math.min(qVehicle.getMaximumVelocity(), link.getFreespeed(time));
-	}
+//	private double getDefaultMaximumVelocity(QVehicle qVehicle, Link link, double time) {
+//		return Math.min(qVehicle.getMaximumVelocity(), link.getFreespeed(time));
+//	}
 
 	/**
 	 * Based on "Flügel et al. -- Empirical speed models for cycling in the Oslo road network" (not yet published!)
