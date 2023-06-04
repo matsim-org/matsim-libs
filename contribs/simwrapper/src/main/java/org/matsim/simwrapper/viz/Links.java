@@ -65,7 +65,7 @@ public class Links extends Viz {
 			@JsonProperty(required = true)
 			public String columnName;
 
-			public int scaleFactor;
+			public Integer scaleFactor;
 
 		}
 
