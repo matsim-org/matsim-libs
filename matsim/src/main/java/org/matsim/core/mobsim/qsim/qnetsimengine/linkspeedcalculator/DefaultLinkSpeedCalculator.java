@@ -19,8 +19,13 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.Collection;
 
 /**
  * A simple link speed calculator taking the vehicle's max speed and the link's
@@ -29,10 +34,31 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
  * @author mrieser / Senozon AG
  */
 public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
+	@Inject private Collection<VehicleSpeedCalculator> calculators;
 
 	@Override
 	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
-		return Math.min(vehicle.getMaximumVelocity(), link.getFreespeed(time));
+		double speed = Double.NaN;
+		for ( VehicleSpeedCalculator calculator : calculators ) {
+			double tmp = calculator.getMaximumVelocity( vehicle, link, time ) ;
+			if ( !Double.isNaN( tmp ) ) {
+				if ( Double.isNaN( speed ) ){
+					speed = tmp;
+				} else {
+					throw new RuntimeException( "two vehicle speed calculators feel responsible for vehicle; don't know what to do." );
+					// would be possible to have the calculators sorted, i.e. as List, but don't see how this could be configured in an easy way.  kai, jun'23
+				}
+			}
+		}
+		if ( !Double.isNaN( speed ) ) {
+			return speed;
+		} else{
+			return Math.min( vehicle.getMaximumVelocity(), link.getFreespeed( time ) );
+		}
+	}
+
+	interface VehicleSpeedCalculator extends LinkSpeedCalculator {
+
 	}
 	
 }
