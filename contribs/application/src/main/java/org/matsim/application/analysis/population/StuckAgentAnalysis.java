@@ -36,8 +36,8 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 	private final Object2IntMap<String> stuckAgentsPerMode = new Object2IntOpenHashMap<>();
 	private final Map<String, Int2DoubleMap> stuckAgentsPerHour = new HashMap<>();
 	private final Map<String, Object2DoubleOpenHashMap<String>> stuckAgentsPerLink = new HashMap<>();
-	private final Object2DoubleOpenHashMap<String> allStuckedLinks = new Object2DoubleOpenHashMap<>();
-	private final List<String> allAgents = new ArrayList<>();
+	private final Object2DoubleOpenHashMap<String> allStuckLinks = new Object2DoubleOpenHashMap<>();
+	private final Set<String> allAgents = new HashSet<>();
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(StuckAgentAnalysis.class);
 	@CommandLine.Mixin
@@ -63,7 +63,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		// Total stats
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents.csv").toString()), CSVFormat.DEFAULT)) {
 			printer.printRecord("Total mobile Agents", "Stuck Agents", "Proportion of stuck agents");
-			printer.printRecord(allAgents.size(), allStuckedLinks.keySet().size(), new DecimalFormat("#.0#").format(((Math.round((100.0 / allAgents.size() * allStuckedLinks.keySet().size()) * 100)) / 100.0)) + '%');
+			printer.printRecord(allAgents.size(), allStuckLinks.keySet().size(), new DecimalFormat("#.0#").format(((Math.round((100.0 / allAgents.size() * allStuckLinks.keySet().size()) * 100)) / 100.0)) + '%');
 		} catch (IOException ex) {
 			log.error(ex);
 		}
@@ -92,8 +92,8 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents_per_link.csv").toString()), CSVFormat.DEFAULT)) {
 
 			// Sort Map
-			List<String> sorted = new ArrayList<>(allStuckedLinks.keySet());
-			sorted.sort((o1, o2) -> -Double.compare(allStuckedLinks.getDouble(o1), allStuckedLinks.getDouble(o2)));
+			List<String> sorted = new ArrayList<>(allStuckLinks.keySet());
+			sorted.sort((o1, o2) -> -Double.compare(allStuckLinks.getDouble(o1), allStuckLinks.getDouble(o2)));
 			List<String> header = new ArrayList<>(stuckAgentsPerLink.keySet());
 			header.add(0, "link");
 			header.add(1, "# Agents");
@@ -170,12 +170,12 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		Object2DoubleMap<String> perLink = stuckAgentsPerLink.computeIfAbsent(event.getLegMode(), (k) -> new Object2DoubleOpenHashMap<>());
 
 		Id<Link> link = Objects.requireNonNullElseGet(event.getLinkId(), () -> Id.createLinkId("unknown"));
-		allStuckedLinks.merge(link.toString(), 1., Double::sum);
+		allStuckLinks.merge(link.toString(), 1., Double::sum);
 		perLink.mergeDouble(link.toString(), 1, Double::sum);
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (!allAgents.contains(event.getPersonId().toString())) allAgents.add(event.getPersonId().toString());
+		allAgents.add(event.getPersonId().toString());
 	}
 }
