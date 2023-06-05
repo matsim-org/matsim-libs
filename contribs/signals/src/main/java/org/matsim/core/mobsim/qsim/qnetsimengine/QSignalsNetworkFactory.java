@@ -55,8 +55,15 @@ public final class QSignalsNetworkFactory implements QNetworkFactory{
 		this.events = events;
 		if (scenario.getConfig().qsim().isUseLanes()) {
 			delegate = new QLanesNetworkFactory(events, scenario, new DefaultQNetworkFactory( events, scenario ) );
+			// this is a cheap shortcut, since we are in the same package.  Otherwise, one would need, in SignalsModule, something like
+			// bind( DefaultQNetworkFactory.class );
+			// bind( QLanesNetworkFactory.class );
+			// and then get it into the present class by injection.  kai, jun'23
 		} else {
 			delegate = new DefaultQNetworkFactory(events, scenario);
+			// this is a cheap shortcut, since we are in the same package.  Otherwise, one would need, in SignalsModule, something like
+			// bind( DefaultQNetworkFactory.class );
+			// and then get it into the present class by injection.  kai, jun'23
 		}
 	}
 	
