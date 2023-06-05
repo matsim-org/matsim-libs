@@ -30,8 +30,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 /*package-private*/ class EqualDistributionOfShipmentsStrategyFactory {
 
@@ -41,40 +40,59 @@ import java.util.Collection;
 	/*package-private*/ GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
 		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
 
-		GenericPlanStrategyModule<LSPPlan> tomorrowModule = new GenericPlanStrategyModule<>() {
+		GenericPlanStrategyModule<LSPPlan> equalModule = new GenericPlanStrategyModule<>() {
+
+			Integer shipmentCountBefore = 0;
+			Integer shipmentCountAfter = 0;
 
 			@Override
 			public void prepareReplanning(ReplanningContext replanningContext) {
-				// TODO Auto-generated method stub
-				// Todo  durchzählen vorher
 			}
 
 			@Override
-			public void handlePlan(LSPPlan plan) {
-//				LSP lsp = assigner.getLSP();
-				LSP lsp = plan.getLSP();
-				var bisherigeShipments = new ArrayList<>();
-				for (LogisticChain logisticChain : plan.getLogisticChains()) {
-					bisherigeShipments.add(logisticChain.getShipmentIds());
+			public void handlePlan(LSPPlan lspPlan) {
+
+				//Ggf. könnte man hier auch den  ConsecutiveAssigner einklinken, der das Gleiche macht
+
+				LSP lsp = lspPlan.getLSP();
+				Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
+
+//				LSPPlan initialPlan = lsp.getPlans().get(0);
+//				for (LogisticChain logisticChain : initialPlan.getLogisticChains()) {
+//					shipmentCountBefore += logisticChain.getShipmentIds().size();
+//				}
+
+				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+					shipmentCountBefore += logisticChain.getShipmentIds().size();
+					// ist der folgende Schritt nötig, da der bestehende Plan kopiert wird?
 					logisticChain.getShipmentIds().clear();
 				}
-				Collection<LSPShipment> shipments = lsp.getShipments();
-				for (LSPShipment shipment : shipments) {
-					//Weise es den Ketten zu
+
+				for (LSPShipment shipment : lsp.getShipments()) {
+					if (shipmentCountByChain.isEmpty()) {
+						for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+							shipmentCountByChain.put(chain, 0);
+						}
+					}
+					LogisticChain minChain = Collections.min(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue()).getKey();
+					minChain.assignShipment(shipment);
+					shipmentCountByChain.merge(minChain, 1, Integer::sum);
+				}
+
+				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+					shipmentCountAfter += logisticChain.getShipmentIds().size();
 				}
 			}
 
 			@Override
 			public void finishReplanning() {
-				// TODO Auto-generated method stub
-				if (nuBefore != nuAfter) {
-					throw new RuntimeException("Mist!");
-				}
-
+//				if (!Objects.equals(shipmentCountBefore, shipmentCountAfter)) {
+//					throw new RuntimeException("Shipments lost in replanning process");
+//				}
 			}
 		};
 
-		strategy.addStrategyModule(tomorrowModule);
+		strategy.addStrategyModule(equalModule);
 		return strategy;
 	}
 
