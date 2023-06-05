@@ -5,11 +5,15 @@ import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Line;
+import org.matsim.simwrapper.viz.Plotly;
+import org.matsim.simwrapper.viz.Table;
+import tech.tablesaw.plotly.components.Axis;
+import tech.tablesaw.plotly.traces.BarTrace;
+import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.util.ArrayList;
 
 public class TravelTimeDashboard implements Dashboard {
-
 
 	private final int startTime;
 	private final int maxTime;
@@ -34,17 +38,34 @@ public class TravelTimeDashboard implements Dashboard {
 		header.title = "Travel times and congestion";
 		header.description = "Analysis of super important stuff";
 
-		layout.row("test_row").el(Line.class, (viz, data) -> {
+		layout.row("index_by_hour").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "Overall network congestion index";
+			viz.title = "Network congestion index";
+
 			viz.description = "by time";
 
-			viz.dataset = data.compute(CongestionAnalysis.class, "network_congestion_total.csv");
+			Plotly.DataSet ds = viz.addDataset(data.compute(CongestionAnalysis.class, "traffic_stats_by_road_type_and_hour.csv"));
 
-			viz.title = "Congestion index";
-			viz.x = "time";
-			viz.columns = new ArrayList<>();
-			viz.columns.add("congestion_index");
-		});
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.yAxis(Axis.builder().title("Index").build())
+					.xAxis(Axis.builder().title("Time in seconds").build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+					.build();
+
+			viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
+					.x("time")
+					.y("congestion_index")
+					.name("road_type", Plotly.ColorScheme.RdYlBu)
+			);
+		})
+				.el(Table.class, ((viz, data) -> {
+
+					viz.title = "Traffic stats per road type";
+
+					viz.dataset = data.compute(CongestionAnalysis.class, "traffic_stats_by_road_type_daily.csv");
+
+					viz.showAllRows = true;
+					viz.enableFilter = false;
+				}));
 	}
 }
