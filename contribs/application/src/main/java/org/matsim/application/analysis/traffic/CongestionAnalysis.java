@@ -1,5 +1,7 @@
 package org.matsim.application.analysis.traffic;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -22,8 +24,7 @@ import tech.tablesaw.api.Table;
 import java.util.Set;
 
 @CommandLine.Command(name = "congestion", description = "Calculates congestion indices and relative traveltimes.")
-@CommandSpec(
-		requires = {"events.xml.gz", "network.xml.gz"},
+@CommandSpec(requireEvents = true, requireNetwork = true,
 		produces = {"network_congestion_total.csv", "network_congestion_by_road_type.csv"}
 )
 public class CongestionAnalysis implements MATSimAppCommand {
@@ -49,11 +50,18 @@ public class CongestionAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--max-time", description = "max daytime for travel time analysis", defaultValue = "86400")
 	private int maxTime;
 
-	@CommandLine.Option(names = "--time-slice", description = "time bin to aggregate travel times and indices", defaultValue = "3600")
+	@CommandLine.Option(names = "--time-slice", description = "time bin to aggregate travel times and indices", defaultValue = "900")
 	private int timeSlice;
+
+	private final Logger logger = LogManager.getLogger(CongestionAnalysis.class);
 
 	@Override
 	public Integer call() throws Exception {
+
+		if(this.timeSlice <= 900){
+			this.timeSlice = 900;
+			logger.info("Set time slice to minimum value of 900");
+		}
 
 		Network network = filterNetwork();
 
@@ -72,7 +80,7 @@ public class CongestionAnalysis implements MATSimAppCommand {
 		Table byRoadType = table.copy().addColumns(StringColumn.create("road_type"));
 
 		for (int i = startTime; i < maxTime; i += timeSlice) {
-			double overallIndex = congestionIndex.getNetworkCongestionIndexByRelativeTravelTime(network, i, null);
+			double overallIndex = congestionIndex.getNetworkCongestionIndex(i, i + timeSlice, null);
 
 			Row row = table.appendRow();
 			row.setDouble("time", i);
@@ -83,13 +91,13 @@ public class CongestionAnalysis implements MATSimAppCommand {
 
 			for (String type : roadTypes) {
 
-				double indexForRoadType = congestionIndex.getNetworkCongestionIndexByRelativeTravelTime(network, i, type);
+				double indexForRoadType = congestionIndex.getNetworkCongestionIndex(i, i + timeSlice, type);
 				detailedRow.setString("road_type", type);
 				detailedRow.setDouble("congestion_index", indexForRoadType);
 			}
 		}
 
-		table.write().csv(output.getPath("network_congestion.csv").toFile());
+		table.write().csv(output.getPath("network_congestion_total.csv").toFile());
 		byRoadType.write().csv(output.getPath("network_congestion_by_road_type.csv").toFile());
 
 		return 0;
@@ -97,16 +105,16 @@ public class CongestionAnalysis implements MATSimAppCommand {
 
 	private Network filterNetwork() {
 
+		Network unfiltered = input.getNetwork();
+		NetworkFilterManager manager = new NetworkFilterManager(unfiltered, new NetworkConfigGroup());
+		manager.addLinkFilter(l -> !l.getId().toString().startsWith("pt_"));
+
 		if (shpOptions.isDefined()) {
-			Network unfiltered = input.getNetwork();
 
 			Geometry geometry = shpOptions.getGeometry();
-
-			NetworkFilterManager manager = new NetworkFilterManager(unfiltered, new NetworkConfigGroup());
 			manager.addLinkFilter(l -> geometry.covers(MGC.coord2Point(l.getCoord())));
+		}
 
-			return manager.applyFilters();
-		} else
-			return input.getNetwork();
+		return manager.applyFilters();
 	}
 }
