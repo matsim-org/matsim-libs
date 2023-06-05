@@ -31,7 +31,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.events.CarrierTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
 
 /*package-private*/  class DistributionTourStartEventHandler implements FreightTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
@@ -58,7 +58,7 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandl
 	}
 
 	@Override
-	public void handleEvent(FreightTourStartEvent event) {
+	public void handleEvent(CarrierTourStartEvent event) {
 		if (event.getTourId().equals(tour.getId())){
 				for (TourElement tourElement : tour.getTourElements()) {
 					if (tourElement instanceof ServiceActivity serviceActivity) {
@@ -71,7 +71,7 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandl
 			}
 	}
 
-	private void logLoad(FreightTourStartEvent event) {
+	private void logLoad(CarrierTourStartEvent event) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getLinkId());
@@ -82,10 +82,10 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandl
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
+		lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
 
-	private void logTransport(FreightTourStartEvent event) {
+	private void logTransport(CarrierTourStartEvent event) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getLinkId());
@@ -96,7 +96,7 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandl
 		ShipmentPlanElement transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().addPlanElement(transportId, transport);
+		lspShipment.getShipmentLog().addPlanElement(transportId, transport);
 	}
 
 

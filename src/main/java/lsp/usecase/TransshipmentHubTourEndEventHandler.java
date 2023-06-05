@@ -37,7 +37,7 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.CarrierTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -98,7 +98,7 @@ import java.util.Map;
 	}
 
 	@Override
-	public void handleEvent(FreightTourEndEvent event) {
+	public void handleEvent(CarrierTourEndEvent event) {
 		Tour tour = null;
 		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
 		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
@@ -150,8 +150,8 @@ import java.util.Map;
 		ShipmentPlanElement handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-			lspShipment.getLog().addPlanElement(loadId, handle);
+		if (!lspShipment.getShipmentLog().getPlanElements().containsKey(loadId)) {
+			lspShipment.getShipmentLog().addPlanElement(loadId, handle);
 		}
 
 	}

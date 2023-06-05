@@ -21,7 +21,7 @@
 
 package lsp;
 
-import com.google.inject.Provider;
+import jakarta.inject.Provider;
 import org.matsim.core.replanning.GenericStrategyManager;
 
 /**

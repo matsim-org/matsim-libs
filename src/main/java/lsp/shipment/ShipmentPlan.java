@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.Id;
 
 import java.util.Map;
 
-public interface ShipmentPlan extends HasBackpointer<LSPShipment> {
+public interface ShipmentPlan extends HasBackpointer<Id<LSPShipment>> {
 
-	LSPShipment getEmbeddingContainer();
+	Id<LSPShipment> getEmbeddingContainer();
 
 	Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements();
 

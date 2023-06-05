@@ -195,7 +195,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				currentShipment = shipmentBuilder.build();
 				currentLsp.getShipments().add(currentShipment);
 			}
-			case PLAN -> {
+			case LSP_PLAN -> {
 				score = Double.valueOf(atts.getValue(SCORE));
 				Gbl.assertNotNull(score);
 				selected = atts.getValue(SELECTED);
@@ -315,7 +315,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			case CAPABILITIES -> currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
 			case ATTRIBUTE -> attributesReader.endTag(name, content, context);
 			case SHIPMENT -> this.currentShipment = null;
-			case PLAN -> {
+			case LSP_PLAN -> {
 				LSPResource resource;
 				List<LogisticChainElement> logisticChainElements = new LinkedList<>();
 
@@ -345,7 +345,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				}
 
 				for (LSPShipment lspShipment : currentLsp.getShipments()) {
-					logisticChain.getShipments().add(lspShipment);
+					logisticChain.getShipmentIds().add(lspShipment.getId());
 				}
 
 				final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();

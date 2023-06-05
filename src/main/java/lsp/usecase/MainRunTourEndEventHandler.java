@@ -32,7 +32,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.CarrierTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -61,7 +61,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 
 
 	@Override
-	public void handleEvent(FreightTourEndEvent event) {
+	public void handleEvent(CarrierTourEndEvent event) {
 		if (event.getTourId().equals(tour.getId())) {
 			for (TourElement tourElement : tour.getTourElements()) {
 				if (tourElement instanceof ServiceActivity serviceActivity) {
@@ -74,7 +74,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		}
 	}
 
-	private void logUnload(FreightTourEndEvent event) {
+	private void logUnload(CarrierTourEndEvent event) {
 		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setStartTime(event.getTime() - getTotalUnloadingTime(tour));
 		builder.setEndTime(event.getTime());
@@ -84,13 +84,13 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		ShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().addPlanElement(unloadId, unload);
+		lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
 	}
 
-	private void logTransport(FreightTourEndEvent event) {
+	private void logTransport(CarrierTourEndEvent event) {
 		String idString = resource.getId() + "" + logisticChainElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
+		ShipmentPlanElement abstractPlanElement = lspShipment.getShipmentLog().getPlanElements().get(id);
 		if (abstractPlanElement instanceof ShipmentLeg transport) {
 			transport.setEndTime(event.getTime() - getTotalUnloadingTime(tour));
 			transport.setToLinkId(event.getLinkId());

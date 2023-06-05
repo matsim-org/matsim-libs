@@ -20,6 +20,7 @@
 
 package lsp;
 
+import lsp.shipment.LSPShipment;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -213,6 +214,21 @@ public final class LSPUtils {
 		public LogisticChainElement build() {
 			return new LogisticChainElementImpl(this);
 		}
+	}
+
+	/**
+	 * Gives back the {@link LSPShipment} object of the {@link LSP}, which matches to the shipmentId
+	 * @param lsp In this LSP this method tries to find the shipment.
+	 * @param shipmentId Id of the shipment that should be found.
+	 * @return the lspShipment object or null, if it is not found.
+	 */
+	public static LSPShipment findLspShipment(LSP lsp, Id<LSPShipment> shipmentId){
+		for (LSPShipment lspShipment : lsp.getShipments()) {
+			if (lspShipment.getId().equals(shipmentId)) {
+				return lspShipment;
+			}
+		}
+		return null;
 	}
 
 }

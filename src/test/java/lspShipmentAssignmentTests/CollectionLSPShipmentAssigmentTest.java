@@ -149,7 +149,7 @@ public class CollectionLSPShipmentAssigmentTest {
 
 		for (LogisticChain solution : solutions) {
 			if (solutions.indexOf(solution) == 0) {
-				assertEquals(10, solution.getShipments().size());
+				assertEquals(10, solution.getShipmentIds().size());
 				for (LogisticChainElement element : solution.getLogisticChainElements()) {
 					if (element.getPreviousElement() == null) {
 						assertTrue(element.getIncomingShipments().getShipments().isEmpty());
@@ -157,7 +157,7 @@ public class CollectionLSPShipmentAssigmentTest {
 					}
 				}
 			} else {
-				assertTrue(solution.getShipments().isEmpty());
+				assertTrue(solution.getShipmentIds().isEmpty());
 			}
 		}
 

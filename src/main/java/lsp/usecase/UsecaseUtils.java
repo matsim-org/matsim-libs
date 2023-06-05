@@ -140,7 +140,7 @@ public class UsecaseUtils {
 			System.out.println(str0);
 			writer.write(str0 + "\n");
 			for (LSPShipment shipment : lsp.getShipments()) {
-				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getLog().getPlanElements().values());
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
 				writeShipmentWithPlanElements(writer, shipment, elementList);
 			}
