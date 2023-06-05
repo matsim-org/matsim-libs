@@ -18,7 +18,7 @@ public class Table extends Viz {
 	/**
 	 * This option could be used to filter columns. This option adds a filter mask to each column. The default setting is false.
 	 */
-	public boolean enableFilter;
+	public Boolean enableFilter;
 
 	/**
 	 * Array of strings. List of column names that should be ignored.

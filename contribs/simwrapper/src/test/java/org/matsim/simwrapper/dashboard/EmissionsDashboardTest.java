@@ -1,6 +1,8 @@
 package org.matsim.simwrapper.dashboard;
 
 import com.google.common.collect.Iterables;
+import org.assertj.core.api.Assertions;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -14,7 +16,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.counts.CountsModule;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
@@ -22,12 +23,14 @@ import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.nio.file.Path;
+
 public class EmissionsDashboardTest {
 
 	private static final String HBEFA_2020_PATH = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
 	private static final String HBEFA_FILE_COLD_DETAILED = HBEFA_2020_PATH + "82t7b02rc0rji2kmsahfwp933u2rfjlkhfpi2u9r20.enc";
 	private static final String HBEFA_FILE_WARM_DETAILED = HBEFA_2020_PATH + "944637571c833ddcf1d0dfcccb59838509f397e6.enc";
-	private static final String HBEFA_FILE_COLD_AVERAGE = HBEFA_2020_PATH + "r9230ru2n209r30u2fn0c9rn20n2rujkhkjhoewt84202.enc" ;
+	private static final String HBEFA_FILE_COLD_AVERAGE = HBEFA_2020_PATH + "r9230ru2n209r30u2fn0c9rn20n2rujkhkjhoewt84202.enc";
 	private static final String HBEFA_FILE_WARM_AVERAGE = HBEFA_2020_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
 
 	@Rule
@@ -35,6 +38,11 @@ public class EmissionsDashboardTest {
 
 	@Test
 	public void generate() {
+
+		// This test can only run if the password is set
+		Assume.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "emissions");
 
 		Config config = TestScenario.loadConfig(utils);
 
@@ -58,8 +66,11 @@ public class EmissionsDashboardTest {
 		prepareVehicleTypes(scenario);
 		prepareHbefaNetwork(scenario);
 
-		controler.addOverridingModule(new CountsModule());
 		controler.run();
+
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**emissions_total.csv")
+			.isDirectoryContaining("glob:**emissions_grid_per_day.xyt.csv");
 
 	}
 
