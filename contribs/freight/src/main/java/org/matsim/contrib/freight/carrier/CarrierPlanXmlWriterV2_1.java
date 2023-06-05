@@ -282,7 +282,8 @@ import java.util.*;
 								createTuple("shipmentId", act.getShipment().getId().toString())), true
 						);
 						if (!carrier.getShipments().containsKey(act.getShipment().getId())) {
-							logger.warn("shipment with id " + act.getShipment().getId().toString() + " not contained in carrier with carrierId: " + carrier.getId());
+							logger.error("Shipment with id " + act.getShipment().getId().toString() + " is contained in the carriers plan, " +
+								"but not available the list of shipments. Carrier with carrierId: " + carrier.getId());
 						}
 					}
 					else if (tourElement instanceof ServiceActivity act) {
@@ -291,7 +292,8 @@ import java.util.*;
 								createTuple("serviceId", act.getService().getId().toString())), true
 						);
 						if (!carrier.getServices().containsKey(act.getService().getId())) {
-							logger.warn("service with id " + act.getService().getId().toString() + " not contained in carrier with carrierId: " + carrier.getId());
+							logger.error("service with id " + act.getService().getId().toString() + " is contained in the carriers plan, " +
+								"but not available the list of services. Carrier with carrierId: " + carrier.getId());
 						}
 					}
 				}
