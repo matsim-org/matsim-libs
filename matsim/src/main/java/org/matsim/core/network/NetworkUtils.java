@@ -667,8 +667,9 @@ public final class NetworkUtils {
 
 	/**
 	 * Returns the road type of a highway link. In OSM highway links contain links for car traffic.
-	 * */
-	public static String getHighwayType(Link link){
+	 * If not set this method will return "unclassified".
+	 */
+	public static String getHighwayType(Link link) {
 
 		String type = (String) link.getAttributes().getAttribute(TYPE);
 
@@ -679,6 +680,20 @@ public final class NetworkUtils {
 			type = "unclassified";
 
 		return type;
+	}
+
+	/**
+	 * Return the allowed speed attribute if set, otherwise freeflow speed.
+	 */
+	public static double getAllowedSpeed(Link link) {
+
+		Object speed = link.getAttributes().getAttribute(ALLOWED_SPEED);
+		if (speed == null)
+			return link.getFreespeed();
+
+		if (speed instanceof Double s)
+			return s;
+		return Double.parseDouble(speed.toString());
 	}
 
 	public static String getOrigId( Link link ) {

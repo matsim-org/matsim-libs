@@ -93,15 +93,18 @@ public class DashboardTests {
 
 
 	}
-	public void emissions() {
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+	@Test
+	public void traffic() {
 
-		run(new EmissionsDashboard());
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
+
+		run(new TrafficDashboard());
+
 		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**amount_per_age_group.csv")
-				.isDirectoryContaining("glob:**amount_per_sex_group.csv")
-				.isDirectoryContaining("glob:**total_agents.csv");
+				.isDirectoryContaining("glob:**traffic_stats_by_link_daily.csv")
+				.isDirectoryContaining("glob:**traffic_stats_by_road_type_and_hour.csv")
+				.isDirectoryContaining("glob:**traffic_stats_by_road_type_daily.csv");
 
 
 	}

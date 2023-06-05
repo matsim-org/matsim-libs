@@ -4,8 +4,6 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.ints.Int2DoubleArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
@@ -23,7 +21,7 @@ import java.util.regex.Pattern;
  * Class to calculate the traffic congestion index based on the paper
  * "A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index" by by Feifei He, Xuedong Yan*, Yang Liu, Lu Ma.
  */
-public class CongestionIndex {
+public final class TrafficStatsCalculator {
 
 	private final Network network;
 	private final TravelTime travelTime;
@@ -32,7 +30,7 @@ public class CongestionIndex {
 
 	private final IdMap<Link, Int2DoubleMap> perLink = new IdMap(Link.class);
 
-	public CongestionIndex(Network network, TravelTime travelTime) {
+	public TrafficStatsCalculator(Network network, TravelTime travelTime) {
 		this.network = network;
 		this.travelTime = travelTime;
 
@@ -47,7 +45,7 @@ public class CongestionIndex {
 
 		double length = link.getLength();
 
-		double allowedSpeed = Double.parseDouble(link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED).toString());
+		double allowedSpeed = NetworkUtils.getAllowedSpeed(link);
 
 		double actualTravelTime = travelTime.getLinkTravelTime(link, time, null, null);
 
@@ -136,9 +134,5 @@ public class CongestionIndex {
 		double avgSpeed = list.doubleStream().average().orElse(-1);
 
 		return new BigDecimal(avgSpeed).setScale(2, RoundingMode.HALF_UP).doubleValue();
-	}
-
-	public IdMap<Link, Int2DoubleMap> getPerLink() {
-		return perLink;
 	}
 }

@@ -1,10 +1,7 @@
 package org.matsim.simwrapper;
 
 import org.matsim.core.config.Config;
-import org.matsim.simwrapper.dashboard.OverviewDashboard;
-import org.matsim.simwrapper.dashboard.TrafficCountsDashboard;
-import org.matsim.simwrapper.dashboard.StuckAgentDashboard;
-import org.matsim.simwrapper.dashboard.TripDashboard;
+import org.matsim.simwrapper.dashboard.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +15,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 		List<Dashboard> result = new ArrayList<>(List.of(
 			new OverviewDashboard(),
 			new TripDashboard(),
+			new TrafficDashboard(),
 			new StuckAgentDashboard()
 		));
 

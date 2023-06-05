@@ -115,13 +115,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			String name = entry.getValue().getCsLabel();
 
 			Link link = links.get(key);
-			String type = NetworkUtils.getType(link);
-
-			if (type != null)
-				type = type.replaceFirst("^highway\\.", "");
-
-			if (type == null || type.isBlank())
-				type = "unclassified";
+			String type = NetworkUtils.getHighwayType(link);
 
 			if (countVolume.isEmpty())
 				continue;
