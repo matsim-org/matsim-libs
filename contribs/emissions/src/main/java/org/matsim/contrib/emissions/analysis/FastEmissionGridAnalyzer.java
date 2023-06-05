@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -118,6 +119,32 @@ public abstract class FastEmissionGridAnalyzer {
 				return Tuple.of(entry.getKey(), processLinkEmissions(entry.getValue(), network, cellSize, radius));
 			})
 			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+	}
+
+	/**
+	 * Processes emissions that have been read by the {@link EmissionsOnLinkEventHandler}.
+	 */
+	public static Map<Double, Map<Pollutant, Raster>> processHandlerEmissionsPerTimeBin(TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBinMap, Network network, double cellSize, int radius) {
+
+		Map<Pollutant, TObjectDoubleHashMap<Id<Link>>> linkEmissionsByPollutant = new HashMap<>();
+
+		// TODO
+//
+//		// Transpose the map
+//		for (Map.Entry<Id<Link>, Map<Pollutant, Double>> perLink : link2pollutants.entrySet()) {
+//			for (Map.Entry<Pollutant, Double> e : perLink.getValue().entrySet()) {
+//				var linkMap = linkEmissionsByPollutant.computeIfAbsent(e.getKey(), key -> new TObjectDoubleHashMap<>());
+//				linkMap.put(perLink.getKey(), e.getValue());
+//			}
+//		}
+//
+//		return linkEmissionsByPollutant.entrySet().stream()
+//			.map(entry -> {
+//				logger.info("Smoothing of: " + entry.getKey());
+//				return Tuple.of(entry.getKey(), processLinkEmissions(entry.getValue(), network, cellSize, radius));
+//			})
+//			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+		return null;
 	}
 
     /**
