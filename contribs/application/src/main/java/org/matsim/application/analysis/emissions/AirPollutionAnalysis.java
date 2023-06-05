@@ -1,5 +1,6 @@
 package org.matsim.application.analysis.emissions;
 
+import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -14,12 +15,14 @@ import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
+import org.matsim.application.options.SampleOptions;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.*;
+import org.matsim.contrib.emissions.analysis.EmissionsByPollutant;
 import org.matsim.contrib.emissions.analysis.EmissionsOnLinkEventHandler;
 import org.matsim.contrib.emissions.analysis.FastEmissionGridAnalyzer;
 import org.matsim.contrib.emissions.analysis.Raster;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -45,7 +48,7 @@ import java.util.Set;
 	mixinStandardHelpOptions = true, showDefaultValues = true
 )
 @CommandSpec(requireRunDirectory = true,
-	produces = {"emissions_footprint_csv", "emissions_grid_per_day.xyt.csv", "emissions_per_link.csv", "emissions_per_link_per_m.csv", "emissions_vehicle_info.csv"}
+	produces = {"emissions_footprint_csv", "emissions_grid_per_day.xyt.csv", "emissions_per_link.csv", "emissions_per_link_per_m.csv", "emissions_vehicle_info.csv", "emissions_stats.csv"}
 )
 public class AirPollutionAnalysis implements MATSimAppCommand {
 
@@ -57,7 +60,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 	private final OutputOptions output = OutputOptions.ofCommand(AirPollutionAnalysis.class);
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
-
+	@CommandLine.Mixin
+	private SampleOptions sample;
 	@CommandLine.Option(names = "--grid-size", description = "Grid size in meter", defaultValue = "100")
 	private double gridSize;
 
@@ -112,7 +116,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		writeOutput(filteredNetwork, emissionsEventHandler);
 
-		writeRaster(filteredNetwork, emissionsEventHandler);
+		writeRaster(filteredNetwork, config, emissionsEventHandler);
 
 		return 0;
 	}
@@ -143,8 +147,14 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		nf.setMaximumFractionDigits(4);
 		nf.setGroupingUsed(false);
 
+		Map<Pollutant, Double> statsValues = new Object2DoubleArrayMap<>();
+		statsValues.put(Pollutant.CO2e, 0.);
+
 		CSVPrinter absolute = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_link.csv")), CSVFormat.DEFAULT);
 		CSVPrinter perMeter = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_link_per_m.csv")), CSVFormat.DEFAULT);
+		CSVPrinter stats = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_stats.csv")), CSVFormat.DEFAULT);
+
+		stats.print("Total CO2e");
 
 		absolute.print("linkId");
 		perMeter.print("linkId");
@@ -169,6 +179,11 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 			perMeter.print(linkId);
 
 			for (Pollutant pollutant : Pollutant.values()) {
+
+				if (pollutant == Pollutant.CO2e) {
+					statsValues.put(Pollutant.CO2e, statsValues.get(Pollutant.CO2e) + link2pollutants.get(linkId).get(pollutant));
+				}
+
 				double emissionValue = 0.;
 				if (link2pollutants.get(linkId).get(pollutant) != null) {
 					emissionValue = link2pollutants.get(linkId).get(pollutant);
@@ -184,34 +199,49 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 			perMeter.println();
 		}
 
+		stats.print(statsValues.get(Pollutant.CO2e));
+		stats.close();
+
 		absolute.close();
 		perMeter.close();
 	}
 
-	private void writeRaster(Network network, EmissionsOnLinkEventHandler emissionsEventHandler) {
+	/**
+	 * Creates the data for the XY-Time plot. The time is fixed and the data is summarized over the run.
+	 * Currently only the CO2_Total Values is printed because Simwrapper can handle only one value.
+	 * @param network
+	 * @param config
+	 * @param emissionsEventHandler
+	 */
+	private void writeRaster(Network network, Config config, EmissionsOnLinkEventHandler emissionsEventHandler) {
 
 
+		FastEmissionGridAnalyzer.processHandlerEmissionsPerTimeBin(emissionsEventHandler.getTimeBins(), network, gridSize, 20);
 		Map<Pollutant, Raster> rasterMap = FastEmissionGridAnalyzer.processHandlerEmissions(emissionsEventHandler.getLink2pollutants(), network, gridSize, 20);
-
-		Set<Pollutant> poll = rasterMap.keySet();
 
 		List<Integer> xLength = rasterMap.values().stream().map(Raster::getXLength).distinct().toList();
 		List<Integer> yLength = rasterMap.values().stream().map(Raster::getYLength).distinct().toList();
 
 		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_grid_per_day.xyt.csv")), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_grid_per_day.xyt.csv")),
+			CSVFormat.DEFAULT.builder().setCommentMarker('#').build())) {
 
-			double time = 0;
+			String crs = ProjectionUtils.getCRS(network);
+			if (crs == null)
+				crs = config.network().getInputCRS();
+			if (crs == null)
+				crs = config.global().getCoordinateSystem();
+
+			// print coordinate system
+			printer.printComment(crs);
 
 			// print header
 			printer.print("time");
 			printer.print("x");
 			printer.print("y");
 
-			for (Pollutant p : poll) {
-				printer.print(p.name());
-			}
+			printer.print("value");
 
 			printer.println();
 
@@ -220,18 +250,15 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 					Coord coord = raster.getCoordForIndex(xi, yi);
 
-					printer.print(time);
+					printer.print(0.0);
 					printer.print(coord.getX());
 					printer.print(coord.getY());
 
-					for (Pollutant p : poll) {
-						double value = rasterMap.get(p).getValueByIndex(xi, yi);
-						printer.print(value);
-					}
+					double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
+					printer.print(value);
 
 					printer.println();
 				}
-				time += 60;
 			}
 
 		} catch (IOException e) {
