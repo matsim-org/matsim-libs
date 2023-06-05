@@ -665,6 +665,22 @@ public final class NetworkUtils {
 		return (String) link.getAttributes().getAttribute(TYPE);
 	}
 
+	/**
+	 * Returns the road type of a highway link. In OSM highway links contain links for car traffic.
+	 * */
+	public static String getHighwayType(Link link){
+
+		String type = (String) link.getAttributes().getAttribute(TYPE);
+
+		if (type != null)
+			type = type.replaceFirst("^highway\\.", "");
+
+		if (type == null || type.isBlank())
+			type = "unclassified";
+
+		return type;
+	}
+
 	public static String getOrigId( Link link ) {
 //		if ( link instanceof LinkImpl ) {
 //			return ((LinkImpl)link).getOrigId2() ;
