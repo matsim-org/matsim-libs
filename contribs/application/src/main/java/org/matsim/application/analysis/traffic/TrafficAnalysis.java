@@ -207,7 +207,9 @@ public class TrafficAnalysis implements MATSimAppCommand {
 
 		Network unfiltered = input.getNetwork();
 		NetworkFilterManager manager = new NetworkFilterManager(unfiltered, new NetworkConfigGroup());
-		manager.addLinkFilter(l -> !l.getId().toString().startsWith("pt_"));
+
+		// Must contain one of the analyzed modes
+		manager.addLinkFilter(l -> l.getAllowedModes().stream().anyMatch(modes::contains));
 
 		if (shpOptions.isDefined()) {
 			Geometry geometry = shpOptions.getGeometry();
