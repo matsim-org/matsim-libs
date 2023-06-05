@@ -8,4 +8,8 @@ public class Utils {
 	public static ConsecutiveLogisticChainShipmentAssigner createConsecutiveLogisticChainShipmentAssigner() {
 		return new ConsecutiveLogisticChainShipmentAssigner();
 	}
+
+	public static PrimaryLogisticChainShipmentAssigner createPrimaryLogisticChainShipmentAssigner() {
+		return new PrimaryLogisticChainShipmentAssigner();
+	}
 }
