@@ -1,6 +1,5 @@
 package org.matsim.contrib.bicycle;
 
-import jakarta.validation.groups.Default;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -15,7 +14,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -31,11 +31,13 @@ public class BicycleLinkSpeedCalculatorTest {
 
     private static final double MAX_BICYCLE_SPEED = 15;
 
-    private final BicycleConfigGroup configGroup = new BicycleConfigGroup();
+    private final Config config = ConfigUtils.createConfig();
+    private BicycleConfigGroup configGroup;
     private final Network unusedNetwork = NetworkUtils.createNetwork();
 
     @Before
     public void before() {
+        configGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
         configGroup.setMaxBicycleSpeedForRouting(MAX_BICYCLE_SPEED);
         configGroup.setBicycleMode("bike");
     }
@@ -46,16 +48,27 @@ public class BicycleLinkSpeedCalculatorTest {
         VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ) );
         type.setMaximumVelocity(link.getFreespeed() / 2); // less than the link's freespeed
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
-        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
         {
             double speed = calculator.getMaximumVelocity( vehicle, link, 1 );
             assertTrue( Double.isNaN( speed ) );
         }
         {
-            var abc = new DefaultLinkSpeedCalculator();
-            abc.addLinkSpeedCalculator( calculator );
+            Scenario scenario = ScenarioUtils.createScenario( config );
+            AbstractModule module = new AbstractModule( config ){
+                @Override public void install(){
 
-            var speed = abc.getMaximumVelocity( vehicle, link, 1 );
+                }
+            };
+            var injector = Injector.createMinimalMatsimInjector( config, scenario, module );
+            var linkSpeedCalculator = injector.getInstance( DefaultLinkSpeedCalculator.class );
+            linkSpeedCalculator.addLinkSpeedCalculator( calculator );
+            // I think that it is not possible to get access to the full link speed calculator including the additions. :-(  kai, jun'23
+
+//            var abc = new DefaultLinkSpeedCalculator();
+//            abc.addLinkSpeedCalculator( calculator );
+
+            var speed = linkSpeedCalculator.getMaximumVelocity( vehicle, link, 1 );
 
             assertEquals( type.getMaximumVelocity(), speed, 0.0 );
         }
@@ -68,16 +81,27 @@ public class BicycleLinkSpeedCalculatorTest {
         VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ) );
         type.setMaximumVelocity(link.getFreespeed() * 10); // more than the link's freespeed
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
-        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
         {
             double speed = calculator.getMaximumVelocity( vehicle, link, 1 );
             assertTrue( Double.isNaN( speed ) );
         }
         {
-            var abc = new DefaultLinkSpeedCalculator();
-            abc.addLinkSpeedCalculator( calculator );
+            Scenario scenario = ScenarioUtils.createScenario( config );
+            AbstractModule module = new AbstractModule( config ){
+                @Override public void install(){
 
-            var speed = abc.getMaximumVelocity( vehicle, link, 1 );
+                }
+            };
+            var injector = Injector.createMinimalMatsimInjector( config, scenario, module );
+            var linkSpeedCalculator = injector.getInstance( DefaultLinkSpeedCalculator.class );
+            linkSpeedCalculator.addLinkSpeedCalculator( calculator );
+            // I think that it is not possible to get access to the full link speed calculator including the additions. :-(  kai, jun'23
+
+//            var abc = new DefaultLinkSpeedCalculator();
+//            abc.addLinkSpeedCalculator( calculator );
+
+            var speed = linkSpeedCalculator.getMaximumVelocity( vehicle, link, 1 );
 
             assertEquals( link.getFreespeed(1), speed, 0.0 );
         }
@@ -87,6 +111,7 @@ public class BicycleLinkSpeedCalculatorTest {
     private static Vehicle createVehicle(double maxVelocity, long id) {
         VehicleType type = VehicleUtils.createVehicleType(Id.create("bike", VehicleType.class));
         type.setMaximumVelocity(maxVelocity);
+        type.setNetworkMode( "bike" );
         return VehicleUtils.createVehicle(Id.createVehicleId(id), type);
     }
 
@@ -95,7 +120,7 @@ public class BicycleLinkSpeedCalculatorTest {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         QVehicle vehicle = new QVehicleImpl(createVehicle(link.getFreespeed() * 0.5, 1)); // higher speed than the default
-        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
 
         double speed = calculator.getMaximumVelocity(vehicle, link, 1);
 
@@ -107,7 +132,7 @@ public class BicycleLinkSpeedCalculatorTest {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         QVehicle vehicle = new QVehicleImpl(createVehicle(link.getFreespeed() * 2, 1));
-        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
 
         double speed = calculator.getMaximumVelocity(vehicle, link, 1);
 
@@ -118,7 +143,7 @@ public class BicycleLinkSpeedCalculatorTest {
     public void getMaximumVelocityForLink_bikeIsNull() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
-        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
 
         double speed = calculator.getMaximumVelocityForLink(link, null);
 
@@ -132,7 +157,7 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkWithGradient = createLink(100, "paved", "not-a-cycle-way", 1.0);
         Vehicle vehicle = createVehicle(linkForComparison.getFreespeed() * 0.5, 1);
 
-		BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+		BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
 
         double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison, vehicle);
         double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithGradient, vehicle);
@@ -147,7 +172,7 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkWithReducedSpeed = createLink(0, "paved", "not-a-cycle-way", 0.5);
         Vehicle vehicle = createVehicle(linkForComparison.getFreespeed() * 0.5, 1);
 
-        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
 
         double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison, vehicle);
         double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithReducedSpeed, vehicle);
@@ -160,7 +185,7 @@ public class BicycleLinkSpeedCalculatorTest {
 
         var link = createLinkWithNoGradientAndNoSpecialSurface();
         var vehicle = createVehicle(link.getFreespeed() + 1, 1);
-        var calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        var calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
 
         var speed = calculator.getMaximumVelocityForLink(link, vehicle);
 
@@ -174,7 +199,7 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkWithCobbleStone = createLink(0, "cobblestone", "not-a-cycle-way", 1.0);
 
         Vehicle vehicle = createVehicle(linkForComparison.getFreespeed(), 1);
-        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
 
         double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison, vehicle);
         double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithCobbleStone, vehicle);
@@ -216,7 +241,7 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkWithCobbleStone = createLink(0, "some-surface", BicycleUtils.CYCLEWAY, 1.0);
         Vehicle vehicle = createVehicle(linkForComparison.getFreespeed(), 1);
 
-        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
 
         double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison, vehicle);
         double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithCobbleStone, vehicle);

@@ -17,13 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.vehicles.Vehicle;
 
@@ -36,9 +37,12 @@ import java.util.Collection;
  * 
  * @author mrieser / Senozon AG
  */
-public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
+public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator{
+	// I have moved this into the qnetsimengine package so that it can be used without injection inside that package.  kai, jun'23
 	private static final Logger log = LogManager.getLogger(DefaultLinkSpeedCalculator.class );
 	private final Collection<LinkSpeedCalculator> calculators = new ArrayList<>();
+
+	@Inject DefaultLinkSpeedCalculator(){} // so it has to be instantiated by injection from outside package.  kai, jun'23
 
 	@Override public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
 		double speed = Double.NaN;

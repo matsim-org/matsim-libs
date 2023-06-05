@@ -20,23 +20,15 @@ package org.matsim.contrib.bicycle;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.multibindings.Multibinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultTurnAcceptanceLogic;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.withinday.mobsim.WithinDayQSimModule;
 
 /**
  * @author smetzler, dziemke
@@ -50,6 +42,12 @@ public final class BicycleModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		// The idea here is the following:
+		// * scores are just added as score events.  no scoring function is replaced.
+
+		// * link speeds are computed via a plugin handler to the DefaultLinkSpeedCalculator.  If the plugin handler returns a speed, it is
+		// used, otherwise the default speed is used. This has the advantage that multiple plugins can register such special link speed calculators.
+
 
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);

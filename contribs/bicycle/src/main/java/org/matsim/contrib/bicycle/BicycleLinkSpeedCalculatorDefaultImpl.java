@@ -3,8 +3,9 @@ package org.matsim.contrib.bicycle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.Vehicle;
 
@@ -21,8 +22,9 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 	/**
 	 * for unit testing
 	 */
-	BicycleLinkSpeedCalculatorDefaultImpl( BicycleConfigGroup configGroup ) {
-		this.bicycleConfigGroup = configGroup;
+	BicycleLinkSpeedCalculatorDefaultImpl( Config config ) {
+		this.bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
+		this.qSimConfigGroup = config.qsim();
 	}
 
 	@Override
