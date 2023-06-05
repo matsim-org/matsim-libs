@@ -82,6 +82,7 @@ import java.util.List;
 				load = 0;
 				Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime), resource.getNetwork());
 				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
+				carrier.getServices().putAll(auxiliaryCarrier.getServices());
 				cumulatedLoadingTime = 0;
 				shipmentsInCurrentTour.clear();
 			}
@@ -94,6 +95,7 @@ import java.util.List;
 		if (!shipmentsInCurrentTour.isEmpty()) {
 			Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime), resource.getNetwork());
 			scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
+			carrier.getServices().putAll(auxiliaryCarrier.getServices());
 			shipmentsInCurrentTour.clear();
 		}
 
