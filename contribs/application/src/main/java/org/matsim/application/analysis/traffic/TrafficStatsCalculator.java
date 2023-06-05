@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 /**
  * Class to calculate the traffic congestion index based on the paper
- * "A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index" by by Feifei He, Xuedong Yan*, Yang Liu, Lu Ma.
+ * "A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index" by Feifei He, Xuedong Yan*, Yang Liu, Lu Ma.
  */
 public final class TrafficStatsCalculator {
 
