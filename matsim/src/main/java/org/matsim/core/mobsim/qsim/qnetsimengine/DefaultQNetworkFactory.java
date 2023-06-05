@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
+import java.util.Collections;
 import java.util.Set;
 
 
@@ -68,7 +69,7 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 	private final Scenario scenario ;
 	private QLinkImpl.Builder linkBuilder;
 	private QNodeImpl.Builder nodeBuilder;
-	@Inject private Set<LinkSpeedCalculator> calculators;
+	@Inject private Set<LinkSpeedCalculator> calculators = Collections.emptySet();
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine1;
 	@Inject DefaultQNetworkFactory( EventsManager events, Scenario scenario ) {
