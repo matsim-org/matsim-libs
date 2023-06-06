@@ -240,7 +240,7 @@ public final class LSPUtils {
 	 */
 	public static ShipmentPlan findLspShipmentPlan(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
 		for (ShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
-			if (shipmentPlan.getShipmentId().equals(shipmentId)) {
+			if (shipmentPlan.getLspShipmentId().equals(shipmentId)) {
 				return shipmentPlan;
 			}
 		}

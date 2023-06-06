@@ -49,7 +49,7 @@ public final class ShipmentUtils {
 	 */
 	public static ShipmentPlan findPlanOfShipment(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
 		for (ShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
-			if (shipmentPlan.getEmbeddingContainer().equals(shipmentId)){
+			if (shipmentPlan.getLspShipmentId().equals(shipmentId)){
 				return  shipmentPlan;
 			}
 		}

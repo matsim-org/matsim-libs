@@ -42,7 +42,7 @@ import java.util.*;
 
 	//TODO: Ist kein embedding container!
 	@Override
-	public Id<LSPShipment> getEmbeddingContainer() {
+	public Id<LSPShipment> getLspShipmentId() {
 		return lspShipmentId;
 	}
 
