@@ -29,6 +29,7 @@ import java.util.Collection;
 /* package-private */ class LSPPlanImpl implements LSPPlan {
 
 	private final Collection<LogisticChain> logisticChains;
+	private final Collection<ShipmentPlan> shipmentPlans;
 	private LSP lsp;
 	private double score;
 	private ShipmentAssigner assigner;
@@ -37,6 +38,7 @@ import java.util.Collection;
 
 	LSPPlanImpl() {
 		this.logisticChains = new ArrayList<>();
+		this.shipmentPlans = new ArrayList<>();
 	}
 
 	@Override
@@ -70,6 +72,11 @@ import java.util.Collection;
 	@Override public LSPPlan addShipmentPlan(ShipmentPlan shipmentPlan) {
 		this.shipmentPlans.add(shipmentPlan);
 		return null;
+	}
+
+	@Override
+	public Collection<ShipmentPlan> getShipmentPlans() {
+		return shipmentPlans;
 	}
 
 	@Override
