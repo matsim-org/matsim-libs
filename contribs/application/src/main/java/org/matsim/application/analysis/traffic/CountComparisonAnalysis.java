@@ -168,15 +168,18 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 
 		dailyTrafficVolume.addColumns(relError, qualityLabel);
 
-		// Sort by quality
-		Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("quality")));
-		dailyTrafficVolume = dailyTrafficVolume.sortOn(cmp.thenComparing(row -> row.getString("link_id")));
 
+		dailyTrafficVolume = dailyTrafficVolume.sortOn("road_type", "link_id");
 		dailyTrafficVolume.write().csv(output.getPath("count_comparison_daily.csv").toFile());
+
+		byHour = byHour.sortOn("name");
 		byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
 
 		Table byQuality = dailyTrafficVolume.summarize("quality", count).by("quality", "road_type");
 		byQuality.column(2).setName("n");
+
+		// Sort by quality
+		Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("quality")));
 
 		byQuality = byQuality.sortOn(cmp.thenComparing(row -> row.getNumber("n")));
 		byQuality.addColumns(byQuality.doubleColumn("n").copy().setName("share"));
