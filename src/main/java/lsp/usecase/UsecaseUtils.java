@@ -99,12 +99,13 @@ public class UsecaseUtils {
 
 	public static void printResults_shipmentPlan(String outputDir, LSP lsp) {
 		System.out.println("Writing out shipmentPlan for LSP");
+		LSPPlan lspPlan = lsp.getSelectedPlan();
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_schedules.tsv")) {
 			final String str0 = "LSP: " + lsp.getId();
 			System.out.println(str0);
 			writer.write(str0 + "\n");
 			for (LSPShipment shipment : lsp.getShipments()) {
-				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
 				writeShipmentWithPlanElements(writer, shipment, elementList);
 			}

@@ -163,12 +163,14 @@ import java.util.Random;
 		//print the schedules for the assigned LSPShipments
 		for (LSPShipment shipment : shipments) {
 			System.out.println("Shipment: " + shipment.getId());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId())
+					.getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
-			for (ShipmentPlanElement element : shipment.getShipmentPlan().getPlanElements().values()) {
+			for (ShipmentPlanElement element : ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId())
+					.getPlanElements().values()) {
 				System.out.println(
 //					"Solution Id: " + element.getSolutionElement().getEmbeddingContainer().getId() +
 						" SolutionElement Id: " + element.getLogisticChainElement().getId()

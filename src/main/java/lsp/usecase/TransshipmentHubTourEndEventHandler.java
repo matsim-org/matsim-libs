@@ -88,7 +88,7 @@ import java.util.Map;
 	public void addShipment(LSPShipment shipment, LogisticChainElement solutionElement) {
 		TransshipmentHubEventHandlerPair pair = new TransshipmentHubEventHandlerPair(shipment, solutionElement);
 
-		for (ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values()) {
+		for (ShipmentPlanElement planElement : ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values()) {
 			if (planElement instanceof ShipmentLeg transport) {
 				if (transport.getLogisticChainElement().getNextElement() == solutionElement) {
 					servicesWaitedFor.put(transport.getCarrierService(), pair);

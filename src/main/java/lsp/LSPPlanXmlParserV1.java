@@ -369,7 +369,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				for (LSPShipment shipment : currentLsp.getShipments()) {
 					if (shipment.getId().toString().equals(shipmentPlanId)) {
 						for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
-							shipment.getShipmentPlan().addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
+							ShipmentUtils.findPlanOfShipment(currentLsp.getSelectedPlan(), shipment.getId()). //Fixme: I thing, that it has to go into the "current" LspPlan .... (instead of the selctedPlan)
+									addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
 						}
 					}
 				}

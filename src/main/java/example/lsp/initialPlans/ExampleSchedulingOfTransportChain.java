@@ -320,7 +320,7 @@ import java.util.Random;
 
 		//print the schedules for the assigned LSPShipments
 		for (LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			System.out.println("Shipment: " + shipment.getId());
 			for (ShipmentPlanElement element : elementList) {

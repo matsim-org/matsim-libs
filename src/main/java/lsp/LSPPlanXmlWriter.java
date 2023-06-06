@@ -22,6 +22,7 @@ package lsp;
 
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import lsp.usecase.TransshipmentHub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -184,9 +185,9 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 				for (Id<LSPShipment> shipmentId : logisticChain.getShipmentIds()) {
 					writer.write("\t\t\t\t\t\t<" + SHIPMENT_PLAN + " " +  SHIPMENT_ID + "=\"" + shipmentId + "\">\n");
 					var shipment = LSPUtils.findLspShipment(lsp, shipmentId);
-					for (var elementId : shipment.getShipmentPlan().getPlanElements().keySet()) {
+					for (var elementId : ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().keySet()) {
 						writer.write("\t\t\t\t\t\t\t<" + ELEMENT + " " + ID + "=\"" + elementId.toString() + "\" ");
-						ShipmentPlanElement element = shipment.getShipmentPlan().getPlanElements().get(elementId);
+						ShipmentPlanElement element = ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().get(elementId);
 						writer.write(TYPE + "=\"" + element.getElementType() + "\" ");
 						writer.write(START_TIME + "=\"" + element.getStartTime() + "\" ");
 						writer.write(END_TIME + "=\"" + element.getEndTime() + "\" ");

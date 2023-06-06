@@ -254,7 +254,7 @@ public class SecondReloadLSPSchedulingTest {
 	public void testSecondReloadLSPScheduling() {
 
 		for (LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			System.out.println();
 			for (ShipmentPlanElement element : elementList) {
@@ -264,8 +264,8 @@ public class SecondReloadLSPSchedulingTest {
 		}
 
 		for (LSPShipment shipment : lsp.getShipments()) {
-			assertEquals(8, shipment.getShipmentPlan().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			assertEquals(8, ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
 			assertEquals("HANDLE", planElements.get(7).getElementType());
@@ -412,7 +412,7 @@ public class SecondReloadLSPSchedulingTest {
 		for (LSPShipment shipment : lsp.getShipments()) {
 			assertEquals(4, shipment.getSimulationTrackers().size());
 			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements());
 			ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());

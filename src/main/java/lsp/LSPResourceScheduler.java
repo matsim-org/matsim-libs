@@ -21,6 +21,7 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -91,13 +92,14 @@ public abstract class LSPResourceScheduler {
 
 
 	public final void switchHandeledShipments(int bufferTime) {
-		for (LspShipmentWithTime shipment : lspShipmentsWithTime) {
-			double endOfTransportTime = shipment.getShipment().getShipmentPlan().getMostRecentEntry().getEndTime() + bufferTime;
-			LspShipmentWithTime outgoingTuple = new LspShipmentWithTime(endOfTransportTime, shipment.getShipment());
+		for (LspShipmentWithTime lspShipmentWithTime : lspShipmentsWithTime) {
+			var shipmentPlan = ShipmentUtils.findPlanOfShipment(lspPlan, lspShipmentWithTime.getShipment().getId());
+			double endOfTransportTime = shipmentPlan.getMostRecentEntry().getEndTime() + bufferTime;
+			LspShipmentWithTime outgoingTuple = new LspShipmentWithTime(endOfTransportTime, lspShipmentWithTime.getShipment());
 			for (LogisticChainElement element : resource.getClientElements()) {
-				if (element.getIncomingShipments().getShipments().contains(shipment)) {
+				if (element.getIncomingShipments().getShipments().contains(lspShipmentWithTime)) {
 					element.getOutgoingShipments().getShipments().add(outgoingTuple);
-					element.getIncomingShipments().getShipments().remove(shipment);
+					element.getIncomingShipments().getShipments().remove(lspShipmentWithTime);
 					if (element.getNextElement() != null) {
 						element.getNextElement().getIncomingShipments().getShipments().add(outgoingTuple);
 						element.getOutgoingShipments().getShipments().remove(outgoingTuple);
