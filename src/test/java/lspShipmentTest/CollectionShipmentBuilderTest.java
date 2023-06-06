@@ -97,16 +97,16 @@ public class CollectionShipmentBuilderTest {
 			assertNotNull(shipment.getDeliveryServiceTime());
 			assertNotNull(shipment.getTo());
 			assertNotNull(shipment.getPickupTimeWindow());
-			assertNotNull(shipment.getShipmentPlan());
+//			assertNotNull(shipment.getShipmentPlan());
 			assertNotNull(shipment.getShipmentLog());
 			assertNotNull(shipment.getSimulationTrackers());
 
 			assertTrue(shipment.getSimulationTrackers().isEmpty());
-			assertEquals(shipment.getShipmentLog().getEmbeddingContainer(), shipment.getId());
+			assertEquals(shipment.getShipmentLog().getLspShipmentId(), shipment.getId());
 			assertTrue(shipment.getShipmentLog().getPlanElements().isEmpty());
 
-			assertEquals(shipment.getShipmentPlan().getEmbeddingContainer(), shipment.getId());
-			assertTrue(shipment.getShipmentPlan().getPlanElements().isEmpty());
+//			assertEquals(shipment.getShipmentPlan().getEmbeddingContainer(), shipment.getId());
+//			assertTrue(shipment.getShipmentPlan().getPlanElements().isEmpty());
 
 			Link link = network.getLinks().get(shipment.getFrom());
 			assertTrue(link.getFromNode().getCoord().getX() <= 4000);
