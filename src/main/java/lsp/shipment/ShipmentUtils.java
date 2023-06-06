@@ -20,8 +20,6 @@
 
 package lsp.shipment;
 
-//import demand.UtilityFunction;
-
 import lsp.LSPPlan;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
@@ -44,9 +42,9 @@ public final class ShipmentUtils {
 	}
 
 	/**
-	 * Gives back the {@link ShipmentPlan} object of the {@link LSPPlan}, which matches to the Id of the {@link LSPShipment}
-	 * @param lspPlan In this plan of the, this method tries to find the shipment.
-	 * @param shipmentId Id of the shipment that should be found.
+	 * Gives back the {@link ShipmentPlan} object of the {@link LSPPlan}, which matches to the id of the {@link LSPShipment}
+	 * @param lspPlan The lspPlan in which this method tries to find the shipmentPlan.
+	 * @param shipmentId Id of the shipment for which the Plan should be found.
 	 * @return the ShipmentPlan object or null, if it is not found.
 	 */
 	public static ShipmentPlan findPlanOfShipment(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
