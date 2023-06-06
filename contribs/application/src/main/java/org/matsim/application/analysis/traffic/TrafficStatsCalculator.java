@@ -114,25 +114,14 @@ public final class TrafficStatsCalculator {
 			sumLinkLength += length;
 		}
 
-		double index = sumOfLinkLengthMultipiesLinkCongestionIndex / sumLinkLength;
-
-		return new BigDecimal(index).setScale(2, RoundingMode.HALF_UP).doubleValue();
+		return sumOfLinkLengthMultipiesLinkCongestionIndex / sumLinkLength;
 	}
 
 	/**
-	 * Calculates the avg speed for a given link and time interval.
+	 * Calculates the avg speed for a given link and time interval in meter per seconds.
 	 * */
-	public double getAvgSpeed(Link link, int startTime, int endTime) {
-
-		DoubleList list = new DoubleArrayList();
-
-		for (int time = startTime; time < endTime; time += timeSlice) {
-			double linkTravelTime = this.travelTime.getLinkTravelTime(link, time, null, null);
-			list.add(linkTravelTime);
-		}
-
-		double avgSpeed = list.doubleStream().average().orElse(-1);
-
-		return new BigDecimal(avgSpeed).setScale(2, RoundingMode.HALF_UP).doubleValue();
+	public double getAvgSpeed(Link link, int time) {
+		double seconds = this.travelTime.getLinkTravelTime(link, time, null, null);
+		return link.getLength() / seconds;
 	}
 }

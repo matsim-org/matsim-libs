@@ -191,7 +191,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 				row.setDouble("congestion_index", calc.getLinkCongestionIndex(link, h * 3600, (h + 1) * 3600));
 
 				// as km/h
-				row.setDouble("avg_speed", calc.getAvgSpeed(link, h * 3600, (h + 1) * 3600) * 3.6);
+				row.setDouble("avg_speed", calc.getAvgSpeed(link, h * 3600) * 3.6);
 
 				row.setDouble("simulated_traffic_volume", vol[h] / sample.getSample());
 
