@@ -103,10 +103,10 @@ import java.util.Collection;
 	@Override public String toString() {
 		StringBuilder strb = new StringBuilder();
 			strb.append("[score=").append(this.score).append("]");
-			for (LogisticChain solution : this.logisticChains) {
-				strb.append(", [solutionId=").append(solution.getId()).append("], [No of SolutionElements=").append(solution.getLogisticChainElements().size()).append("] \n");
-				if (!solution.getLogisticChainElements().isEmpty()){
-					for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
+			for (LogisticChain logisticChain : this.logisticChains) {
+				strb.append(", [LogisticChainId=").append(logisticChain.getId()).append("], [No of LogisticChainElements=").append(logisticChain.getLogisticChainElements().size()).append("] \n");
+				if (!logisticChain.getLogisticChainElements().isEmpty()){
+					for (LogisticChainElement solutionElement : logisticChain.getLogisticChainElements()) {
 						strb.append("\t \t").append(solutionElement.toString()).append("\n");
 					}
 				}
