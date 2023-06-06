@@ -85,7 +85,7 @@ public abstract class LSPResourceScheduler {
 	 */
 	protected abstract void updateShipments();
 
-	public final void presortIncomingShipments() {
+	private final void presortIncomingShipments() {
 		this.lspShipmentsWithTime = new ArrayList<>();
 		for (LogisticChainElement element : resource.getClientElements()) {
 			lspShipmentsWithTime.addAll(element.getIncomingShipments().getShipments());
@@ -94,7 +94,7 @@ public abstract class LSPResourceScheduler {
 	}
 
 
-	public final void switchHandeledShipments(int bufferTime) {
+	private final void switchHandeledShipments(int bufferTime) {
 		for (LspShipmentWithTime lspShipmentWithTime : lspShipmentsWithTime) {
 			var shipmentPlan = ShipmentUtils.findPlanOfShipment(lspPlan, lspShipmentWithTime.getShipment().getId());
 			double endOfTransportTime = shipmentPlan.getMostRecentEntry().getEndTime() + bufferTime;
