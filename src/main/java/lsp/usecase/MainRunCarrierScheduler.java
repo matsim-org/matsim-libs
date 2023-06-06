@@ -21,6 +21,7 @@
 package lsp.usecase;
 
 import lsp.*;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
@@ -53,7 +54,7 @@ import java.util.*;
 
 	private Carrier carrier;
 	private MainRunCarrierResource resource;
-	private ArrayList<LSPCarrierPair> pairs;
+	private ArrayList<LSPShipmentCarrierServicePair> pairs;
 
 	/*package-private*/   MainRunCarrierScheduler() {
 		this.pairs = new ArrayList<>();
@@ -78,6 +79,10 @@ import java.util.*;
 		List<CarrierPlan> scheduledPlans = new LinkedList<>();
 		
 		for (LspShipmentWithTime tuple : copyOfAssignedShipments) {
+			//Add job as "services" to the carrier. So the carrier has this available
+			CarrierService carrierService = convertToCarrierService(tuple);
+			carrier.getServices().put(carrierService.getId(), carrierService);
+
 			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if ((load + tuple.getShipment().getSize()) > vehicleType.getCapacity().getOther().intValue()) {
 				load = 0;
@@ -126,6 +131,7 @@ import java.util.*;
 			}
 			tourBuilder.addLeg(new Leg());
 			CarrierService carrierService = convertToCarrierService(tuple);
+			pairs.add(new LSPShipmentCarrierServicePair(tuple, carrierService));
 			tourBuilder.scheduleService(carrierService);
 		}
 
@@ -202,24 +208,23 @@ import java.util.*;
 		builder.setCapacityDemand(tuple.getShipment().getSize());
 		builder.setServiceDuration(tuple.getShipment().getDeliveryServiceTime());
 		CarrierService service = builder.build();
-		pairs.add(new LSPCarrierPair(tuple, service));
 		return service;
 	}
 	
 	@Override protected void updateShipments() {
-		for (LspShipmentWithTime tuple : lspShipmentsWithTime) {
+		for (LspShipmentWithTime lspShipmentWithTime : lspShipmentsWithTime) {
 			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 				Tour tour = scheduledTour.getTour();
 				for (TourElement element : tour.getTourElements()) {
 					if (element instanceof Tour.ServiceActivity serviceActivity) {
-						LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
-						for (LSPCarrierPair pair : pairs) {
+						LSPShipmentCarrierServicePair carrierPair = new LSPShipmentCarrierServicePair(lspShipmentWithTime, serviceActivity.getService());
+						for (LSPShipmentCarrierServicePair pair : pairs) {
 							if (pair.tuple == carrierPair.tuple && pair.service.getId() == carrierPair.service.getId()) {
-								addShipmentLoadElement(tuple, tour, serviceActivity);
-								addShipmentTransportElement(tuple, tour, serviceActivity);
-								addShipmentUnloadElement(tuple, tour, serviceActivity);
-								addMainTourRunStartEventHandler(pair.service, tuple, resource, tour);
-								addMainRunTourEndEventHandler(pair.service, tuple, resource, tour);
+								addShipmentLoadElement(lspShipmentWithTime, tour, serviceActivity);
+								addShipmentTransportElement(lspShipmentWithTime, tour, serviceActivity);
+								addShipmentUnloadElement(lspShipmentWithTime, tour, serviceActivity);
+								addMainTourRunStartEventHandler(pair.service, lspShipmentWithTime, resource, tour);
+								addMainRunTourEndEventHandler(pair.service, lspShipmentWithTime, resource, tour);
 							}
 						}
 					}
@@ -326,6 +331,6 @@ import java.util.*;
 		}
 	}
 
-	private record LSPCarrierPair(LspShipmentWithTime tuple, CarrierService service) {
+	private record LSPShipmentCarrierServicePair(LspShipmentWithTime tuple, CarrierService service) {
 	}
 }
