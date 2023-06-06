@@ -34,8 +34,6 @@ import java.util.Collection;
 	private double score;
 	private ShipmentAssigner assigner;
 
-	private Collection<ShipmentPlan> shipmentPlans;
-
 	LSPPlanImpl() {
 		this.logisticChains = new ArrayList<>();
 		this.shipmentPlans = new ArrayList<>();
@@ -72,11 +70,6 @@ import java.util.Collection;
 	@Override public LSPPlan addShipmentPlan(ShipmentPlan shipmentPlan) {
 		this.shipmentPlans.add(shipmentPlan);
 		return null;
-	}
-
-	@Override
-	public Collection<ShipmentPlan> getShipmentPlans() {
-		return shipmentPlans;
 	}
 
 	@Override
