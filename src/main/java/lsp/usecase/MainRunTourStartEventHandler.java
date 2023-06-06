@@ -32,7 +32,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.events.CarrierTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -61,7 +61,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 	}
 
 	@Override
-	public void handleEvent(FreightTourStartEvent event) {
+	public void handleEvent(CarrierTourStartEvent event) {
 		if (event.getTourId().equals(tour.getId())) {
 			for (TourElement tourElement : tour.getTourElements()) {
 				if (tourElement instanceof ServiceActivity serviceActivity) {
@@ -74,7 +74,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		}
 	}
 
-	private void logLoad(FreightTourStartEvent event, Tour tour) {
+	private void logLoad(CarrierTourStartEvent event, Tour tour) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getLinkId());
@@ -98,7 +98,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		return cumulatedLoadingTime;
 	}
 
-	private void logTransport(FreightTourStartEvent event, Tour tour) {
+	private void logTransport(CarrierTourStartEvent event, Tour tour) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getLinkId());
