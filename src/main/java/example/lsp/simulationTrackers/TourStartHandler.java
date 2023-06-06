@@ -28,7 +28,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.events.CarrierTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
 
 import java.util.Collection;
@@ -49,7 +49,7 @@ import java.util.Collection;
 	}
 
 	@Override
-	public void handleEvent(FreightTourStartEvent event) {
+	public void handleEvent(CarrierTourStartEvent event) {
 		log.warn("handling tour start event=" + event.toString());
 
 		CarrierVehicle carrierVehicle = null;

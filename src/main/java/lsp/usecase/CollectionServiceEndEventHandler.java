@@ -30,7 +30,7 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -57,14 +57,14 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightSe
 	}
 
 	@Override
-	public void handleEvent(FreightServiceEndEvent event) {
+	public void handleEvent(CarrierServiceEndEvent event) {
 		if (event.getServiceId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 			logLoad(event);
 			logTransport(event);
 		}
 	}
 
-	private void logLoad(FreightServiceEndEvent event) {
+	private void logLoad(CarrierServiceEndEvent event) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setStartTime(event.getTime() - event.getServiceDuration());
 		builder.setEndTime(event.getTime());
@@ -78,7 +78,7 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightSe
 		lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
 
-	private void logTransport(FreightServiceEndEvent event) {
+	private void logTransport(CarrierServiceEndEvent event) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setLogisticChainElement(logisticChainElement);

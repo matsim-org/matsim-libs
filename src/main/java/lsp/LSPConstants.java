@@ -33,12 +33,11 @@ public abstract class LSPConstants {
             static final String END_DELIVERY = "endDelivery";
             static final String PICKUP_SERVICE_TIME = "pickupServiceTime";
             static final String DELIVERY_SERVICE_TIME = "deliveryServiceTime";
-        static final String LSP_PLANS = "LSPPlans";
-        static final String PLAN = "plan";
+        static final String LSP_PLANS = "LspPlans";
+        static final String LSP_PLAN = "LspPlan";
             static final String SCORE = "score";
     static final String SELECTED = "selected";
             static final String RESOURCES = "resources";
-            static final String RESOURCE = "resource";
     static final String LOGISTIC_CHAINS = "logisticChains";
             static final String LOGISTIC_CHAIN = "logisticChain";
             static final String LOGISTIC_CHAIN_ELEMENT = "logisticChainElement";
