@@ -80,7 +80,7 @@ import java.util.Collection;
 
 	@Override
 	public void schedule(int bufferTime) {
-		mainRunScheduler.scheduleShipments(this, bufferTime);
+		mainRunScheduler.scheduleShipments(bufferTime, lspPlan,this);
 	}
 
 	public Carrier getCarrier() {

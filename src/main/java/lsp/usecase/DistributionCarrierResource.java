@@ -78,7 +78,7 @@ import java.util.Collection;
 
 	@Override
 	public void schedule(int bufferTime) {
-		distributionHandler.scheduleShipments(this, bufferTime);
+		distributionHandler.scheduleShipments(lspPlan, this, bufferTime);
 	}
 
 	public Network getNetwork() {

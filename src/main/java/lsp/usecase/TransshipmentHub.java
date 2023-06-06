@@ -88,7 +88,7 @@ public class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPR
 
 	@Override
 	public void schedule(int bufferTime) {
-		transshipmentHubScheduler.scheduleShipments(this, bufferTime);
+		transshipmentHubScheduler.scheduleShipments(lspPlan, this, bufferTime);
 	}
 
 	public double getCapacityNeedFixed() {

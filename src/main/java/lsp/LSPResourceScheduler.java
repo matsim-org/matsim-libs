@@ -45,8 +45,11 @@ public abstract class LSPResourceScheduler {
 	protected LSPResource resource;
 	protected ArrayList<LspShipmentWithTime> lspShipmentsWithTime;
 
+	private LSPPlan lspPlan;
 
-	public final void scheduleShipments(LSPResource resource, int bufferTime) {
+
+	public final void scheduleShipments(LSPPlan lspPlan, LSPResource resource, int bufferTime) {
+		this.lspPlan = lspPlan;
 		this.resource = resource;
 		this.lspShipmentsWithTime = new ArrayList<>();
 		initializeValues(resource);

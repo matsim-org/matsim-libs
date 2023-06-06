@@ -79,7 +79,7 @@ import java.util.List;
 
 	@Override
 	public void schedule(int bufferTime) {
-		collectionScheduler.scheduleShipments(this, bufferTime);
+		collectionScheduler.scheduleShipments(lspPlan, this, bufferTime);
 	}
 
 	public Carrier getCarrier() {
