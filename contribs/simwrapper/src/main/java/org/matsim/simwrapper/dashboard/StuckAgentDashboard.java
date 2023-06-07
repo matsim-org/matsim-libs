@@ -4,11 +4,17 @@ import org.matsim.application.analysis.population.StuckAgentAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
-import org.matsim.simwrapper.viz.*;
+import org.matsim.simwrapper.viz.Bar;
+import org.matsim.simwrapper.viz.Plotly;
+import org.matsim.simwrapper.viz.Table;
+import org.matsim.simwrapper.viz.Tile;
+import tech.tablesaw.plotly.traces.PieTrace;
 
 import java.util.List;
 
-// TODO: doc
+/**
+ * Dashboard for stuck agents.
+ */
 public class StuckAgentDashboard implements Dashboard {
 
 	@Override
@@ -24,34 +30,45 @@ public class StuckAgentDashboard implements Dashboard {
 		});
 
 		layout.row("second")
-			// FIXME: rewrite using plotly plugin
-			.el(PieChart.class, (viz, data) -> {
-				viz.title = "Stuck Agents per Transport Mode";
-				viz.dataset = data.compute(StuckAgentAnalysis.class, "stuckAgentsPerModePieChart.csv");
-				viz.useLastRow = true;
+			.el(Plotly.class, (viz, data) -> {
+				viz.title = "Stuck Agents";
+				viz.description = "per Mode";
+
+				Plotly.DataSet ds = viz.addDataset(data.compute(StuckAgentAnalysis.class, "stuck_agents_per_mode.csv"));
+				viz.addTrace(PieTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
+					.text("Mode")
+					.x("Agents")
+				);
+
 			})
 			.el(Table.class, (viz, data) -> {
-				viz.title = "Stuck Agents per Mode";
+				viz.title = "Stuck Agents";
+				viz.description = "per Mode";
+
 				viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_mode.csv");
 			});
 
 		layout.row("third")
-				.el(Bar.class, (viz, data) -> {
-					viz.title = "Stuck Agents per Hour";
-					viz.stacked = true;
-					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
-					viz.x = "hour";
-					viz.xAxisName = "Hour";
-					viz.yAxisName = "# Stuck";
-					viz.ignoreColumns = List.of("Total");
-				})
-				.el(Table.class, (viz, data) -> {
-					viz.title = "Stuck Agents per Hour";
-					viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
-				});
+			.el(Bar.class, (viz, data) -> {
+				viz.title = "Stuck Agents";
+				viz.description = "per hour";
+
+				viz.stacked = true;
+				viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
+				viz.x = "hour";
+				viz.xAxisName = "Hour";
+				viz.yAxisName = "# Stuck";
+				viz.ignoreColumns = List.of("Total");
+			})
+			.el(Table.class, (viz, data) -> {
+				viz.title = "Stuck Agents";
+				viz.description = "per hour";
+				viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_hour.csv");
+			});
 
 		layout.row("four").el(Table.class, (viz, data) -> {
-			viz.title = "Stuck Agents per Link (Top 20)";
+			viz.title = "Stuck Agents";
+			viz.description = "per Link (Top 20)";
 			viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents_per_link.csv");
 		});
 	}
