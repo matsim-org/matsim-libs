@@ -195,7 +195,7 @@ import java.util.List;
 		ShipmentPlanElement load = builder.build();
 		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + "" + load.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getShipmentPlan().addPlanElement(id, load);
+		ShipmentUtils.findPlanOfShipment(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, load);
 	}
 
 	private void addShipmentTransportElement(LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
@@ -220,7 +220,7 @@ import java.util.List;
 		ShipmentPlanElement transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getShipmentPlan().addPlanElement(id, transport);
+		ShipmentUtils.findPlanOfShipment(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, transport);
 	}
 
 	private void addShipmentUnloadElement(LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
@@ -241,7 +241,7 @@ import java.util.List;
 		ShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getShipmentPlan().addPlanElement(id, unload);
+		ShipmentUtils.findPlanOfShipment(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, unload);
 	}
 
 	private int carrierCnt = 1;

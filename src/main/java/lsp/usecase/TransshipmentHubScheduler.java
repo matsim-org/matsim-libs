@@ -20,10 +20,8 @@
 
 package lsp.usecase;
 
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
-import lsp.LogisticChainElement;
-import lsp.LspShipmentWithTime;
+import lsp.*;
+import lsp.shipment.ShipmentPlan;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
@@ -81,13 +79,14 @@ import java.util.ArrayList;
 		ShipmentPlanElement handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getShipmentPlan().addPlanElement(id, handle);
+		ShipmentUtils.findPlanOfShipment(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, handle);
 	}
 
 	private void addShipmentToEventHandler(LspShipmentWithTime tuple) {
 		for (LogisticChainElement element : transshipmentHub.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				eventHandler.addShipment(tuple.getShipment(), element);
+				ShipmentPlan shipmentPlan = ShipmentUtils.findPlanOfShipment(lspPlan, tuple.getShipment().getId());
+				eventHandler.addShipment(tuple.getShipment(), element, shipmentPlan);
 				break;
 			}
 		}

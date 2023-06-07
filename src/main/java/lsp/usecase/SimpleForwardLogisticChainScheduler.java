@@ -62,7 +62,7 @@ import java.util.List;
 		for (LSPResource resource : resources) {
 			for (LSPResource lspResource : lsp.getResources()) {
 				if (lspResource == resource) {
-					lspResource.schedule(bufferTime);
+					lspResource.schedule(bufferTime, lsp.getSelectedPlan());
 				}
 			}
 		}

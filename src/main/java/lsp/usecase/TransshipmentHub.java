@@ -21,6 +21,7 @@
 package lsp.usecase;
 
 import lsp.LSPDataObject;
+import lsp.LSPPlan;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
@@ -87,7 +88,7 @@ public class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPR
 	}
 
 	@Override
-	public void schedule(int bufferTime) {
+	public void schedule(int bufferTime, LSPPlan lspPlan) {
 		transshipmentHubScheduler.scheduleShipments(lspPlan, this, bufferTime);
 	}
 

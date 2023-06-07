@@ -40,7 +40,6 @@ import java.util.*;
 		throw new RuntimeException("not implemented");
 	}
 
-	//TODO: Ist kein embedding container!
 	@Override
 	public Id<LSPShipment> getLspShipmentId() {
 		return lspShipmentId;

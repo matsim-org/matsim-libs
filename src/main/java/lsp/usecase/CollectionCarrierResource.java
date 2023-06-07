@@ -20,10 +20,7 @@
 
 package lsp.usecase;
 
-import lsp.LSPCarrierResource;
-import lsp.LSPDataObject;
-import lsp.LSPResource;
-import lsp.LogisticChainElement;
+import lsp.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -78,7 +75,7 @@ import java.util.List;
 	}
 
 	@Override
-	public void schedule(int bufferTime) {
+	public void schedule(int bufferTime, LSPPlan lspPlan) {
 		collectionScheduler.scheduleShipments(lspPlan, this, bufferTime);
 	}
 
