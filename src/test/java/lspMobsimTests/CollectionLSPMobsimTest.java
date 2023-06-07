@@ -211,7 +211,7 @@ public class CollectionLSPMobsimTest {
 
 			log.warn("");
 			log.warn("shipment schedule plan elements:");
-			for (ShipmentPlanElement planElement : ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values()) {
+			for (ShipmentPlanElement planElement : ShipmentUtils.findPlanOfShipment(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values()) {
 				log.warn(planElement);
 			}
 			log.warn("");
@@ -221,8 +221,8 @@ public class CollectionLSPMobsimTest {
 			}
 			log.warn("");
 
-			assertEquals(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
+			assertEquals(ShipmentUtils.findPlanOfShipment(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.findPlanOfShipment(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
