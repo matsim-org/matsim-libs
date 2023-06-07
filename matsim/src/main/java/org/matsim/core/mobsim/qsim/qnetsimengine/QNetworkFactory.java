@@ -31,12 +31,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalIn
 
 
 /**
- * The current design idea of this is as follows:<ul>
+ * <p> The current design idea of this is as follows:<ul>
  * <li> It is now possible to inject this.  See {@link QSimModule} for how the default is set up.   It can also be overridden in the usual way.
  * <li> For a specific example, see {@link DefaultQNetworkFactory}.
- * </ul>
- *
- * <p></p>
+ * </ul></p>
  *
  * @author dgrether, nagel
  *
@@ -47,14 +45,15 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalIn
 public interface QNetworkFactory extends MatsimFactory {
 
 	/**
-	 * I need info from the mobsim.  However, as long as the factory is injected, it cannot get to "the" mobsim; at best, it
+	 * <p>I need info from the mobsim.  However, as long as the factory is injected, it cannot get to "the" mobsim; at best, it
 	 * can get an instance of the mobsim which is, however, not the same mobsim it will be working with.  So "initializeFactory"
 	 * is called by the mobsim to provide some info about itself (e.g. agentCounter).
-	 * <p></p>
+	 * </p><p>
 	 * This could be solved using custom scopes.  They do, however, for the time being only exist in the guice inject framework, not
 	 * in jakarta.inject, and thus we do not want to use them (yet?).
-	 * <p></p>
+	 * </p><p>
 	 * (yy I think that the above has been changed with the separate QSimComponents, and thus one could attempt to fix it.  kai, jul'22)
+	 * </p>
 	 */
 	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1 ) ;
 
