@@ -48,10 +48,6 @@ public abstract class LSPResourceScheduler {
 	protected LSPPlan lspPlan;
 
 
-	LSPPlan getLspPlan() {
-		return lspPlan;
-	}
-
 	public final void scheduleShipments(LSPPlan lspPlan, LSPResource resource, int bufferTime) {
 		this.lspPlan = lspPlan;
 		this.resource = resource;
