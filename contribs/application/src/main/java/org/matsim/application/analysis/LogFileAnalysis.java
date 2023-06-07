@@ -14,6 +14,9 @@ import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,11 +24,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "log-file", description = "Analyses MATSim log files to gather run information.")
 @CommandSpec(
 	requires = "logfile.log",
-	produces = {"run_info.csv", "memory_stats.csv", "runtime_stats.csv", "warnings.csv"},
+	produces = {"run_info.csv", "memory_stats.csv", "runtime_stats.csv", "warnings.csv", "status.md"},
 	group = "general"
 )
 public class LogFileAnalysis implements MATSimAppCommand {
@@ -153,7 +157,55 @@ public class LogFileAnalysis implements MATSimAppCommand {
 			}
 		}
 
+		try (BufferedWriter writer = Files.newBufferedWriter(output.getPath("status.md"))) {
+			renderWarnings(writer, warnings);
+		}
+
 		return 0;
+	}
+
+	private void renderWarnings(BufferedWriter writer, Set<Warning> warnings) throws IOException {
+
+		if (warnings.isEmpty()) {
+			writer.write("<h3 class=\"no-warnings\">No warnings found ✅</h3>\n\n");
+		} else {
+
+			Map<String, List<Warning>> grouped = warnings.stream().collect(Collectors.groupingBy(w -> w.module, Collectors.toList()));
+			writer.write(String.format("<h3 class=\"found-warnings\">Warnings in %d module%s found ❌</h3>\n\n", grouped.size(), grouped.size() > 1 ? "s" : ""));
+
+			for (Map.Entry<String, List<Warning>> e : grouped.entrySet()) {
+
+				writer.write("#### " + e.getKey() + "\n\n");
+				writer.write("```\n");
+				for (Warning w : e.getValue()) {
+					writer.write(w.msg + "\n");
+				}
+
+				writer.write("```\n");
+			}
+		}
+
+		writer.write("""
+			<style>
+			.dash-row.row-warnings .dash-card-frame {
+				margin-bottom: 0;
+			}
+			.dash-row.row-warnings .no-warnings {
+				color: #4BB543;
+				font-weight: bold;
+			}
+			.dash-row.row-warnings .found-warnings {
+				color: #ED4337;
+				font-weight: bold;
+			}
+			.dash-row.row-warnings h4 {
+				color: #6f5425;
+			}
+			.dash-row.row-warnings pre {
+				background: #f8f3d6;
+				color: #6f5425;
+			}
+			</style>""");
 	}
 
 	private record Memory(LocalDateTime date, int used, int free, int total) {

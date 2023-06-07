@@ -20,6 +20,14 @@ public class OverviewDashboard implements Dashboard {
 		header.title = "Overview";
 		header.description = "General overview of the MATSim run.";
 
+		layout.row("warnings")
+			.el(TextBlock.class, (viz, data) -> {
+				viz.title = "Config Check";
+				viz.file = data.compute(LogFileAnalysis.class, "status.md");
+				// Force minimal height
+				viz.height = 0.1d;
+			});
+
 		layout.row("first")
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Run Info";
