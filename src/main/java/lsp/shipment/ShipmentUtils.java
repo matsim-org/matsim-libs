@@ -53,7 +53,10 @@ public final class ShipmentUtils {
 				return  shipmentPlan;
 			}
 		}
-		return null;
+		//TODO Make this more standard behaviour. --> If ShipmentPlan does not exist, create and register it. (KMT Jun'23)
+		ShipmentPlan newShipmentPlan = new ShipmentPlanImpl(shipmentId);
+		lspPlan.addShipmentPlan(newShipmentPlan);
+		return newShipmentPlan;
 	}
 
 	public static final class LoggedShipmentHandleBuilder {
