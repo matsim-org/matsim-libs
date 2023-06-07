@@ -1,10 +1,9 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.diposition.SimpleDisposition;
-import ch.sbb.matsim.contrib.railsim.qsimengine.diposition.TrainDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;

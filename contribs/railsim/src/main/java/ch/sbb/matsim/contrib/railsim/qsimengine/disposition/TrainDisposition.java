@@ -1,4 +1,4 @@
-package ch.sbb.matsim.contrib.railsim.qsimengine.diposition;
+package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
