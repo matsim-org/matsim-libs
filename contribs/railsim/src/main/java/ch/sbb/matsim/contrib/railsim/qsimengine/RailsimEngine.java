@@ -165,11 +165,30 @@ final class RailsimEngine implements Steppable {
 
 		if (!blockLinkTracks(time, state.routeIdx, state)) {
 
-			// TODO: calculate speed to arrival at the last blocked link
+			// Calculate the acceleration needed to stop
+			if (state.acceleration >= 0) {
+				// unoccupied space ahead
+				double dist = resources.getLink(state.headLink).length - state.headPosition;
+				for (int i = state.routeIdx; i < state.route.size(); i++) {
+					RailLink link = state.route.get(i);
+					if (link.isBlockedBy(state.driver))
+						dist += link.length;
+				}
 
-			// Break when reservation is not possible
-			state.targetSpeed = 0;
-			state.acceleration = -state.train.deceleration();
+				assert FuzzyUtils.greaterEqualThan(dist, 1): "Small head room needed to stop before end of link";
+
+				// Trains try to stop shortly before the next link
+				// Removing this would lead to train trying to enter the next link already
+
+				// Break when reservation is not possible
+				state.targetSpeed = 0;
+				state.acceleration = -state.train.deceleration();
+
+				// TODO: use other method
+//				state.acceleration = RailsimCalc.calcTargetDecel(dist - 1, state.speed);
+				assert state.acceleration <= 0 &&
+					FuzzyUtils.lessEqualThan(Math.abs(state.acceleration), state.train.deceleration()): "Train deceleration must be within specification, but was " + state.acceleration;
+			}
 
 			event.checkReservation = time + POLL_INTERVAL;
 			decideNextUpdate(event);
@@ -187,9 +206,8 @@ final class RailsimEngine implements Steppable {
 		if (blockLinkTracks(time, state.routeIdx, state)) {
 
 			updatePosition(time, event);
-			// TODO: maximum speed could be lower
-			// see enterLink as well
 
+			// target speed could be lower, but this should be updated calc decel distance later
 			state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
 			state.targetSpeed = state.allowedMaxSpeed;
 			state.acceleration = state.train.acceleration();
@@ -259,7 +277,6 @@ final class RailsimEngine implements Steppable {
 
 		List<RailLink> blocked = disposition.blockRailSegment(time, state.driver, links);
 
-
 		// Only continue successfully if all requested link have been blocked
 		return links.size() == blocked.size();
 	}
@@ -318,17 +335,7 @@ final class RailsimEngine implements Steppable {
 
 		assert link.isBlockedBy(state.driver) : "Link has to be blocked by driver when entered";
 
-		// TODO: this probably needs to be a separate function to calculate possible target speed more accurately
-		if (RailsimCalc.calcDecelDistanceAndSpeed(link, event) == Double.POSITIVE_INFINITY &&
-			!event.isAwaitingReservation()) {
-
-			state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
-
-			if (state.allowedMaxSpeed > state.targetSpeed) {
-				state.targetSpeed = state.allowedMaxSpeed;
-				state.acceleration = state.train.acceleration();
-			}
-		}
+		updateTargetSpeed(event, state, link);
 
 		createEvent(state.asEvent(time));
 
@@ -357,6 +364,8 @@ final class RailsimEngine implements Steppable {
 
 		state.tailLink = nextTailLink.getLinkId();
 		state.tailPosition = 0;
+
+		updateTargetSpeed(event, state, resources.getLink(state.headLink));
 
 		decideNextUpdate(event);
 	}
@@ -434,6 +443,9 @@ final class RailsimEngine implements Steppable {
 
 		return stopTime;
 	}
+
+	// TODO: increase speed when leaving a link
+
 
 	/**
 	 * Decide which update is the earliest and needs to be the next.
@@ -515,6 +527,24 @@ final class RailsimEngine implements Steppable {
 		assert Double.isFinite(event.plannedTime) : "Planned update time must be finite, but was " + event.plannedTime;
 	}
 
+	/**
+	 * Calculate the possible target speed. This can be lower than allowed if links in front are blocked.
+	 */
+	private void updateTargetSpeed(UpdateEvent event, TrainState state, RailLink headLink) {
+
+		// TODO: this probably needs to be a separate function to calculate possible target speed more accurately
+		if (RailsimCalc.calcDecelDistanceAndSpeed(headLink, event) == Double.POSITIVE_INFINITY &&
+			!event.isAwaitingReservation()) {
+
+			state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
+
+			if (state.allowedMaxSpeed > state.targetSpeed) {
+				state.targetSpeed = state.allowedMaxSpeed;
+				state.acceleration = state.train.acceleration();
+			}
+		}
+
+	}
 
 	/**
 	 * Allowed speed for the train.

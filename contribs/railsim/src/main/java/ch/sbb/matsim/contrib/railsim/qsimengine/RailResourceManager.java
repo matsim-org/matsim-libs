@@ -71,7 +71,7 @@ public final class RailResourceManager {
 	 *
 	 * @return true if the resource is now blocked or was blocked for this driver already.
 	 */
-	public boolean tryBlockResource(RailResource resource, MobsimDriverAgent driver) {
+	private boolean tryBlockResource(RailResource resource, MobsimDriverAgent driver) {
 
 		if (resource.reservations.contains(driver))
 			return true;
@@ -89,7 +89,7 @@ public final class RailResourceManager {
 	 *
 	 * @return whether driver is still blocking this resource.
 	 */
-	public boolean tryReleaseResource(RailResource resource, MobsimDriverAgent driver) {
+	private boolean tryReleaseResource(RailResource resource, MobsimDriverAgent driver) {
 
 		if (resource.links.stream().noneMatch(l -> l.isBlockedBy(driver))) {
 			resource.reservations.remove(driver);
@@ -100,12 +100,23 @@ public final class RailResourceManager {
 	}
 
 	/**
-	 * Try to block a track and return whether it was successful.
+	 * Try to block a track and the underlying resource and return whether it was successful.
 	 */
 	public boolean tryBlockTrack(double time, MobsimDriverAgent driver, RailLink link) {
 
 		if (link.isBlockedBy(driver))
 			return true;
+
+		Id<RailResource> resourceId = link.getResourceId();
+		if (resourceId != null) {
+
+			RailResource resource =  getResource(resourceId);
+
+			// resource is required
+			if (!tryBlockResource(resource, driver)) {
+				return false;
+			}
+		}
 
 		if (link.hasFreeTrack()) {
 			int track = link.blockTrack(driver);
@@ -114,6 +125,7 @@ public final class RailResourceManager {
 
 			return true;
 		}
+
 		return false;
 	}
 
@@ -124,6 +136,12 @@ public final class RailResourceManager {
 		int track = link.releaseTrack(driver);
 		eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(), driver.getVehicle().getId(),
 			TrackState.FREE, track));
+
+		// Release held resources
+		if (link.getResourceId() != null) {
+			tryReleaseResource(getResource(link.getResourceId()), driver);
+		}
+
 	}
 
 }

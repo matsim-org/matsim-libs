@@ -13,7 +13,7 @@ import java.util.Set;
 public class RailResource {
 
 	/**
-	 * Links beloning to this resource.
+	 * Links belonging to this resource.
 	 */
 	final List<RailLink> links;
 
@@ -30,6 +30,8 @@ public class RailResource {
 	public RailResource(List<RailLink> links) {
 		capacity = links.stream().mapToInt(RailLink::getNumberOfTracks).min().orElseThrow();
 		this.links = links;
+
+		// TODO: this is not necessarily needed and can be computed implicitly
 		reservations = new HashSet<>();
 	}
 

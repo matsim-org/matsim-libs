@@ -67,4 +67,14 @@ public class RailsimCalcTest {
 			.isCloseTo(dist, Offset.offset(0.001));
 
 	}
+
+	@Test
+	public void decel() {
+
+		double d = RailsimCalc.calcTargetDecel(1000, 10);
+
+		assertThat(RailsimCalc.calcTraveledDist(10, -10 / d, d))
+			.isCloseTo(1000, Offset.offset(0.001));
+
+	}
 }

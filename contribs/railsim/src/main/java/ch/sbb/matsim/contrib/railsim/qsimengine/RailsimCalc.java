@@ -19,7 +19,7 @@ public class RailsimCalc {
 	}
 
 	/**
-	 * Inverse of {@link #calcTraveledDist(double, double, double)}, solves for distance.
+	 * Inverse of {@link #calcTraveledDist(double, double, double)}, solves for distance, returns needed time.
 	 */
 	static double solveTraveledDist(double speed, double dist, double acceleration) {
 		if (acceleration == 0)
@@ -213,6 +213,25 @@ public class RailsimCalc {
 
 		// No need to reserve yet
 		return Double.POSITIVE_INFINITY;
+	}
+
+	/**
+	 * Calculate the deceleration needed to come to halt exactly after {@code dist}.
+	 *
+	 * @return negative acceleration, always a negative number.
+	 */
+	static double calcTargetDecel(double dist, double currentSpeed) {
+		return -currentSpeed * currentSpeed / (2 * dist);
+	}
+
+	/**
+	 * Calculate the maximum speed that can be achieved if trains want to stop after dist.
+	 */
+	static double calcTargetSpeedForStop(double dist, TrainState state) {
+
+		// TODO
+
+		return 0;
 	}
 
 	/**

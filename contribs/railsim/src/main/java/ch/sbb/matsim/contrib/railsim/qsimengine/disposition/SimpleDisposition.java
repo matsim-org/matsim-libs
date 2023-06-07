@@ -33,28 +33,6 @@ public class SimpleDisposition implements TrainDisposition {
 		// Iterate all links that need to be blocked
 		for (RailLink link : segment) {
 
-			if (link.isBlockedBy(driver)) {
-				blocked.add(link);
-				continue;
-			}
-
-			Id<RailResource> resourceId = link.getResourceId();
-			if (resourceId != null) {
-
-				RailResource resource = resources.getResource(resourceId);
-				if (resources.tryBlockResource(resource, driver)) {
-
-					boolean b = resources.tryBlockTrack(time, driver, link);
-					assert b : "Link blocked by resource must be free";
-
-					blocked.add(link);
-					continue;
-				}
-
-				// Could not reserve resource
-				break;
-			}
-
 			// Check if single link can be reserved
 			if (resources.tryBlockTrack(time, driver, link)) {
 				blocked.add(link);
@@ -67,11 +45,8 @@ public class SimpleDisposition implements TrainDisposition {
 
 	@Override
 	public void unblockRailLink(double time, MobsimDriverAgent driver, RailLink link) {
-		resources.releaseTrack(time, driver, link);
 
-		// Release held resources
-		if (link.getResourceId() != null) {
-			resources.tryReleaseResource(resources.getResource(link.getResourceId()), driver);
-		}
+		// put resource handling into release track
+		resources.releaseTrack(time, driver, link);
 	}
 }
