@@ -41,6 +41,8 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 /**
  * @author knagel
  * @see DefaultQNetworkFactory
+ * @deprecated It would be good to migrate the configuration of this here to
+ * the way it is now done with {@link LinkSpeedCalculator} in {@link DefaultLinkSpeedCalculator}.
  */
 public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	private QSimConfigGroup qsimConfig;

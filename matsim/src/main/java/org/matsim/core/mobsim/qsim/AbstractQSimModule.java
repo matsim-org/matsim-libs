@@ -98,8 +98,13 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule{
 	// the methods below are strictly speaking not necessary.  But help with detectability.  A bit similar to the general matsim AbstractModule.
 
 	/**
-	 * This is deliberately ``add'' and not ``set'' since multiple such speed calculators can be added, as long as they do not answer to the same
-	 * (vehicle, link, time) combination.  kai, jun'23
+	 * <p>This is deliberately ``add'' and not ``set'' since multiple such speed calculators can be added, as long as they do not answer to the same
+	 * (vehicle, link, time) combination.</p>
+	 *
+	 * <p>This is plugged together in {@link org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory}.
+	 * Should presumably be done similarly
+	 * for the other ways to configure {@link org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory},
+	 * and then the latter could be deprecated.</p>
 	 */
 	protected LinkedBindingBuilder<LinkSpeedCalculator> addLinkSpeedCalculator(){
 		return Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class ).addBinding();

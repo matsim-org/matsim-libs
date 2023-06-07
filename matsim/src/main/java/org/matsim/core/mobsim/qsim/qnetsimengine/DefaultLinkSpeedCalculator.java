@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
@@ -64,6 +65,12 @@ public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator{
 		}
 	}
 
+	/**
+	 * This is not meant to be used directly.  But rather through {@link AbstractQSimModule} addLinkSpeedCalculator().  The idea there is that different
+	 * link speed calculators can be added orthogonally.  However, if someone still insists on replacing the full link speed calculator, then this
+	 * functionality can clearly be used.  kai, jun'23
+	 */
+	@SuppressWarnings("UnusedReturnValue")
 	public final DefaultLinkSpeedCalculator addLinkSpeedCalculator( LinkSpeedCalculator linkSpeedCalculator ){
 		this.calculators.add( linkSpeedCalculator );
 		return this;

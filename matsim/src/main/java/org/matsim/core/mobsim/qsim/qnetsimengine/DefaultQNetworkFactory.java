@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
@@ -89,9 +90,10 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(),
 				mobsimTimer, linkWidthCalculator );
 
+		Gbl.assertNotNull(context);
+
 		this.netsimEngine1 = netsimEngine1;
 
-		this.nodeBuilder = new QNodeImpl.Builder( netsimEngine1, context, scenario.getConfig().qsim() ) ;
 
 	}
 	@Override public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
@@ -106,6 +108,7 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override public QNodeI createNetsimNode( final Node node ) {
+		this.nodeBuilder = new QNodeImpl.Builder( netsimEngine1, context, scenario.getConfig().qsim() ) ;
 		return nodeBuilder.build( node ) ;
 	}
 }

@@ -21,6 +21,7 @@
 
  package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
@@ -30,17 +31,18 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 	
 	@Override
 	protected void configureQSim() {
-		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).asEagerSingleton();
-
-		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).asEagerSingleton();
+		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).in( Singleton.class );
+		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).in( Singleton.class );
+		// in the two lines above, I changed "asEagerSingleton" to "in( Singleton.class )", since forcing construction early often leads to problems.  kai, jun'23
 
 		if ( this.getConfig().qsim().isUseLanes() ) {
-			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
-			bind( DefaultQNetworkFactory.class );
+			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ).in( Singleton.class ) ;
+			bind( DefaultQNetworkFactory.class ).in( Singleton.class );
 			// (need this here because QLanesNetworkFactory uses it as a delegate.  maybe some other design would be better?  kai, jun'23)
 		} else {
-			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
+			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ).in( Singleton.class) ;
 		}
+		// I added in(Singleton.class) above.  Might cause problems with parallel implementations?  kai, jun'23
 
 		// defining this here so we do not have to hedge against null:
 		Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class );
