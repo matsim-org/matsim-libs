@@ -168,26 +168,40 @@ final class RailsimEngine implements Steppable {
 			// Calculate the acceleration needed to stop
 			if (state.acceleration >= 0) {
 				// unoccupied space ahead
-				double dist = resources.getLink(state.headLink).length - state.headPosition;
+				// 1 meter is reserved to prevent trains from going on the next occupied link
+				double dist = resources.getLink(state.headLink).length - state.headPosition - 1;
 				for (int i = state.routeIdx; i < state.route.size(); i++) {
 					RailLink link = state.route.get(i);
 					if (link.isBlockedBy(state.driver))
 						dist += link.length;
 				}
 
-				assert FuzzyUtils.greaterEqualThan(dist, 1): "Small head room needed to stop before end of link";
+				assert FuzzyUtils.greaterEqualThan(dist, 0) : "Small head room needed to stop before end of link";
 
-				// Trains try to stop shortly before the next link
-				// Removing this would lead to train trying to enter the next link already
 
-				// Break when reservation is not possible
 				state.targetSpeed = 0;
 				state.acceleration = -state.train.deceleration();
 
-				// TODO: use other method
-//				state.acceleration = RailsimCalc.calcTargetDecel(dist - 1, state.speed);
+				/*
+				TODO: there might be pt stop on a reserved segment, which would be missed
+				// Train can reduce speed smoothly
+				if (state.acceleration >= 0) {
+					state.targetSpeed = 0;
+					state.acceleration = RailsimCalc.calcTargetDecel(dist, state.speed);
+				}*/
+
+				/*
+				TODO: It might be possible to still accelerate
+				else if (state.acceleration >= 0) {
+
+					// Train is still accelerating, maximum speed target will be calculated in this case
+					// deceleration will start at a later point
+					state.targetSpeed = RailsimCalc.calcTargetSpeedForStop(dist, state.train.acceleration(), state.train.deceleration(), state.speed);
+				}
+				 */
+
 				assert state.acceleration <= 0 &&
-					FuzzyUtils.lessEqualThan(Math.abs(state.acceleration), state.train.deceleration()): "Train deceleration must be within specification, but was " + state.acceleration;
+					FuzzyUtils.lessEqualThan(Math.abs(state.acceleration), state.train.deceleration()) : "Train deceleration must be within specification, but was " + state.acceleration;
 			}
 
 			event.checkReservation = time + POLL_INTERVAL;
@@ -213,6 +227,10 @@ final class RailsimEngine implements Steppable {
 			state.acceleration = state.train.acceleration();
 
 			event.checkReservation = -1;
+
+			// TODO: target speed could be too fast
+			//updateTargetSpeed(event, state);
+
 			decideNextUpdate(event);
 
 		} else {
@@ -335,7 +353,10 @@ final class RailsimEngine implements Steppable {
 
 		assert link.isBlockedBy(state.driver) : "Link has to be blocked by driver when entered";
 
-		updateTargetSpeed(event, state, link);
+		// TODO: might be too restrictive, target speed logic should take care of that
+		if (RailsimCalc.calcDecelDistanceAndSpeed(resources.getLink(state.headLink), event) == Double.POSITIVE_INFINITY ) {
+			updateTargetSpeed(event, state);
+		}
 
 		createEvent(state.asEvent(time));
 
@@ -365,7 +386,7 @@ final class RailsimEngine implements Steppable {
 		state.tailLink = nextTailLink.getLinkId();
 		state.tailPosition = 0;
 
-		updateTargetSpeed(event, state, resources.getLink(state.headLink));
+		updateTargetSpeed(event, state);
 
 		decideNextUpdate(event);
 	}
@@ -420,7 +441,10 @@ final class RailsimEngine implements Steppable {
 		state.tailPosition += dist;
 		state.timestamp = time;
 
-		assert state.routeIdx <= 1 || FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
+		// When trains are put into the network their tail may be longer than the current link
+		// this assertion may not hold depending on the network, should possibly be removed
+		assert state.routeIdx <= 2 || FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
+
 		assert FuzzyUtils.lessEqualThan(state.headPosition, resources.getLink(state.headLink).length) : "Illegal state update. Head position must be smaller than link length";
 		assert FuzzyUtils.greaterEqualThan(state.headPosition, 0) : "Head position must be positive";
 		assert FuzzyUtils.lessEqualThan(state.speed, state.allowedMaxSpeed) : "Speed must be less equal than the allowed speed";
@@ -443,9 +467,6 @@ final class RailsimEngine implements Steppable {
 
 		return stopTime;
 	}
-
-	// TODO: increase speed when leaving a link
-
 
 	/**
 	 * Decide which update is the earliest and needs to be the next.
@@ -473,7 +494,7 @@ final class RailsimEngine implements Steppable {
 			Double.POSITIVE_INFINITY :
 			RailsimCalc.calcDecelDistanceAndSpeed(currentLink, event);
 
-		assert FuzzyUtils.greaterEqualThan(decelDist, 0) : "Deceleration distance must be larger than 0, but was" + decelDist;
+		assert FuzzyUtils.greaterEqualThan(decelDist, 0) : "Deceleration distance must be larger than 0, but was " + decelDist;
 
 		// (3) next link needs reservation
 		double reserveDist = Double.POSITIVE_INFINITY;
@@ -530,11 +551,11 @@ final class RailsimEngine implements Steppable {
 	/**
 	 * Calculate the possible target speed. This can be lower than allowed if links in front are blocked.
 	 */
-	private void updateTargetSpeed(UpdateEvent event, TrainState state, RailLink headLink) {
+	private void updateTargetSpeed(UpdateEvent event, TrainState state) {
 
-		// TODO: this probably needs to be a separate function to calculate possible target speed more accurately
-		if (RailsimCalc.calcDecelDistanceAndSpeed(headLink, event) == Double.POSITIVE_INFINITY &&
-			!event.isAwaitingReservation()) {
+		// TODO: needs to account for many more factors such as pt stops, possibly blocked links, possible speed under deceleration
+
+		if (!event.isAwaitingReservation()) {
 
 			state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
 

@@ -108,4 +108,48 @@ public class RailsimEngineTest {
 			.hasTrainState("regio2", 358, 1000, 0);
 
 	}
+
+	@Test
+	public void varyingSpeed_one() {
+
+		RailsimTestUtils.Holder test = getTestEngine("network1.xml");
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "t1_IN-t1_OUT", "t3_IN-t3_OUT");
+
+		test.doSimStepUntil(10000);
+
+		test.debug(collector, "varyingSpeed");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio", 7599, 0, 2.7777777)
+			.hasTrainState("regio", 7674, 200, 0);
+
+		test = getTestEngine("network1.xml");
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "t1_IN-t1_OUT", "t3_IN-t3_OUT");
+
+		test.doStateUpdatesUntil(10000, 1);
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio", 7599, 0, 2.7777777)
+			.hasTrainState("regio", 7674, 200, 0);
+
+//		test.debug(collector, "varyingSpeed_detailed");
+
+	}
+
+	@Test
+	public void varyingSpeed_many() {
+
+		RailsimTestUtils.Holder test = getTestEngine("network1.xml");
+
+		for (int i = 0; i < 10; i++) {
+			RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio" + i, 60 * i, "t1_IN-t1_OUT", "t3_IN-t3_OUT");
+		}
+
+		test.doSimStepUntil(50000);
+
+		test.debug(collector, "speedDiff_many");
+
+	}
 }

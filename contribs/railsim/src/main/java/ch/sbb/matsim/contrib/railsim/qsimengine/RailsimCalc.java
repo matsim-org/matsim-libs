@@ -105,6 +105,26 @@ public class RailsimCalc {
 	}
 
 	/**
+	 * Calculate the deceleration needed to come to halt exactly after {@code dist}.
+	 *
+	 * @return negative acceleration, always a negative number.
+	 */
+	static double calcTargetDecel(double dist, double currentSpeed) {
+		return -currentSpeed * currentSpeed / (2 * dist);
+	}
+
+	/**
+	 * Calculate the maximum speed that can be achieved if trains want to stop after dist.
+	 */
+	static double calcTargetSpeedForStop(double dist, double acceleration, double deceleration, double currentSpeed) {
+
+		double nom = 2 * acceleration * deceleration * dist
+			+ deceleration * currentSpeed * currentSpeed;
+
+		return Math.sqrt(nom / (acceleration + deceleration));
+	}
+
+	/**
 	 * Calc the distance deceleration needs to start and the target speed.
 	 */
 	static double calcDecelDistanceAndSpeed(RailLink currentLink, UpdateEvent event) {
@@ -140,6 +160,8 @@ public class RailsimCalc {
 				// train stops at the very end of a link
 				if (i > 0 && state.isStop(state.route.get(i - 1).getLinkId()))
 					allowed = 0;
+				else if (!link.isBlockedBy(state.driver) && !link.hasFreeTrack())
+					allowed = 0;
 				else
 					allowed = link.getAllowedFreespeed(state.driver);
 			}
@@ -174,6 +196,66 @@ public class RailsimCalc {
 			return Double.POSITIVE_INFINITY;
 
 		return decelDist;
+	}
+
+	/**
+	 * Calculate the possible target speed a train can safely achieve.
+	 * Taking upcoming links and deceleration into account, target speed might be lower than the allowed.
+	 */
+	static double calcPossibleTargetSpeed(TrainState state, RailLink currentLink) {
+
+		// TODO: not correct yet
+
+		// Distance to the next speed change point (link)
+		double dist = currentLink.length - state.headPosition;
+
+		// Lookahead window
+		double window = RailsimCalc.calcTraveledDist(state.allowedMaxSpeed, state.allowedMaxSpeed / state.train.deceleration(),
+			-state.train.deceleration()) + currentLink.length;
+
+		double targetSpeed = Double.POSITIVE_INFINITY;
+
+		for (int i = state.routeIdx; i <= state.route.size(); i++) {
+
+			RailLink link;
+			double allowed;
+			if (i == state.route.size()) {
+				link = null;
+				allowed = 0;
+			} else {
+				link = state.route.get(i);
+
+				// If the previous link is a transit stop the speed needs to be 0 at the next link
+				// train stops at the very end of a link
+				if (i > 0 && state.isStop(state.route.get(i - 1).getLinkId()))
+					allowed = 0;
+				else if (!link.isBlockedBy(state.driver) && !link.hasFreeTrack())
+					allowed = 0;
+				else
+					allowed = link.getAllowedFreespeed(state.driver);
+			}
+
+			// only need to consider reduction
+			if (allowed < state.allowedMaxSpeed) {
+
+				double timeDecel = (state.allowedMaxSpeed - allowed) / state.train.deceleration();
+				double distDecel = calcTraveledDist(targetSpeed, timeDecel, -state.train.deceleration());
+
+				// There would not be enough headroom to stop
+				// target speed is reduced to this speed link.
+				if (distDecel > dist && allowed < targetSpeed) {
+					targetSpeed = allowed;
+				}
+			}
+
+			if (link != null)
+				dist += link.length;
+
+			if (dist >= window)
+				break;
+		}
+
+		return Math.min(targetSpeed, state.allowedMaxSpeed);
 	}
 
 	/**
@@ -213,25 +295,6 @@ public class RailsimCalc {
 
 		// No need to reserve yet
 		return Double.POSITIVE_INFINITY;
-	}
-
-	/**
-	 * Calculate the deceleration needed to come to halt exactly after {@code dist}.
-	 *
-	 * @return negative acceleration, always a negative number.
-	 */
-	static double calcTargetDecel(double dist, double currentSpeed) {
-		return -currentSpeed * currentSpeed / (2 * dist);
-	}
-
-	/**
-	 * Calculate the maximum speed that can be achieved if trains want to stop after dist.
-	 */
-	static double calcTargetSpeedForStop(double dist, TrainState state) {
-
-		// TODO
-
-		return 0;
 	}
 
 	/**

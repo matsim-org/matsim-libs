@@ -77,4 +77,19 @@ public class RailsimCalcTest {
 			.isCloseTo(1000, Offset.offset(0.001));
 
 	}
+
+	@Test
+	public void speedForStop() {
+
+		double v = RailsimCalc.calcTargetSpeedForStop(1000, 0.5, 0.5, 0);
+
+		double accelTime = v / 0.5;
+
+		double d1 = RailsimCalc.calcTraveledDist(0, accelTime, 0.5);
+		double d2 = RailsimCalc.calcTraveledDist(v, accelTime, -0.5);
+
+		assertThat(d1 + d2)
+			.isCloseTo(1000, Offset.offset(0.0001));
+
+	}
 }
