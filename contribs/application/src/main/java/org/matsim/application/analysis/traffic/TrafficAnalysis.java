@@ -1,7 +1,5 @@
 package org.matsim.application.analysis.traffic;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.TransportMode;
@@ -21,28 +19,30 @@ import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import picocli.CommandLine;
+import tech.tablesaw.aggregate.NumericAggregateFunction;
 import tech.tablesaw.api.*;
 import tech.tablesaw.columns.Column;
 import tech.tablesaw.selection.Selection;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.mean;
+import static tech.tablesaw.aggregate.AggregateFunctions.sum;
 
 @CommandLine.Command(name = "congestion", description = "Calculates congestion indices and relative travel times.")
 @CommandSpec(requireEvents = true, requireNetwork = true,
-	produces = {"traffic_stats_by_link_daily.csv", "traffic_stats_by_link_and_hour.csv", "traffic_stats_by_road_type_daily.csv", "traffic_stats_by_road_type_and_hour.csv"}
+		produces = {"traffic_stats_by_link_daily.csv", "traffic_stats_by_link_and_hour.csv", "traffic_stats_by_road_type_daily.csv", "traffic_stats_by_road_type_and_hour.csv"}
 )
 public class TrafficAnalysis implements MATSimAppCommand {
 
-	private final Logger log = LogManager.getLogger(TrafficAnalysis.class);
+	@CommandLine.Mixin
+	private final InputOptions input = InputOptions.ofCommand(TrafficAnalysis.class);
 
 	@CommandLine.Mixin
-	private InputOptions input = InputOptions.ofCommand(TrafficAnalysis.class);
-
-	@CommandLine.Mixin
-	private OutputOptions output = OutputOptions.ofCommand(TrafficAnalysis.class);
+	private final OutputOptions output = OutputOptions.ofCommand(TrafficAnalysis.class);
 
 	/**
 	 * Sample size is used to compute actual flow capacity.
@@ -104,26 +104,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 
 		Table ds = createDataset(network, calc, volumes);
 
-		// TODO: Avg must be weighted by link length, (and lanes) ?
-		// 	"lane_km" also for the aggregate info table
-
-		// TODO:
-		// columns speed_performance_index, congestion_index, avg_speed, simulated_traffic_volume, road_capacity_utilization,
-
-		// TODO: aggregates: (one file each)
-		// per link and time bin
-
-		// per link daily
-
-		// per road type and time bin
-		// + (all = additiomal road_type)
-
-		// per road type daily
-
-		// TODO: compute daily and hourly data separately?
-		// can daily be  aggregated from hourly values easily?
-
-		List<String> aggr = List.of("speed_performance_index", "congestion_index", "avg_speed", "simulated_traffic_volume", "road_capacity_utilization");
+		List<String> aggr = List.of("speed_performance_index", "congestion_index", "avg_speed", "simulated_traffic_volume", "road_capacity_utilization", "lane_km");
 
 		Table daily = normalizeColumns(ds.summarize(aggr, mean).by("link_id"));
 
@@ -134,28 +115,70 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		copy.stringColumn("road_type").set(Selection.withRange(0, ds.rowCount()), "all");
 		copy.forEach(ds::append);
 
-		// TODO: weighted mean
-		Table perRoadTypeAndHour = ds.summarize(aggr, mean).by("road_type", "hour");
-		normalizeColumns(perRoadTypeAndHour)
-			.rejectColumns("simulated_traffic_volume")
-			.sortOn("road_type", "hour")
-			.write().csv(output.getPath("traffic_stats_by_road_type_and_hour.csv").toFile());
+		Table perRoadTypeAndHour = weightedMeanBy(ds, aggr, "road_type", "hour");
 
-		// TODO: needs weighted mean
-		Table perRoadType = normalizeColumns(ds.summarize(aggr, mean).by("road_type"));
-		perRoadType.column("road_type").setName("Road Type");
-		perRoadType.column("road_capacity_utilization").setName("Cap. Utilization");
-		perRoadType.column("avg_speed").setName("Avg. Speed [km/h]");
-		perRoadType.column("congestion_index").setName("Congestion Index");
-		perRoadType.column("speed_performance_index").setName("Speed Performance Index");
+		List<String> toRemove = perRoadTypeAndHour.columnNames().stream().filter(string -> string.contains("_weighted")).toList();
 
-		perRoadType
-			.rejectColumns("simulated_traffic_volume")
-			.sortOn("Road type")
-			.write().csv(output.getPath("traffic_stats_by_road_type_daily.csv").toFile());
+		perRoadTypeAndHour
+				.rejectColumns(toRemove.toArray(new String[toRemove.size()]))
+				.rejectColumns("simulated_traffic_volume")
+				.sortOn("road_type", "hour")
+				.write().csv(output.getPath("traffic_stats_by_road_type_and_hour.csv").toFile());
 
+		List<String> withoutWeight = new ArrayList<>(aggr);
+		withoutWeight.remove("lane_km");
+
+		Table temp = perRoadTypeAndHour.rejectColumns(withoutWeight.toArray(new String[withoutWeight.size()]));
+		for(var col: temp.columns())
+			col.setName(col.name().replace("_weighted", ""));
+
+		Table dailyPerRoadType = normalizeColumns(temp.summarize(aggr, sum).by("road_type"));
+		Table weightedDailyMean = divideByLength(dailyPerRoadType);
+		DoubleColumn meanLaneKm = weightedDailyMean.doubleColumn("lane_km").divide(24).setName("lane_km");
+		weightedDailyMean.replaceColumn(meanLaneKm);
+		weightedDailyMean
+				.rejectColumns(toRemove.toArray(new String[toRemove.size()]))
+				.rejectColumns("simulated_traffic_volume")
+				.sortOn("road_type")
+				.write().csv(output.getPath("traffic_stats_by_road_type_daily.csv").toFile());
 
 		return 0;
+	}
+
+	private Table weightedMeanBy(Table table, List<String> aggr, String... by) {
+		Table first = multiplyWithLinkLength(table).summarize(aggr, sum).by(by);
+		return divideByLength(normalizeColumns(first));
+	}
+
+	private Table divideByLength(Table table) {
+
+		Table copy = Table.create();
+		for (Column<?> column : table.columns()) {
+
+			if (column instanceof DoubleColumn && !column.name().equals("lane_km")) {
+				String name = column.name();
+				DoubleColumn divided = ((DoubleColumn) column).divide(table.doubleColumn("lane_km")).setName(name);
+				copy.addColumns(divided, column.setName(name + "_weighted"));
+			} else
+				copy.addColumns(column);
+		}
+
+		return copy;
+	}
+
+	private Table multiplyWithLinkLength(Table table) {
+
+		Table copy = Table.create();
+
+		for (Column<?> column : table.columns()) {
+
+			if (column instanceof DoubleColumn && !column.name().equals("lane_km")) {
+				DoubleColumn multiplied = ((DoubleColumn) column).multiply(table.doubleColumn("lane_km")).setName(column.name());
+				copy.addColumns(multiplied);
+			} else
+				copy.addColumns(column);
+		}
+		return copy;
 	}
 
 	/**
@@ -164,15 +187,15 @@ public class TrafficAnalysis implements MATSimAppCommand {
 	private Table createDataset(Network network, TrafficStatsCalculator calc, VolumesAnalyzer volumes) {
 
 		Table all = Table.create(
-			TextColumn.create("link_id"),
-			IntColumn.create("hour"),
-			StringColumn.create("road_type"),
-			DoubleColumn.create("lane_km"),
-			DoubleColumn.create("speed_performance_index"),
-			DoubleColumn.create("congestion_index"),
-			DoubleColumn.create("avg_speed"),
-			DoubleColumn.create("simulated_traffic_volume"),
-			DoubleColumn.create("road_capacity_utilization")
+				TextColumn.create("link_id"),
+				IntColumn.create("hour"),
+				StringColumn.create("road_type"),
+				DoubleColumn.create("lane_km"),
+				DoubleColumn.create("speed_performance_index"),
+				DoubleColumn.create("congestion_index"),
+				DoubleColumn.create("avg_speed"),
+				DoubleColumn.create("simulated_traffic_volume"),
+				DoubleColumn.create("road_capacity_utilization")
 		);
 
 		for (Link link : network.getLinks().values()) {
@@ -201,6 +224,20 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		}
 
 		return all;
+	}
+
+	private static NumericAggregateFunction weightedMean(DoubleColumn weight) {
+
+		return new NumericAggregateFunction("weighted_mean") {
+
+			@Override
+			public Double summarize(NumericColumn<?> column) {
+
+				double sumOfMultipliedCols = column.copy().multiply(weight).sum();
+				double sumWeight = weight.copy().sum();
+				return sumOfMultipliedCols / sumWeight;
+			}
+		};
 	}
 
 	private Network filterNetwork() {
