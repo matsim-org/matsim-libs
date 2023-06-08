@@ -24,7 +24,6 @@ public class StuckAgentDashboard implements Dashboard {
 		header.description = "Analyze agents that are 'stuck' i.e. could not finish their daily plan.";
 
 		layout.row("first").el(Tile.class, (viz, data) -> {
-			viz.title = "";
 			viz.dataset = data.compute(StuckAgentAnalysis.class, "stuck_agents.csv");
 			viz.height = 0.1;
 		});
