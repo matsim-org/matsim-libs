@@ -4,7 +4,7 @@
 
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="coordinateSystem" value="CH1903plus_LV95" />
+		<param name="coordinateSystem" value="Atlantis" />
 	</module>
 
 	<module name="controler">
@@ -20,18 +20,21 @@
 
 		<param name="snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name="mainMode" value="car" />
+
+		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+		<param name="stuckTime" value="999999." />
 	</module>
 
 	<module name="transit" >
 		<param name="routingAlgorithmType" value="SwissRailRaptor" />
-		<param name="transitScheduleFile" value="transitSchedule.xml.gz" />
+		<param name="transitScheduleFile" value="transitSchedule.xml" />
 		<param name="useTransit" value="true" />
 		<param name="usingTransitInMobsim" value="true" />
-		<param name="vehiclesFile" value="transitVehicles.xml.gz" />
+		<param name="vehiclesFile" value="transitVehicles.xml" />
 	</module>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="../../qsimengine/network_genf.xml.gz" />
+		<param name="inputNetworkFile" value="trainNetwork.xml" />
 	</module>
 
 </config>

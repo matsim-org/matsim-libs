@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="1-2" x="500" y="0" linkRefId="1-2" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="7-8" x="500" y="-300" linkRefId="7-8" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="14-15" x="500" y="-600" linkRefId="14-15" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="5-6" x="30500" y="0" linkRefId="5-6" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="12-13" x="30500" y="-300" linkRefId="12-13" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="19-20" x="30500" y="-600" linkRefId="19-20" isBlocking="false">
+		</stopFacility>
+	</transitStops>
+	<transitLine id="line1">
+		<transitRoute id="line1_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="1-2" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="19-20" arrivalOffset="01:00:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="1-2"/>
+				<link refId="2-3"/>
+				<link refId="3-9"/>
+				<link refId="9-10"/>
+				<link refId="10-17"/>
+				<link refId="17-17a"/>
+				<link refId="17a-17b"/>
+				<link refId="17b-17c"/>
+				<link refId="17c-18"/>
+				<link refId="18-19"/>
+				<link refId="19-20"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train1"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="line2">
+		<transitRoute id="line2_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="7-8" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="12-13" arrivalOffset="01:00:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="7-8"/>
+				<link refId="8-9"/>
+				<link refId="9-10"/>
+				<link refId="10-11"/>
+				<link refId="11-12"/>
+				<link refId="12-13"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:01:20" vehicleRefId="train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>
