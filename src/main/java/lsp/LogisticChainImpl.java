@@ -65,7 +65,7 @@ import java.util.Collection;
 	}
 
 	@Override
-	public void assignShipment(LSPShipment shipment) {
+	public void addShipmentToChain(LSPShipment shipment) {
 		shipmentIds.add(shipment.getId());
 	}
 

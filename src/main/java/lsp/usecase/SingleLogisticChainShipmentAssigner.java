@@ -54,7 +54,7 @@ class SingleLogisticChainShipmentAssigner implements ShipmentAssigner {
 	public void assignToLogisticChain(LSPShipment shipment) {
 		Gbl.assertIf(lsp.getSelectedPlan().getLogisticChains().size() == 1);
 		LogisticChain singleSolution = lsp.getSelectedPlan().getLogisticChains().iterator().next();
-		singleSolution.assignShipment(shipment);
+		singleSolution.addShipmentToChain(shipment);
 	}
 
 }

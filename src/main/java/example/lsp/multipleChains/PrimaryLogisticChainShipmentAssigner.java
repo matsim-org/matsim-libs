@@ -35,6 +35,6 @@ class PrimaryLogisticChainShipmentAssigner implements ShipmentAssigner {
 	public void assignToLogisticChain(LSPShipment shipment) {
 		Gbl.assertIf(lsp.getSelectedPlan().getLogisticChains().size() > 0);
 		LogisticChain firstLogisticChain = lsp.getSelectedPlan().getLogisticChains().iterator().next();
-		firstLogisticChain.assignShipment(shipment);
+		firstLogisticChain.addShipmentToChain(shipment);
 	}
 }

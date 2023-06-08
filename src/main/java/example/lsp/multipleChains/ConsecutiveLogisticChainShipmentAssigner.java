@@ -49,7 +49,7 @@ public class ConsecutiveLogisticChainShipmentAssigner implements ShipmentAssigne
 
 		//assign the shipment to the chain with the least number of assigned shipments so far, increase its value by one
 		LogisticChain minChain = Collections.min(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue()).getKey();
-		minChain.assignShipment(shipment);
+		minChain.addShipmentToChain(shipment);
 		shipmentCountByChain.merge(minChain, 1, Integer::sum);
 	}
 
