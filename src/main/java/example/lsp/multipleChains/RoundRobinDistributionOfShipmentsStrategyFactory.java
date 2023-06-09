@@ -32,15 +32,15 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 
 import java.util.*;
 
-/*package-private*/ class EqualDistributionOfShipmentsStrategyFactory {
+/*package-private*/ class RoundRobinDistributionOfShipmentsStrategyFactory {
 
-	/*package-private*/ EqualDistributionOfShipmentsStrategyFactory() {
+	/*package-private*/ RoundRobinDistributionOfShipmentsStrategyFactory() {
 	}
 
 	/*package-private*/ GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
 		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
 
-		GenericPlanStrategyModule<LSPPlan> equalModule = new GenericPlanStrategyModule<>() {
+		GenericPlanStrategyModule<LSPPlan> roundRobinModule = new GenericPlanStrategyModule<>() {
 
 			@Override
 			public void prepareReplanning(ReplanningContext replanningContext) {
@@ -69,7 +69,7 @@ import java.util.*;
 
 		};
 
-		strategy.addStrategyModule(equalModule);
+		strategy.addStrategyModule(roundRobinModule);
 		return strategy;
 	}
 
