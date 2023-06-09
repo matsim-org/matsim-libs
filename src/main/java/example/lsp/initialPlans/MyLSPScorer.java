@@ -30,9 +30,9 @@ import lsp.usecase.TransshipmentHub;
 
 	private void scoreLspCarriers() {
 		var lspPlan = lsp.getSelectedPlan();
-		for (LogisticChain solution : lspPlan.getLogisticChains()) {
-			for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
-				if (solutionElement.getResource() instanceof LSPCarrierResource carrierResource) {
+		for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+			for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
+				if (logisticChainElement.getResource() instanceof LSPCarrierResource carrierResource) {
 					var carriersScore = carrierResource.getCarrier().getSelectedPlan().getScore();
 					if (carriersScore != null) {
 						score = score + carriersScore;
@@ -51,9 +51,9 @@ import lsp.usecase.TransshipmentHub;
 	 */
 	private void scoreHub() {
 		var lspPlan = lsp.getSelectedPlan();
-		for (LogisticChain solution : lspPlan.getLogisticChains()) {
-			for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
-				if (solutionElement.getResource() instanceof TransshipmentHub hub){
+		for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+			for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
+				if (logisticChainElement.getResource() instanceof TransshipmentHub hub){
 					score = score - LSPUtils.getFixedCost(hub);
 				}
 			}
