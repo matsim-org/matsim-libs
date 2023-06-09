@@ -82,13 +82,17 @@ public class ExampleTwoChainsReplanning {
 				});
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new RoundRobinDistributionOfShipmentsStrategyFactory().createStrategy(), null, 0.5);
-					strategyManager.addStrategy(new RandomDistributionOfShipmentsStrategyFactory().createStrategy(), null, 0.5);
+//					strategyManager.addStrategy(new RoundRobinDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1);
+//					strategyManager.addStrategy(new RandomDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1);
+					strategyManager.addStrategy(new LeastUsedChainDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(1);
 					return strategyManager;
 				});
 			}
 		});
+
+		//TODO: Innovation switch off funktioniert noch nicht
+		config.strategy().setFractionOfIterationsToDisableInnovation(1);
 
 		log.info("Run MATSim");
 
