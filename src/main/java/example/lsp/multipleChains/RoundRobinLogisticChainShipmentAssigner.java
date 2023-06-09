@@ -18,14 +18,14 @@ import java.util.Map;
  * Requirements: There must be at least one logisticChain in the plan
  */
 
-public class ConsecutiveLogisticChainShipmentAssigner implements ShipmentAssigner {
+public class RoundRobinLogisticChainShipmentAssigner implements ShipmentAssigner {
 
 	private LSP lsp;
 
 	// map of logistic chains and their number of assigned shipments in order of addition
 	Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
 
-	ConsecutiveLogisticChainShipmentAssigner() {
+	RoundRobinLogisticChainShipmentAssigner() {
 	}
 
 	@Override
