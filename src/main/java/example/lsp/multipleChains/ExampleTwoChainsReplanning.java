@@ -80,9 +80,11 @@ public class ExampleTwoChainsReplanning {
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
-				bind( LSPStrategyManager.class ).toProvider(() -> {
+				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new EqualDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1 );
+					strategyManager.addStrategy(new EqualDistributionOfShipmentsStrategyFactory().createStrategy(), null, 0.5);
+					strategyManager.addStrategy(new RandomDistributionOfShipmentsStrategyFactory().createStrategy(), null, 0.5);
+					strategyManager.setMaxPlansPerAgent(1);
 					return strategyManager;
 				});
 			}
