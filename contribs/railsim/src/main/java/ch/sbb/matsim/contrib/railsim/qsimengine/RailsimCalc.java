@@ -105,12 +105,12 @@ public class RailsimCalc {
 	}
 
 	/**
-	 * Calculate the deceleration needed to come to halt exactly after {@code dist}.
+	 * Calculate the deceleration needed to arrive at {@code targetSpeed} exactly after {@code dist}.
 	 *
 	 * @return negative acceleration, always a negative number.
 	 */
-	static double calcTargetDecel(double dist, double currentSpeed) {
-		return -currentSpeed * currentSpeed / (2 * dist);
+	static double calcTargetDecel(double dist, double targetSpeed, double currentSpeed) {
+		return -(currentSpeed * currentSpeed - targetSpeed * targetSpeed) / (2 * dist);
 	}
 
 	/**
@@ -122,140 +122,6 @@ public class RailsimCalc {
 			+ deceleration * currentSpeed * currentSpeed;
 
 		return Math.sqrt(nom / (acceleration + deceleration));
-	}
-
-	/**
-	 * Calc the distance deceleration needs to start and the target speed.
-	 */
-	static double calcDecelDistanceAndSpeed(RailLink currentLink, UpdateEvent event) {
-
-		TrainState state = event.state;
-		double assumedSpeed = state.speed;
-
-		double maxSpeed = Math.max(assumedSpeed, state.allowedMaxSpeed);
-
-		// Lookahead window
-		double window = RailsimCalc.calcTraveledDist(maxSpeed, maxSpeed / state.train.deceleration(),
-			-state.train.deceleration()) + currentLink.length;
-
-		// Distance to the next speed change point (link)
-		double dist = currentLink.length - state.headPosition;
-
-		double decelDist = Double.POSITIVE_INFINITY;
-		double targetSpeed = state.targetSpeed;
-		double speed = 0;
-
-		for (int i = state.routeIdx; i <= state.route.size(); i++) {
-
-			RailLink link;
-			double allowed;
-			// Last track where train comes to halt
-			if (i == state.route.size()) {
-				link = null;
-				allowed = 0;
-			} else {
-				link = state.route.get(i);
-
-				// If the previous link is a transit stop the speed needs to be 0 at the next link
-				// train stops at the very end of a link
-				if (i > 0 && state.isStop(state.route.get(i - 1).getLinkId()))
-					allowed = 0;
-				else if (!link.isBlockedBy(state.driver) && !link.hasFreeTrack())
-					allowed = 0;
-				else
-					allowed = link.getAllowedFreespeed(state.driver);
-			}
-
-			// Special case when accelerating from 0 and reaching 0 again
-			if (allowed < assumedSpeed || (allowed == 0 && allowed == assumedSpeed)) {
-
-				SpeedTarget target = calcTargetSpeed(dist, state.acceleration, state.train.deceleration(), state.speed, state.targetSpeed, allowed);
-
-				double newDecelDist = dist - target.decelDist;
-
-				if (newDecelDist < decelDist) {
-					decelDist = newDecelDist;
-					targetSpeed = target.targetSpeed;
-					speed = allowed;
-				}
-			}
-
-			if (link != null)
-				dist += link.length;
-
-			// don't need to look further than distance needed for full stop
-			if (dist >= window)
-				break;
-		}
-
-		state.targetSpeed = targetSpeed;
-		event.newSpeed = speed;
-
-		// No update required
-		if (FuzzyUtils.equals(event.newSpeed, state.targetSpeed))
-			return Double.POSITIVE_INFINITY;
-
-		return decelDist;
-	}
-
-	/**
-	 * Calculate the possible target speed a train can safely achieve.
-	 * Taking upcoming links and deceleration into account, target speed might be lower than the allowed.
-	 */
-	static double calcPossibleTargetSpeed(TrainState state, RailLink currentLink) {
-
-		// TODO: not correct yet
-
-		// Distance to the next speed change point (link)
-		double dist = currentLink.length - state.headPosition;
-
-		// Lookahead window
-		double window = RailsimCalc.calcTraveledDist(state.allowedMaxSpeed, state.allowedMaxSpeed / state.train.deceleration(),
-			-state.train.deceleration()) + currentLink.length;
-
-		double targetSpeed = Double.POSITIVE_INFINITY;
-
-		for (int i = state.routeIdx; i <= state.route.size(); i++) {
-
-			RailLink link;
-			double allowed;
-			if (i == state.route.size()) {
-				link = null;
-				allowed = 0;
-			} else {
-				link = state.route.get(i);
-
-				// If the previous link is a transit stop the speed needs to be 0 at the next link
-				// train stops at the very end of a link
-				if (i > 0 && state.isStop(state.route.get(i - 1).getLinkId()))
-					allowed = 0;
-				else if (!link.isBlockedBy(state.driver) && !link.hasFreeTrack())
-					allowed = 0;
-				else
-					allowed = link.getAllowedFreespeed(state.driver);
-			}
-
-			// only need to consider reduction
-			if (allowed < state.allowedMaxSpeed) {
-
-				double timeDecel = (state.allowedMaxSpeed - allowed) / state.train.deceleration();
-				double distDecel = calcTraveledDist(targetSpeed, timeDecel, -state.train.deceleration());
-
-				// There would not be enough headroom to stop
-				// target speed is reduced to this speed link.
-				if (distDecel > dist && allowed < targetSpeed) {
-					targetSpeed = allowed;
-				}
-			}
-
-			if (link != null)
-				dist += link.length;
-
-			if (dist >= window)
-				break;
-		}
-
-		return Math.min(targetSpeed, state.allowedMaxSpeed);
 	}
 
 	/**

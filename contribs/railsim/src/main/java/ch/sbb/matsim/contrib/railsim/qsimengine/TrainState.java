@@ -70,6 +70,11 @@ final class TrainState {
 	double targetSpeed;
 
 	/**
+	 * Train plans to decelerate after this distance.
+	 */
+	double targetDecelDist;
+
+	/**
 	 * Current allowed speed, which depends on train type, links, but not on other trains or speed needed to stop.
 	 */
 	double allowedMaxSpeed;
@@ -103,6 +108,7 @@ final class TrainState {
 		this.timestamp = timestamp;
 		this.headLink = linkId;
 		this.tailLink = linkId;
+		this.targetDecelDist = Double.POSITIVE_INFINITY;
 	}
 
 	@Override

@@ -11,13 +11,21 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	double plannedTime;
 	Type type;
 
-	double newSpeed = -1;
+	/**
+	 * Timestamp when next reservation will be checked.
+	 */
 	double checkReservation = -1;
+
+	/**
+	 * Whether train is waiting on the very link end for the next to be unblocked.
+	 */
+	boolean waitingForLink;
 
 	public UpdateEvent(TrainState state, Type type) {
 		this.state = state;
 		this.plannedTime = state.timestamp;
 		this.type = type;
+		this.waitingForLink = false;
 	}
 
 	@Override

@@ -130,6 +130,23 @@ public final class RailResourceManager {
 	}
 
 	/**
+	 * Whether a driver already reserved a link or would be able to reserve it.
+	 */
+	public boolean canBeBlockedBy(RailLink link, MobsimDriverAgent driver) {
+
+		if (link.isBlockedBy(driver))
+			return true;
+
+		Id<RailResource> resourceId = link.getResourceId();
+		if (resourceId != null) {
+			RailResource resource =  getResource(resourceId);
+			return resource.reservations.contains(driver) || resource.hasCapacity();
+		}
+
+		return link.hasFreeTrack();
+	}
+
+	/**
 	 * Release a non-free track to be free again.
 	 */
 	public void releaseTrack(double time, MobsimDriverAgent driver, RailLink link) {
@@ -143,5 +160,4 @@ public final class RailResourceManager {
 		}
 
 	}
-
 }

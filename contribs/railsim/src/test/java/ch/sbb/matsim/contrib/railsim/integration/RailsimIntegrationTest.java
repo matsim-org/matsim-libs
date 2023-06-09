@@ -11,14 +11,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.vsp.scenario.SnzActivities;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
@@ -28,53 +26,11 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public class RailsimIntegrationTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	@Test
-	public void scenario0() {
-
-		File dir = new File(utils.getPackageInputDirectory(), "test0");
-
-		Config config = ConfigUtils.loadConfig(new File(dir, "config.xml").toString());
-
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-
-		controler.addOverridingModule(new RailsimModule());
-		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
-
-		controler.run();
-
-	}
-
-	@Test
-	public void scenario_genf() {
-
-		File dir = new File(utils.getPackageInputDirectory(), "test_genf");
-
-		Config config = ConfigUtils.loadConfig(new File(dir, "config.xml").toString());
-
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-
-		controler.addOverridingModule(new RailsimModule());
-		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
-
-		controler.run();
-
-	}
 
 	@Test
 	public void scenario_kelheim() {
@@ -113,6 +69,38 @@ public class RailsimIntegrationTest {
 		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
 
 		controler.run();
+	}
+
+	@Test
+	public void test0_simple() {
+
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "0_simple"));
+
+
+	}
+
+	@Test
+	public void scenario_genf() {
+
+		// TODO: can probably be replaced by the genf_bern test
+
+		File dir = new File(utils.getPackageInputDirectory(), "test_genf");
+
+		Config config = ConfigUtils.loadConfig(new File(dir, "config.xml").toString());
+
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
+		config.controler().setCreateGraphs(false);
+		config.controler().setDumpDataAtEnd(false);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+
+		controler.addOverridingModule(new RailsimModule());
+		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
+
+		controler.run();
+
 	}
 
 	private EventsCollector runSimulation(File scenarioDir) {
@@ -205,7 +193,6 @@ public class RailsimIntegrationTest {
 		double accDistance3 = distanceTravelled(stationSpeed, acceleration, accTime3);
 		currentTime += accTime3;
 		assertTrainState(currentTime, linkSpeed, linkSpeed, 0, accDistance1 + cruiseDistance2 + accDistance3, train1events.get(4));
-
 
 		// train can cruise with link speed until it needs to decelerate for next station
 
