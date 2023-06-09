@@ -42,31 +42,14 @@ import java.util.*;
 
 		GenericPlanStrategyModule<LSPPlan> equalModule = new GenericPlanStrategyModule<>() {
 
-			Integer shipmentCountBefore = 0;
-			Integer shipmentCountAfter = 0;
-
 			@Override
 			public void prepareReplanning(ReplanningContext replanningContext) {
 			}
 
 			@Override
 			public void handlePlan(LSPPlan lspPlan) {
-
-				//Ggf. könnte man hier auch den  ConsecutiveAssigner einklinken, der das Gleiche macht
-
 				LSP lsp = lspPlan.getLSP();
 				Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
-
-//				LSPPlan initialPlan = lsp.getPlans().get(0);
-//				for (LogisticChain logisticChain : initialPlan.getLogisticChains()) {
-//					shipmentCountBefore += logisticChain.getShipmentIds().size();
-//				}
-
-				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-					shipmentCountBefore += logisticChain.getShipmentIds().size();
-					// ist der folgende Schritt nötig, da der bestehende Plan kopiert wird?
-					logisticChain.getShipmentIds().clear();
-				}
 
 				for (LSPShipment shipment : lsp.getShipments()) {
 					if (shipmentCountByChain.isEmpty()) {
@@ -75,21 +58,15 @@ import java.util.*;
 						}
 					}
 					LogisticChain minChain = Collections.min(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue()).getKey();
-					minChain.assignShipment(shipment);
+					minChain.addShipmentToChain(shipment);
 					shipmentCountByChain.merge(minChain, 1, Integer::sum);
-				}
-
-				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-					shipmentCountAfter += logisticChain.getShipmentIds().size();
 				}
 			}
 
 			@Override
 			public void finishReplanning() {
-//				if (!Objects.equals(shipmentCountBefore, shipmentCountAfter)) {
-//					throw new RuntimeException("Shipments lost in replanning process");
-//				}
 			}
+
 		};
 
 		strategy.addStrategyModule(equalModule);
