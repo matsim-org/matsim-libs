@@ -206,9 +206,7 @@ final class RailsimEngine implements Steppable {
 			} else {
 				decideNextUpdate(event);
 			}
-
 		}
-
 	}
 
 	private void updateDeparture(double time, UpdateEvent event) {
@@ -279,7 +277,7 @@ final class RailsimEngine implements Steppable {
 
 			double stopTime = handleTransitStop(time, state);
 
-			assert stopTime >= 0: "Stop time must be positive";
+			assert stopTime >= 0 : "Stop time must be positive";
 			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at pt stop, but was " + state.speed;
 
 			// Same event is re-scheduled after stopping,
@@ -464,12 +462,7 @@ final class RailsimEngine implements Steppable {
 		TrainState state = event.state;
 		RailLink currentLink = resources.getLink(state.headLink);
 
-//		if (state.routeIdx >= 877 && state.routeIdx <= 880 && state.timestamp >= 7300)
-//			log.info("debug");
-
-//		if (state.driver.getId().toString().equals("pt_Expresszug_BE_GE_train_0_train_Expresszug_BE_GE") && state.timestamp > 7000)
-//			log.info("debug");
-
+//		assert debug(state);
 
 		// (1) max speed reached
 		double accelDist = Double.POSITIVE_INFINITY;
@@ -525,11 +518,13 @@ final class RailsimEngine implements Steppable {
 		// dist is the minimum of all supplied distances
 		event.plannedTime = state.timestamp + RailsimCalc.calcRequiredTime(state, dist);
 
-		// insert reservation event if necessary
-		if (event.checkReservation >= 0 && event.checkReservation > state.timestamp &&
-			event.plannedTime > event.checkReservation) {
+		// There could be old reservations events that need to be checked first
+		if (event.isAwaitingReservation() && event.checkReservation < state.timestamp) {
+			event.checkReservation = state.timestamp;
+		}
 
-			// TODO how could the check smaller than timestamp
+		// insert reservation event if necessary
+		if (event.isAwaitingReservation() && event.plannedTime > event.checkReservation) {
 
 			event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
 			event.plannedTime = event.checkReservation;
@@ -620,23 +615,13 @@ final class RailsimEngine implements Steppable {
 	}
 
 	/**
-	 * Calculate the possible target speed. This can be lower than allowed if links in front are blocked.
+	 * Debug helper function to create breakpoints.
 	 */
-	@Deprecated
-	private void updateTargetSpeed(UpdateEvent event, TrainState state) {
+	private static boolean debug(TrainState state) {
+		if (state.driver.getId().toString().equals("pt_Expresszug_GE_BE_train_3_train_Expresszug_GE_BE") && state.routeIdx > 550)
+			log.info("debug");
 
-		// TODO: needs to account for many more factors such as pt stops, possibly blocked links, possible speed under deceleration
-
-		if (!event.isAwaitingReservation()) {
-
-			state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
-
-			if (state.allowedMaxSpeed > state.targetSpeed) {
-				state.targetSpeed = state.allowedMaxSpeed;
-				state.acceleration = state.train.acceleration();
-			}
-		}
-
+		return true;
 	}
 
 	/**

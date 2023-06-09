@@ -84,6 +84,22 @@ public class RailsimCalcTest {
 	}
 
 	@Test
+	public void targetSpeed() {
+
+		RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(100, 0.5, 0.5, 0, 23, 0);
+
+		assertThat(target.decelDist())
+			.isCloseTo(50, Offset.offset(0.0001));
+
+
+		target = RailsimCalc.calcTargetSpeed(200, 0.5, 0.5, 13, 13, 0);
+
+		assertThat(target.decelDist())
+			.isCloseTo(169, Offset.offset(0.0001));
+
+	}
+
+	@Test
 	public void speedForStop() {
 
 		double v = RailsimCalc.calcTargetSpeedForStop(1000, 0.5, 0.5, 0);
