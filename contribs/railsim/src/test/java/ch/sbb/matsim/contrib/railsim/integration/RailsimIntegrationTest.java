@@ -347,4 +347,9 @@ public class RailsimIntegrationTest {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "14_mesoStations"));
 	}
 
+	@Test @Ignore(value="no assert statements yet")
+	public void test_station_rerouting() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "station_rerouting"));
+	}
+
 }
