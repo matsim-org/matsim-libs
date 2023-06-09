@@ -14,7 +14,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 class ProximityDistributionOfShipmentsStrategyFactory {
 
 
-	public ProximityDistributionOfShipmentsStrategyFactory() {
+	ProximityDistributionOfShipmentsStrategyFactory() {
 	}
 
 	GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
