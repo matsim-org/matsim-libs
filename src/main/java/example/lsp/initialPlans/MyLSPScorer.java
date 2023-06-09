@@ -2,6 +2,8 @@ package example.lsp.initialPlans;
 
 import lsp.*;
 import lsp.usecase.TransshipmentHub;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A scorer for the LSP.
@@ -14,6 +16,7 @@ import lsp.usecase.TransshipmentHub;
 /*package-private*/ class MyLSPScorer implements LSPScorer {
 	private double score = 0;
 
+	final Logger logger = LogManager.getLogger(MyLSPScorer.class);
 	private LSP lsp;
 
 	@Override
@@ -25,6 +28,7 @@ import lsp.usecase.TransshipmentHub;
 	public double getScoreForCurrentPlan() {
 		scoreLspCarriers();
 		scoreHub();
+		scoreMissingShipments();
 		return score;
 	}
 
@@ -57,6 +61,19 @@ import lsp.usecase.TransshipmentHub;
 					score = score - LSPUtils.getFixedCost(hub);
 				}
 			}
+		}
+	}
+
+	private void scoreMissingShipments() {
+		LSPPlan lspPlan = lsp.getSelectedPlan();
+		int lspPlanShipmentCount = lspPlan.getLogisticChains()
+				.stream()
+				.mapToInt(logisticChain -> logisticChain.getShipmentIds().size())
+				.sum();
+		if (lspPlanShipmentCount !=  lsp.getShipments().size()) {
+			logger.error("LspPlan doesn't contain the same number of shipments as LSP, " +
+					"shipments probably lost during replanning.");
+			score -= 10000;
 		}
 	}
 

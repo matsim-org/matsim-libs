@@ -2,6 +2,8 @@ package example.lsp.multipleChains;
 
 import lsp.*;
 import lsp.usecase.TransshipmentHub;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A scorer for the LSP.
@@ -14,6 +16,7 @@ import lsp.usecase.TransshipmentHub;
 /*package-private*/ class MyLSPScorer implements LSPScorer {
 	private double score = 0;
 
+	final Logger logger = LogManager.getLogger(MyLSPScorer.class);
 	private LSP lsp;
 
 	@Override
@@ -25,14 +28,15 @@ import lsp.usecase.TransshipmentHub;
 	public double getScoreForCurrentPlan() {
 		scoreLspCarriers();
 		scoreHub();
+		scoreMissingShipments();
 		return score;
 	}
 
 	private void scoreLspCarriers() {
 		var lspPlan = lsp.getSelectedPlan();
-		for (LogisticChain solution : lspPlan.getLogisticChains()) {
-			for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
-				if (solutionElement.getResource() instanceof LSPCarrierResource carrierResource) {
+		for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+			for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
+				if (logisticChainElement.getResource() instanceof LSPCarrierResource carrierResource) {
 					var carriersScore = carrierResource.getCarrier().getSelectedPlan().getScore();
 					if (carriersScore != null) {
 						score = score + carriersScore;
@@ -51,12 +55,25 @@ import lsp.usecase.TransshipmentHub;
 	 */
 	private void scoreHub() {
 		var lspPlan = lsp.getSelectedPlan();
-		for (LogisticChain solution : lspPlan.getLogisticChains()) {
-			for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
-				if (solutionElement.getResource() instanceof TransshipmentHub hub){
+		for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+			for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
+				if (logisticChainElement.getResource() instanceof TransshipmentHub hub){
 					score = score - LSPUtils.getFixedCost(hub);
 				}
 			}
+		}
+	}
+
+	private void scoreMissingShipments() {
+		LSPPlan lspPlan = lsp.getSelectedPlan();
+		int lspPlanShipmentCount = lspPlan.getLogisticChains()
+				.stream()
+				.mapToInt(logisticChain -> logisticChain.getShipmentIds().size())
+				.sum();
+		if (lspPlanShipmentCount !=  lsp.getShipments().size()) {
+			logger.error("LspPlan doesn't contain the same number of shipments as LSP, " +
+					"shipments probably lost during replanning.");
+			score -= 10000;
 		}
 	}
 
