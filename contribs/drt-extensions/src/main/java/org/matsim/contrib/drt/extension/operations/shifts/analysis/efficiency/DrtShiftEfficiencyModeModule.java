@@ -9,6 +9,8 @@
 
 package org.matsim.contrib.drt.extension.operations.shifts.analysis.efficiency;
 
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -31,11 +33,12 @@ public class DrtShiftEfficiencyModeModule extends AbstractDvrpModeModule {
         bindModal(ShiftEfficiencyTracker.class).toProvider(modalProvider(getter ->
                 new ShiftEfficiencyTracker())).asEagerSingleton();
         addEventHandlerBinding().to(modalKey(ShiftEfficiencyTracker.class));
-        addControlerListenerBinding().toProvider(modalProvider(
-                getter -> new ShiftEfficiencyAnalysisControlerListener(drtConfigGroup,
-                        getter.getModal(ShiftEfficiencyTracker.class),
-                        getter.getModal(DrtShiftsSpecification.class),
-                        getter.get(MatsimServices.class)))).asEagerSingleton();
-
+		bindModal(ShiftEfficiencyAnalysisControlerListener.class).toProvider(modalProvider(getter ->
+						new ShiftEfficiencyAnalysisControlerListener(drtConfigGroup,
+								getter.getModal(ShiftEfficiencyTracker.class),
+								getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}),
+								getter.get(MatsimServices.class))
+		));
+        addControlerListenerBinding().to(modalKey(ShiftEfficiencyAnalysisControlerListener.class));
     }
 }

@@ -24,15 +24,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.contrib.freight.events.FreightServiceStartEvent;
+import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceStartEvent;
 
 import java.util.LinkedHashMap;
 
 /**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ *
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
+@Deprecated(since = "apr23", forRemoval = true)
 class FreightAnalysisServiceTracking {
 
 	private final LinkedHashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers = new LinkedHashMap<>();
@@ -87,7 +92,7 @@ class FreightAnalysisServiceTracking {
 	}
 
 	// UNTESTED handling of LSP Service events that provided reliable info about driver and timestamps.
-	public void handleStartEvent(FreightServiceStartEvent event) {
+	public void handleStartEvent(CarrierServiceStartEvent event) {
 		if (carrierServiceTrackers.containsKey(event.getCarrierId())){
 			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getServiceId())){
 				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getServiceId());
@@ -96,7 +101,7 @@ class FreightAnalysisServiceTracking {
 			}
 		}
 	}
-	public void handleEndEvent(FreightServiceEndEvent event) {
+	public void handleEndEvent(CarrierServiceEndEvent event) {
 		if (carrierServiceTrackers.containsKey(event.getCarrierId())){
 			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getServiceId())){
 				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getServiceId());
@@ -128,6 +133,12 @@ class FreightAnalysisServiceTracking {
 	}
 }
 
+/**
+ *  @deprecated We have new event types now, allowing us to use a more straight forward analysis without guessing.
+ *  I will let this here for some time so we can have a look, what else should be moved over, but in the end, We will remove this here.
+ *  (kmt apr'23)
+ */
+@Deprecated(since = "apr23")
 class ServiceTracker {
 	public CarrierService service;
 	public Double calculatedArrival =0.0;

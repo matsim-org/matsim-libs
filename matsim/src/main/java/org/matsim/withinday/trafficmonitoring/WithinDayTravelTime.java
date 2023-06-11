@@ -34,8 +34,8 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,10 +76,10 @@ import org.matsim.vehicles.Vehicle;
 /**
  * Collects link travel times over a given time span (storedTravelTimesBinSize)
  * and calculates an average travel time over this time span.
- * 
+ *
  * TODO:
  * - make storedTravelTimesBinSize configurable (e.g. via config)
- * 
+ *
  * @author cdobler
  */
 @Singleton
@@ -96,13 +96,13 @@ public class WithinDayTravelTime implements TravelTime,
 	// Trips with no Activity on the current Link
 	private Map<Id<Vehicle>, TripBin> regularActiveTrips; // VehicleId
 	private Map<Id<Link>, TravelTimeInfo> travelTimeInfos; // LinkId
-	
+
 	private TravelTimeInfoProvider travelTimeInfoProvider;
 
 	// Links that are changed by network change events
 	private TreeMap<Double, Map<Link,Double>> changedLinksByTime;
 	// yy better a priority queue.  kai, dec'17
-	
+
 	/*
 	 * For parallel Execution
 	 */
@@ -113,16 +113,16 @@ public class WithinDayTravelTime implements TravelTime,
 
 	private final int infoTimeStep = 3600;
 	private int nextInfoTime = 0;
-	
+
 	private Set<Id<Vehicle>> vehiclesToFilter;
 	private final Set<String> analyzedModes;
 	private final boolean filterModes;
 
 	private boolean problem = true ;
 	private int resetCnt = 0;
-	
+
 	private double now = Double.NEGATIVE_INFINITY ;
-	
+
 	@Inject
 	WithinDayTravelTime(Scenario scenario) {
 		this(scenario, null);
@@ -154,46 +154,46 @@ public class WithinDayTravelTime implements TravelTime,
 		this.travelTimeInfos = new ConcurrentHashMap<>();
 		this.changedLinksByTime = new TreeMap<>();
 		this.vehiclesToFilter = new HashSet<>();
-		
+
 		// one TravelTimeInfo per link:
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeInfo travelTimeInfo = new TravelTimeInfo();
 			this.travelTimeInfos.put(link.getId(), travelTimeInfo);
 		}
-		
+
 		/*
-		 * If no RoutingNetwork is used, ArrayBasedTravelTimeInfoProvider uses 
-		 * a MapBasedTravelTimeInfoProvider as fall back solution. This increases 
+		 * If no RoutingNetwork is used, ArrayBasedTravelTimeInfoProvider uses
+		 * a MapBasedTravelTimeInfoProvider as fall back solution. This increases
 		 * routing times of a AStarLandmarks router by ~5%.
 		 */
 //		this.travelTimeInfoProvider = new MapBasedTravelTimeInfoProvider(this.travelTimeInfos);
 		this.travelTimeInfoProvider = new ArrayBasedTravelTimeInfoProvider(this.travelTimeInfos, this.network);
-		
+
 		/*
 		 * If the network is time variant, we have to update the link parameters
 		 * according to the network change events.
 		 */
 		Queue<NetworkChangeEvent> networkChangeEvents = NetworkUtils.getNetworkChangeEvents(this.network);
-		
+
 		// I just changed the return type of the network change events from Collection to Queue.
 		// This should, in a first step, allow to remove the separate changedLinksByTime data structure.
 		// In a second step, this should allow to insert link change events after everything
 		// has started.  kai, dec'17
 		// Well, but maybe I don't even want this, and I want this class here recognize changes
 		// only when someone observes them??? (bushfire evacuation use case). kai, dec'17
-		
+
 		// If one looks at transport telematics, then we need to also be able to set expected
 		// speeds for the future!  Which would indeed justify its own data model.  kai, dec'17
 		// (in contrast, watch out: the NetworkChangeEventsEngine also keeps its own
 		// copy for the mobsim)
-		
+
 		if (networkChangeEvents != null) {
 			for (NetworkChangeEvent networkChangeEvent : networkChangeEvents) {
 				addNetworkChangeEventToLocalDataStructure(networkChangeEvent);
 			}
 		}
 	}
-	
+
 	private void addNetworkChangeEventToLocalDataStructure(NetworkChangeEvent networkChangeEvent) {
 		ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();
 		if (freespeedChange != null) {
@@ -223,7 +223,7 @@ public class WithinDayTravelTime implements TravelTime,
 			}
 		}
 	}
-	
+
 	public final void addNetworkChangeEvent(NetworkChangeEvent networkChangeEvent) {
 		this.addNetworkChangeEventToLocalDataStructure(networkChangeEvent);
 	}
@@ -233,7 +233,7 @@ public class WithinDayTravelTime implements TravelTime,
 		final double travelTime = this.travelTimeInfoProvider.getTravelTimeInfo(link).travelTime;
 		return travelTime;
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		init();
@@ -248,12 +248,12 @@ public class WithinDayTravelTime implements TravelTime,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		/* 
+		/*
 		 * If only some modes are analyzed, we check whether the vehicle
 		 * performs a trip with one of those modes. if not, we skip the event.
 		 */
 		if (filterModes && vehiclesToFilter.contains(event.getVehicleId())) return;
-		
+
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		double time = event.getTime();
 
@@ -304,21 +304,21 @@ public class WithinDayTravelTime implements TravelTime,
 		Id<Vehicle> vehicleId = event.getVehicleId();
 
 		this.regularActiveTrips.remove(vehicleId);
-		
+
 		// try to remove vehicle from set with filtered vehicles
 		if (filterModes) this.vehiclesToFilter.remove(event.getVehicleId());
 	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		/* 
+		/*
 		 * If filtering transport modes is enabled and the vehicle
 		 * starts a leg on a non analyzed transport mode, add the vehicle
 		 * to the filtered vehicles set.
 		 */
 		if (filterModes && !analyzedModes.contains(event.getNetworkMode())) this.vehiclesToFilter.add(event.getVehicleId());
 	}
-	
+
 	/*
 	 * Initially set free speed travel time.
 	 */
@@ -330,13 +330,13 @@ public class WithinDayTravelTime implements TravelTime,
 			double simStartTime = ((QSim) e.getQueueSimulation()).getSimTimer().getSimStartTime();
 
 			/*
-			 * infoTime may be < simStartTime, this ensures to print 
-			 * out the info at the very first timestep already			
+			 * infoTime may be < simStartTime, this ensures to print
+			 * out the info at the very first timestep already
 			 */
 			this.nextInfoTime = (int)(Math.floor(simStartTime / this.infoTimeStep) * this.infoTimeStep);
 		}
-		
-		
+
+
 		for (Link link : this.network.getLinks().values()) {
 			double freeSpeedTravelTime = link.getLength() / link.getFreespeed();
 
@@ -353,15 +353,15 @@ public class WithinDayTravelTime implements TravelTime,
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		problem = false ;
-		
+
 		// yyyy In terms of "bushfire evacuation" design (and maybe even in terms of more general transport telematics)
 		// one would need some settable TimeDependentNetworkUpdater class.  kai, dec'17
-		
+
 //		Collection<Link> links = changedLinksByTime.remove(e.getSimulationTime());
 		// yyyyyy I find it quite optimistic to do this with doubles. What
 		// if someone adds a link change event in between two integer
 		// time steps?  kai, dec'17
-		
+
 		while( !changedLinksByTime.isEmpty() && changedLinksByTime.firstKey() <= e.getSimulationTime() ) {
 			Map<Link, Double> map = changedLinksByTime.pollFirstEntry().getValue();
 			for ( Map.Entry<Link,Double> link2speed : map.entrySet() ) {
@@ -378,7 +378,7 @@ public class WithinDayTravelTime implements TravelTime,
 				travelTimeInfo.checkActiveState();	// ensure that the estimated link travel time is updated
 			}
 		}
-		
+
 //		if (links != null) {
 //			for (Link link : links) {
 //				double freeSpeedTravelTime = link.getLength() / link.getFreespeed(e.getSimulationTime());
@@ -398,7 +398,7 @@ public class WithinDayTravelTime implements TravelTime,
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		problem = false ;
-		
+
 		now = e.getSimulationTime() ;
 
 		// parallel Execution
@@ -411,9 +411,9 @@ public class WithinDayTravelTime implements TravelTime,
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		problem = false ;
-		
+
 		/*
-		 * Calling the afterSim Method of the Threads will set their 
+		 * Calling the afterSim Method of the Threads will set their
 		 * simulationRunning flag to false.
 		 */
 		for (UpdateMeanTravelTimesRunnable runnable : this.updateMeanTravelTimesRunnables) {
@@ -431,7 +431,7 @@ public class WithinDayTravelTime implements TravelTime,
 			throw new RuntimeException(ex);
 		}
 	}
-	
+
 	private void printInfo(double time) {
 		if (time >= this.nextInfoTime) {
 			int activeLinks = 0;
@@ -462,7 +462,7 @@ public class WithinDayTravelTime implements TravelTime,
 		double sumTravelTimes = 0.0; // We cache the sum of the TravelTimes
 
 		double freeSpeedTravelTime = Double.MAX_VALUE; // We cache the FreeSpeedTravelTimes
-		double travelTime = Double.MAX_VALUE; 
+		double travelTime = Double.MAX_VALUE;
 
 		double dynamicBinSize = 0.0; // size of the time window that is taken into account
 
@@ -536,12 +536,12 @@ public class WithinDayTravelTime implements TravelTime,
 			updateMeanTravelTimesRunnable.setStartBarrier(this.startBarrier);
 			updateMeanTravelTimesRunnable.setEndBarrier(this.endBarrier);
 			updateMeanTravelTimesRunnables[i] = updateMeanTravelTimesRunnable;
-			
+
 			Thread thread = new Thread(updateMeanTravelTimesRunnable);
 			thread.setName("UpdateMeanTravelTimes" + i);
 			thread.setDaemon(true); // make the Thread demons so they will terminate automatically
 			threads[i] = thread;
-			
+
 			thread.start();
 		}
 
@@ -572,10 +572,10 @@ public class WithinDayTravelTime implements TravelTime,
 	private static class UpdateMeanTravelTimesRunnable implements Runnable {
 
 		private volatile boolean simulationRunning = true;
-		
+
 		private CyclicBarrier startBarrier = null;
 		private CyclicBarrier endBarrier = null;
-		
+
 		private OptionalTime time = OptionalTime.undefined();
 		private Collection<TravelTimeInfo> activeTravelTimeInfos;
 
@@ -606,7 +606,7 @@ public class WithinDayTravelTime implements TravelTime,
 		public void afterSim() {
 			this.simulationRunning = false;
 		}
-		
+
 		@Override
 		public void run() {
 
@@ -616,7 +616,7 @@ public class WithinDayTravelTime implements TravelTime,
 					 * The End of the Moving is synchronized with the
 					 * endBarrier. If all Threads reach this Barrier the main
 					 * run() Thread can go on.
-					 * 
+					 *
 					 * The Threads wait now at the startBarrier until they are
 					 * triggered again in the next TimeStep by the main run()
 					 * method.
@@ -633,7 +633,7 @@ public class WithinDayTravelTime implements TravelTime,
 						Gbl.printCurrentThreadCpuTime();
 						return;
 					}
-					
+
 					Iterator<TravelTimeInfo> iter = activeTravelTimeInfos.iterator();
 					while (iter.hasNext()) {
 						TravelTimeInfo travelTimeInfo = iter.next();

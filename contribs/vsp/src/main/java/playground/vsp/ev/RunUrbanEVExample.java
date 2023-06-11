@@ -43,6 +43,7 @@ package playground.vsp.ev;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -54,15 +55,19 @@ import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecifications;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.modal.AbstractModalQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
+
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.*;
 
 /**
  * this is an example of how to run MATSim with the UrbanEV module which inserts charging activities for all legs which use a EV.
@@ -77,54 +82,62 @@ public class RunUrbanEVExample {
 	static final double CAR_INITIAL_SOC = 0.5;
 
 	public static void main(String[] args) {
-		EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.timeProfiles = true;
-		evConfigGroup.chargersFile = "chargers.xml";
+//		String pathToConfig = args.length > 0 ?
+//				args[0] :
+//				"contribs/vsp/test/input/playground/vsp/ev/chessboard-config.xml";
 
-		String pathToConfig = args.length > 0 ?
-				args[0] :
-				"contribs/vsp/test/input/playground/vsp/ev/chessboard-config.xml";
+		Config config = prepareConfig( args );
 
-		Config config = ConfigUtils.loadConfig(pathToConfig, evConfigGroup);
-		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
+		Scenario scenario = prepareScenario( config );
 
-		prepareConfig(config);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		createAndRegisterPersonalCarAndBikeVehicles(scenario);
 		Controler controler = prepareControler(scenario);
 
 		controler.run();
 	}
+	private static Scenario prepareScenario( Config config ){
+		Scenario scenario = ScenarioUtils.loadScenario( config );
+		createAndRegisterPersonalCarAndBikeVehicles(scenario);
+		return scenario;
+	}
+	private static Config prepareConfig( String[] args ){
+		Config config = ConfigUtils.loadConfig( args );
+		EvConfigGroup evConfigGroup = ConfigUtils.addOrGetModule( config, EvConfigGroup.class );
+		evConfigGroup.timeProfiles = true;
+		evConfigGroup.chargersFile = "chargers.xml";
+
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
+
+//		UrbanEVConfigGroup urbanEVConfi = new UrbanEVConfigGroup();
+//		config.addModule(urbanEVConfi );
+		UrbanEVConfigGroup urbanEVConfig = ConfigUtils.addOrGetModule( config, UrbanEVConfigGroup.class );
+		urbanEVConfig.setCriticalSOC(0.4);
+
+		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none );
+
+		//register charging interaction activities for car
+		config.planCalcScore().addActivityParams(
+				new ActivityParams(TransportMode.car + UrbanEVModule.PLUGOUT_INTERACTION).setScoringThisActivityAtAll(false ) );
+		config.planCalcScore().addActivityParams(
+				new ActivityParams( TransportMode.car + UrbanEVModule.PLUGIN_INTERACTION).setScoringThisActivityAtAll( false ) );
+		return config;
+	}
 
 	public static Controler prepareControler(Scenario scenario) {
+
 		Controler controler = new Controler(scenario);
 		//plug in UrbanEVModule
 		controler.addOverridingModule(new UrbanEVModule());
 		//register EV qsim components
-		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
+//		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
+
+//		controler.addOverridingQSimModule( new AbstractQSimModule(){
+//			@Override protected void configureQSim(){
+//				this.addQSimComponentBinding( EvModule.EV_COMPONENT );
+//			}
+//		} );
+
 		return controler;
-	}
-
-	public static void prepareConfig(Config config) {
-		UrbanEVConfigGroup evReplanningCfg = new UrbanEVConfigGroup();
-		config.addModule(evReplanningCfg);
-		evReplanningCfg.setCriticalSOC(0.4);
-
-		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
-
-		//register charging interaction activities for car
-		config.planCalcScore()
-				.addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams(TransportMode.car
-						+ UrbanEVModule.PLUGOUT_INTERACTION).setScoringThisActivityAtAll(false ) );
-		config.planCalcScore()
-				.addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams(
-						TransportMode.car + UrbanEVModule.PLUGIN_INTERACTION).setScoringThisActivityAtAll(
-						false ));
-	}
-
-	public static void prepareScenario( Scenario scenario ) {
-		createAndRegisterPersonalCarAndBikeVehicles( scenario );
 	}
 
 	static void createAndRegisterPersonalCarAndBikeVehicles(Scenario scenario) {

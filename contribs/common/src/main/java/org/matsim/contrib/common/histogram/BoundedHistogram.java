@@ -43,12 +43,6 @@ public class BoundedHistogram extends AbstractHistogram<Double> {
 		this.bounds = bounds;
 	}
 
-	public void addValues(double[] values) {
-		for (double v : values) {
-			addValue(v);
-		}
-	}
-
 	public void addValue(double value) {
 		if (value < bounds[0] || value >= bounds[bounds.length - 1]) {
 			throw new IllegalArgumentException("Value=" + value + " beyond the bounds");

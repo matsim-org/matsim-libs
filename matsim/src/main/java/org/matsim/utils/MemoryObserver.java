@@ -47,7 +47,7 @@ public class MemoryObserver {
 		private final long millis;
 		private final AtomicBoolean stopFlag = new AtomicBoolean(false);
 
-		MemoryPrinter(long millis) {
+		private MemoryPrinter(long millis) {
 			this.millis = millis;
 		}
 

@@ -22,8 +22,8 @@ import org.matsim.core.config.Config;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 
 /**
@@ -42,7 +42,7 @@ public class RandomizingTransitRouterFactory implements Provider<TransitRouter> 
 		this.schedule = schedule;
 		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
 	}
-	
+
 	@Override
 	public TransitRouter get() {
 		RandomizingTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizingTransitRouterTravelTimeAndDisutility(trConfig);

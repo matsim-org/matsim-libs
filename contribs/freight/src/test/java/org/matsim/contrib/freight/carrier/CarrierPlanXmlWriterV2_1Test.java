@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -110,6 +111,30 @@ public class CarrierPlanXmlWriterV2_1Test {
 		CarrierPlan plan3 = plans.get(2);
 		ScheduledTour tour1 = plan3.getScheduledTours().iterator().next();
 		assertEquals(9,tour1.getTour().getTourElements().size());
+	}
+
+	@Test
+	public void test_whenReadingToursOfPlan1_SpritScoreIsCorrect(){
+		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		CarrierPlan plan1 = plans.get(0);
+		plan1.getAttributes().getAttribute("jspritScore");
+		assertEquals(Double.NaN, FreightUtils.getJspritScore(plan1), testUtils.EPSILON);
+	}
+
+	@Test
+	public void test_whenReadingToursOfPlan2_jSpritScoreIsCorrect(){
+		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		CarrierPlan plan2 = plans.get(1);
+		plan2.getAttributes().getAttribute("jspritScore");
+		assertEquals(80.0, FreightUtils.getJspritScore(plan2), testUtils.EPSILON);
+	}
+
+	@Test
+	public void test_whenReadingToursOfPlan3_jSpritIsCorrect(){
+		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
+		CarrierPlan plan3 = plans.get(2);
+		plan3.getAttributes().getAttribute("jspritScore");
+		assertEquals(105.0, FreightUtils.getJspritScore(plan3), testUtils.EPSILON);
 	}
 
 

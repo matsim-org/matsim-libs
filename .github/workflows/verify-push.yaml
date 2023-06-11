@@ -44,6 +44,7 @@ jobs:
           - contribs/noise
           - contribs/accidents
           - contribs/freight
+          - contribs/freightreceiver
           - contribs/parking
           - contribs/matrixbasedptrouter
           - contribs/accessibility
@@ -58,10 +59,12 @@ jobs:
           - contribs/analysis
           - contribs/eventsBasedPTRouter
           - contribs/hybridsim
+          - contribs/informed-mode-choice
           - contribs/otfvis
           - contribs/osm
           - contribs/application
           - contribs/sbb-extensions
+          - contribs/simulatedannealing
           - benchmark
 
     steps:

@@ -2,23 +2,22 @@ package org.matsim.contrib.drt.extension.operations.shifts.run;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
-import org.matsim.contrib.drt.extension.operations.shifts.analysis.*;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
-import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
-import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
-import org.matsim.contrib.drt.extension.operations.shifts.io.OperationFacilitiesReader;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesSpecification;
-import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesSpecificationImpl;
+import org.matsim.contrib.drt.extension.operations.shifts.analysis.*;
+import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftStayTask;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -28,10 +27,11 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileWriter;
-import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
+import org.matsim.contrib.common.timeprofile.ProfileWriter;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileView;
+import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileView;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -90,21 +90,13 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 			}).asEagerSingleton();
 		}
 
-		OperationFacilitiesParams operationFacilitiesParams = drtOperationsParams.getOperationFacilitiesParams().orElseThrow();
-		if (operationFacilitiesParams.operationFacilityInputFile != null) {
-			bindModal(OperationFacilitiesSpecification.class).toProvider(() -> {
-				OperationFacilitiesSpecification operationFacilitiesSpecification = new OperationFacilitiesSpecificationImpl();
-				new OperationFacilitiesReader(operationFacilitiesSpecification)
-						.readURL(operationFacilitiesParams.getOperationFacilityInputUrl(getConfig().getContext()));
-				return operationFacilitiesSpecification;
-			}).asEagerSingleton();
-		}
-
 		bindModal(ShiftDurationXY.class).toProvider(modalProvider(
-				getter -> new ShiftDurationXY(getter.getModal(DrtShiftsSpecification.class)))).asEagerSingleton();
+				getter -> new ShiftDurationXY(getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}))
+		)).asEagerSingleton();
 
 		bindModal(BreakCorridorXY.class).toProvider(modalProvider(
-				getter -> new BreakCorridorXY(getter.getModal(DrtShiftsSpecification.class)))).asEagerSingleton();
+				getter -> new BreakCorridorXY(getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}))
+		)).asEagerSingleton();
 
 		bindModal(ShiftHistogram.class).toProvider(modalProvider(
 				getter -> new ShiftHistogram(getter.get(Population.class), getter.get(Config.class)))).asEagerSingleton();
@@ -123,7 +115,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DumpShiftDataAtEndImpl.class).toProvider(modalProvider(
 				getter -> new DumpShiftDataAtEndImpl(
-						getter.getModal(DrtShiftsSpecification.class),
+						getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}),
 						getter.getModal(OperationFacilitiesSpecification.class),
 						getter.get(OutputDirectoryHierarchy.class)
 				))
@@ -132,21 +124,18 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> getter.getModal(DumpShiftDataAtEndImpl.class)
 		));
-
 		bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
 						300, getter.get(QSimConfigGroup.class), ImmutableSet.of(DrtDriveTask.TYPE,
 						DefaultDrtStopTask.TYPE, ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE,
 						ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)))).asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new VehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
-						getter.getModal(VehicleOccupancyProfileCalculator.class), taskTypeComparator,
-						taskTypePaints, "shift_occupancy_time_profiles"))).in(Singleton.class);
+		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
+				new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class), taskTypeComparator, taskTypePaints),
+				"shift_occupancy_time_profiles"))).in(Singleton.class);
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
-						getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator,
-						taskTypePaints, "shift_task_time_profiles"))).in(Singleton.class);
+		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
+				new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator, taskTypePaints),
+				"shift_task_time_profiles"))).in(Singleton.class);
 	}
 }

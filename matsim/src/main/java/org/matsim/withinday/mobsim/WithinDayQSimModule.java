@@ -47,9 +47,9 @@ public class WithinDayQSimModule extends AbstractQSimModule {
 		bind(FixedOrderSimulationListener.class).toInstance(fixedOrderSimulationListener);
 		bind(WithinDayTravelTime.class).toInstance(withinDayTravelTime);
 
-		addNamedComponent(FixedOrderSimulationListener.class, FIXED_ORDER_LISTENER_COMPONENT_NAME);
-		addNamedComponent(WithinDayTravelTime.class, COMPONENT_NAME);
-		addNamedComponent(WithinDayEngine.class, COMPONENT_NAME);
+		addQSimComponentBinding( FIXED_ORDER_LISTENER_COMPONENT_NAME ).to( FixedOrderSimulationListener.class );
+		addQSimComponentBinding( COMPONENT_NAME ).to( WithinDayTravelTime.class );
+		addQSimComponentBinding( COMPONENT_NAME ).to( WithinDayEngine.class );
 	}
 
 	static public void configureComponents(QSimComponentsConfig components) {

@@ -72,13 +72,15 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 		this.activeComponents = new ArrayList<>( activeComponentsAsSet ) ;
 	}
 
-	public final QSimComponentsConfigGroup addActiveComponent( String component ){
-		List<String> components = this.getActiveComponents();
-		components.add( component );
-		this.setActiveComponents( components );
-		return this;
-	}
 
+	public void addActiveComponent( String component ) {
+		// I need this so often that I am finally adding it here.  kai, apr'23
+
+		List<String> components = getActiveComponents();
+		components.add( component );
+		setActiveComponents( components );
+		// (doing this the indirect way because of the Set vs List discussion above.  kai, apr'23
+	}
 
 	@StringGetter(ACTIVE_COMPONENTS)
 	public String getActiveComponentsAsString() {

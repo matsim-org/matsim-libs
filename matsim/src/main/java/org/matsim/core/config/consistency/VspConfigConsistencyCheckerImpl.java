@@ -25,14 +25,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -81,17 +78,26 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		// yy: sort the config groups alphabetically
 		
+		// === controler:
+
+		problem = checkControlerConfigGroup( config, lvl, problem );
+
+		// === facilities:
+
+		// 2023-05:
+		if ( config.facilities().getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.none ) {
+//			problem = true;
+			System.out.flush();
+			log.log( lvl, "vsp should move away from facilitiesSource=FacilitiesSource.none");
+		}
+
 		// === global:
-		
+
 		if ( config.global().isInsistingOnDeprecatedConfigVersion() ) {
 			problem = true ;
 			System.out.flush();
 			log.log( lvl, "you are insisting on config v1.  vsp default is using v2." ) ;
 		}
-		
-		// === controler:
-
-		problem = checkControlerConfigGroup( config, lvl, problem );
 
 		// === location choice:
 		
@@ -200,6 +206,19 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				if( activityParam.getMinimalDuration().isDefined() ){
 					log.log( lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey() );
 				}
+			}
+		}
+
+		// added may'23
+		for ( ModeParams params : config.planCalcScore().getModes().values() ){
+			if ( params.getMarginalUtilityOfTraveling() != 0. ) {
+				log.log( lvl, "You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
+							      + ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions.");
+			}
+			if ( params.getMode().equals( TransportMode.walk ) && params.getConstant() != 0. ) {
+				problem = true;
+				log.log( lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
+							      + ".  Values different from zero cause problems here because the ASC is also used for access/egress modes" );
 			}
 		}
 

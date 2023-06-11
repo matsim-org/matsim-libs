@@ -22,8 +22,8 @@ package playground.vsp.cadyts.multiModeCadyts;
 
 import java.io.IOException;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.supply.SimResults;
 import org.apache.logging.log4j.LogManager;
@@ -72,7 +72,7 @@ public class ModalCountsCadytsContext implements CadytsContextI<ModalCountsLinkI
 	private final EventsManager eventsManager;
 	private final VolumesAnalyzer volumesAnalyzer;
 	private final OutputDirectoryHierarchy controlerIO;
-	
+
 	private final Map<Id<ModalCountsLinkIdentifier>,ModalCountsLinkIdentifier> modalLinkContainer;
 
 	@Inject
@@ -94,7 +94,7 @@ public class ModalCountsCadytsContext implements CadytsContextI<ModalCountsLinkI
 		// dont set calibrated items back to cadytsConfig because by default, count stations for car mode (from config file) are used.
 // As far as I see, this is a problem is using more than one cadyts in parallel and only one cadyts config group. Amit May'18
 //		cadytsConfig.setCalibratedItems(modalLinkContainer.keySet().stream().map(Object::toString).collect(Collectors.toSet()));
-		
+
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 
@@ -106,7 +106,7 @@ public class ModalCountsCadytsContext implements CadytsContextI<ModalCountsLinkI
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.simResults = new ModalCountsSimResultsContainerImpl(volumesAnalyzer, countsScaleFactor);
-		
+
 		// this collects events and generates cadyts plans from it
 		this.plansTranslator = new ModalCountsPlansTranslatorBasedOnEvents(scenario, modalLinkContainer);
 		this.eventsManager.addHandler(plansTranslator);
@@ -121,7 +121,7 @@ public class ModalCountsCadytsContext implements CadytsContextI<ModalCountsLinkI
 		// This is fine, since the number of these plans will go to zero in normal simulations,
 		// and Cadyts can handle this "noise". Checked this with Gunnar.
 		// mz 2015
-		for (Person person : scenario.getPopulation().getPersons().values()) { // this is wrong. adding plan 
+		for (Person person : scenario.getPopulation().getPersons().values()) { // this is wrong. adding plan
 			this.calibrator.addToDemand(plansTranslator.getCadytsPlan(person.getSelectedPlan()));
 		}
 	}
