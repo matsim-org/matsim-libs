@@ -62,7 +62,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
-import jakarta.inject.Inject;
+import javax.inject.Inject;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
@@ -124,6 +124,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private final MobsimListenerManager listenerManager;
 	private final Scenario scenario;
 	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
+	private final List<AbortHandler> abortHandlers = new ArrayList<>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 	private final org.matsim.core.mobsim.qsim.AgentCounter agentCounter;
 	private final Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
@@ -272,8 +273,8 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 					// we want to log this exception thrown during the cleanup, but not to throw it
 					// since there is another (earlier) exception thrown in the try block
 					log.warn("exception in finally block - "
-									+ "this may be a follow-up exception of an exception thrown in the try block.",
-							cleanupException);
+							+ "this may be a follow-up exception of an exception thrown in the try block.",
+						cleanupException);
 				} else {
 					// no exception thrown in the try block, let's re-throw the exception from the cleanup step
 					throw cleanupException;
@@ -294,8 +295,8 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		createAgents();
 		this.initSimTimer();
 		this.infoTime = Math.floor(this.simTimer.getSimStartTime()
-				/ INFO_PERIOD)
-				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
+			/ INFO_PERIOD)
+			* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
 		// to print out the info at the very first
 		// timestep already
 
@@ -322,7 +323,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		} else {
 			if (wrnCnt2 < 1) {
 				log.warn( "not able to add parked vehicle since there is no netsim engine.  continuing anyway, but it may "
-						+ "not be clear what this means ...") ;
+					+ "not be clear what this means ...") ;
 				log.warn(Gbl.ONLYONCE);
 				wrnCnt2++;
 			}
@@ -456,33 +457,32 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	}
 
 	private void arrangeNextAgentAction(final MobsimAgent agent) {
-		switch( agent.getState() ) {
-		case ACTIVITY:
-			arrangeAgentActivity(agent);
-			break ;
-		case LEG:
-			this.arrangeAgentDeparture(agent);
-			break ;
-		case ABORT:
-			this.events.processEvent( new PersonStuckEvent(this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode()));
-
-			// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
-			// register abort handlers.  If someone ever comes to this place here and needs this.  kai, nov'17
-
-			this.agents.remove(agent.getId()) ;
-			this.agentCounter.decLiving();
-			this.agentCounter.incLost();
-			break ;
-		default:
-			throw new RuntimeException("agent with unknown state (possibly null)") ;
-		}
-	}
-
-	private void arrangeAgentActivity(final MobsimAgent agent) {
-		for (ActivityHandler activityHandler : this.activityHandlers) {
-			if (activityHandler.handleActivity(agent)) {
-				return;
+		switch( agent.getState() ){
+			case ACTIVITY -> {
+				for( ActivityHandler activityHandler : this.activityHandlers ){
+					if( activityHandler.handleActivity( agent ) ){
+						break;
+					}
+				}
 			}
+			case LEG -> this.arrangeAgentDeparture( agent );
+			case ABORT -> {
+				for( AbortHandler abortHandler : this.abortHandlers ){
+					if( abortHandler.handleAbort( agent ) ){
+						return;
+					}
+				}
+				this.events.processEvent( new PersonStuckEvent( this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode() ) );
+
+				// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
+				// register abort handlers.  If someone ever comes to this place here and needs this.  kai, nov'17
+				// The above comment has now been satisfied by the introduction of abort handlers.  kai, mar'22
+
+				this.agents.remove( agent.getId() );
+				this.agentCounter.decLiving();
+				this.agentCounter.incLost();
+			}
+			default -> throw new RuntimeException( "agent with unknown state (possibly null)" );
 		}
 	}
 
@@ -561,13 +561,13 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 			this.infoTime += INFO_PERIOD;
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.realWorldStarttime
-					.getTime()) / 1000;
+				.getTime()) / 1000;
 			double diffsim = time - this.simTimer.getSimStartTime();
 			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time)
-					+ " : #Veh=" + this.agentCounter.getLiving() + " lost="
-					+ this.agentCounter.getLost() + " simT=" + diffsim
-					+ "s realT=" + (diffreal) + "s; (s/r): "
-					+ (diffsim / (diffreal + Double.MIN_VALUE)));
+				+ " : #Veh=" + this.agentCounter.getLiving() + " lost="
+				+ this.agentCounter.getLost() + " simT=" + diffsim
+				+ "s realT=" + (diffreal) + "s; (s/r): "
+				+ (diffsim / (diffreal + Double.MIN_VALUE)));
 		}
 	}
 
@@ -659,6 +659,11 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		}
 	}
 
+	public void addAbortHandler(AbortHandler abortHandler ) {
+		Gbl.assertNotNull( abortHandler );
+		this.abortHandlers.add( abortHandler );
+	}
+
 	/**
 	 * Adds the QueueSimulationListener instance given as parameters as listener
 	 * to this QueueSimulation instance.
@@ -736,7 +741,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		}
 		if ( !processed ) {
 			throw new RuntimeException("received a network change event, but did not process it.  Maybe " +
-											   "the network change events engine was not set up for the qsim?  Aborting ...") ;
+				"the network change events engine was not set up for the qsim?  Aborting ...") ;
 		}
 	}
 
