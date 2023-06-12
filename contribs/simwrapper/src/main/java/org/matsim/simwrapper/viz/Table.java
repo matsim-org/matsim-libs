@@ -33,7 +33,7 @@ public class Table extends Viz {
 	/**
 	 * This option defines whether the whole table should be displayed or if there are several pages. The default setting is false.
 	 */
-	public boolean showAllRows;
+	public Boolean showAllRows;
 
 	public Table() {
 		super("csv");

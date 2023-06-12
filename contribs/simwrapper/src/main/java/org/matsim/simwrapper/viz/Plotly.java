@@ -20,7 +20,7 @@ import java.util.*;
 /**
  * Viz for arbitrary plotly graphs.
  */
-public class Plotly extends Viz {
+public final class Plotly extends Viz {
 
 	/**
 	 * Empty placeholder array, which may be used as input for constructing traces.

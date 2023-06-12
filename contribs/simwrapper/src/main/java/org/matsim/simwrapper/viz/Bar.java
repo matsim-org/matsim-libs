@@ -8,12 +8,12 @@ import java.util.List;
 public class Bar extends Chart {
 
 	/**
-	 * true/false for bar charts, whether to stack multiple bars
+	 * true/false for bar charts, whether to stack multiple bars.
 	 */
 	public Boolean stacked;
 
 	/**
-	 * Defines als columns that should be not displayed
+	 * Defines als columns that should be not displayed.
 	 */
 	public List<String> ignoreColumns;
 

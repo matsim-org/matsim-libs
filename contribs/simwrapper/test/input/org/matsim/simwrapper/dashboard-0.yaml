@@ -61,8 +61,6 @@ layout:
   - type: csv
     title: Table
     dataset: example.csv
-    enableFilter: false
-    showAllRows: false
   - type: text
     title: TextBlock
     file: example.csv
