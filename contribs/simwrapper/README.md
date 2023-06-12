@@ -8,7 +8,7 @@ This extension allows you to automatically create SimWrapper dashboards after si
 Additionally, to generating dashboard YAML files, it will also take care of executing any necessary post-process step to
 generate required data files.
 
-To use it, simply install the module:
+To use it, include the maven dependency, and install the module:
 
 ```java
 controler.addOverridingModule(new SimWrapperModule())
