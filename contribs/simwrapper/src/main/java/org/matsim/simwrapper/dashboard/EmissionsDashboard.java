@@ -50,8 +50,8 @@ public class EmissionsDashboard implements Dashboard {
 
 		layout.row("second")
 			.el(XYTime.class, (viz, data) -> {
-				viz.title = "Emissions over Time";
-				viz.description = "Displays the emissions over time.";
+				viz.title = "CO₂ Emissions";
+				viz.description = "per day";
 				viz.height = 12.;
 				viz.file = data.compute(AirPollutionAnalysis.class, "emissions_grid_per_day.xyt.csv");
 			});

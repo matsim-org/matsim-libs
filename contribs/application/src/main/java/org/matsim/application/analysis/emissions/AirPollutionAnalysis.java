@@ -18,6 +18,7 @@ import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.SampleOptions;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.analysis.EmissionsOnLinkEventHandler;
@@ -33,6 +34,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -52,7 +54,9 @@ import java.util.Map;
 @CommandSpec(requireRunDirectory = true,
 	produces = {
 		"emissions_total.csv", "emissions_grid_per_day.xyt.csv", "emissions_per_link.csv",
-		"emissions_per_link_per_m.csv", "emissions_vehicle_info.csv",
+		"emissions_per_link_per_m.csv",
+		"emissions_grid_per_hour.xyt.csv",
+		"emissions_vehicle_info.csv",
 	}
 )
 public class AirPollutionAnalysis implements MATSimAppCommand {
@@ -124,6 +128,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		writeTotal(filteredNetwork, emissionsEventHandler);
 
 		writeRaster(filteredNetwork, config, emissionsEventHandler);
+
+		// writeTimeDependentRaster(filteredNetwork, config, emissionsEventHandler);
 
 		return 0;
 	}
@@ -288,4 +294,61 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 			log.error("Error writing results", e);
 		}
 	}
+
+	private void writeTimeDependentRaster(Network network, Config config, EmissionsOnLinkEventHandler emissionsEventHandler) {
+
+		TimeBinMap<Map<Pollutant, Raster>> timeBinMap = FastEmissionGridAnalyzer.processHandlerEmissionsPerTimeBin(emissionsEventHandler.getTimeBins(), network, gridSize, 20);
+
+		Map<Pollutant, Raster> firstBin = timeBinMap.getTimeBin(timeBinMap.getStartTime()).getValue();
+
+		List<Integer> xLength = firstBin.values().stream().map(Raster::getXLength).distinct().toList();
+		List<Integer> yLength = firstBin.values().stream().map(Raster::getYLength).distinct().toList();
+
+		Raster raster = firstBin.values().stream().findFirst().orElseThrow();
+
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("emissions_grid_per_hour.xyt.csv").toString()),
+			CSVFormat.DEFAULT.builder().setCommentMarker('#').build())) {
+
+			String crs = ProjectionUtils.getCRS(network);
+			if (crs == null)
+				crs = config.network().getInputCRS();
+			if (crs == null)
+				crs = config.global().getCoordinateSystem();
+
+			// print coordinate system
+			printer.printComment(crs);
+
+			// print header
+			printer.print("time");
+			printer.print("x");
+			printer.print("y");
+
+			printer.print("value");
+
+			printer.println();
+
+			for (int xi = 0; xi < xLength.get(0); xi++) {
+				for (int yi = 0; yi < yLength.get(0); yi++) {
+					for (TimeBinMap.TimeBin<Map<Pollutant, Raster>> timeBin : timeBinMap.getTimeBins()) {
+
+						Coord coord = raster.getCoordForIndex(xi, yi);
+
+						printer.print(timeBin.getStartTime());
+						printer.print(coord.getX());
+						printer.print(coord.getY());
+
+						double value = timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
+						printer.print(value);
+
+						printer.println();
+					}
+				}
+			}
+
+		} catch (IOException e) {
+			log.error("Error writing results", e);
+		}
+
+	}
+
 }
