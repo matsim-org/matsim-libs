@@ -5,7 +5,7 @@ SimWrapper provides a wide range of visualization options within the web browser
 evaluate and disseminate MATSim runs visually.
 
 This extension allows you to automatically create SimWrapper dashboards after simulation runs have finished.
-Additionally, to generating dashboard YAML files, it will also take care of executing any necessary post-process step to
+Additionally, to generating dashboard YAML files, it will also take care of executing all necessary post-process steps to
 generate required data files.
 
 To use it, include the maven dependency, and install the module:
