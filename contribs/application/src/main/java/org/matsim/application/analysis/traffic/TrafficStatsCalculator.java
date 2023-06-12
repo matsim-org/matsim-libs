@@ -2,20 +2,14 @@ package org.matsim.application.analysis.traffic;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import it.unimi.dsi.fastutil.ints.Int2DoubleArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 
 import javax.annotation.Nullable;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Class to calculate the traffic congestion index based on the paper
@@ -26,16 +20,12 @@ public final class TrafficStatsCalculator {
 	private final Network network;
 	private final TravelTime travelTime;
 
-	private final int timeSlice = 900;
+	private final int timeSlice;
 
-	private final IdMap<Link, Int2DoubleMap> perLink = new IdMap(Link.class);
-
-	public TrafficStatsCalculator(Network network, TravelTime travelTime) {
+	public TrafficStatsCalculator(Network network, TravelTime travelTime, int timeSlice) {
 		this.network = network;
 		this.travelTime = travelTime;
-
-		for (Link link : network.getLinks().values())
-			perLink.put(link.getId(), new Int2DoubleArrayMap());
+		this.timeSlice = timeSlice;
 	}
 
 	/**
@@ -54,6 +44,17 @@ public final class TrafficStatsCalculator {
 		double ratio = actualSpeed / allowedSpeed;
 
 		return ratio > 1 ? 1 : ratio;
+	}
+
+	public double getSpeedPerformanceIndex(Link link, int startTime, int endTime) {
+		DoubleList indices = new DoubleArrayList();
+
+		for (int time = startTime; time < endTime; time += timeSlice)
+			indices.add(
+					this.getSpeedPerformanceIndex(link, time)
+			);
+
+		return indices.doubleStream().average().orElse(-1);
 	}
 
 	/**
@@ -90,24 +91,15 @@ public final class TrafficStatsCalculator {
 		double sumOfLinkLengthMultipiesLinkCongestionIndex = 0.0;
 		double sumLinkLength = 0.0;
 
-		Pattern pattern = null;
-
-		if (roadType != null)
-			pattern = Pattern.compile(roadType, Pattern.CASE_INSENSITIVE);
-
-
 		for (Map.Entry<Id<Link>, ? extends Link> entry : this.network.getLinks().entrySet()) {
 			Link link = entry.getValue();
 
 			double linkCongestionIndex = getLinkCongestionIndex(link, startTime, endTime);
 
-			if (roadType == null)
-				this.perLink.get(link.getId()).put(startTime, linkCongestionIndex);
-
 			double length = link.getLength();
 			String type = NetworkUtils.getHighwayType(link);
 
-			if (pattern != null && pattern.matcher(type).find())
+			if (type.equals(roadType))
 				continue;
 
 			sumOfLinkLengthMultipiesLinkCongestionIndex += length * linkCongestionIndex;
@@ -119,9 +111,17 @@ public final class TrafficStatsCalculator {
 
 	/**
 	 * Calculates the avg speed for a given link and time interval in meter per seconds.
-	 * */
-	public double getAvgSpeed(Link link, int time) {
-		double seconds = this.travelTime.getLinkTravelTime(link, time, null, null);
-		return link.getLength() / seconds;
+	 */
+	public double getAvgSpeed(Link link, int startTime, int endTime) {
+
+		DoubleList speeds = new DoubleArrayList();
+
+		for (int time = startTime; time < endTime; time += timeSlice) {
+
+			double seconds = this.travelTime.getLinkTravelTime(link, time, null, null);
+			speeds.add(link.getLength() / seconds);
+		}
+
+		return speeds.doubleStream().average().orElse(-1);
 	}
 }
