@@ -84,7 +84,8 @@ public class ExampleTwoChainsReplanning {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 //					strategyManager.addStrategy(new RoundRobinDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1);
 //					strategyManager.addStrategy(new RandomDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1);
-					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 1);
+//					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 1);
+					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(1);
 					return strategyManager;
 				});
