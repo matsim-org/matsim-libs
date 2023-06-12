@@ -125,7 +125,7 @@ public final class Data {
 				throw new IllegalArgumentException("Resource '" + name + "' not found!");
 		}
 
-		Path res = Path.of(resource.getPath());
+		String baseName = FilenameUtils.getName(resource.getPath());
 
 		Path baseDir;
 		if (currentContext.getName().isBlank())
@@ -134,7 +134,7 @@ public final class Data {
 			baseDir = this.path.resolve("resources-" + currentContext.getName());
 
 		// Final path where resource should be copied
-		Path resolved = baseDir.resolve(res.getFileName().toString());
+		Path resolved = baseDir.resolve(baseName);
 
 		try {
 			if (resources.containsKey(resolved) && !resources.get(resolved).toURI().equals(resource.toURI()))
