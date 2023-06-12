@@ -5,12 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * Creates a heatmap for simwrapper
+ * Creates a heatmap for simwrapper.
  */
 public class Heatmap extends Viz {
 
 	/**
-	 * The filepath containing the data
+	 * The filepath containing the data.
 	 */
 	@JsonProperty(required = true)
 	public String dataset;
@@ -29,12 +29,12 @@ public class Heatmap extends Viz {
 	public List<String> columns;
 
 	/**
-	 * Descriptive titles for the x-axis
+	 * Descriptive titles for the x-axis.
 	 */
 	public String xAxisTitle;
 
 	/**
-	 * Descriptive titles for the y-axis
+	 * Descriptive titles for the y-axis.
 	 */
 	public String yAxisTitle;
 

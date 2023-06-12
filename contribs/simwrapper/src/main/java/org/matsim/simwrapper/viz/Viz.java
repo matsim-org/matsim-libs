@@ -22,9 +22,4 @@ public abstract class Viz {
 		this.type = type;
 	}
 
-
-	public final Viz prop(String name, String value) {
-		return this;
-	}
-
 }

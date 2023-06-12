@@ -10,7 +10,9 @@ import org.matsim.simwrapper.viz.Viz;
 @FunctionalInterface
 public interface VizElement<T extends Viz> {
 
+	/**
+	 * Method called in order to configure the viz element and retrieve needed data paths.
+	 */
 	void configure(T viz, Data data);
-
 
 }

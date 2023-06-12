@@ -3,7 +3,7 @@ package org.matsim.simwrapper.viz;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * The abstract class Plot combines the attributes dataset, x, y, legendName, xAxisName and yAxisName used by Bubble and Scatter Plot
+ * The abstract class Plot combines the attributes dataset, x, y, legendName, xAxisName and yAxisName used by Bubble and Scatter Plot.
  */
 public abstract class Plot extends Viz {
 

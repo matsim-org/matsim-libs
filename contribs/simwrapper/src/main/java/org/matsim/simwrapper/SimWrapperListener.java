@@ -14,8 +14,10 @@ import org.matsim.core.controler.listener.StartupListener;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
 
 /**
@@ -89,8 +91,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 				if (!simWrapper.hasDashboard(d.getClass(), d.context()) || d instanceof Dashboard.Customizable) {
 					log.info("Adding dashboard {}", d);
 					simWrapper.addDashboard(d);
-				}
-				else
+				} else
 					log.warn("Skipping dashboard {} with context {}, because it is already present", d, d.context());
 			}
 		}

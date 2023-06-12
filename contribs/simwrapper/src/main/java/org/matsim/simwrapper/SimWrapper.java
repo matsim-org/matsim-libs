@@ -62,7 +62,7 @@ public final class SimWrapper {
 	}
 
 	/**
-	 * Return the {@link Data} instance for managing
+	 * Return the {@link Data} instance for managing.
 	 */
 	public Data getData() {
 		return data;

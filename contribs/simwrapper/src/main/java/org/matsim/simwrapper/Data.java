@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages and holds data needed for {@link org.matsim.simwrapper.SimWrapper},
+ * Manages and holds data needed for {@link org.matsim.simwrapper.SimWrapper}.
  */
 public final class Data {
 

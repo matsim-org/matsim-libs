@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Links extends Viz {
 
 	/**
-	 * Sets the path of the network file
+	 * Sets the path of the network file.
 	 */
 	@JsonProperty(required = true)
 	public String network;
@@ -21,12 +21,12 @@ public class Links extends Viz {
 	public String projection;
 
 	/**
-	 * Sets the center coordinates
+	 * Sets the center coordinates.
 	 */
 	public double[] center;
 
 	/**
-	 * Sets the display options for the map
+	 * Sets the display options for the map.
 	 */
 	public Display display = new Display();
 
@@ -40,7 +40,7 @@ public class Links extends Viz {
 	public static final class Datasets {
 
 		/**
-		 * Sets the .csv file that includes the data
+		 * Sets the .csv file that includes the data.
 		 */
 		@JsonProperty(required = true)
 		public String csvFile;
@@ -49,7 +49,7 @@ public class Links extends Viz {
 	}
 
 	/**
-	 * Sets the display options
+	 * Sets the display options.
 	 */
 	public static final class Display {
 
@@ -57,6 +57,9 @@ public class Links extends Viz {
 
 		public Width width = new Width();
 
+		/**
+		 * Defines how the width should be calculated.
+		 */
 		public static final class Width {
 
 			@JsonProperty(required = true)
@@ -69,6 +72,9 @@ public class Links extends Viz {
 
 		}
 
+		/**
+		 * Defines how the color is determined.
+		 */
 		public static final class Color {
 
 			public String dataset;
