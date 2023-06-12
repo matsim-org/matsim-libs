@@ -1,10 +1,10 @@
 # SimWrapper Contrib
 
 Contrib to provide [SimWrapper](https://simwrapper.github.io/) integration.
-SimWrapper offers a huge amount of visualization possibilities in the web browser and enables users to analyze,
+SimWrapper provides a wide range of visualization options within the web browser, allowing users to analyze,
 evaluate and disseminate MATSim runs visually.
 
-This extension allows you to automatically create SimWrapper dashboards after runs have finished.
+This extension allows you to automatically create SimWrapper dashboards after simulation runs have finished.
 Additionally, to generating dashboard YAML files, it will also take care of executing any necessary post-process step to
 generate required data files.
 
@@ -75,9 +75,8 @@ the corresponding package name to `packages` in the config.
 This module relies on the MATSim application contrib to integrate classes needed for post-processing.
 
 A class that depends on the output of a run and is supposed to produce files to be shown on the dashboard needs to be
-written
-as `MATSimAppCommand` class. Additionally, it needs to declare the files it depends on and produces via
-the`@CommandSpec` annotation.
+written  as `MATSimAppCommand` class.
+Additionally, it needs to declare the files it depends on and produces via the`@CommandSpec` annotation.
 Here is an example that shows the structure of such a class:
 
 ```java
@@ -103,6 +102,7 @@ public class TripAnalysis implements MATSimAppCommand {
 }
 ```
 
-In a dashboard, the output of this analysis can be referenced
-using `data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")`.
+In a dashboard, the output of this analysis can be referenced using `data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")`.
 The contrib will collect all required analysis classes, no further configuration for the post-processing is necessary.
+
+For detailed examples, please refer to existing dashboards in `org.matsim.simwrapper.dashboard`.
