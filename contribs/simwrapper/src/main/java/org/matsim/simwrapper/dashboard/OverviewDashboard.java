@@ -47,6 +47,15 @@ public class OverviewDashboard implements Dashboard {
 				viz.height = 0.1d;
 			});
 
+		/*
+		Not yet finalized in SimWrapper
+		layout.row("config")
+			.el(XML.class, (viz, data) -> {
+				viz.file = data.output("*.output_config.xml");
+				viz.height = 5d;
+			});
+		 */
+
 		// modeshare + mode progression
 		layout.row("second")
 			.el(PieChart.class, (viz, data) -> {

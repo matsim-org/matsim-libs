@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Hexagons extends Viz{
+public class Hexagons extends Viz {
 
 	/**
 	 * The filepath containing the data.
@@ -27,15 +27,15 @@ public class Hexagons extends Viz{
 	 */
 	private Map<String, List<Aggregations.FromToObject>> aggregations = new HashMap<>();
 
-	public Hexagons addAggregation(String aggregationTitle, String fromTitle, String fromX, String fromY, String toTitle, String toX, String toY) {
-
-		this.aggregations.put(aggregationTitle, List.of(new Aggregations.FromToObject(fromTitle,  fromX,  fromY), new Aggregations.FromToObject(toTitle,  toX,  toY)));
-
-		return this;
-	}
-
 	public Hexagons() {
 		super("hexagons");
+	}
+
+	public Hexagons addAggregation(String aggregationTitle, String fromTitle, String fromX, String fromY, String toTitle, String toX, String toY) {
+
+		this.aggregations.put(aggregationTitle, List.of(new Aggregations.FromToObject(fromTitle, fromX, fromY), new Aggregations.FromToObject(toTitle, toX, toY)));
+
+		return this;
 	}
 
 	/**
