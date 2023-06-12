@@ -49,10 +49,10 @@ public class TrafficAnalysis implements MATSimAppCommand {
 	private SampleOptions sample;
 
 	@CommandLine.Mixin
-	private ShpOptions shpOptions;
+	private ShpOptions shp;
 
 	@CommandLine.Option(names = "--transport-modes", description = "transport modes to analyze", split = ",")
-	private Set<String> modes = Set.of(TransportMode.car, "freight");
+	private Set<String> modes;
 
 	public static void main(String[] args) {
 		new TrafficAnalysis().execute(args);
@@ -98,10 +98,11 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		copy.forEach(ds::append);
 
 		Table perRoadTypeAndHour = Table.create(StringColumn.create("road_type"), IntColumn.create("hour"), DoubleColumn.create("congestion_index"));
+		Set<String> roadTypes = new HashSet<>(ds.stringColumn("road_type").asList());
 
 		for (int hour = 0; hour < 24; hour++) {
 
-			for (String roadType : new HashSet<>(copy.stringColumn("road_type").asList())) {
+			for (String roadType : roadTypes) {
 
 				double congestionIndex;
 				if (roadType.equals("all")) {
@@ -116,14 +117,13 @@ public class TrafficAnalysis implements MATSimAppCommand {
 			}
 		}
 
-		roundColumns(perRoadTypeAndHour);
 		perRoadTypeAndHour
 				.sortOn("road_type", "hour")
 				.write().csv(output.getPath("traffic_stats_by_road_type_and_hour.csv").toFile());
 
 		Table dailyCongestionIndex = Table.create(StringColumn.create("road_type"), DoubleColumn.create("congestion_index"));
 
-		for (String roadType : new HashSet<>(copy.stringColumn("road_type").asList())) {
+		for (String roadType : roadTypes) {
 
 			double congestionIndex;
 			if (roadType.equals("all")) {
@@ -267,10 +267,10 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		NetworkFilterManager manager = new NetworkFilterManager(unfiltered, new NetworkConfigGroup());
 
 		// Must contain one of the analyzed modes
-		manager.addLinkFilter(l -> l.getAllowedModes().stream().anyMatch(modes::contains));
+		manager.addLinkFilter(l -> l.getAllowedModes().stream().anyMatch(s -> modes.contains(s)));
 
-		if (shpOptions.isDefined()) {
-			Geometry geometry = shpOptions.getGeometry();
+		if (shp.isDefined()) {
+			Geometry geometry = shp.getGeometry();
 			manager.addLinkFilter(l -> geometry.covers(MGC.coord2Point(l.getCoord())));
 		}
 
