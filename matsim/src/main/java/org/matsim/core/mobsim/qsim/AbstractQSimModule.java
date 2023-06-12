@@ -34,63 +34,79 @@ import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 
-public abstract class AbstractQSimModule extends AbstractMobsimModule {
+public abstract class AbstractQSimModule extends AbstractMobsimModule{
 	@Override
-	protected final void configureMobsim() {
+	protected final void configureMobsim(){
 		configureQSim();
 	}
 
 	@Deprecated // for experts only
-	protected final LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Annotation annotation) {
-		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotation);
+	protected final LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( Annotation annotation ){
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder( binder(), QSimComponent.class, annotation );
 		multibinder.permitDuplicates();
 		return multibinder.addBinding();
 	}
 
 	@Deprecated // for experts only
-	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Class<? extends Annotation> annotationClass) {
-		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class,
-				annotationClass);
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( Class<? extends Annotation> annotationClass ){
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder( binder(), QSimComponent.class,
+				annotationClass );
 		multibinder.permitDuplicates();
 		return multibinder.addBinding();
 	}
 
-	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(String name) {
-		return addQSimComponentBinding(Names.named(name));
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( String name ){
+		return addQSimComponentBinding( Names.named( name ) );
 	}
 
 	// Use methods above
 	@Deprecated
-	protected <T extends QSimComponent> void addNamedComponent(Class<T> componentClass, String name) {
-		addQSimComponentBinding(name).to(componentClass);
+	protected <T extends QSimComponent> void addNamedComponent( Class<T> componentClass, String name ){
+		addQSimComponentBinding( name ).to( componentClass );
 	}
 
-	protected LinkedBindingBuilder<MobsimScopeEventHandler> addMobsimScopeEventHandlerBinding() {
-		return Multibinder.newSetBinder(binder(), MobsimScopeEventHandler.class).addBinding();
+	protected LinkedBindingBuilder<MobsimScopeEventHandler> addMobsimScopeEventHandlerBinding(){
+		return Multibinder.newSetBinder( binder(), MobsimScopeEventHandler.class ).addBinding();
 	}
 
 	protected abstract void configureQSim();
 
-	protected void install(AbstractQSimModule module) {
-		module.setParent(this);
-		super.install(module);
+	protected void install( AbstractQSimModule module ){
+		module.setParent( this );
+		super.install( module );
 	}
 
-	public static AbstractQSimModule overrideQSimModules(Collection<AbstractQSimModule> base,
-			List<AbstractQSimModule> overrides) {
-		Module composite = Modules.override(base).with(overrides);
+	public static AbstractQSimModule overrideQSimModules( Collection<AbstractQSimModule> base,
+							      List<AbstractQSimModule> overrides ){
+		Module composite = Modules.override( base ).with( overrides );
 
-		AbstractQSimModule wrapper = new AbstractQSimModule() {
+		AbstractQSimModule wrapper = new AbstractQSimModule(){
 			@Override
-			protected void configureQSim() {
-				install(composite);
+			protected void configureQSim(){
+				install( composite );
 			}
 		};
 
-		base.forEach(m -> m.setParent(wrapper));
-		overrides.forEach(m -> m.setParent(wrapper));
+		base.forEach( m -> m.setParent( wrapper ) );
+		overrides.forEach( m -> m.setParent( wrapper ) );
 
 		return wrapper;
+	}
+
+	// the methods below are strictly speaking not necessary.  But help with detectability.  A bit similar to the general matsim AbstractModule.
+
+	/**
+	 * <p>This is deliberately ``add'' and not ``set'' since multiple such speed calculators can be added, as long as they do not answer to the same
+	 * (vehicle, link, time) combination.</p>
+	 *
+	 * <p>This is plugged together in {@link org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory}.
+	 * Should presumably be done similarly
+	 * for the other ways to configure {@link org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory},
+	 * and then the latter could be deprecated.</p>
+	 */
+	protected LinkedBindingBuilder<LinkSpeedCalculator> addLinkSpeedCalculator(){
+		return Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class ).addBinding();
 	}
 }
