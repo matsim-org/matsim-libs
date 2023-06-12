@@ -4,7 +4,6 @@ import lsp.LSP;
 import lsp.LSPPlan;
 import lsp.LogisticChain;
 import lsp.shipment.LSPShipment;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
@@ -14,6 +13,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 class RandomShiftingStrategyFactory {
 
@@ -31,9 +31,8 @@ class RandomShiftingStrategyFactory {
 
 			@Override
 			public void handlePlan(LSPPlan lspPlan) {
-				//TODO: Logistikketten können keine Shipments enthalten. Das wäre ein Problem beim entfernen.
+
 				LSP lsp = lspPlan.getLSP();
-				Id<LSPShipment> shipmentId = null;
 
 				// iterate through initial plan chains and add shipment IDs to corresponding new plan chains
 				for (LogisticChain initialPlanChain : lsp.getPlans().get(0).getLogisticChains()) {
@@ -45,44 +44,37 @@ class RandomShiftingStrategyFactory {
 					}
 				}
 
-				int removeChainIndex;
-				LogisticChain removeChain;
-				Iterator<LogisticChain> removeChainIterator;
-				do {
-					removeChainIndex = MatsimRandom.getRandom().nextInt(lsp.getSelectedPlan().getLogisticChains().size());
-					removeChainIterator = lsp.getSelectedPlan().getLogisticChains().iterator();
-					for (int i = 0; i < removeChainIndex; i++) {
-						removeChainIterator.next();
-					}
-					removeChain = removeChainIterator.next();
-				} while (lsp.getSelectedPlan().getLogisticChains().iterator().next().getShipmentIds().isEmpty());
+				// Make a new list of shipments and pick a random shipment from it
+				List<LSPShipment> shipments = new ArrayList<>(lsp.getShipments());
+				int shipmentIndex = MatsimRandom.getRandom().nextInt(lsp.getShipments().size());
+				LSPShipment shipment = shipments.get(shipmentIndex);
 
-				int addChainIndex = MatsimRandom.getRandom().nextInt(lsp.getSelectedPlan().getLogisticChains().size());
-
-				while (removeChainIndex == addChainIndex) {
-					addChainIndex = MatsimRandom.getRandom().nextInt(lsp.getSelectedPlan().getLogisticChains().size());
-				}
-
-				Iterator<LogisticChain> iterator = lsp.getSelectedPlan().getLogisticChains().iterator();
-				for (int i = 0; iterator.hasNext(); i++) {
-					LogisticChain logisticChain = iterator.next();
-					if (i == removeChainIndex) {
-						shipmentId = logisticChain.getShipmentIds().iterator().next();
-						logisticChain.getShipmentIds().remove(shipmentId);
+				// Find and remove the random shipment from its current logistic chain
+				LogisticChain sourceLogisticChain = null;
+				for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+					if (logisticChain.getShipmentIds().remove(shipment.getId())) {
+						sourceLogisticChain = logisticChain;
 						break;
 					}
 				}
 
-				if (shipmentId != null) {
-					iterator = lsp.getSelectedPlan().getLogisticChains().iterator();
+				// Find a new logistic chain for the shipment
+				// Ensure that the chain selected is not the same as the one it was removed from
+				int chainIndex;
+				LogisticChain targetLogisticChain = null;
+				do {
+					chainIndex = MatsimRandom.getRandom().nextInt(lsp.getSelectedPlan().getLogisticChains().size());
+					Iterator<LogisticChain> iterator = lsp.getSelectedPlan().getLogisticChains().iterator();
 					for (int i = 0; iterator.hasNext(); i++) {
-						LogisticChain logisticChain = iterator.next();
-						if (i == addChainIndex) {
-							logisticChain.getShipmentIds().add(shipmentId);
+						targetLogisticChain = iterator.next();
+						if (i == chainIndex) {
 							break;
 						}
 					}
-				}
+				} while (targetLogisticChain == sourceLogisticChain);
+
+				// Add the shipment to the new logistic chain
+				targetLogisticChain.addShipmentToChain(shipment);
 			}
 
 			@Override
