@@ -98,7 +98,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 			sorted.sort((o1, o2) -> -Double.compare(allStuckLinks.getDouble(o1), allStuckLinks.getDouble(o2)));
 			List<String> header = new ArrayList<>(stuckAgentsPerLink.keySet());
 			header.add(0, "link");
-			header.add(1, "# Agents");
+			header.add(1, "Agents");
 			// Write to .csv
 			printer.printRecord(header);
 			for (int i = 0; i < 20; i++) {
