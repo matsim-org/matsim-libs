@@ -32,9 +32,9 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 
 import java.util.*;
 
-/*package-private*/ class RoundRobinDistributionOfShipmentsStrategyFactory {
+/*package-private*/ class RoundRobinDistributionAllShipmentsStrategyFactory {
 
-	/*package-private*/ RoundRobinDistributionOfShipmentsStrategyFactory() {
+	/*package-private*/ RoundRobinDistributionAllShipmentsStrategyFactory() {
 	}
 
 	/*package-private*/ GenericPlanStrategy<LSPPlan, LSP> createStrategy() {

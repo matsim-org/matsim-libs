@@ -14,9 +14,9 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import java.util.ArrayList;
 import java.util.List;
 
-class RandomDistributionOfShipmentsStrategyFactory {
+class RandomDistributionAllShipmentsStrategyFactory {
 
-	RandomDistributionOfShipmentsStrategyFactory() {
+	RandomDistributionAllShipmentsStrategyFactory() {
 	}
 
 	GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
