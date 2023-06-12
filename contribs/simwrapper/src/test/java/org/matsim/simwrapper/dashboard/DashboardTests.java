@@ -25,10 +25,10 @@ public class DashboardTests {
 		Config config = TestScenario.loadConfig(utils);
 		config.controler().setLastIteration(2);
 
-		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		simWrapperConfigGroup.defaultParams().sampleSize = "0.001";
+		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+		group.defaultParams().sampleSize = "0.001";
 
-		SimWrapper sw = SimWrapper.create();
+		SimWrapper sw = SimWrapper.create(group);
 		for (Dashboard d : dashboards) {
 			sw.addDashboard(d);
 		}
