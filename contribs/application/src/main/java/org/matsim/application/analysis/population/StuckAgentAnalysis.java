@@ -63,8 +63,9 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 
 		// Total stats
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents.csv").toString()), CSVFormat.DEFAULT)) {
-			printer.printRecord("Total mobile Agents", "Stuck Agents", "Proportion of stuck agents");
-			printer.printRecord(allAgents.size(), allStuckLinks.keySet().size(), new DecimalFormat("#.0#", DecimalFormatSymbols.getInstance(Locale.US)).format(((Math.round((100.0 / allAgents.size() * allStuckLinks.keySet().size()) * 100)) / 100.0)) + '%');
+			printer.printRecord("Total mobile Agents", allAgents.size(), "user-group");
+			printer.printRecord("Stuck Agents", allStuckLinks.keySet().size(), "person-circle-xmark");
+			printer.printRecord("Proportion of stuck agents", new DecimalFormat("#.0#", DecimalFormatSymbols.getInstance(Locale.US)).format(((Math.round((100.0 / allAgents.size() * allStuckLinks.keySet().size()) * 100)) / 100.0)) + '%', "chart-pie");
 		} catch (IOException ex) {
 			log.error(ex);
 		}

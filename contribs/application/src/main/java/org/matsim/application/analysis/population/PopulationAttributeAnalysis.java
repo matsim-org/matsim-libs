@@ -104,8 +104,9 @@ public class PopulationAttributeAnalysis implements MATSimAppCommand {
 
 		// Average Income Per Age
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("total_agents.csv").toString()), CSVFormat.DEFAULT)) {
-			printer.printRecord("Total Agents", "Average Age", "Average Income");
-			printer.printRecord(totalAgents, new DecimalFormat("#.0#").format(this.calculateMeanFromIntegerArray(allAges)), new DecimalFormat("#.0#").format(this.calculateMeanFromDoubleArray(allIncomes)));
+			printer.printRecord("Total Agents", totalAgents, "user-group");
+			printer.printRecord("Average Age", new DecimalFormat("#.0#").format(this.calculateMeanFromIntegerArray(allAges)));
+			printer.printRecord("Average Income", new DecimalFormat("#.0#").format(this.calculateMeanFromDoubleArray(allIncomes)), "money-check-dollar");
 		} catch (IOException ex) {
 			log.error(ex);
 		}
