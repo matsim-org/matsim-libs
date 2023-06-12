@@ -10,6 +10,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -23,6 +24,9 @@ public class DashboardTests {
 
 		Config config = TestScenario.loadConfig(utils);
 		config.controler().setLastIteration(2);
+
+		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+		simWrapperConfigGroup.defaultParams().sampleSize = "0.001";
 
 		SimWrapper sw = SimWrapper.create();
 		for (Dashboard d : dashboards) {
