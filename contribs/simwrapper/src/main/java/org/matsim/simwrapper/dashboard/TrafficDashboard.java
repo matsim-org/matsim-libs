@@ -13,7 +13,6 @@ import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Dashboard to show traffic statistics.
@@ -40,42 +39,45 @@ public class TrafficDashboard implements Dashboard {
 
 		layout.row("index_by_hour").el(Plotly.class, (viz, data) -> {
 
-					viz.title = "Network congestion index";
-					viz.description = "by hour";
+				viz.title = "Network congestion index";
+				viz.description = "by hour";
 
-					Plotly.DataSet ds = viz.addDataset(data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_and_hour.csv", args));
+				Plotly.DataSet ds = viz.addDataset(data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_and_hour.csv", args));
 
-					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-							.yAxis(Axis.builder().title("Index").build())
-							.xAxis(Axis.builder().title("Hour").build())
-							.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
-							.build();
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.yAxis(Axis.builder().title("Index").build())
+					.xAxis(Axis.builder().title("Hour").build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+					.build();
 
-					viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
-							.x("hour")
-							.y("congestion_index")
-							.name("road_type", Plotly.ColorScheme.Spectral)
-					);
-				})
-				.el(Table.class, ((viz, data) -> {
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
+					.x("hour")
+					.y("congestion_index")
+					.name("road_type", Plotly.ColorScheme.Spectral)
+				);
+			})
+			.el(Table.class, ((viz, data) -> {
 
-					viz.title = "Traffic stats per road type";
+				viz.title = "Traffic stats per road type";
+				viz.description = "daily";
 
-					viz.dataset = data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_daily.csv", args);
+				viz.dataset = data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_daily.csv", args);
 
-					viz.showAllRows = true;
-					viz.enableFilter = false;
-				}));
+				viz.showAllRows = true;
+				viz.enableFilter = false;
+			}));
 
-
+		// TODO: not working ideally, should be converted to map viz
 		layout.row("map").el(Links.class, (viz, data) -> {
 
 			viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
 			viz.datasets.csvBase = data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv", args);
+			viz.center = data.context().getCenter();
+
+			viz.display.color.columnName = "avg_speed";
+			viz.display.width.columnName = "avg_speed";
+
 			viz.height = 12d;
-
-			// TODO: links datasets API
-
 		});
 
 	}
