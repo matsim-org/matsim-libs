@@ -53,6 +53,9 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@NotNull
 	public String chargersFile = null;
 
+	/**
+	 * @deprecated -- please avoid booleans in config.  Change to enum.  kai, apr'23
+	 */
 	// output
 	@Parameter
 	@Comment("If true, charge/SoC time profile plots will be created")
@@ -63,6 +66,9 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	public int numberOfIndividualTimeProfiles = 50;
 
+	/**
+	 * @deprecated -- please avoid booleans in config.  Change to enum.  kai, apr'23
+	 */
 	@Parameter
 	@Comment("determines whether the resulting SoC at the end of the iteration X is set to be the initial SoC"
 			+ "in iteration X+1 for each EV."

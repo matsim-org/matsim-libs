@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +34,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
@@ -61,7 +61,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private NetsimInternalInterface netsimEngine ;
 		private final NetsimEngineContext context;
 		private LaneFactory laneFactory;
-		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+		private LinkSpeedCalculator linkSpeedCalculator;
 		private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
 		
 		Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
@@ -84,6 +84,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			if ( laneFactory == null ) {
 				laneFactory = new QueueWithBuffer.Builder( context ) ;
 			}
+			Objects.requireNonNull( linkSpeedCalculator );
 			return new QLinkImpl( link, toNode, laneFactory, context, netsimEngine, linkSpeedCalculator, vehicleHandler) ;
 		}
 	}

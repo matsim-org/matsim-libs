@@ -24,7 +24,6 @@ import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmLis
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -68,6 +67,7 @@ public class FreightUtils {
 	private static final Logger log = LogManager.getLogger(FreightUtils.class);
 
 	private static final String ATTR_SKILLS = "skills";
+	private static final String ATTR_JSPRIT_SCORE = "jspritScore";
 
 	/**
 	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
@@ -498,6 +498,14 @@ public class FreightUtils {
 	}
 	public static void putVehicle( Plan plan, Vehicle vehicle ){
 		plan.getAttributes().putAttribute( CARRIER_VEHICLE, vehicle );
+	}
+
+	public static void setJspritScore(CarrierPlan plan, Double jspritScore){
+		plan.getAttributes().putAttribute(ATTR_JSPRIT_SCORE, jspritScore);
+	}
+
+	public static Double getJspritScore (CarrierPlan plan) {
+		return (Double) plan.getAttributes().getAttribute(ATTR_JSPRIT_SCORE);
 	}
 
 	public static void writeCarriers( Carriers carriers, String filename ) {

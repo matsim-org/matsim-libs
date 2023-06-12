@@ -23,19 +23,25 @@ package org.matsim.contrib.freight.carrier;
 
 import java.util.Collection;
 import org.matsim.api.core.v01.population.BasicPlan;
+import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
- * 
- * A specific plan of a carrier, and its score. 
- * 
+ *
+ * A specific plan of a carrier, and its score.
+ *
  * @author mzilske, sschroeder
- * 
+ *
  */
-public class CarrierPlan implements BasicPlan {
+public class CarrierPlan implements BasicPlan, Attributable {
 
 	private final Carrier carrier;
 	private final Collection<ScheduledTour> scheduledTours;
 	private Double score = null;
+
+	private final Attributes attributes = new AttributesImpl();
 
 	@Override
 	public String toString() {
@@ -51,18 +57,49 @@ public class CarrierPlan implements BasicPlan {
 		return carrier;
 	}
 
+	/**
+	 * In future (starting in May'23) this is the score from the MATSim scoring function.
+	 * The jsprit score is saved in attribute. Please use the method getJspritScore() to access it.
+	 * @return the (MATSim) score
+	 */
 	@Override
 	public Double getScore() {
 		return score;
 	}
 
+	/**
+	 * In future (starting in May'23) this is the score from the MATSim scoring function.
+	 * The jsprit score is saved in attribute. Please use the method setJspritScore() to store it.
+	 * @return the (MATSim) score
+	 */
 	@Override
 	public void setScore(Double score) {
 		this.score = score;
+	}
+
+	/**
+	 * Returns the score from the jsprit VRP solving. It is stored in an attribute of the CarrierPlan
+	 * This is _not_ the score from the MATSim simulation.
+	 * @return score from jsprit.
+	 */
+	public Double getJspritScore(){
+		return FreightUtils.getJspritScore(this);
+	}
+
+	/**
+	 * Store the score from the jsprit VRP solving in an attribute of the CarrierPlan.
+	 * This is _not_ the score from the MATSim simulation.
+	 */
+	public void setJspritScore(Double score){
+		FreightUtils.setJspritScore(this, score);
 	}
 
 	public Collection<ScheduledTour> getScheduledTours() {
 		return scheduledTours;
 	}
 
+	@Override
+	public final Attributes getAttributes() {
+		return this.attributes;
+	}
 }

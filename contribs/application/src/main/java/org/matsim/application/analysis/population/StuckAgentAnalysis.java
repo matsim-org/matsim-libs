@@ -27,10 +27,11 @@ import picocli.CommandLine;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 @CommandLine.Command(name = "stuck-agents", description = "Generates statistics for stuck agents.")
-@CommandSpec(requireEvents = true, produces = {"stuck_agents_per_hour.csv", "stuck_agents_per_mode.csv", "stuck_agents_per_link.csv", "stuckAgentsPerModePieChart.csv", "stuck_agents.csv"})
+@CommandSpec(requireEvents = true, produces = {"stuck_agents_per_hour.csv", "stuck_agents_per_mode.csv", "stuck_agents_per_link.csv", "stuck_agents.csv"})
 public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHandler, ActivityStartEventHandler {
 	private static final Logger log = LogManager.getLogger(StuckAgentAnalysis.class);
 	private final Object2IntMap<String> stuckAgentsPerMode = new Object2IntOpenHashMap<>();
@@ -62,8 +63,9 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 
 		// Total stats
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents.csv").toString()), CSVFormat.DEFAULT)) {
-			printer.printRecord("Total mobile Agents", "Stuck Agents", "Proportion of stuck agents");
-			printer.printRecord(allAgents.size(), allStuckLinks.keySet().size(), new DecimalFormat("#.0#").format(((Math.round((100.0 / allAgents.size() * allStuckLinks.keySet().size()) * 100)) / 100.0)) + '%');
+			printer.printRecord("Total mobile Agents", allAgents.size(), "user-group");
+			printer.printRecord("Stuck Agents", allStuckLinks.keySet().size(), "person-circle-xmark");
+			printer.printRecord("Proportion of stuck agents", new DecimalFormat("#.0#", DecimalFormatSymbols.getInstance(Locale.US)).format(((Math.round((100.0 / allAgents.size() * allStuckLinks.keySet().size()) * 100)) / 100.0)) + '%', "chart-pie");
 		} catch (IOException ex) {
 			log.error(ex);
 		}
@@ -96,7 +98,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 			sorted.sort((o1, o2) -> -Double.compare(allStuckLinks.getDouble(o1), allStuckLinks.getDouble(o2)));
 			List<String> header = new ArrayList<>(stuckAgentsPerLink.keySet());
 			header.add(0, "link");
-			header.add(1, "# Agents");
+			header.add(1, "Agents");
 			// Write to .csv
 			printer.printRecord(header);
 			for (int i = 0; i < 20; i++) {
@@ -114,23 +116,10 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 
 		// Stuck agents per mode
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuck_agents_per_mode.csv").toString()), CSVFormat.DEFAULT)) {
-			printer.printRecord("Mode", "# Agents");
+			printer.printRecord("Mode", "Agents");
 			for (Object2IntMap.Entry<String> entry : stuckAgentsPerMode.object2IntEntrySet()) {
 				printer.printRecord(entry.getKey(), entry.getIntValue());
 			}
-		} catch (IOException ex) {
-			log.error(ex);
-		}
-
-		// Pie chart
-		// FIXME: if plotly plugin is used, this file won't be needed anymore
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("stuckAgentsPerModePieChart.csv").toString()), CSVFormat.DEFAULT)) {
-
-			List<String> header = new ArrayList<>(stuckAgentsPerMode.keySet());
-			List<Integer> values = new ArrayList<>(stuckAgentsPerMode.values());
-
-			printer.printRecord(header);
-			printer.printRecord(values);
 		} catch (IOException ex) {
 			log.error(ex);
 		}

@@ -171,7 +171,7 @@ public class LogFileAnalysis implements MATSimAppCommand {
 		} else {
 
 			Map<String, List<Warning>> grouped = warnings.stream().collect(Collectors.groupingBy(w -> w.module, Collectors.toList()));
-			writer.write(String.format("<h3 class=\"found-warnings\">Warnings in %d module%s found ❌</h3>\n\n", grouped.size(), grouped.size() > 1 ? "s" : ""));
+			writer.write(String.format("<h3 class=\"found-warnings\">Warnings found in %d module%s ❌</h3>\n\n", grouped.size(), grouped.size() > 1 ? "s" : ""));
 
 			for (Map.Entry<String, List<Warning>> e : grouped.entrySet()) {
 
@@ -188,7 +188,9 @@ public class LogFileAnalysis implements MATSimAppCommand {
 		writer.write("""
 			<style>
 			.dash-row.row-warnings .dash-card-frame {
+				margin-top: 0;
 				margin-bottom: 0;
+				padding: 0 0.4em;
 			}
 			.dash-row.row-warnings .no-warnings {
 				color: #4BB543;
@@ -199,11 +201,18 @@ public class LogFileAnalysis implements MATSimAppCommand {
 				font-weight: bold;
 			}
 			.dash-row.row-warnings h4 {
-				color: #6f5425;
+				color: white;
+				background: #6f5425;
+				font-weight: bold;
+				padding: 0.75rem 1.5rem;
+				margin-top: 1rem;
+				border-radius: 10px 10px 0 0;
 			}
 			.dash-row.row-warnings pre {
 				background: #f8f3d6;
 				color: #6f5425;
+				border-radius: 0 0 10px 10px;
+				white-space: pre-wrap;
 			}
 			</style>""");
 	}
