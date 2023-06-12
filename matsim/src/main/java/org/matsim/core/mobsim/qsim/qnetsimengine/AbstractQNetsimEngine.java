@@ -64,7 +64,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	private NetsimInternalInterface ii = new NetsimInternalInterface(){
 		@Override public QNetwork getNetsimNetwork() {
-			return network ;
+			return qNetwork;
 		}
 		@Override public void arrangeNextAgentState(MobsimAgent driver) {
 			AbstractQNetsimEngine.this.arrangeNextAgentState(driver);
@@ -86,7 +86,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	private final VehicularDepartureHandler dpHandler;
 //	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 	protected final int numOfThreads;
-	protected final QNetwork network;
+	protected final QNetwork qNetwork;
 
 	private double infoTime = 0;
 	private List<A> engines;
@@ -118,17 +118,18 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		}
 		
 		if (netsimNetworkFactory != null){
-			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
+			qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
 		} else {
-			Scenario scenario = sim.getScenario();
-			EventsManager events = sim.getEventsManager() ;
-			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
-			MobsimTimer mobsimTimer = sim.getSimTimer() ;
-			AgentCounter agentCounter = sim.getAgentCounter() ;
-			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
-			network = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
+			throw new RuntimeException( "this execution path is no longer allowed; network factory needs to come from elsewhere (in general via injection).  kai, jun'23" );
+//			Scenario scenario = sim.getScenario();
+//			EventsManager events = sim.getEventsManager() ;
+//			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
+//			MobsimTimer mobsimTimer = sim.getSimTimer() ;
+//			AgentCounter agentCounter = sim.getAgentCounter() ;
+//			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
+//			qNetwork = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
 		}
-		network.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
+		qNetwork.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
 
 		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
 	}
@@ -192,7 +193,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
-		for (QLinkI link : network.getNetsimLinks().values()) {
+		for (QLinkI link : qNetwork.getNetsimLinks().values()) {
 			link.clearVehicles();
 		}
 	}
@@ -244,7 +245,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 				log.warn(Gbl.ONLYONCE);
 			}
 		}
-		QLinkI qlink = network.getNetsimLinks().get(startLinkId);
+		QLinkI qlink = qNetwork.getNetsimLinks().get(startLinkId );
 		if (qlink == null) {
 			throw new RuntimeException("requested link with id=" + startLinkId + " does not exist in network. Possible vehicles "
 					+ "or activities or facilities are registered to a different network.") ;
@@ -275,7 +276,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	}
 
 	public final NetsimNetwork getNetsimNetwork() {
-		return this.network;
+		return this.qNetwork;
 	}
 
 	public final VehicularDepartureHandler getDepartureHandler() {
@@ -289,7 +290,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 		Id<Link> linkId = planAgent.getCurrentLinkId(); 
 		if (linkId != null) { // may be bushwacking
-			QLinkI qLink = this.network.getNetsimLink(linkId);
+			QLinkI qLink = this.qNetwork.getNetsimLink(linkId );
 			if ( qLink==null ) {
 				throw new RuntimeException("netsim link lookup failed; agentId=" + planAgent.getId() + "; linkId=" + linkId ) ;
 			}
@@ -301,7 +302,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		if  (linkId == null) { // seems that this can happen in tests; not sure if it can happen in regular code. kai, jun'15
 			return null;
 		}
-		QLinkI qLink = this.network.getNetsimLink(linkId);
+		QLinkI qLink = this.qNetwork.getNetsimLink(linkId );
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}
 
@@ -391,7 +392,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		int links[] = new int[this.engines.size()];
 
 		int roundRobin = 0;
-		for (QNodeI node : network.getNetsimNodes().values()) {
+		for (QNodeI node : qNetwork.getNetsimNodes().values()) {
 			int i = roundRobin % this.engines.size();
 			if( node instanceof AbstractQNode){
 				((AbstractQNode) node).setNetElementActivationRegistry(this.engines.get(i));
@@ -400,7 +401,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 			// set activator for out links
 			for (Link outLink : node.getNode().getOutLinks().values()) {
-				AbstractQLink qLink = (AbstractQLink) network.getNetsimLink(outLink.getId());
+				AbstractQLink qLink = (AbstractQLink) qNetwork.getNetsimLink(outLink.getId() );
 				// (must be of this type to work.  kai, feb'12)
 
 				// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10

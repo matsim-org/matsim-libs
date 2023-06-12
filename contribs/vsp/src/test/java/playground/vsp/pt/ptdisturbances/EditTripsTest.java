@@ -129,7 +129,7 @@ public class EditTripsTest {
 
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 51. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
@@ -167,7 +167,7 @@ public class EditTripsTest {
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 30. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
@@ -207,7 +207,7 @@ public class EditTripsTest {
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 23. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
@@ -243,7 +243,7 @@ public class EditTripsTest {
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 33. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
@@ -286,7 +286,7 @@ public class EditTripsTest {
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 25. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
@@ -328,7 +328,7 @@ public class EditTripsTest {
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 25. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
@@ -365,7 +365,7 @@ public class EditTripsTest {
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 25. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
@@ -405,7 +405,7 @@ public class EditTripsTest {
 			scenario.getPopulation().addPerson(person);
 		}
 		testReplanTime = 7. * 3600 + 33. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		for (Id<?> personId : arrivalTimes.keySet()) {
 			String[] parts = personId.toString().split("_");
 			double activityEndTime = Double.parseDouble(parts[1]);
@@ -451,7 +451,8 @@ public class EditTripsTest {
 
 
 
-	void run(Config config, Scenario scenario, boolean openOTFVis, HashMap<Id<Person>, List<String>> trips, HashMap<Id<Person>, Double> arrivalTimes) {
+	void run( Scenario scenario, boolean openOTFVis, HashMap<Id<Person>, List<String>> trips, HashMap<Id<Person>, Double> arrivalTimes ) {
+		Config config = scenario.getConfig();
 
 		RunExamplePtDisturbances.adaptConfig(config);
 
@@ -461,7 +462,6 @@ public class EditTripsTest {
 
 		SignalSystemsConfigGroup signalSystemsConfigGroup = adaptConfigForSignals(config);
 
-//		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		buildSignals(scenario, signalSystemsConfigGroup);
 
 		Controler controler = new Controler(scenario);
