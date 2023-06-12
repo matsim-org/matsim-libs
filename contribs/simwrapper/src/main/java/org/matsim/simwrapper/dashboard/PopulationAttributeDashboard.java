@@ -1,15 +1,16 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.population.PopulationAttributeAnalysis;
-import org.matsim.application.analysis.population.StuckAgentAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Bar;
 import org.matsim.simwrapper.viz.PieChart;
-import org.matsim.simwrapper.viz.Table;
 import org.matsim.simwrapper.viz.Tile;
 
+/**
+ * Shows attributes distribution of the population.
+ */
 public class PopulationAttributeDashboard implements Dashboard {
 	@Override
 	public void configure(Header header, Layout layout) {

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public abstract class Chart extends Viz {
+abstract class Chart extends Viz {
 
 	/**
 	 * The filepath containing the data

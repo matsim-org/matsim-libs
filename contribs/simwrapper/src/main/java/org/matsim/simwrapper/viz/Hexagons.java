@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Hexagons extends Viz {
+/**
+ * Produces a hexagon plot on a map.
+ */
+public final class Hexagons extends Viz {
 
 	/**
 	 * The filepath containing the data.
@@ -39,7 +42,7 @@ public class Hexagons extends Viz {
 	}
 
 	/**
-	 * Defines an aggregation element
+	 * Defines an aggregation element.
 	 */
 	private static final class Aggregations {
 

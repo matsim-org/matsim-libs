@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * A generic viz element that can hold any properties.
  */
-public class GenericViz extends Viz {
+public final class GenericViz extends Viz {
 
 	public String type;
 	@JsonIgnore

@@ -45,6 +45,9 @@ public class Video extends Viz {
 		super("video");
 	}
 
+	/**
+	 * Supported mime types for video source files.
+	 */
 	public enum MIMETypes {
 
 		MP4("video/mp4"),
