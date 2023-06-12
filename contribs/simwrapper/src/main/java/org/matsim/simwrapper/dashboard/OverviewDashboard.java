@@ -83,6 +83,7 @@ public class OverviewDashboard implements Dashboard {
 				viz.x = "Iteration";
 				viz.xAxisName = "Iteration";
 				viz.yAxisName = "Runtime [s]";
+				viz.columns = List.of("seconds");
 				viz.dataset = data.compute(LogFileAnalysis.class, "runtime_stats.csv");
 
 			})

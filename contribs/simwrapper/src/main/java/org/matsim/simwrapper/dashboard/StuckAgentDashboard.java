@@ -57,7 +57,7 @@ public class StuckAgentDashboard implements Dashboard {
 				viz.x = "hour";
 				viz.xAxisName = "Hour";
 				viz.yAxisName = "# Stuck";
-				viz.ignoreColumns = List.of("Total");
+				viz.columns = List.of("pt","walk");
 			})
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Stuck Agents";
