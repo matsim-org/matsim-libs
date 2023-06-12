@@ -98,6 +98,41 @@ public abstract class FastEmissionGridAnalyzer {
                 .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
     }
 
+	public static TimeBinMap<Map<Pollutant, Raster>> processEventsFileByTime(String eventsFile, Network network, double cellSize, int radius, double timeBinSize) {
+
+		logger.info("Start parsing events file.");
+		TimeBinMap<Map<Pollutant, TObjectDoubleHashMap<Id<Link>>>> collected = new TimeBinMap<>(timeBinSize);
+
+		new RawEmissionEventsReader((time, linkId, vehicleId, pollutant, value) -> {
+
+			var id = Id.createLinkId(linkId);
+			if (network.getLinks().containsKey(id)) {
+
+				var bin = collected.getTimeBin(time);
+				var linkEmissionByPollutant = bin.computeIfAbsent(HashMap::new);
+				var linkMap = linkEmissionByPollutant.computeIfAbsent(pollutant, key -> new TObjectDoubleHashMap<>());
+				linkMap.adjustOrPutValue(id, value, value);
+			}
+		}).readFile(eventsFile);
+
+		TimeBinMap<Map<Pollutant, Raster>> result = new TimeBinMap<>(timeBinSize);
+
+		for (var bin : collected.getTimeBins()) {
+
+			var resultBin = result.getTimeBin(bin.getStartTime());
+
+			for (var pollutantEntry : bin.getValue().entrySet()) {
+
+				var raster = processLinkEmissions(pollutantEntry.getValue(), network, cellSize, radius);
+				var pollutantMap = resultBin.computeIfAbsent(HashMap::new);
+				pollutantMap.put(pollutantEntry.getKey(), raster);
+
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * Processes emissions that have been read by the {@link EmissionsOnLinkEventHandler}.
 	 */
@@ -124,26 +159,49 @@ public abstract class FastEmissionGridAnalyzer {
 	/**
 	 * Processes emissions that have been read by the {@link EmissionsOnLinkEventHandler}.
 	 */
-	public static Map<Double, Map<Pollutant, Raster>> processHandlerEmissionsPerTimeBin(TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBinMap, Network network, double cellSize, int radius) {
+	public static TimeBinMap<Map<Pollutant, Raster>> processHandlerEmissionsPerTimeBin(TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBinMap, Network network, double cellSize, int radius) {
 
-		Map<Pollutant, TObjectDoubleHashMap<Id<Link>>> linkEmissionsByPollutant = new HashMap<>();
+		Map<Double, Map<Pollutant, TObjectDoubleHashMap<Id<Link>>>> linkEmissionsByPollutantAndTime = new HashMap<>();
 
+		System.out.println("processHandlerEmissionsPerTimeBin()");
+		for (TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> perLink : timeBinMap.getTimeBins()) {
+			Double time = perLink.getStartTime();
+			// Added time if not already included
+			if (!linkEmissionsByPollutantAndTime.keySet().contains(time)) linkEmissionsByPollutantAndTime.put(time, new HashMap<>());
+			for (Map.Entry<Id<Link>, EmissionsByPollutant> emissionsByPollutantEntry : perLink.getValue().entrySet()) {
+				// Added linkID if not exists
+				Id<Link> linkId = emissionsByPollutantEntry.getKey();
+
+
+//				if (!linkEmissionsByPollutantAndTime.get(time).containsKey(linkId)) linkEmissionsByPollutantAndTime.get(time).put(linkId, new TObjectDoubleHashMap<>());
+//				for (Map.Entry<Pollutant, Double> pollutantDoubleMap : emissionsByPollutantEntry.getValue().getEmissions().entrySet()) {
+//					linkEmissionsByPollutantAndTime.get(time).get(linkId);
+//					linkEmissionsByPollutantAndTime.get(time).get(linkId).put(pollutantDoubleMap.getKey(), pollutantDoubleMap.getValue());
+//				}
+			}
+		}
+
+		logger.info("MAP SIZE: " + linkEmissionsByPollutantAndTime.size());
 		// TODO
-//
-//		// Transpose the map
-//		for (Map.Entry<Id<Link>, Map<Pollutant, Double>> perLink : link2pollutants.entrySet()) {
-//			for (Map.Entry<Pollutant, Double> e : perLink.getValue().entrySet()) {
-//				var linkMap = linkEmissionsByPollutant.computeIfAbsent(e.getKey(), key -> new TObjectDoubleHashMap<>());
-//				linkMap.put(perLink.getKey(), e.getValue());
-//			}
-//		}
-//
-//		return linkEmissionsByPollutant.entrySet().stream()
-//			.map(entry -> {
-//				logger.info("Smoothing of: " + entry.getKey());
-//				return Tuple.of(entry.getKey(), processLinkEmissions(entry.getValue(), network, cellSize, radius));
-//			})
-//			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+
+		TimeBinMap<Map<Pollutant, Raster>> result = new TimeBinMap<>(timeBinMap.getBinSize());
+
+		// Transpose the map
+		for (Map.Entry<Double, Map<Pollutant, TObjectDoubleHashMap<Id<Link>>>> timeSlice : linkEmissionsByPollutantAndTime.entrySet()) {
+
+			Double time = timeSlice.getKey();
+			Map<Pollutant, TObjectDoubleHashMap<Id<Link>>> pollutants = timeSlice.getValue();
+
+			for (Map.Entry<Pollutant, TObjectDoubleHashMap<Id<Link>>> e : pollutants.entrySet()) {
+
+				Pollutant pollutant = e.getKey();
+				TObjectDoubleHashMap<Id<Link>> emissions = e.getValue();
+
+				Raster raster = processLinkEmissions(emissions, network, cellSize, radius);
+			}
+		}
+
+
 		return null;
 	}
 
