@@ -1,10 +1,12 @@
-# SimWrapper
+# SimWrapper Contrib
 
 Contrib to provide [SimWrapper](https://simwrapper.github.io/) integration.
-SimWrapper offers a huge amount of visualization possibilities in the webbrowser and enables users to analyze,
-evaluate and  disseminate MATSim runs visually.
+SimWrapper offers a huge amount of visualization possibilities in the web browser and enables users to analyze,
+evaluate and disseminate MATSim runs visually.
 
 This extension allows you to automatically create SimWrapper dashboards after runs have finished.
+Additionally, to generating dashboard YAML files, it will also take care of executing any necessary post-process step to
+generate required data files.
 
 To use it, simply install the module:
 
@@ -18,8 +20,7 @@ This module not only provides a set of default dashboards, but is designed to be
 dashboards as needed.
 The existing dashboards in `org.matsim.simwrapper.dashboard` serve as good examples to get started.
 
-Internally SimWrapper works mostly with YAML files, but in the Java API all YAML files are generated automatically for
-you.
+Internally SimWrapper works mostly with YAML files, but in the Java API all YAML files are generated automatically.
 During development, you only interact with type-safe Java API and set the necessary attributes:
 
 ```java
@@ -38,13 +39,15 @@ public class CustomDashboard implements Dashboard {
 }
 ```
 
+The package `org.matsim.simwrapper.viz` contains all the viz elements available in SimWrapper as Java API.
+
 ## Adding Dashboards
 
 The philosophy of this module is to provide as much functionality as possible without any need for configuration.
 
 To define which dashboard are available you need to implement
 a [DashboardProvider](src%2Fmain%2Fjava%2Forg%2Fmatsim%2Fsimwrapper%2FDashboardProvider.java), which simply returns a
-list of  dashboards.
+list of dashboards.
 
 There are two preferred ways to add these providers by default:
 
@@ -55,12 +58,51 @@ classpath.
 Thus, dashboards added this way will be available as soon the maven dependency is imported. No other configuration is
 required from the users side.
 
-To use this method you need a file `META-INF/services/org.matsim.simwrapper.DashboardProvider`, which lists all your provider implementations.
+To use this method you need a file `META-INF/services/org.matsim.simwrapper.DashboardProvider`, which lists all your
+provider implementations.
 
 ### 2. Package Scanning
 
-If dashboards should not be added automatically without any configuration, then you still need to implement the provider, but not add it to the services file.
+If dashboards should not be added automatically without any configuration, then you still need to implement the
+provider, but not add it to the services file.
 
-The developer then needs to configure [SimWrapperConfigGroup](src%2Fmain%2Fjava%2Forg%2Fmatsim%2Fsimwrapper%2FSimWrapperConfigGroup.java) and add
+The developer then needs to
+configure [SimWrapperConfigGroup](src%2Fmain%2Fjava%2Forg%2Fmatsim%2Fsimwrapper%2FSimWrapperConfigGroup.java) and add
 the corresponding package name to `packages` in the config.
-The contrib will then pick it up from there only if configured correctly.
+
+## Post-processing
+
+This module relies on the MATSim application contrib to integrate classes needed for post-processing.
+
+A class that depends on the output of a run and is supposed to produce files to be shown on the dashboard needs to be
+written
+as `MATSimAppCommand` class. Additionally, it needs to declare the files it depends on and produces via
+the`@CommandSpec` annotation.
+Here is an example that shows the structure of such a class:
+
+```java
+
+@CommandLine.Command(name = "trips", description = "Calculates various trip related metrics.")
+@CommandSpec(
+        requires = {"trips.csv", "persons.csv"},
+        produces = {"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv"}
+)
+public class TripAnalysis implements MATSimAppCommand {
+
+    @CommandLine.Mixin
+    private InputOptions input = InputOptions.ofCommand(TripAnalysis.class);
+    @CommandLine.Mixin
+    private OutputOptions output = OutputOptions.ofCommand(TripAnalysis.class);
+
+    @Override
+    public Integer call() throws Exception {
+        Path p = input.getPath("trips.csv");
+        // .. Analysis codes that generates the required csv ...
+        Path out = output.getPath("trip_purposes_by_hour.csv");
+    }
+}
+```
+
+In a dashboard, the output of this analysis can be referenced
+using `data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")`.
+The contrib will collect all required analysis classes, no further configuration for the post-processing is necessary.
