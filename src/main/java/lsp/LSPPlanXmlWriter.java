@@ -31,7 +31,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -104,11 +103,13 @@ public class LSPPlanXmlWriter  extends MatsimXmlWriter {
 		this.writeStartTag(RESOURCES, null);
 		for (LSPResource resource : lsp.getResources()) {
 			if (resource instanceof TransshipmentHub hub) {
-				this.writeStartTag(HUB, List.of(
-						createTuple(ID, hub.getId().toString()),
-						createTuple(LOCATION, hub.getStartLinkId().toString()),
-						createTuple(FIXED_COST, hub.getAttributes().getAttribute(FIXED_COST).toString()))
-				);
+				List<Tuple<String, String>> tupleList = new ArrayList<>();
+				tupleList.add(new Tuple<>(ID, hub.getId().toString()));
+				tupleList.add(new Tuple<>(LOCATION, hub.getStartLinkId().toString()));
+				if (hub.getAttributes().getAttribute(FIXED_COST) != null) {
+					tupleList.add(new Tuple<>(FIXED_COST, hub.getAttributes().getAttribute(FIXED_COST).toString()));
+				}
+				this.writeStartTag(HUB, tupleList);
 				this.writeStartTag(SCHEDULER, List.of(
 						createTuple(CAPACITY_NEED_FIXED, hub.getCapacityNeedFixed()),
 						createTuple(CAPACITY_NEED_LINEAR, hub.getCapacityNeedLinear())), true
