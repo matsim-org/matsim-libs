@@ -21,12 +21,12 @@
 						</logisticChain>
 					</logisticChains>
 					<shipmentPlans>
-						<shipmentPlan shipmentId="shipmentSouth">
+						<shipmentPlan shipmentId="shipmentSouth" chainId="singleChain">
 							<element id="singleCarriersingleCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="120.0" resourceId="singleCarrier"/>
 							<element id="singleCarriersingleCarrierElementTRANSPORT" type="TRANSPORT" startTime="120.0" endTime="3540.0" resourceId="singleCarrier"/>
 							<element id="singleCarriersingleCarrierElementUNLOAD" type="UNLOAD" startTime="3540.0" endTime="3600.0" resourceId="singleCarrier"/>
 						</shipmentPlan>
-						<shipmentPlan shipmentId="shipmentNorth">
+						<shipmentPlan shipmentId="shipmentNorth" chainId="singleChain">
 							<element id="singleCarriersingleCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="120.0" resourceId="singleCarrier"/>
 							<element id="singleCarriersingleCarrierElementTRANSPORT" type="TRANSPORT" startTime="120.0" endTime="2040.0" resourceId="singleCarrier"/>
 							<element id="singleCarriersingleCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2100.0" resourceId="singleCarrier"/>
@@ -43,15 +43,15 @@
 						</logisticChain>
 					</logisticChains>
 					<shipmentPlans>
-						<shipmentPlan shipmentId="shipmentSouth">
-							<element id="singleCarriersingleCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="120.0" resourceId="singleCarrier"/>
-							<element id="singleCarriersingleCarrierElementTRANSPORT" type="TRANSPORT" startTime="120.0" endTime="3540.0" resourceId="singleCarrier"/>
-							<element id="singleCarriersingleCarrierElementUNLOAD" type="UNLOAD" startTime="3540.0" endTime="3600.0" resourceId="singleCarrier"/>
+						<shipmentPlan shipmentId="shipmentSouth" chainId="southChain">
+							<element id="carrierSouthsouthCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="60.0" resourceId="carrierSouth"/>
+							<element id="carrierSouthsouthCarrierElementTRANSPORT" type="TRANSPORT" startTime="60.0" endTime="1020.0" resourceId="carrierSouth"/>
+							<element id="carrierSouthsouthCarrierElementUNLOAD" type="UNLOAD" startTime="1020.0" endTime="1080.0" resourceId="carrierSouth"/>
 						</shipmentPlan>
-						<shipmentPlan shipmentId="shipmentNorth">
-							<element id="singleCarriersingleCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="120.0" resourceId="singleCarrier"/>
-							<element id="singleCarriersingleCarrierElementTRANSPORT" type="TRANSPORT" startTime="120.0" endTime="2040.0" resourceId="singleCarrier"/>
-							<element id="singleCarriersingleCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2100.0" resourceId="singleCarrier"/>
+						<shipmentPlan shipmentId="shipmentNorth" chainId="northChain">
+							<element id="CarrierNorthnorthCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="60.0" resourceId="CarrierNorth"/>
+							<element id="CarrierNorthnorthCarrierElementTRANSPORT" type="TRANSPORT" startTime="60.0" endTime="1020.0" resourceId="CarrierNorth"/>
+							<element id="CarrierNorthnorthCarrierElementUNLOAD" type="UNLOAD" startTime="1020.0" endTime="1080.0" resourceId="CarrierNorth"/>
 						</shipmentPlan>
 					</shipmentPlans>
 				</LspPlan>
