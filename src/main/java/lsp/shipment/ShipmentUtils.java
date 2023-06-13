@@ -47,7 +47,7 @@ public final class ShipmentUtils {
 	 * @param shipmentId Id of the shipment for which the Plan should be found.
 	 * @return the ShipmentPlan object or null, if it is not found.
 	 */
-	public static ShipmentPlan findPlanOfShipment(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
+	public static ShipmentPlan getOrCreateShipmentPlan(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
 		for (ShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
 			if (shipmentPlan.getLspShipmentId().equals(shipmentId)){
 				return  shipmentPlan;

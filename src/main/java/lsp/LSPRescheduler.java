@@ -72,7 +72,7 @@ final class LSPRescheduler {
 				}
 
 				for (LSPShipment shipment : lsp.getShipments()) {
-					ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).clear();
+					ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).clear();
 					shipment.getShipmentLog().clear();
 					lsp.getSelectedPlan().getAssigner().assignToLogisticChain(shipment);
 				}

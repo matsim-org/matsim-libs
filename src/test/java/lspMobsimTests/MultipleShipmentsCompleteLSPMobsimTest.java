@@ -335,7 +335,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		for (LSPShipment shipment : completeLSP.getShipments()) {
 			log.info("comparing shipment: " + shipment.getId());
 			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.findPlanOfShipment(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());

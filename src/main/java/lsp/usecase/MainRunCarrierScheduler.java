@@ -21,7 +21,6 @@
 package lsp.usecase;
 
 import lsp.*;
-import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
@@ -258,7 +257,7 @@ import java.util.*;
 		ShipmentPlanElement load = builder.build();
 		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + "" + load.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		ShipmentUtils.findPlanOfShipment(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, load);
+		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, load);
 	}
 
 	private void addShipmentTransportElement(LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
@@ -281,7 +280,7 @@ import java.util.*;
 		ShipmentPlanElement transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		ShipmentUtils.findPlanOfShipment(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, transport);
+		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, transport);
 	}
 
 	private void addShipmentUnloadElement(LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
@@ -308,7 +307,7 @@ import java.util.*;
 		ShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		ShipmentUtils.findPlanOfShipment(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, unload);
+		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, unload);
 	}
 
 	private void addMainTourRunStartEventHandler(CarrierService carrierService, LspShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {

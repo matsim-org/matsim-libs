@@ -96,7 +96,7 @@ public abstract class LSPResourceScheduler {
 
 	private final void switchHandeledShipments(int bufferTime) {
 		for (LspShipmentWithTime lspShipmentWithTime : lspShipmentsWithTime) {
-			var shipmentPlan = ShipmentUtils.findPlanOfShipment(lspPlan, lspShipmentWithTime.getShipment().getId());
+			var shipmentPlan = ShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getShipment().getId());
 			double endOfTransportTime = shipmentPlan.getMostRecentEntry().getEndTime() + bufferTime;
 			LspShipmentWithTime outgoingTuple = new LspShipmentWithTime(endOfTransportTime, lspShipmentWithTime.getShipment());
 			for (LogisticChainElement element : resource.getClientElements()) {

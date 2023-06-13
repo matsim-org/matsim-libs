@@ -274,8 +274,8 @@ public class MultipleIterationsMainRunLSPMobsimTest {
 	public void testFirstReloadLSPMobsim() {
 		for (LSPShipment shipment : lsp.getShipments()) {
 			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
-			assertEquals(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.findPlanOfShipment(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
+			assertEquals(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());

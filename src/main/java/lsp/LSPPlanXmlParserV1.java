@@ -371,7 +371,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				for (LSPShipment shipment : currentLsp.getShipments()) {
 					if (shipment.getId().toString().equals(shipmentPlanId)) {
 						for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
-							ShipmentUtils.findPlanOfShipment(currentLspPlan, shipment.getId())
+							ShipmentUtils.getOrCreateShipmentPlan(currentLspPlan, shipment.getId())
 											.addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
 						}
 					}
