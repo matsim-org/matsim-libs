@@ -2,7 +2,6 @@ package org.matsim.application.analysis.traffic;
 
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.CommandSpec;
@@ -32,7 +31,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.sum;
 
 @CommandLine.Command(name = "congestion", description = "Calculates congestion indices and relative travel times.")
 @CommandSpec(requireEvents = true, requireNetwork = true,
-		produces = {"traffic_stats_by_link_daily.csv", "traffic_stats_by_link_and_hour.csv", "traffic_stats_by_road_type_daily.csv", "traffic_stats_by_road_type_and_hour.csv"}
+	produces = {"traffic_stats_by_link_daily.csv", "traffic_stats_by_link_and_hour.csv", "traffic_stats_by_road_type_daily.csv", "traffic_stats_by_road_type_and_hour.csv"}
 )
 public class TrafficAnalysis implements MATSimAppCommand {
 
@@ -58,6 +57,19 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		new TrafficAnalysis().execute(args);
 	}
 
+	private static Table normalizeColumns(Table table) {
+		for (Column<?> c : table.columns()) {
+			int start = c.name().indexOf("[");
+			int end = c.name().indexOf("]");
+
+			if (start > -1 && end > -1) {
+				c.setName(c.name().substring(start + 1, end));
+			}
+		}
+
+		return table;
+	}
+
 	@Override
 	public Integer call() throws Exception {
 
@@ -70,7 +82,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		builder.setTimeslice(900);
 
 		TravelTimeCalculator travelTimes = builder.build();
-		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 86400, network);
+		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 86400, network, true);
 
 		EventsManager manager = EventsUtils.createEventsManager();
 
@@ -85,10 +97,13 @@ public class TrafficAnalysis implements MATSimAppCommand {
 
 		Table ds = createDataset(network, calc, volumes);
 
-		List<String> aggr = List.of("speed_performance_index", "congestion_index", "avg_speed", "simulated_traffic_volume", "road_capacity_utilization", "lane_km");
+		List<String> means = List.of("speed_performance_index", "congestion_index", "avg_speed", "road_capacity_utilization", "lane_km");
+		Table dailyMean = normalizeColumns(ds.summarize(means, mean).by("link_id"));
 
-		Table daily = normalizeColumns(ds.summarize(aggr, mean).by("link_id"));
-		roundColumns(daily);
+		List<String> sums = ds.columnNames().stream().filter(s -> s.startsWith("vol_") || s.endsWith("_volume")).toList();
+		Table dailySum = normalizeColumns(ds.summarize(sums, sum).by("link_id"));
+
+		Table daily = dailyMean.joinOn("link_id").inner(dailySum);
 
 		daily.write().csv(output.getPath("traffic_stats_by_link_daily.csv").toFile());
 
@@ -104,11 +119,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 
 			for (String roadType : roadTypes) {
 
-				double congestionIndex;
-				if (roadType.equals("all")) {
-					congestionIndex = calc.getNetworkCongestionIndex(hour * 3600, (hour + 1) * 3600, null);
-				} else
-					congestionIndex = calc.getNetworkCongestionIndex(hour * 3600, (hour + 1) * 3600, roadType);
+				double congestionIndex = calc.getNetworkCongestionIndex(hour * 3600, (hour + 1) * 3600, roadType.equals("all") ? null : roadType);
 
 				Row row = perRoadTypeAndHour.appendRow();
 				row.setString("road_type", roadType);
@@ -118,26 +129,21 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		}
 
 		perRoadTypeAndHour
-				.sortOn("road_type", "hour")
-				.write().csv(output.getPath("traffic_stats_by_road_type_and_hour.csv").toFile());
+			.sortOn("road_type", "hour")
+			.write().csv(output.getPath("traffic_stats_by_road_type_and_hour.csv").toFile());
 
 		Table dailyCongestionIndex = Table.create(StringColumn.create("road_type"), DoubleColumn.create("congestion_index"));
 
 		for (String roadType : roadTypes) {
 
-			double congestionIndex;
-			if (roadType.equals("all")) {
-				congestionIndex = calc.getNetworkCongestionIndex(0, 86400, null);
-			} else
-				congestionIndex = calc.getNetworkCongestionIndex(0, 86400, roadType);
-
+			double congestionIndex = calc.getNetworkCongestionIndex(0, 86400, roadType.equals("all") ? null : roadType);
 			Row row = dailyCongestionIndex.appendRow();
 			row.setString("road_type", roadType);
 			row.setDouble("congestion_index", congestionIndex);
 		}
 
 		Table perRoadType = dailyCongestionIndex.joinOn("road_type").leftOuter(
-				weightedMeanBy(ds, aggr, "road_type").rejectColumns("speed_performance_index", "congestion_index")
+			weightedMeanBy(ds, means, "road_type").rejectColumns("speed_performance_index", "congestion_index")
 		);
 
 		DoubleColumn meanLaneKm = perRoadType.doubleColumn("lane_km").divide(24).multiply(1000).round().divide(1000).setName("lane_km");
@@ -151,9 +157,8 @@ public class TrafficAnalysis implements MATSimAppCommand {
 
 		roundColumns(perRoadType);
 		perRoadType
-				.rejectColumns("simulated_traffic_volume")
-				.sortOn("Road Type")
-				.write().csv(output.getPath("traffic_stats_by_road_type_daily.csv").toFile());
+			.sortOn("Road Type")
+			.write().csv(output.getPath("traffic_stats_by_road_type_daily.csv").toFile());
 
 		return 0;
 	}
@@ -203,35 +208,29 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		}
 	}
 
-	private static Table normalizeColumns(Table table) {
-		for (Column<?> c : table.columns()) {
-			int start = c.name().indexOf("[");
-			int end = c.name().indexOf("]");
-
-			if (start > -1 && end > -1) {
-				c.setName(c.name().substring(start + 1, end));
-			}
-		}
-
-		return table;
-	}
-
 	/**
 	 * Create table with all disaggregated data.
 	 */
 	private Table createDataset(Network network, TrafficStatsCalculator calc, VolumesAnalyzer volumes) {
 
 		Table all = Table.create(
-				TextColumn.create("link_id"),
-				IntColumn.create("hour"),
-				StringColumn.create("road_type"),
-				DoubleColumn.create("lane_km"),
-				DoubleColumn.create("speed_performance_index"),
-				DoubleColumn.create("congestion_index"),
-				DoubleColumn.create("avg_speed"),
-				DoubleColumn.create("simulated_traffic_volume"),
-				DoubleColumn.create("road_capacity_utilization")
+			TextColumn.create("link_id"),
+			IntColumn.create("hour"),
+			StringColumn.create("road_type"),
+			DoubleColumn.create("lane_km"),
+			DoubleColumn.create("speed_performance_index"),
+			DoubleColumn.create("congestion_index"),
+			DoubleColumn.create("avg_speed"),
+			DoubleColumn.create("road_capacity_utilization"),
+			DoubleColumn.create("simulated_traffic_volume")
 		);
+
+		// Somehow Expensive operation
+		Set<String> modes = volumes.getModes();
+
+		for (String mode : modes) {
+			all.addColumns(DoubleColumn.create("vol_" + mode));
+		}
 
 		for (Link link : network.getLinks().values()) {
 
@@ -245,16 +244,23 @@ public class TrafficAnalysis implements MATSimAppCommand {
 				row.setString("road_type", NetworkUtils.getHighwayType(link));
 				row.setDouble("lane_km", (link.getLength() * link.getNumberOfLanes()) / 1000);
 
-				row.setDouble("speed_performance_index", calc.getSpeedPerformanceIndex(link, h * 3600, (h + 1) * 3600));
-				row.setDouble("congestion_index", calc.getLinkCongestionIndex(link, h * 3600, (h + 1) * 3600));
+				int startTime = h * 3600;
+				int endTime = (h + 1) * 3600;
+
+				row.setDouble("speed_performance_index", calc.getSpeedPerformanceIndex(link, startTime, endTime));
+				row.setDouble("congestion_index", calc.getLinkCongestionIndex(link, startTime, endTime));
 
 				// as km/h
-				row.setDouble("avg_speed", calc.getAvgSpeed(link, h * 3600, (h + 1) * 3600) * 3.6);
-
-				row.setDouble("simulated_traffic_volume", vol[h] / sample.getSample());
+				row.setDouble("avg_speed", calc.getAvgSpeed(link, startTime, endTime) * 3.6);
 
 				double capacity = link.getCapacity() * sample.getSample();
 				row.setDouble("road_capacity_utilization", vol[h] / capacity);
+
+				row.setDouble("simulated_traffic_volume", vol[h] / sample.getSample());
+
+				for (String mode : modes) {
+					row.setDouble("vol_" + mode, volumes.getVolumesPerHourForLink(link.getId(), mode)[h] / sample.getSample());
+				}
 			}
 		}
 
