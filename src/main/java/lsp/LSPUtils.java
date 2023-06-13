@@ -21,6 +21,7 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlan;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -226,6 +227,21 @@ public final class LSPUtils {
 		for (LSPShipment lspShipment : lsp.getShipments()) {
 			if (lspShipment.getId().equals(shipmentId)) {
 				return lspShipment;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the {@link ShipmentPlan} of an {@link LSPShipment}.
+	 * @param lspPlan the lspPlan: It contains the information of its shipmentPlans
+	 * @param shipmentId Id of the shipment that should be found.
+	 * @return the shipmentPlan object or null, if it is not found.
+	 */
+	public static ShipmentPlan findLspShipmentPlan(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
+		for (ShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
+			if (shipmentPlan.getLspShipmentId().equals(shipmentId)) {
+				return shipmentPlan;
 			}
 		}
 		return null;

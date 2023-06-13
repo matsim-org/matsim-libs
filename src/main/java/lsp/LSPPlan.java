@@ -21,6 +21,7 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlan;
 import org.matsim.api.core.v01.population.BasicPlan;
 
 import java.util.Collection;
@@ -43,5 +44,8 @@ public interface LSPPlan extends BasicPlan, KnowsLSP {
 	ShipmentAssigner getAssigner();
 
 	LSPPlan setAssigner(ShipmentAssigner assigner);
+
+	Collection<ShipmentPlan> getShipmentPlans();
+	LSPPlan addShipmentPlan(ShipmentPlan shipmentPlan);
 
 }

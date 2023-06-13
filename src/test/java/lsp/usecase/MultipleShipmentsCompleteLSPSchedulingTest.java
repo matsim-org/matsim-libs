@@ -291,7 +291,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 	public void testCompletedLSPScheduling() {
 
 		for (LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			System.out.println();
 			for (ShipmentPlanElement element : elementList) {
@@ -304,8 +304,8 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 
 		for (LSPShipment shipment : lsp.getShipments()) {
-			assertEquals(11, shipment.getShipmentPlan().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			assertEquals(11, ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
 			assertEquals("UNLOAD", planElements.get(10).getElementType());
@@ -485,7 +485,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		for (LSPShipment shipment : lsp.getShipments()) {
 			assertEquals(6, shipment.getSimulationTrackers().size());
 			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);

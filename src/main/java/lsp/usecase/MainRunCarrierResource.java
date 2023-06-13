@@ -20,10 +20,7 @@
 
 package lsp.usecase;
 
-import lsp.LSPCarrierResource;
-import lsp.LSPDataObject;
-import lsp.LSPResource;
-import lsp.LogisticChainElement;
+import lsp.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -79,8 +76,8 @@ import java.util.Collection;
 	}
 
 	@Override
-	public void schedule(int bufferTime) {
-		mainRunScheduler.scheduleShipments(this, bufferTime);
+	public void schedule(int bufferTime, LSPPlan lspPlan) {
+		mainRunScheduler.scheduleShipments(lspPlan, this, bufferTime);
 	}
 
 	public Carrier getCarrier() {
