@@ -92,7 +92,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	 */
 	@Nullable
 	@Inject
-	private Collection<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
+	private Set<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
 
 	/**
 	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils,
