@@ -48,12 +48,13 @@ public final class ShipmentUtils {
 	 * @return the ShipmentPlan object or null, if it is not found.
 	 */
 	public static ShipmentPlan getOrCreateShipmentPlan(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
+		//Return shipmentPlan if already existing in LspPlan
 		for (ShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
 			if (shipmentPlan.getLspShipmentId().equals(shipmentId)){
 				return  shipmentPlan;
 			}
 		}
-		//TODO Make this more standard behaviour. --> If ShipmentPlan does not exist, create and register it. (KMT Jun'23)
+		//ShipmentPlan does not exist in LspPlan. Will create one, add it to the LspPlan.
 		ShipmentPlan newShipmentPlan = new ShipmentPlanImpl(shipmentId);
 		lspPlan.addShipmentPlan(newShipmentPlan);
 		return newShipmentPlan;
