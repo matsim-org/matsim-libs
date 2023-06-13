@@ -59,6 +59,8 @@ import org.matsim.vehicles.VehicleUtils;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -84,6 +86,10 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final PlansConfigGroup plansConfigGroup;
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
 	private final TimeInterpretation timeInterpretation;
+
+	@Inject
+	@Nullable
+	private Collection<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
 
 	/**
 	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils,
@@ -171,6 +177,12 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		createAndAddVehiclesForEveryNetworkMode();
 
 		adaptOutdatedPlansForRoutingMode();
+
+		if (prepareForSimAlgorithms != null) {
+			for (PersonPrepareForSimAlgorithm algo : prepareForSimAlgorithms) {
+				ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(), algo);
+			}
+		}
 
 		// make sure all routes are calculated.
 		// the above creation of vehicles per agent has to be run before executing the initial routing here. janek, aug'19
