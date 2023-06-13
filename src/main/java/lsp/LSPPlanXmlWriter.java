@@ -182,14 +182,17 @@ public class LSPPlanXmlWriter  extends MatsimXmlWriter {
 			writeStartTag(SHIPMENT_PLANS, null);
 			for (LogisticChain chain : plan.getLogisticChains()) {
 				for (Id<LSPShipment> shipmentId : chain.getShipmentIds()) {
-					this.writeStartTag(SHIPMENT_PLAN, List.of(
-							createTuple(SHIPMENT_ID, shipmentId.toString()))
-					);
+					if (chain.getShipmentIds().contains(shipmentId)) {
+						this.writeStartTag(SHIPMENT_PLAN, List.of(
+								createTuple(SHIPMENT_ID, shipmentId.toString()),
+								createTuple(CHAIN_ID, chain.getId().toString()))
+						);
+					}
 					LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
 					assert shipment != null;
-					final Map<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements = ShipmentUtils.getOrCreateShipmentPlan(lspPlan, shipment.getId()).getPlanElements();
-					for (Id<ShipmentPlanElement> elementId : planElements().keySet()) {
-						ShipmentPlanElement element = planElements().get(elementId);
+					final Map<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements = ShipmentUtils.getOrCreateShipmentPlan(plan, shipment.getId()).getPlanElements();
+					for (Id<ShipmentPlanElement> elementId : planElements.keySet()) {
+						ShipmentPlanElement element = planElements.get(elementId);
 						this.writeStartTag(ELEMENT, List.of(
 								createTuple(ID, elementId.toString()),
 								createTuple(TYPE, element.getElementType()),
