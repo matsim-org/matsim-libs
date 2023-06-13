@@ -56,6 +56,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 	private LSP currentLsp = null;
 	private Carrier currentCarrier = null;
 	private LSPShipment currentShipment = null;
+	private LSPPlan currentLspPlan = null;
 	private final LSPs lsPs;
 	private final Carriers carriers;
 	private CarrierCapabilities.Builder capabilityBuilder;
@@ -196,6 +197,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				currentLsp.getShipments().add(currentShipment);
 			}
 			case LSP_PLAN -> {
+				currentLspPlan = LSPUtils.createLSPPlan();
 				score = Double.valueOf(atts.getValue(SCORE));
 				Gbl.assertNotNull(score);
 				selected = atts.getValue(SELECTED);
@@ -351,26 +353,26 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
 
 				//create LspPlan
-				LSPPlan currentPlan = LSPUtils.createLSPPlan()
-						.addLogisticChain(logisticChain)
-						.setAssigner(singleSolutionShipmentAssigner);
+				currentLspPlan.addLogisticChain(logisticChain);
+				currentLspPlan.setAssigner(singleSolutionShipmentAssigner);
 
 
-				currentPlan.setScore(score);
-				currentPlan.setLSP(currentLsp);
+				currentLspPlan.setScore(score);
+				currentLspPlan.setLSP(currentLsp);
 				if (selected.equals("true")) {
-					currentLsp.setSelectedPlan(currentPlan);
+					currentLsp.setSelectedPlan(currentLspPlan);
 				} else {
-					currentLsp.addPlan(currentPlan);
+					currentLsp.addPlan(currentLspPlan);
 				}
 
+				currentLspPlan = null;
 			}
 			case SHIPMENT_PLAN -> {
 				for (LSPShipment shipment : currentLsp.getShipments()) {
 					if (shipment.getId().toString().equals(shipmentPlanId)) {
 						for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
-							ShipmentUtils.findPlanOfShipment(currentLsp.getSelectedPlan(), shipment.getId()). //Fixme: I thing, that it has to go into the "current" LspPlan .... (instead of the selctedPlan)
-									addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
+							ShipmentUtils.findPlanOfShipment(currentLspPlan, shipment.getId())
+											.addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
 						}
 					}
 				}
