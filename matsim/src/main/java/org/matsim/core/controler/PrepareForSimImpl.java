@@ -87,8 +87,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
 	private final TimeInterpretation timeInterpretation;
 
+	/**
+	 * Can be null if instantiated via constructor, which should only happen in tests.
+	 */
 	@Nullable
-	@com.google.inject.Inject(optional = true)
+	@Inject
 	private Collection<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
 
 	/**
@@ -178,6 +181,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		adaptOutdatedPlansForRoutingMode();
 
+		// Can be null if instantiated via constructor, which should only happen in tests
 		if (prepareForSimAlgorithms != null) {
 			for (PersonPrepareForSimAlgorithm algo : prepareForSimAlgorithms) {
 				ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(), algo);
