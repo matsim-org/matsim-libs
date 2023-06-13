@@ -82,7 +82,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		org.matsim.utils.objectattributes.attributable.Attributes currAttributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
+		org.matsim.utils.objectattributes.attributable.Attributes currAttributes;
 		switch (name) {
 			case LSP -> {
 				String lspId = atts.getValue(ID);
