@@ -87,8 +87,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
 	private final TimeInterpretation timeInterpretation;
 
-	@Inject
 	@Nullable
+	@com.google.inject.Inject(optional = true)
 	private Collection<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
 
 	/**
