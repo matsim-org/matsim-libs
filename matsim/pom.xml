@@ -117,7 +117,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.2</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -203,7 +203,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.5-2</version>
+			<version>1.5.5-4</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -321,7 +321,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.5.0</version>
+						<version>3.6.0</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly-release.xml</descriptor>

@@ -27,12 +27,12 @@ import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 /**
  * Factory for the variable transit router
- * 
+ *
  * @author sergioo
  */
 @Singleton
@@ -52,7 +52,7 @@ public class TransitRouterEventsWSFactory implements Provider<TransitRouter> {
     }
 
     private StopStopTime stopStopTime;
-	
+
 	@Inject
     public TransitRouterEventsWSFactory(final Scenario scenario, final WaitTime waitTime, final StopStopTime stopStopTime) {
 		this.config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),

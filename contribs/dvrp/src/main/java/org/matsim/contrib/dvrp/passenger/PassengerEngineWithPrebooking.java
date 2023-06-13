@@ -28,8 +28,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -91,8 +91,7 @@ public final class PassengerEngineWithPrebooking
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 	}
 
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
+	@Override public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 		internalPassengerHandling.setInternalInterface(internalInterface);
 	}
@@ -101,24 +100,22 @@ public final class PassengerEngineWithPrebooking
 		return mode;
 	}
 
-	@Override
-	public void onPrepareSim() {
-	}
+	@Override public void onPrepareSim() { }
 
-	@Override
-	public void doSimStep(double time) {
+	@Override public void doSimStep(double time) {
 		processPassengerRequestEvents();
 	}
 
-	@Override
-	public void afterSim() {
-	}
+	@Override public void afterSim() { }
 
-	@Override
-	public final List<TripInfo> getTripInfos(TripInfo.Request tripInfoRequest) {
+	@Override public final List<TripInfo> getTripInfos(TripInfo.Request tripInfoRequest) {
 		// idea is to be able to return multiple trip options, cf. public transit router.  In the case here, we will need only one.  I.e. goals of this method are:
+
 		// (1) fill out TripInfo
-		// (2) keep handle so that passenger can accept, or not-confirmed request is eventually deleted again.  Also see doSimStet(...) ;
+
+		// (2) possibly keep handle so that passenger can accept, or not-confirmed request is eventually deleted again.  Also see
+		// doSimStep(...).  (In reality, it seems that real trips are not planned until the offer is accepted, which means that one does not
+		// need to keep a handle.)
 
 		Gbl.assertIf(tripInfoRequest.getTimeInterpretation() == TripInfo.Request.TimeInterpretation.departure);
 		Link pickupLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getFromFacility(), network);
@@ -127,10 +124,8 @@ public final class PassengerEngineWithPrebooking
 
 		//FIXME we need to send TripInfoRequest to VrpOptimizer and actually get TripInfos from there
 		// for the time being: generating TripInfo object that will be returned to the potential passenger:
-		return ImmutableList.of(
-				new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now, tripInfoRequest, this));
+		return ImmutableList.of( new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now, tripInfoRequest, this));
 	}
-
 	/**
 	 * @param passenger will be changed to passengerId
 	 * @param tripInfo
@@ -148,15 +143,12 @@ public final class PassengerEngineWithPrebooking
 		validateAndSubmitRequest(passenger, request, tripInfo.getOriginalRequest(), now);
 		advanceRequests.put(request.getPassengerId(), request);
 	}
-
 	private Link getLink(Id<Link> linkId) {
 		return Preconditions.checkNotNull(network.getLinks().get(linkId),
 				"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
 				linkId, mode);
 	}
-
-	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId) {
+	@Override public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId) {
 		if (!agent.getMode().equals(mode)) {
 			return false;
 		}
@@ -164,11 +156,11 @@ public final class PassengerEngineWithPrebooking
 		MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
 		internalInterface.registerAdditionalAgentOnLink(passenger);
 
-		Id<Link> toLinkId = passenger.getDestinationLinkId();
-		List<PassengerRequest> prebookedRequests = retrieveRequests(passenger.getId(), fromLinkId, toLinkId);
+		List<PassengerRequest> prebookedRequests = removeRequests(passenger.getId(), fromLinkId, passenger.getDestinationLinkId() );
 
-		Preconditions.checkState(prebookedRequests.size() == 1,
-				"Currently only one request is allowed for the sae from-to link pair");
+		Preconditions.checkState(prebookedRequests.size() == 1, "Currently only one request is allowed for the same from-to link pair");
+		// (but this is a local restriction, which could be locally changed.  kai, apr'23)
+
 		//TODO what if it was already rejected while prebooking??
 
 		PassengerRequest prebookedRequest = prebookedRequests.get(0);
@@ -179,13 +171,15 @@ public final class PassengerEngineWithPrebooking
 		return true;
 	}
 
-	private List<PassengerRequest> retrieveRequests(Id<Person> passengerId, Id<Link> fromLinkId, Id<Link> toLinkId) {
-		Collection<PassengerRequest> allRequests = advanceRequests.get(passengerId);
+	private List<PassengerRequest> removeRequests( Id<Person> passengerId, Id<Link> fromLinkId, Id<Link> toLinkId ) {
+		Collection<PassengerRequest> allRequestsForThisPassenger = advanceRequests.get(passengerId);
 		List<PassengerRequest> filteredRequests = advanceRequests.get(passengerId)
 				.stream()
 				.filter(r -> r.getFromLink().getId().equals(fromLinkId) && r.getToLink().getId().equals(toLinkId))
 				.collect(Collectors.toList());
-		allRequests.removeAll(filteredRequests);
+
+		allRequestsForThisPassenger.removeAll(filteredRequests);
+
 		return filteredRequests;
 	}
 
@@ -280,9 +274,7 @@ public final class PassengerEngineWithPrebooking
 		private final PassengerRequest request;
 		private final MobsimPassengerAgent passenger;
 		private final TripInfo.Request originalRequest;
-
-		private RequestEntry(PassengerRequest request, MobsimPassengerAgent passenger,
-				TripInfo.Request originalRequest) {
+		private RequestEntry(PassengerRequest request, MobsimPassengerAgent passenger, TripInfo.Request originalRequest) {
 			this.request = request;
 			this.passenger = passenger;
 			this.originalRequest = originalRequest;
@@ -291,17 +283,11 @@ public final class PassengerEngineWithPrebooking
 
 	public static Provider<PassengerEngine> createProvider(String mode) {
 		return new ModalProviders.AbstractProvider<>(mode, DvrpModes::mode) {
-			@Inject
-			private EventsManager eventsManager;
-
-			@Inject
-			private MobsimTimer mobsimTimer;
-
+			@Inject private EventsManager eventsManager;
+			@Inject private MobsimTimer mobsimTimer;
 			@Inject
 			private PreplanningEngine preplanningEngine;
-
-			@Override
-			public PassengerEngineWithPrebooking get() {
+			@Override public PassengerEngineWithPrebooking get() {
 				return new PassengerEngineWithPrebooking(getMode(), eventsManager, mobsimTimer, preplanningEngine,
 						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
 						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class));

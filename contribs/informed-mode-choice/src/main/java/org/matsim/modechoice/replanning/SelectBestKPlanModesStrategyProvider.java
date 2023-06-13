@@ -13,8 +13,8 @@ import org.matsim.modechoice.ModeChoiceWeightScheduler;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 /**
  * Provider for {@link SelectFromGeneratorStrategy}.

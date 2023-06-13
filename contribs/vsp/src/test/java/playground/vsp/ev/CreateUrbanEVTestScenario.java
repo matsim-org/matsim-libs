@@ -20,15 +20,16 @@
 
 package playground.vsp.ev;
 
-import org.junit.ClassRule;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestUtils;
 
 class CreateUrbanEVTestScenario {
 	static Scenario createTestScenario(){
@@ -39,7 +40,18 @@ class CreateUrbanEVTestScenario {
 
 		//prepare config
 		Config config = ConfigUtils.loadConfig("test/input/playground/vsp/ev/chessboard-config.xml", evConfigGroup);
-		RunUrbanEVExample.prepareConfig(config);
+		UrbanEVConfigGroup evReplanningCfg = new UrbanEVConfigGroup();
+		config.addModule(evReplanningCfg );
+		evReplanningCfg.setCriticalSOC(0.4);
+
+		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
+		config.plansCalcRoute().setAccessEgressType( PlansCalcRouteConfigGroup.AccessEgressType.none );
+
+		//register charging interaction activities for car
+		config.planCalcScore().addActivityParams(
+				new PlanCalcScoreConfigGroup.ActivityParams( TransportMode.car + UrbanEVModule.PLUGOUT_INTERACTION).setScoringThisActivityAtAll(false ) );
+		config.planCalcScore().addActivityParams(
+				new PlanCalcScoreConfigGroup.ActivityParams( TransportMode.car + UrbanEVModule.PLUGIN_INTERACTION).setScoringThisActivityAtAll( false ) );
 		config.network().setInputFile("1pctNetwork.xml");
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setLastIteration(5);

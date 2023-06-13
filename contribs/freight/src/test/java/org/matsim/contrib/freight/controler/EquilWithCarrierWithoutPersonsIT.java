@@ -41,7 +41,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class EquilWithCarrierWithoutPersonsIT {
 
 	private Controler controler;
-	
+
 	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	public void setUp() {
@@ -194,7 +194,24 @@ public class EquilWithCarrierWithoutPersonsIT {
 		Assert.assertEquals(-4871.0, carrier1.getSelectedPlan().getScore(), 2.0);
 	}
 
-	
-	
-	
+	@Test
+	public void testEventFilessAreEqual(){
+		setUp();
+		controler.addOverridingModule(new CarrierModule());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
+		controler.run();
+
+		String expected = testUtils.getClassInputDirectory() + "/output_events.xml.gz" ;
+		String actual = testUtils.getOutputDirectory() + "/output_events.xml.gz" ;
+		MatsimTestUtils.assertEqualEventsFiles(expected, actual);
+
+	}
+
+
 }

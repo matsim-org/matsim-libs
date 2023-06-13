@@ -57,8 +57,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,14 +88,21 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final TimeInterpretation timeInterpretation;
 
 	/**
-	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
+	 * Can be null if instantiated via constructor, which should only happen in tests.
+	 */
+	@Nullable
+	@Inject
+	private Set<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
+
+	/**
+	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils,
 	 * nor the AnalysisMainModeidentifier used for analysis (ModeStats etc.).
 	 */
 	@Inject
 	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
-				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
-				PlansConfigGroup plansConfigGroup, 
+				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup,
+				PlansConfigGroup plansConfigGroup,
 				MainModeIdentifier backwardCompatibilityMainModeIdentifier,
 				TimeInterpretation timeInterpretation) {
 		this.globalConfigGroup = globalConfigGroup;
@@ -169,8 +178,15 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// the person (maybe via the household).    kai, feb'18
 		// each agent receives a vehicle for each main mode now. janek, aug'19
 		createAndAddVehiclesForEveryNetworkMode();
-		
+
 		adaptOutdatedPlansForRoutingMode();
+
+		// Can be null if instantiated via constructor, which should only happen in tests
+		if (prepareForSimAlgorithms != null) {
+			for (PersonPrepareForSimAlgorithm algo : prepareForSimAlgorithms) {
+				ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(), algo);
+			}
+		}
 
 		// make sure all routes are calculated.
 		// the above creation of vehicles per agent has to be run before executing the initial routing here. janek, aug'19
@@ -180,7 +196,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities, timeInterpretation), scenario,
 						carOnlyNetwork)
 		);
-		
+
 		if (scenario instanceof Lockable) {
 			((Lockable)scenario).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
@@ -189,7 +205,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		if (population instanceof Lockable) {
 			((Lockable) population).setLocked();
 		}
-		
+
 		if ( network instanceof Lockable ) {
 			((Lockable) network).setLocked();
 		}
@@ -289,9 +305,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			}
 		}
 	}
-	
+
 	private static boolean insistingOnPlansWithoutRoutingModeLogWarnNotShownYet = true;
-	
+
 	private void adaptOutdatedPlansForRoutingMode() {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {

@@ -49,7 +49,7 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 
 	@Inject
 	public GroupSubtourModeChoiceFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory, Provider<TripRouter> tripRouterFactory,
-										 @Strong PlanLinkIdentifier planLinkIdentifier, javax.inject.Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
+										 @Strong PlanLinkIdentifier planLinkIdentifier, jakarta.inject.Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
@@ -95,7 +95,7 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
 					sc.getConfig(),
 					tripRouterFactory, timeInterpretation) );
-		
+
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
 					sc.getConfig(),

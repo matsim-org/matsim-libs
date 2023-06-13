@@ -17,6 +17,22 @@
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
 
+	<vehicleType id="medium20">
+
+		<capacity seats="0" standingRoomInPersons="0" other="20.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="10.0"/>
+		<costInformation fixedCostsPerDay="75.0" costsPerMeter="0.005" costsPerSecond="0.01">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
 	<vehicleType id="small05">
 
 		<capacity seats="0" standingRoomInPersons="0" other="5.0">
@@ -32,6 +48,6 @@
 		<networkMode networkMode="car"/>
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
-		
+
 
 </vehicleDefinitions>

@@ -23,12 +23,9 @@
 package org.matsim.core.controler;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,7 +36,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -219,6 +215,10 @@ public abstract class AbstractModule implements Module {
 		return binder().bind(RoutingModule.class).annotatedWith(Names.named(mode));
 	}
 
+	protected final Multibinder<PersonPrepareForSimAlgorithm> addPersonPrepareForSimAlgorithm() {
+		return Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
+	}
+
 	protected final com.google.inject.binder.LinkedBindingBuilder<EventsManager> bindEventsManager() {
 		return binder().bind(EventsManager.class);
 	}
@@ -252,7 +252,7 @@ public abstract class AbstractModule implements Module {
 		return binder;
 	}
 
-	protected final <T> javax.inject.Provider<T> getProvider(TypeLiteral<T> typeLiteral) {
+	protected final <T> jakarta.inject.Provider<T> getProvider(TypeLiteral<T> typeLiteral) {
 		return binder.getProvider(Key.get(typeLiteral));
 	}
 

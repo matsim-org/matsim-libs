@@ -32,8 +32,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 public class CountsModule extends AbstractModule {
     private static final Logger log = LogManager.getLogger( CountsModule.class );
