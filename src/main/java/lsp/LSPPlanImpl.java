@@ -21,18 +21,22 @@
 
 package lsp;
 
+import lsp.shipment.ShipmentPlan;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 /* package-private */ class LSPPlanImpl implements LSPPlan {
 
 	private final Collection<LogisticChain> logisticChains;
+	private final Collection<ShipmentPlan> shipmentPlans;
 	private LSP lsp;
 	private double score;
 	private ShipmentAssigner assigner;
 
 	LSPPlanImpl() {
 		this.logisticChains = new ArrayList<>();
+		this.shipmentPlans = new ArrayList<>();
 	}
 
 	@Override
@@ -57,6 +61,15 @@ import java.util.Collection;
 		this.assigner = assigner;
 		this.assigner.setLSP(this.lsp);
 		return this;
+	}
+
+	@Override public Collection<ShipmentPlan> getShipmentPlans() {
+		return this.shipmentPlans;
+	}
+
+	@Override public LSPPlan addShipmentPlan(ShipmentPlan shipmentPlan) {
+		this.shipmentPlans.add(shipmentPlan);
+		return null;
 	}
 
 	@Override
@@ -90,10 +103,10 @@ import java.util.Collection;
 	@Override public String toString() {
 		StringBuilder strb = new StringBuilder();
 			strb.append("[score=").append(this.score).append("]");
-			for (LogisticChain solution : this.logisticChains) {
-				strb.append(", [solutionId=").append(solution.getId()).append("], [No of SolutionElements=").append(solution.getLogisticChainElements().size()).append("] \n");
-				if (!solution.getLogisticChainElements().isEmpty()){
-					for (LogisticChainElement solutionElement : solution.getLogisticChainElements()) {
+			for (LogisticChain logisticChain : this.logisticChains) {
+				strb.append(", [LogisticChainId=").append(logisticChain.getId()).append("], [No of LogisticChainElements=").append(logisticChain.getLogisticChainElements().size()).append("] \n");
+				if (!logisticChain.getLogisticChainElements().isEmpty()){
+					for (LogisticChainElement solutionElement : logisticChain.getLogisticChainElements()) {
 						strb.append("\t \t").append(solutionElement.toString()).append("\n");
 					}
 				}

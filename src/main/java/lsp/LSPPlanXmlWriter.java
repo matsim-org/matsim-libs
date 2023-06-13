@@ -22,6 +22,7 @@ package lsp;
 
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import lsp.usecase.TransshipmentHub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static lsp.LSPConstants.*;
 
@@ -184,8 +186,10 @@ public class LSPPlanXmlWriter  extends MatsimXmlWriter {
 							createTuple(SHIPMENT_ID, shipmentId.toString()))
 					);
 					LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
-					for (Id<ShipmentPlanElement> elementId : shipment.getShipmentPlan().getPlanElements().keySet()) {
-						ShipmentPlanElement element = shipment.getShipmentPlan().getPlanElements().get(elementId);
+					assert shipment != null;
+					final Map<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements = ShipmentUtils.getOrCreateShipmentPlan(lspPlan, shipment.getId()).getPlanElements();
+					for (Id<ShipmentPlanElement> elementId : planElements().keySet()) {
+						ShipmentPlanElement element = planElements().get(elementId);
 						this.writeStartTag(ELEMENT, List.of(
 								createTuple(ID, elementId.toString()),
 								createTuple(TYPE, element.getElementType()),

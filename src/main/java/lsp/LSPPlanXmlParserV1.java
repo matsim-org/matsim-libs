@@ -57,6 +57,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 	private LSP currentLsp = null;
 	private Carrier currentCarrier = null;
 	private LSPShipment currentShipment = null;
+	private LSPPlan currentLspPlan = null;
 	private final LSPs lsPs;
 	private final Carriers carriers;
 	private CarrierCapabilities.Builder capabilityBuilder;
@@ -199,6 +200,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				currentLsp.getShipments().add(currentShipment);
 			}
 			case LSP_PLAN -> {
+				currentLspPlan = LSPUtils.createLSPPlan();
 				score = Double.valueOf(atts.getValue(SCORE));
 				Gbl.assertNotNull(score);
 				selected = atts.getValue(SELECTED);
@@ -381,7 +383,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				for (LSPShipment shipment : currentLsp.getShipments()) {
 					if (shipment.getId().toString().equals(shipmentPlanId)) {
 						for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
-							shipment.getShipmentPlan().addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
+							ShipmentUtils.getOrCreateShipmentPlan(currentLspPlan, shipment.getId())
+											.addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
 						}
 					}
 				}

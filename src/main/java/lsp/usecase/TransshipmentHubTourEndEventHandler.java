@@ -20,13 +20,11 @@
 
 package lsp.usecase;
 
+import lsp.LSPPlan;
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
 import lsp.LogisticChainElement;
-import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentLeg;
-import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.ShipmentUtils;
+import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -85,12 +83,12 @@ import java.util.Map;
 		// This is maybe not ideal, but works; kmt oct'22
 	}
 
-	public void addShipment(LSPShipment shipment, LogisticChainElement solutionElement) {
-		TransshipmentHubEventHandlerPair pair = new TransshipmentHubEventHandlerPair(shipment, solutionElement);
+	public void addShipment(LSPShipment shipment, LogisticChainElement logisticChainElement, ShipmentPlan shipmentPlan) {
+		TransshipmentHubEventHandlerPair pair = new TransshipmentHubEventHandlerPair(shipment, logisticChainElement);
 
-		for (ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values()) {
+		for (ShipmentPlanElement planElement : shipmentPlan.getPlanElements().values()) {
 			if (planElement instanceof ShipmentLeg transport) {
-				if (transport.getLogisticChainElement().getNextElement() == solutionElement) {
+				if (transport.getLogisticChainElement().getNextElement() == logisticChainElement) {
 					servicesWaitedFor.put(transport.getCarrierService(), pair);
 				}
 			}
