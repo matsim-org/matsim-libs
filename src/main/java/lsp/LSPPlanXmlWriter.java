@@ -22,6 +22,7 @@ package lsp;
 
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import lsp.usecase.TransshipmentHub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static lsp.LSPConstants.LSP;
 import static lsp.LSPConstants.*;
@@ -155,13 +157,13 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 		if (lsp.getPlans().isEmpty()) return;
 		writer.write("\t\t\t<" + LSP_PLANS + ">\n");
 
-		for (LSPPlan plan : lsp.getPlans()) {
+		for (LSPPlan lspPlan : lsp.getPlans()) {
 			writer.write("\t\t\t\t<" + LSP_PLAN);
-			if (plan.getScore() != null) {
-				writer.write(" " + SCORE + "=\"" + plan.getScore() + "\"");
+			if (lspPlan.getScore() != null) {
+				writer.write(" " + SCORE + "=\"" + lspPlan.getScore() + "\"");
 			}
 			if (lsp.getSelectedPlan() != null) {
-				if (plan == lsp.getSelectedPlan()) {
+				if (lspPlan == lsp.getSelectedPlan()) {
 					writer.write(" selected=\"true\"");
 				} else {
 					writer.write(" selected=\"false\"");
@@ -172,7 +174,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 			writer.write(">\n");
 
 			writer.write("\t\t\t\t\t<" + LOGISTIC_CHAINS + ">\n");
-			for (LogisticChain logisticChain : plan.getLogisticChains()) {
+			for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
 				writer.write("\t\t\t\t\t\t<" + LOGISTIC_CHAIN + " " + ID + "=\"" + logisticChain.getId() + "\">\n");
 				for (LogisticChainElement chainElement : logisticChain.getLogisticChainElements()) {
 					writer.write("\t\t\t\t\t\t\t<" + LOGISTIC_CHAIN_ELEMENT + " " + ID + "=\"" + chainElement.getId() + "\" ");
@@ -184,9 +186,11 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 				for (Id<LSPShipment> shipmentId : logisticChain.getShipmentIds()) {
 					writer.write("\t\t\t\t\t\t<" + SHIPMENT_PLAN + " " +  SHIPMENT_ID + "=\"" + shipmentId + "\">\n");
 					var shipment = LSPUtils.findLspShipment(lsp, shipmentId);
-					for (var elementId : shipment.getShipmentPlan().getPlanElements().keySet()) {
+					assert shipment != null;
+					final Map<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements = ShipmentUtils.getOrCreateShipmentPlan(lspPlan, shipment.getId()).getPlanElements();
+					for (var elementId : planElements.keySet()) {
 						writer.write("\t\t\t\t\t\t\t<" + ELEMENT + " " + ID + "=\"" + elementId.toString() + "\" ");
-						ShipmentPlanElement element = shipment.getShipmentPlan().getPlanElements().get(elementId);
+						ShipmentPlanElement element = planElements.get(elementId);
 						writer.write(TYPE + "=\"" + element.getElementType() + "\" ");
 						writer.write(START_TIME + "=\"" + element.getStartTime() + "\" ");
 						writer.write(END_TIME + "=\"" + element.getEndTime() + "\" ");

@@ -21,6 +21,7 @@
 package lsp;
 
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.core.controler.events.ReplanningEvent;
 
 
@@ -71,7 +72,7 @@ final class LSPRescheduler {
 				}
 
 				for (LSPShipment shipment : lsp.getShipments()) {
-					shipment.getShipmentPlan().clear();
+					ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).clear();
 					shipment.getShipmentLog().clear();
 					lsp.getSelectedPlan().getAssigner().assignToLogisticChain(shipment);
 				}

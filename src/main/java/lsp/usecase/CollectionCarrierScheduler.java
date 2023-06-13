@@ -46,6 +46,7 @@ import java.util.ArrayList;
 	private Carrier carrier;
 	private CollectionCarrierResource resource;
 	private ArrayList<LSPCarrierPair> pairs;
+	
 
 	CollectionCarrierScheduler() {
 		this.pairs = new ArrayList<>();
@@ -125,27 +126,7 @@ import java.util.ArrayList;
 		ShipmentPlanElement load = builder.build();
 		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + "" + load.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getShipmentPlan().addPlanElement(id, load);
-	}
-
-	private void addCollectionServiceEventHandler(CarrierService carrierService, LspShipmentWithTime tuple, LSPCarrierResource resource) {
-		for (LogisticChainElement element : this.resource.getClientElements()) {
-			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, tuple.getShipment(), element, resource);
-				tuple.getShipment().addSimulationTracker(endHandler);
-				break;
-			}
-		}
-	}
-
-	private void addCollectionTourEndEventHandler(CarrierService carrierService, LspShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
-		for (LogisticChainElement element : this.resource.getClientElements()) {
-			if (element.getIncomingShipments().getShipments().contains(tuple)) {
-				CollectionTourEndEventHandler handler = new CollectionTourEndEventHandler(carrierService, tuple.getShipment(), element, resource, tour);
-				tuple.getShipment().addSimulationTracker(handler);
-				break;
-			}
-		}
+		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, load);
 	}
 
 	private void addShipmentTransportElement(LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
@@ -170,7 +151,27 @@ import java.util.ArrayList;
 		ShipmentPlanElement transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getShipmentPlan().addPlanElement(id, transport);
+		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, transport);
+	}
+
+	private void addCollectionServiceEventHandler(CarrierService carrierService, LspShipmentWithTime tuple, LSPCarrierResource resource) {
+		for (LogisticChainElement element : this.resource.getClientElements()) {
+			if (element.getIncomingShipments().getShipments().contains(tuple)) {
+				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, tuple.getShipment(), element, resource);
+				tuple.getShipment().addSimulationTracker(endHandler);
+				break;
+			}
+		}
+	}
+
+	private void addCollectionTourEndEventHandler(CarrierService carrierService, LspShipmentWithTime tuple, LSPCarrierResource resource, Tour tour) {
+		for (LogisticChainElement element : this.resource.getClientElements()) {
+			if (element.getIncomingShipments().getShipments().contains(tuple)) {
+				CollectionTourEndEventHandler handler = new CollectionTourEndEventHandler(carrierService, tuple.getShipment(), element, resource, tour);
+				tuple.getShipment().addSimulationTracker(handler);
+				break;
+			}
+		}
 	}
 
 	private void addShipmentUnloadElement(LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
@@ -191,7 +192,7 @@ import java.util.ArrayList;
 		ShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getShipmentPlan().addPlanElement(id, unload);
+		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, unload);
 	}
 
 	private double getUnloadEndTime(Tour tour) {
