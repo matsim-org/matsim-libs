@@ -498,7 +498,7 @@ final class RailsimEngine implements Steppable {
 		double dist;
 		if (accelDist <= decelDist && accelDist <= reserveDist && accelDist <= tailDist && accelDist <= headDist) {
 			dist = accelDist;
-			event.type = UpdateEvent.Type.POSITION;
+			event.type = UpdateEvent.Type.SPEED_CHANGE;
 		} else if (decelDist <= accelDist && decelDist <= reserveDist && decelDist <= tailDist && decelDist <= headDist) {
 			dist = decelDist;
 			event.type = UpdateEvent.Type.SPEED_CHANGE;
@@ -550,10 +550,10 @@ final class RailsimEngine implements Steppable {
 		double window = RailsimCalc.calcTraveledDist(state.allowedMaxSpeed, state.allowedMaxSpeed / state.train.deceleration(),
 			-state.train.deceleration()) + currentLink.length;
 
+		double minAllowed = state.allowedMaxSpeed;
+
 		state.targetSpeed = state.allowedMaxSpeed;
 		state.targetDecelDist = Double.POSITIVE_INFINITY;
-		double targetDist = Double.POSITIVE_INFINITY;
-
 
 		for (int i = state.routeIdx; i <= state.route.size(); i++) {
 
@@ -569,33 +569,44 @@ final class RailsimEngine implements Steppable {
 				// train stops at the very end of a link
 				if (i > 0 && state.isStop(state.route.get(i - 1).getLinkId()))
 					allowed = 0;
-				else if (!resources.canBeBlockedBy(link, state.driver))
+				else if (!resources.isBlockedBy(link, state.driver))
 					allowed = 0;
 				else
 					allowed = link.getAllowedFreespeed(state.driver);
 			}
 
-			if (allowed < state.allowedMaxSpeed) {
-
-				RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(dist, state.train.acceleration(), state.train.deceleration(), state.speed, state.allowedMaxSpeed, allowed);
-
-				double newDecelDist = dist - target.decelDist();
-
-				assert FuzzyUtils.greaterEqualThan(newDecelDist, 0) : "Decel dist must be greater than 0, or stopping is not possible";
-
-				// Need to decelerate now
-				if (FuzzyUtils.equals(newDecelDist, 0)) {
-					state.targetSpeed = allowed;
-					state.targetDecelDist = Double.POSITIVE_INFINITY;
-					targetDist = dist;
-					break;
-				} else if (newDecelDist < state.targetDecelDist) {
-					state.targetSpeed = target.targetSpeed();
-					state.targetDecelDist = newDecelDist;
-					targetDist = dist;
-				}
+			// If speed is higher than seen limits, no further links need to be considered
+			if (allowed > minAllowed) {
+				break;
 			}
 
+			// Might happen if train is on the very end
+			if (FuzzyUtils.equals(dist, 0)) {
+				assert FuzzyUtils.lessEqualThan(state.speed, allowed): "Speed must be smaller than allowed";
+				continue;
+			}
+
+			RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(dist, state.train.acceleration(), state.train.deceleration(), state.speed, state.allowedMaxSpeed, allowed);
+
+			assert FuzzyUtils.greaterEqualThan(target.decelDist(), 0) : "Decel dist must be greater than 0, or stopping is not possible";
+
+			if (FuzzyUtils.equals(target.decelDist(), 0)) {
+
+				// Need to decelerate now
+				state.targetSpeed = allowed;
+				state.targetDecelDist = Double.POSITIVE_INFINITY;
+				break;
+			} else if (target.decelDist() < state.targetDecelDist && target.targetSpeed() <= state.targetSpeed) {
+
+				// Decelerate later
+				state.targetSpeed = target.targetSpeed();
+				state.targetDecelDist = target.decelDist();
+
+			} else if (target.targetSpeed() > state.targetSpeed && target.decelDist() >= state.targetDecelDist) {
+				// Acceleration is required
+				state.targetSpeed = target.targetSpeed();
+				state.targetDecelDist = target.decelDist();
+			}
 
 			if (link != null)
 				dist += link.length;
@@ -603,15 +614,21 @@ final class RailsimEngine implements Steppable {
 			if (dist >= window)
 				break;
 
+			minAllowed = allowed;
 		}
 
+		// Calc accel depending on target
 		if (FuzzyUtils.equals(state.speed, state.targetSpeed)) {
 			state.acceleration = 0;
 		} else if (FuzzyUtils.lessThan(state.speed, state.targetSpeed)) {
 			state.acceleration = state.train.acceleration();
 		} else {
-			state.acceleration = RailsimCalc.calcTargetDecel(targetDist, state.targetSpeed, state.speed);
+			state.acceleration = -state.train.deceleration();
 		}
+
+		assert FuzzyUtils.equals(state.targetSpeed, state.speed) || state.acceleration != 0 : "Acceleration must be set if target speed is different than current";
+		assert FuzzyUtils.greaterThan(state.targetDecelDist, 0) : "Target decel must be greater than 0 after updating";
+
 	}
 
 	/**

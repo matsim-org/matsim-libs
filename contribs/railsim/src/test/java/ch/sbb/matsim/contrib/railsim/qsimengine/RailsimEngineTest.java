@@ -170,4 +170,20 @@ public class RailsimEngineTest {
 			.hasTrainState("regio1", 7734, 200, 0);
 
 	}
+
+	@Test
+	public void trainFollowing() {
+
+		RailsimTestUtils.Holder test = getTestEngine("../integration/7_trainFollowing/trainNetwork.xml");
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "1-2", "20-21");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "1-2", "20-21");
+
+		test.doSimStepUntil(10000);
+
+//		test.debug(collector, "trainFollowing");
+
+
+	}
+
 }

@@ -74,23 +74,40 @@ public class RailsimCalc {
 	 * again after traveled {@code dist}.
 	 */
 	static SpeedTarget calcTargetSpeed(double dist, double acceleration, double deceleration,
-									   double currentSpeed, double targetSpeed, double finalSpeed) {
+									   double currentSpeed, double allowedSpeed, double finalSpeed) {
 
-		double timeDecel = (targetSpeed - finalSpeed) / deceleration;
-		double distDecel = calcTraveledDist(targetSpeed, timeDecel, -deceleration);
+		// Calculation is simplified if target is the same
+		if (FuzzyUtils.equals(allowedSpeed, finalSpeed)) {
+			return new SpeedTarget(finalSpeed, Double.POSITIVE_INFINITY);
+		}
 
-		// This code below only works during deceleration
-		if (acceleration <= 0 || currentSpeed >= targetSpeed)
-			return new SpeedTarget(targetSpeed, distDecel);
+		double timeDecel = (allowedSpeed - finalSpeed) / deceleration;
+		double distDecel = calcTraveledDist(allowedSpeed, timeDecel, -deceleration);
 
-		assert FuzzyUtils.greaterEqualThan(targetSpeed, finalSpeed) : "Final speed must be smaller than target";
+		// No further acceleration needed
+		if (FuzzyUtils.equals(currentSpeed, allowedSpeed)) {
+			double decelDist = dist - distDecel;
 
-		double timeAccel = (targetSpeed - currentSpeed) / acceleration;
+			// Start to stop now
+			if (FuzzyUtils.equals(decelDist, 0)) {
+				return new SpeedTarget(finalSpeed, 0);
+			}
+
+			// Decelerate later
+			return new SpeedTarget(allowedSpeed, decelDist);
+		}
+
+
+		assert FuzzyUtils.greaterEqualThan(allowedSpeed, currentSpeed) : "Current speed must be lower than allowed";
+		assert FuzzyUtils.greaterEqualThan(allowedSpeed, finalSpeed) : "Final speed must be smaller than target";
+
+		double timeAccel = (allowedSpeed - currentSpeed) / acceleration;
 		double distAccel = calcTraveledDist(currentSpeed, timeAccel, acceleration);
 
 		// there is enough distance to accelerate to the target speed
-		if (distAccel + distDecel < dist)
-			return new SpeedTarget(targetSpeed, distDecel);
+		if (FuzzyUtils.lessThan(distAccel + distDecel, dist)) {
+			return new SpeedTarget(allowedSpeed, dist - distDecel);
+		}
 
 		double nom = 2 * acceleration * deceleration * dist
 			+ acceleration * finalSpeed * finalSpeed
@@ -101,8 +118,9 @@ public class RailsimCalc {
 		timeDecel = (v - finalSpeed) / deceleration;
 		distDecel = calcTraveledDist(v, timeDecel, -deceleration);
 
-		return new SpeedTarget(v, distDecel);
+		return new SpeedTarget(v, dist - distDecel);
 	}
+
 
 	/**
 	 * Calculate the deceleration needed to arrive at {@code targetSpeed} exactly after {@code dist}.
