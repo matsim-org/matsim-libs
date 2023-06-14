@@ -41,7 +41,7 @@ class RandomLogisticChainShipmentAssigner implements ShipmentAssigner {
 		Random rand = MatsimRandom.getRandom();
 		int index = rand.nextInt(logisticChains.size());
 		LogisticChain logisticChain = logisticChains.get(index);
-		logisticChain.assignShipment(shipment);
+		logisticChain.addShipmentToChain(shipment);
 	}
 }
 

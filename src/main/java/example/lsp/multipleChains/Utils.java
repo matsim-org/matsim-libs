@@ -5,7 +5,11 @@ public class Utils {
 		return new RandomLogisticChainShipmentAssigner();
 	}
 
-	public static ConsecutiveLogisticChainShipmentAssigner createConsecutiveLogisticChainShipmentAssigner() {
-		return new ConsecutiveLogisticChainShipmentAssigner();
+	public static RoundRobinLogisticChainShipmentAssigner createRoundRobinLogisticChainShipmentAssigner() {
+		return new RoundRobinLogisticChainShipmentAssigner();
+	}
+
+	public static PrimaryLogisticChainShipmentAssigner createPrimaryLogisticChainShipmentAssigner() {
+		return new PrimaryLogisticChainShipmentAssigner();
 	}
 }

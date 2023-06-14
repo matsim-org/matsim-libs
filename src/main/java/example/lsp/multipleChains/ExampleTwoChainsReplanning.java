@@ -31,7 +31,7 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 
-public class ExampleTwoChains_10Shipments {
+public class ExampleTwoChainsReplanning {
 
 	private static final double TOLL_VALUE = 0;
 
@@ -48,7 +48,7 @@ public class ExampleTwoChains_10Shipments {
 			.setCostPerTimeUnit(0.01)
 			.build();
 
-	private ExampleTwoChains_10Shipments() {
+	private ExampleTwoChainsReplanning() {
 	}
 
 	public static void main(String[] args) {
@@ -74,19 +74,26 @@ public class ExampleTwoChains_10Shipments {
 				carrierScorer.setToll(TOLL_VALUE);
 
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
+				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
 				bind(CarrierStrategyManager.class).toProvider(() -> {
 					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
-				bind( LSPStrategyManager.class ).toProvider(() -> {
+				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+//					strategyManager.addStrategy(new RoundRobinDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1);
+//					strategyManager.addStrategy(new RandomDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1);
+//					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 1);
+					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
+					strategyManager.setMaxPlansPerAgent(1);
 					return strategyManager;
 				});
-				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
 			}
 		});
+
+		//TODO: Innovation switch off funktioniert noch nicht
+		config.strategy().setFractionOfIterationsToDisableInnovation(1);
 
 		log.info("Run MATSim");
 
@@ -113,7 +120,7 @@ public class ExampleTwoChains_10Shipments {
 			}
 			ConfigUtils.applyCommandline(config,args);
 		} else {
-			config.controler().setOutputDirectory("output/2chains10shipments");
+			config.controler().setOutputDirectory("output/2chainsReplanning");
 			config.controler().setLastIteration(2);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
@@ -143,31 +150,6 @@ public class ExampleTwoChains_10Shipments {
 	private static LSP createLSP(Scenario scenario) {
 		log.info("create LSP");
 		Network network = scenario.getNetwork();
-
-		// A plan with one logistic chain, containing a single carrier is created
-		LSPPlan lspPlan_oneChain;
-		{
-			Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
-			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-
-			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource singleCarrierResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-					.build();
-
-			LogisticChainElement singleCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("singleCarrierElement", LogisticChainElement.class))
-					.setResource(singleCarrierResource)
-					.build();
-
-			LogisticChain singleChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("singleChain", LogisticChain.class))
-					.addLogisticChainElement(singleCarrierElement)
-					.build();
-
-			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-			lspPlan_oneChain = LSPUtils.createLSPPlan()
-					.addLogisticChain(singleChain)
-					.setAssigner(singleSolutionShipmentAssigner);
-		}
 
 		// A plan with two different logistic chains in the south and north, with respective carriers is created
 		LSPPlan lspPlan_twoChains;
@@ -210,7 +192,7 @@ public class ExampleTwoChains_10Shipments {
 					.addLogisticChainElement(northCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = Utils.createRoundRobinLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = Utils.createPrimaryLogisticChainShipmentAssigner();
 			lspPlan_twoChains = LSPUtils.createLSPPlan()
 					.addLogisticChain(southChain)
 					.addLogisticChain(northChain)
@@ -218,14 +200,12 @@ public class ExampleTwoChains_10Shipments {
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
-		lspPlans.add(lspPlan_oneChain);
 		lspPlans.add(lspPlan_twoChains);
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(lspPlan_oneChain)
+				.setInitialPlan(lspPlan_twoChains)
 				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
-		lsp.addPlan(lspPlan_twoChains);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");

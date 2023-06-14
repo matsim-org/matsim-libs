@@ -183,7 +183,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getOutputPath() + "/lsps.xml");
-		new CarrierPlanWriter(FreightUtils.getCarriers(scenario)).write(controlerIO.getOutputPath() + "/carriers.xml");
+		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getOutputPath() + "/output_lsps.xml.gz");
+		new CarrierPlanWriter(FreightUtils.getCarriers(scenario)).write(controlerIO.getOutputPath() + "/output_carriers.xml.gz");
 	}
 }

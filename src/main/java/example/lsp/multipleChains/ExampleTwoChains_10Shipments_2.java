@@ -185,7 +185,7 @@ public class ExampleTwoChains_10Shipments_2 {
 					.addLogisticChainElement(northCarrierElement1)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = Utils.createConsecutiveLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = Utils.createRoundRobinLogisticChainShipmentAssigner();
 			lspPlan_twoChains_1 = LSPUtils.createLSPPlan()
 					.addLogisticChain(southChain1)
 					.addLogisticChain(northChain1)
@@ -232,7 +232,7 @@ public class ExampleTwoChains_10Shipments_2 {
 					.addLogisticChainElement(northCarrierElement2)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = Utils.createConsecutiveLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = Utils.createRoundRobinLogisticChainShipmentAssigner();
 			lspPlan_twoChains_2 = LSPUtils.createLSPPlan()
 					.addLogisticChain(southChain2)
 					.addLogisticChain(northChain2)

@@ -251,7 +251,7 @@ public class ExampleThreeChains {
 					.addLogisticChain(southChain)
 					.addLogisticChain(northChain)
 					.addLogisticChain(hubChain)
-					.setAssigner(Utils.createConsecutiveLogisticChainShipmentAssigner());
+					.setAssigner(Utils.createRoundRobinLogisticChainShipmentAssigner());
 		}
 
 

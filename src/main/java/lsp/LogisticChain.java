@@ -42,6 +42,6 @@ public interface LogisticChain extends Identifiable<LogisticChain>, KnowsLSP, Ha
 
 	Collection<Id<LSPShipment>> getShipmentIds();
 
-	void assignShipment(LSPShipment shipment);
+	void addShipmentToChain(LSPShipment shipment);
 
 }

@@ -383,7 +383,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 					}
 					for (LogisticChain chain : currentLspPlan.getLogisticChains()) {
 						if (chain.getId().toString().equals(shipmentChainId) && shipment.getId().toString().equals(shipmentPlanId)) {
-							chain.assignShipment(shipment);
+							chain.addShipmentToChain(shipment);
 						}
 					}
 				}
