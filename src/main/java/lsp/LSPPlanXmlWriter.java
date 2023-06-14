@@ -31,7 +31,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -40,9 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static lsp.LSPConstants.LSP;
 import static lsp.LSPConstants.*;
-
 
 /**
  * Writes out resources, shipments and plans for each LSP in an XML-file including header for validating against
@@ -50,12 +47,11 @@ import static lsp.LSPConstants.*;
  * Uses variables defined in LSPConstants-class for the elements and attributes within the XML.
  * @author nrichter (Niclas Richter)
  */
-public class LSPPlanXmlWriter extends MatsimXmlWriter {
+public class LSPPlanXmlWriter  extends MatsimXmlWriter {
 
-	private static final  Logger logger = LogManager.getLogger(LSPPlanXmlWriter.class);
+	private static final Logger logger = LogManager.getLogger(LSPPlanXmlWriter.class);
 
 	private final Collection<LSP> lsPs;
-	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 
 	public LSPPlanXmlWriter(LSPs lsPs) {
 		super();
@@ -68,19 +64,19 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 			this.openFile(filename);
 			this.writeXmlHead();
 			this.writeRootElement();
-			this.startLSPs(this.writer);
+			this.writeStartTag(LSPS, null);
 			for (LSP lsp : lsPs) {
 				this.startLSP(lsp, this.writer);
 				this.writeResources(lsp, this.writer);
 				this.writeShipments(lsp, this.writer);
 				this.writePlans(lsp, this.writer);
-				this.endLSP(this.writer);
+				this.writeEndTag(LSP);
 			}
-			this.endLSPs(this.writer);
+			this.writeEndTag(LSPS);
 			this.writeEndTag(LSPConstants.LSPS_DEFINITIONS);
 			this.close();
 			logger.info("done");
-		} catch ( IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);
 			System.exit(1);
@@ -96,121 +92,123 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 		this.writer.write(NL);
 	}
 
-	private void startLSPs(BufferedWriter writer) throws IOException {
-		writer.write("\n\t<" + LSPS + ">\n");
-	}
-
 	private void startLSP(LSP lsp, BufferedWriter writer)
 			throws IOException {
-		writer.write("\t\t<" + LSP + " " + ID + "=\"" + lsp.getId() + "\">\n");
+		this.writeStartTag(LSP, List.of(
+				createTuple(ID, lsp.getId().toString())));
 	}
 
-	private void writeResources(LSP lsp, BufferedWriter writer )throws IOException {
+	private void writeResources(LSP lsp, BufferedWriter writer) throws IOException {
 		if (lsp.getResources().isEmpty()) return;
-		writer.write("\t\t\t<" + RESOURCES + ">\n");
+		this.writeStartTag(RESOURCES, null);
 		for (LSPResource resource : lsp.getResources()) {
 			if (resource instanceof TransshipmentHub hub) {
-				writer.write("\t\t\t\t<" + HUB + " ");
-				writer.write(ID + "=\"" + hub.getId() + "\" ");
-				writer.write(LOCATION + "=\"" + hub.getStartLinkId() + "\" ");
-				writer.write(FIXED_COST + "=\"" + hub.getAttributes().getAttribute(FIXED_COST) + "\">\n");
-				writer.write("\t\t\t\t\t<" + SCHEDULER + " ");
-				writer.write(CAPACITY_NEED_FIXED + "=\"" + hub.getCapacityNeedFixed() +  "\" ");
-				writer.write(CAPACITY_NEED_LINEAR + "=\"" + hub.getCapacityNeedLinear() +  "\"/>\n");
-				writer.write("\t\t\t\t</" + HUB + ">\n");
+				List<Tuple<String, String>> tupleList = new ArrayList<>();
+				tupleList.add(new Tuple<>(ID, hub.getId().toString()));
+				tupleList.add(new Tuple<>(LOCATION, hub.getStartLinkId().toString()));
+				if (hub.getAttributes().getAttribute(FIXED_COST) != null) {
+					tupleList.add(new Tuple<>(FIXED_COST, hub.getAttributes().getAttribute(FIXED_COST).toString()));
+				}
+				this.writeStartTag(HUB, tupleList);
+				this.writeStartTag(SCHEDULER, List.of(
+						createTuple(CAPACITY_NEED_FIXED, hub.getCapacityNeedFixed()),
+						createTuple(CAPACITY_NEED_LINEAR, hub.getCapacityNeedLinear())), true
+				);
+				this.writeEndTag(HUB);
 			}
 			if (resource instanceof LSPCarrierResource carrierResource) {
-				writer.write("\t\t\t\t<" + CARRIER + " ");
-				writer.write(ID + "=\"" + carrierResource.getId() + "\"/>\n");
+				this.writeStartTag(CARRIER, List.of(
+						createTuple(ID, carrierResource.getId().toString())), true
+				);
 			}
 		}
-		writer.write("\t\t\t</" + RESOURCES + ">\n\n");
+		this.writeEndTag(RESOURCES);
 	}
 
-	private void writeShipments(LSP lsp, BufferedWriter writer )throws IOException {
-		if(lsp.getShipments().isEmpty()) return;
-		writer.write("\t\t\t<" + SHIPMENTS + ">\n");
-		for (LSPShipment shipment: lsp.getShipments()) {
-			writer.write("\t\t\t\t<" + SHIPMENT + " ");
-			writer.write(ID + "=\"" + shipment.getId() + "\" ");
-			writer.write(FROM + "=\"" + shipment.getFrom() + "\" ");
-			writer.write(TO + "=\"" + shipment.getTo() + "\" ");
-			writer.write(SIZE + "=\"" + shipment.getSize() + "\" ");
-			writer.write(START_PICKUP + "=\"" + shipment.getPickupTimeWindow().getStart() + "\" ");
-			writer.write(END_PICKUP + "=\"" + shipment.getPickupTimeWindow().getEnd() + "\" ");
-			writer.write(START_DELIVERY + "=\"" + shipment.getDeliveryTimeWindow().getStart() + "\" ");
-			writer.write(END_DELIVERY + "=\"" + shipment.getDeliveryTimeWindow().getEnd() + "\" ");
-			writer.write(PICKUP_SERVICE_TIME + "=\"" + shipment.getPickupServiceTime() + "\" ");
-			writer.write(DELIVERY_SERVICE_TIME + "=\"" + shipment.getDeliveryServiceTime());
-			if (shipment.getAttributes().isEmpty()) {
-				writer.write("\"/>\n");
-			} else {
-				writer.write("\">\n");
-				this.attributesWriter.writeAttributes("\t\t\t\t\t", writer, shipment.getAttributes());
-				writer.write("\t\t\t\t</" + SHIPMENT + ">\n");
-			}
+	private void writeShipments(LSP lsp, BufferedWriter writer) throws IOException {
+		if (lsp.getShipments().isEmpty()) return;
+		this.writeStartTag(SHIPMENTS, null);
+		for (LSPShipment shipment : lsp.getShipments()) {
+			this.writeStartTag(SHIPMENT, List.of(
+					createTuple(ID, shipment.getId().toString()),
+					createTuple(FROM, shipment.getFrom().toString()),
+					createTuple(TO, shipment.getTo().toString()),
+					createTuple(SIZE, shipment.getSize()),
+					createTuple(START_PICKUP, shipment.getPickupTimeWindow().getStart()),
+					createTuple(END_PICKUP, shipment.getPickupTimeWindow().getEnd()),
+					createTuple(START_DELIVERY, shipment.getDeliveryTimeWindow().getStart()),
+					createTuple(END_DELIVERY, shipment.getDeliveryTimeWindow().getEnd()),
+					createTuple(PICKUP_SERVICE_TIME, shipment.getPickupServiceTime()),
+					createTuple(DELIVERY_SERVICE_TIME, shipment.getDeliveryServiceTime())), true
+			);
 		}
-		writer.write("\t\t\t</" + SHIPMENTS + ">\n\n");
+		this.writeEndTag(SHIPMENTS);
 	}
 
 	private void writePlans(LSP lsp, BufferedWriter writer) throws IOException {
 		if (lsp.getPlans().isEmpty()) return;
-		writer.write("\t\t\t<" + LSP_PLANS + ">\n");
+		this.writeStartTag(LSP_PLANS, null);
 
-		for (LSPPlan lspPlan : lsp.getPlans()) {
-			writer.write("\t\t\t\t<" + LSP_PLAN);
-			if (lspPlan.getScore() != null) {
-				writer.write(" " + SCORE + "=\"" + lspPlan.getScore() + "\"");
-			}
-			if (lsp.getSelectedPlan() != null) {
-				if (lspPlan == lsp.getSelectedPlan()) {
-					writer.write(" selected=\"true\"");
+		for (LSPPlan plan : lsp.getPlans()) {
+			if (plan.getScore() != null && lsp.getSelectedPlan() != null) {
+				if (plan == lsp.getSelectedPlan()) {
+					this.writeStartTag(LSP_PLAN, List.of(
+							createTuple(SCORE, plan.getScore()),
+							createTuple(SELECTED, "true")));
 				} else {
-					writer.write(" selected=\"false\"");
+					this.writeStartTag(LSP_PLAN, List.of(
+							createTuple(SCORE, plan.getScore()),
+							createTuple(SELECTED, "false")));
 				}
 			} else {
-				writer.write(" selected=\"false\"");
+				this.writeStartTag(LSP_PLAN, List.of(
+						createTuple(SELECTED, "false")));
 			}
-			writer.write(">\n");
 
-			writer.write("\t\t\t\t\t<" + LOGISTIC_CHAINS + ">\n");
-			for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-				writer.write("\t\t\t\t\t\t<" + LOGISTIC_CHAIN + " " + ID + "=\"" + logisticChain.getId() + "\">\n");
-				for (LogisticChainElement chainElement : logisticChain.getLogisticChainElements()) {
-					writer.write("\t\t\t\t\t\t\t<" + LOGISTIC_CHAIN_ELEMENT + " " + ID + "=\"" + chainElement.getId() + "\" ");
-					writer.write(RESOURCE_ID + "=\"" + chainElement.getResource().getId() + "\"/>\n");
+			this.writeStartTag(LOGISTIC_CHAINS, null);
+			for (LogisticChain chain : plan.getLogisticChains()) {
+				writeStartTag(LOGISTIC_CHAIN, List.of(
+						createTuple(ID, chain.getId().toString()))
+				);
+				for (LogisticChainElement chainElement : chain.getLogisticChainElements()) {
+					this.writeStartTag(LOGISTIC_CHAIN_ELEMENT, List.of(
+							createTuple(ID, chainElement.getId().toString()),
+							createTuple(RESOURCE_ID, chainElement.getResource().getId().toString())), true
+					);
 				}
-				writer.write("\t\t\t\t\t\t</" + LOGISTIC_CHAIN + ">\n");
-				writer.write("\t\t\t\t\t</" + LOGISTIC_CHAINS + ">\n");
-				writer.write("\t\t\t\t\t<" + SHIPMENT_PLANS + ">\n");
-				for (Id<LSPShipment> shipmentId : logisticChain.getShipmentIds()) {
-					writer.write("\t\t\t\t\t\t<" + SHIPMENT_PLAN + " " +  SHIPMENT_ID + "=\"" + shipmentId + "\">\n");
-					var shipment = LSPUtils.findLspShipment(lsp, shipmentId);
-					assert shipment != null;
-					final Map<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements = ShipmentUtils.getOrCreateShipmentPlan(lspPlan, shipment.getId()).getPlanElements();
-					for (var elementId : planElements.keySet()) {
-						writer.write("\t\t\t\t\t\t\t<" + ELEMENT + " " + ID + "=\"" + elementId.toString() + "\" ");
-						ShipmentPlanElement element = planElements.get(elementId);
-						writer.write(TYPE + "=\"" + element.getElementType() + "\" ");
-						writer.write(START_TIME + "=\"" + element.getStartTime() + "\" ");
-						writer.write(END_TIME + "=\"" + element.getEndTime() + "\" ");
-						writer.write(RESOURCE_ID + "=\"" + element.getResourceId() + "\"/>\n");
+				writeEndTag(LOGISTIC_CHAIN);
+			}
+			writeEndTag(LOGISTIC_CHAINS);
+
+			writeStartTag(SHIPMENT_PLANS, null);
+			for (LogisticChain chain : plan.getLogisticChains()) {
+				for (Id<LSPShipment> shipmentId : chain.getShipmentIds()) {
+					if (chain.getShipmentIds().contains(shipmentId)) {
+						this.writeStartTag(SHIPMENT_PLAN, List.of(
+								createTuple(SHIPMENT_ID, shipmentId.toString()),
+								createTuple(CHAIN_ID, chain.getId().toString()))
+						);
 					}
-					writer.write("\t\t\t\t\t\t</" + SHIPMENT_PLAN + ">\n");
+					LSPShipment shipment = LSPUtils.findLspShipment(lsp, shipmentId);
+					assert shipment != null;
+					final Map<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements = ShipmentUtils.getOrCreateShipmentPlan(plan, shipment.getId()).getPlanElements();
+					for (Id<ShipmentPlanElement> elementId : planElements.keySet()) {
+						ShipmentPlanElement element = planElements.get(elementId);
+						this.writeStartTag(ELEMENT, List.of(
+								createTuple(ID, elementId.toString()),
+								createTuple(TYPE, element.getElementType()),
+								createTuple(START_TIME, element.getStartTime()),
+								createTuple(END_TIME, element.getEndTime()),
+								createTuple(RESOURCE_ID, element.getResourceId().toString())), true
+						);
+					}
+					writeEndTag(SHIPMENT_PLAN);
 				}
-				writer.write("\t\t\t\t\t</" + SHIPMENT_PLANS + ">\n");
 			}
-			writer.write("\t\t\t\t</"+ LSP_PLAN + ">\n");
+			writeEndTag(SHIPMENT_PLANS);
+			writeEndTag(LSP_PLAN);
 		}
-		writer.write("\t\t\t</" + LSP_PLANS + ">\n\n");
-	}
-
-	private void endLSP(BufferedWriter writer) throws IOException {
-		writer.write("\t\t</" + LSP + ">\n");
-	}
-
-	private void endLSPs(BufferedWriter writer) throws IOException {
-		writer.write("\t</" + LSPS + ">\n");
+		this.writeEndTag(LSP_PLANS);
 	}
 
 }
