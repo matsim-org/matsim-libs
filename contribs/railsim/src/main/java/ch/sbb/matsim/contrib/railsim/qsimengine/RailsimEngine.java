@@ -219,10 +219,14 @@ final class RailsimEngine implements Steppable {
 		state.timestamp = time;
 
 		state.allowedMaxSpeed = retrieveAllowedMaxSpeed(state);
-		state.headPosition = resources.getLink(state.headLink).length;
-		state.tailPosition = resources.getLink(state.headLink).length - state.train.length();
 
-		if (blockLinkTracks(time, state)) {
+		RailLink firstLink = resources.getLink(state.headLink);
+
+		state.headPosition = firstLink.length;
+		state.tailPosition = firstLink.length - state.train.length();
+
+		// reserve links and start if first one is free
+		if (blockLinkTracks(time, state) || resources.isBlockedBy(firstLink, state.driver)) {
 
 			createEvent(new PersonEntersVehicleEvent(time, state.driver.getId(), state.driver.getVehicle().getId()));
 			createEvent(new VehicleEntersTrafficEvent(time, state.driver.getId(),

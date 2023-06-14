@@ -186,7 +186,7 @@ public class RailsimEngineTest {
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 1138, 1000, 0)
-			.hasTrainState("regio2", 1558, 1000, 0);
+			.hasTrainState("regio2", 1517, 1000, 0);
 
 		test = getTestEngine("../integration/7_trainFollowing/trainNetwork.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "1-2", "20-21");
@@ -198,7 +198,7 @@ public class RailsimEngineTest {
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 1138, 1000, 0)
-			.hasTrainState("regio2", 1558, 1000, 0);
+			.hasTrainState("regio2", 1517, 1000, 0);
 
 
 	}
