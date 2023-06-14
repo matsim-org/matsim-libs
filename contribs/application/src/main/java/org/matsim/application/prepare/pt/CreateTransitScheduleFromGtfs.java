@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -144,7 +145,10 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 		Network network = NetworkUtils.readNetwork(networkFile);
 
-		Scenario ptScenario = getScenarioWithPseudoPtNetworkAndTransitVehicles(network, scenario.getTransitSchedule(), "pt_");
+		// Can not be changed, because it is hard coded in the network creator
+		String networkMode = TransportMode.pt;
+
+		Scenario ptScenario = getScenarioWithPseudoPtNetworkAndTransitVehicles(network, scenario.getTransitSchedule(), networkMode);
 
 		if (validate) {
 			//Check schedule and network
@@ -191,14 +195,14 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	/**
 	 * Creates the pt scenario and network.
 	 */
-	private static Scenario getScenarioWithPseudoPtNetworkAndTransitVehicles(Network network, TransitSchedule schedule, String ptNetworkIdentifier) {
+	private static Scenario getScenarioWithPseudoPtNetworkAndTransitVehicles(Network network, TransitSchedule schedule, String networkMode) {
 		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(ConfigUtils.createConfig());
 		builder.setNetwork(network);
 		builder.setTransitSchedule(schedule);
 		Scenario scenario = builder.build();
 
 		// add pseudo network for pt
-		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "pt_", 0.1, 100000.0).createNetwork();
+		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), networkMode + "_", 0.1, 100000.0).createNetwork();
 
 		// create TransitVehicle types
 		// see https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2014/14-24/ for veh capacities
@@ -217,6 +221,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setAccessTime(reRbVehicleType, 1.0 / 10.0); // 1s per boarding agent, distributed on 10 doors
 			VehicleUtils.setEgressTime(reRbVehicleType, 1.0 / 10.0); // 1s per alighting agent, distributed on 10 doors
 			scenario.getTransitVehicles().addVehicleType(reRbVehicleType);
+
+			reRbVehicleType.setNetworkMode(networkMode);
 		}
 		VehicleType sBahnVehicleType = vehicleFactory.createVehicleType(Id.create("S-Bahn_veh_type", VehicleType.class));
 		{
@@ -227,6 +233,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setAccessTime(sBahnVehicleType, 1.0 / 24.0); // 1s per boarding agent, distributed on 8*3 doors
 			VehicleUtils.setEgressTime(sBahnVehicleType, 1.0 / 24.0); // 1s per alighting agent, distributed on 8*3 doors
 			scenario.getTransitVehicles().addVehicleType(sBahnVehicleType);
+
+			sBahnVehicleType.setNetworkMode(networkMode);
 		}
 		VehicleType uBahnVehicleType = vehicleFactory.createVehicleType(Id.create("U-Bahn_veh_type", VehicleType.class));
 		{
@@ -237,6 +245,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setAccessTime(uBahnVehicleType, 1.0 / 18.0); // 1s per boarding agent, distributed on 6*3 doors
 			VehicleUtils.setEgressTime(uBahnVehicleType, 1.0 / 18.0); // 1s per alighting agent, distributed on 6*3 doors
 			scenario.getTransitVehicles().addVehicleType(uBahnVehicleType);
+
+			uBahnVehicleType.setNetworkMode(networkMode);
 		}
 		VehicleType tramVehicleType = vehicleFactory.createVehicleType(Id.create("Tram_veh_type", VehicleType.class));
 		{
@@ -247,6 +257,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setAccessTime(tramVehicleType, 1.0 / 5.0); // 1s per boarding agent, distributed on 5 doors
 			VehicleUtils.setEgressTime(tramVehicleType, 1.0 / 5.0); // 1s per alighting agent, distributed on 5 doors
 			scenario.getTransitVehicles().addVehicleType(tramVehicleType);
+
+			tramVehicleType.setNetworkMode(networkMode);
 		}
 		VehicleType busVehicleType = vehicleFactory.createVehicleType(Id.create("Bus_veh_type", VehicleType.class));
 		{
@@ -257,6 +269,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setAccessTime(busVehicleType, 1.0 / 3.0); // 1s per boarding agent, distributed on 3 doors
 			VehicleUtils.setEgressTime(busVehicleType, 1.0 / 3.0); // 1s per alighting agent, distributed on 3 doors
 			scenario.getTransitVehicles().addVehicleType(busVehicleType);
+
+			busVehicleType.setNetworkMode(networkMode);
 		}
 		VehicleType ferryVehicleType = vehicleFactory.createVehicleType(Id.create("Ferry_veh_type", VehicleType.class));
 		{
@@ -267,6 +281,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setAccessTime(ferryVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
 			VehicleUtils.setEgressTime(ferryVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
 			scenario.getTransitVehicles().addVehicleType(ferryVehicleType);
+
+			ferryVehicleType.setNetworkMode(networkMode);
 		}
 
 		VehicleType ptVehicleType = vehicleFactory.createVehicleType(Id.create("Pt_veh_type", VehicleType.class));
@@ -278,6 +294,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setAccessTime(ptVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
 			VehicleUtils.setEgressTime(ptVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
 			scenario.getTransitVehicles().addVehicleType(ptVehicleType);
+
+			ptVehicleType.setNetworkMode(networkMode);
 		}
 
 		// set link speeds and create vehicles according to pt mode
@@ -377,7 +395,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 				// create vehicles for Departures
 				for (Departure departure : route.getDepartures().values()) {
-					Vehicle veh = vehicleFactory.createVehicle(Id.create("pt_" + route.getId().toString() + "_" + Long.toString(routeVehId++), Vehicle.class), lineVehicleType);
+					Vehicle veh = vehicleFactory.createVehicle(Id.create(networkMode + "_" + route.getId().toString() + "_" + Long.toString(routeVehId++), Vehicle.class), lineVehicleType);
 					scenario.getTransitVehicles().addVehicle(veh);
 					departure.setVehicleId(veh.getId());
 				}
