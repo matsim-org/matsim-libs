@@ -173,19 +173,23 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 
-		// TODO: some parts of the route might be available already
-		// train could advance and then stop again
-		// currently waits for whole segment to be unblocked
+		RailLink nextLink = state.route.get(state.routeIdx);
 
-		if (blockLinkTracks(time, state)) {
+		boolean allBlocked = blockLinkTracks(time, state);
 
-			event.checkReservation = -1;
+		// Driver can advance if the next link is already free
+		if (allBlocked || nextLink.isBlockedBy(state.driver)) {
+
+			if (allBlocked)
+				event.checkReservation = -1;
+			else {
+				event.checkReservation = time + POLL_INTERVAL;
+			}
 
 			// Train already waits at the end of previous link
 			if (event.waitingForLink) {
 
 				enterLink(time, event);
-
 				event.waitingForLink = false;
 
 			} else {
@@ -307,13 +311,17 @@ final class RailsimEngine implements Steppable {
 			return;
 		}
 
-		// Train stops and wait for next link to be unblocked
+		// Train stopped and reserves next links
 		if (FuzzyUtils.equals(state.speed, 0) && !blockLinkTracks(time, state)) {
-			event.waitingForLink = true;
-			event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
-			event.plannedTime = time + POLL_INTERVAL;
 
-			return;
+			RailLink currentLink = state.route.get(state.routeIdx);
+			// If this linked is blocked the driver can continue
+			if (!currentLink.isBlockedBy(state.driver)) {
+				event.waitingForLink = true;
+				event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
+				event.plannedTime = time + POLL_INTERVAL;
+				return;
+			}
 		}
 
 
@@ -635,7 +643,7 @@ final class RailsimEngine implements Steppable {
 		if (state.driver.getId().toString().equals("pt_Expresszug_GE_BE_train_3_train_Expresszug_GE_BE") && state.routeIdx > 550)
 			log.info("debug");
 
-		if (state.driver.getVehicle().getId().toString().equals("regio1"))
+		if (state.driver.getVehicle().getId().toString().equals("regio5"))
 			log.info("debug");
 
 		return true;

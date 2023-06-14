@@ -218,12 +218,23 @@ public class RailsimCalc {
 		return result;
 	}
 
+	/**
+	 * Maximum speed of the next upcoming links.
+	 */
 	private static double calcPossibleMaxSpeed(TrainState state) {
 
-		// TODO better would be the maximum that is possible over the next upcoming links
-		// taking safety distance into account
+		double safety = RailsimCalc.calcTraveledDist(state.train.maxVelocity(), state.train.maxVelocity() / state.train.deceleration(), -state.train.deceleration());
+		double maxSpeed = state.allowedMaxSpeed;
 
-		return state.train.maxVelocity();
+		double dist = 0;
+		for (int i = 0; i < state.route.size() && dist < safety; i++) {
+			RailLink link = state.route.get(i);
+			maxSpeed = Math.max(maxSpeed, link.getAllowedFreespeed(state.driver));
+
+			dist += link.length;
+		}
+
+		return maxSpeed;
 	}
 
 	record SpeedTarget(double targetSpeed, double decelDist) implements Comparable<SpeedTarget> {

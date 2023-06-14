@@ -122,7 +122,7 @@ public class RailsimTestUtils {
 			}
 		}
 
-		public void debug(EventCollector collector, String out) {
+		public void debugFiles(EventCollector collector, String out) {
 			RailsimCsvWriter.writeTrainStatesCsv(
 				collector.events.stream().filter(ev -> ev instanceof RailsimTrainStateEvent)
 					.map(ev -> (RailsimTrainStateEvent) ev)
