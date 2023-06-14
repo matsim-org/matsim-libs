@@ -68,10 +68,11 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 	private Double score;
 	private String selected;
 	private String shipmentPlanId;
+	private String shipmentChainId;
 	private final Map<String, String> elementIdResourceIdMap = new LinkedHashMap<>();
 	private final Map<String, ShipmentPlanElement> planElements = new LinkedHashMap<>();
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
-
+	private final List<LogisticChain> logisticChains = new LinkedList<>();
 
 	LSPPlanXmlParserV1( LSPs lsPs, Carriers carriers ) {
 		super();
@@ -81,7 +82,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		org.matsim.utils.objectattributes.attributable.Attributes currAttributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
+		org.matsim.utils.objectattributes.attributable.Attributes currAttributes;
 		switch (name) {
 			case LSP -> {
 				String lspId = atts.getValue(ID);
@@ -218,6 +219,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			case SHIPMENT_PLAN -> {
 				shipmentPlanId = atts.getValue(SHIPMENT_ID);
 				Gbl.assertNotNull(shipmentPlanId);
+				shipmentChainId = atts.getValue(CHAIN_ID);
+				Gbl.assertNotNull(shipmentChainId);
 			}
 			case ELEMENT -> {
 				String elementId = atts.getValue(ID);
@@ -318,6 +321,27 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			case ATTRIBUTE -> attributesReader.endTag(name, content, context);
 			case SHIPMENT -> this.currentShipment = null;
 			case LSP_PLAN -> {
+			}
+
+			case LOGISTIC_CHAINS -> {
+				currentLspPlan = LSPUtils.createLSPPlan();
+
+				for (LogisticChain logisticChain : logisticChains) {
+					currentLspPlan.addLogisticChain(logisticChain);
+				}
+
+				currentLspPlan.setScore(score);
+				currentLspPlan.setLSP(currentLsp);
+				if (selected.equals("true")) {
+					currentLsp.setSelectedPlan(currentLspPlan);
+				} else {
+					currentLsp.addPlan(currentLspPlan);
+				}
+
+				logisticChains.clear();
+			}
+
+			case LOGISTIC_CHAIN -> {
 				LSPResource resource;
 				List<LogisticChainElement> logisticChainElements = new LinkedList<>();
 
@@ -336,43 +360,30 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
 				elementIdResourceIdMap.clear();
 
-				//create logisticChain
-				LogisticChain logisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
+				LogisticChain currentLogisticChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create(chainId, LogisticChain.class))
 						.addLogisticChainElement(logisticChainElements.get(0))
 						.build();
 
 				for (int i = 1; i < logisticChainElements.size(); i++) { // element 0 was already added in Builder as first element.
 					logisticChainElements.get(i - 1).connectWithNextElement(logisticChainElements.get(i));
-					logisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
+					currentLogisticChain.getLogisticChainElements().add(logisticChainElements.get(i));
 				}
 
-				for (LSPShipment lspShipment : currentLsp.getShipments()) {
-					logisticChain.getShipmentIds().add(lspShipment.getId());
-				}
-
-				final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-
-				//create LspPlan
-				currentLspPlan.addLogisticChain(logisticChain);
-				currentLspPlan.setAssigner(singleSolutionShipmentAssigner);
-
-
-				currentLspPlan.setScore(score);
-				currentLspPlan.setLSP(currentLsp);
-				if (selected.equals("true")) {
-					currentLsp.setSelectedPlan(currentLspPlan);
-				} else {
-					currentLsp.addPlan(currentLspPlan);
-				}
-
-				currentLspPlan = null;
+				logisticChains.add(currentLogisticChain);
 			}
+
+
 			case SHIPMENT_PLAN -> {
 				for (LSPShipment shipment : currentLsp.getShipments()) {
 					if (shipment.getId().toString().equals(shipmentPlanId)) {
 						for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
 							ShipmentUtils.getOrCreateShipmentPlan(currentLspPlan, shipment.getId())
 											.addPlanElement(Id.create(planElement.getKey(), ShipmentPlanElement.class), planElement.getValue());
+						}
+					}
+					for (LogisticChain chain : currentLspPlan.getLogisticChains()) {
+						if (chain.getId().toString().equals(shipmentChainId) && shipment.getId().toString().equals(shipmentPlanId)) {
+							chain.assignShipment(shipment);
 						}
 					}
 				}
