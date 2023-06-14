@@ -91,7 +91,7 @@ public class RailsimEngineTest {
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 293, 600, 0)
-			.hasTrainState("regio2", 353, 1000, 0);
+			.hasTrainState("regio2", 358, 1000, 0);
 
 
 		test = getTestEngine("network0.xml");
@@ -105,7 +105,7 @@ public class RailsimEngineTest {
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 293, 600, 0)
-			.hasTrainState("regio2", 353, 1000, 0);
+			.hasTrainState("regio2", 358, 1000, 0);
 
 	}
 
@@ -154,7 +154,7 @@ public class RailsimEngineTest {
 			.hasTrainState("regio0", 7674, 200, 0)
 			.hasTrainState("regio1", 7734, 200, 0);
 
-//		test.debug(collector, "varyingSpeed_many");
+		test.debug(collector, "varyingSpeed_many");
 
 		test = getTestEngine("network1.xml");
 
@@ -179,7 +179,7 @@ public class RailsimEngineTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "1-2", "20-21");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "1-2", "20-21");
 
-		test.doSimStepUntil(10000);
+		test.doSimStepUntil(5000);
 
 //		test.debug(collector, "trainFollowing");
 

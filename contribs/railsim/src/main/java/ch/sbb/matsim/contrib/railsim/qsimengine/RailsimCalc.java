@@ -152,59 +152,79 @@ public class RailsimCalc {
 	 */
 	public static double nextLinkReservation(TrainState state, RailLink currentLink) {
 
+		double assumedSpeed = calcPossibleMaxSpeed(state);
+
 		// time needed for full stop
-		double assumedSpeed = state.allowedMaxSpeed;
 		double stopTime = assumedSpeed / state.train.deceleration();
 
 		assert stopTime > 0 : "Stop time can not be negative";
 
-		// TODO: there is an additional safety factor (also in links to block)
-		// this might be reduced, but currently the case when a train stops exactly before the not reserved link is not handled
-
 		// safety distance
-		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration()) * 1.5;
-
-		double dist = currentLink.length - state.headPosition;
+		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration());
 
 		int idx = state.routeIdx;
-		do {
-			RailLink nextLink = state.route.get(idx++);
+		double dist = currentLink.length - state.headPosition;
+
+		RailLink nextLink = null;
+		// need to check beyond safety distance
+		while (FuzzyUtils.lessEqualThan(dist, safety * 2) && idx < state.route.size()) {
+			nextLink = state.route.get(idx++);
 
 			if (!nextLink.isBlockedBy(state.driver))
 				return dist - safety;
 
+			// No reservation beyond pt stop
+			if (state.isStop(nextLink.getLinkId()))
+				break;
+
 			dist += nextLink.length;
+		}
 
-		} while (dist <= safety && idx < state.route.size());
+		// No reservation needed after the end
+		if (idx == state.route.size() || (nextLink != null && state.isStop(nextLink.getLinkId())))
+			return Double.POSITIVE_INFINITY;
 
-		// No need to reserve yet
-		return Double.POSITIVE_INFINITY;
+		return dist - safety;
 	}
 
 	/**
 	 * Links that need to be blocked or otherwise stop needs to be initiated.
 	 */
-	public static List<RailLink> calcLinksToBlock(int idx, TrainState state) {
+	public static List<RailLink> calcLinksToBlock(TrainState state, RailLink currentLink) {
 
 		List<RailLink> result = new ArrayList<>();
 
-		// safety distance
-		double assumedSpeed = state.allowedMaxSpeed;
-
+		double assumedSpeed = calcPossibleMaxSpeed(state);
 		double stopTime = assumedSpeed / state.train.deceleration();
-		// safety distance
-		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration()) * 1.5 + state.headPosition;
 
-		double reserved = 0;
-		while (reserved < safety && idx < state.route.size()) {
+		// safety distance
+		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration());
+
+		int idx = state.routeIdx;
+
+		// dist to next
+		double dist = currentLink.length - state.headPosition;
+
+		while (FuzzyUtils.lessEqualThan(dist, safety) && idx < state.route.size()) {
 			RailLink nextLink = state.route.get(idx++);
 			result.add(nextLink);
-			reserved += nextLink.length;
+			dist += nextLink.length;
+
+			// Beyond pt stop links don't need to be reserved
+			if (state.isStop(nextLink.getLinkId()))
+				break;
 		}
 
 		return result;
 	}
 
+	private static double calcPossibleMaxSpeed(TrainState state) {
+
+		// TODO better would be the maximum that is possible over the next upcoming links
+		// taking safety distance into account
+
+		return state.train.maxVelocity();
+	}
 
 	record SpeedTarget(double targetSpeed, double decelDist) implements Comparable<SpeedTarget> {
 

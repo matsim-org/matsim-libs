@@ -4,7 +4,6 @@ import ch.sbb.matsim.contrib.railsim.RailsimModule;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -75,30 +74,6 @@ public class RailsimIntegrationTest {
 	public void test0_simple() {
 
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "0_simple"));
-
-	}
-
-	@Test
-	public void scenario_genf() {
-
-		// TODO: can probably be replaced by the genf_bern test
-
-		File dir = new File(utils.getPackageInputDirectory(), "test_genf");
-
-		Config config = ConfigUtils.loadConfig(new File(dir, "config.xml").toString());
-
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-
-		controler.addOverridingModule(new RailsimModule());
-		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
-
-		controler.run();
 
 	}
 
