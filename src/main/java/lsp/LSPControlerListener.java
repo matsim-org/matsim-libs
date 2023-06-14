@@ -121,20 +121,20 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 		strategyManager.run( lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext() );
-		for( LSP lsp : lsps.getLSPs().values() ){
-			lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels weird, but getting NullPointer because of missing lsp inside the assigner
-			//TODO: Do we need to do it for each plan, if it gets selected???
-			// yyyyyy Means IMO that something is incomplete with the plans copying.  kai, jul'22
-		}
-
-		LSPRescheduler.notifyReplanning(lsps, event);
-
-		//Update carriers in scenario and CarrierAgentTracker
-		carrierAgentTracker.getCarriers().getCarriers().clear();
-		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
-			FreightUtils.getCarriers(scenario).addCarrier(carrier);
-			carrierAgentTracker.getCarriers().addCarrier(carrier);
-		}
+//		for( LSP lsp : lsps.getLSPs().values() ){
+//			lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels weird, but getting NullPointer because of missing lsp inside the assigner
+//			//TODO: Do we need to do it for each plan, if it gets selected???
+//			// yyyyyy Means IMO that something is incomplete with the plans copying.  kai, jul'22
+//		}
+//
+//		LSPRescheduler.notifyReplanning(lsps, event);
+//
+//		//Update carriers in scenario and CarrierAgentTracker
+//		carrierAgentTracker.getCarriers().getCarriers().clear();
+//		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
+//			FreightUtils.getCarriers(scenario).addCarrier(carrier);
+//			carrierAgentTracker.getCarriers().addCarrier(carrier);
+//		}
 
 	}
 
