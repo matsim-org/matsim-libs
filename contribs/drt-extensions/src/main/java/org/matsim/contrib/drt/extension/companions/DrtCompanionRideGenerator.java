@@ -61,7 +61,8 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 	private Set<Id<Person>> companionAgentIds = new HashSet<>();
 	private WeightedRandomSelection<Integer> sampler;
 
-	DrtCompanionRideGenerator(final String drtMode, final MainModeIdentifier mainModeIdentifier, final Scenario scenario, final Network network,
+	DrtCompanionRideGenerator(final String drtMode, final MainModeIdentifier mainModeIdentifier,
+							  final Scenario scenario, final Network network,
 							  final DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		this.scenario = scenario;
 		this.mainModeIdentifier = mainModeIdentifier;
@@ -77,9 +78,11 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 		if (!drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow().getDrtCompanionSamplingWeights()
 				.isEmpty()) {
 			this.sampler = DrtCompanionUtils.createIntegerSampler(
-					drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow().getDrtCompanionSamplingWeights());
+					drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow()
+							.getDrtCompanionSamplingWeights());
 		} else {
-			throw new IllegalStateException("drtCompanionSamplingWeights are empty, please check your DrtCompanionParams");
+			throw new IllegalStateException(
+					"drtCompanionSamplingWeights are empty, please check your DrtCompanionParams");
 		}
 	}
 
@@ -90,13 +93,18 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
 				String mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
 				if (this.drtModes.equals(mainMode)) {
+
 					int additionalCompanions = sampler.select();
+
 					for (int i = 0; i < additionalCompanions; i++) {
 						int currentCounter = drtCompanionAgents.getOrDefault(mainMode, 0);
 						currentCounter++;
 						drtCompanionAgents.put(mainMode, currentCounter);
+						int groupSize = additionalCompanions + 1;
+						int groupPart = i;
+
 						companions.add(createCompanionAgent(mainMode, person, trip, trip.getOriginActivity(),
-								trip.getDestinationActivity()));
+								trip.getDestinationActivity(), groupPart, groupSize));
 					}
 				}
 			}
@@ -112,7 +120,7 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 	}
 
 	private Person createCompanionAgent(String drtMode, Person originalPerson, TripStructureUtils.Trip trip,
-										Activity fromActivity, Activity toActivity) {
+										Activity fromActivity, Activity toActivity, int groupPart, int groupSize) {
 		String prefix = getCompanionPrefix(drtMode);
 		String companionId = prefix + "_" + originalPerson.getId().toString() + "_" + UUID.randomUUID();
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId(companionId));
@@ -130,7 +138,13 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 		plan.getPlanElements().add(copyFromActivity);
 		plan.getPlanElements().addAll(trip.getTripElements());
 		plan.getPlanElements().add(toActivity);
+
 		person.addPlan(plan);
+
+		// Add group information to trip
+		DrtCompanionUtils.setAdditionalGroupPart(person, groupPart);
+		DrtCompanionUtils.setAdditionalGroupSize(person, groupSize);
+
 		return person;
 	}
 
