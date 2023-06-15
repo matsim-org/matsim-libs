@@ -4,6 +4,7 @@ import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,14 +39,13 @@ final class RailsimEngine implements Steppable {
 	private final Queue<UpdateEvent> updateQueue = new PriorityQueue<>();
 
 	private final RailResourceManager resources;
-
 	private final TrainDisposition disposition;
 
-	public RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, RailResourceManager resources) {
+	public RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, RailResourceManager resources, TrainDisposition disposition) {
 		this.eventsManager = eventsManager;
 		this.config = config;
 		this.resources = resources;
-		this.disposition = new SimpleDisposition(resources);
+		this.disposition = disposition;
 	}
 
 	@Override
@@ -267,6 +267,40 @@ final class RailsimEngine implements Steppable {
 
 		if (links.isEmpty())
 			return true;
+
+		Optional<RailLink> entry = links.stream().filter(l -> l.isEntryLink() && !l.isBlockedBy(state.driver)).findFirst();
+		if (state.pt != null && entry.isPresent()) {
+
+			int start = -1;
+			int end = -1;
+			RailLink exit = null;
+
+			for (int i = state.routeIdx; i < state.route.size(); i++) {
+				RailLink l = state.route.get(i);
+
+				if (l == entry.get())
+					start = i;
+
+				if (start > -1 && l.isExitLink()) {
+					exit = l;
+					end = i;
+					break;
+				}
+			}
+
+			// there might be no exit link if this is the end of the route
+			// network could be wrong as well, but hard to verify
+			if (exit != null) {
+				List<RailLink> detour = disposition.requestRoute(time, state.pt, entry.get(), exit);
+
+				// check if this route is different
+				if (detour != null && !state.route.subList(start + 1, end).equals(detour)) {
+					// TODO: apply the detour
+					// TODO: throw event
+
+				}
+			}
+		}
 
 		List<RailLink> blocked = disposition.blockRailSegment(time, state.driver, links);
 

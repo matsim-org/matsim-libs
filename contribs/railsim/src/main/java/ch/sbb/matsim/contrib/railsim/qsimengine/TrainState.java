@@ -9,6 +9,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Stores the mutable current state of a train.
@@ -24,7 +25,7 @@ final class TrainState {
 	 * Transit agent, if this is a pt transit.
 	 */
 	@Nullable
-	final TransitDriverAgent pt;
+	final RailsimTransitDriverAgent pt;
 
 	/**
 	 * Next transit stop.
@@ -101,7 +102,7 @@ final class TrainState {
 
 	TrainState(MobsimDriverAgent driver, TrainInfo train, double timestamp, @Nullable Id<Link> linkId, List<RailLink> route) {
 		this.driver = driver;
-		this.pt = driver instanceof TransitDriverAgent ptDriver ? ptDriver : null;
+		this.pt = driver instanceof RailsimTransitDriverAgent ptDriver ? ptDriver : null;
 		this.nextStop = pt != null ? pt.getNextTransitStop() : null;
 		this.train = train;
 		this.route = route;

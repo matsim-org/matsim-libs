@@ -19,6 +19,9 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import com.google.inject.multibindings.OptionalBinder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
@@ -39,9 +42,16 @@ public class RailsimQSimModule extends AbstractQSimModule implements QSimCompone
 	@Override
 	protected void configureQSim() {
 		bind(RailsimQSimEngine.class).asEagerSingleton();
+
+		bind(TrainRouter.class).asEagerSingleton();
+		bind(RailResourceManager.class).asEagerSingleton();
+
+		// This Interface might be replaced with other implementations
+		bind(TrainDisposition.class).to(SimpleDisposition.class).asEagerSingleton();
+
 		addQSimComponentBinding(COMPONENT_NAME).to(RailsimQSimEngine.class);
 
 		OptionalBinder.newOptionalBinder(binder(), TransitDriverAgentFactory.class)
-			.setBinding().to( RailsimDriverAgentFactory.class );
+			.setBinding().to(RailsimDriverAgentFactory.class);
 	}
 }

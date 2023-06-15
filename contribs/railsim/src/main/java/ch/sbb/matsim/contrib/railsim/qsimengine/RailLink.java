@@ -22,6 +22,9 @@ public final class RailLink implements HasLinkId {
 	 */
 	private final TrackState[] state;
 
+	private final boolean isEntryLink;
+	private final boolean isExitLink;
+
 	/**
 	 * Reservations held for each track.
 	 */
@@ -47,6 +50,8 @@ public final class RailLink implements HasLinkId {
 		minimumHeadwayTime = RailsimUtils.getMinimumTrainHeadwayTime(link);
 		String resourceId = RailsimUtils.getResourceId(link);
 		resource = resourceId != null ? Id.create(resourceId, RailResource.class) : null;
+		isEntryLink = RailsimUtils.isEntryLink(link);
+		isExitLink = RailsimUtils.isExitLink(link);
 	}
 
 	@Override
@@ -62,7 +67,7 @@ public final class RailLink implements HasLinkId {
 	/**
 	 * Number of tracks on this link.
 	 */
-	public int getNumberOfTracks(){
+	public int getNumberOfTracks() {
 		return state.length;
 	}
 
@@ -125,6 +130,21 @@ public final class RailLink implements HasLinkId {
 			}
 		}
 		throw new AssertionError("Driver " + driver + " has not reserved the track.");
+	}
+
+
+	/**
+	 * Entry link of a station relevant for re-routing.
+	 */
+	public boolean isEntryLink() {
+		return isEntryLink;
+	}
+
+	/**
+	 * Exit link of a station for re-routing.
+	 */
+	public boolean isExitLink() {
+		return isExitLink;
 	}
 
 	@Override

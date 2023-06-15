@@ -1,11 +1,13 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailResource;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailResourceManager;
-import org.matsim.api.core.v01.Id;
+import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimTransitDriverAgent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
+import jakarta.inject.Inject;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,14 +17,23 @@ import java.util.List;
 public class SimpleDisposition implements TrainDisposition {
 
 	private final RailResourceManager resources;
+	private final TrainRouter router;
 
-	public SimpleDisposition(RailResourceManager resources) {
+	@Inject
+	public SimpleDisposition(RailResourceManager resources, TrainRouter router) {
 		this.resources = resources;
+		this.router = router;
 	}
 
 	@Override
 	public void onDeparture(double time, MobsimDriverAgent driver, List<RailLink> route) {
 		// Nothing to do.
+	}
+
+	@Nullable
+	@Override
+	public List<RailLink> requestRoute(double time, RailsimTransitDriverAgent driver, RailLink entry, RailLink exit) {
+		return router.calcRoute(entry, exit);
 	}
 
 	@Override

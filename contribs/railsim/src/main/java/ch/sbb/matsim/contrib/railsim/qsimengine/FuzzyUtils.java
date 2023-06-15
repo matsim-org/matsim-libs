@@ -3,12 +3,12 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 /**
  * Util class for fuzzy comparisons.
  */
-class FuzzyUtils {
+final class FuzzyUtils {
+
+	private static final double EPSILON = 1E-5;
 
 	private FuzzyUtils() {
 	}
-
-	private final static double EPSILON = 1E-5;
 
 
 	/**

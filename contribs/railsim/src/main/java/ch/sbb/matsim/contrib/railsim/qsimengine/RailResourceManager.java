@@ -2,12 +2,15 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
+import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.QSim;
 
 import java.util.List;
 import java.util.Map;
@@ -20,13 +23,19 @@ import java.util.stream.Collectors;
 public final class RailResourceManager {
 
 	private final EventsManager eventsManager;
+
 	/**
-	 * Rail links
+	 * Rail links.
 	 */
 	private final Map<Id<Link>, RailLink> links;
 
 
 	private final Map<Id<RailResource>, RailResource> resources;
+
+	@Inject
+	public RailResourceManager(QSim qsim) {
+		this(qsim.getEventsManager(), ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class), qsim.getScenario().getNetwork());
+	}
 
 	/**
 	 * Construct resources from network.
@@ -63,6 +72,7 @@ public final class RailResourceManager {
 	 * Return the resource for a given id.
 	 */
 	public RailResource getResource(Id<RailResource> id) {
+		if (id == null) return null;
 		return resources.get(id);
 	}
 
@@ -110,7 +120,7 @@ public final class RailResourceManager {
 		Id<RailResource> resourceId = link.getResourceId();
 		if (resourceId != null) {
 
-			RailResource resource =  getResource(resourceId);
+			RailResource resource = getResource(resourceId);
 
 			// resource is required
 			if (!tryBlockResource(resource, driver)) {
@@ -127,6 +137,24 @@ public final class RailResourceManager {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Checks whether a link or underlying resource has remaining capacity.
+	 */
+	public boolean hasCapacity(Id<Link> link) {
+
+		RailLink l = getLink(link);
+
+		if (!l.hasFreeTrack())
+			return false;
+
+		RailResource res = getResource(l.getResourceId());
+		if (res != null) {
+			return res.hasCapacity();
+		}
+
+		return true;
 	}
 
 	/**

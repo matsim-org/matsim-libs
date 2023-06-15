@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -48,6 +49,8 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 	private final QSim qsim;
 	private final RailsimConfigGroup config;
+	private final RailResourceManager res;
+	private final TrainDisposition disposition;
 	private final Set<String> modes;
 	private final TransitStopAgentTracker agentTracker;
 	private InternalInterface internalInterface;
@@ -55,9 +58,12 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private RailsimEngine engine;
 
 	@Inject
-	public RailsimQSimEngine(QSim qsim, TransitStopAgentTracker agentTracker) {
+	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition,
+							 TransitStopAgentTracker agentTracker) {
 		this.qsim = qsim;
 		this.config = ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
+		this.res = res;
+		this.disposition = disposition;
 		this.modes = config.getRailNetworkModes();
 		this.agentTracker = agentTracker;
 	}
@@ -69,8 +75,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		engine = new RailsimEngine(qsim.getEventsManager(), config,
-			new RailResourceManager(qsim.getEventsManager(), config, qsim.getScenario().getNetwork()));
+		engine = new RailsimEngine(qsim.getEventsManager(), config, res, disposition);
 	}
 
 	@Override
@@ -117,28 +122,8 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 		return engine.handleDeparture(now, driver, linkId, networkRoute);
 	}
 
-	// Get inspiration from SBBTransitQSimEngine on what methods to overwrite
 
-	// TODO: Questions
-	// Is the rail engine a passenger engine in itself ?
-	// Should maybe be lower level like qsim ?
-
-	/* some implementation notes and ideas:
-	   - data structure to store a track-state per link (or multiple track-state if a link depicts multiple parallel tracks)
-	     - track-state can be `free`, `blocked` (only a single train can be in a blocked track), or `reserved` (multiple trains can reserve the same track)
-	   - data structure to store position and other data of trains
-	     - head position, given as meters from fromNode on a link
-	     - current route (ordered list of links)
-	     - length of the train
-	     - current speed of the train
-	     - current acceleration/deceleration of the train
-	     - additional attributes as required, e.g. required stopping distance ("bremsweg", emergency braking distance, maxDeceleration) given the current speed
-	   - in each simStep (may be optimized later to a lower interval), the position of each train is updated
-	   - each train tries to block as many links in front of the train to cover the stopping distance
-	     - if not enough links can be blocked, the train must decelerate accordingly (normal braking distance, deceleration)
-	   - a train can only accelerate, if the complete train is on links with the higher allowed speed
-	     (e.g. train cannot accelerate if only the engine is on a faster link, but the rest of the train are still on links with lower freespeed)
-
+	/*
 	   For visualization purposes, the following output should be produced:
 	   - CSV containing time-dependent link-attributes depicting the track-state (needs discussion what we output when a link contains multiple tracks)
 	     - optionally include information which trains (vehicleId) blocked or reserved a track?
@@ -155,18 +140,8 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	   This is where the `reserved` track-state might come into play.
 
 
-	   TODO Implementation steps:
-	   0. RailsimConfigGroup
-	   1. RailsimQSimEngine extracts all "rail"-links (depending on config) and builds a data structure to store track-states
-	   2. RailsimQSimEngine handles all "rail"-vehicles (also depending on config) and moves the trains each second
-	      First implementation can be very basic, e.g. constant speed per link according to freespeed, no checks if track is free
-	   3. Handle passengers at stops, see SBBTransitQSimEngine how to do this
-	   4. Each train blocks the links it currently occupies, plus 1 link in front of it if possible
-	   5. A train can only move to the next link it that link is blocked by that train
-	   6. Each train tries to block as many link in front of it along the route as it needs for the stopping distance
-	   7. Trains accelerate smoothly when entering links with a higher freespeed
-	   8. Trains decelerate smoothly before entering links with a lower freespeed
-	   9. Trains decelerate smoothly if they cannot block enough links in front of them
+	  TODO:
+	  	9. Re routing
 	   10. Deadlock Prevention
 
 	 */

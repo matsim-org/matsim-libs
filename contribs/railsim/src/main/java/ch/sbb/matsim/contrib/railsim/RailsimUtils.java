@@ -68,7 +68,22 @@ public final class RailsimUtils {
 	 * Resource id or null if there is none.
 	 */
 	public static String getResourceId(Link link) {
-		return  (String) link.getAttributes().getAttribute(LINK_ATTRIBUTE_RESOURCE_ID);
+		return (String) link.getAttributes().getAttribute(LINK_ATTRIBUTE_RESOURCE_ID);
+	}
+
+	/**
+	 * Whether this link is an entry link applicable for re routing.
+	 */
+	public static boolean isEntryLink(Link link) {
+		return Boolean.TRUE.equals(link.getAttributes().getAttribute("railsimEntry"));
+	}
+
+
+	/**
+	 * Exit link used for re routing.
+	 */
+	public static boolean isExitLink(Link link) {
+		return Boolean.TRUE.equals(link.getAttributes().getAttribute("railsimExit"));
 	}
 
 	/**

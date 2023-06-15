@@ -1,6 +1,8 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,8 +38,10 @@ public class RailsimEngineTest {
 
 		collector.clear();
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(
-			eventsManager, config, new RailResourceManager(eventsManager, config, net)), net);
+		RailResourceManager res = new RailResourceManager(eventsManager, config, net);
+		TrainRouter router = new TrainRouter(net, res);
+
+		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router)), net);
 	}
 
 	@Test
