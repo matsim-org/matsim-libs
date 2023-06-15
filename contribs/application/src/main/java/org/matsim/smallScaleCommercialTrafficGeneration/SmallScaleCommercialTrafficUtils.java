@@ -169,12 +169,16 @@ public class SmallScaleCommercialTrafficUtils {
 				if (tourElement instanceof Activity activity) {
 					activity.setCoord(
 							scenario.getNetwork().getLinks().get(activity.getLinkId()).getFromNode().getCoord());
-					if (!activity.getType().equals("start"))
-						activity.setEndTimeUndefined();
-					else
+					if (activity.getType().equals("start")) {
 						tourStartTime = activity.getEndTime().seconds();
-					if (activity.getType().equals("end"))
+						activity.setType("commercial_start");
+					}
+					else
+						activity.setEndTimeUndefined();
+					if (activity.getType().equals("end")) {
 						activity.setStartTime(tourStartTime + 8 * 3600);
+						activity.setType("commercial_end");
+					}
 					plan.addActivity(activity);
 				}
 				if (tourElement instanceof Leg) {
