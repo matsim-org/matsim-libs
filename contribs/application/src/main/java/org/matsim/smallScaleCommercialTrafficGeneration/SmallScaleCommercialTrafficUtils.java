@@ -33,6 +33,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -47,6 +48,7 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
@@ -102,7 +104,28 @@ public class SmallScaleCommercialTrafficUtils {
 		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdNameConnection);
 		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
 	}
-
+	static Id<Link> findNearestPossibleLink(String zone, ArrayList<String> noPossibleLinks, Map<String, HashMap<Id<Link>, Link>> regionLinksMap,
+													Id<Link> newLink, Coord centroidPointOfBuildingPolygon, int numberOfPossibleLinks) {
+		double minDistance = Double.MAX_VALUE;
+		searchLink: for (Link possibleLink : regionLinksMap.get(zone).values()) {
+			if(possibleLink.getToNode().getOutLinks() == null)
+				continue;
+			if (noPossibleLinks != null && numberOfPossibleLinks > noPossibleLinks.size())
+				for (String depotLink : noPossibleLinks) {
+					if (depotLink.equals(possibleLink.getId().toString())
+						|| (NetworkUtils.findLinkInOppositeDirection(possibleLink) != null && depotLink.equals(
+						NetworkUtils.findLinkInOppositeDirection(possibleLink).getId().toString())))
+						continue searchLink;
+				}
+			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
+				(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+			if (distance < minDistance) {
+				newLink = possibleLink.getId();
+				minDistance = distance;
+			}
+		}
+		return newLink;
+	}
 	/**
 	 * Writer of data distribution data.
 	 */

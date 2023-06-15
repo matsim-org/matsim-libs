@@ -765,25 +765,11 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 					.get(rnd.nextInt(buildingsPerZone.get(zone).get(selectedCategory).size()));
 			Coord centroidPointOfBuildingPolygon = MGC
 					.point2Coord(((Geometry) possibleBuilding.getDefaultGeometry()).getCentroid());
-			double minDistance = Double.MAX_VALUE;
+
 			int numberOfPossibleLinks = regionLinksMap.get(zone).size();
 
 			// searches and selects the nearest link of the possible links in this zone
-			searchLink: for (Link possibleLink : regionLinksMap.get(zone).values()) {
-				if (noPossibleLinks != null && numberOfPossibleLinks > noPossibleLinks.size())
-					for (String depotLink : noPossibleLinks) {
-						if (depotLink.equals(possibleLink.getId().toString())
-								|| (NetworkUtils.findLinkInOppositeDirection(possibleLink) != null && depotLink.equals(
-										NetworkUtils.findLinkInOppositeDirection(possibleLink).getId().toString())))
-							continue searchLink;
-					}
-				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-						(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
-				if (distance < minDistance) {
-					newLink = possibleLink.getId();
-					minDistance = distance;
-				}
-			}
+			newLink = SmallScaleCommercialTrafficUtils.findNearestPossibleLink(zone, noPossibleLinks, regionLinksMap, newLink, centroidPointOfBuildingPolygon, numberOfPossibleLinks);
 		}
 		if (newLink == null)
 			throw new RuntimeException("No possible link for buildings with type '" + selectedCategory + "' in zone '"
