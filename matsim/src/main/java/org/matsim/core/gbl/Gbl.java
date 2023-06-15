@@ -36,22 +36,22 @@ import java.nio.charset.StandardCharsets;
  *
  */
 public abstract class Gbl {
-	
+
 	private static final Logger log = LogManager.getLogger(Gbl.class);
-	
+
 	public final static String ONLYONCE = " This message given only once.";
-	
+
 	public final static String FUTURE_SUPPRESSED = " Future occurences of this logging statement are suppressed." ;
-	
+
 	public final static String SEPARATOR = "****************************" ;
 
 	public static final String CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE = "This class wants to overwrite createRoutingAlgorithm(), which is no longer possible.  Making createRoutingAlgorithm() non-final would not help since, after recent code changes, it is only used during initialization but not in replanning.  kai, may'13.  Aborting ...";
-	
+
 	public static final String NOT_IMPLEMENTED = "not implemented" ;
-	
+
 	public static final String ABSORBED_INTO_CORE="This execution path is no longer supported.  The functionality has been absorbed into the core." ;
 	public static final String INVALID = "invalid";
-	
+
 	public static final void printMemoryUsage() {
 		long totalMem = Runtime.getRuntime().totalMemory();
 		long freeMem = Runtime.getRuntime().freeMemory();
@@ -71,12 +71,16 @@ public abstract class Gbl {
 		log.info("CPU cores: " + Runtime.getRuntime().availableProcessors());
 		log.info("max. Memory: " + Runtime.getRuntime().maxMemory() / 1024.0 / 1024.0 + "MB (" + Runtime.getRuntime().maxMemory() + "B)");
 	}
-	
+
+	public static final void printRunCommand() {
+		log.info("Command: " + System.getProperty("sun.java.command"));
+	}
+
 	public static final String getBuildInfoString() {
 		return getBuildInfoString("MATSim", "/revision.txt");
 	}
-	
-	/** 
+
+	/**
 	 * Prints some information about the current build/revision of this code.
 	 * Currently, this will only work with the Nightly-Build-Jars.
 	 */
@@ -100,7 +104,7 @@ public abstract class Gbl {
 			return component + "-Build: unknown";
 		}
 	}
-	
+
 	public static final void printBuildInfo() {
 		printBuildInfo("MATSim", "/revision.txt");
 	}
@@ -199,7 +203,7 @@ public abstract class Gbl {
 	public static final void printCurrentThreadCpuTime() {
 		printThreadCpuTime(Thread.currentThread());
 	}
-	
+
 	public static void assertIf( boolean flag ) {
 		if ( !flag ) {
 			throw new RuntimeException("assertion error; follow stack trace") ;
@@ -227,21 +231,21 @@ public abstract class Gbl {
 
 	public static final String LOAD_DATA_IS_NOW_FINAL = "controler.loadData() is now final.  If you need this functionality, use ScenarioUtils.loadScenario(...), "
 	+ "then modify the scenario, then pass it into new Controler( scenario ).  Talk to MZ or KN if you need help.  kai, may'15";
-	
+
 	public static final String CONTROLER_IS_NOW_FINAL = "The Controler class is now final.  Everything that used to be "
 			+ "possible by inheritance should now be doable by other constructs.  See tutorial.programming.* for examples.  Please talk"
 			+ "to MZ or KN if you would like to get help.  kai, may'15" ;
-	
+
 	public static final String RETROFIT_CONTROLER = Gbl.CONTROLER_IS_NOW_FINAL + " I tried to adapt this to new syntax"
 			+ "but please check functionality. kai, mar'15" ;
-	
+
 	public static final String PROBLEM_WITH_ACCESS_EGRESS = "When the TripRouter also generates access/egress legs, within-day replanning "
 			+ "needs to sort out if it wants that, or if it just wants to replan the current leg.  kai, feb'16" ;
 
 	public static final String WRONG_IMPLEMENTATION = "wrong implementation of interface; " ;
-	
+
 	public static final String COPY_PASTE_FROM_CORE_NO_LONGER_WORKING="Another solution for this has been found in the core, and thus this copy-and-paste from the core is no longer working." ;
-	
+
 	public static String aboutToWrite( String what, String filename ) {
 		return "about to write " + what + " to: "  + filename ;
 	}
