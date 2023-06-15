@@ -167,7 +167,6 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		output = Path.of(config.controler().getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		String carriersFileLocation;
 		FreightConfigGroup freightConfigGroup;
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution -> {
