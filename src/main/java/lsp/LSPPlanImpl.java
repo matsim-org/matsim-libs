@@ -33,6 +33,7 @@ import java.util.Collection;
 	private LSP lsp;
 	private double score;
 	private ShipmentAssigner assigner;
+	private String type = null;
 
 	LSPPlanImpl() {
 		this.logisticChains = new ArrayList<>();
@@ -83,6 +84,16 @@ import java.util.Collection;
 	}
 
 	@Override
+	public String getType() {
+		return this.type;
+	}
+
+	@Override
+	public void setType(final String type) {
+		this.type = type;
+	}
+
+	@Override
 	public LSP getLSP() {
 		return lsp;
 	}
@@ -103,6 +114,7 @@ import java.util.Collection;
 	@Override public String toString() {
 		StringBuilder strb = new StringBuilder();
 			strb.append("[score=").append(this.score).append("]");
+			strb.append(", [type=").append(this.type).append("]");
 			for (LogisticChain logisticChain : this.logisticChains) {
 				strb.append(", [LogisticChainId=").append(logisticChain.getId()).append("], [No of LogisticChainElements=").append(logisticChain.getLogisticChainElements().size()).append("] \n");
 				if (!logisticChain.getLogisticChainElements().isEmpty()){
