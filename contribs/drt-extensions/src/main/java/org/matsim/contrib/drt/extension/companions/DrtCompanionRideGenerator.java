@@ -53,6 +53,7 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 
 	private static final Logger LOG = LogManager.getLogger(DrtCompanionRideGenerator.class);
 	public final static String DRT_COMPANION_AGENT_PREFIX = "COMPANION";
+	public static final String DRT_COMPANION_TYPE = "drtCompanion";
 
 	private final Scenario scenario;
 	private final String drtModes;
@@ -124,6 +125,7 @@ public final class DrtCompanionRideGenerator implements BeforeMobsimListener, Af
 		String prefix = getCompanionPrefix(drtMode);
 		String companionId = prefix + "_" + originalPerson.getId().toString() + "_" + UUID.randomUUID();
 		Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId(companionId));
+		DrtCompanionUtils.setDRTCompanionType(person, DRT_COMPANION_TYPE);
 
 		// Copy attributes from person
 		AttributesUtils.copyAttributesFromTo(originalPerson, person);
