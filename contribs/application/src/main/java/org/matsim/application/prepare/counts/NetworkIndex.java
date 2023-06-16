@@ -21,6 +21,7 @@ public class NetworkIndex<T> {
 	private final GeometryFactory factory = new GeometryFactory();
 	private final GeometryGetter getter;
 	private final List<BiPredicate<Link, T>> filter = new ArrayList<>();
+	private final Map<Link, LineString> geometries;
 
 	public NetworkIndex(Network network, double range, GeometryGetter getter) {
 
@@ -29,10 +30,27 @@ public class NetworkIndex<T> {
 
 		for (Link link : network.getLinks().values()) {
 			Envelope env = getLinkEnvelope(link);
-			index.insert(env, link);
+			this.index.insert(env, link);
 		}
 
-		index.build();
+		this.geometries = Map.of();
+		this.index.build();
+	}
+
+	public NetworkIndex(Map<Link, LineString> linkGeometries, double range, GeometryGetter getter) {
+
+		this.range = range;
+		this.getter = getter;
+
+		this.geometries = linkGeometries;
+
+		for (Map.Entry<Link, LineString> entry : linkGeometries.entrySet()) {
+			Envelope env = entry.getValue().getEnvelopeInternal();
+
+			this.index.insert(env, entry.getKey());
+		}
+
+		this.index.build();
 	}
 
 	/**
@@ -53,8 +71,14 @@ public class NetworkIndex<T> {
 		Map<Link, Geometry> resultMap = new HashMap<>();
 		for (Link link : result) {
 
-			LineString ls = this.link2LineString(link);
-			resultMap.put(link, ls);
+			if (this.geometries.isEmpty()) {
+				LineString ls = this.link2LineString(link);
+				resultMap.put(link, ls);
+			} else {
+
+				LineString ls = this.geometries.get(link);
+				resultMap.put(link, ls);
+			}
 		}
 
 		return getClosestCandidate(resultMap, toMatch);
@@ -124,7 +148,7 @@ public class NetworkIndex<T> {
 
 	private void applyFilter(Map<Link, Geometry> result, T toMatch) {
 
-		for (var it = result.entrySet().iterator(); it.hasNext(); ) {
+		for (var it = result.entrySet().iterator(); it.hasNext();) {
 
 			Map.Entry<Link, Geometry> next = it.next();
 			Link link = next.getKey();
