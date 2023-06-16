@@ -119,7 +119,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 */
 	protected final void writeDoctype(String rootTag, String dtdUrl) throws UncheckedIOException {
 		try {
-			this.writer.write("<!DOCTYPE " + rootTag + " SYSTEM \"" + dtdUrl + "\">\n");
+			this.writer.write("<!DOCTYPE " + rootTag + " SYSTEM \"" + dtdUrl + "\">"+NL);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -142,6 +142,15 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * Convenience method to create XML Attributes written by startTag()
 	 */
 	protected static Tuple<String, String> createTuple(String one, double two) {
+		if (Double.isNaN(two)) {
+			return MatsimXmlWriter.createTuple(one, "NaN");
+		}
+		if (two == Double.POSITIVE_INFINITY) {
+			return MatsimXmlWriter.createTuple(one, "INF");
+		}
+		if (two == Double.NEGATIVE_INFINITY) {
+			return MatsimXmlWriter.createTuple(one, "-INF");
+		}
 		return MatsimXmlWriter.createTuple(one, Double.toString(two));
 	}
 
@@ -172,10 +181,14 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @throws UncheckedIOException
 	 */
 	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes) throws UncheckedIOException{
-		this.writeStartTag(tagname, attributes, false);
+		this.writeStartTag(tagname, attributes, false, false);
 	}
 
-	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement) throws UncheckedIOException {
+	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement) throws UncheckedIOException{
+		this.writeStartTag(tagname, attributes, closeElement, false);
+	}
+
+	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement, boolean emptyLineAfter) throws UncheckedIOException {
 		try {
 		if (doPrettyPrint) {
 			this.writer.write(NL);
@@ -196,6 +209,9 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 			}
 			else {
 				this.writer.write(">");
+			}
+			if (emptyLineAfter) {
+				this.writer.write(NL);
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

@@ -20,15 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +31,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.DefaultFlowEfficiencyCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
@@ -123,7 +114,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	/* public? */ static final class Builder {
 		private final NetsimEngineContext context;
 		private final NetsimInternalInterface netsimEngine;
-		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+		private LinkSpeedCalculator linkSpeedCalculator;
 		private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
 		private FlowEfficiencyCalculator flowEfficiencyCalculator = new DefaultFlowEfficiencyCalculator();
 
@@ -141,6 +132,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		}
 
 		AbstractQLink build(Link link, QNodeI toNodeQ, List<ModelLane> lanes ) {
+			Objects.requireNonNull( linkSpeedCalculator );
 			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator, flowEfficiencyCalculator, vehicleHandler ) ;
 		}
 

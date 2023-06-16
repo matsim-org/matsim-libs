@@ -69,7 +69,7 @@ public final class ShpOptions {
 	 * Return whether a shape was set.
 	 */
 	public boolean isDefined() {
-		return shp != null && !shp.toString().isBlank();
+		return shp != null && !shp.toString().isBlank() && !shp.toString().equals("none");
 	}
 
 	/**
@@ -170,12 +170,12 @@ public final class ShpOptions {
 	 */
 	public Index createIndex(String queryCRS, String attr, Set<String> filter) {
 
-		if (shp == null)
+		if (!isDefined())
 			throw new IllegalStateException("Shape file path not specified");
 		if (!Files.exists(shp))
 			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 		if (queryCRS == null)
-			throw new IllegalArgumentException("Input crs must not be null!");
+			throw new IllegalArgumentException("Query crs must not be null!");
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(queryCRS, detectCRS());
 

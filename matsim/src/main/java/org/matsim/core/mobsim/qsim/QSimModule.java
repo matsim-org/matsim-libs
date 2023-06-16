@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -72,60 +72,41 @@ import com.google.inject.name.Names;
  * </pre>
  * To be used when the intention is to <i>not</i> override.
  */
-public class QSimModule extends AbstractModule {
-	@Inject Config config ;
-	
+public final class QSimModule extends AbstractModule {
 	private final boolean addDefaultQSimModules;
-	
+
 	public QSimModule() {
 		this(true);
 	}
-	
+
 	public QSimModule(boolean addDefaultQSimModules) {
 		this.addDefaultQSimModules = addDefaultQSimModules;
 	}
-	
+
 	@Override
 	public void install() {
 		install(new QSimComponentsModule());
 		// this is essentially a structured collection of strings that determines which QSimModules will later be used.  Can be
 		// used to configure from config, but maybe easiest just ignore when getting started with this.  The default QSimModules
 		// bind the corresponding implementations under the correct names.
-		
-		if (addDefaultQSimModules) {		
+
+		if (addDefaultQSimModules) {
 			getDefaultQSimModules().forEach(this::installQSimModule);
 			// this binds all the default modules, i.e. sets up the default QSim
 		}
-		
+
 		bind(
 				Key.get(new TypeLiteral<List<AbstractQSimModule>>() {}, Names.named("overrides"))
 		).toInstance(Collections.emptyList());
 		// this initializes (I think) the container with the overriding bindings with an empty container.  Recall that "Key" and
 		// "TypeLiteral" are only there to circumvent Java type erasure, so what we really have is
 		//     List<AbstractQSimModule> annotated with "overrides"
-		
-		bind(
-				new TypeLiteral<Collection<AbstractQSimModule>>() {}
-		).to(new TypeLiteral<Set<AbstractQSimModule>>() {});
-		// I don't know why this is here.  kai, nov'18
+
+		bind( new TypeLiteral<Collection<AbstractQSimModule>>() {} ).to(new TypeLiteral<Set<AbstractQSimModule>>() {});
+		// I think that the result of this that you can use @Inject Collection<AbstractQSimModule> in addition to @Inject
+		// Set<AbstractQSimModule>.  Don't know why this is needed.  kai, jun'23
 
 		bind(Mobsim.class).toProvider(QSimProvider.class);
-		
-		// yyyy the following will eventually be moved to QSim scope, and into QNetsimEngineModule:
-//		if ( config.qsim().isUseLanes() ) {
-//			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
-//		} else {
-//			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
-//		}
-		
-		// yyyy the following will eventually be moved to QSim scope, and into TranistEngineModule:
-//		if ( config.transit().isUseTransit() && config.transit().isUsingTransitInMobsim() ) {
-//			bind( TransitStopHandlerFactory.class ).to( ComplexTransitStopHandlerFactory.class ) ;
-//		} else {
-//			// Explicit bindings are required, so although it may not be used, we need provide something.
-//			bind( TransitStopHandlerFactory.class ).to( SimpleTransitStopHandlerFactory.class );
-//		}
-		// yy see MATSIM-756
 	}
 
 	static public Collection<AbstractQSimModule> getDefaultQSimModules() {

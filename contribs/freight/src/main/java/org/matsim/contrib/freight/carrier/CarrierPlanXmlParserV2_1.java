@@ -51,6 +51,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	private static final String SHIPMENT = "shipment";
 	private static final String SERVICES = "services";
 	private static final String SERVICE = "service";
+	private static final String PLAN = "plan";
 	private static final String ID = "id";
 	private static final String FROM = "from";
 	private static final String TO = "to";
@@ -71,6 +72,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	private CarrierVehicle currentVehicle = null;
 	private CarrierService currentService = null;
 	private CarrierShipment currentShipment = null;
+	private CarrierPlan currentPlan = null;
 	private Tour.Builder currentTourBuilder = null;
 	private Id<Link> previousActLoc = null;
 	private String previousRouteContent;
@@ -123,7 +125,6 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				currentCarrier = CarrierUtils.createCarrier(Id.create(id, Carrier.class));
 				break;
 			}
-
 			//services
 			case SERVICES:
 				serviceMap = new HashMap<>();
@@ -207,13 +208,11 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 			case "vehicleType", "engineInformation", "costInformation":
 				throw new RuntimeException(VEHICLE_TYPES_MSG);
 
-
 				//vehicle
 			case VEHICLES:
 				vehicles = new HashMap<>();
 				break;
 			case VEHICLE:
-
 				String vId = atts.getValue(ID);
 				if (vId == null) throw new IllegalStateException("vehicleId is missing.");
 
@@ -239,13 +238,17 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				break;
 
 			//plans
+			case "plans":
+				// do nothing
+				break ;
 			case "plan":
 				String score = atts.getValue("score");
-				if (score != null) currentScore = parseTimeToDouble(score);
+				if (score != null) currentScore = parseDouble(score);
 				String selected = atts.getValue("selected");
 				if (selected == null) this.selected = false;
 				else this.selected = selected.equals("true");
 				scheduledTours = new ArrayList<>();
+				currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
 				break;
 			case "tour":
 				String tourId = atts.getValue("tourId");
@@ -315,6 +318,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 					case CARRIER -> currAttributes = currentCarrier.getAttributes();
 					case SERVICE -> currAttributes = currentService.getAttributes();
 					case SHIPMENT -> currAttributes = currentShipment.getAttributes();
+					case PLAN -> currAttributes = currentPlan.getAttributes();
 					default ->
 							throw new RuntimeException("could not derive context for attributes. context=" + context.peek());
 				}
@@ -345,13 +349,14 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 				currentCarrier = null;
 			}
+			case "plans" -> {} //do nothing
 			case "plan" -> {
-				CarrierPlan currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
 				currentPlan.setScore(currentScore);
 				currentCarrier.getPlans().add(currentPlan);
 				if (this.selected) {
 					currentCarrier.setSelectedPlan(currentPlan);
 				}
+				currentPlan = null;
 			}
 			case "tour" -> {
 				ScheduledTour sTour = ScheduledTour.newInstance(currentTourBuilder.build(), currentVehicle, currentStartTime);

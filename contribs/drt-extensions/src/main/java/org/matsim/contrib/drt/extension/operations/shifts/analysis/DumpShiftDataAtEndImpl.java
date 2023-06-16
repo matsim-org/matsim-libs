@@ -10,7 +10,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * Dumps DRT shift related data at end. Based on {@link org.matsim.core.controler.corelisteners.DumpDataAtEndImpl}

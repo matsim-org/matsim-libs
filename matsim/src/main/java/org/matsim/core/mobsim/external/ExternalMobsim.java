@@ -23,7 +23,7 @@ package org.matsim.core.mobsim.external;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -129,7 +129,7 @@ public class ExternalMobsim implements Mobsim {
 	protected void writePlans(final String iterationPlansFile) {
 		log.info("writing plans for external mobsim");
 		log.warn("I don't know if this works; was changed after the streaming api changed, and never tested after that.  Pls let us know. kai, jul'16" ) ;
-		
+
 		Population pop2 = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
 		PopulationFactory pf = pop2.getFactory() ;
 		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
@@ -139,7 +139,7 @@ public class ExternalMobsim implements Mobsim {
 			person2.addPlan(plan2) ;
 			pop2.addPerson(person2);
 		}
-		
+
 		PopulationWriter writer = new PopulationWriter( pop2 ) ;
 		writer.writeV4( iterationPlansFile );
 
@@ -156,8 +156,8 @@ public class ExternalMobsim implements Mobsim {
 //			if (plan != null) {
 //				/* we have to re-implement a custom writer here, because we only want to
 //				 * write a single plan (the selected one) and not all plans of the person.
-//				 * 
-//				 * yy could as well copy only the selected plans to a new population.  That would be closer to our 
+//				 *
+//				 * yy could as well copy only the selected plans to a new population.  That would be closer to our
 //				 * programming style over the recent years (sacrifice performance for cleaner code at non-critical locations).
 //				 * kai, jul'16
 //				 */
