@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.extension.companions;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.util.WeightedRandomSelection;
 import org.matsim.core.gbl.MatsimRandom;
@@ -33,6 +34,10 @@ import org.matsim.core.gbl.MatsimRandom;
 public class DrtCompanionUtils {
 	public final static String ADDITIONAL_GROUP_SIZE_ATTRIBUTE = "additionalGroupSize";
 	public final static String ADDITIONAL_GROUP_PART_ATTRIBUTE = "additionalGroupPart";
+
+    public static boolean isDrtCompanion(Id<Person> personId) {
+        return personId.toString().startsWith(DrtCompanionRideGenerator.DRT_COMPANION_AGENT_PREFIX);
+    }
 
 	public static WeightedRandomSelection<Integer> createIntegerSampler(final List<Double> distribution) {
 		WeightedRandomSelection<Integer> wrs = new WeightedRandomSelection<>(MatsimRandom.getLocalInstance());
