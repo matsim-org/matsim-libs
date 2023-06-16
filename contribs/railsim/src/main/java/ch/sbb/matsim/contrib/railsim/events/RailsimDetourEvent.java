@@ -4,10 +4,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -21,13 +23,16 @@ public class RailsimDetourEvent extends Event implements HasVehicleId {
 	private final Id<Link> entry;
 	private final Id<Link> exit;
 	private final List<Id<Link>> detour;
+	private final Id<TransitStopFacility> newStop;
 
-	public RailsimDetourEvent(double time, Id<Vehicle> vehicleId, Id<Link> entry, Id<Link> exit, List<Id<Link>> detour) {
+	public RailsimDetourEvent(double time, Id<Vehicle> vehicleId, Id<Link> entry, Id<Link> exit, List<Id<Link>> detour,
+							  Id<TransitStopFacility> newStop) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.entry = entry;
 		this.exit = exit;
 		this.detour = detour;
+		this.newStop = newStop;
 	}
 
 	@Override
@@ -49,6 +54,7 @@ public class RailsimDetourEvent extends Event implements HasVehicleId {
 		attributes.put("entry", entry.toString());
 		attributes.put("exit", exit.toString());
 		attributes.put("detour", detour.stream().map(Object::toString).collect(Collectors.joining(",")));
+		attributes.put("newStop", Objects.toString(newStop));
 
 		return attributes;
 	}

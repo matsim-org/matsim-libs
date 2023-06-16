@@ -141,12 +141,16 @@ public class RailsimIntegrationTest {
 		}
 	}
 
+	private List<RailsimTrainStateEvent> filterTrainEvents(EventsCollector collector, String train) {
+		return collector.getEvents().stream().filter(event -> event instanceof RailsimTrainStateEvent).map(event -> (RailsimTrainStateEvent) event).filter(event -> event.getVehicleId().toString().equals(train)).toList();
+	}
+
 	@Test
 	public void test0_varyingCapacities() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "0_varyingCapacities"));
 
 		// print events of train1 for debugging
-		List<RailsimTrainStateEvent> train1events = collector.getEvents().stream().filter(event -> event instanceof RailsimTrainStateEvent).map(event -> (RailsimTrainStateEvent) event).filter(event -> event.getVehicleId().toString().equals("train1")).toList();
+		List<RailsimTrainStateEvent> train1events = filterTrainEvents(collector, "train1");
 		train1events.forEach(System.out::println);
 
 		// calculation of expected time for train1: acceleration = 0.5, length = 100
@@ -242,7 +246,7 @@ public class RailsimIntegrationTest {
 		double cruiseTime10 = timeForDistance(cruiseDistance10, stationSpeed);
 
 		currentTime += cruiseTime10;
-		assertTrainState(currentTime, stationSpeed, 0, -acceleration,  cruiseDistance10, train1events);
+		assertTrainState(currentTime, stationSpeed, 0, -acceleration, cruiseDistance10, train1events);
 
 		// final train arrival
 		currentTime += decTime11;
@@ -339,6 +343,17 @@ public class RailsimIntegrationTest {
 	@Test
 	public void test_station_rerouting() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "station_rerouting"));
+
+		collector.getEvents().forEach(System.out::println);
+
+		// Checks end times
+		assertTrainState(30854, 0, 0, 0, 400, filterTrainEvents(collector, "train1"));
+		// 1min later
+		assertTrainState(30914, 0, 0, 0, 400, filterTrainEvents(collector, "train2"));
+
+		// These arrive closer together, because both waited
+		assertTrainState(30974, 0, 0, 0, 400, filterTrainEvents(collector, "train3"));
+		assertTrainState(30982, 0, 0, 0, 400, filterTrainEvents(collector, "train4"));
 	}
 
 }

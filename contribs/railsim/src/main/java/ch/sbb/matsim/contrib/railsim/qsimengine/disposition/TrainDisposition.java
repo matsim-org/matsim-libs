@@ -21,7 +21,7 @@ public interface TrainDisposition {
 	/**
 	 * Called by the driver when an entry link is within stop distance.
 	 *
-	 * @param segment the link segment the driver tried to block
+	 * @param segment the original link segment between entry and exit
 	 * @return the route change, or null if nothing should be changed
 	 */
 	@Nullable

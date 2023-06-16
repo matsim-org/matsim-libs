@@ -219,6 +219,15 @@ public class RailsimCalc {
 	}
 
 	/**
+	 * Whether re-routing should be tried.
+	 *
+	 * @param upcoming the upcoming links the train tried to block.
+	 */
+	public static boolean considerReRouting(List<RailLink> upcoming, RailLink currentLink) {
+		return currentLink.isEntryLink() || upcoming.stream().anyMatch(RailLink::isEntryLink);
+	}
+
+	/**
 	 * Maximum speed of the next upcoming links.
 	 */
 	private static double calcPossibleMaxSpeed(TrainState state) {
