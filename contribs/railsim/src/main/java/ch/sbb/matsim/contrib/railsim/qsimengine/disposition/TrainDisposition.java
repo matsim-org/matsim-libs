@@ -21,10 +21,12 @@ public interface TrainDisposition {
 	/**
 	 * Called by the driver when an entry link is within stop distance.
 	 *
+	 * @param segment the link segment the driver tried to block
 	 * @return the route change, or null if nothing should be changed
 	 */
 	@Nullable
-	default List<RailLink> requestRoute(double time, RailsimTransitDriverAgent driver, RailLink entry, RailLink exit) {
+	default List<RailLink> requestRoute(double time, RailsimTransitDriverAgent driver, List<RailLink> segment,
+										RailLink entry, RailLink exit) {
 		return null;
 	}
 

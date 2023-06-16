@@ -31,3 +31,7 @@ compatibility with existing analysis and visualization tools.
 
 This event is emitted every time there is a position update for a train. 
 This event contains detailed information about the trains position on a single link.
+
+### railsimDetourEvent
+
+This event is emitted when a train is re-routed and contains parts of the routes that have changed.

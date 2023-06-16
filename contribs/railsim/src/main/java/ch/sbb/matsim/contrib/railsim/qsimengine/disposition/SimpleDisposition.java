@@ -32,8 +32,15 @@ public class SimpleDisposition implements TrainDisposition {
 
 	@Nullable
 	@Override
-	public List<RailLink> requestRoute(double time, RailsimTransitDriverAgent driver, RailLink entry, RailLink exit) {
-		return router.calcRoute(entry, exit);
+	public List<RailLink> requestRoute(double time, RailsimTransitDriverAgent driver, List<RailLink> segment, RailLink entry, RailLink exit) {
+
+		// Only re-routes if the link segment is occupied
+		for (RailLink link : segment) {
+			if (!resources.isBlockedBy(link, driver) && !resources.hasCapacity(link.getLinkId()))
+				return router.calcRoute(entry, exit);
+		}
+
+		return null;
 	}
 
 	@Override

@@ -1,10 +1,9 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
-import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -173,12 +172,13 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 
-		RailLink nextLink = state.route.get(state.routeIdx);
+		// train might be at the end of route already
+		RailLink nextLink = state.isRouteAtEnd() ? null : state.route.get(state.routeIdx);
 
 		boolean allBlocked = blockLinkTracks(time, state);
 
 		// Driver can advance if the next link is already free
-		if (allBlocked || nextLink.isBlockedBy(state.driver)) {
+		if (allBlocked || (nextLink != null && nextLink.isBlockedBy(state.driver))) {
 
 			if (allBlocked)
 				event.checkReservation = -1;
@@ -291,13 +291,26 @@ final class RailsimEngine implements Steppable {
 			// there might be no exit link if this is the end of the route
 			// network could be wrong as well, but hard to verify
 			if (exit != null) {
-				List<RailLink> detour = disposition.requestRoute(time, state.pt, entry.get(), exit);
+				List<RailLink> detour = disposition.requestRoute(time, state.pt, links, entry.get(), exit);
 
 				// check if this route is different
-				if (detour != null && !state.route.subList(start + 1, end).equals(detour)) {
-					// TODO: apply the detour
-					// TODO: throw event
+				List<RailLink> subRoute = state.route.subList(start + 1, end);
 
+				if (detour != null && !subRoute.equals(detour)) {
+
+					if (state.pt.addDetour(state.routeIdx, start, end, detour)) {
+						subRoute.clear();
+						subRoute.addAll(detour);
+
+						createEvent(new RailsimDetourEvent(
+							time, state.driver.getVehicle().getId(),
+							entry.get().getLinkId(), exit.getLinkId(),
+							detour.stream().map(RailLink::getLinkId).toList()
+						));
+
+						// Block links again using the updated route
+						links = RailsimCalc.calcLinksToBlock(state, resources.getLink(state.headLink));
+					}
 				}
 			}
 		}
@@ -476,7 +489,9 @@ final class RailsimEngine implements Steppable {
 
 		state.timestamp = time;
 
-		createEvent(state.asEvent(time));
+		// Only emit events on certain occasions
+		if (event.type == UpdateEvent.Type.ENTER_LINK || event.type == UpdateEvent.Type.LEAVE_LINK || event.type == UpdateEvent.Type.POSITION || event.type == UpdateEvent.Type.SPEED_CHANGE)
+			createEvent(state.asEvent(time));
 	}
 
 	/**
