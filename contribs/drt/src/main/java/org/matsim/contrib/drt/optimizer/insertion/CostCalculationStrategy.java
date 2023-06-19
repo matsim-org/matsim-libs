@@ -58,7 +58,7 @@ public interface CostCalculationStrategy {
 
 		@Override
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
-				DetourTimeInfo detourTimeInfo) {
+				       DetourTimeInfo detourTimeInfo) {
 
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
 			// (additional time vehicle will operate if insertion is accepted)
@@ -70,8 +70,36 @@ public interface CostCalculationStrategy {
 			// (if drt vehicle drops off too late) (submission time + alpha * directTravelTime + beta)
 
 			return MAX_WAIT_TIME_VIOLATION_PENALTY * waitTimeViolation
-					+ MAX_TRAVEL_TIME_VIOLATION_PENALTY * travelTimeViolation
-					+ totalTimeLoss;
+					       + MAX_TRAVEL_TIME_VIOLATION_PENALTY * travelTimeViolation
+					       + totalTimeLoss;
+		}
+	}
+	class SeparateWaitFromInVeh implements CostCalculationStrategy {
+		//XXX try to keep penalties reasonably high to prevent people waiting or travelling for hours
+		//XXX however, at the same time prefer max-wait-time to max-travel-time violations
+		static final double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
+		static final double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
+
+		@Override
+		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
+				       DetourTimeInfo detourTimeInfo) {
+
+			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
+			// (additional time vehicle will operate if insertion is accepted)
+
+//			double latestArrivalTime = detourTimeInfo.pickupDetourInfo.departureTime  + alphaBetaTravelTime;
+
+			double latestArrivalTime = detourTimeInfo.pickupDetourInfo.departureTime + request.getLatestArrivalTime()  - request.getEarliestStartTime();
+
+			if (detourTimeInfo.pickupDetourInfo.departureTime > request.getLatestStartTime()
+					    || detourTimeInfo.dropoffDetourInfo.arrivalTime > latestArrivalTime ) {
+				//no extra time is lost => do not check if the current slack time is long enough (can be even negative)
+				return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
+			}
+
+			return totalTimeLoss;
+
+
 		}
 	}
 }
