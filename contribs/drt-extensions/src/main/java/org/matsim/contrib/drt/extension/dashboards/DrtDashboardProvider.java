@@ -12,7 +12,6 @@ public class DrtDashboardProvider implements DashboardProvider  {
 	public List<Dashboard> getDashboards(Config config, SimWrapper simWrapper) {
 
 		// TODO:
-
-		return List.of();
+		return List.of(new DrtSupplyDashboard());
 	}
 }

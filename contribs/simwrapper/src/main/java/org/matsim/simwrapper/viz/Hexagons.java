@@ -25,6 +25,8 @@ public final class Hexagons extends Viz {
 
 	public double[] center = new double[2];
 
+	public Double zoom;
+
 	/**
 	 * List of all shown aggregations
 	 */
