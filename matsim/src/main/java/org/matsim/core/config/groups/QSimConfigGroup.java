@@ -138,7 +138,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	// ---
 	public enum LinkDynamics {FIFO, PassingQ, SeepageQ}
 
-	private LinkDynamics linkDynamics = LinkDynamics.FIFO;
+	private LinkDynamics linkDynamics = LinkDynamics.PassingQ;
 	private Collection<String> mainModes = Collections.singletonList(TransportMode.car);
 
 	// ---
