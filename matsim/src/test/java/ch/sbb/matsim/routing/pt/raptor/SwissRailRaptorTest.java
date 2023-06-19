@@ -862,7 +862,7 @@ public class SwissRailRaptorTest {
         config.transitRouter().setDirectWalkFactor(1.0);
 
         double beelineDistanceFactor = config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-        PlansCalcRouteConfigGroup.ModeRoutingParams walkParameters = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.walk);
+        PlansCalcRouteConfigGroup.TeleportedModeParams walkParameters = new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk);
         walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
         config.plansCalcRoute().addParameterSet(walkParameters);
 
@@ -1225,7 +1225,7 @@ public class SwissRailRaptorTest {
             this.config.transitRouter().setMaxBeelineWalkConnectionDistance(100.0);
 
             double beelineDistanceFactor = this.config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-            PlansCalcRouteConfigGroup.ModeRoutingParams walkParameters = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.walk);
+            PlansCalcRouteConfigGroup.TeleportedModeParams walkParameters = new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk);
             walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
             this.config.plansCalcRoute().addParameterSet(walkParameters);
 

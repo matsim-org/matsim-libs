@@ -38,9 +38,9 @@ import org.matsim.vehicles.Vehicle;
 
 class FreespeedFactorRouting implements Provider<RoutingModule> {
 
-	private final PlansCalcRouteConfigGroup.ModeRoutingParams params;
+	private final PlansCalcRouteConfigGroup.TeleportedModeParams params;
 
-	public FreespeedFactorRouting(PlansCalcRouteConfigGroup.ModeRoutingParams params) {
+	public FreespeedFactorRouting( PlansCalcRouteConfigGroup.TeleportedModeParams params ) {
 		this.params = params;
 	}
 

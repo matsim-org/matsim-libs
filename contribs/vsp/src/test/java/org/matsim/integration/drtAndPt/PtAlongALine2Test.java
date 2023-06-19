@@ -1,7 +1,6 @@
 package org.matsim.integration.drtAndPt;
 
 import static java.util.stream.Collectors.toList;
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -119,16 +118,16 @@ public class PtAlongALine2Test {
 		if (drtMode == DrtMode.teleportBeeline) {// (configure teleportation router)
 			config.plansCalcRoute()
 					.addModeRoutingParams(
-							new ModeRoutingParams().setMode(TransportMode.drt).setTeleportedModeSpeed(100. / 3.6));
+							new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode(TransportMode.drt ).setTeleportedModeSpeed(100. / 3.6 ) );
 			if (drt2) {
 				config.plansCalcRoute()
 						.addModeRoutingParams(
-								new ModeRoutingParams().setMode("drt2").setTeleportedModeSpeed(100. / 3.6));
+								new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode("drt2" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
 			if (drt3) {
 				config.plansCalcRoute()
 						.addModeRoutingParams(
-								new ModeRoutingParams().setMode("drt3").setTeleportedModeSpeed(100. / 3.6));
+								new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode("drt3" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if (drtMode == DrtMode.teleportBasedOnNetworkRoute) {// (route as network route)
@@ -144,11 +143,11 @@ public class PtAlongALine2Test {
 		}
 
 		config.plansCalcRoute()
-				.addModeRoutingParams(new ModeRoutingParams().setMode("walk").setTeleportedModeSpeed(5. / 3.6));
+				.addModeRoutingParams(new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode("walk" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// set up walk2 so we don't need walk in raptor:
 		config.plansCalcRoute()
-				.addModeRoutingParams(new ModeRoutingParams().setMode("walk2").setTeleportedModeSpeed(5. / 3.6));
+				.addModeRoutingParams(new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode("walk2" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// === RAPTOR: ===
 		{
@@ -598,10 +597,10 @@ public class PtAlongALine2Test {
 		config.plansCalcRoute().setNetworkModes(new HashSet<>(Arrays.asList(TransportMode.drt, "drt2")));
 
 		// set up walk2 so we don't use faulty walk in raptor:
-		config.plansCalcRoute().addModeRoutingParams(new ModeRoutingParams("walk2").setTeleportedModeSpeed(5. / 3.6));
+		config.plansCalcRoute().addModeRoutingParams(new PlansCalcRouteConfigGroup.TeleportedModeParams("walk2").setTeleportedModeSpeed(5. / 3.6 ) );
 
 		config.plansCalcRoute()
-				.addModeRoutingParams(new ModeRoutingParams(TransportMode.walk).setTeleportedModeSpeed(0.));
+				.addModeRoutingParams(new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(0. ) );
 		// (when specifying "walk2", all default routing params are cleared.  However, swiss rail raptor needs "walk" to function. kai, feb'20)
 
 		// === RAPTOR: ===

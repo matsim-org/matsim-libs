@@ -20,7 +20,6 @@
 package org.matsim.core.config;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -28,7 +27,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -132,8 +130,8 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 						comparisonPSet = ((ScoringParameterSet) comparisonModule).getOrCreateModeParams(((ModeParams) pSet).getMode());
 					} else if ( pSet instanceof ActivityParams ) {
 						comparisonPSet = ((ScoringParameterSet) comparisonModule).getOrCreateActivityParams(((ActivityParams) pSet).getActivityType());
-					} else if ( pSet instanceof ModeRoutingParams ) {
-						comparisonPSet = ((PlansCalcRouteConfigGroup) comparisonModule).getOrCreateModeRoutingParams(((ModeRoutingParams) pSet).getMode()) ;
+					} else if ( pSet instanceof PlansCalcRouteConfigGroup.TeleportedModeParams ) {
+						comparisonPSet = ((PlansCalcRouteConfigGroup) comparisonModule).getOrCreateModeRoutingParams(((PlansCalcRouteConfigGroup.TeleportedModeParams) pSet).getMode() ) ;
 					} else {
 						try {
 							comparisonPSet = pSet.getClass().newInstance();
@@ -230,9 +228,9 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		if ( ! ( pSet.getName().equals( cg.getName() ) ) ) {
 			return false;
 		}
-		if ( pSet instanceof ModeRoutingParams ) {
+		if ( pSet instanceof PlansCalcRouteConfigGroup.TeleportedModeParams ) {
 			// (these are the "teleportedRouteParameters" in config.xml)
-			if ( ((ModeRoutingParams)pSet).getMode().equals( ((ModeRoutingParams)cg).getMode() ) ) {
+			if ( ((PlansCalcRouteConfigGroup.TeleportedModeParams)pSet).getMode().equals( ((PlansCalcRouteConfigGroup.TeleportedModeParams)cg).getMode() ) ) {
 				return true ;
 			}
 		}
