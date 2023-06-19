@@ -117,6 +117,15 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		this.isUsingOpportunityCostOfTimeForLocationChoice = isUsingOpportunityCostOfTimeForLocationChoice;
 	}
 	// ---
+	public enum CheckingOfMarginalUtilityOfTravellng { allZero, none };
+	private CheckingOfMarginalUtilityOfTravellng checkingOfMarginalUtilityOfTravellng = CheckingOfMarginalUtilityOfTravellng.allZero;
+	public CheckingOfMarginalUtilityOfTravellng getCheckingOfMarginalUtilityOfTravellng(){
+		return checkingOfMarginalUtilityOfTravellng;
+	}
+	public void setCheckingOfMarginalUtilityOfTravellng( CheckingOfMarginalUtilityOfTravellng checkingOfMarginalUtilityOfTravellng ){
+		this.checkingOfMarginalUtilityOfTravellng = checkingOfMarginalUtilityOfTravellng;
+	}
+	// ---
 
 
 
@@ -167,5 +176,5 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	protected void checkConsistency(Config config) {
 	}
-	
+
 }

@@ -33,6 +33,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationSco
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.CheckingOfMarginalUtilityOfTravellng;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.pt.PtConstants;
@@ -89,6 +90,10 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		problem = checkLocationChoiceConfigGroup( config, problem );
 
+		// === mode choice:
+
+		problem = checkModeChoiceConfigGroup( config, lvl, problem );
+
 		// === planCalcScore:
 
 		problem = checkPlanCalcScoreConfigGroup( config, lvl, problem );
@@ -104,6 +109,10 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		// === qsim:
 
 		problem = checkQsimConfigGroup( config, lvl, problem );
+
+		// === subtour mode choice:
+
+		problem = checkSubtourModeChoiceConfigGroup( config, lvl, problem );
 
 		// === strategy:
 
@@ -141,6 +150,20 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			throw new RuntimeException( str ) ;
 		}
 		
+	}
+	private boolean checkSubtourModeChoiceConfigGroup( Config config, Level lvl, boolean problem ){
+		if ( config.subtourModeChoice().considerCarAvailability() ) {
+//			problem = true;
+			log.log( lvl, "you are considering car abailability; vsp config is not doing that.   Instead, we are using a daily monetary constant for car.");
+		}
+		return problem;
+	}
+	private boolean checkModeChoiceConfigGroup( Config config, Level lvl, boolean problem ){
+		if ( !config.changeMode().getIgnoreCarAvailability() ) {
+//			problem = true;
+			log.log( lvl, "you are considering car abailability; vsp config is not doing that.   Instead, we are using a daily monetary constant for car.");
+		}
+		return problem;
 	}
 	private static boolean checkGlobalConfigGroup( Config config, Level lvl, boolean problem ){
 		if ( config.global().isInsistingOnDeprecatedConfigVersion() ) {
@@ -398,9 +421,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		// added may'23
 		for ( ModeParams params : config.planCalcScore().getModes().values() ){
-			if ( params.getMarginalUtilityOfTraveling() != 0. ) {
-				log.log( lvl, "You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
-							      + ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions.");
+			if ( config.vspExperimental().getCheckingOfMarginalUtilityOfTravellng()== CheckingOfMarginalUtilityOfTravellng.allZero ){
+				if( params.getMarginalUtilityOfTraveling() != 0. ){
+					log.log( lvl, "You are setting the marginal utility of traveling with mode " + params.getMode() + " to " + params.getMarginalUtilityOfTraveling()
+								      + ". VSP standard is to set this to zero.  Please document carefully why you are using a value different from zero, e.g. by showing distance distributions." );
+				}
 			}
 			if ( params.getMode().equals( TransportMode.walk ) && params.getConstant() != 0. ) {
 				problem = true;
