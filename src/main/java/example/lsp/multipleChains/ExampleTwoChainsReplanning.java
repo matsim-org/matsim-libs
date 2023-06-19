@@ -85,7 +85,8 @@ public class ExampleTwoChainsReplanning {
 //					strategyManager.addStrategy(new RoundRobinDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1);
 //					strategyManager.addStrategy(new RandomDistributionOfShipmentsStrategyFactory().createStrategy(), null, 1);
 //					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 1);
-					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
+//					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
+					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(1);
 					return strategyManager;
 				});
@@ -121,7 +122,7 @@ public class ExampleTwoChainsReplanning {
 			ConfigUtils.applyCommandline(config,args);
 		} else {
 			config.controler().setOutputDirectory("output/2chainsReplanning");
-			config.controler().setLastIteration(2);
+			config.controler().setLastIteration(10);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
