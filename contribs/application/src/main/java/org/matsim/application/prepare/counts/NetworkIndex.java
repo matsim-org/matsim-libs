@@ -46,15 +46,8 @@ public class NetworkIndex<T> {
 
 		for (Map.Entry<Link, LineString> entry : linkGeometries.entrySet()) {
 
-			try{
-				Envelope env = entry.getValue().getEnvelopeInternal();
-
-				this.index.insert(env, entry.getKey());
-			} catch (NullPointerException e){
-				String id = entry.getKey().getId().toString();
-				System.out.println("Error processing link " + id);
-			}
-
+			Envelope env = entry.getValue().getEnvelopeInternal();
+			this.index.insert(env, entry.getKey());
 		}
 
 		this.index.build();
