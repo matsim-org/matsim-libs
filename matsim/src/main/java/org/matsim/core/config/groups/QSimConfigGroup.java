@@ -87,7 +87,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
-	private boolean usePersonIdForMissingVehicleId = true;
+	private boolean usePersonIdForMissingVehicleId = false;
 	@Positive
 	private int numberOfThreads = 1;
 	//	private static final String CREATING_VEHICLES_FOR_ALL_NETWORK_MODES = "creatingVehiclesForAllNetworkModes";
