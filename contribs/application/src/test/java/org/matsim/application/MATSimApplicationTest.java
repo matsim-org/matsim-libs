@@ -1,6 +1,7 @@
 package org.matsim.application;
 
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.options.SampleOptions;
@@ -126,6 +127,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
+	@Ignore("Class is deprecated")
 	public void freight() {
 
 		Path input = Path.of("..", "..", "..", "..",
@@ -179,7 +181,7 @@ public class MATSimApplicationTest {
 	@MATSimApplication.Prepare({
 			TrajectoryToPlans.class, GenerateShortDistanceTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
 	})
-	private static final class TestScenario extends MATSimApplication {
+	public static final class TestScenario extends MATSimApplication {
 
 		@CommandLine.Mixin
 		private SampleOptions sample = new SampleOptions(1, 10, 25);

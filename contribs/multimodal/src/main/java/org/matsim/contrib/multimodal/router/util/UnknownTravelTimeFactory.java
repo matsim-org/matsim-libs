@@ -23,23 +23,23 @@ package org.matsim.contrib.multimodal.router.util;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 public class UnknownTravelTimeFactory implements Provider<TravelTime> {
 
 	private final String mode;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	
+
 	public UnknownTravelTimeFactory(String mode, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
 
 		this.mode = mode;
 		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
-		
+
 		Double speed = plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(mode);
 		Double speedFactor = plansCalcRouteConfigGroup.getTeleportedModeFreespeedFactors().get(mode);
-		
+
 		if (speed != null && speedFactor != null) {
-			throw new RuntimeException("Speed as well as speed factor was found for mode " + mode + 
+			throw new RuntimeException("Speed as well as speed factor was found for mode " + mode +
 					"!  Don't know which should be used. Aborting.");
 		} else if (speed == null && speedFactor == null) {
 			throw new RuntimeException("Neither speed nor speed factor was found for mode " + mode + "! Aborting.");
@@ -50,5 +50,5 @@ public class UnknownTravelTimeFactory implements Provider<TravelTime> {
 	public TravelTime get() {
 		return new UnknownTravelTime(this.mode, this.plansCalcRouteConfigGroup);
 	}
-	
+
 }

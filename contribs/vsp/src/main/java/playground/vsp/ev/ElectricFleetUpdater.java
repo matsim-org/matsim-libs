@@ -53,10 +53,9 @@ class ElectricFleetUpdater implements IterationStartsListener {
 	}
 
 	private void registerEVs(Plan plan) {
-		var evs = TripStructureUtils.getLegs(plan)
-				.stream()
+		var modalVehicles = TripStructureUtils.getLegs(plan).stream()
 				.map(leg -> vehicles.getVehicles().get(VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode())))
 				.toList();
-		ElectricVehicleSpecificationImpl.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification, evs);
+		ElectricVehicleSpecificationImpl.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification, modalVehicles);
 	}
 }

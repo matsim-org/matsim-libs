@@ -23,7 +23,7 @@ package org.matsim.contrib.cadyts.car;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,13 +50,13 @@ public final class PlansTranslatorBasedOnEvents implements PlansTranslator<Link>
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	// could be/remain public as long as constructor is package-private. kai, feb'20
 	// used from outside, e.g. vsp-playgrounds
-	
+
 	private static final Logger log = LogManager.getLogger(PlansTranslatorBasedOnEvents.class);
 
 	private final Scenario scenario;
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
-	
+
 	private int iteration = -1;
 
 	// this is _only_ there for output:
@@ -99,7 +99,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
 				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
 		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
-		
+
 		delegate.reset(iteration);
 	}
 
@@ -108,45 +108,45 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		if (event.getNetworkMode().equals(TransportMode.car))
 			delegate.handleEvent(event);
 	}
-	
+
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		delegate.handleEvent(event);
 	}
-	
+
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		
+
 		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-		
+
 		// if it is not a car, ignore the event
-		if (driverId == null) 
+		if (driverId == null)
 			return;
-		
+
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
-		if (!calibratedLinks.contains(event.getLinkId())) 
+		if (!calibratedLinks.contains(event.getLinkId()))
 			return;
-		
+
 		// get the "Person" behind the id:
 		Person person = this.scenario.getPopulation().getPersons().get(driverId);
-		
+
 		// return if the driver is not in the standard population:
 		if ( person==null ) {
 			return ;
 		}
 		// (I think that this will be ok: they will be counted, as they will be in reality.  But we cannot influence them in the normal way because they are not part of normal replanning.  Cadyts
 		// should still work, since it operates on all the others. kai, based on https://matsim.atlassian.net/browse/MATSIM-648, nov'18
-		
+
 		// get the selected plan:
 		Plan selectedPlan = person.getSelectedPlan();
-		
+
 		// get the planStepFactory for the plan (or create one):
 		PlanBuilder<Link> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
-		
+
 		if (tmpPlanStepFactory != null) {
-						
+
 			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-					
+
 			// add the "turn" to the planStepfactory
 			tmpPlanStepFactory.addTurn(link, (int) event.getTime());
 		}

@@ -13,12 +13,12 @@
 				<xs:element name="LSPs">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="lsp">
+							<xs:element name="lsp" maxOccurs="unbounded">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="resources" type="ResourceType" minOccurs="0" />
 										<xs:element name="shipments" type="ShipmentType" minOccurs="0" />
-										<xs:element name="LSPPlans" type="LSPPlanType" minOccurs="0" />
+										<xs:element name="LspPlans" type="LSPPlanType" minOccurs="0" />
 									</xs:sequence>
 									<xs:attribute name="id" type="xs:string"/>
 								</xs:complexType>
@@ -40,7 +40,7 @@
 			<xs:element name="hub">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="scheduler" minOccurs="1">
+						<xs:element name="scheduler">
 							<xs:complexType>
 								<xs:attribute name="capacityNeedFixed" type="xs:string"/>
 								<xs:attribute name="capacityNeedLinear" type="xs:string"/>
@@ -78,13 +78,13 @@
 
 	<xs:complexType name="LSPPlanType">
 		<xs:sequence>
-			<xs:element name="plan" maxOccurs="unbounded">
+			<xs:element name="LspPlan" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="logisticChains" minOccurs="0">
 							<xs:complexType>
 								<xs:sequence>
-									<xs:element name="logisticChain" minOccurs="0">
+									<xs:element name="logisticChain" minOccurs="0" maxOccurs="unbounded">
 										<xs:complexType>
 											<xs:sequence>
 												<xs:element name="logisticChainElement" minOccurs="0" maxOccurs="unbounded">
@@ -118,6 +118,7 @@
 												</xs:element>
 											</xs:sequence>
 											<xs:attribute name="shipmentId" type="xs:string"/>
+											<xs:attribute name="chainId" type="xs:string"/>
 										</xs:complexType>
 									</xs:element>
 								</xs:sequence>

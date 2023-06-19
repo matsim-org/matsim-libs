@@ -80,8 +80,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final RoutingModule accessToNetworkRouter;
 	private final RoutingModule egressFromNetworkRouter;
 	private final Config config;
-	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
-	public static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
+
 	private static boolean hasWarnedAccessEgress = false;
 	private PlansCalcRouteConfigGroup.AccessEgressType accessEgressType;
 	private final TimeInterpretation timeInterpretation;
@@ -132,7 +131,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	public synchronized List<? extends PlanElement> calcRoute(RoutingRequest request) {
 		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
 		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
-		
+
 		final Facility fromFacility = request.getFromFacility();
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
@@ -225,7 +224,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			egressLeg.setTravelTime(egressTime);
 			egressLeg.getRoute().setTravelTime(egressTime);
 			egressTrip.add(egressLeg);
-		} else {
+		} else if ( accessEgressType==AccessEgressType.accessEgressModeToLink || accessEgressType==AccessEgressType.accessEgressModeToLinkPlusTimeConstant ) {
 			Facility fromFacility = FacilitiesUtils.wrapLinkAndCoord(egressActLink,startCoord);
 			List<? extends PlanElement> networkRoutedEgressTrip = egressFromNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person, routingAttributes));
 			if(networkRoutedEgressTrip == null) return null;
@@ -237,6 +236,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				leg0.getRoute().setTravelTime(travelTime);
 			}
 			egressTrip.addAll(networkRoutedEgressTrip);
+		} else {
+			throw new RuntimeException( "should not happen" );
 		}
 		return egressTrip;
 	}
@@ -272,8 +273,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				startLinkId = accessActLink.getId();
 			}
 
-			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, departureTime, startLinkId, accessActLink.getId(), populationFactory,
-					config);
+			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, departureTime, startLinkId, accessActLink.getId(), populationFactory, config);
 			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 
 			accessTrip.add(accessLeg);
@@ -292,7 +292,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			accessLeg.getRoute().setTravelTime(accessTime);
 			accessTrip.add(accessLeg);
 //			now += accessTime;
-		} else {
+		} else if ( accessEgressType==AccessEgressType.accessEgressModeToLink || accessEgressType==AccessEgressType.accessEgressModeToLinkPlusTimeConstant ) {
 			Facility toFacility = FacilitiesUtils.wrapLinkAndCoord(accessActLink,endCoord);
 			List<? extends PlanElement> networkRoutedAccessTrip = accessToNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person, routingAttributes));
 			if (networkRoutedAccessTrip == null) return null; //no access trip could be computed for accessMode
@@ -304,6 +304,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				leg0.getRoute().setTravelTime(travelTime);
 			}
 			accessTrip.addAll(networkRoutedAccessTrip);
+		} else {
+			throw new RuntimeException( "should not happen" );
 		}
 
 		final Activity interactionActivity = createInteractionActivity(endCoord, accessActLink.getId(), stageActivityType);
@@ -332,7 +334,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			log.fatal( "(2) " + TransportMode.walk + " is routed on the network.  Then you need to define the corresponding teleportation (= mode routing) params for "
 						  + TransportMode.non_network_walk + ".");
 			log.fatal("The old default fallback bevhavior was disabled in may'21.");
-			throw new RuntimeException( "Need teleportation params for bushwhaking modes.  See log statements above." );
+			throw new RuntimeException( "Need teleportation params for bushwhacking modes.  See log statements above." );
 
 //			params = new ModeRoutingParams();
 //			// old defaults
@@ -341,6 +343,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			// yyyyyy The above may be a source for buggy behavior: If the teleportation params are cleared, then presumably also the
 			// non-network routing is cleared, and then here it will fall back on the auto-magic behavior.  kai, may'21.
+
+			// Not sure if this can happen:
+			// (1) If walk is a non-network mode, then using the params from that is what we want.
+			// (2) If walk is a network mode, then the walk params cannot be defined as teleportation mode params at the same time.
+			// But presumably there are other cases.  kai, jun'22
 		}
 
 		routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);

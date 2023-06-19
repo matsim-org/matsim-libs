@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,8 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.charField = 'z';
 		dumpedModule.byteField = 78;
 		dumpedModule.booleanField = true;
+		dumpedModule.enumListField = List.of(MyEnum.VALUE1, MyEnum.VALUE2);
+		dumpedModule.enumSetField = Set.of(MyEnum.VALUE2);
 		dumpedModule.setField = ImmutableSet.of("a", "b", "c");
 		dumpedModule.listField = List.of("1", "2", "3");
 		assertEqualAfterDumpAndRead(dumpedModule);
@@ -76,6 +79,8 @@ public class ReflectiveConfigGroupTest {
 		MyModule dumpedModule = new MyModule();
 		dumpedModule.listField = List.of();
 		dumpedModule.setField = ImmutableSet.of();
+		dumpedModule.enumListField = List.of();
+		dumpedModule.enumSetField = ImmutableSet.of();
 		assertEqualAfterDumpAndRead(dumpedModule);
 	}
 
@@ -141,15 +146,18 @@ public class ReflectiveConfigGroupTest {
 
 	@Test
 	public void testComments() {
-		var expectedComments = Map.of("floatField", "float",//
-				"longField", "long",//
-				"intField", "int",//
-				"shortField", "short",//
-				"charField", "char",//
-				"byteField", "byte",//
-				"booleanField", "boolean",//
-				"enumField", "Possible values: VALUE1,VALUE2",//
-				"setField", "set");
+		var expectedComments = new HashMap<>();
+		expectedComments.put("floatField", "float");
+		expectedComments.put("longField", "long");
+		expectedComments.put("intField", "int");
+		expectedComments.put("shortField", "short");
+		expectedComments.put("charField", "char");
+		expectedComments.put("byteField", "byte");
+		expectedComments.put("booleanField", "boolean");
+		expectedComments.put("enumField", "Possible values: VALUE1,VALUE2");
+		expectedComments.put("enumListField", "list of enum");
+		expectedComments.put("enumSetField", "set of enum");
+		expectedComments.put("setField", "set");
 
 		assertThat(new MyModule().getComments()).isEqualTo(expectedComments);
 	}
@@ -434,6 +442,14 @@ public class ReflectiveConfigGroupTest {
 		@Comment("set")
 		@Parameter
 		private Set<String> setField;
+
+		@Comment("list of enum")
+		@Parameter
+		private List<MyEnum> enumListField;
+
+		@Comment("set of enum")
+		@Parameter
+		private Set<MyEnum> enumSetField;
 
 		// Object fields:
 		// Id: string representation is toString

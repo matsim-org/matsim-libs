@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,7 +52,7 @@ import org.matsim.vis.snapshotwriters.TeleportationVisData;
  */
 public final class DefaultTeleportationEngine implements TeleportationEngine {
 	private static final Logger log = LogManager.getLogger( DefaultTeleportationEngine.class ) ;
-	
+
 	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<>(
 			30, new Comparator<Tuple<Double, MobsimAgent>>() {
 
@@ -101,10 +101,10 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 			Facility arfac = agent.getDestinationFacility() ;
 			travelTime = DefaultTeleportationEngine.travelTimeCheck(travelTime, speed, dpfac, arfac);
 		}
-    	
+
 		double arrivalTime = now + travelTime ;
 		this.teleportationList.add(new Tuple<>(arrivalTime, agent));
-		
+
 		// === below here is only visualization, no dynamics ===
 		Id<Person> agentId = agent.getId();
 		Link currLink = this.scenario .getNetwork().getLinks().get(linkId);
@@ -113,7 +113,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		Coord toCoord = destLink.getToNode().getCoord();
 		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
 		this.teleportationData.put(agentId, agentInfo);
-		
+
 		return true;
 	}
 
@@ -174,32 +174,32 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		if ( speed==null ) {
 			// if we don't have a bushwhacking speed, the only thing we can do is trust the router
 			return travelTime ;
-		} 
-		
+		}
+
 		if ( dpfac == null || arfac == null ) {
 			log.warn( "dpfac = " + dpfac ) ;
 			log.warn( "arfac = " + arfac ) ;
 			throw new RuntimeException("have bushwhacking mode but nothing that leads to coordinates; don't know what to do ...") ;
 			// (means that the agent is not correctly implemented)
 		}
-		
+
 		if ( dpfac.getCoord()==null || arfac.getCoord()==null ) {
 			// yy this is for example the case if activities are initialized at links, without coordinates.  Could use the link coordinate
 			// instead, but somehow this does not feel any better. kai, feb'16
-			
+
 			return travelTime ;
 		}
-			
+
 		final Coord dpCoord = dpfac.getCoord();
 		final Coord arCoord = arfac.getCoord();
-				
+
 		double dist = NetworkUtils.getEuclideanDistance( dpCoord, arCoord ) ;
 		double travelTimeTmp = dist / speed ;
-		
+
 		if ( travelTimeTmp < travelTime ) {
 			return travelTime ;
 		}
-			
+
 		return travelTimeTmp ;
 	}
 }

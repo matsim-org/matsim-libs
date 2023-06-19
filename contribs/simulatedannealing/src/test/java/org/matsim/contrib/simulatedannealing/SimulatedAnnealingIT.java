@@ -19,12 +19,12 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
 import org.matsim.contrib.simulatedannealing.cost.CostCalculator;
-import org.matsim.contrib.simulatedannealing.perturbation.ChainedPeturbatorFactory;
+import org.matsim.contrib.simulatedannealing.perturbation.ChainedPerturbatorFactory;
 import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 /**
  * @author nkuehnel / MOIA
@@ -74,7 +74,7 @@ public class SimulatedAnnealingIT {
 				addEventHandlerBinding().toInstance(costCalculator);
 
 				bind(new TypeLiteral<PerturbatorFactory<VolumeEstimator>>(){}).toInstance(
-						new ChainedPeturbatorFactory.Builder<VolumeEstimator>()
+						new ChainedPerturbatorFactory.Builder<VolumeEstimator>()
 								.add((iteration, temperature) -> current -> {
 									return new VolumeEstimator((int) (current.estimation * MatsimRandom.getRandom().nextDouble(2.)));
 								}, 1)

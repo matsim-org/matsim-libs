@@ -21,7 +21,9 @@
 package org.matsim.contrib.taxi.analysis;
 
 import java.awt.Color;
+import java.awt.Paint;
 import java.util.Comparator;
+import java.util.Map;
 
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -34,10 +36,11 @@ import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
-import org.matsim.contrib.taxi.util.stats.TaxiVehicleOccupancyProfiles;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
-import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
+import org.matsim.contrib.common.timeprofile.ProfileWriter;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileView;
+import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileView;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.MatsimServices;
@@ -53,6 +56,17 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 
 	private final ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(TaxiEmptyDriveTask.TYPE,
 			TaxiPickupTask.TYPE, TaxiOccupiedDriveTask.TYPE, TaxiDropoffTask.TYPE);
+
+	private static final Comparator<Task.TaskType> nonPassengerTaskTypeComparator = Comparator.comparing(type -> {
+		//we want the following order on the plot: STAY, other
+		if (type.equals(TaxiStayTask.TYPE)) {
+			return "B";
+		} else {
+			return "A" + type.name();
+		}
+	});
+
+	private static final Map<Task.TaskType, Paint> taskTypePaints = ImmutableMap.of(TaxiStayTask.TYPE, Color.LIGHT_GRAY);
 
 	private final TaxiConfigGroup taxiCfg;
 
@@ -83,23 +97,23 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 							getter.getModal(FleetSpecification.class), 300, getter.get(QSimConfigGroup.class),
 							passengerServingTaskTypes))).asEagerSingleton();
 			addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
-			addControlerListenerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
-			addControlerListenerBinding().toProvider(modalProvider(
-					getter -> TaxiVehicleOccupancyProfiles.createProfileWriter(getter.get(MatsimServices.class),
-							getMode(), getter.getModal(VehicleOccupancyProfileCalculator.class))));
+			addControlerListenerBinding().toProvider(modalProvider(getter -> {
+				MatsimServices matsimServices = getter.get(MatsimServices.class);
+				String mode = getMode();
+				return new ProfileWriter(matsimServices, mode,
+						new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class), nonPassengerTaskTypeComparator,
+								taskTypePaints), "occupancy_time_profiles");
+			}));
 
 			bindModal(VehicleTaskProfileCalculator.class).toProvider(modalProvider(
 					getter -> new VehicleTaskProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
 							300, getter.get(QSimConfigGroup.class)))).asEagerSingleton();
 			addEventHandlerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
-			addControlerListenerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 
-			addControlerListenerBinding().toProvider(modalProvider(
-					getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class), getMode(),
-							getter.getModal(VehicleTaskProfileCalculator.class),
-							Comparator.comparing(Task.TaskType::name),
-							ImmutableMap.of(TaxiStayTask.TYPE, Color.LIGHT_GRAY))));
+			addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), getMode(),
+					new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), Comparator.comparing(Task.TaskType::name),
+							taskTypePaints), "task_time_profiles")));
 		}
 	}
 }

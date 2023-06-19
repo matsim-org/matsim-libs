@@ -399,8 +399,10 @@ public class TrafficVolumeGenerationTest {
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()));
+				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
+                        buildingsPerZone);
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
 
@@ -462,8 +464,10 @@ public class TrafficVolumeGenerationTest {
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()));
+				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
+                        buildingsPerZone);
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
 
@@ -533,7 +537,8 @@ public class TrafficVolumeGenerationTest {
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
 		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()));
+				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
+                        buildingsPerZone);
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
 
@@ -691,7 +696,8 @@ public class TrafficVolumeGenerationTest {
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
 		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()));
+				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
+                        buildingsPerZone);
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
 

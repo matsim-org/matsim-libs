@@ -29,7 +29,7 @@ import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Set;
 
 class NewControler extends AbstractController implements ControlerI {
@@ -50,7 +50,7 @@ class NewControler extends AbstractController implements ControlerI {
 	private final Set<ControlerListener> controlerListenersDeclaredByModules;
 	private final ControlerConfigGroup controlerConfigGroup;
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
-	
+
 	@Inject
 	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices,
 			 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
@@ -113,7 +113,7 @@ class NewControler extends AbstractController implements ControlerI {
 	protected final void prepareForSim() {
 		this.prepareForSim.run();
 	}
-	
+
 	@Override
 	protected final void prepareForMobsim() {
 		this.prepareForMobsim.run() ;

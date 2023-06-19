@@ -40,12 +40,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated Use {@link AirPollutionAnalysis}
+ */
 @CommandLine.Command(
 		name = "air-pollution-spatial-aggregation",
 		description = "Aggregate emissions on a spatial grid",
 		mixinStandardHelpOptions = true,
 		showDefaultValues = true
 )
+@Deprecated
 public class AirPollutionSpatialAggregation implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(AirPollutionSpatialAggregation.class);

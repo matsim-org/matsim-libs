@@ -36,7 +36,7 @@ public class JDEQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addNamedComponent(JDEQSimEngine.class, COMPONENT_NAME);
+		addQSimComponentBinding( COMPONENT_NAME ).to( JDEQSimEngine.class );
 	}
 
 	@Provides

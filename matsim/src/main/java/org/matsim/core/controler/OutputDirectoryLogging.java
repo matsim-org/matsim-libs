@@ -35,7 +35,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 
 /**
- * 
+ *
  * Put MATSim logs into the output directory.
  * This is static, like Loggers.
  * Call initLogging with either an OutputDirectoryHierarchy or simply with a pathname.
@@ -43,7 +43,7 @@ import org.matsim.core.utils.io.CollectLogMessagesAppender;
  * Call catchLogEntries() before either of the initLogging methods to memorize log entries between that call and the init
  * call and put them into the log file. Useful if creating the log directory only happens after some set-up which
  * allready produces log messages.
- * 
+ *
  * @author dgrether, michaz
  *
  */
@@ -158,6 +158,7 @@ public final class OutputDirectoryLogging {
 		}
 		Gbl.printSystemInfo();
 		Gbl.printBuildInfo();
+		Gbl.printRunCommand();
 	}
 
 	/**
