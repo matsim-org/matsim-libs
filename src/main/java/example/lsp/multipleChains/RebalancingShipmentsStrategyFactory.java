@@ -13,7 +13,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 class RebalancingShipmentsStrategyFactory {
@@ -33,7 +33,7 @@ class RebalancingShipmentsStrategyFactory {
 			@Override
 			public void handlePlan(LSPPlan lspPlan) {
 				LSP lsp = lspPlan.getLSP();
-				Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
+				Map<LogisticChain, Integer> shipmentCountByChain = new HashMap<>();
 				LogisticChain minChain = null;
 				LogisticChain maxChain = null;
 
