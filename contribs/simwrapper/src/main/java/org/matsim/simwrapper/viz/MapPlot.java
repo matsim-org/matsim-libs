@@ -91,8 +91,8 @@ public final class MapPlot extends Viz {
 		/**
 		 * Sets the full color ramps settings.
 		 */
-		public DisplaySettings setColorRamp(String ramp, int steps, boolean reversed) {
-			colorRamp = Map.of("ramp", ramp, "reversed", reversed, "steps", steps);
+		public DisplaySettings setColorRamp(String ramp, int steps, boolean reverse) {
+			colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
 			return this;
 		}
 	}
