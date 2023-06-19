@@ -51,7 +51,8 @@ public class NetworkIndex<T> {
 
 				this.index.insert(env, entry.getKey());
 			} catch (NullPointerException e){
-				System.out.println("Error processing link " + entry.getKey().getId().toString());
+				String id = entry.getKey().getId().toString();
+				System.out.println("Error processing link " + id);
 			}
 
 		}
