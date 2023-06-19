@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Phaser;
 import java.util.function.Consumer;
 
-class PbfParser implements OsmHandler {
+public class PbfParser implements OsmHandler {
 
     private final Consumer<OsmNode> nodeHandler;
     private final Consumer<OsmWay> waysHandler;
@@ -27,8 +27,6 @@ class PbfParser implements OsmHandler {
 
     private final Phaser phaser = new Phaser();
     private final ExecutorService executor;
-
-    //TODO maybe have a builder, to avoid passing null for handlers which are not needed.
     private PbfParser(Consumer<OsmNode> nodeHandler, Consumer<OsmWay> waysHandler, Consumer<OsmRelation> relationHandler, ExecutorService executor) {
         this.nodeHandler = nodeHandler;
         this.waysHandler = waysHandler;
