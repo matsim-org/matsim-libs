@@ -25,8 +25,9 @@ public class DrtDashboardProvider implements DashboardProvider {
 			for (DrtConfigGroup drtConfig : multiModeDrtConfigGroup.getModalElements()) {
 
 				URL transitStopFile = drtConfig.transitStopFile != null ? ConfigGroup.getInputFileURL(config.getContext(), drtConfig.transitStopFile) : null;
+				URL serviceAreaShapeFile = drtConfig.drtServiceAreaShapeFile != null ? ConfigGroup.getInputFileURL(config.getContext(), drtConfig.drtServiceAreaShapeFile) : null;
 
-				result.add(new DrtDashboard(drtConfig.mode, transitStopFile));
+				result.add(new DrtDashboard(drtConfig.mode, transitStopFile, serviceAreaShapeFile));
 				result.add(new DrtDetailedDashboard(drtConfig.mode, transitStopFile));
 			}
 		}
