@@ -92,7 +92,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	 */
 	@Nullable
 	@Inject
-	private Set<Provider<PersonPrepareForSimAlgorithm>> prepareForSimAlgorithms;
+	private Set<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
 
 	/**
 	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils,
@@ -183,8 +183,12 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		// Can be null if instantiated via constructor, which should only happen in tests
 		if (prepareForSimAlgorithms != null) {
-			for (Provider<PersonPrepareForSimAlgorithm> algo : prepareForSimAlgorithms) {
-				ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(), algo::get);
+			// This does not nake use of multi-threading because it can not be assumed that these instances are thread-safe
+			// thread-safety could be ensured with Providers, but they can not be used automatically in conjunction with set binders.
+			for (PersonPrepareForSimAlgorithm algo : prepareForSimAlgorithms) {
+				for (Person person : population.getPersons().values()) {
+					algo.run(person);
+				}
 			}
 		}
 
