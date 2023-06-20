@@ -1,20 +1,12 @@
 package org.matsim.contrib.drt.extension.dashboards;
-
-import org.matsim.application.analysis.LogFileAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Hexagons;
-import org.matsim.simwrapper.viz.Line;
-import org.matsim.simwrapper.viz.Plotly;
 import org.matsim.simwrapper.viz.Table;
-import tech.tablesaw.plotly.components.Axis;
-import tech.tablesaw.plotly.traces.BarTrace;
-
-import java.util.List;
 
 /**
- * @Autor:xinxin
+ * The Supply of KEXI vehicles
  */
 public class DrtSupplyDashboard implements Dashboard {
 	@Override
@@ -44,11 +36,6 @@ public class DrtSupplyDashboard implements Dashboard {
 					viz.file = "../../input/kelheim-v2.0-drt-stops-locations.csv";
 
 					 //viz.addAggregation("Locations","Stops","X","Y",)
-
-
-
-
-
 
 
 				});
