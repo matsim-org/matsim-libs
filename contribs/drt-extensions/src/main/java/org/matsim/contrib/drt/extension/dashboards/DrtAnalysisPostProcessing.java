@@ -1,5 +1,9 @@
 package org.matsim.contrib.drt.extension.dashboards;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FileDataStoreFactorySpi;
@@ -15,9 +19,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
@@ -28,20 +30,22 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import picocli.CommandLine;
 import tech.tablesaw.api.ColumnType;
+import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(
@@ -82,9 +86,9 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 
 		writeStopsShp(stops, output.getPath("stops.shp"));
 
-		Path legPath = ApplicationUtils.matchInput("drt_legs_" + drtMode + ".csv", input.getRunDirectory());
+		Map<String, TransitStopFacility> byLink = stops.stream().collect(Collectors.toMap(s -> s.getLinkId().toString(), Function.identity()));
 
-		Map<Id<Link>, List<TransitStopFacility>> byLink = stops.stream().collect(Collectors.groupingBy(Facility::getLinkId, Collectors.toList()));
+		Path legPath = ApplicationUtils.matchInput("drt_legs_" + drtMode + ".csv", input.getRunDirectory());
 
 		Table legs = Table.read().csv(CsvReadOptions.builder(legPath.toFile()).separator(';')
 			.columnTypesPartial(Map.of(
@@ -92,7 +96,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 				"toLinkId", ColumnType.TEXT, "fromLinkId", ColumnType.TEXT
 			)).build());
 
-		writeTripsPerStop(byLink, legs, output.getPath("trips_per_stop.csv"));
+		writeTripsPerStop(stops, legs, output.getPath("trips_per_stop.csv"));
 		writeOD(byLink, legs, output.getPath("od.csv"));
 
 		return 0;
@@ -139,11 +143,45 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		}
 	}
 
-	private void writeTripsPerStop(Map<Id<Link>, List<TransitStopFacility>> stops, Table legs, Path path) {
+	private void writeTripsPerStop(List<TransitStopFacility> stops, Table legs, Path path) throws IOException {
 
+		Object2IntMap<String> departures = new Object2IntOpenHashMap<>();
+		Object2IntMap<String> arrivals = new Object2IntOpenHashMap<>();
+
+		for (Row leg : legs) {
+			departures.mergeInt(leg.getString("fromLinkId"), 1, Integer::sum);
+			arrivals.mergeInt(leg.getString("toLinkId"), 1, Integer::sum);
+		}
+
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
+
+			csv.printRecord("stop_id", "departures", "arrivals");
+
+			for (TransitStopFacility stop : stops) {
+				csv.printRecord(stop.getId(), departures.getInt(stop.getLinkId().toString()), arrivals.getInt(stop.getLinkId().toString()));
+			}
+		}
 	}
 
-	private void writeOD(Map<Id<Link>, List<TransitStopFacility>> stops, Table legs, Path path) {
+	private void writeOD(Map<String, TransitStopFacility> stops, Table legs, Path path) throws IOException {
+
+		Object2IntMap<OD> trips = new Object2IntOpenHashMap<>();
+
+		for (Row leg : legs) {
+			trips.mergeInt(new OD(leg.getString("fromLinkId"), leg.getString("toLinkId")), 1, Integer::sum);
+		}
+
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
+
+			csv.printRecord("from_stop", "to_stop", "trips");
+
+			for (Object2IntMap.Entry<OD> e : trips.object2IntEntrySet()) {
+				OD od = e.getKey();
+
+				if (e.getIntValue() > 0)
+					csv.printRecord(stops.get(od.origin).getLinkId(), stops.get(od.destination).getLinkId(), e.getIntValue());
+			}
+		}
 	}
 
 	private List<TransitStopFacility> readTransitStops(URL stopFile) {
@@ -152,6 +190,9 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		new TransitScheduleReader(scenario).readURL(stopFile);
 
 		return new ArrayList<>(scenario.getTransitSchedule().getFacilities().values());
+	}
+
+	private record OD(String origin, String destination) {
 	}
 
 }
