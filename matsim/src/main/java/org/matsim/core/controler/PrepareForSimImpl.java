@@ -92,7 +92,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	 */
 	@Nullable
 	@Inject
-	private Set<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
+	private Set<Provider<PersonPrepareForSimAlgorithm>> prepareForSimAlgorithms;
 
 	/**
 	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils,
@@ -183,8 +183,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		// Can be null if instantiated via constructor, which should only happen in tests
 		if (prepareForSimAlgorithms != null) {
-			for (PersonPrepareForSimAlgorithm algo : prepareForSimAlgorithms) {
-				ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(), algo);
+			for (Provider<PersonPrepareForSimAlgorithm> algo : prepareForSimAlgorithms) {
+				ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(), algo::get);
 			}
 		}
 
