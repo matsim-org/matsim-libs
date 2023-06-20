@@ -25,7 +25,7 @@ public class DrtDetailedDashboard implements Dashboard {
 	 */
 	public String getTitle() {
 		String name = context();
-		return name.isBlank() ? "DRT Details" : name + " - Detailed";
+		return name.isBlank() ? "DRT (Detailed)" : name + " (Detailed)";
 
 	}
 
@@ -36,8 +36,11 @@ public class DrtDetailedDashboard implements Dashboard {
 
 	@Override
 	public void configure(Header header, Layout layout) {
-
 		header.title = getTitle();
+	}
 
+	@Override
+	public double priority() {
+		return -0.5;
 	}
 }

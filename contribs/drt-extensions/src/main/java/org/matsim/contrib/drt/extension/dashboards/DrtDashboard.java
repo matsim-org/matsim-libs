@@ -5,6 +5,7 @@ import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Data;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Table;
 
 import java.net.URL;
@@ -17,11 +18,13 @@ import java.util.List;
 public class DrtDashboard implements Dashboard {
 
 	private final String mode;
+	private final String crs;
 	private final URL transitStopFile;
 	private final URL serviceAreaShapeFile;
 
-	public DrtDashboard(String mode, URL transitStopFile, URL serviceAreaShapeFile) {
+	public DrtDashboard(String mode, String crs, URL transitStopFile, URL serviceAreaShapeFile) {
 		this.mode = mode;
+		this.crs = crs;
 		this.transitStopFile = transitStopFile;
 		this.serviceAreaShapeFile = serviceAreaShapeFile;
 	}
@@ -40,7 +43,8 @@ public class DrtDashboard implements Dashboard {
 	}
 
 	private String postProcess(Data data, String file) {
-		List<String> args = new ArrayList<>(List.of("--drt-mode", mode));
+		List<String> args = new ArrayList<>(List.of("--drt-mode", mode, "--input-crs", crs));
+
 		if (transitStopFile != null) {
 			args.addAll(List.of("--stop-file", transitStopFile.toString()));
 		}
@@ -55,8 +59,13 @@ public class DrtDashboard implements Dashboard {
 
 		layout.row("overview")
 			.el(Table.class, (viz, data) -> {
-				viz.dataset = postProcess(data, "overview.csv");
+				viz.dataset = postProcess(data, "kpi.csv");
 				viz.showAllRows = true;
+			})
+			.el(MapPlot.class, (viz, data) -> {
+
+				viz.setShape(postProcess(data, "stops.shp"), "id");
+
 			});
 
 

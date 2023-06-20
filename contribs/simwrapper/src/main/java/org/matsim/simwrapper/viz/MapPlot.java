@@ -25,7 +25,7 @@ public final class MapPlot extends Viz {
 	/**
 	 * Set the shape url, providing the path.
 	 */
-	public MapPlot setShapes(String file) {
+	public MapPlot setShape(String file) {
 		shapes = file;
 		return this;
 	}
