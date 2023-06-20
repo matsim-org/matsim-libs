@@ -549,6 +549,7 @@ public final class Plotly extends Viz {
 		public static final String Tableau10 = "Tableau10";
 		public static final String RdGy = "RdGy";
 		public static final String RdYlBu = "RdYlBu";
+		public static final String RdBu = "RdBu";
 		public static final String PiYG = "PiYG";
 		public static final String RdYlGn = "RdYlGn";
 		public static final String Spectral = "Spectral";
@@ -560,7 +561,7 @@ public final class Plotly extends Viz {
 		public static final String Rainbow = "Rainbow";
 
 
-		private ColorScheme() {
+        private ColorScheme() {
 		}
 	}
 
