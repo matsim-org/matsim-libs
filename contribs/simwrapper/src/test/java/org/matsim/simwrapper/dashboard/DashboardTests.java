@@ -28,7 +28,7 @@ public class DashboardTests {
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		group.defaultParams().sampleSize = "0.001";
 
-		SimWrapper sw = SimWrapper.create(group);
+		SimWrapper sw = SimWrapper.create(config);
 		for (Dashboard d : dashboards) {
 			sw.addDashboard(d);
 		}
