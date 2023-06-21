@@ -133,6 +133,11 @@ final class RailsimEngine implements Steppable {
 			case LEAVE_LINK -> leaveLink(time, event);
 			case BLOCK_TRACK -> blockTrack(time, event);
 			case WAIT_FOR_RESERVATION -> checkTrackReservation(time, event);
+			case UNBLOCK_LINK -> {
+				unblockTrack(time, event.state,  event.unblockLink);
+				// event will be removed
+				event.type = UpdateEvent.Type.IDLE;
+			}
 			default -> throw new IllegalStateException("Unhandled update type " + event.type);
 		}
 	}
@@ -282,8 +287,7 @@ final class RailsimEngine implements Steppable {
 				if (l.isEntryLink()) {
 					entry = l;
 					start = i;
-				}
-				else if (start > -1 && l.isBlockedBy(state.driver)) {
+				} else if (start > -1 && l.isBlockedBy(state.driver)) {
 					// check if any link beyond entry is already blocked
 					// if that is the case re-route is not possible anymore
 					break;
@@ -428,8 +432,8 @@ final class RailsimEngine implements Steppable {
 		updatePosition(time, event);
 
 		createEvent(new RailsimTrainLeavesLinkEvent(time, state.driver.getVehicle().getId(), state.tailLink));
-		// TODO: link should be released after headway time
-		disposition.unblockRailLink(time, state.driver, resources.getLink(state.tailLink));
+
+		RailLink tailLink = resources.getLink(state.tailLink);
 
 		state.tailLink = nextTailLink.getLinkId();
 		state.tailPosition = 0;
@@ -437,6 +441,19 @@ final class RailsimEngine implements Steppable {
 		decideTargetSpeed(event, state);
 
 		decideNextUpdate(event);
+
+		if (tailLink.minimumHeadwayTime == 0)
+			unblockTrack(time, state, tailLink);
+		else
+			updateQueue.add(new UpdateEvent(state, tailLink, time));
+
+	}
+
+	/**
+	 * Unblocks a link.
+	 */
+	private void unblockTrack(double time, TrainState state, RailLink unblockLink) {
+		disposition.unblockRailLink(time, state.driver, unblockLink);
 	}
 
 	/**

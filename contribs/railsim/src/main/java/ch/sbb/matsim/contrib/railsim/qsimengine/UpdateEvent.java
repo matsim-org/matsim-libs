@@ -21,11 +21,23 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	 */
 	boolean waitingForLink;
 
+	/**
+	 * Stores a link that is should to be released.
+	 */
+	final RailLink unblockLink;
+
 	public UpdateEvent(TrainState state, Type type) {
 		this.state = state;
 		this.plannedTime = state.timestamp;
 		this.type = type;
 		this.waitingForLink = false;
+		this.unblockLink = null;
+	}
+
+	public UpdateEvent(TrainState state, RailLink unblockLink, double time) {
+		this.state = state;
+		this.unblockLink = unblockLink;
+		this.plannedTime = time + unblockLink.minimumHeadwayTime;
 	}
 
 	@Override
@@ -71,7 +83,9 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		RELEASE_TRACK,
 		BLOCK_TRACK,
 		WAIT_FOR_RESERVATION,
-		SPEED_CHANGE
+		SPEED_CHANGE,
+
+		UNBLOCK_LINK
 
 	}
 

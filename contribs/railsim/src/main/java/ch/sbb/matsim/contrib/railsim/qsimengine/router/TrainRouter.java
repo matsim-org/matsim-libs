@@ -16,12 +16,10 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.List;
 
+/**
+ * Calculates unblocked route between two {@link RailLink}.
+ */
 public final class TrainRouter {
-
-	// TODO Placeholder for a routing interface
-
-	// Train stations or other areas are modeled as block with entry and exit links
-	// within these blocks the train can be rerouted depending on track availability
 
 	private final Network network;
 	private final RailResourceManager resources;
