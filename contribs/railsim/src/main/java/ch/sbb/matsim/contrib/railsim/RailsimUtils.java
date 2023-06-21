@@ -35,7 +35,7 @@ public final class RailsimUtils {
 	 */
 	public static int getTrainCapacity(Link link) {
 		Object attr = link.getAttributes().getAttribute(LINK_ATTRIBUTE_CAPACITY);
-		return attr != null ? (int) attr: 1;
+		return attr != null ? (int) attr : 1;
 	}
 
 	/**
@@ -44,6 +44,13 @@ public final class RailsimUtils {
 	public static double getMinimumTrainHeadwayTime(Link link) {
 		Object attr = link.getAttributes().getAttribute(LINK_ATTRIBUTE_MINIMUM_TIME);
 		return attr != null ? (double) attr : 0;
+	}
+
+	/**
+	 * Sets the minimum headway time after a link can be released.
+	 */
+	public static void setMinimumTrainHeadwayTime(Link link, double time) {
+		link.getAttributes().putAttribute(LINK_ATTRIBUTE_MINIMUM_TIME, time);
 	}
 
 	/**

@@ -38,6 +38,7 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		this.state = state;
 		this.unblockLink = unblockLink;
 		this.plannedTime = time + unblockLink.minimumHeadwayTime;
+		this.type = Type.UNBLOCK_LINK;
 	}
 
 	@Override
@@ -84,7 +85,6 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		BLOCK_TRACK,
 		WAIT_FOR_RESERVATION,
 		SPEED_CHANGE,
-
 		UNBLOCK_LINK
 
 	}
