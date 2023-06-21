@@ -59,6 +59,8 @@ import org.matsim.vehicles.VehicleUtils;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -84,6 +86,13 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final PlansConfigGroup plansConfigGroup;
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
 	private final TimeInterpretation timeInterpretation;
+
+	/**
+	 * Can be null if instantiated via constructor, which should only happen in tests.
+	 */
+	@Nullable
+	@Inject
+	private Set<PersonPrepareForSimAlgorithm> prepareForSimAlgorithms;
 
 	/**
 	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils,
@@ -171,6 +180,17 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		createAndAddVehiclesForEveryNetworkMode();
 
 		adaptOutdatedPlansForRoutingMode();
+
+		// Can be null if instantiated via constructor, which should only happen in tests
+		if (prepareForSimAlgorithms != null) {
+			// This does not nake use of multi-threading because it can not be assumed that these instances are thread-safe
+			// thread-safety could be ensured with Providers, but they can not be used automatically in conjunction with set binders.
+			for (PersonPrepareForSimAlgorithm algo : prepareForSimAlgorithms) {
+				for (Person person : population.getPersons().values()) {
+					algo.run(person);
+				}
+			}
+		}
 
 		// make sure all routes are calculated.
 		// the above creation of vehicles per agent has to be run before executing the initial routing here. janek, aug'19

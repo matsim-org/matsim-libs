@@ -1,12 +1,10 @@
-package org.matsim.application.analysis.travelTimeValidation;
+package org.matsim.application.analysis.traffic;
 
 import com.google.common.base.Joiner;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -22,7 +20,6 @@ import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsLayer;
-import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;

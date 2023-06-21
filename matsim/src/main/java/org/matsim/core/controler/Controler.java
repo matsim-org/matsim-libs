@@ -505,7 +505,7 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	}
 
     /**
-     * Only use if you know what you are doing, for experts only.
+     * @deprecated  -- Only use if you know what you are doing, for experts only.
      */
 	@Override
 	public final Controler configureQSimComponents(QSimComponentsConfigurator configurator) {

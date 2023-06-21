@@ -19,6 +19,8 @@
 
 package org.matsim.core.controler;
 
+import com.google.inject.multibindings.Multibinder;
+
 /**
  * Created by amit on 10.07.17.
  */
@@ -28,5 +30,6 @@ public class DefaultPrepareForSimModule extends AbstractModule {
     @Override
     public void install() {
         bind(PrepareForSim.class).to(PrepareForSimImpl.class);
+		Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
     }
 }

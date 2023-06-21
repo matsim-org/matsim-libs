@@ -72,15 +72,21 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	public enum AccessEgressType {
 		@Deprecated none,
-		/**
-		 *
-		 */
-		accessEgressModeToLink,
+
 		/**
 		 * Euclidian distance from facility to nearest point on link; then teleported walk.  In normal cases, all activities that belong to the
 		 * same link are mapped into the same facility; in consequence, in that situation all will have the same walk time.  kai, may'23
 		 */
+		accessEgressModeToLink,
+
+		/**
+		 * The walk time to the link is taken from a link attribute, and in consequence the same for all agents walking to that link.
+		 */
 		walkConstantTimeToLink,
+
+		/**
+		 * The sum of the two above.  I.e. walking the Euklidean distance PLUS a time taken from the link attribute.
+		 */
 		accessEgressModeToLinkPlusTimeConstant
 	}
 

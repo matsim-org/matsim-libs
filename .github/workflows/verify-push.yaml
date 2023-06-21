@@ -63,6 +63,7 @@ jobs:
           - contribs/otfvis
           - contribs/osm
           - contribs/application
+          - contribs/simwrapper
           - contribs/sbb-extensions
           - contribs/simulatedannealing
           - benchmark

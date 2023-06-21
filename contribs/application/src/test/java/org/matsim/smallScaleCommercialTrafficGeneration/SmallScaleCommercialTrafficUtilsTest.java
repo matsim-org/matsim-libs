@@ -30,11 +30,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,9 +61,11 @@ public class SmallScaleCommercialTrafficUtilsTest {
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()));
+				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
+                        buildingsPerZone);
 
 		Assert.assertEquals(3, regionLinksMap.size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(60, regionLinksMap.get("testArea1_area1").size(), MatsimTestUtils.EPSILON);
