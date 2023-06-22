@@ -71,7 +71,8 @@ import java.util.List;
 		LSPPlan copiedPlan = LSPUtils.createLSPPlan();
 		copiedPlan.setAssigner(plan2copy.getAssigner());
 		copiedPlan.setLSP(plan2copy.getLSP());
-		copiedPlan.setScore( plan2copy.getScore() );
+		copiedPlan.setScore(plan2copy.getScore());
+		copiedPlan.setType(plan2copy.getType());
 		copiedPlan.getLogisticChains().addAll(copiedSolutions);
 		return copiedPlan;
 	}
