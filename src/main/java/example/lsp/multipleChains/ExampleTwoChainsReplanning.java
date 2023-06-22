@@ -199,7 +199,7 @@ public class ExampleTwoChainsReplanning {
 					.addLogisticChain(northChain)
 					.setAssigner(shipmentAssigner);
 
-			lspPlan_twoChains.setType(LspPlanTypes.SINGLE_ECHELON_MULTIPLE_CHAIN);
+			lspPlan_twoChains.setType(Utils.LspPlanTypes.ONE_ECHELON_MULTIPLE_CHAIN.toString());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
