@@ -48,4 +48,8 @@ public interface LSPPlan extends BasicPlan, KnowsLSP {
 	Collection<ShipmentPlan> getShipmentPlans();
 	LSPPlan addShipmentPlan(ShipmentPlan shipmentPlan);
 
+	String getType();
+
+	void setType(final String type);
+
 }

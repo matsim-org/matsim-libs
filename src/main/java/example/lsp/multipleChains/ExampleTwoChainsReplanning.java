@@ -88,6 +88,7 @@ public class ExampleTwoChainsReplanning {
 //					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
 					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(1);
+					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
 					return strategyManager;
 				});
 			}
@@ -198,6 +199,8 @@ public class ExampleTwoChainsReplanning {
 					.addLogisticChain(southChain)
 					.addLogisticChain(northChain)
 					.setAssigner(shipmentAssigner);
+
+			lspPlan_twoChains.setType(Utils.LspPlanTypes.ONE_ECHELON_MULTIPLE_CHAINS.toString());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
