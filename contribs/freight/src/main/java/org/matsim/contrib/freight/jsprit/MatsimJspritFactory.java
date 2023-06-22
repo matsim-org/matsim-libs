@@ -716,7 +716,7 @@ public final class MatsimJspritFactory {
 			tours.add(scheduledTour);
 		}
 		CarrierPlan carrierPlan = new CarrierPlan(carrier, tours);
-		carrierPlan.setScore(solution.getCost() * (-1));
+		carrierPlan.setJspritScore(solution.getCost() * (-1));
 		return carrierPlan;
 	}
 

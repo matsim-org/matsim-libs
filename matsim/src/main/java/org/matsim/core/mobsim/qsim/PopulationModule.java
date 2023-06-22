@@ -39,7 +39,7 @@ public class PopulationModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(PopulationAgentSource.class).asEagerSingleton();
-		addNamedComponent(PopulationAgentSource.class, COMPONENT_NAME);
+		addQSimComponentBinding( COMPONENT_NAME ).to( PopulationAgentSource.class );
 	}
 
 	@Provides

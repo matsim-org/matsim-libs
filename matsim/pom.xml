@@ -117,7 +117,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.1.2</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -203,7 +203,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.5-3</version>
+			<version>1.5.5-4</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -214,13 +214,13 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>8.0.0.Final</version>
+			<version>8.0.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>8.0.0.Final</version>
+			<version>8.0.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>

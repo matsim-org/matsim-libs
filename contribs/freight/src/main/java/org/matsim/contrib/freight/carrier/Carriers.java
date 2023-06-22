@@ -22,7 +22,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +41,7 @@ public class Carriers {
 	@SuppressWarnings("unused")
 	private static final  Logger log = LogManager.getLogger(Carriers.class);
 
-	private final Map<Id<Carrier>, Carrier> carriers = new HashMap<>();
+	private final Map<Id<Carrier>, Carrier> carriers = new LinkedHashMap<>();
 
 	public Carriers(Collection<Carrier> carriers) {
 		makeMap(carriers);

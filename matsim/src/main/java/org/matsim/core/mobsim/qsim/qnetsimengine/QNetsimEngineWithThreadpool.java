@@ -48,18 +48,16 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	private final int numOfRunners;
 	private ExecutorService pool;
 
-	public QNetsimEngineWithThreadpool(final QSim sim) {
-		this(sim, null);
-	}
+//	public QNetsimEngineWithThreadpool(final QSim sim) {
+//		this(sim, null);
+//	}
 
-	@Inject
-	public QNetsimEngineWithThreadpool(final QSim sim, QNetworkFactory netsimNetworkFactory) {
+	@Inject QNetsimEngineWithThreadpool(final QSim sim, QNetworkFactory netsimNetworkFactory) {
 		super(sim, netsimNetworkFactory);
 		this.numOfRunners = this.numOfThreads;
 	}
 
-	@Override
-	public void finishMultiThreading() {
+	@Override public void finishMultiThreading() {
 		this.pool.shutdown();
 	}
 

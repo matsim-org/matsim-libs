@@ -13,7 +13,7 @@
 				<xs:element name="LSPs">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="lsp">
+							<xs:element name="lsp" maxOccurs="unbounded">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="resources" type="ResourceType" minOccurs="0" />
@@ -40,7 +40,7 @@
 			<xs:element name="hub">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="scheduler" minOccurs="1">
+						<xs:element name="scheduler">
 							<xs:complexType>
 								<xs:attribute name="capacityNeedFixed" type="xs:string"/>
 								<xs:attribute name="capacityNeedLinear" type="xs:string"/>

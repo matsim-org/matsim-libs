@@ -39,7 +39,7 @@ public class TransitEngineModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(TransitQSimEngine.class).asEagerSingleton();
-		addNamedComponent(TransitQSimEngine.class, TRANSIT_ENGINE_NAME);
+		addQSimComponentBinding( TRANSIT_ENGINE_NAME ).to( TransitQSimEngine.class );
 
 		if ( this.getConfig().transit().isUseTransit() && this.getConfig().transit().isUsingTransitInMobsim() ) {
 			bind( TransitStopHandlerFactory.class ).to( ComplexTransitStopHandlerFactory.class ) ;
