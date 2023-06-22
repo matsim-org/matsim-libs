@@ -21,8 +21,8 @@ public class Utils {
 	public enum LspPlanTypes {
 		ONE_ECHELON_SINGLE_CHAIN("oneEchelonSingleChain"),
 		TWO_ECHELON_SINGLE_CHAIN("twoEchelonSingleChain"),
-		ONE_ECHELON_MULTIPLE_CHAIN("onechelonMultipleChain"),
-		TWO_ECHELON_MULTIPLE_CHAIN("twoEchelonMultipleChain"),
+		ONE_ECHELON_MULTIPLE_CHAINS("oneEchelonMultipleChains"),
+		TWO_ECHELON_MULTIPLE_CHAINS("twoEchelonMultipleChains"),
 		HYBRID_PLAN ("hybridPlan");
 
 		private final String label;
