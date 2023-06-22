@@ -10,8 +10,8 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -29,7 +29,6 @@ import java.util.Set;
 public class RailsimLinkSpeedCalculatorImpl implements TransitDriverStartsEventHandler, RailsimLinkSpeedCalculator {
 	private static final Logger log = LogManager.getLogger(RailsimLinkSpeedCalculatorImpl.class);
 
-	DefaultLinkSpeedCalculator defaultLinkSpeedCalculator = new DefaultLinkSpeedCalculator();
 	Set<Id<Vehicle>> transitVehicles = new HashSet<>();
 
 	@Inject
@@ -37,6 +36,12 @@ public class RailsimLinkSpeedCalculatorImpl implements TransitDriverStartsEventH
 
 	@Inject
 	TrainStatistics statistics;
+
+	/**
+	 * TODO: This was changed during merge and is now untested.
+	 */
+	@Inject
+	DefaultLinkSpeedCalculator defaultLinkSpeedCalculator;
 
 	@Override
 	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
