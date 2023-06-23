@@ -6,6 +6,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -17,14 +18,22 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class RailsimIntegrationTest {
 
@@ -78,6 +87,10 @@ public class RailsimIntegrationTest {
 	}
 
 	private EventsCollector runSimulation(File scenarioDir) {
+		return runSimulation(scenarioDir, null);
+	}
+
+	private EventsCollector runSimulation(File scenarioDir, Consumer<Scenario> f) {
 		Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
 
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -86,6 +99,10 @@ public class RailsimIntegrationTest {
 		config.controler().setLastIteration(0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		if (f != null)
+			f.accept(scenario);
+
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new RailsimModule());
 		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
@@ -288,6 +305,36 @@ public class RailsimIntegrationTest {
 	@Test
 	public void test4_genf_bern() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "4_genf_bern"));
+	}
+
+	@Test
+	public void test4_1_genf_bern() {
+
+		// Remove vehicles except the first one
+		Consumer<Scenario> filter = scenario -> {
+
+			Set<Id<Vehicle>> remove = scenario.getTransitVehicles().getVehicles().values().stream().filter(
+				v -> !v.getId().toString().equals("Bummelzug_GE_BE_train_0")
+			).map(Vehicle::getId).collect(Collectors.toSet());
+
+			for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
+
+				for (TransitRoute route : line.getRoutes().values()) {
+
+					Collection<Departure> values = new ArrayList<>(route.getDepartures().values());
+					for (Departure departure : values) {
+
+						if (remove.contains(departure.getVehicleId()))
+							route.removeDeparture(departure);
+					}
+				}
+			}
+
+			remove.forEach(v -> scenario.getTransitVehicles().removeVehicle(v));
+		};
+
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "4_genf_bern"), filter);
+
 	}
 
 	@Test
