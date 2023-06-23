@@ -87,7 +87,7 @@ public class ExampleTwoChainsReplanning {
 //					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 1);
 //					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
 					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
-					strategyManager.setMaxPlansPerAgent(1);
+					strategyManager.setMaxPlansPerAgent(2);
 					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
 					return strategyManager;
 				});
@@ -153,6 +153,33 @@ public class ExampleTwoChainsReplanning {
 		log.info("create LSP");
 		Network network = scenario.getNetwork();
 
+		// A plan with one logistic chain, containing a single carrier is created
+		LSPPlan lspPlan_singleChain;
+		{
+			Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
+			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+
+			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
+			LSPResource singleCarrierResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
+					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.build();
+
+			LogisticChainElement singleCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("singleCarrierElement", LogisticChainElement.class))
+					.setResource(singleCarrierResource)
+					.build();
+
+			LogisticChain singleChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("singleChain", LogisticChain.class))
+					.addLogisticChainElement(singleCarrierElement)
+					.build();
+
+			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+			lspPlan_singleChain = LSPUtils.createLSPPlan()
+					.addLogisticChain(singleChain)
+					.setAssigner(singleSolutionShipmentAssigner);
+
+			lspPlan_singleChain.setType(Utils.LspPlanTypes.ONE_ECHELON_SINGLE_CHAIN.toString());
+		}
+
 		// A plan with two different logistic chains in the south and north, with respective carriers is created
 		LSPPlan lspPlan_twoChains;
 		{
@@ -205,11 +232,13 @@ public class ExampleTwoChainsReplanning {
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
 		lspPlans.add(lspPlan_twoChains);
+		lspPlans.add(lspPlan_singleChain);
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
 				.setInitialPlan(lspPlan_twoChains)
 				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
+		lsp.addPlan(lspPlan_singleChain);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
