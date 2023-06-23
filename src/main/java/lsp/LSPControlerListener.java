@@ -129,12 +129,12 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 //
 //		LSPRescheduler.notifyReplanning(lsps, event);
 //
-//		//Update carriers in scenario and CarrierAgentTracker
-//		carrierAgentTracker.getCarriers().getCarriers().clear();
-//		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
-//			FreightUtils.getCarriers(scenario).addCarrier(carrier);
-//			carrierAgentTracker.getCarriers().addCarrier(carrier);
-//		}
+		//Update carriers in scenario and CarrierAgentTracker
+		carrierAgentTracker.getCarriers().getCarriers().clear();
+		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
+			FreightUtils.getCarriers(scenario).addCarrier(carrier);
+			carrierAgentTracker.getCarriers().addCarrier(carrier);
+		}
 		for (LSP lsp : lsps.getLSPs().values()) {
 			lsp.scheduleLogisticChains();
 		}
