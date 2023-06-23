@@ -13,11 +13,16 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandRunner;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.simwrapper.viz.Viz;
 import tech.tablesaw.plotly.components.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,6 +40,7 @@ public final class SimWrapper {
 
 	private final Config config = new Config();
 
+	private final org.matsim.core.config.Config matsimConfig;
 	private final SimWrapperConfigGroup configGroup;
 
 	private final List<Dashboard> dashboards = new ArrayList<>();
@@ -42,8 +48,9 @@ public final class SimWrapper {
 	/**
 	 * Use {@link #create(SimWrapperConfigGroup)}.
 	 */
-	private SimWrapper(SimWrapperConfigGroup configGroup) {
-		this.configGroup = configGroup;
+	private SimWrapper(org.matsim.core.config.Config config) {
+		this.matsimConfig = config;
+		this.configGroup = ConfigUtils.addOrGetModule(matsimConfig, SimWrapperConfigGroup.class);
 		this.data = new Data(configGroup);
 	}
 
@@ -51,14 +58,14 @@ public final class SimWrapper {
 	 * Create a new {@link SimWrapper} instance with default config.
 	 */
 	public static SimWrapper create() {
-		return new SimWrapper(new SimWrapperConfigGroup());
+		return new SimWrapper(ConfigUtils.createConfig());
 	}
 
 	/**
 	 * * Create a new {@link SimWrapper} instance with given config.
 	 */
-	public static SimWrapper create(SimWrapperConfigGroup configGroup) {
-		return new SimWrapper(configGroup);
+	public static SimWrapper create(org.matsim.core.config.Config config) {
+		return new SimWrapper(config);
 	}
 
 	/**
@@ -175,7 +182,18 @@ public final class SimWrapper {
 			runner.setSampleSize(ctx.sampleSize);
 
 			if (ctx.shp != null) {
-				runner.setShp(ctx.shp);
+
+				try {
+					URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.shp).toURI();
+
+					if (path.getScheme().equals("file"))
+						runner.setShp(new File(path).getAbsoluteFile().toString());
+					else
+						runner.setShp(path.toString());
+
+				} catch (URISyntaxException e) {
+					log.warn("Could not set shp file", e);
+				}
 			}
 
 			runner.run(dir);

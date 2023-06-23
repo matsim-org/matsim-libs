@@ -215,8 +215,8 @@ public abstract class AbstractModule implements Module {
 		return binder().bind(RoutingModule.class).annotatedWith(Names.named(mode));
 	}
 
-	protected final Multibinder<PersonPrepareForSimAlgorithm> addPersonPrepareForSimAlgorithm() {
-		return Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
+	protected final LinkedBindingBuilder<PersonPrepareForSimAlgorithm> addPersonPrepareForSimAlgorithm() {
+		return Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class).addBinding();
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<EventsManager> bindEventsManager() {
