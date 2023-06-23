@@ -34,7 +34,7 @@ public class PbfParser implements OsmHandler {
         this.executor = executor;
     }
 
-    void parse(Path file) {
+    public void parse(Path file) {
         try (InputStream fileInputStream = new BufferedInputStream(new FileInputStream(file.toFile()))) {
             parse(fileInputStream);
         } catch (IOException e) {
@@ -42,7 +42,7 @@ public class PbfParser implements OsmHandler {
         }
     }
 
-    void parse(InputStream input) throws IOException {
+   public void parse(InputStream input) throws IOException {
 
         DataInputStream data = new DataInputStream(input);
         ParsingResult parsingResult = ParsingResult.Continue;
