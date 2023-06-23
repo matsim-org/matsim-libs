@@ -32,7 +32,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.assertTrue;
 
@@ -46,7 +45,15 @@ public class WorstPlanSelectorTest {
 	private static final Id<Link> DEPOT_SOUTH_LINK_ID = Id.createLinkId("i(1,0)");
 	private static final Id<Link> DEPOT_NORTH_LINK_ID = Id.createLinkId("i(1,8)");
 
-	private static final VehicleType VEH_TYPE_LARGE_50 = CarrierVehicleType.Builder.newInstance(Id.create("large50", VehicleType.class))
+	private static final VehicleType VEH_TYPE_CHEAP = CarrierVehicleType.Builder.newInstance(Id.create("cheap", VehicleType.class))
+			.setCapacity(50)
+			.setMaxVelocity(10)
+			.setFixCost(1)
+			.setCostPerDistanceUnit(0.001)
+			.setCostPerTimeUnit(0.001)
+			.build();
+
+	private static final VehicleType VEH_TYPE_EXPENSIVE = CarrierVehicleType.Builder.newInstance(Id.create("expensive", VehicleType.class))
 			.setCapacity(50)
 			.setMaxVelocity(10)
 			.setFixCost(100)
@@ -75,7 +82,7 @@ public class WorstPlanSelectorTest {
 				final MyEventBasedCarrierScorer carrierScorer = new MyEventBasedCarrierScorer();
 
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
-				bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
+				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
 				bind(CarrierStrategyManager.class).toProvider(() -> {
 					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
@@ -97,10 +104,10 @@ public class WorstPlanSelectorTest {
 		this.lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
 	}
 
-	private static Config prepareConfig() {
+	private Config prepareConfig() {
 		Config config = ConfigUtils.createConfig();
 
-		config.controler().setOutputDirectory("output/2chainsReplanning");
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(10);
 
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
@@ -130,12 +137,12 @@ public class WorstPlanSelectorTest {
 		Network network = scenario.getNetwork();
 
 		// A plan with one logistic chain, containing a single carrier is created
-		LSPPlan lspPlan_singleChain_1;
+		LSPPlan lspPlan_singleChain;
 		{
 			Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
 			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
+			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_EXPENSIVE));
 			LSPResource singleCarrierResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -149,49 +156,22 @@ public class WorstPlanSelectorTest {
 					.build();
 
 			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-			lspPlan_singleChain_1 = LSPUtils.createLSPPlan()
+			lspPlan_singleChain = LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
 					.setAssigner(singleSolutionShipmentAssigner);
 
-			lspPlan_singleChain_1.setType(Utils.LspPlanTypes.ONE_ECHELON_SINGLE_CHAIN.toString());
-		}
-
-		// Another plan with one logistic chain, containing a single carrier is created
-		LSPPlan lspPlan_singleChain_2;
-		{
-			Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
-			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-
-			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource singleCarrierResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-					.build();
-
-			LogisticChainElement singleCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("singleCarrierElement", LogisticChainElement.class))
-					.setResource(singleCarrierResource)
-					.build();
-
-			LogisticChain singleChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("singleChain", LogisticChain.class))
-					.addLogisticChainElement(singleCarrierElement)
-					.build();
-
-			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-			lspPlan_singleChain_2 = LSPUtils.createLSPPlan()
-					.addLogisticChain(singleChain)
-					.setAssigner(singleSolutionShipmentAssigner);
-
-			lspPlan_singleChain_2.setType(Utils.LspPlanTypes.ONE_ECHELON_SINGLE_CHAIN.toString());
+			lspPlan_singleChain.setType(Utils.LspPlanTypes.ONE_ECHELON_SINGLE_CHAIN.toString());
 		}
 
 		// A plan with two different logistic chains in the south and north, with respective carriers is created
-		LSPPlan lspPlan_twoChains_1;
+		LSPPlan lspPlan_twoChains;
 		{
 			LogisticChainElement southCarrierElement;
 			{
 				Carrier carrierSouth = CarrierUtils.createCarrier(Id.create("carrierSouth", Carrier.class));
 				carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
+				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_CHEAP));
 				LSPResource carrierSouthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
 						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 						.build();
@@ -206,7 +186,7 @@ public class WorstPlanSelectorTest {
 				Carrier carrierNorth = CarrierUtils.createCarrier(Id.create("CarrierNorth", Carrier.class));
 				carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_LARGE_50));
+				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_CHEAP));
 				LSPResource carrierNorthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
 						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 						.build();
@@ -225,77 +205,23 @@ public class WorstPlanSelectorTest {
 					.build();
 
 			final ShipmentAssigner shipmentAssigner = Utils.createPrimaryLogisticChainShipmentAssigner();
-			lspPlan_twoChains_1 = LSPUtils.createLSPPlan()
+			lspPlan_twoChains = LSPUtils.createLSPPlan()
 					.addLogisticChain(southChain)
 					.addLogisticChain(northChain)
 					.setAssigner(shipmentAssigner);
 
-			lspPlan_twoChains_1.setType(Utils.LspPlanTypes.ONE_ECHELON_MULTIPLE_CHAINS.toString());
-		}
-
-		// Another plan with two different logistic chains in the south and north, with respective carriers is created
-		LSPPlan lspPlan_twoChains_2;
-		{
-			LogisticChainElement southCarrierElement;
-			{
-				Carrier carrierSouth = CarrierUtils.createCarrier(Id.create("carrierSouth", Carrier.class));
-				carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-
-				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-				LSPResource carrierSouthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
-						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-						.build();
-
-				southCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("southCarrierElement", LogisticChainElement.class))
-						.setResource(carrierSouthResource)
-						.build();
-			}
-
-			LogisticChainElement northCarrierElement;
-			{
-				Carrier carrierNorth = CarrierUtils.createCarrier(Id.create("CarrierNorth", Carrier.class));
-				carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-
-				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_LARGE_50));
-				LSPResource carrierNorthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
-						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-						.build();
-
-				northCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("northCarrierElement", LogisticChainElement.class))
-						.setResource(carrierNorthResource)
-						.build();
-			}
-
-			LogisticChain southChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("southChain", LogisticChain.class))
-					.addLogisticChainElement(southCarrierElement)
-					.build();
-
-			LogisticChain northChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("northChain", LogisticChain.class))
-					.addLogisticChainElement(northCarrierElement)
-					.build();
-
-			final ShipmentAssigner shipmentAssigner = Utils.createPrimaryLogisticChainShipmentAssigner();
-			lspPlan_twoChains_2 = LSPUtils.createLSPPlan()
-					.addLogisticChain(southChain)
-					.addLogisticChain(northChain)
-					.setAssigner(shipmentAssigner);
-
-			lspPlan_twoChains_2.setType(Utils.LspPlanTypes.ONE_ECHELON_MULTIPLE_CHAINS.toString());
+			lspPlan_twoChains.setType(Utils.LspPlanTypes.ONE_ECHELON_MULTIPLE_CHAINS.toString());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
-		lspPlans.add(lspPlan_singleChain_1);
-		lspPlans.add(lspPlan_singleChain_2);
-		lspPlans.add(lspPlan_twoChains_1);
-		lspPlans.add(lspPlan_twoChains_2);
+		lspPlans.add(lspPlan_singleChain);
+		lspPlans.add(lspPlan_twoChains);
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("lsp", LSP.class))
-				.setInitialPlan(lspPlan_singleChain_1)
+				.setInitialPlan(lspPlan_singleChain)
 				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
-		lsp.addPlan(lspPlan_singleChain_2);
-		lsp.addPlan(lspPlan_twoChains_1);
-		lsp.addPlan(lspPlan_twoChains_2);
+		lsp.addPlan(lspPlan_twoChains);
 
 		for (LSPShipment shipment : createInitialLSPShipments(network)) {
 			lsp.assignShipmentToLSP(shipment);
@@ -354,22 +280,19 @@ public class WorstPlanSelectorTest {
 		return resourceList;
 	}
 
-
 	@Test
 	public void testPreserveLastPlanOfType() {
-		Map<String, Integer> typeCounts = new ConcurrentHashMap<String, Integer>();
+		Set<String> planTypes = new HashSet<>();
 
-		// count how many plans per type an agent has:
-		for (LSPPlan plan : lsp.getPlans()) {
-			String type = plan.getType();
-			typeCounts.merge( type, 1, ( a, b ) -> a + b );
+		for (LSPPlan lspPlan : lsp.getPlans()) {
+			planTypes.add(lspPlan.getType());
+
+			if (planTypes.size() > 1) {
+				break;
+			}
 		}
 
-		//TODO: check if map hast more than one entry
-
-		//		assertTrue(lsp.getPlans().);
-
-
-
+		assertTrue(planTypes.size() > 1);
 	}
+
 }
