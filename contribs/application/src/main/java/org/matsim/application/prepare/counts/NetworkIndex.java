@@ -37,7 +37,7 @@ public class NetworkIndex<T> {
 		this.index.build();
 	}
 
-	public NetworkIndex(Map<Link, LineString> linkGeometries, double range, GeometryGetter getter) {
+	public NetworkIndex(Map<Link, LineString> linkGeometries, double range, GeometryGetter<T> getter) {
 
 		this.range = range;
 		this.getter = getter;
