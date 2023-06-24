@@ -110,9 +110,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (PERSON.equals(name))
-		{
+		//Reached first time a person
+		if (PERSON.equals(name) && !this.reachedPersons) {
 			this.reachedPersons = true;
+
+			if (!isPopulationStreaming && this.threads == null) {
+				log.info("Start parallel population reading...");
+				initThreads();
+			}
 		}
 
 		// if population streaming is activated, use non-parallel reader
@@ -121,20 +126,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 			return;
 		}
 
-		if (this.threads==null) {
-			log.info("Start parallel population reading...");
-			initThreads();
-		}
 
-			// If it is a new person, create a new person and a list for its attributes.
-			if (PERSON.equals(name)) {
-				Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
-				currentPersonXmlData = new ArrayList<>();
-				PersonTag personTag = new PersonTag();
-				personTag.person = person;
-				currentPersonXmlData.add(personTag);
-				this.plans.addPerson(person);
-			} else {
+		// If it is a new person, create a new person and a list for its attributes.
+		if (PERSON.equals(name)) {
+			Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
+			currentPersonXmlData = new ArrayList<>();
+			PersonTag personTag = new PersonTag();
+			personTag.person = person;
+			currentPersonXmlData.add(personTag);
+			this.plans.addPerson(person);
+		} else {
 
 			// Create a new start tag and add it to the person data.
 			Stack<String> contextCopy = new Stack<>();
