@@ -71,8 +71,8 @@ import com.google.inject.Inject;
 /* deliberately package */ class PopulationReaderMatsimV6 extends MatsimXmlParser implements MatsimReader {
     private static final Logger log = LogManager.getLogger(PopulationReaderMatsimV6.class);
 
-	private final static String POPULATION = "population";
-	private final static String PERSON = "person";
+	/* package */ final static String POPULATION = "population";
+	/* package */ final static String PERSON = "person";
 	private final static String ATTRIBUTES = "attributes";
 	private final static String ATTRIBUTE = "attribute";
 	private final static String PLAN = "plan";
@@ -109,10 +109,10 @@ import com.google.inject.Inject;
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 
 	private final Scenario scenario;
-	private final Population plans;
+	final Population plans;
 	private final String externalInputCRS;
 
-	private Person currperson = null;
+	Person currperson = null;
 	private Plan currplan = null;
 	private Activity curract = null;
 	private Leg currleg = null;
@@ -448,7 +448,7 @@ import com.google.inject.Inject;
 		String startLinkId = atts.getValue(ATTR_ROUTE_STARTLINK);
 		String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
 		String routeType = atts.getValue("type");
-		
+
 		if (routeType == null) {
 			String legMode = this.currleg.getMode();
 			if ("pt".equals(legMode)) {
@@ -459,10 +459,10 @@ import com.google.inject.Inject;
 				routeType = "generic";
 			}
 		}
-		
+
 		RouteFactories factory = this.scenario.getPopulation().getFactory().getRouteFactories();
 		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
-		
+
 		this.currRoute = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(routeClass, startLinkId == null ? null : Id.create(startLinkId, Link.class), endLinkId == null ? null : Id.create(endLinkId, Link.class));
 		this.currleg.setRoute(this.currRoute);
 
@@ -488,7 +488,7 @@ import com.google.inject.Inject;
 		this.currRoute.setStartLinkId(startLinkId);
 		this.currRoute.setEndLinkId(endLinkId);
 		this.currRoute.setRouteDescription(this.routeDescription.trim());
-		
+
 		// yy I think that my intuition would be to put the following into prepareForSim. kai, dec'16
 		if (Double.isNaN(this.currRoute.getDistance())) {
 			if (this.currRoute instanceof NetworkRoute) {
