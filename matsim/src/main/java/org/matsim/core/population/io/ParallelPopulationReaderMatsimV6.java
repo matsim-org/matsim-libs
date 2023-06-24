@@ -110,28 +110,31 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
+		if (PERSON.equals(name))
+		{
+			this.reachedPersons = true;
+		}
+
 		// if population streaming is activated, use non-parallel reader
 		if (isPopulationStreaming || !this.reachedPersons) {
 			super.startTag(name, atts, context);
 			return;
 		}
 
-		if (POPULATION.equals(name)) {
-			super.startTag(name, atts, context);
+		if (this.threads==null) {
 			log.info("Start parallel population reading...");
 			initThreads();
-		} else {
+		}
+
 			// If it is a new person, create a new person and a list for its attributes.
 			if (PERSON.equals(name)) {
-				this.reachedPersons = true;
 				Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 				currentPersonXmlData = new ArrayList<>();
 				PersonTag personTag = new PersonTag();
 				personTag.person = person;
 				currentPersonXmlData.add(personTag);
 				this.plans.addPerson(person);
-			}
-
+			} else {
 
 			// Create a new start tag and add it to the person data.
 			Stack<String> contextCopy = new Stack<>();
@@ -177,10 +180,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 			// Till parsing population
 		} else {
 			// Create a new end tag and add it to the person data.
+			Stack<String> contextCopy = new Stack<>();
+			contextCopy.addAll(context);
 			EndTag tag = new EndTag();
 			tag.name = name;
 			tag.content = content;
-			tag.context = context;
+			tag.context = contextCopy;
 			currentPersonXmlData.add(tag);
 
 			// if its a person end tag, add the persons xml data to the queue.
