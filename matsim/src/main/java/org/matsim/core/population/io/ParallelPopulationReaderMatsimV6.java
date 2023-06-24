@@ -24,22 +24,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.Config;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.households.Households;
-import org.matsim.lanes.Lanes;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -60,9 +50,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 	private final boolean isPopulationStreaming;
 	private final int numThreads;
 	private final BlockingQueue<List<Tag>> queue;
-	private final CollectorScenario collectorScenario;
-	private final CollectorPopulation collectorPopulation;
-
 	private Thread[] threads;
 	private List<Tag> currentPersonXmlData;
 
@@ -70,6 +57,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 	private final String targetCRS;
 
 	private boolean reachedPersons = false;
+
 
 	public ParallelPopulationReaderMatsimV6(
 			final String inputCRS,
@@ -89,8 +77,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 			this.isPopulationStreaming = true;
 			this.numThreads = 1;
 			this.queue = null;
-			this.collectorPopulation = null;
-			this.collectorScenario = null;
+
 		} else {
 			isPopulationStreaming = false;
 
@@ -99,8 +86,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 			} else this.numThreads = 1;
 
 			this.queue = new LinkedBlockingQueue<>();
-			this.collectorPopulation = new CollectorPopulation(this.plans);
-			this.collectorScenario = new CollectorScenario(scenario, collectorPopulation);
 		}
 	}
 
@@ -112,7 +97,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 					new ParallelPopulationReaderMatsimV6Runner(
 							this.inputCRS,
 							this.targetCRS,
-							this.collectorScenario,
+							this.scenario,
 							this.queue);
 
 			Thread thread = new Thread(runner);
@@ -202,118 +187,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 			if (PERSON.equals(name)) {
 				queue.add(currentPersonXmlData);
 			}
-		}
-	}
-
-	private static class CollectorScenario implements Scenario {
-		// yyyy Why is this necessary at all?  Could you please explain your design decisions?  The same instance is passed to all threads, so
-		// what is the difference to using the underlying population directly?
-
-		private final Scenario delegate;
-		private final CollectorPopulation population;
-
-		public CollectorScenario(Scenario scenario, CollectorPopulation population) {
-			this.delegate = scenario;
-			this.population = population;
-		}
-
-		@Override
-		public Network getNetwork() {
-			return this.delegate.getNetwork();
-		}
-
-		@Override
-		public Population getPopulation() {
-			return this.population;    // return collector population
-		}
-
-		@Override
-		public ActivityFacilities getActivityFacilities() {
-			return this.delegate.getActivityFacilities();
-		}
-
-		@Override
-		public TransitSchedule getTransitSchedule() {
-			return this.delegate.getTransitSchedule();
-		}
-
-		@Override
-		public Config getConfig() {
-			return this.delegate.getConfig();
-		}
-
-		@Override
-		public void addScenarioElement(String name, Object o) {
-			this.delegate.addScenarioElement(name, o);
-		}
-
-		@Override
-		public Object getScenarioElement(String name) {
-			return this.delegate.getScenarioElement(name);
-		}
-
-		@Override
-		public Vehicles getTransitVehicles() {
-			return this.delegate.getTransitVehicles();
-		}
-
-		@Override
-		public Households getHouseholds() {
-			return this.delegate.getHouseholds();
-		}
-
-		@Override
-		public Lanes getLanes() {
-			return this.delegate.getLanes();
-		}
-
-		@Override
-		public Vehicles getVehicles() {
-			return this.delegate.getVehicles();
-		}
-	}
-
-	private static class CollectorPopulation implements Population {
-
-		private final Population population;
-
-		public CollectorPopulation(Population population) {
-			this.population = population;
-		}
-
-		@Override
-		public PopulationFactory getFactory() {
-			return population.getFactory();
-		}
-
-		@Override
-		public String getName() {
-			throw new RuntimeException("Calls to this method are not expected to happen...");
-		}
-
-		@Override
-		public void setName(String name) {
-			throw new RuntimeException("Calls to this method are not expected to happen...");
-		}
-
-		@Override
-		public Map<Id<Person>, ? extends Person> getPersons() {
-			throw new RuntimeException("Calls to this method are not expected to happen...");
-		}
-
-		@Override
-		public void addPerson(Person p) {
-			throw new RuntimeException("Calls to this method are not expected to happen...");
-		}
-
-		@Override
-		public Person removePerson(Id<Person> personId) {
-			throw new RuntimeException("not implemented");
-		}
-
-		@Override
-		public org.matsim.utils.objectattributes.attributable.Attributes getAttributes() {
-			throw new RuntimeException("Calls to this method are not expected to happen...");
 		}
 	}
 

@@ -20,17 +20,11 @@
 
 package org.matsim.core.population.io;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.population.io.ParallelPopulationReaderMatsimV6.*;
+
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.io.ParallelPopulationReaderMatsimV6.EndProcessingTag;
-import org.matsim.core.population.io.ParallelPopulationReaderMatsimV6.EndTag;
-import org.matsim.core.population.io.ParallelPopulationReaderMatsimV6.PersonTag;
-import org.matsim.core.population.io.ParallelPopulationReaderMatsimV6.StartTag;
-import org.matsim.core.population.io.ParallelPopulationReaderMatsimV6.Tag;
-import org.xml.sax.Attributes;
 
 /**
  * Runnable used by ParallelPopulationReaderMatsimV6.
@@ -62,19 +56,11 @@ import org.xml.sax.Attributes;
 			try {
 				List<Tag> tags;
 				tags = queue.take();
-
 				for (Tag tag : tags) {
 					if (tag instanceof PersonTag) {
 						this.currperson = ((PersonTag) tag).person;
 					} else if (tag instanceof StartTag) {
-						// if its is a person tag, we use the startPerson method from this class
-						if (PERSON.equals(tag.name)) {
-							//startPerson(((ParallelPopulationReaderMatsimV6.StartTag) tag).atts);
-						}
-						// otherwise hand the tag over to the super class
-						else {
-							this.startTag(tag.name, ((ParallelPopulationReaderMatsimV6.StartTag) tag).atts, tag.context);
-						}
+						this.startTag(tag.name, ((ParallelPopulationReaderMatsimV6.StartTag) tag).atts, tag.context);
 					} else if (tag instanceof EndTag) {
 						/*
 						 * If its is a person tag, we reset the current person. We do not hand the
@@ -95,23 +81,6 @@ import org.xml.sax.Attributes;
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
-		}
-	}
-
-	private void startPerson(final Attributes atts) {
-		String ageString = atts.getValue("age");
-//		int age = Integer.MIN_VALUE;
-		Integer age = null ;
-		if (ageString != null) age = Integer.parseInt(ageString);
-		PersonUtils.setAge(this.currperson, age);
-		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
-		PersonUtils.setLicence(this.currperson, atts.getValue("license"));
-		PersonUtils.setCarAvail(this.currperson, atts.getValue("car_avail"));
-		String employed = atts.getValue("employed");
-		if (employed == null) {
-			PersonUtils.setEmployed(this.currperson, null);
-		} else {
-			PersonUtils.setEmployed(this.currperson, "yes".equals(employed));
 		}
 	}
 }

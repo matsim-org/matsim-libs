@@ -108,7 +108,7 @@ import com.google.inject.Inject;
 	// TODO: infrastructure to configure converters
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 
-	private final Scenario scenario;
+	final Scenario scenario;
 	final Population plans;
 	private final String externalInputCRS;
 
