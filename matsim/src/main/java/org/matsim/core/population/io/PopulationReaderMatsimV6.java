@@ -81,7 +81,7 @@ import com.google.inject.Inject;
 	private final static String ROUTE = "route";
 
 	private final static String ATTR_POPULATION_DESC = "desc";
-	private final static String ATTR_PERSON_ID = "id";
+	/* package */ final static String ATTR_PERSON_ID = "id";
 	private final static String ATTR_PLAN_SCORE = "score";
 	private final static String ATTR_PLAN_TYPE = "type";
 	private final static String ATTR_PLAN_SELECTED = "selected";

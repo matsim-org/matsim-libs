@@ -2,11 +2,11 @@ package org.matsim.core.population.io;
 
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParallelPlansReaderMatsimV4.java
+ * ParallelPlansReaderMatsimV6.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -121,10 +121,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 			log.info("Start parallel population reading...");
 			initThreads();
 		} else {
-			// If it is an new person, create a new person and a list for its attributes.
+			// If it is a new person, create a new person and a list for its attributes.
 			if (PERSON.equals(name)) {
 				this.reachedPersons = true;
-				Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
+				Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 				currentPersonXmlData = new ArrayList<>();
 				PersonTag personTag = new PersonTag();
 				personTag.person = person;
@@ -192,25 +192,25 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	public abstract static class Tag {
 		String name;
-		Stack<String> context = null;    // not used by the PopulationReader
+		Stack<String> context;
 	}
 
-	public final class StartTag extends Tag {
+	public final static class StartTag extends Tag {
 		Attributes atts;
 	}
 
-	public final class PersonTag extends Tag {
+	public final static class PersonTag extends Tag {
 		Person person;
 	}
 
-	public final class EndTag extends Tag {
+	public final static class EndTag extends Tag {
 		String content;
 	}
 
 	/*
 	 * Marker Tag to inform the threads that no further data has to be parsed.
 	 */
-	public final class EndProcessingTag extends Tag {
+	public final static class EndProcessingTag extends Tag {
 	}
 }
 
