@@ -111,7 +111,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		// if population streaming is activated, use non-parallel reader
-		if (isPopulationStreaming || this.reachedPersons == false) {
+		if (isPopulationStreaming || !this.reachedPersons) {
 			super.startTag(name, atts, context);
 			return;
 		}
@@ -149,7 +149,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 		// if population streaming is activated, use non-parallel reader
 		// or if not reached the persons in the xml
-		if (isPopulationStreaming || this.reachedPersons == false) {
+		if (isPopulationStreaming || !this.reachedPersons) {
 			super.endTag(name, content, context);
 			return;
 		}
