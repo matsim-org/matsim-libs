@@ -94,13 +94,13 @@ public final class TrafficStatsCalculator {
 		for (Map.Entry<Id<Link>, ? extends Link> entry : this.network.getLinks().entrySet()) {
 			Link link = entry.getValue();
 
+			String type = NetworkUtils.getHighwayType(link);
+			if (roadType != null && !type.equals(roadType))
+				continue;
+
 			double linkCongestionIndex = getLinkCongestionIndex(link, startTime, endTime);
 
-			double length = link.getLength();
-			String type = NetworkUtils.getHighwayType(link);
-
-			if (type.equals(roadType))
-				continue;
+			double length = link.getLength() * link.getNumberOfLanes();
 
 			sumOfLinkLengthMultipiesLinkCongestionIndex += length * linkCongestionIndex;
 			sumLinkLength += length;
