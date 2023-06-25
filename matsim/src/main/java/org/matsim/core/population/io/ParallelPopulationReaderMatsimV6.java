@@ -189,7 +189,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 			tag.context = contextCopy;
 			currentPersonXmlData.add(tag);
 
-			// if its a person end tag, add the persons xml data to the queue.
+			// if it's a person end tag, add the persons xml data to the queue.
 			if (PERSON.equals(name)) {
 				queue.add(currentPersonXmlData);
 			}
