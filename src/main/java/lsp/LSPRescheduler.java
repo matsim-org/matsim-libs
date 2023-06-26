@@ -60,24 +60,24 @@ final class LSPRescheduler {
 	private LSPRescheduler() {
 	}
 
-	static void notifyReplanning(LSPs lsps, ReplanningEvent event) {
-		if (event.getIteration() != 0) {
-			for (LSP lsp : lsps.getLSPs().values()) {
-				for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-					solution.getShipmentIds().clear();
-					for (LogisticChainElement element : solution.getLogisticChainElements()) {
-						element.getIncomingShipments().clear();
-						element.getOutgoingShipments().clear();
-					}
-				}
-
-				for (LSPShipment shipment : lsp.getShipments()) {
-					ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).clear();
-					shipment.getShipmentLog().clear();
-					lsp.getSelectedPlan().getAssigner().assignToLogisticChain(shipment);
-				}
-				lsp.scheduleLogisticChains();
-			}
-		}
-	}
+//	static void notifyReplanning(LSPs lsps, ReplanningEvent event) {
+//		if (event.getIteration() != 0) {
+//			for (LSP lsp : lsps.getLSPs().values()) {
+//				for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
+//					solution.getShipmentIds().clear();
+//					for (LogisticChainElement element : solution.getLogisticChainElements()) {
+//						element.getIncomingShipments().clear();
+//						element.getOutgoingShipments().clear();
+//					}
+//				}
+//
+//				for (LSPShipment shipment : lsp.getShipments()) {
+//					ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).clear();
+//					shipment.getShipmentLog().clear();
+//					lsp.getSelectedPlan().getAssigner().assignToPlan(shipment);
+//				}
+//				lsp.scheduleLogisticChains();
+//			}
+//		}
+//	}
 }
