@@ -2,7 +2,7 @@ package org.matsim.core.population.io;
 
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParallelPlansReaderMatsimV6.java
+ * ParallelPopulationReaderMatsimV6.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *

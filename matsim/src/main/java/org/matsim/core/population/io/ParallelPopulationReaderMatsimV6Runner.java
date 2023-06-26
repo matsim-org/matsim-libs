@@ -57,11 +57,11 @@ import java.util.concurrent.BlockingQueue;
 				List<Tag> tags;
 				tags = queue.take();
 				for (Tag tag : tags) {
-					if (tag instanceof PersonTag) {
-						this.currperson = ((PersonTag) tag).person;
-					} else if (tag instanceof StartTag) {
-						this.startTag(tag.name, ((ParallelPopulationReaderMatsimV6.StartTag) tag).atts, tag.context);
-					} else if (tag instanceof EndTag) {
+					if (tag instanceof PersonTag personTag) {
+						this.currperson = personTag.person;
+					} else if (tag instanceof StartTag startTag) {
+						this.startTag(tag.name, startTag.atts, tag.context);
+					} else if (tag instanceof EndTag endTag) {
 						/*
 						 * If its is a person tag, we reset the current person. We do not hand the
 						 * tag over to the superclass because the person has already been added
@@ -72,7 +72,7 @@ import java.util.concurrent.BlockingQueue;
 						}
 						// otherwise hand the tag over to the super class
 						else {
-							this.endTag(tag.name, ((EndTag) tag).content, tag.context);
+							this.endTag(tag.name, endTag.content, tag.context);
 						}
 					} else if (tag instanceof EndProcessingTag) {
 						return;
