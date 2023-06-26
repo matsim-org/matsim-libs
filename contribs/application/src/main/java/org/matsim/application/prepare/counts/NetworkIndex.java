@@ -1,12 +1,21 @@
 package org.matsim.application.prepare.counts;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.geotools.geometry.jts.JTS;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.io.IOUtils;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
@@ -22,33 +31,84 @@ public class NetworkIndex<T> {
 	private final GeometryGetter<T> getter;
 	private final List<BiPredicate<Link, T>> filter = new ArrayList<>();
 
+	/**
+	 * Stores references to all records in the tree.
+	 */
+	private final Map<Id<Link>, LinkGeometryRecord> records = new HashMap<>();
+
+	/**
+	 * TODO: docs
+	 */
 	public NetworkIndex(Network network, double range, GeometryGetter<T> getter) {
+		this(network, new HashMap<>(), range, getter);
+	}
+
+
+	/**
+	 * TODO docs
+	 */
+	public NetworkIndex(Network network, Map<Id<Link>, Geometry> geometries, double range, GeometryGetter<T> getter) {
 
 		this.range = range;
 		this.getter = getter;
 
 		for (Link link : network.getLinks().values()) {
-			LinkGeometryRecord r = new LinkGeometryRecord(link, this.link2LineString(link));
-			Envelope env = getLinkEnvelope(link);
-			this.index.insert(env, r);
+			Geometry geom = geometries.getOrDefault(link.getId(), this.link2LineString(link));
+			LinkGeometryRecord r = new LinkGeometryRecord(link, geom);
+			this.index.insert(r.geometry.getEnvelopeInternal(), r);
+			this.records.put(link.getId(), r);
 		}
 
 		this.index.build();
 	}
 
-	public NetworkIndex(Map<Link, LineString> linkGeometries, double range, GeometryGetter<T> getter) {
+	/**
+	 * Read network geometries that have been written with {@link org.matsim.contrib.sumo.SumoNetworkConverter}.
+	 */
+	public static Map<Id<Link>, Geometry> readGeometriesFromSumo(String path, MathTransform crs) throws IOException, TransformException {
 
-		this.range = range;
-		this.getter = getter;
+		Map<Id<Link>, Geometry> result = new HashMap<>();
 
-		for (Map.Entry<Link, LineString> entry : linkGeometries.entrySet()) {
+		GeometryFactory factory = new GeometryFactory();
 
-			LinkGeometryRecord r = new LinkGeometryRecord(entry.getKey(), entry.getValue());
-			Envelope env = entry.getValue().getEnvelopeInternal();
-			this.index.insert(env, r);
+		try (CSVParser csv = new CSVParser(IOUtils.getBufferedReader(path), CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build())) {
+
+			for (CSVRecord r : csv) {
+				String idAsString = r.get("LinkId");
+				String raw = r.get("Geometry");
+
+				LineString link = parseCoordinates(raw, factory);
+				Id<Link> linkId = Id.createLinkId(idAsString);
+
+				result.put(linkId, JTS.transform(link, crs));
+			}
 		}
 
-		this.index.build();
+		return result;
+	}
+
+	private static LineString parseCoordinates(String coordinateSequence, GeometryFactory factory) {
+
+		String[] split = coordinateSequence.split("\\)");
+
+		Coordinate[] coordinates = new Coordinate[split.length];
+
+		for (int i = 0; i < split.length; i++) {
+			String coord = split[i];
+			int toRemove = coord.indexOf("(");
+
+			String cleaned = coord.substring(toRemove + 1);
+
+			String[] split1 = cleaned.split(",");
+
+			Coordinate coordinate = new Coordinate();
+			coordinate.setX(Double.parseDouble(split1[0]));
+			coordinate.setY(Double.parseDouble(split1[1]));
+
+			coordinates[i] = coordinate;
+		}
+
+		return factory.createLineString(coordinates);
 	}
 
 	/**
@@ -70,17 +130,6 @@ public class NetworkIndex<T> {
 	}
 
 	/**
-	 * Returns the envelope of an MATSim network link.
-	 */
-	public Envelope getLinkEnvelope(Link link) {
-		Coord from = link.getFromNode().getCoord();
-		Coord to = link.getToNode().getCoord();
-		Coordinate[] coordinates = {MGC.coord2Coordinate(from), MGC.coord2Coordinate(to)};
-
-		return factory.createLineString(coordinates).getEnvelopeInternal();
-	}
-
-	/**
 	 * Transforms a MATSim network link to a LineString Object.
 	 */
 	public LineString link2LineString(Link link) {
@@ -96,8 +145,8 @@ public class NetworkIndex<T> {
 	 * Removes a Link from the index.
 	 */
 	public void remove(Link link) {
-		Envelope env = getLinkEnvelope(link);
-		index.remove(env, link);
+		LinkGeometryRecord r = records.get(link.getId());
+		index.remove(r.geometry.getEnvelopeInternal(), r);
 	}
 
 	private Link getClosestCandidate(List<LinkGeometryRecord> result, T toMatch) {
@@ -111,7 +160,7 @@ public class NetworkIndex<T> {
 			return null;
 
 		Map<Link, Double> distances = result.stream()
-				.collect(Collectors.toMap(r -> r.link, r -> r.geometry.distance(this.getter.getGeometry(toMatch))));
+			.collect(Collectors.toMap(r -> r.link, r -> r.geometry.distance(this.getter.getGeometry(toMatch))));
 
 		Double min = Collections.min(distances.values());
 
@@ -133,7 +182,7 @@ public class NetworkIndex<T> {
 
 	private void applyFilter(List<LinkGeometryRecord> result, T toMatch) {
 
-		for (var it = result.iterator(); it.hasNext();) {
+		for (var it = result.iterator(); it.hasNext(); ) {
 
 			LinkGeometryRecord next = it.next();
 			Link link = next.link;
@@ -155,6 +204,7 @@ public class NetworkIndex<T> {
 		Geometry getGeometry(T toMatch);
 	}
 
-	private record LinkGeometryRecord(Link link, Geometry geometry){}
+	private record LinkGeometryRecord(Link link, Geometry geometry) {
+	}
 }
 
