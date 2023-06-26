@@ -46,7 +46,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /* deliberately package */  class ParallelPopulationReaderMatsimV6 extends PopulationReaderMatsimV6 {
 
 	static final Logger log = LogManager.getLogger(ParallelPopulationReaderMatsimV6.class);
-
+	private static int THREADS_LIMIT = 4;
 	private final boolean isPopulationStreaming;
 	private final int numThreads;
 	private final BlockingQueue<List<Tag>> queue;
@@ -82,7 +82,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 			isPopulationStreaming = false;
 
 			if (scenario.getConfig().global().getNumberOfThreads() > 0) {
-				this.numThreads = scenario.getConfig().global().getNumberOfThreads();
+				this.numThreads = Math.min(THREADS_LIMIT,scenario.getConfig().global().getNumberOfThreads());
 			} else this.numThreads = 1;
 
 			this.queue = new LinkedBlockingQueue<>();
