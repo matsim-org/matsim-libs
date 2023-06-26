@@ -62,18 +62,21 @@ import java.util.List;
 	}
 
 	public static LSPPlan copyPlan(LSPPlan plan2copy) {
-		List<LogisticChain> copiedSolutions = new ArrayList<>();
-		for (LogisticChain solution : plan2copy.getLogisticChains()) {
-			LogisticChain copiedSolution = LSPUtils.LogisticChainBuilder.newInstance(solution.getId()).build();
-			copiedSolution.getLogisticChainElements().addAll(solution.getLogisticChainElements());
-			copiedSolutions.add(copiedSolution);
+		List<LogisticChain> newPlanChains = new ArrayList<>();
+		for (LogisticChain initialPlanChain : plan2copy.getLogisticChains()) {
+			LogisticChain newPlanChain = LSPUtils.LogisticChainBuilder.newInstance(initialPlanChain.getId()).build();
+			newPlanChain.getLogisticChainElements().addAll(initialPlanChain.getLogisticChainElements());
+			newPlanChain.getShipmentIds().addAll(initialPlanChain.getShipmentIds());
+			newPlanChains.add(newPlanChain);
 		}
+
+
 		LSPPlan copiedPlan = LSPUtils.createLSPPlan();
 		copiedPlan.setAssigner(plan2copy.getAssigner());
 		copiedPlan.setLSP(plan2copy.getLSP());
 		copiedPlan.setScore(plan2copy.getScore());
 		copiedPlan.setType(plan2copy.getType());
-		copiedPlan.getLogisticChains().addAll(copiedSolutions);
+		copiedPlan.getLogisticChains().addAll(newPlanChains);
 		return copiedPlan;
 	}
 
