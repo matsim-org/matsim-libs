@@ -23,18 +23,18 @@ import java.util.stream.Collectors;
 /**
  * Wrapper class for an STRtree. Can be used to match objects, geometries for example, to an MATSim network.
  */
-public class NetworkIndex<T> {
+public final class NetworkIndex<T> {
 
 	private final STRtree index = new STRtree();
 	private final double range;
 	private final GeometryFactory factory = new GeometryFactory();
 	private final GeometryGetter<T> getter;
 	private final List<BiPredicate<Link, T>> filter = new ArrayList<>();
-
 	/**
 	 * Stores references to all records in the tree.
 	 */
 	private final Map<Id<Link>, LinkGeometryRecord> records = new HashMap<>();
+	private GeometryDistance<T> distance;
 
 	/**
 	 * TODO: docs
@@ -51,6 +51,8 @@ public class NetworkIndex<T> {
 
 		this.range = range;
 		this.getter = getter;
+		// Standard geometric distance
+		this.distance = (geom, toMatch) -> geom.distance(this.getter.getGeometry(toMatch));
 
 		for (Link link : network.getLinks().values()) {
 			Geometry geom = geometries.getOrDefault(link.getId(), this.link2LineString(link));
@@ -61,6 +63,8 @@ public class NetworkIndex<T> {
 
 		this.index.build();
 	}
+
+	// TODO: may use Hausdorff distance to compare two line strings
 
 	/**
 	 * Read network geometries that have been written with {@link org.matsim.contrib.sumo.SumoNetworkConverter}.
@@ -112,6 +116,14 @@ public class NetworkIndex<T> {
 	}
 
 	/**
+	 * Change the distance calculation.
+	 */
+	public NetworkIndex<T> setDistance(GeometryDistance<T> distance) {
+		this.distance = distance;
+		return this;
+	}
+
+	/**
 	 * Uses an STRtree to match an Object to a network link. Custom filters are applied to filter the query results.
 	 * The closest link to the object, based on the Geometry distance function is returned.
 	 */
@@ -159,18 +171,9 @@ public class NetworkIndex<T> {
 		if (result.isEmpty())
 			return null;
 
-		Map<Link, Double> distances = result.stream()
-			.collect(Collectors.toMap(r -> r.link, r -> r.geometry.distance(this.getter.getGeometry(toMatch))));
-
-		Double min = Collections.min(distances.values());
-
-		for (Map.Entry<Link, Double> entry : distances.entrySet()) {
-			if (entry.getValue().doubleValue() == min.doubleValue()) {
-				return entry.getKey();
-			}
-		}
-
-		return null;
+		Map<Link, Double> distances = result.stream().collect(Collectors.toMap(r -> r.link, r -> distance.computeDistance(r.geometry, toMatch)));
+		Map.Entry<Link, Double> min = Collections.min(distances.entrySet(), Comparator.comparingDouble(Map.Entry::getValue));
+		return min.getKey();
 	}
 
 	/**
@@ -202,6 +205,17 @@ public class NetworkIndex<T> {
 	public interface GeometryGetter<T> {
 
 		Geometry getGeometry(T toMatch);
+	}
+
+
+	/**
+	 * Logic to compute distance or similarity between two objects.
+	 */
+	@FunctionalInterface
+	public interface GeometryDistance<T> {
+
+		double computeDistance(Geometry geom, T toMatch);
+
 	}
 
 	private record LinkGeometryRecord(Link link, Geometry geometry) {
