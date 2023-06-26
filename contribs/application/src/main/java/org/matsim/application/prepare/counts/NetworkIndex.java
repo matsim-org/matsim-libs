@@ -21,7 +21,6 @@ public class NetworkIndex<T> {
 	private final GeometryFactory factory = new GeometryFactory();
 	private final GeometryGetter<T> getter;
 	private final List<BiPredicate<Link, T>> filter = new ArrayList<>();
-	private final Map<Link, LineString> geometries;
 
 	public NetworkIndex(Network network, double range, GeometryGetter<T> getter) {
 
@@ -29,11 +28,11 @@ public class NetworkIndex<T> {
 		this.getter = getter;
 
 		for (Link link : network.getLinks().values()) {
+			LinkGeometryRecord r = new LinkGeometryRecord(link, this.link2LineString(link));
 			Envelope env = getLinkEnvelope(link);
-			this.index.insert(env, link);
+			this.index.insert(env, r);
 		}
 
-		this.geometries = Map.of();
 		this.index.build();
 	}
 
@@ -42,12 +41,11 @@ public class NetworkIndex<T> {
 		this.range = range;
 		this.getter = getter;
 
-		this.geometries = linkGeometries;
-
 		for (Map.Entry<Link, LineString> entry : linkGeometries.entrySet()) {
 
+			LinkGeometryRecord r = new LinkGeometryRecord(entry.getKey(), entry.getValue());
 			Envelope env = entry.getValue().getEnvelopeInternal();
-			this.index.insert(env, entry.getKey());
+			this.index.insert(env, r);
 		}
 
 		this.index.build();
@@ -64,23 +62,11 @@ public class NetworkIndex<T> {
 
 		Envelope searchArea = geometry.buffer(this.range).getEnvelopeInternal();
 
-		List<Link> result = index.query(searchArea);
+		List<LinkGeometryRecord> result = index.query(searchArea);
 
 		if (result.isEmpty()) return null;
 
-		Map<Link, Geometry> resultMap = new HashMap<>();
-		for (Link link : result) {
-
-			LineString ls;
-			if (this.geometries.isEmpty()) {
-				ls = this.link2LineString(link);
-			} else
-				ls = this.geometries.get(link);
-
-			resultMap.put(link, ls);
-		}
-
-		return getClosestCandidate(resultMap, toMatch);
+		return getClosestCandidate(result, toMatch);
 	}
 
 	/**
@@ -114,18 +100,18 @@ public class NetworkIndex<T> {
 		index.remove(env, link);
 	}
 
-	private Link getClosestCandidate(Map<Link, Geometry> result, T toMatch) {
+	private Link getClosestCandidate(List<LinkGeometryRecord> result, T toMatch) {
 
 		if (result.isEmpty()) return null;
-		if (result.size() == 1) return result.keySet().stream().findFirst().get();
+		if (result.size() == 1) return result.stream().findFirst().get().link;
 
 		applyFilter(result, toMatch);
 
 		if (result.isEmpty())
 			return null;
 
-		Map<Link, Double> distances = result.entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, r -> r.getValue().distance(this.getter.getGeometry(toMatch))));
+		Map<Link, Double> distances = result.stream()
+				.collect(Collectors.toMap(r -> r.link, r -> r.geometry.distance(this.getter.getGeometry(toMatch))));
 
 		Double min = Collections.min(distances.values());
 
@@ -145,12 +131,12 @@ public class NetworkIndex<T> {
 		this.filter.add(filter);
 	}
 
-	private void applyFilter(Map<Link, Geometry> result, T toMatch) {
+	private void applyFilter(List<LinkGeometryRecord> result, T toMatch) {
 
-		for (var it = result.entrySet().iterator(); it.hasNext();) {
+		for (var it = result.iterator(); it.hasNext();) {
 
-			Map.Entry<Link, Geometry> next = it.next();
-			Link link = next.getKey();
+			LinkGeometryRecord next = it.next();
+			Link link = next.link;
 			for (BiPredicate<Link, T> predicate : this.filter) {
 				if (!predicate.test(link, toMatch)) {
 					it.remove();
@@ -168,5 +154,7 @@ public class NetworkIndex<T> {
 
 		Geometry getGeometry(T toMatch);
 	}
+
+	private record LinkGeometryRecord(Link link, Geometry geometry){}
 }
 
