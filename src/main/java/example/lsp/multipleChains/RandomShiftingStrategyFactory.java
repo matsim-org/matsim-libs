@@ -32,17 +32,10 @@ class RandomShiftingStrategyFactory {
 			@Override
 			public void handlePlan(LSPPlan lspPlan) {
 
-				LSP lsp = lspPlan.getLSP();
+				// Shifting shipments only makes sense for multiple chains
+				if (lspPlan.getLogisticChains().size() < 2) return;
 
-				// iterate through initial plan chains and add shipment IDs to corresponding new plan chains
-				for (LogisticChain initialPlanChain : lsp.getPlans().get(0).getLogisticChains()) {
-					for (LogisticChain newPlanChain : lspPlan.getLogisticChains()) {
-						if (newPlanChain.getId().equals(initialPlanChain.getId())) {
-							newPlanChain.getShipmentIds().addAll(new ArrayList<>(initialPlanChain.getShipmentIds()));
-							break;
-						}
-					}
-				}
+				LSP lsp = lspPlan.getLSP();
 
 				// Make a new list of shipments and pick a random shipment from it
 				List<LSPShipment> shipments = new ArrayList<>(lsp.getShipments());

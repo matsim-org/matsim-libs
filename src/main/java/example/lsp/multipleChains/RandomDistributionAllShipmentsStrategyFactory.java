@@ -30,6 +30,10 @@ class RandomDistributionAllShipmentsStrategyFactory {
 
 			@Override
 			public void handlePlan(LSPPlan lspPlan) {
+
+				// Shifting shipments only makes sense for multiple chains
+				if (lspPlan.getLogisticChains().size() < 2) return;
+
 				LSP lsp = lspPlan.getLSP();
 				List<LogisticChain> logisticChains = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains());
 

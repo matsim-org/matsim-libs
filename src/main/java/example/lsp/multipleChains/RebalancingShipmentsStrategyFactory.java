@@ -32,20 +32,14 @@ class RebalancingShipmentsStrategyFactory {
 
 			@Override
 			public void handlePlan(LSPPlan lspPlan) {
+
+				// Shifting shipments only makes sense for multiple chains
+				if (lspPlan.getLogisticChains().size() < 2) return;
+
 				LSP lsp = lspPlan.getLSP();
 				Map<LogisticChain, Integer> shipmentCountByChain = new HashMap<>();
 				LogisticChain minChain = null;
 				LogisticChain maxChain = null;
-
-				// iterate through initial plan chains and add shipment IDs to corresponding new plan chains
-				for (LogisticChain initialPlanChain : lsp.getPlans().get(0).getLogisticChains()) {
-					for (LogisticChain newPlanChain : lspPlan.getLogisticChains()) {
-						if (newPlanChain.getId().equals(initialPlanChain.getId())) {
-							newPlanChain.getShipmentIds().addAll(new ArrayList<>(initialPlanChain.getShipmentIds()));
-							break;
-						}
-					}
-				}
 
 				// fill the shipmentCountByChain map with each chain's shipment count
 				for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
