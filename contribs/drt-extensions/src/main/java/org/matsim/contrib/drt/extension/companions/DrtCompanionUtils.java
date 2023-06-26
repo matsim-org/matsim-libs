@@ -21,7 +21,6 @@ package org.matsim.contrib.drt.extension.companions;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.util.WeightedRandomSelection;
 import org.matsim.core.gbl.MatsimRandom;
@@ -32,12 +31,30 @@ import org.matsim.core.gbl.MatsimRandom;
  *
  */
 public class DrtCompanionUtils {
+
 	public final static String ADDITIONAL_GROUP_SIZE_ATTRIBUTE = "additionalGroupSize";
 	public final static String ADDITIONAL_GROUP_PART_ATTRIBUTE = "additionalGroupPart";
+	public static final String COMPANION_TYPE_ATTRIBUTE = "companionType";
 
-    public static boolean isDrtCompanion(Id<Person> personId) {
-        return personId.toString().startsWith(DrtCompanionRideGenerator.DRT_COMPANION_AGENT_PREFIX);
-    }
+	private DrtCompanionUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+
+	public static boolean isDrtCompanion(Person person) {
+		return getDRTCompanionType(person) != null;
+	}
+
+	public static void setDRTCompanionType(Person person, String drtCompanionType) {
+		if (drtCompanionType == null) {
+			person.getAttributes().removeAttribute(COMPANION_TYPE_ATTRIBUTE);
+		} else {
+			person.getAttributes().putAttribute(COMPANION_TYPE_ATTRIBUTE, drtCompanionType);
+		}
+	}
+
+	public static String getDRTCompanionType(Person person) {
+		return (String) person.getAttributes().getAttribute(COMPANION_TYPE_ATTRIBUTE);
+	}
 
 	public static WeightedRandomSelection<Integer> createIntegerSampler(final List<Double> distribution) {
 		WeightedRandomSelection<Integer> wrs = new WeightedRandomSelection<>(MatsimRandom.getLocalInstance());
