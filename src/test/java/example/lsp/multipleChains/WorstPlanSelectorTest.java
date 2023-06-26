@@ -90,6 +90,7 @@ public class WorstPlanSelectorTest {
 				});
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+					strategyManager.addStrategy(new SelectExpBetaStrategyFactory().createStrategy(), null, 1);
 					strategyManager.addStrategy(new RandomDistributionAllShipmentsStrategyFactory().createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(2);
 					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
