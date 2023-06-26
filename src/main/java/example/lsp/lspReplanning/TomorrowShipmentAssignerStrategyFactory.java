@@ -53,6 +53,7 @@ import java.util.Collection;
 
 			@Override
 			public void handlePlan(LSPPlan plan) {
+				plan.getLogisticChains().iterator().next().getShipmentIds().clear();
 				plan.setAssigner(assigner);
 //				LSP lsp = assigner.getLSP();
 				LSP lsp = plan.getLSP();
