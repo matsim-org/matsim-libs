@@ -21,6 +21,7 @@
 package lsp.usecase;
 
 import lsp.LSP;
+import lsp.LSPPlan;
 import lsp.LogisticChain;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
@@ -51,9 +52,9 @@ class SingleLogisticChainShipmentAssigner implements ShipmentAssigner {
 	}
 
 	@Override
-	public void assignToLogisticChain(LSPShipment shipment) {
-		Gbl.assertIf(lsp.getSelectedPlan().getLogisticChains().size() == 1);
-		LogisticChain singleSolution = lsp.getSelectedPlan().getLogisticChains().iterator().next();
+	public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+		Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
+		LogisticChain singleSolution = lspPlan.getLogisticChains().iterator().next();
 		singleSolution.addShipmentToChain(shipment);
 	}
 

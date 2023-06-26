@@ -152,7 +152,9 @@ import java.util.List;
 	public void assignShipmentToLSP(LSPShipment shipment) {
 //		shipment.setLspId(this.getId()); // und rückweg dann auch darüber und dann lsp.getselectedPlan.getShipment...
 		shipments.add(shipment);
-		selectedPlan.getAssigner().assignToLogisticChain(shipment);
+		for (LSPPlan lspPlan : plans) {
+			lspPlan.getAssigner().assignToPlan(lspPlan, shipment);
+		}
 	}
 
 	@Override

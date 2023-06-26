@@ -58,7 +58,7 @@ import java.util.Collection;
 				LSP lsp = plan.getLSP();
 				Collection<LSPShipment> shipments = lsp.getShipments();
 				for (LSPShipment shipment : shipments) {
-					assigner.assignToLogisticChain(shipment);
+					assigner.assignToPlan(plan ,shipment);
 				}
 			}
 
