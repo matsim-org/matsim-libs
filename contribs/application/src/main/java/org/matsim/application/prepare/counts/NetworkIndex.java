@@ -19,11 +19,11 @@ public class NetworkIndex<T> {
 	private final STRtree index = new STRtree();
 	private final double range;
 	private final GeometryFactory factory = new GeometryFactory();
-	private final GeometryGetter getter;
+	private final GeometryGetter<T> getter;
 	private final List<BiPredicate<Link, T>> filter = new ArrayList<>();
 	private final Map<Link, LineString> geometries;
 
-	public NetworkIndex(Network network, double range, GeometryGetter getter) {
+	public NetworkIndex(Network network, double range, GeometryGetter<T> getter) {
 
 		this.range = range;
 		this.getter = getter;
@@ -71,14 +71,13 @@ public class NetworkIndex<T> {
 		Map<Link, Geometry> resultMap = new HashMap<>();
 		for (Link link : result) {
 
+			LineString ls;
 			if (this.geometries.isEmpty()) {
-				LineString ls = this.link2LineString(link);
-				resultMap.put(link, ls);
-			} else {
+				ls = this.link2LineString(link);
+			} else
+				ls = this.geometries.get(link);
 
-				LineString ls = this.geometries.get(link);
-				resultMap.put(link, ls);
-			}
+			resultMap.put(link, ls);
 		}
 
 		return getClosestCandidate(resultMap, toMatch);
@@ -126,7 +125,7 @@ public class NetworkIndex<T> {
 			return null;
 
 		Map<Link, Double> distances = result.entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, r -> r.getValue().distance(getter.getGeometry(toMatch))));
+				.collect(Collectors.toMap(Map.Entry::getKey, r -> r.getValue().distance(this.getter.getGeometry(toMatch))));
 
 		Double min = Collections.min(distances.values());
 
