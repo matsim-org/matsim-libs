@@ -138,9 +138,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 		} else {
 
 			// Create a new start tag and add it to the person data.
+			Stack<String> contextCopy = new Stack<>();
+			contextCopy.addAll(context);
 			StartTag tag = new StartTag();
 			tag.name = name;
-			tag.context = (Stack<String>) context.clone();
+			tag.context = contextCopy;
 			tag.atts = new AttributesImpl(atts);    // We have to create copies of the attributes because the object is re-used by the parser!
 			currentPersonXmlData.add(tag);
 		}
@@ -179,10 +181,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 			// Till parsing population
 		} else {
 			// Create a new end tag and add it to the person data.
+			Stack<String> contextCopy = new Stack<>();
+			contextCopy.addAll(context);
 			EndTag tag = new EndTag();
 			tag.name = name;
 			tag.content = content;
-			tag.context = (Stack<String>) context.clone();
+			tag.context = contextCopy;
 			currentPersonXmlData.add(tag);
 
 			// if it's a person end tag, add the persons xml data to the queue.
