@@ -82,7 +82,7 @@ import java.util.List;
 
 	@Override
 	public void scheduleLogisticChains() {
-		logisticChainScheduler.scheduleLogisticChain();
+		logisticChainScheduler.scheduleLogisticChains();
 	}
 
 	@Override

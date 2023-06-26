@@ -57,13 +57,16 @@ import java.util.ArrayList;
 	}
 
 	@Override
-	public void scheduleLogisticChain() {
-		insertShipmentsAtBeginning();
-		setResourceNeighbours();
-		sortResources();
-		for (LSPResource resource : sortedResourceList) {
-			resource.schedule(bufferTime, lsp.getSelectedPlan() );
+	public void scheduleLogisticChains() {
+		for (LSPPlan lspPlan : lsp.getPlans()) {
+			insertShipmentsAtBeginning(lspPlan);
+			setResourceNeighbours();
+			sortResources();
+			for (LSPResource resource : sortedResourceList) {
+				resource.schedule(bufferTime, lspPlan);
+			}
 		}
+
 	}
 
 	@Override
@@ -126,8 +129,8 @@ import java.util.ArrayList;
 		return false;
 	}
 
-	private void insertShipmentsAtBeginning() {
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
+	private void insertShipmentsAtBeginning(LSPPlan lspPlan) {
+		for (LogisticChain solution : lspPlan.getLogisticChains()) {
 			LogisticChainElement firstElement = getFirstElement(solution);
 			assert firstElement != null;
 			for (Id<LSPShipment> lspShipmentId : solution.getShipmentIds()) {
