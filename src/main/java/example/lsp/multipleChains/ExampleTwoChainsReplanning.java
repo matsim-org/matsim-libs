@@ -247,8 +247,8 @@ public class ExampleTwoChainsReplanning {
 			lsp.assignShipmentToLSP(shipment);
 		}
 
-//		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
-//		lsp.scheduleLogisticChains();
+		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
+		lsp.scheduleLogisticChains();
 
 		return lsp;
 	}

@@ -94,8 +94,6 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 				}
 			}
-			log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
-			lsp.scheduleLogisticChains();
 		}
 	}
 
@@ -137,9 +135,9 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 			FreightUtils.getCarriers(scenario).addCarrier(carrier);
 			carrierAgentTracker.getCarriers().addCarrier(carrier);
 		}
-//		for (LSP lsp : lsps.getLSPs().values()) {
-//			lsp.scheduleLogisticChains();
-//		}
+		for (LSP lsp : lsps.getLSPs().values()) {
+			lsp.scheduleLogisticChains();
+		}
 
 	}
 
