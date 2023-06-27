@@ -162,9 +162,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 		if (POPULATION.equals(name)) {
 			// signal the threads that they should end parsing
 			for (int i = 0; i < this.numThreads; i++) {
-				List<Tag> list = new ArrayList<>();
-				list.add(new EndProcessingTag());
-				this.queue.add(list);
+				this.queue.add(List.of(new EndProcessingTag()));
 			}
 
 			// wait for the threads to finish
