@@ -31,7 +31,7 @@ import java.util.Collection;
 	private final Collection<LogisticChain> logisticChains;
 	private final Collection<ShipmentPlan> shipmentPlans;
 	private LSP lsp;
-	private double score;
+	private Double score = null;
 	private ShipmentAssigner assigner;
 	private String type = null;
 
