@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.geotools.geometry.jts.JTS;
+import org.locationtech.jts.algorithm.distance.DiscreteHausdorffDistance;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
@@ -15,6 +16,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -64,7 +66,29 @@ public final class NetworkIndex<T> {
 		this.index.build();
 	}
 
-	// TODO: may use Hausdorff distance to compare two line strings
+	/**
+	 * Calculate the minimum hausdorff distance between two geometries.
+	 * Unlike the classical distance, this uses the minimum instead of maximum of the two directed distances.
+	 * This makes it more usable for geometries with different extent.
+	 * This function may be used to compute the similarity of two line strings.
+	 */
+	public static double minHausdorffDistance(Geometry g1, Geometry g2) {
+
+		DiscreteHausdorffDistance d1 = new DiscreteHausdorffDistance(g1, g2);
+		double u = d1.orientedDistance();
+
+		DiscreteHausdorffDistance d2 = new DiscreteHausdorffDistance(g2, g1);
+		double v = d2.orientedDistance();
+
+		return Math.min(u, v);
+	}
+
+	/**
+	 * Calculates the angle of vector from v to u.
+	 */
+	public static double angle(Coordinate v, Coordinate u) {
+		return Math.atan2(u.getY() - v.getY(), u.getX() - v.getX());
+	}
 
 	/**
 	 * Read network geometries that have been written with {@link org.matsim.contrib.sumo.SumoNetworkConverter}.
@@ -118,17 +142,18 @@ public final class NetworkIndex<T> {
 	/**
 	 * Change the distance calculation.
 	 */
-	public NetworkIndex<T> setDistance(GeometryDistance<T> distance) {
+	public NetworkIndex<T> setDistanceCalculator(GeometryDistance<T> distance) {
 		this.distance = distance;
 		return this;
 	}
 
 	/**
 	 * Uses an STRtree to match an Object to a network link. Custom filters are applied to filter the query results.
-	 * The closest link to the object, based on the Geometry distance function is returned.
+	 * The closest link to the object, based on the distance function is returned.
+	 * @param filter optional filter, only for this query.
 	 */
 	@SuppressWarnings("unchecked")
-	public Link query(T toMatch) {
+	public Link query(T toMatch, @Nullable BiPredicate<Link, T> filter) {
 
 		Geometry geometry = getter.getGeometry(toMatch);
 
@@ -136,15 +161,23 @@ public final class NetworkIndex<T> {
 
 		List<LinkGeometryRecord> result = index.query(searchArea);
 
-		if (result.isEmpty()) return null;
+		if (result.isEmpty())
+			return null;
 
-		return getClosestCandidate(result, toMatch);
+		return getClosestCandidate(result, toMatch, filter);
+	}
+
+	/**
+	 * See {@link #query(Object, BiPredicate)}.
+	 */
+	public Link query(T toMatch) {
+		return query(toMatch, null);
 	}
 
 	/**
 	 * Transforms a MATSim network link to a LineString Object.
 	 */
-	public LineString link2LineString(Link link) {
+	private LineString link2LineString(Link link) {
 
 		Coord from = link.getFromNode().getCoord();
 		Coord to = link.getToNode().getCoord();
@@ -161,12 +194,15 @@ public final class NetworkIndex<T> {
 		index.remove(r.geometry.getEnvelopeInternal(), r);
 	}
 
-	private Link getClosestCandidate(List<LinkGeometryRecord> result, T toMatch) {
+	private Link getClosestCandidate(List<LinkGeometryRecord> result, T toMatch, BiPredicate<Link, T> filter) {
 
-		if (result.isEmpty()) return null;
-		if (result.size() == 1) return result.stream().findFirst().get().link;
+		if (result.isEmpty())
+			return null;
 
-		applyFilter(result, toMatch);
+		if (result.size() == 1)
+			return result.stream().findFirst().get().link;
+
+		applyFilter(result, toMatch, filter);
 
 		if (result.isEmpty())
 			return null;
@@ -183,18 +219,21 @@ public final class NetworkIndex<T> {
 		this.filter.add(filter);
 	}
 
-	private void applyFilter(List<LinkGeometryRecord> result, T toMatch) {
+	private void applyFilter(List<LinkGeometryRecord> result, T toMatch, BiPredicate<Link, T> filter) {
 
-		for (var it = result.iterator(); it.hasNext(); ) {
-
+		outer: for (var it = result.iterator(); it.hasNext(); ) {
 			LinkGeometryRecord next = it.next();
 			Link link = next.link;
 			for (BiPredicate<Link, T> predicate : this.filter) {
 				if (!predicate.test(link, toMatch)) {
 					it.remove();
-					break;
+					// No further filter should be checked
+					continue outer;
 				}
 			}
+
+			if (filter != null && !filter.test(link, toMatch))
+				it.remove();
 		}
 	}
 
