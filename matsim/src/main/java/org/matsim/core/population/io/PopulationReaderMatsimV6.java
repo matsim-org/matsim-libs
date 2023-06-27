@@ -54,6 +54,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
@@ -138,6 +139,11 @@ import com.google.inject.Inject;
 		    this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
 		    ProjectionUtils.putCRS(this.plans, targetCRS);
 	    }
+	}
+
+	public ObjectAttributesConverter getObjectAttributesConverter()
+	{
+		return attributesReader.getObjectAttributesConverter();
 	}
 
 	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {

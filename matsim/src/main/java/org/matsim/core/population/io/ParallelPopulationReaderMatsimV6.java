@@ -25,11 +25,14 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -89,6 +92,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 		}
 	}
 
+	private static void initObjectAttributeConverters(ParallelPopulationReaderMatsimV6Runner runner, ObjectAttributesConverter converter)
+	{
+		Map<String, AttributeConverter<?>> targetConverter = runner.getObjectAttributesConverter().getConverters();
+		converter.getConverters().entrySet().forEach( e -> targetConverter.put(e.getKey(), e.getValue()));
+	}
+
 	private void initThreads() {
 		threads = new Thread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
@@ -99,6 +108,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 							this.targetCRS,
 							this.scenario,
 							this.queue);
+			initObjectAttributeConverters(runner,this.getObjectAttributesConverter());
 
 			Thread thread = new Thread(runner);
 			thread.setDaemon(true);
