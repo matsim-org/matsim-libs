@@ -70,10 +70,11 @@ import org.apache.logging.log4j.Logger;
 				.stream()
 				.mapToInt(logisticChain -> logisticChain.getShipmentIds().size())
 				.sum();
-		if (lspPlanShipmentCount !=  lsp.getShipments().size()) {
-			logger.error("LspPlan doesn't contain the same number of shipments as LSP, " +
+		int shipmentCountDifference = lsp.getShipments().size() - lspPlanShipmentCount;
+		if (shipmentCountDifference > 0) {
+			logger.error("LspPlan contains less shipments than LSP, " +
 					"shipments probably lost during replanning.");
-			score -= 10000;
+			score -= 10000 * shipmentCountDifference;
 		}
 	}
 
