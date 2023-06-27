@@ -28,7 +28,7 @@ package lsp;
  */
 public interface LogisticChainScheduler extends HasBackpointer<LSP> {
 
-	void scheduleLogisticChains();
+	void scheduleLogisticChain();
 
 	void setBufferTime(int bufferTime);
 }

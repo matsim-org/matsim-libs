@@ -57,14 +57,12 @@ import java.util.List;
 	}
 
 	@Override
-	public void scheduleLogisticChains() {
-		for (LSPPlan lspPlan : lsp.getPlans()) {
-			insertShipmentsAtBeginning(lspPlan);
-			for (LSPResource resource : resources) {
-				for (LSPResource lspResource : lsp.getResources()) {
-					if (lspResource == resource) {
-						lspResource.schedule(bufferTime, lspPlan);
-					}
+	public void scheduleLogisticChain() {
+		insertShipmentsAtBeginning();
+		for (LSPResource resource : resources) {
+			for (LSPResource lspResource : lsp.getResources()) {
+				if (lspResource == resource) {
+					lspResource.schedule(bufferTime, lsp.getSelectedPlan());
 				}
 			}
 		}
@@ -76,16 +74,16 @@ import java.util.List;
 	}
 
 
-	private void insertShipmentsAtBeginning(LSPPlan lspPlan) {
-			for (LogisticChain solution : lspPlan.getLogisticChains()) {
-				LogisticChainElement firstElement = getFirstElement(solution);
-				assert firstElement != null;
-				for (Id<LSPShipment> lspShipmentId : solution.getShipmentIds()) {
-					var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
-					assert shipment != null;
-					firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment);
-				}
+	private void insertShipmentsAtBeginning() {
+		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
+			LogisticChainElement firstElement = getFirstElement(solution);
+			assert firstElement != null;
+			for (Id<LSPShipment> lspShipmentId : solution.getShipmentIds()) {
+				var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
+				assert shipment != null;
+				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment);
 			}
+		}
 	}
 
 	private LogisticChainElement getFirstElement(LogisticChain solution) {
