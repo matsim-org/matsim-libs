@@ -52,6 +52,10 @@ import java.util.*;
 				// Shifting shipments only makes sense for multiple chains
 				if (lspPlan.getLogisticChains().size() < 2) return;
 
+				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+					logisticChain.getShipmentIds().clear();
+				}
+
 				LSP lsp = lspPlan.getLSP();
 				Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
 
