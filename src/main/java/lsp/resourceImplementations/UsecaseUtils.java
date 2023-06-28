@@ -26,9 +26,6 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.core.utils.io.IOUtils;
@@ -164,88 +161,6 @@ public class UsecaseUtils {
 
 	public enum VehicleReturn {returnToFromLink, endAtToLink}
 
-
-	public static class TranshipmentHubSchedulerBuilder {
-		private double capacityNeedLinear;
-		private double capacityNeedFixed;
-
-		private TranshipmentHubSchedulerBuilder() {
-		}
-
-		public static TranshipmentHubSchedulerBuilder newInstance() {
-			return new TranshipmentHubSchedulerBuilder();
-		}
-
-		public TranshipmentHubSchedulerBuilder setCapacityNeedLinear(double capacityNeedLinear) {
-			this.capacityNeedLinear = capacityNeedLinear;
-			return this;
-		}
-
-		public TranshipmentHubSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed) {
-			this.capacityNeedFixed = capacityNeedFixed;
-			return this;
-		}
-		public TransshipmentHubScheduler build() {
-			return new TransshipmentHubScheduler(this);
-		}
-
-		//--- Getters ---
-
-		double getCapacityNeedLinear() {
-			return capacityNeedLinear;
-		}
-
-		double getCapacityNeedFixed() {
-			return capacityNeedFixed;
-		}
-	}
-
-	public static final class TransshipmentHubBuilder {
-
-		private final Id<LSPResource> id;
-		private final Id<Link> locationLinkId;
-		private final ArrayList<LogisticChainElement> clientElements;
-		private TransshipmentHubScheduler transshipmentHubScheduler;
-		private final Scenario scenario;
-
-		private TransshipmentHubBuilder(Id<LSPResource> id, Id<Link> locationLinkId, Scenario scenario) {
-			this.id = id;
-			this.clientElements = new ArrayList<>();
-			this.locationLinkId = locationLinkId;
-			this.scenario = scenario;
-		}
-
-		public static TransshipmentHubBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId, Scenario scenario) {
-			return new TransshipmentHubBuilder(id, locationLinkId, scenario);
-		}
-
-		public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler TranshipmentHubScheduler) {
-			this.transshipmentHubScheduler = (TransshipmentHubScheduler) TranshipmentHubScheduler;
-			return this;
-		}
-
-		public TransshipmentHub build() {
-			return new TransshipmentHub(this, scenario);
-		}
-		//--- Getters ---
-
-		Id<LSPResource> getId() {
-			return id;
-		}
-
-		Id<Link> getLocationLinkId() {
-			return locationLinkId;
-		}
-
-		TransshipmentHubScheduler getTransshipmentHubScheduler() {
-			return transshipmentHubScheduler;
-		}
-
-		ArrayList<LogisticChainElement> getClientElements() {
-			return clientElements;
-		}
-
-	}
 
 	public enum CARRIER_TYPE {collectionCarrier, mainRunCarrier, distributionCarrier, undefined}
 

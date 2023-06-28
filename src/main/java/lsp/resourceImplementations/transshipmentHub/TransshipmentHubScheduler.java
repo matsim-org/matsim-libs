@@ -18,7 +18,7 @@
  *  * ***********************************************************************
  */
 
-package lsp.resourceImplementations;
+package lsp.resourceImplementations.transshipmentHub;
 
 import lsp.*;
 import lsp.shipment.ShipmentPlan;
@@ -38,7 +38,7 @@ import java.util.ArrayList;
 	private TransshipmentHub transshipmentHub;
 	private TransshipmentHubTourEndEventHandler eventHandler;
 
-	TransshipmentHubScheduler(UsecaseUtils.TranshipmentHubSchedulerBuilder builder) {
+	TransshipmentHubScheduler(TranshipmentHubUtils.TranshipmentHubSchedulerBuilder builder) {
 		this.lspShipmentsWithTime = new ArrayList<>();
 		this.capacityNeedLinear = builder.getCapacityNeedLinear();
 		this.capacityNeedFixed = builder.getCapacityNeedFixed();

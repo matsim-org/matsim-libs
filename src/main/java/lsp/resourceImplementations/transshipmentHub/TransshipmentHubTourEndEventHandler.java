@@ -18,7 +18,7 @@
  *  * ***********************************************************************
  */
 
-package lsp.resourceImplementations;
+package lsp.resourceImplementations.transshipmentHub;
 
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
@@ -43,9 +43,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/*package-private*/  class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
+public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
+// Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
 
-//	@Inject Scenario scenario;
 	private final Scenario scenario;
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
 	private final TransshipmentHub transshipmentHub;
@@ -190,7 +190,7 @@ import java.util.Map;
 		return linkId;
 	}
 
-	static class TransshipmentHubEventHandlerPair {
+	public static class TransshipmentHubEventHandlerPair {
 		public final LSPShipment shipment;
 		public final LogisticChainElement element;
 

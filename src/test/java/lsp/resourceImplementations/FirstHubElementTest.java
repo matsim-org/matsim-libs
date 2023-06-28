@@ -23,6 +23,8 @@ package lsp.resourceImplementations;
 import lsp.LSPResource;
 import lsp.LSPUtils;
 import lsp.LogisticChainElement;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import lsp.resourceImplementations.transshipmentHub.TransshipmentHub;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -36,12 +38,12 @@ public class FirstHubElementTest {
 
 	@Before
 	public void initialize() {
-		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder schedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		schedulerBuilder.setCapacityNeedFixed(10);
 		schedulerBuilder.setCapacityNeedLinear(1);
 
 
-		point = UsecaseUtils.TransshipmentHubBuilder
+		point = TranshipmentHubUtils.TransshipmentHubBuilder
 				.newInstance(Id.create("TranshipmentHub1", LSPResource.class), Id.createLinkId("(4 2) (4 3)"), null)
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
 				.build();

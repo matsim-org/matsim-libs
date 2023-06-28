@@ -23,6 +23,7 @@ package example.lsp.initialPlans;
 import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.resourceImplementations.UsecaseUtils;
@@ -193,13 +194,13 @@ import java.util.*;
 			log.info("Create depot");
 
 			//The scheduler for the first reloading point is created --> this will be the depot in this use case
-			LSPResourceScheduler depotScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+			LSPResourceScheduler depotScheduler = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
 					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
 					.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
 					.build();
 
 			//The scheduler is added to the Resource and the Resource is created
-			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Depot", LSPResource.class), depotLinkId, scenario)
+			LSPResource depotResource = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(Id.create("Depot", LSPResource.class), depotLinkId, scenario)
 					.setTransshipmentHubScheduler(depotScheduler)
 					.build();
 
@@ -252,7 +253,7 @@ import java.util.*;
 			log.info("");
 			log.info("The second reloading adapter (hub) i.e. the Resource is created");
 			//The scheduler for the second reloading point is created
-			LSPResourceScheduler hubScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+			LSPResourceScheduler hubScheduler = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
 					.setCapacityNeedFixed(10)
 					.setCapacityNeedLinear(1)
 					.build();
@@ -260,7 +261,7 @@ import java.util.*;
 			//The scheduler is added to the Resource and the Resource is created
 			//The second reloading adapter i.e. the Resource is created
 			Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
-			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, hubLinkId,scenario )
+			LSPResource hubResource = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, hubLinkId,scenario )
 					.setTransshipmentHubScheduler(hubScheduler)
 					.build();
 

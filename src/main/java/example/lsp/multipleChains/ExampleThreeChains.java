@@ -3,6 +3,7 @@ package example.lsp.multipleChains;
 import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.resourceImplementations.UsecaseUtils;
@@ -206,12 +207,12 @@ public class ExampleThreeChains {
 
 				LogisticChainElement hubElement;
 				{
-					LSPResourceScheduler hubScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+					LSPResourceScheduler hubScheduler = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
 							.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
 							.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
 							.build();
 
-					LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("hub", LSPResource.class), HUB_LINK_ID, scenario)
+					LSPResource hubResource = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(Id.create("hub", LSPResource.class), HUB_LINK_ID, scenario)
 							.setTransshipmentHubScheduler(hubScheduler)
 							.build();
 					LSPUtils.setFixedCost(hubResource, HUBCOSTS_FIX);

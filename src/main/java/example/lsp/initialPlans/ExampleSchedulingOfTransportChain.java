@@ -24,6 +24,7 @@ import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -94,10 +95,10 @@ import java.util.Random;
 		//The first reloading adapter i.e. the Resource is created
 		Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
-		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
+		TranshipmentHubUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
 
 		//The scheduler for the first reloading point is created
-		final LSPResourceScheduler firstHubScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+		final LSPResourceScheduler firstHubScheduler = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
 				.setCapacityNeedFixed(10)
 				.setCapacityNeedLinear(1)
 				.build();
@@ -154,12 +155,12 @@ import java.util.Random;
 		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
 
 		//The scheduler for the second reloading point is created
-		LSPResourceScheduler secondHubScheduler  = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+		LSPResourceScheduler secondHubScheduler  = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
 				.setCapacityNeedFixed(10)
 				.setCapacityNeedLinear(1)
 				.build();
 
-		LSPResource secondTransshipmentHubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario)
+		LSPResource secondTransshipmentHubResource = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario)
 				.setTransshipmentHubScheduler(secondHubScheduler)
 				.build();
 

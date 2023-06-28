@@ -22,6 +22,8 @@ package lsp.resourceImplementations;
 
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import lsp.resourceImplementations.transshipmentHub.TransshipmentHub;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -37,14 +39,14 @@ public class SecondReloadResourceTest {
 
 	@Before
 	public void initialize() {
-		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder schedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		schedulerBuilder.setCapacityNeedFixed(10);
 		schedulerBuilder.setCapacityNeedLinear(1);
 
 		Id<LSPResource> reloadingId = Id.create("TranshipmentHub2", LSPResource.class);
 		reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder transshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId, null);
+		TranshipmentHubUtils.TransshipmentHubBuilder transshipmentHubBuilder = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId, null);
 		transshipmentHubBuilder.setTransshipmentHubScheduler(schedulerBuilder.build());
 		transshipmentHub = transshipmentHubBuilder.build();
 

@@ -18,7 +18,7 @@
  *  * ***********************************************************************
  */
 
-package lsp.resourceImplementations;
+package lsp.resourceImplementations.transshipmentHub;
 
 import lsp.LSPDataObject;
 import lsp.LSPPlan;
@@ -61,7 +61,7 @@ public class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPR
 		throw new RuntimeException("This should have never been called, because it is not planed for getting instantiated.");
 	}
 
-	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder, Scenario scenario) {
+	TransshipmentHub(TranshipmentHubUtils.TransshipmentHubBuilder builder, Scenario scenario) {
 		super(builder.getId());
 		this.locationLinkId = builder.getLocationLinkId();
 		this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
