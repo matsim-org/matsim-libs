@@ -23,7 +23,7 @@ package example.lspAndDemand.requirementsChecking;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;

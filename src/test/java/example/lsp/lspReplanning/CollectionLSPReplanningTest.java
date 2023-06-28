@@ -23,7 +23,7 @@ package example.lsp.lspReplanning;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

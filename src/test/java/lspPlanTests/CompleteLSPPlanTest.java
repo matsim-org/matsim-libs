@@ -21,7 +21,7 @@
 package lspPlanTests;
 
 import lsp.*;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;

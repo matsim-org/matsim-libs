@@ -23,7 +23,7 @@ package logisticChainElementTests;
 import lsp.LSPCarrierResource;
 import lsp.LSPUtils;
 import lsp.LogisticChainElement;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;

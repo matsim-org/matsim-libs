@@ -23,7 +23,7 @@ package example.lsp.initialPlans;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;

@@ -1,7 +1,7 @@
 package example.lsp.multipleChains;
 
 import lsp.*;
-import lsp.usecase.TransshipmentHub;
+import lsp.resourceImplementations.TransshipmentHub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -24,7 +24,7 @@ import lsp.*;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
