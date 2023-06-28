@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * VehicleHouseholdMapping
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,20 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.households;
 
-package org.matsim.core.controler;
+import java.util.Map;
 
-import com.google.inject.multibindings.Multibinder;
+import javax.annotation.Nullable;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.vehicles.Vehicle;
 
 /**
- * Created by amit on 10.07.17.
+ * Tiny helper to get the household associated with a vehicle's id.
+ * 
+ * @author dgrether
+ *
  */
+public class VehicleHouseholdMapping {
 
-public class DefaultPrepareForSimModule extends AbstractModule {
-    // probably, rename it.
-    @Override
-    public void install() {
-        bind(PrepareForSim.class).to(PrepareForSimImpl.class);
-		Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
-    }
+	private final Map<Id<Vehicle>, Household> vhMap = new IdMap<>(Vehicle.class);
+
+	public VehicleHouseholdMapping(Households hhs) {
+		this.reinitialize(hhs);
+	}
+
+	public void reinitialize(Households hhs) {
+		this.vhMap.clear();
+		for (Household h : hhs.getHouseholds().values()) {
+			for (Id<Vehicle> vehicle : h.getVehicleIds()) {
+				this.vhMap.put(vehicle, h);
+			}
+		}
+	}
+
+	public @Nullable Household getHousehold(Id<Vehicle> vehicleId) {
+		return this.vhMap.get(vehicleId);
+	}
+
 }

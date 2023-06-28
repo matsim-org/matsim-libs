@@ -36,7 +36,7 @@ public final class SimWrapperModule extends AbstractModule {
 	@Singleton
 	public SimWrapper getSimWrapper(Config config) {
 		if (simWrapper == null)
-			return SimWrapper.create(ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class));
+			return SimWrapper.create(config);
 
 		return simWrapper;
 	}

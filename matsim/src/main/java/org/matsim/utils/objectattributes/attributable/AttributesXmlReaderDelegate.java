@@ -47,6 +47,11 @@ public class AttributesXmlReaderDelegate {
 	/*package*/ final static String ATTR_ATTRIBUTENAME = "name";
 	/*package*/ final static String ATTR_ATTRIBUTECLASS = "class";
 
+	public ObjectAttributesConverter getObjectAttributesConverter()
+	{
+		return this.converter;
+	}
+
 	public void startTag(String name,
 						 org.xml.sax.Attributes atts,
 						 Stack<String> context,

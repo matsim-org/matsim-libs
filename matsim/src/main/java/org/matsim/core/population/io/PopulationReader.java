@@ -116,7 +116,7 @@ public final class PopulationReader extends MatsimXmlParser {
 		switch ( doctype ) {
 			case POPULATION_V6:
 				this.delegate =
-						new PopulationReaderMatsimV6(
+						new ParallelPopulationReaderMatsimV6(
 						        inputCRS,
 						        targetCRS,
 								this.scenario);
