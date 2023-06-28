@@ -46,7 +46,7 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 
-import static lsp.resourceImplementations.UsecaseUtils.*;
+import static lsp.resourceImplementations.ResourceImplementationUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

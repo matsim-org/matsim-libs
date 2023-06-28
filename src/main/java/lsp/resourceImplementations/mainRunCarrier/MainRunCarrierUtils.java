@@ -2,7 +2,7 @@ package lsp.resourceImplementations.mainRunCarrier;
 
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -27,11 +27,11 @@ public class MainRunCarrierUtils {
         private Id<Link> fromLinkId;
         private Id<Link> toLinkId;
         private MainRunCarrierScheduler mainRunScheduler;
-        private UsecaseUtils.VehicleReturn vehicleReturn;
+        private ResourceImplementationUtils.VehicleReturn vehicleReturn;
 
         private MainRunCarrierResourceBuilder(Carrier carrier, Network network) {
             this.id = Id.create(carrier.getId().toString(), LSPResource.class);
-            UsecaseUtils.setCarrierType(carrier, UsecaseUtils.CARRIER_TYPE.mainRunCarrier);
+            ResourceImplementationUtils.setCarrierType(carrier, ResourceImplementationUtils.CARRIER_TYPE.mainRunCarrier);
             this.carrier = carrier;
             this.clientElements = new ArrayList<>();
             this.network = network;
@@ -42,7 +42,7 @@ public class MainRunCarrierUtils {
         }
 
         public MainRunCarrierResourceBuilder setCarrier(Carrier carrier) {
-            UsecaseUtils.setCarrierType(carrier, UsecaseUtils.CARRIER_TYPE.mainRunCarrier);
+            ResourceImplementationUtils.setCarrierType(carrier, ResourceImplementationUtils.CARRIER_TYPE.mainRunCarrier);
             this.carrier = carrier;
             return this;
         }
@@ -62,7 +62,7 @@ public class MainRunCarrierUtils {
             return this;
         }
 
-        public MainRunCarrierResourceBuilder setVehicleReturn(UsecaseUtils.VehicleReturn vehicleReturn) {
+        public MainRunCarrierResourceBuilder setVehicleReturn(ResourceImplementationUtils.VehicleReturn vehicleReturn) {
             this.vehicleReturn = vehicleReturn;
             return this;
         }
@@ -101,7 +101,7 @@ public class MainRunCarrierUtils {
             return network;
         }
 
-        UsecaseUtils.VehicleReturn getVehicleReturn() {
+        ResourceImplementationUtils.VehicleReturn getVehicleReturn() {
             return vehicleReturn;
         }
     }

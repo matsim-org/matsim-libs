@@ -22,7 +22,7 @@ package lsp.resourceImplementations.distributionCarrier;
 
 import lsp.*;
 import lsp.resourceImplementations.CarrierSchedulerUtils;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
@@ -79,7 +79,7 @@ import java.util.List;
 
 		for (LspShipmentWithTime tuple : copyOfAssignedShipments) {
 			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber was ist, wenn es mehrere gibt???
-			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
+			VehicleType vehicleType = ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if ((load + tuple.getShipment().getSize()) > vehicleType.getCapacity().getOther().intValue()) {
 				load = 0;
 				Carrier auxiliaryCarrier = CarrierSchedulerUtils.routeCarrier(createAuxiliaryCarrier(shipmentsInCurrentTour, availiabilityTimeOfLastShipment + cumulatedLoadingTime), resource.getNetwork());

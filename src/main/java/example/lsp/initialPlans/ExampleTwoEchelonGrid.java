@@ -26,7 +26,7 @@ import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -157,10 +157,10 @@ final class ExampleTwoEchelonGrid {
 		log.info("Some results ....");
 
 		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
-			UsecaseUtils.printScores(controler.getControlerIO().getOutputPath(), lsp);
-			UsecaseUtils.printShipmentsOfLSP(controler.getControlerIO().getOutputPath(), lsp);
-			UsecaseUtils.printResults_shipmentPlan(controler.getControlerIO().getOutputPath(), lsp);
-			UsecaseUtils.printResults_shipmentLog(controler.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printScores(controler.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printShipmentsOfLSP(controler.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentPlan(controler.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentLog(controler.getControlerIO().getOutputPath(), lsp);
 		}
 		log.info("Done.");
 	}
@@ -229,7 +229,7 @@ final class ExampleTwoEchelonGrid {
 					.addLogisticChainElement(directCarrierElement)
 					.build();
 
-			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+			final ShipmentAssigner singleSolutionShipmentAssigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 			lspPlan_direct = LSPUtils.createLSPPlan()
 					.addLogisticChain(solution_direct)
 					.setAssigner(singleSolutionShipmentAssigner);
@@ -247,7 +247,7 @@ final class ExampleTwoEchelonGrid {
 					.setFromLinkId(DEPOT_LINK_ID)
 					.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 					.setToLinkId(HUB_LINK_ID)
-					.setVehicleReturn(UsecaseUtils.VehicleReturn.returnToFromLink)
+					.setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
 					.build();
 
 			LogisticChainElement mainCarrierLSE = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("mainCarrierLSE", LogisticChainElement.class))
@@ -301,7 +301,7 @@ final class ExampleTwoEchelonGrid {
 
 			lspPlan_withHub = LSPUtils.createLSPPlan()
 					.addLogisticChain(solution_withHub)
-					.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner());
+					.setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner());
 		}
 
 		//Todo: Auch das ist wirr: Muss hier alle sommeln, damit man die dann im LSPBuilder dem SolutionScheduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu ... urgs KMT'Jul22
@@ -311,7 +311,7 @@ final class ExampleTwoEchelonGrid {
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
 				.setInitialPlan(lspPlan_direct)
-				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
+				.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
 		lsp.addPlan(lspPlan_withHub); //add the second plan to the lsp
 

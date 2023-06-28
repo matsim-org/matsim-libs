@@ -28,7 +28,7 @@ import lsp.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -92,7 +92,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				String lspId = atts.getValue(ID);
 				Gbl.assertNotNull(lspId);
 				currentLsp = LSPUtils.LSPBuilder.getInstance(Id.create(lspId, LSP.class))
-						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.emptyList()))
+						.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.emptyList()))
 						.setInitialPlan(new LSPPlanImpl())
 						.build();
 			}
@@ -297,7 +297,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				Gbl.assertNotNull(carriers.getCarriers());
 				LSPResource lspResource;
 
-				switch (UsecaseUtils.getCarrierType(currentCarrier)) {
+				switch (ResourceImplementationUtils.getCarrierType(currentCarrier)) {
 					case collectionCarrier -> lspResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 							.build();

@@ -24,7 +24,7 @@ import java.util.List;
 public class CarrierSchedulerUtils {
 	public static Carrier routeCarrier(Carrier carrier, Network network) {
 		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
-		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, UsecaseUtils.getVehicleTypeCollection(carrier));
+		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, ResourceImplementationUtils.getVehicleTypeCollection(carrier));
 		NetworkBasedTransportCosts netbasedTransportCosts = tpcostsBuilder.build();
 		vrpBuilder.setRoutingCost(netbasedTransportCosts);
 		VehicleRoutingProblem vrp = vrpBuilder.build();

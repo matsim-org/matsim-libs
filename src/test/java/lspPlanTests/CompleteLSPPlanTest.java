@@ -22,7 +22,7 @@ package lspPlanTests;
 
 import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
@@ -205,7 +205,7 @@ public class CompleteLSPPlanTest {
 				.addLogisticChainElement(distributionElement)
 				.build();
 
-		assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+		assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addLogisticChain(logisticChain);

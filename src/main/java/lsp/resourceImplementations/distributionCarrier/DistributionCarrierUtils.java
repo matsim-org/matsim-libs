@@ -2,7 +2,7 @@ package lsp.resourceImplementations.distributionCarrier;
 
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -29,7 +29,7 @@ public class DistributionCarrierUtils {
 
         private DistributionCarrierResourceBuilder(Carrier carrier, Network network) {
             this.id = Id.create(carrier.getId().toString(), LSPResource.class);
-            UsecaseUtils.setCarrierType(carrier, UsecaseUtils.CARRIER_TYPE.distributionCarrier);
+            ResourceImplementationUtils.setCarrierType(carrier, ResourceImplementationUtils.CARRIER_TYPE.distributionCarrier);
             this.carrier = carrier;
             this.clientElements = new ArrayList<>();
             this.network = network;

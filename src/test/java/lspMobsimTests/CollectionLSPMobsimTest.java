@@ -54,7 +54,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static lsp.resourceImplementations.UsecaseUtils.*;
+import static lsp.resourceImplementations.ResourceImplementationUtils.*;
 import static org.junit.Assert.*;
 
 public class CollectionLSPMobsimTest {

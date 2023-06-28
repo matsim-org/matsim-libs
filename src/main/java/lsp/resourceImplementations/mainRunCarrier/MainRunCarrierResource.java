@@ -21,7 +21,7 @@
 package lsp.resourceImplementations.mainRunCarrier;
 
 import lsp.*;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,7 +41,7 @@ import java.util.Collection;
 	private final Collection<LogisticChainElement> clientElements;
 	private final MainRunCarrierScheduler mainRunScheduler;
 
-	private final UsecaseUtils.VehicleReturn vehicleReturn;
+	private final ResourceImplementationUtils.VehicleReturn vehicleReturn;
 	private final Network network;
 
 
@@ -55,8 +55,8 @@ import java.util.Collection;
 		if (builder.getVehicleReturn() != null){
 			this.vehicleReturn = builder.getVehicleReturn();
 		} else {
-			log.warn("Return behaviour was not specified. Using the following setting as default: " + UsecaseUtils.VehicleReturn.endAtToLink);
-			this.vehicleReturn = UsecaseUtils.VehicleReturn.endAtToLink;
+			log.warn("Return behaviour was not specified. Using the following setting as default: " + ResourceImplementationUtils.VehicleReturn.endAtToLink);
+			this.vehicleReturn = ResourceImplementationUtils.VehicleReturn.endAtToLink;
 		}
 		this.network = builder.getNetwork();
 	}
@@ -89,7 +89,7 @@ import java.util.Collection;
 		return network;
 	}
 
-	public UsecaseUtils.VehicleReturn getVehicleReturn() {
+	public ResourceImplementationUtils.VehicleReturn getVehicleReturn() {
 		return vehicleReturn;
 	}
 }

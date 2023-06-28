@@ -24,7 +24,7 @@ import lsp.*;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -135,7 +135,7 @@ public class AssignerRequirementsTest {
 		resourcesList.add(redCollectionResource);
 		resourcesList.add(blueCollectionResource);
 
-		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		LSP collectionLSP = collectionLSPBuilder.build();
 

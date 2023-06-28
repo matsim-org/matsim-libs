@@ -21,7 +21,7 @@
 package lspPlanTests;
 
 import lsp.*;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,7 +90,7 @@ public class CollectionLSPPlanTest {
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		logisticChain = collectionSolutionBuilder.build();
 
-		assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+		assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addLogisticChain(logisticChain);

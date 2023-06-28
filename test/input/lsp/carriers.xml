@@ -3,7 +3,7 @@
 <carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
 	<carrier id="singleCarrier">
 		<attributes>
-			<attribute name="carrierType" class="lsp.resourceImplementations.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+			<attribute name="carrierType" class="lsp.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
 		</attributes>
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
@@ -36,7 +36,7 @@
 	</carrier>
 	<carrier id="carrierSouth">
 		<attributes>
-			<attribute name="carrierType" class="lsp.resourceImplementations.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+			<attribute name="carrierType" class="lsp.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
 		</attributes>
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
@@ -50,7 +50,7 @@
 	</carrier>
 	<carrier id="CarrierNorth">
 		<attributes>
-			<attribute name="carrierType" class="lsp.resourceImplementations.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+			<attribute name="carrierType" class="lsp.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
 		</attributes>
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
@@ -64,7 +64,7 @@
 	</carrier>
 	<carrier id="mainCarrier">
 		<attributes>
-			<attribute name="carrierType" class="lsp.resourceImplementations.UsecaseUtils$CARRIER_TYPE">mainRunCarrier</attribute>
+			<attribute name="carrierType" class="lsp.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">mainRunCarrier</attribute>
 		</attributes>
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
@@ -137,7 +137,7 @@
 	</carrier>
 	<carrier id="distributionCarrier">
 		<attributes>
-			<attribute name="carrierType" class="lsp.resourceImplementations.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+			<attribute name="carrierType" class="lsp.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
 		</attributes>
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
@@ -217,7 +217,7 @@
 	</carrier>
 	<carrier id="directCarrier">
 		<attributes>
-			<attribute name="carrierType" class="lsp.resourceImplementations.UsecaseUtils$CARRIER_TYPE">distributionCarrier</attribute>
+			<attribute name="carrierType" class="lsp.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
 		</attributes>
 		<capabilities fleetSize="INFINITE">
 			<vehicles>

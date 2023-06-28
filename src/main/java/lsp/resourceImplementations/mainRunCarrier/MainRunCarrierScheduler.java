@@ -22,7 +22,7 @@ package lsp.resourceImplementations.mainRunCarrier;
 
 import lsp.*;
 import lsp.resourceImplementations.CarrierSchedulerUtils;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
@@ -84,7 +84,7 @@ import java.util.*;
 			CarrierService carrierService = convertToCarrierService(tuple);
 			carrier.getServices().put(carrierService.getId(), carrierService);
 
-			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
+			VehicleType vehicleType = ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if ((load + tuple.getShipment().getSize()) > vehicleType.getCapacity().getOther().intValue()) {
 				load = 0;
 				CarrierPlan plan = createPlan(carrier, shipmentsInCurrentTour);
@@ -114,7 +114,7 @@ import java.util.*;
 	private CarrierPlan createPlan(Carrier carrier, List<LspShipmentWithTime> tuples) {
 
 		//TODO: Allgemein: Hier ist alles manuell zusammen gesetzt; es findet KEINE Tourenplanung statt!
-		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(resource.getNetwork(), UsecaseUtils.getVehicleTypeCollection(resource.getCarrier()));
+		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(resource.getNetwork(), ResourceImplementationUtils.getVehicleTypeCollection(resource.getCarrier()));
 		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
 		Collection<ScheduledTour> tours = new ArrayList<>();
 

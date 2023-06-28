@@ -26,7 +26,7 @@ import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -164,7 +164,7 @@ import java.util.*;
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
-		UsecaseUtils.printResults_shipmentPlan(config.controler().getOutputDirectory(), lsp);
+		ResourceImplementationUtils.printResults_shipmentPlan(config.controler().getOutputDirectory(), lsp);
 
 		log.info("Done.");
 
@@ -352,7 +352,7 @@ import java.util.*;
 				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
 
 				return lspBuilder.setInitialPlan(lspPlan_Reloading)
-						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_Reloading)))
+						.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_Reloading)))
 						.build();
 
 			}
@@ -364,7 +364,7 @@ import java.util.*;
 
 				return lspBuilder
 						.setInitialPlan(lspPlan_direct)
-						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
+						.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
 						.build();
 			}
 			case twoPlans_directAndHub -> {
@@ -385,7 +385,7 @@ import java.util.*;
 
 				final LSP lsp = lspBuilder
 						.setInitialPlan(lspPlan_direct)
-						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList))
+						.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList))
 						.build();
 
 				lsp.addPlan(lspPlan_Reloading); //adding the second plan
@@ -431,7 +431,7 @@ import java.util.*;
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
 		return LSPUtils.createLSPPlan()
-				.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner())
+				.setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
 				.addLogisticChain(completeSolutionDirect);
 	}
 
@@ -457,7 +457,7 @@ import java.util.*;
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
 		return LSPUtils.createLSPPlan()
-				.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner())
+				.setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
 				.addLogisticChain(completeSolutionWithReloading);
 	}
 

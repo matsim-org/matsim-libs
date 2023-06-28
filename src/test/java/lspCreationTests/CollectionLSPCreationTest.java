@@ -21,7 +21,7 @@
 package lspCreationTests;
 
 import lsp.*;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,7 +94,7 @@ public class CollectionLSPCreationTest {
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		logisticChain = collectionSolutionBuilder.build();
 
-		assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+		assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addLogisticChain(logisticChain);
@@ -104,7 +104,7 @@ public class CollectionLSPCreationTest {
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionResource);
 
-		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	}

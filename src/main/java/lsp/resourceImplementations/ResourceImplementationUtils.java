@@ -35,9 +35,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class UsecaseUtils {
+public class ResourceImplementationUtils {
 
-	private static final Logger log = LogManager.getLogger(UsecaseUtils.class);
+	private static final Logger log = LogManager.getLogger(ResourceImplementationUtils.class);
 
 	public static SimpleForwardLogisticChainScheduler createDefaultSimpleForwardLogisticChainScheduler(List<LSPResource> resources) {
 		return new SimpleForwardLogisticChainScheduler(resources);
