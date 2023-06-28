@@ -35,9 +35,10 @@ import java.util.List;
 
 public class ExampleTwoChains {
 
-	private static final double TOLL_VALUE = 0;
-
 	private static final Logger log = LogManager.getLogger(ExampleTwoChains.class);
+
+	private static final DemandSetting demandSetting = DemandSetting.twentyFiveUnits;
+	enum DemandSetting {twentyFiveUnits, fiftyUnits}
 
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("j(0,5)R");
 
@@ -72,8 +73,6 @@ public class ExampleTwoChains {
 			@Override
 			public void install() {
 				final MyEventBasedCarrierScorer carrierScorer = new MyEventBasedCarrierScorer();
-				carrierScorer.setToll(TOLL_VALUE);
-
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
 				bind(CarrierStrategyManager.class).toProvider(() -> {
 					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
@@ -114,7 +113,7 @@ public class ExampleTwoChains {
 			}
 			ConfigUtils.applyCommandline(config,args);
 		} else {
-			config.controler().setOutputDirectory("output/2chains");
+			config.controler().setOutputDirectory("output/2chains_" + demandSetting);
 			config.controler().setLastIteration(2);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
@@ -242,8 +241,13 @@ public class ExampleTwoChains {
 
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
 		List<LSPShipment> shipmentList = new ArrayList<>();
+		int capacityDemand;
 
-		int capacityDemand = 1;
+		switch (demandSetting) {
+			case twentyFiveUnits -> capacityDemand = 25;
+			case fiftyUnits -> capacityDemand = 50;
+			default -> throw new IllegalStateException("Unexpected value: " + demandSetting);
+		}
 
 		Id<LSPShipment> shipmentSouthId = Id.create("shipmentSouth", LSPShipment.class);
 		ShipmentUtils.LSPShipmentBuilder shipment1Builder = ShipmentUtils.LSPShipmentBuilder.newInstance(shipmentSouthId);
