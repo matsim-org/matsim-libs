@@ -21,12 +21,12 @@ import java.util.List;
  *
  * @author Kai Martins-Turner (kturner)
  */
-/*package-private*/ class CarrierSchedulerUtils {
-	static Carrier routeCarrier(Carrier carrier, Network network) {
+public class CarrierSchedulerUtils {
+	public static Carrier routeCarrier(Carrier carrier, Network network) {
 		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, UsecaseUtils.getVehicleTypeCollection(carrier));
-		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
-		vrpBuilder.setRoutingCost(netbasedTransportcosts);
+		NetworkBasedTransportCosts netbasedTransportCosts = tpcostsBuilder.build();
+		vrpBuilder.setRoutingCost(netbasedTransportCosts);
 		VehicleRoutingProblem vrp = vrpBuilder.build();
 
 		VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(vrp);
@@ -36,7 +36,7 @@ import java.util.List;
 		VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
 
 		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
-		NetworkRouter.routePlan(plan, netbasedTransportcosts);
+		NetworkRouter.routePlan(plan, netbasedTransportCosts);
 		carrier.setSelectedPlan(plan);
 		return carrier;
 	}

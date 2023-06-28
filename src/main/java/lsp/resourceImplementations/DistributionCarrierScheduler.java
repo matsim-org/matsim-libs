@@ -21,7 +21,6 @@
 package lsp.resourceImplementations;
 
 import lsp.*;
-import lsp.resourceImplementations.collectionCarrier.CollectionCarrierScheduler;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Ähnlich zu {@link CollectionCarrierScheduler}: Nun werden Sendungen verteilt statt eingesammelt.
+ * Ähnlich zu CollectionCarrierScheduler: Nun werden Sendungen verteilt statt eingesammelt.
  * <p>
  * BUT: scheduleResource() is different from the one
  * used in the case of collection. The LSPShipments are not simply handed over
