@@ -23,6 +23,7 @@ package example.lsp.initialPlans;
 import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -136,10 +137,10 @@ import java.util.Random;
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		//The adapter i.e. the main run resource is created
-		LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+		LSPResource mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
 				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
-				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 				.build();
 
 		//The LogisticsSolutionElement for the main run Resource is created

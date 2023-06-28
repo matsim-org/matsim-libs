@@ -22,6 +22,7 @@ package example.lsp.initialPlans;
 
 import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.resourceImplementations.UsecaseUtils;
@@ -234,10 +235,10 @@ import java.util.*;
 							.build());
 
 			//The scheduler for the main run Resource is created and added to the Resource
-			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+			LSPResource mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
 					.setFromLinkId(depotLinkId)
 					.setToLinkId(hubLinkId)
-					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+					.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 					.build();
 
 			mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))

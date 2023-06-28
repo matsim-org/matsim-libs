@@ -22,6 +22,7 @@ package example.lsp.initialPlans;
 
 import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.resourceImplementations.UsecaseUtils;
@@ -245,9 +246,9 @@ final class ExampleTwoEchelonGrid_NR {
 			mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource mainCarrierRessource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
+			LSPResource mainCarrierRessource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
 					.setFromLinkId(DEPOT_LINK_ID)
-					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+					.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 					.setToLinkId(HUB_LINK_ID)
 					.setVehicleReturn(UsecaseUtils.VehicleReturn.returnToFromLink)
 					.build();

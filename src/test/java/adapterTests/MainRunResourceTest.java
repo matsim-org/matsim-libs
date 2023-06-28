@@ -21,7 +21,7 @@
 package adapterTests;
 
 import lsp.LSPCarrierResource;
-import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -84,8 +84,8 @@ public class MainRunResourceTest {
 		carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-		mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(carrier, network)
-				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+		mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(carrier, network)
+				.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)")).setToLinkId(Id.createLinkId("(14 2) (14 3)"))
 				.build();
 

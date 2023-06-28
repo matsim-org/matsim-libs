@@ -27,6 +27,9 @@ import lsp.resourceImplementations.distributionCarrier.DistributionTourStartEven
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionServiceEndEventHandler;
 import lsp.resourceImplementations.collectionCarrier.CollectionTourEndEventHandler;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunTourEndEventHandler;
+import lsp.resourceImplementations.mainRunCarrier.MainRunTourStartEventHandler;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -149,8 +152,8 @@ public class CompleteLSPSchedulingTest {
 		Carrier mainRunCarrier = CarrierUtils.createCarrier(mainRunCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
-		mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+		mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 				.setFromLinkId(fromLinkId)
 				.setToLinkId(toLinkId)
 				.build();

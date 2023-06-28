@@ -35,6 +35,7 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
 public class DistributionServiceStartEventHandler implements AfterMobsimListener, FreightServiceStartEventHandler, LSPSimulationTracker<LSPShipment> {
+// Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
 
 	private final CarrierService carrierService;
 	private final LogisticChainElement logisticChainElement;

@@ -18,9 +18,10 @@
  *  * ***********************************************************************
  */
 
-package lsp.resourceImplementations;
+package lsp.resourceImplementations.mainRunCarrier;
 
 import lsp.*;
+import lsp.resourceImplementations.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +45,7 @@ import java.util.Collection;
 	private final Network network;
 
 
-	MainRunCarrierResource(UsecaseUtils.MainRunCarrierResourceBuilder builder) {
+	MainRunCarrierResource(MainRunCarrierUtils.MainRunCarrierResourceBuilder builder) {
 		super(builder.getId());
 		this.carrier = builder.getCarrier();
 		this.fromLinkId = builder.getFromLinkId();
