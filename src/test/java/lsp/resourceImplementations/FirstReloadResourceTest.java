@@ -23,7 +23,7 @@ package lsp.resourceImplementations;
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import lsp.resourceImplementations.transshipmentHub.TransshipmentHub;
+import lsp.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 public class FirstReloadResourceTest {
 
 	private static final Id<Link> hubLinkId = Id.createLinkId("(4 2) (4 3)");
-	private TransshipmentHub transshipmentHub;
+	private TransshipmentHubResource transshipmentHubResource;
 
 	@Before
 	public void initialize() {
@@ -45,25 +45,25 @@ public class FirstReloadResourceTest {
 		schedulerBuilder.setCapacityNeedFixed(10);
 		schedulerBuilder.setCapacityNeedLinear(1);
 
-		transshipmentHub = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(Id.create("TranshipmentHub1", LSPResource.class), hubLinkId, null)
+		transshipmentHubResource = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(Id.create("TranshipmentHub1", LSPResource.class), hubLinkId, null)
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
 				.build();
 	}
 
 	@Test
 	public void TranshipmentHubTest() {
-		assertEquals(10, transshipmentHub.getCapacityNeedFixed(), 0.0);
-		assertEquals(1, transshipmentHub.getCapacityNeedLinear(), 0.0);
-		assertFalse(LSPCarrierResource.class.isAssignableFrom(transshipmentHub.getClass()));
+		assertEquals(10, transshipmentHubResource.getCapacityNeedFixed(), 0.0);
+		assertEquals(1, transshipmentHubResource.getCapacityNeedLinear(), 0.0);
+		assertFalse(LSPCarrierResource.class.isAssignableFrom(transshipmentHubResource.getClass()));
 //		assertSame(TranshipmentHub.getClassOfResource(), TranshipmentHub.class);
-		assertNotNull(transshipmentHub.getClientElements());
-		assertTrue(transshipmentHub.getClientElements().isEmpty());
-		assertSame(transshipmentHub.getEndLinkId(), hubLinkId);
-		assertSame(transshipmentHub.getStartLinkId(), hubLinkId);
-		assertNotNull(transshipmentHub.getSimulationTrackers());
-		assertFalse(transshipmentHub.getSimulationTrackers().isEmpty());
-		assertEquals(1, transshipmentHub.getSimulationTrackers().size());
-		assertNotNull(transshipmentHub.getAttributes());
-		assertTrue(transshipmentHub.getAttributes().isEmpty());
+		assertNotNull(transshipmentHubResource.getClientElements());
+		assertTrue(transshipmentHubResource.getClientElements().isEmpty());
+		assertSame(transshipmentHubResource.getEndLinkId(), hubLinkId);
+		assertSame(transshipmentHubResource.getStartLinkId(), hubLinkId);
+		assertNotNull(transshipmentHubResource.getSimulationTrackers());
+		assertFalse(transshipmentHubResource.getSimulationTrackers().isEmpty());
+		assertEquals(1, transshipmentHubResource.getSimulationTrackers().size());
+		assertNotNull(transshipmentHubResource.getAttributes());
+		assertTrue(transshipmentHubResource.getAttributes().isEmpty());
 	}
 }

@@ -24,7 +24,7 @@ import lsp.LSPResource;
 import lsp.LSPUtils;
 import lsp.LogisticChainElement;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import lsp.resourceImplementations.transshipmentHub.TransshipmentHub;
+import lsp.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 
 public class FirstHubElementTest {
 
-	private TransshipmentHub point;
+	private TransshipmentHubResource point;
 	private LogisticChainElement reloadingElement;
 
 	@Before

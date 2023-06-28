@@ -1,7 +1,7 @@
 package example.lsp.initialPlans;
 
 import lsp.*;
-import lsp.resourceImplementations.transshipmentHub.TransshipmentHub;
+import lsp.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -57,7 +57,7 @@ import org.apache.logging.log4j.Logger;
 		var lspPlan = lsp.getSelectedPlan();
 		for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
 			for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
-				if (logisticChainElement.getResource() instanceof TransshipmentHub hub){
+				if (logisticChainElement.getResource() instanceof TransshipmentHubResource hub){
 					score = score - LSPUtils.getFixedCost(hub);
 				}
 			}

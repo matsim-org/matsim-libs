@@ -35,7 +35,7 @@ import java.util.ArrayList;
 	final Logger log = LogManager.getLogger(TransshipmentHubScheduler.class);
 	private final double capacityNeedLinear;
 	private final double capacityNeedFixed;
-	private TransshipmentHub transshipmentHub;
+	private TransshipmentHubResource transshipmentHubResource;
 	private TransshipmentHubTourEndEventHandler eventHandler;
 
 	TransshipmentHubScheduler(TranshipmentHubUtils.TranshipmentHubSchedulerBuilder builder) {
@@ -46,7 +46,7 @@ import java.util.ArrayList;
 	}
 	
 	@Override protected void initializeValues( LSPResource resource ) {
-		this.transshipmentHub = (TransshipmentHub) resource;
+		this.transshipmentHubResource = (TransshipmentHubResource) resource;
 	}
 	
 	@Override protected void scheduleResource() {
@@ -70,8 +70,8 @@ import java.util.ArrayList;
 		ShipmentUtils.ScheduledShipmentHandleBuilder builder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
 		builder.setStartTime(tuple.getTime());
 		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getSize());
-		builder.setResourceId(transshipmentHub.getId());
-		for (LogisticChainElement element : transshipmentHub.getClientElements()) {
+		builder.setResourceId(transshipmentHubResource.getId());
+		for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				builder.setLogisticsChainElement(element);
 			}
@@ -83,7 +83,7 @@ import java.util.ArrayList;
 	}
 
 	private void addShipmentToEventHandler(LspShipmentWithTime tuple) {
-		for (LogisticChainElement element : transshipmentHub.getClientElements()) {
+		for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
 			if (element.getIncomingShipments().getShipments().contains(tuple)) {
 				ShipmentPlan shipmentPlan = ShipmentUtils.getOrCreateShipmentPlan(lspPlan, tuple.getShipment().getId());
 				eventHandler.addShipment(tuple.getShipment(), element, shipmentPlan);
@@ -102,8 +102,8 @@ import java.util.ArrayList;
 	}
 
 
-	public void setTranshipmentHub(TransshipmentHub transshipmentHub) {
-		this.transshipmentHub = transshipmentHub;
+	public void setTranshipmentHub(TransshipmentHubResource transshipmentHubResource) {
+		this.transshipmentHubResource = transshipmentHubResource;
 	}
 
 	public void setEventHandler(TransshipmentHubTourEndEventHandler eventHandler) {

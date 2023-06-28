@@ -62,7 +62,7 @@ import java.util.*;
  * The depot is located at the outer border of the network, while the jobs are located in the middle area.
  * The {@link lsp.LSP} has two different {@link lsp.LSPPlan}s:
  * 1) direct delivery from the depot
- * 2) Using a TransshipmentHub: All goods were brought from the depot to the hub, reloaded and then brought from the hub to the customers
+ * 2) Using a TransshipmentHubResource: All goods were brought from the depot to the hub, reloaded and then brought from the hub to the customers
  * <p>
  * The decision which of these plans is chosen should be made via the Score of the plans.
  * We will modify the costs of the vehicles and/or for using(having) the Transshipment hub. Depending on this setting,

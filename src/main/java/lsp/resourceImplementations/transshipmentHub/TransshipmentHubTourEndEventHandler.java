@@ -48,20 +48,20 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 
 	private final Scenario scenario;
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
-	private final TransshipmentHub transshipmentHub;
+	private final TransshipmentHubResource transshipmentHubResource;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
 
 	/**
 	 * What is a TranshipmentHubTour ??? KMT, Sep 22
 	 *
-	 * @param transshipmentHub
+	 * @param transshipmentHubResource
 	 * @param scenario
 	 */
-	TransshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub, Scenario scenario) {
-		this.transshipmentHub = transshipmentHub;
-		this.linkId = transshipmentHub.getEndLinkId();
-		this.resourceId = transshipmentHub.getId();
+	TransshipmentHubTourEndEventHandler(TransshipmentHubResource transshipmentHubResource, Scenario scenario) {
+		this.transshipmentHubResource = transshipmentHubResource;
+		this.linkId = transshipmentHubResource.getEndLinkId();
+		this.resourceId = transshipmentHubResource.getId();
 		this.scenario = scenario;
 		this.servicesWaitedFor = new HashMap<>();
 	}
@@ -110,9 +110,9 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 			if (allShipmentsOfTourEndInOnePoint(tour)) {
 				for (TourElement tourElement : tour.getTourElements()) {
 					if (tourElement instanceof ServiceActivity serviceActivity) {
-						if (serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
+						if (serviceActivity.getLocation() == transshipmentHubResource.getStartLinkId()
 								&& allServicesAreInOnePoint(tour)
-								&& (tour.getStartLinkId() != transshipmentHub.getStartLinkId())) {
+								&& (tour.getStartLinkId() != transshipmentHubResource.getStartLinkId())) {
 							logHandlingInHub(serviceActivity.getService(), event.getTime());
 						} else {
 							logHandlingInHub(serviceActivity.getService(), event.getTime() + getUnloadEndTime(tour));
@@ -141,7 +141,7 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 		builder.setLinkId(linkId);
 		builder.setResourceId(resourceId);
 		builder.setStartTime(startTime);
-		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
+		double handlingTime = transshipmentHubResource.getCapacityNeedFixed() + transshipmentHubResource.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);
 		builder.setLogisticsChainElement(servicesWaitedFor.get(carrierService).element);
 		ShipmentPlanElement handle = builder.build();
@@ -178,8 +178,8 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 		return servicesWaitedFor;
 	}
 
-	public TransshipmentHub getTranshipmentHub() {
-		return transshipmentHub;
+	public TransshipmentHubResource getTranshipmentHub() {
+		return transshipmentHubResource;
 	}
 
 	public Id<LSPResource> getResourceId() {

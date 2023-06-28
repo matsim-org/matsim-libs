@@ -73,8 +73,8 @@ public class TranshipmentHubUtils {
             return this;
         }
 
-        public TransshipmentHub build() {
-            return new TransshipmentHub(this, scenario);
+        public TransshipmentHubResource build() {
+            return new TransshipmentHubResource(this, scenario);
         }
         //--- Getters ---
 

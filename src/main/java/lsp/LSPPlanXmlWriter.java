@@ -20,10 +20,10 @@
 
 package lsp;
 
+import lsp.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.transshipmentHub.TransshipmentHub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -102,7 +102,7 @@ public class LSPPlanXmlWriter  extends MatsimXmlWriter {
 		if (lsp.getResources().isEmpty()) return;
 		this.writeStartTag(RESOURCES, null);
 		for (LSPResource resource : lsp.getResources()) {
-			if (resource instanceof TransshipmentHub hub) {
+			if (resource instanceof TransshipmentHubResource hub) {
 				List<Tuple<String, String>> tupleList = new ArrayList<>();
 				tupleList.add(new Tuple<>(ID, hub.getId().toString()));
 				tupleList.add(new Tuple<>(LOCATION, hub.getStartLinkId().toString()));

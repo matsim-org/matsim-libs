@@ -41,19 +41,19 @@ import java.util.List;
  * and the client element are entered, so that the way that the {@link lsp.shipment.LSPShipment}
  * takes is specified. In addition, the planned start and end time of the handling
  * (i.e. cross-docking) of the shipment is entered. In the example, cross-docking
- * starts as soon as the considered LSPShipment arrives at the {@link TransshipmentHub}
+ * starts as soon as the considered LSPShipment arrives at the {@link TransshipmentHubResource}
  * and ends after a fixed and a size dependent amount of time.
  * <p>
  * I (KMT, oct'22) have done this temporally public - including a "do not instantiate" constructor , because I need it the class for
  * an instanceOf check for a quick scoring of hubs. This can be reverted, once hubs will appear in the MATSim events stream.
  */
-public class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPResource {
+public class TransshipmentHubResource extends LSPDataObject<LSPResource> implements LSPResource {
 
 	private final Id<Link> locationLinkId;
 	private final TransshipmentHubScheduler transshipmentHubScheduler;
 	private final List<LogisticChainElement> clientElements;
 
-	private TransshipmentHub() { // Do not instantiate. (removable once this class is package-private again) KMT oct'22
+	private TransshipmentHubResource() { // Do not instantiate. (removable once this class is package-private again) KMT oct'22
 		super(null);
 		this.locationLinkId = null;
 		this.transshipmentHubScheduler = null;
@@ -61,7 +61,7 @@ public class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPR
 		throw new RuntimeException("This should have never been called, because it is not planed for getting instantiated.");
 	}
 
-	TransshipmentHub(TranshipmentHubUtils.TransshipmentHubBuilder builder, Scenario scenario) {
+	TransshipmentHubResource(TranshipmentHubUtils.TransshipmentHubBuilder builder, Scenario scenario) {
 		super(builder.getId());
 		this.locationLinkId = builder.getLocationLinkId();
 		this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
