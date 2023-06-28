@@ -1,9 +1,12 @@
 package example.lsp.multipleChains;
 
 import lsp.*;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -107,10 +110,10 @@ public class ExampleThreeChains {
 		log.info("Some results ....");
 
 		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
-			UsecaseUtils.printScores(controler.getControlerIO().getOutputPath(), lsp);
-			UsecaseUtils.printShipmentsOfLSP(controler.getControlerIO().getOutputPath(), lsp);
-			UsecaseUtils.printResults_shipmentPlan(controler.getControlerIO().getOutputPath(), lsp);
-			UsecaseUtils.printResults_shipmentLog(controler.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printScores(controler.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printShipmentsOfLSP(controler.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentPlan(controler.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentLog(controler.getControlerIO().getOutputPath(), lsp);
 		}
 		log.info("Done.");
 	}
@@ -161,8 +164,8 @@ public class ExampleThreeChains {
 			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource singleCarrierResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+			LSPResource singleCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
+					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
 			LogisticChainElement singleCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("singleCarrierElement", LogisticChainElement.class))
@@ -173,7 +176,7 @@ public class ExampleThreeChains {
 					.addLogisticChainElement(singleCarrierElement)
 					.build();
 
-			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+			final ShipmentAssigner singleSolutionShipmentAssigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 			lspPlan_oneChain = LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
 					.setAssigner(singleSolutionShipmentAssigner);
@@ -190,11 +193,11 @@ public class ExampleThreeChains {
 					mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 					CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-					LSPResource mainCarrierRessource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
+					LSPResource mainCarrierRessource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
 							.setFromLinkId(DEPOT_SOUTH_LINK_ID)
-							.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+							.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 							.setToLinkId(HUB_LINK_ID)
-							.setVehicleReturn(UsecaseUtils.VehicleReturn.returnToFromLink)
+							.setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
 							.build();
 
 					mainCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("mainCarrierElement", LogisticChainElement.class))
@@ -204,12 +207,12 @@ public class ExampleThreeChains {
 
 				LogisticChainElement hubElement;
 				{
-					LSPResourceScheduler hubScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+					LSPResourceScheduler hubScheduler = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
 							.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
 							.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
 							.build();
 
-					LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("hub", LSPResource.class), HUB_LINK_ID, scenario)
+					LSPResource hubResource = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(Id.create("hub", LSPResource.class), HUB_LINK_ID, scenario)
 							.setTransshipmentHubScheduler(hubScheduler)
 							.build();
 					LSPUtils.setFixedCost(hubResource, HUBCOSTS_FIX);
@@ -225,8 +228,8 @@ public class ExampleThreeChains {
 					distributionCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 					CarrierUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, VEH_TYPE_SMALL_05));
-					LSPResource distributionCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
-							.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					LSPResource distributionCarrierRessource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+							.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 							.build();
 
 					distributionCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("distributionCarrierElement", LogisticChainElement.class))
@@ -261,7 +264,7 @@ public class ExampleThreeChains {
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
 				.setInitialPlan(lspPlan_threeChains)
-				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
+				.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
 //		lsp.addPlan(lspPlan_threeChains);
 
@@ -285,8 +288,8 @@ public class ExampleThreeChains {
 			carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource carrierSouthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+			LSPResource carrierSouthResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
+					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
 			southCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("southCarrierElement", LogisticChainElement.class))
@@ -307,8 +310,8 @@ public class ExampleThreeChains {
 			carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource carrierNorthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+			LSPResource carrierNorthResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
+					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
 			northCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("northCarrierElement", LogisticChainElement.class))

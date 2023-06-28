@@ -20,11 +20,15 @@
 
 package lsp;
 
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import lsp.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.TransshipmentHub;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -60,7 +64,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 	private final LSPs lsPs;
 	private final Carriers carriers;
 	private CarrierCapabilities.Builder capabilityBuilder;
-	private TransshipmentHub hubResource;
+	private TransshipmentHubResource hubResource;
 	private String currentHubId;
 	private Double currentHubFixedCost;
 	private String currentHubLocation;
@@ -88,7 +92,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				String lspId = atts.getValue(ID);
 				Gbl.assertNotNull(lspId);
 				currentLsp = LSPUtils.LSPBuilder.getInstance(Id.create(lspId, LSP.class))
-						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.emptyList()))
+						.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.emptyList()))
 						.setInitialPlan(new LSPPlanImpl())
 						.build();
 			}
@@ -118,8 +122,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 			case SCHEDULER -> {
 				double capacityNeedFixed = Double.parseDouble(atts.getValue(CAPACITY_NEED_FIXED));
 				double capacityNeedLinear = Double.parseDouble(atts.getValue(CAPACITY_NEED_LINEAR));
-				hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create(currentHubId, LSPResource.class), Id.createLinkId(currentHubLocation), null)
-						.setTransshipmentHubScheduler(UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+				hubResource = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(Id.create(currentHubId, LSPResource.class), Id.createLinkId(currentHubLocation), null)
+						.setTransshipmentHubScheduler(TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
 								.setCapacityNeedFixed(capacityNeedFixed) //Time needed, fixed (for Scheduler)
 								.setCapacityNeedLinear(capacityNeedLinear) //additional time needed per shipmentSize (for Scheduler)
 								.build())
@@ -293,15 +297,15 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				Gbl.assertNotNull(carriers.getCarriers());
 				LSPResource lspResource;
 
-				switch (UsecaseUtils.getCarrierType(currentCarrier)) {
-					case collectionCarrier -> lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(currentCarrier, null)
-							.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+				switch (ResourceImplementationUtils.getCarrierType(currentCarrier)) {
+					case collectionCarrier -> lspResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(currentCarrier, null)
+							.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 							.build();
-					case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(currentCarrier, null)
-							.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+					case mainRunCarrier -> lspResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(currentCarrier, null)
+							.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 							.build();
-					case distributionCarrier -> lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(currentCarrier, null)
-							.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					case distributionCarrier -> lspResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(currentCarrier, null)
+							.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 							.build();
 					default -> throw new IllegalStateException("Unexpected value: " + currentCarrier.getAttributes().toString());
 				}

@@ -21,7 +21,7 @@
 package adapterTests;
 
 import lsp.LSPCarrierResource;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -84,8 +84,8 @@ public class DistributionResourceTest {
 		distributionCarrier.setCarrierCapabilities(capabilities);
 
 
-		UsecaseUtils.DistributionCarrierResourceBuilder builder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network);
-		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
+		DistributionCarrierUtils.DistributionCarrierResourceBuilder builder = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network);
+		builder.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler());
 		builder.setLocationLinkId(distributionLinkId);
 		distributionResource = builder.build();
 	}

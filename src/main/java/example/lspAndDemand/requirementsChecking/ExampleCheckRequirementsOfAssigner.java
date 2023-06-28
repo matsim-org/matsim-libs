@@ -21,9 +21,10 @@
 package example.lspAndDemand.requirementsChecking;
 
 import lsp.*;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -69,8 +70,8 @@ class ExampleCheckRequirementsOfAssigner {
 		Carrier redCarrier = CarrierUtils.createCarrier(redCarrierId);
 		redCarrier.setCarrierCapabilities(redCapabilities);
 
-		LSPResource redResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource redResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -101,8 +102,8 @@ class ExampleCheckRequirementsOfAssigner {
 		Carrier blueCarrier = CarrierUtils.createCarrier(blueCarrierId);
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 
-		LSPResource blueResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource blueResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -131,7 +132,7 @@ class ExampleCheckRequirementsOfAssigner {
 
 		return LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 				.setInitialPlan(plan)
-				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList))
+				.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList))
 				.build();
 	}
 
