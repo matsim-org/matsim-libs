@@ -18,7 +18,7 @@
  *  * ***********************************************************************
  */
 
-package lsp.resourceImplementations;
+package lsp.resourceImplementations.distributionCarrier;
 
 import lsp.*;
 import org.matsim.api.core.v01.Id;
@@ -36,7 +36,7 @@ import java.util.Collection;
 	private final DistributionCarrierScheduler distributionHandler;
 	private final Network network;
 
-	DistributionCarrierResource(UsecaseUtils.DistributionCarrierResourceBuilder builder) {
+	DistributionCarrierResource(DistributionCarrierUtils.DistributionCarrierResourceBuilder builder) {
 		super(builder.id);
 		this.distributionHandler = builder.distributionHandler;
 		this.clientElements = builder.clientElements;

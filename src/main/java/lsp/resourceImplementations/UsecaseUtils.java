@@ -43,10 +43,6 @@ public class UsecaseUtils {
 
 	private static final Logger log = LogManager.getLogger(UsecaseUtils.class);
 
-	public static DistributionCarrierScheduler createDefaultDistributionCarrierScheduler() {
-		return new DistributionCarrierScheduler();
-	}
-
 	public static MainRunCarrierScheduler createDefaultMainRunCarrierScheduler() {
 		return new MainRunCarrierScheduler();
 	}
@@ -69,7 +65,7 @@ public class UsecaseUtils {
 	 * @param carrier the carrier
 	 * @return Collection of VehicleTypes
 	 */
-	static Collection<VehicleType> getVehicleTypeCollection(Carrier carrier) {
+	public static Collection<VehicleType> getVehicleTypeCollection(Carrier carrier) {
 		Set<VehicleType> vehicleTypeCollection = new HashSet<>();
 		for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			vehicleTypeCollection.add(carrierVehicle.getType());
@@ -173,43 +169,6 @@ public class UsecaseUtils {
 
 	public enum VehicleReturn {returnToFromLink, endAtToLink}
 
-
-	public static class DistributionCarrierResourceBuilder {
-
-		final Id<LSPResource> id;
-		final ArrayList<LogisticChainElement> clientElements;
-		final Network network;
-		Carrier carrier;
-		Id<Link> locationLinkId;
-		DistributionCarrierScheduler distributionHandler;
-
-		private DistributionCarrierResourceBuilder(Carrier carrier, Network network) {
-			this.id = Id.create(carrier.getId().toString(), LSPResource.class);
-			setCarrierType(carrier, CARRIER_TYPE.distributionCarrier);
-			this.carrier = carrier;
-			this.clientElements = new ArrayList<>();
-			this.network = network;
-		}
-
-		public static DistributionCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
-			return new DistributionCarrierResourceBuilder(carrier, network);
-		}
-
-		public DistributionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
-			this.locationLinkId = locationLinkId;
-			return this;
-		}
-
-		public DistributionCarrierResourceBuilder setDistributionScheduler(DistributionCarrierScheduler distributionCarrierScheduler) {
-			this.distributionHandler = distributionCarrierScheduler;
-			return this;
-		}
-
-		public DistributionCarrierResource build() {
-			return new DistributionCarrierResource(this);
-		}
-
-	}
 
 	public static class MainRunCarrierResourceBuilder {
 

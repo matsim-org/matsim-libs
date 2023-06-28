@@ -20,6 +20,7 @@
 
 package lsp;
 
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
@@ -301,8 +302,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 					case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
 							.build();
-					case distributionCarrier -> lspResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(currentCarrier, null)
-							.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					case distributionCarrier -> lspResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(currentCarrier, null)
+							.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 							.build();
 					default -> throw new IllegalStateException("Unexpected value: " + currentCarrier.getAttributes().toString());
 				}

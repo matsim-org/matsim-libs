@@ -41,7 +41,7 @@ public class CarrierSchedulerUtils {
 		return carrier;
 	}
 
-	static Double sumUpScore(List<CarrierPlan> scheduledPlans) {
+	public static Double sumUpScore(List<CarrierPlan> scheduledPlans) {
 		double score = 0;
 		for (CarrierPlan scheduledPlan : scheduledPlans) {
 			if (scheduledPlan.getScore() != null) {

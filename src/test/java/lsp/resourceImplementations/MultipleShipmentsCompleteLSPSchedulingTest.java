@@ -21,6 +21,9 @@
 package lsp.resourceImplementations;
 
 import lsp.*;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.distributionCarrier.DistributionServiceStartEventHandler;
+import lsp.resourceImplementations.distributionCarrier.DistributionTourStartEventHandler;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionServiceEndEventHandler;
 import lsp.resourceImplementations.collectionCarrier.CollectionTourEndEventHandler;
@@ -198,8 +201,8 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 
-		distributionResource  = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
-				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+		distributionResource  = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+				.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 				.setLocationLinkId(distributionLinkId)
 				.build();
 

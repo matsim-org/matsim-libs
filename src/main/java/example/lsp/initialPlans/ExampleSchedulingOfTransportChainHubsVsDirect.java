@@ -21,6 +21,7 @@
 package example.lsp.initialPlans;
 
 import lsp.*;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.resourceImplementations.UsecaseUtils;
@@ -285,9 +286,9 @@ import java.util.*;
 							.build());
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource distributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+			LSPResource distributionResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
 					.setLocationLinkId(hubLinkId)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 			// (The scheduler is where jsprit comes into play.)
 
@@ -319,9 +320,9 @@ import java.util.*;
 			directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource directDistributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(directDistributionCarrier, network)
+			LSPResource directDistributionResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(directDistributionCarrier, network)
 					.setLocationLinkId(depotLinkId)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 			// (The scheduler is where jsprit comes into play.)
 
