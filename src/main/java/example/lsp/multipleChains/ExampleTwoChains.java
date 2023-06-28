@@ -39,6 +39,7 @@ public class ExampleTwoChains {
 
 	private static final Logger log = LogManager.getLogger(ExampleTwoChains.class);
 
+	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("j(0,5)R");
 	private static final Id<Link> DEPOT_SOUTH_LINK_ID = Id.createLinkId("i(1,0)");
 	private static final Id<Link> DEPOT_NORTH_LINK_ID = Id.createLinkId("i(1,8)");
 
@@ -152,7 +153,7 @@ public class ExampleTwoChains {
 			Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
 			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
+			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 			LSPResource singleCarrierResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -179,7 +180,7 @@ public class ExampleTwoChains {
 				Carrier carrierSouth = CarrierUtils.createCarrier(Id.create("carrierSouth", Carrier.class));
 				carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
+				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource carrierSouthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
 						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 						.build();
@@ -194,7 +195,7 @@ public class ExampleTwoChains {
 				Carrier carrierNorth = CarrierUtils.createCarrier(Id.create("CarrierNorth", Carrier.class));
 				carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_LARGE_50));
+				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource carrierNorthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
 						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 						.build();
@@ -249,7 +250,7 @@ public class ExampleTwoChains {
 		Id<LSPShipment> shipmentSouthId = Id.create("shipmentSouth", LSPShipment.class);
 		ShipmentUtils.LSPShipmentBuilder shipment1Builder = ShipmentUtils.LSPShipmentBuilder.newInstance(shipmentSouthId);
 		shipment1Builder.setCapacityDemand(capacityDemand);
-		shipment1Builder.setFromLinkId(DEPOT_SOUTH_LINK_ID);
+		shipment1Builder.setFromLinkId(DEPOT_LINK_ID);
 		shipment1Builder.setToLinkId(Id.createLinkId("i(9,0)"));
 		shipment1Builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 		shipment1Builder.setStartTimeWindow(TimeWindow.newInstance(0, (24)));
@@ -259,8 +260,8 @@ public class ExampleTwoChains {
 		Id<LSPShipment> shipmentNorthId = Id.create("shipmentNorth", LSPShipment.class);
 		ShipmentUtils.LSPShipmentBuilder shipment2Builder = ShipmentUtils.LSPShipmentBuilder.newInstance(shipmentNorthId);
 		shipment2Builder.setCapacityDemand(capacityDemand);
-		shipment2Builder.setFromLinkId(DEPOT_NORTH_LINK_ID);
-		shipment2Builder.setToLinkId(Id.createLinkId("i(9,8)"));
+		shipment2Builder.setFromLinkId(DEPOT_LINK_ID);
+		shipment2Builder.setToLinkId(Id.createLinkId("j(9,9)"));
 		shipment2Builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 		shipment2Builder.setStartTimeWindow(TimeWindow.newInstance(0, (24)));
 		shipment2Builder.setDeliveryServiceTime(capacityDemand * 60);
