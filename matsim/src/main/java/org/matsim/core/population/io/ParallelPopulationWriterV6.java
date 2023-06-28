@@ -25,7 +25,8 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 public class ParallelPopulationWriterV6 implements PopulationWriterHandler{
 	private static final int THREAD_LIMIT = 4;
 	private final Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
-	private final BlockingQueue<PersonData> queue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<PersonData> inputQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<CompletableFuture<String>> outputQueue = new LinkedBlockingQueue<>();
 	private final CoordinateTransformation coordinateTransformation;
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 	private Thread[] threads;
@@ -37,14 +38,14 @@ public class ParallelPopulationWriterV6 implements PopulationWriterHandler{
 
 
 	private void initThreads() {
-		int computeThreads = Math.min(1,Runtime.getRuntime().availableProcessors());
+		int computeThreads = Math.min(THREAD_LIMIT,Runtime.getRuntime().availableProcessors());
 		threads = new Thread[computeThreads];
 		for (int i = 0; i < computeThreads; i++) {
 
 			ParallelPopulationCreatorV6 runner =
 					new ParallelPopulationCreatorV6(
 							this.coordinateTransformation,
-							this.queue);
+							this.inputQueue);
 
 			initObjectAttributeConverters(runner);
 
@@ -92,17 +93,19 @@ public class ParallelPopulationWriterV6 implements PopulationWriterHandler{
 
 	@Override
 	public void writePerson(Person person, BufferedWriter out) throws IOException {
-		this.queue.add(new PersonData(person, new CompletableFuture<>()));
+		CompletableFuture<String> futurePersonString = new CompletableFuture<>();
+		this.inputQueue.add(new PersonData(person, futurePersonString));
+		this.outputQueue.add(futurePersonString);
 	}
 
 	@Override
 	public void endPlans(final BufferedWriter out) throws IOException {
 		// Let's start parallel person serialization...
 		initThreads();
-		while(!this.queue.isEmpty())
+		while(!this.outputQueue.isEmpty())
 		{
 			try {
-				String personString = queue.poll().completableFuture().get();
+				String personString = outputQueue.poll().get();
 				out.write(personString);
 				counter.incCounter();
 			} catch (InterruptedException | ExecutionException e) {
@@ -127,5 +130,5 @@ public class ParallelPopulationWriterV6 implements PopulationWriterHandler{
 		this.converters.putAll(converters);
 	}
 
-	public record PersonData(Person person, CompletableFuture<String> completableFuture){};
+	public record PersonData(Person person, CompletableFuture<String> futurePersonString){};
 }

@@ -52,13 +52,13 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 /*package*/ class ParallelPopulationCreatorV6 implements Runnable {
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 	private final CoordinateTransformation coordinateTransformation;
-	private final BlockingQueue<ParallelPopulationWriterV6.PersonData> queue;
+	private final BlockingQueue<ParallelPopulationWriterV6.PersonData> inputQueue;
 
 	private final StringBuilder stringBuilder = new StringBuilder();
 
 	ParallelPopulationCreatorV6(CoordinateTransformation coordinateTransformation, BlockingQueue<ParallelPopulationWriterV6.PersonData> queue) {
 		this.coordinateTransformation = coordinateTransformation;
-		this.queue = queue;
+		this.inputQueue = queue;
 	}
 
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
@@ -66,9 +66,9 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 	}
 
 	private void process() throws IOException {
-		while (!this.queue.isEmpty())
+		while (!this.inputQueue.isEmpty())
 		{
-			ParallelPopulationWriterV6.PersonData personData = this.queue.poll();
+			ParallelPopulationWriterV6.PersonData personData = this.inputQueue.poll();
 			Person person = personData.person();
 			StringBuilder out = stringBuilder;
 
@@ -95,7 +95,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 			}
 			ParallelPopulationCreatorV6.endPerson(out);
 			this.writeSeparator(out);
-			CompletableFuture<String> completableFuture = personData.completableFuture();
+			CompletableFuture<String> completableFuture = personData.futurePersonString();
 			completableFuture.complete(out.toString());
 
 			// Reset stringBuilder instead of instantiate
