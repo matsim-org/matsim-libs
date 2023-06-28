@@ -18,7 +18,7 @@
  *  * ***********************************************************************
  */
 
-package lsp.resourceImplementations;
+package lsp.resourceImplementations.collectionCarrier;
 
 import lsp.*;
 import org.matsim.api.core.v01.Id;
@@ -37,7 +37,7 @@ import java.util.List;
 	private final CollectionCarrierScheduler collectionScheduler;
 	private final Network network;
 
-	CollectionCarrierResource(UsecaseUtils.CollectionCarrierResourceBuilder builder) {
+	CollectionCarrierResource(CollectionCarrierUtils.CollectionCarrierResourceBuilder builder) {
 		super(builder.id);
 		this.collectionScheduler = builder.collectionScheduler;
 		this.clientElements = builder.clientElements;

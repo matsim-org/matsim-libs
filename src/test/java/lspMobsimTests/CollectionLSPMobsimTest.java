@@ -21,6 +21,7 @@
 package lspMobsimTests;
 
 import lsp.*;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -110,8 +111,8 @@ public class CollectionLSPMobsimTest {
 
 
 
-		collectionResource  = CollectionCarrierResourceBuilder.newInstance(carrier, scenario.getNetwork())
-				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setLocationLinkId(collectionLinkId)
+		collectionResource  = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, scenario.getNetwork())
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler()).setLocationLinkId(collectionLinkId)
 				.build();
 
 		final LogisticChainElement collectionElement;

@@ -18,9 +18,10 @@
  *  * ***********************************************************************
  */
 
-package lsp.resourceImplementations;
+package lsp.resourceImplementations.collectionCarrier;
 
 import lsp.*;
+import lsp.resourceImplementations.CarrierSchedulerUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;

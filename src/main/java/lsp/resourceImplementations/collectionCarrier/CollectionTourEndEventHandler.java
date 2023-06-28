@@ -18,7 +18,7 @@
  *  * ***********************************************************************
  */
 
-package lsp.resourceImplementations;
+package lsp.resourceImplementations.collectionCarrier;
 
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;

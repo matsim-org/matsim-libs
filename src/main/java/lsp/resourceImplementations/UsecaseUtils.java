@@ -43,10 +43,6 @@ public class UsecaseUtils {
 
 	private static final Logger log = LogManager.getLogger(UsecaseUtils.class);
 
-	public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler() {
-		return new CollectionCarrierScheduler();
-	}
-
 	public static DistributionCarrierScheduler createDefaultDistributionCarrierScheduler() {
 		return new DistributionCarrierScheduler();
 	}
@@ -176,42 +172,6 @@ public class UsecaseUtils {
 	}
 
 	public enum VehicleReturn {returnToFromLink, endAtToLink}
-
-	public static class CollectionCarrierResourceBuilder {
-
-		final Id<LSPResource> id;
-		final ArrayList<LogisticChainElement> clientElements;
-		final Network network;
-		Carrier carrier;
-		Id<Link> locationLinkId;
-		CollectionCarrierScheduler collectionScheduler;
-
-		private CollectionCarrierResourceBuilder(Carrier carrier, Network network) {
-			this.id = Id.create(carrier.getId().toString(), LSPResource.class);
-			setCarrierType(carrier, CARRIER_TYPE.collectionCarrier);
-			this.carrier = carrier;
-			this.clientElements = new ArrayList<>();
-			this.network = network;
-		}
-
-		public static CollectionCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
-			return new CollectionCarrierResourceBuilder(carrier, network);
-		}
-
-		public CollectionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
-			this.locationLinkId = locationLinkId;
-			return this;
-		}
-
-		public CollectionCarrierResourceBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler) {
-			this.collectionScheduler = collectionCarrierScheduler;
-			return this;
-		}
-
-		public CollectionCarrierResource build() {
-			return new CollectionCarrierResource(this);
-		}
-	}
 
 
 	public static class DistributionCarrierResourceBuilder {
@@ -438,7 +398,7 @@ public class UsecaseUtils {
 		}
 
 	}
-	private static void setCarrierType( Carrier carrier,  CARRIER_TYPE carrierType ) {
+	public static void setCarrierType(Carrier carrier, CARRIER_TYPE carrierType) {
 		carrier.getAttributes().putAttribute(CARRIER_TYPE_ATTR, carrierType ) ;
 	}
 

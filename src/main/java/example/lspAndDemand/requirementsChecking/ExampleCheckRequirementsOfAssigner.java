@@ -21,6 +21,7 @@
 package example.lspAndDemand.requirementsChecking;
 
 import lsp.*;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.resourceImplementations.UsecaseUtils;
@@ -69,8 +70,8 @@ class ExampleCheckRequirementsOfAssigner {
 		Carrier redCarrier = CarrierUtils.createCarrier(redCarrierId);
 		redCarrier.setCarrierCapabilities(redCapabilities);
 
-		LSPResource redResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource redResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -101,8 +102,8 @@ class ExampleCheckRequirementsOfAssigner {
 		Carrier blueCarrier = CarrierUtils.createCarrier(blueCarrierId);
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 
-		LSPResource blueResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource blueResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 

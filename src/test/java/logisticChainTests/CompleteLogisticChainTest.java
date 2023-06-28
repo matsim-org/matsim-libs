@@ -25,6 +25,7 @@ import lsp.LSPUtils;
 import lsp.LogisticChain;
 import lsp.LogisticChainElement;
 import lsp.resourceImplementations.UsecaseUtils;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -84,9 +85,9 @@ public class CompleteLogisticChainTest {
 		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder
+		CollectionCarrierUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = CollectionCarrierUtils.CollectionCarrierResourceBuilder
 				.newInstance(collectionCarrier, network);
-		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+		collectionResourceBuilder.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler());
 		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 
 		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement",

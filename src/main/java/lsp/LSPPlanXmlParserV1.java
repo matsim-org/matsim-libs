@@ -20,6 +20,7 @@
 
 package lsp;
 
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -294,8 +295,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 				LSPResource lspResource;
 
 				switch (UsecaseUtils.getCarrierType(currentCarrier)) {
-					case collectionCarrier -> lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(currentCarrier, null)
-							.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+					case collectionCarrier -> lspResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(currentCarrier, null)
+							.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 							.build();
 					case mainRunCarrier -> lspResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(currentCarrier, null)
 							.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
