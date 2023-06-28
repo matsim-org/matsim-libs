@@ -154,7 +154,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 
 	/**
 	 * Writes all plans to the output stream and closes it.
-	 * 
+	 *
 	 */
 	public final void write(OutputStream outputStream) {
 		try {
@@ -209,17 +209,17 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	}
 
 	public final void writeV6(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
+		this.handler = new ParallelPopulationWriterV6(coordinateTransformation);
 		write(filename);
 	}
 
 	public final void writeV6(final OutputStream stream) {
-		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
+		this.handler = new ParallelPopulationWriterV6(coordinateTransformation);
 		write(stream);
 	}
 
 	public final void setWriterHandler(final PopulationWriterHandler handler) {
 		this.handler = handler;
 	}
-	
+
 }
