@@ -87,7 +87,7 @@ public class ExampleTwoChainsReplanning {
 //					strategyManager.addStrategy(new RandomDistributionAllShipmentsStrategyFactory().createStrategy(), null, 1);
 //					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 1);
 //					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
-					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
+//					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(5);
 					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
 					return strategyManager;

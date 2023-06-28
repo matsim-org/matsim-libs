@@ -40,8 +40,6 @@ public class ExampleTwoChains {
 	private static final Logger log = LogManager.getLogger(ExampleTwoChains.class);
 
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("j(0,5)R");
-	private static final Id<Link> DEPOT_SOUTH_LINK_ID = Id.createLinkId("i(1,0)");
-	private static final Id<Link> DEPOT_NORTH_LINK_ID = Id.createLinkId("i(1,8)");
 
 	private static final VehicleType VEH_TYPE_LARGE_50 = CarrierVehicleType.Builder.newInstance(Id.create("large50", VehicleType.class))
 			.setCapacity(50)
