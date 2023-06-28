@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class UsecaseUtils {
+	// yyyy This is not really "use cases" any more.  Rather something like "entities" or "models".  Or "implementations for resources".  kai/kai, jun'23
 
 	private static final Logger log = LogManager.getLogger(UsecaseUtils.class);
 
