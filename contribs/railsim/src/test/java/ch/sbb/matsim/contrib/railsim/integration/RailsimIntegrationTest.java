@@ -21,6 +21,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
@@ -273,23 +274,6 @@ public class RailsimIntegrationTest {
 	@Test
 	public void test1_oppositeTraffic() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "1_oppositeTraffic"));
-
-//		List<VehicleArrivesAtFacilityEvent> arrivalEvents = collector.getEvents()
-//			.stream()
-//			.filter(event -> event instanceof VehicleArrivesAtFacilityEvent)
-//			.map(event -> (VehicleArrivesAtFacilityEvent) event)
-//			.filter(event -> event.getFacilityId().toString().equals("t3_A-B"))
-//			.toList();
-//		VehicleArrivesAtFacilityEvent train0Arrival = arrivalEvents.stream()
-//			.filter(event -> event.getFacilityId().toString().equals("t3_A-B"))
-//			.filter(event -> event.getVehicleId().toString().equals("train1"))
-//			.findFirst().orElseThrow();
-//		Assert.assertEquals("train1 should arrive at 10:00:00", 36000.0, train0Arrival.getTime(), 1e-7); // TODO fix times
-//		VehicleArrivesAtFacilityEvent train10Arrival = arrivalEvents.stream()
-//			.filter(event -> event.getFacilityId().toString().equals("t1_B-A"))
-//			.filter(event -> event.getVehicleId().toString().equals("train2"))
-//			.findFirst().orElseThrow();
-//		Assert.assertEquals("train2 should arrive at 10:00:00", 36000.0, train0Arrival.getTime(), 1e-7); // TODO fix times
 	}
 
 	@Test
@@ -403,4 +387,29 @@ public class RailsimIntegrationTest {
 		assertTrainState(30982, 0, 0, 0, 400, filterTrainEvents(collector, "train4"));
 	}
 
+	@Test
+	public void test_station_rerouting_concurrent() {
+		Consumer<Scenario> filter = scenario ->  {
+
+			TransitScheduleFactory f = scenario.getTransitSchedule().getFactory();
+
+			for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
+
+				for (TransitRoute route : line.getRoutes().values()) {
+
+					Collection<Departure> values = new ArrayList<>(route.getDepartures().values());
+					values.forEach(route::removeDeparture);
+
+					// Re-create departure for same time
+					for (Departure departure : values) {
+						Departure d = f.createDeparture(departure.getId(), 8 * 3600);
+						d.setVehicleId(departure.getVehicleId());
+						route.addDeparture(d);
+					}
+				}
+			}
+		};
+
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "station_rerouting"), filter);
+	}
 }

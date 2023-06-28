@@ -32,6 +32,7 @@ public class RailsimTrainStateEventMapper implements MatsimEventsReader.CustomEv
 		var attributes = event.getAttributes();
 		return new RailsimTrainStateEvent(
 			event.getTime(),
+			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_EXACT_TIME)),
 			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
 			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEADLINK), Link.class),
 			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEADPOSITION)),

@@ -1,5 +1,6 @@
 package ch.sbb.matsim.contrib.railsim.analysis;
 
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import org.apache.commons.csv.CSVFormat;
@@ -39,13 +40,13 @@ public class RailsimCsvWriter {
 		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(filename), CSVFormat.DEFAULT.builder().setHeader(header).build())) {
 			for (RailsimTrainStateEvent event : events) {
 				csv.print(event.getVehicleId().toString());
-				csv.print(event.getTime());
+				csv.print(event.getExactTime());
 				csv.print(event.getAcceleration());
-				csv.print(event.getSpeed());
-				csv.print(event.getTargetSpeed());
+				csv.print(RailsimUtils.round(event.getSpeed()));
+				csv.print(RailsimUtils.round(event.getTargetSpeed()));
 
 				csv.print(event.getHeadLink().toString());
-				csv.print(event.getHeadPosition());
+				csv.print(RailsimUtils.round(event.getHeadPosition()));
 				if (network != null) {
 					Link link = network.getLinks().get(event.getHeadLink());
 					if (link != null) {
@@ -61,7 +62,7 @@ public class RailsimCsvWriter {
 				}
 
 				csv.print(event.getTailLink().toString());
-				csv.print(event.getTailPosition());
+				csv.print(RailsimUtils.round(event.getTailPosition()));
 				if (network != null) {
 					Link link = network.getLinks().get(event.getTailLink());
 					if (link != null) {

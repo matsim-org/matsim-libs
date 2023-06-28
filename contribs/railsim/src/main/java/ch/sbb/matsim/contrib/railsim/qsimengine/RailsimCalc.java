@@ -152,6 +152,10 @@ public class RailsimCalc {
 	 */
 	public static double nextLinkReservation(TrainState state, RailLink currentLink) {
 
+		// on way to pt stop, no need to reserve anymore
+		if (state.isStop(currentLink.getLinkId()) && FuzzyUtils.lessThan(state.headPosition, currentLink.length))
+			return Double.POSITIVE_INFINITY;
+
 		double assumedSpeed = calcPossibleMaxSpeed(state);
 
 		// time needed for full stop
@@ -193,6 +197,10 @@ public class RailsimCalc {
 	public static List<RailLink> calcLinksToBlock(TrainState state, RailLink currentLink) {
 
 		List<RailLink> result = new ArrayList<>();
+
+		// Currently driving to pt stop
+		if (state.isStop(currentLink.getLinkId()) && FuzzyUtils.lessThan(state.headPosition, currentLink.length))
+			return result;
 
 		double assumedSpeed = calcPossibleMaxSpeed(state);
 		double stopTime = assumedSpeed / state.train.deceleration();

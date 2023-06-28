@@ -577,7 +577,7 @@ final class RailsimEngine implements Steppable {
 				List<RailLink> tmp = RailsimCalc.calcLinksToBlock(state, currentLink);
 				double r = RailsimCalc.nextLinkReservation(state, currentLink);
 
-				throw new AssertionError("Reserve distance must be positive, but was" + r);
+				throw new AssertionError("Reserve distance must be positive, but was " + r);
 			}
 		}
 

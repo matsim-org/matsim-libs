@@ -7,6 +7,9 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.VehicleType;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Utility class for working with Railsim and its specific attributes.
  *
@@ -29,6 +32,13 @@ public final class RailsimUtils {
 	}
 
 	// TODO: Setter methods
+
+	/**
+	 * Round number to precision commonly used in Railsim.
+	 */
+	public static double round(double d) {
+		return BigDecimal.valueOf(d).setScale(3, RoundingMode.HALF_EVEN).doubleValue();
+	}
 
 	/**
 	 * @return the train capacity for this link, if no link attribute is provided the default is 1.

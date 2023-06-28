@@ -1,11 +1,14 @@
 package ch.sbb.matsim.contrib.railsim.events;
 
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 /**
@@ -15,6 +18,7 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 
 	public static final String EVENT_TYPE = "railsimTrainStateEvent";
 
+	public static final String ATTRIBUTE_EXACT_TIME = "exactTime";
 	public static final String ATTRIBUTE_HEADLINK = "headLink";
 	public static final String ATTRIBUTE_HEADPOSITION = "headPosition";
 	public static final String ATTRIBUTE_TAILLINK = "tailLink";
@@ -23,6 +27,10 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 	public static final String ATTRIBUTE_ACCELERATION = "acceleration";
 	public static final String ATTRIBUTE_TARGETSPEED = "targetSpeed";
 
+	/**
+	 * Exact time with resolution of 0.001s.
+	 */
+	private final double exactTime;
 	private final Id<Vehicle> vehicleId;
 	private final Id<Link> headLink;
 	private final double headPosition;
@@ -32,11 +40,12 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 	private final double acceleration;
 	private final double targetSpeed;
 
-	public RailsimTrainStateEvent(double time, Id<Vehicle> vehicleId,
+	public RailsimTrainStateEvent(double time, double exactTime, Id<Vehicle> vehicleId,
 								  Id<Link> headLink, double headPosition,
 								  Id<Link> tailLink, double tailPosition,
 								  double speed, double acceleration, double targetSpeed) {
 		super(time);
+		this.exactTime = RailsimUtils.round(exactTime);
 		this.vehicleId = vehicleId;
 		this.headLink = headLink;
 		this.headPosition = headPosition;
@@ -55,6 +64,10 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 	@Override
 	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
+	}
+
+	public double getExactTime() {
+		return exactTime;
 	}
 
 	public double getHeadPosition() {
@@ -88,6 +101,7 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_EXACT_TIME, String.valueOf(exactTime));
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		attr.put(ATTRIBUTE_HEADLINK, String.valueOf(headLink));
 		attr.put(ATTRIBUTE_HEADPOSITION, Double.toString(headPosition));

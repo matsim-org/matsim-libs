@@ -141,7 +141,7 @@ final class TrainState {
 	}
 
 	RailsimTrainStateEvent asEvent(double time) {
-		return new RailsimTrainStateEvent(time, driver.getVehicle().getId(),
+		return new RailsimTrainStateEvent(time, time, driver.getVehicle().getId(),
 			headLink, headPosition,
 			tailLink, tailPosition,
 			speed, acceleration, targetSpeed);
