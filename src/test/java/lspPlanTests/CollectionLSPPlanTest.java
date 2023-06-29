@@ -21,7 +21,8 @@
 package lspPlanTests;
 
 import lsp.*;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -74,8 +75,8 @@ public class CollectionLSPPlanTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
-		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+		CollectionCarrierUtils.CollectionCarrierResourceBuilder adapterBuilder = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
+		adapterBuilder.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 
 
@@ -89,7 +90,7 @@ public class CollectionLSPPlanTest {
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		logisticChain = collectionSolutionBuilder.build();
 
-		assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+		assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addLogisticChain(logisticChain);

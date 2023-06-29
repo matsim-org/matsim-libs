@@ -24,7 +24,7 @@ import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 import lsp.LSPUtils;
 import lsp.LogisticChainElement;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -79,8 +79,8 @@ public class DistributionElementTest {
 
 
 		Id<LSPResource> adapterId = Id.create("DistributionCarrierResource", LSPResource.class);
-		adapter = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
-				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+		adapter = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
+				.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 				.setLocationLinkId(distributionLinkId)
 				.build();
 

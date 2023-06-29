@@ -21,10 +21,14 @@
 package example.lsp.mobsimExamples;
 
 import lsp.*;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -77,8 +81,8 @@ import java.util.Random;
 		collectionCarrier.setCarrierCapabilities(capabilities);
 
 		//The collection adapter i.e. the Resource is created
-		LSPResource collectionResource  = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource collectionResource  = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -90,10 +94,10 @@ import java.util.Random;
 		//The first reloading adapter i.e. the Resource is created
 		Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
-		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
+		TranshipmentHubUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
 
 		//The scheduler for the first reloading point is created
-		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
 		firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
 
@@ -132,10 +136,10 @@ import java.util.Random;
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		//The adapter i.e. the main run resource is created
-		LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+		LSPResource mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
 				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
-				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+				.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 				.build();
 
 		//The LogisticsSolutionElement for the main run Resource is created
@@ -147,10 +151,10 @@ import java.util.Random;
 		//The second reloading adapter i.e. the Resource is created       
 		Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
 		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
-		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario);
+		TranshipmentHubUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario);
 
 		//The scheduler for the second reloading point is created
-		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
 		secondSchedulerBuilder.setCapacityNeedLinear(1);
 
@@ -189,10 +193,10 @@ import java.util.Random;
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 		//The distribution adapter i.e. the Resource is created
-		LSPResource distributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+		LSPResource distributionResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
 				.setLocationLinkId(distributionLinkId)
 				//The scheduler for the Resource is created and added. This is where jsprit comes into play.
-				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+				.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 				.build();
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
@@ -221,7 +225,7 @@ import java.util.Random;
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
-		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		completePlan.setAssigner(assigner);
 		completePlan.addLogisticChain(completeSolution);
 
@@ -235,7 +239,7 @@ import java.util.Random;
 		resourcesList.add(mainRunResource);
 		resourcesList.add(secondTranshipmentHubResource);
 		resourcesList.add(distributionResource);
-		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 
 		return completeLSPBuilder.build();

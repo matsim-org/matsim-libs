@@ -21,9 +21,10 @@
 package example.lsp.lspReplanning;
 
 import lsp.*;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -102,8 +103,8 @@ public class CollectionLSPReplanningTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-				UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
-		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+				CollectionCarrierUtils.CollectionCarrierResourceBuilder adapterBuilder = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
+		adapterBuilder.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
 
@@ -117,7 +118,7 @@ public class CollectionLSPReplanningTest {
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		LogisticChain collectionSolution = collectionSolutionBuilder.build();
 
-		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addLogisticChain(collectionSolution);
@@ -127,7 +128,7 @@ public class CollectionLSPReplanningTest {
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionResource);
 
-		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 
