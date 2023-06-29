@@ -21,7 +21,6 @@ package org.matsim.core.population.io;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -216,7 +215,6 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 		private final CoordinateTransformation coordinateTransformation;
 		private final BlockingQueue<ParallelPopulationWriterHandlerV6.PersonData> queue;
-		private final StringBuilder routeDescStringBuilder = new StringBuilder(100);
 		private final StringBuilder stringBuilder = new StringBuilder(100_000);
 		private boolean finish = false;
 
@@ -266,13 +264,8 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			}
 			out.append(">");
 
-			String rd;
-			if (route instanceof NetworkRoute networkRoute) {
-				rd = getRouteDescriptionNetworkRoute(this.routeDescStringBuilder, networkRoute);
-				this.routeDescStringBuilder.setLength(0);
-			} else {
-				rd = route.getRouteDescription();
-			}
+			String rd = route.getRouteDescription();
+
 			if (rd != null) {
 				out.append(encodeContent(rd));
 			}
@@ -443,21 +436,6 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-		}
-
-		// This method re-uses the existing StringBuilder
-		public static String getRouteDescriptionNetworkRoute(StringBuilder desc, NetworkRoute route) {
-			desc.append(route.getStartLinkId().toString());
-			for (Id<Link> linkId : route.getLinkIds()) {
-				desc.append(" ");
-				desc.append(linkId.toString());
-			}
-			// If the start links equals the end link additionally check if its is a round trip.
-			if (!route.getEndLinkId().equals(route.getStartLinkId()) || route.getLinkIds().size() > 0) {
-				desc.append(" ");
-				desc.append(route.getEndLinkId().toString());
-			}
-			return desc.toString();
 		}
 	}
 }
