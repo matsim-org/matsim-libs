@@ -40,7 +40,6 @@ import org.matsim.contrib.freight.events.CarrierTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 
@@ -48,7 +47,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TransshipmentHubTourEndEventHandler implements  BeforeMobsimListener, AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
+public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
 
 	private final Scenario scenario;
@@ -208,10 +207,6 @@ public class TransshipmentHubTourEndEventHandler implements  BeforeMobsimListene
 
 	public Id<Link> getLinkId() {
 		return linkId;
-	}
-
-	@Override public void notifyBeforeMobsim(BeforeMobsimEvent beforeMobsimEvent) {
-//		eventsManager = beforeMobsimEvent.getServices().getEvents();
 	}
 
 	public static class TransshipmentHubEventHandlerPair {
