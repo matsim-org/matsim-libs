@@ -1196,6 +1196,10 @@ public final class PopulationUtils {
 		putPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation );
 	}
 
+	public static void removeSubpopulation(Person person) {
+		person.getAttributes().removeAttribute(SUBPOPULATION_ATTRIBUTE_NAME);
+	}
+
 	public static Population getOrCreateAllpersons( Scenario  scenario ) {
 		Population map = (Population) scenario.getScenarioElement( "allpersons" );
 		if ( map==null ) {
