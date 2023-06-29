@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
@@ -161,4 +163,38 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	}
 
 	public record PersonData(Person person, CompletableFuture<String> futurePersonString){}
+
+	public class ParallelPopulationWriterV6 implements Runnable {
+		private final Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
+		private BlockingQueue<CompletableFuture<String>> outputQueue;
+		private BufferedWriter out;
+
+		private boolean finish = false;
+
+
+		ParallelPopulationWriterV6(BlockingQueue<CompletableFuture<String>> outputQueue, BufferedWriter out) {
+			this.outputQueue = outputQueue;
+			this.out = out;
+		}
+
+		@Override
+		public void run() {
+			do {
+				try {
+					CompletableFuture<String> f = outputQueue.poll();
+					if(f!=null)
+					{
+						out.write(f.get());
+						counter.incCounter();
+					}
+				} catch (InterruptedException | ExecutionException | IOException e) {
+					throw new RuntimeException(e);
+				}
+			} while (!(this.outputQueue.isEmpty() && finish));
+		}
+
+		public void finish() {
+			this.finish = true;
+		}
+	}
 }
