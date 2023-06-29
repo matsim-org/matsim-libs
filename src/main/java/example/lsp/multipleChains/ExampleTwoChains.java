@@ -74,17 +74,17 @@ public class ExampleTwoChains {
 			public void install() {
 				final MyEventBasedCarrierScorer carrierScorer = new MyEventBasedCarrierScorer();
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
+				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
 				bind(CarrierStrategyManager.class).toProvider(() -> {
 					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
-				bind( LSPStrategyManager.class ).toProvider(() -> {
+				bind(LSPStrategyManager.class ).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
-				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
 			}
 		});
 
@@ -94,14 +94,6 @@ public class ExampleTwoChains {
 		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
 
-		log.info("Some results ....");
-
-		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
-			UsecaseUtils.printScores(controler.getControlerIO().getOutputPath(), lsp);
-			UsecaseUtils.printShipmentsOfLSP(controler.getControlerIO().getOutputPath(), lsp);
-			UsecaseUtils.printResults_shipmentPlan(controler.getControlerIO().getOutputPath(), lsp);
-			UsecaseUtils.printResults_shipmentLog(controler.getControlerIO().getOutputPath(), lsp);
-		}
 		log.info("Done.");
 	}
 
@@ -145,7 +137,7 @@ public class ExampleTwoChains {
 		Network network = scenario.getNetwork();
 
 		// A plan with one logistic chain, containing a single carrier is created
-		LSPPlan lspPlan_oneChain;
+		LSPPlan lspPlan_singleChain;
 		{
 			Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
 			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
@@ -164,7 +156,7 @@ public class ExampleTwoChains {
 					.build();
 
 			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
-			lspPlan_oneChain = LSPUtils.createLSPPlan()
+			lspPlan_singleChain = LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
 					.setAssigner(singleSolutionShipmentAssigner);
 		}
@@ -218,11 +210,11 @@ public class ExampleTwoChains {
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
-		lspPlans.add(lspPlan_oneChain);
+		lspPlans.add(lspPlan_singleChain);
 		lspPlans.add(lspPlan_twoChains);
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(lspPlan_oneChain)
+				.setInitialPlan(lspPlan_singleChain)
 				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
 		lsp.addPlan(lspPlan_twoChains);

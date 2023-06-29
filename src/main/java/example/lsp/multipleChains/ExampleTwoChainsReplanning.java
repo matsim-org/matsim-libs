@@ -34,8 +34,6 @@ import java.util.*;
 
 public class ExampleTwoChainsReplanning {
 
-	private static final double TOLL_VALUE = 0;
-
 	private static final Logger log = LogManager.getLogger(ExampleTwoChains_10Shipments.class);
 
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("j(0,5)R");
@@ -71,8 +69,6 @@ public class ExampleTwoChainsReplanning {
 			@Override
 			public void install() {
 				final MyEventBasedCarrierScorer carrierScorer = new MyEventBasedCarrierScorer();
-				carrierScorer.setToll(TOLL_VALUE);
-
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
 				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
 				bind(CarrierStrategyManager.class).toProvider(() -> {
@@ -214,7 +210,7 @@ public class ExampleTwoChainsReplanning {
 					.addLogisticChainElement(northCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = Utils.createPrimaryLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = Utils.createRoundRobinLogisticChainShipmentAssigner();
 			lspPlan_twoChains = LSPUtils.createLSPPlan()
 					.addLogisticChain(southChain)
 					.addLogisticChain(northChain)
@@ -224,14 +220,14 @@ public class ExampleTwoChainsReplanning {
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
-		lspPlans.add(lspPlan_twoChains);
 		lspPlans.add(lspPlan_singleChain);
+		lspPlans.add(lspPlan_twoChains);
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(lspPlan_twoChains)
+				.setInitialPlan(lspPlan_singleChain)
 				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
-		lsp.addPlan(lspPlan_singleChain);
+		lsp.addPlan(lspPlan_twoChains);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
