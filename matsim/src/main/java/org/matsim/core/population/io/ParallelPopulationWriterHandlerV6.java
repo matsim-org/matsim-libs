@@ -25,8 +25,9 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandler{
 	static final Logger LOG = LogManager.getLogger(ParallelPopulationWriterHandlerV6.class);
 	private static final int THREAD_LIMIT = 2;
+	private static final int MAX_QUEUE_LENGTH = 1000;
 	private final BlockingQueue<PersonData> inputQueue = new LinkedBlockingQueue<>();
-	private final BlockingQueue<CompletableFuture<String>> outputQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<CompletableFuture<String>> outputQueue = new LinkedBlockingQueue<>(MAX_QUEUE_LENGTH);
 	private final CoordinateTransformation coordinateTransformation;
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 	private Thread[] threads;
