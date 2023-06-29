@@ -22,6 +22,7 @@ package org.matsim.core.population.io;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -50,72 +51,135 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
  * @author steffenaxer
  */
 /*package*/ class ParallelPopulationCreatorV6 implements Runnable {
+	//static final Logger LOG = LogManager.getLogger(ParallelPopulationCreatorV6.class);
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 	private final CoordinateTransformation coordinateTransformation;
-	private final BlockingQueue<ParallelPopulationWriterV6.PersonData> inputQueue;
+	private final BlockingQueue<ParallelPopulationWriterHandlerV6.PersonData> queue;
+	private final StringBuilder routeDescStringBuilder = new StringBuilder(100);
+	private final StringBuilder stringBuilder = new StringBuilder(100_000);
+	private boolean finish = false;
 
-	private final StringBuilder stringBuilder = new StringBuilder();
-
-	ParallelPopulationCreatorV6(CoordinateTransformation coordinateTransformation, BlockingQueue<ParallelPopulationWriterV6.PersonData> queue) {
+	ParallelPopulationCreatorV6(CoordinateTransformation coordinateTransformation, BlockingQueue<ParallelPopulationWriterHandlerV6.PersonData> queue) {
 		this.coordinateTransformation = coordinateTransformation;
-		this.inputQueue = queue;
+		this.queue = queue;
 	}
 
-	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
-		this.attributesWriter.putAttributeConverters( converters );
+	private static void endPerson(final StringBuilder out)  {
+		out.append("\t</person>\n\n");
 	}
 
-	private void process() throws IOException {
-		while (!this.inputQueue.isEmpty())
-		{
-			ParallelPopulationWriterV6.PersonData personData = this.inputQueue.poll();
-			Person person = personData.person();
-			StringBuilder out = stringBuilder;
+	private static void endPlan(final StringBuilder out) {
+		out.append("\t\t</plan>\n\n");
+	}
 
-			this.startPerson(person, out);
-			for (Plan plan : person.getPlans()) {
-				startPlan(plan, out);
-				// act/leg
-				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof Activity act) {
-						this.writeAct(act, out);
-					}
-					else if (pe instanceof Leg leg) {
-						this.startLeg(leg, out);
-						// route
-						Route route = leg.getRoute();
-						if (route != null) {
-							ParallelPopulationCreatorV6.startRoute(route, out);
-							ParallelPopulationCreatorV6.endRoute(out);
-						}
-						ParallelPopulationCreatorV6.endLeg(out);
-					}
-				}
-				ParallelPopulationCreatorV6.endPlan(out);
+	private static void endLeg(final StringBuilder out)  {
+		out.append("\t\t\t</leg>\n");
+	}
+
+	private void startRoute(final Route route, final StringBuilder out) {
+		out.append("\t\t\t\t<route ");
+		out.append("type=\"");
+		out.append(encodeAttributeValue(route.getRouteType()));
+		out.append("\"");
+		out.append(" start_link=\"");
+		out.append(encodeAttributeValue(route.getStartLinkId().toString()));
+		out.append("\"");
+		out.append(" end_link=\"");
+		out.append(encodeAttributeValue(route.getEndLinkId().toString()));
+		out.append("\"");
+		out.append(" trav_time=\"");
+		out.append(Time.writeTime(route.getTravelTime()));
+		out.append("\"");
+		out.append(" distance=\"");
+		out.append(route.getDistance());
+		out.append("\"");
+		if (route instanceof NetworkRoute networkRoute) {
+			out.append(" vehicleRefId=\"");
+			final Id<Vehicle> vehicleId = networkRoute.getVehicleId();
+			if (vehicleId == null) {
+				out.append("null");
+			} else {
+				out.append(encodeAttributeValue(vehicleId.toString()));
 			}
-			ParallelPopulationCreatorV6.endPerson(out);
-			this.writeSeparator(out);
-			CompletableFuture<String> completableFuture = personData.futurePersonString();
-			completableFuture.complete(out.toString());
+			out.append("\"");
+		}
+		out.append(">");
 
-			// Reset stringBuilder instead of instantiate
-			stringBuilder.setLength(0);
+		String rd;
+		if (route instanceof NetworkRoute networkRoute) {
+			rd = getRouteDescriptionNetworkRoute(this.routeDescStringBuilder, networkRoute);
+			this.routeDescStringBuilder.setLength(0);
+		} else {
+			rd = route.getRouteDescription();
+		}
+		if (rd != null) {
+			out.append(encodeContent(rd));
 		}
 	}
 
-	private void startPerson(final Person person, final StringBuilder out) throws IOException {
+	private static void endRoute(final StringBuilder out) {
+		out.append("</route>\n");
+	}
+
+	public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
+		this.attributesWriter.putAttributeConverters(converters);
+	}
+
+	private void process() throws IOException {
+		do {
+			//LOG.info("{} Current queue size # {}",this.getClass().getName() ,this.inputQueue.size());
+			ParallelPopulationWriterHandlerV6.PersonData personData = this.queue.poll();
+			if (personData != null) {
+				Person person = personData.person();
+				StringBuilder out = stringBuilder;
+
+				this.startPerson(person, out);
+				for (Plan plan : person.getPlans()) {
+					startPlan(plan, out);
+					// act/leg
+					for (PlanElement pe : plan.getPlanElements()) {
+						if (pe instanceof Activity act) {
+							this.writeAct(act, out);
+						} else if (pe instanceof Leg leg) {
+							this.startLeg(leg, out);
+							// route
+							Route route = leg.getRoute();
+							if (route != null) {
+								startRoute(route, out);
+								endRoute(out);
+							}
+							endLeg(out);
+						}
+					}
+					endPlan(out);
+				}
+				endPerson(out);
+				this.writeSeparator(out);
+				CompletableFuture<String> completableFuture = personData.futurePersonString();
+				completableFuture.complete(out.toString());
+
+				// Reset stringBuilder instead of instantiate
+				stringBuilder.setLength(0);
+			}
+
+
+		} while (!(this.queue.isEmpty() && finish));
+
+	}
+
+	public void finish() {
+		this.finish = true;
+	}
+
+	private void startPerson(final Person person, final StringBuilder out) {
 		out.append("\t<person id=\"");
 		out.append(encodeAttributeValue(person.getId().toString()));
 		out.append("\"");
 		out.append(">\n");
-		this.attributesWriter.writeAttributes( "\t\t" , out , person.getAttributes() );
+		this.attributesWriter.writeAttributes("\t\t", out, person.getAttributes());
 	}
 
-	private static void endPerson(final StringBuilder out) throws IOException {
-		out.append("\t</person>\n\n");
-	}
-
-	private void startPlan(final Plan plan, final StringBuilder out) throws IOException {
+	private void startPlan(final Plan plan, final StringBuilder out)  {
 		out.append("\t\t<plan");
 		if (plan.getScore() != null) {
 			out.append(" score=\"");
@@ -133,14 +197,10 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 		}
 		out.append(">\n");
 
-		this.attributesWriter.writeAttributes( "\t\t\t\t" , out , plan.getAttributes() );
+		this.attributesWriter.writeAttributes("\t\t\t\t", out, plan.getAttributes());
 	}
 
-	private static void endPlan(final StringBuilder out) throws IOException {
-		out.append("\t\t</plan>\n\n");
-	}
-
-	private void writeAct(final Activity act, final StringBuilder out) throws IOException {
+	private void writeAct(final Activity act, final StringBuilder out) {
 		out.append("\t\t\t<activity type=\"");
 		out.append(encodeAttributeValue(act.getType()));
 		out.append("\"");
@@ -155,16 +215,16 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 			out.append("\"");
 		}
 		if (act.getCoord() != null) {
-			final Coord coord = this.coordinateTransformation.transform( act.getCoord() );
+			final Coord coord = this.coordinateTransformation.transform(act.getCoord());
 			out.append(" x=\"");
-			out.append(Double.toString( coord.getX() ));
+			out.append(coord.getX());
 			out.append("\" y=\"");
-			out.append(Double.toString( coord.getY() ));
+			out.append(coord.getY());
 			out.append("\"");
 
-			if ( act.getCoord().hasZ() ) {
+			if (act.getCoord().hasZ()) {
 				out.append(" z=\"");
-				out.append(Double.toString( coord.getZ() ));
+				out.append(coord.getZ());
 				out.append("\"");
 			}
 		}
@@ -190,7 +250,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 		out.append("\t\t\t</activity>\n");
 	}
 
-	private void startLeg(final Leg leg, final StringBuilder out) throws IOException {
+	private void startLeg(final Leg leg, final StringBuilder out) {
 		out.append("\t\t\t<leg mode=\"");
 		out.append(encodeAttributeValue(leg.getMode()));
 		out.append("\"");
@@ -211,50 +271,8 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 			Attributes attributes = new AttributesImpl();
 			AttributesUtils.copyTo(leg.getAttributes(), attributes);
 			attributes.putAttribute(TripStructureUtils.routingMode, leg.getRoutingMode());
-			this.attributesWriter.writeAttributes( "\t\t\t\t" , out , attributes );
-		} else this.attributesWriter.writeAttributes( "\t\t\t\t" , out , leg.getAttributes() );
-	}
-
-	private static void endLeg(final StringBuilder out) throws IOException {
-		out.append("\t\t\t</leg>\n");
-	}
-
-	private static void startRoute(final Route route, final StringBuilder out) throws IOException {
-		out.append("\t\t\t\t<route ");
-		out.append("type=\"");
-		out.append(encodeAttributeValue(route.getRouteType()));
-		out.append("\"");
-		out.append(" start_link=\"");
-		out.append(encodeAttributeValue(route.getStartLinkId().toString()));
-		out.append("\"");
-		out.append(" end_link=\"");
-		out.append(encodeAttributeValue(route.getEndLinkId().toString()));
-		out.append("\"");
-		out.append(" trav_time=\"");
-		out.append(Time.writeTime(route.getTravelTime()));
-		out.append("\"");
-		out.append(" distance=\"");
-		out.append(Double.toString(route.getDistance()));
-		out.append("\"");
-		if ( route instanceof NetworkRoute) {
-			out.append(" vehicleRefId=\"");
-			final Id<Vehicle> vehicleId = ((NetworkRoute) route).getVehicleId();
-			if ( vehicleId==null ) {
-				out.append("null");
-			} else {
-				out.append(encodeAttributeValue(vehicleId.toString()));
-			}
-			out.append("\"");
-		}
-		out.append(">");
-		String rd = route.getRouteDescription();
-		if (rd != null) {
-			out.append(encodeContent(rd));
-		}
-	}
-
-	private static void endRoute(final StringBuilder out) throws IOException {
-		out.append("</route>\n");
+			this.attributesWriter.writeAttributes("\t\t\t\t", out, attributes);
+		} else this.attributesWriter.writeAttributes("\t\t\t\t", out, leg.getAttributes());
 	}
 
 	public void writeSeparator(final StringBuilder out) throws IOException {
@@ -268,5 +286,20 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	// This method re-uses the existing StringBuilder
+	public static String getRouteDescriptionNetworkRoute(StringBuilder desc, NetworkRoute route) {
+		desc.append(route.getStartLinkId().toString());
+		for (Id<Link> linkId : route.getLinkIds()) {
+			desc.append(" ");
+			desc.append(linkId.toString());
+		}
+		// If the start links equals the end link additionally check if its is a round trip.
+		if (!route.getEndLinkId().equals(route.getStartLinkId()) || route.getLinkIds().size() > 0) {
+			desc.append(" ");
+			desc.append(route.getEndLinkId().toString());
+		}
+		return desc.toString();
 	}
 }
