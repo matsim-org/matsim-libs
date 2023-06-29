@@ -94,8 +94,12 @@ public class ParallelPopulationWriterV6 implements PopulationWriterHandler{
 	@Override
 	public void writePerson(Person person, BufferedWriter out) throws IOException {
 		CompletableFuture<String> futurePersonString = new CompletableFuture<>();
-		this.inputQueue.add(new PersonData(person, futurePersonString));
-		this.outputQueue.add(futurePersonString);
+		try {
+			this.inputQueue.put(new PersonData(person, futurePersonString));
+			this.outputQueue.put(futurePersonString);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
