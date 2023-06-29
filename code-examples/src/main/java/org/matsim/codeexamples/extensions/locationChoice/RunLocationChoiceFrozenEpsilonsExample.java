@@ -42,7 +42,7 @@ class RunLocationChoiceFrozenEpsilonsExample{
 		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
 		dccg.setEpsilonScaleFactors("10.0" ); // larger value means locations are farther away
 //		dccg.setAlgorithm( bestResponse ); // is default
-		dccg.setFlexibleTypes( "shop" );
+		dccg.setFlexibleTypes( "shopping" );
 //		dccg.setTravelTimeApproximationLevel( FrozenTastesConfigGroup.ApproximationLevel.localRouting ); // is default
 //		dccg.setRandomSeed( 221177 ); // is default
 		dccg.setDestinationSamplePercent( 5. );
