@@ -20,7 +20,6 @@
 
 package lsp.resourceImplementations.transshipmentHub;
 
-import com.google.inject.Inject;
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
 import lsp.LogisticChainElement;
@@ -60,7 +59,7 @@ public class TransshipmentHubTourEndEventHandler implements  BeforeMobsimListene
 	private EventsManager eventsManager;
 
 	/**
-	 * This is a TourEndEvent-Handler, doing some stuff regarding the {@link TransshipmentHub}.
+	 * This is a TourEndEvent-Handler, doing some stuff regarding the {@link TransshipmentHubResource}.
 	 *
 	 * @param transshipmentHubResource hub
 	 * @param scenario The scenario. Is used to get the Carrier(s).
@@ -71,7 +70,7 @@ public class TransshipmentHubTourEndEventHandler implements  BeforeMobsimListene
 		this.resourceId = transshipmentHubResource.getId();
 		this.scenario = scenario;
 		this.servicesWaitedFor = new HashMap<>();
-		this.transshipmentHub.addSimulationTracker(this);
+		this.transshipmentHubResource.addSimulationTracker(this);
 	}
 
 	@Override
@@ -150,7 +149,7 @@ public class TransshipmentHubTourEndEventHandler implements  BeforeMobsimListene
 	private void logHandlingInHub(CarrierService carrierService, double startTime) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 
-		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
+		double handlingTime = transshipmentHubResource.getCapacityNeedFixed() + transshipmentHubResource.getCapacityNeedLinear() * lspShipment.getSize();
 		double endTime = startTime + handlingTime;
 
 		{ //Old logging approach - will be removed at some point in time
