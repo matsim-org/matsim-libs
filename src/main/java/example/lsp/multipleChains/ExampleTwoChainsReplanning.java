@@ -1,9 +1,10 @@
 package example.lsp.multipleChains;
 
 import lsp.*;
+import lsp.resourceImplementations.ResourceImplementationUtils;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,7 +35,7 @@ import java.util.*;
 
 public class ExampleTwoChainsReplanning {
 
-	private static final Logger log = LogManager.getLogger(ExampleTwoChains_10Shipments.class);
+	private static final Logger log = LogManager.getLogger(ExampleTwoChainsReplanning.class);
 
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("j(0,5)R");
 
@@ -161,7 +162,7 @@ public class ExampleTwoChainsReplanning {
 					.addLogisticChainElement(singleCarrierElement)
 					.build();
 
-			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+			final ShipmentAssigner singleSolutionShipmentAssigner = Utils.createPrimaryLogisticChainShipmentAssigner();
 			lspPlan_singleChain = LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
 					.setAssigner(singleSolutionShipmentAssigner);
@@ -177,7 +178,7 @@ public class ExampleTwoChainsReplanning {
 				Carrier carrierSouth = CarrierUtils.createCarrier(Id.create("carrierSouth", Carrier.class));
 				carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_LARGE_50));
+				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource carrierSouthResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();
@@ -192,7 +193,7 @@ public class ExampleTwoChainsReplanning {
 				Carrier carrierNorth = CarrierUtils.createCarrier(Id.create("CarrierNorth", Carrier.class));
 				carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_LARGE_50));
+				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource carrierNorthResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();

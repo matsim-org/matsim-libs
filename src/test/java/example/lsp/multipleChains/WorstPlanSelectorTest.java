@@ -1,9 +1,10 @@
 package example.lsp.multipleChains;
 
 import lsp.*;
+import lsp.resourceImplementations.ResourceImplementationUtils;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -146,8 +147,8 @@ public class WorstPlanSelectorTest {
 			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_EXPENSIVE));
-			LSPResource singleCarrierResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+			LSPResource singleCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
+					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 
 			LogisticChainElement singleCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("singleCarrierElement", LogisticChainElement.class))
@@ -158,7 +159,7 @@ public class WorstPlanSelectorTest {
 					.addLogisticChainElement(singleCarrierElement)
 					.build();
 
-			final ShipmentAssigner singleSolutionShipmentAssigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+			final ShipmentAssigner singleSolutionShipmentAssigner = Utils.createPrimaryLogisticChainShipmentAssigner();
 			lspPlan_singleChain = LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
 					.setAssigner(singleSolutionShipmentAssigner);
@@ -175,8 +176,8 @@ public class WorstPlanSelectorTest {
 				carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_CHEAP));
-				LSPResource carrierSouthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
-						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+				LSPResource carrierSouthResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
+						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();
 
 				southCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("southCarrierElement", LogisticChainElement.class))
@@ -190,8 +191,8 @@ public class WorstPlanSelectorTest {
 				carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_CHEAP));
-				LSPResource carrierNorthResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
-						.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+				LSPResource carrierNorthResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
+						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();
 
 				northCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("northCarrierElement", LogisticChainElement.class))
@@ -222,7 +223,7 @@ public class WorstPlanSelectorTest {
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("lsp", LSP.class))
 				.setInitialPlan(lspPlan_singleChain)
-				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
+				.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
 		lsp.addPlan(lspPlan_twoChains);
 
