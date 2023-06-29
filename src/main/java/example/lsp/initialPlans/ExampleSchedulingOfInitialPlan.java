@@ -21,10 +21,11 @@
 package example.lsp.initialPlans;
 
 import lsp.*;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -71,8 +72,8 @@ import java.util.Random;
 		carrier.setCarrierCapabilities(capabilities);
 
 		//The Resource i.e. the Resource is created
-		LSPResource collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource collectionResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -88,14 +89,14 @@ import java.util.Random;
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addLogisticChain(collectionSolution);
 
 		//The exogenous list of Resoruces for the SolutuionScheduler is compiled and the Scheduler is added to the LSPBuilder
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionResource);
-		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 
 		return LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 				.setInitialPlan(collectionPlan)
@@ -163,12 +164,14 @@ import java.util.Random;
 		//print the schedules for the assigned LSPShipments
 		for (LSPShipment shipment : shipments) {
 			System.out.println("Shipment: " + shipment.getId());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
+					.getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
-			for (ShipmentPlanElement element : shipment.getShipmentPlan().getPlanElements().values()) {
+			for (ShipmentPlanElement element : ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
+					.getPlanElements().values()) {
 				System.out.println(
 //					"Solution Id: " + element.getSolutionElement().getEmbeddingContainer().getId() +
 						" SolutionElement Id: " + element.getLogisticChainElement().getId()

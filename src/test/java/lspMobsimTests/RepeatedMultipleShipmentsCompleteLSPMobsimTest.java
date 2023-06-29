@@ -21,10 +21,14 @@
 package lspMobsimTests;
 
 import lsp.*;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -98,8 +102,8 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		LSPResource collectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource collectionResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -107,7 +111,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 				.setResource(collectionResource)
 				.build();
 
-		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
 		firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
 
@@ -115,7 +119,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
+		TranshipmentHubUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId, scenario);
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 		LSPResource firstTranshipmentHubResource = firstTransshipmentHubBuilder.build();
 
@@ -149,8 +153,8 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
-		LSPResource mainRunResource  = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+		LSPResource mainRunResource  = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
 				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
 				.build();
@@ -159,14 +163,14 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 				.setResource(mainRunResource)
 				.build();
 
-		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
 		secondSchedulerBuilder.setCapacityNeedLinear(1);
 
 		Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
 		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario);
+		TranshipmentHubUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId, scenario);
 
 		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
 		LSPResource secondTranshipmentHubResource = secondTransshipmentHubBuilder.build();
@@ -198,8 +202,8 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		Carrier carrier = CarrierUtils.createCarrier(distributionCarrierId);
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
-		LSPResource distributionResource  = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
-				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+		LSPResource distributionResource  = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
+				.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 				.setLocationLinkId(distributionLinkId)
 				.build();
 
@@ -222,7 +226,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 				.addLogisticChainElement(distributionElement)
 				.build();
 
-		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addLogisticChain(completeSolution);
@@ -237,7 +241,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		resourcesList.add(distributionResource);
 
 
-		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
@@ -319,7 +323,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 			initialize();
 			for (LSPShipment shipment : completeLSP.getShipments()) {
 				assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
-				ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+				ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 				scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 				ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 				logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
@@ -329,7 +333,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 					if (!scheduleElement.getElementType().equals(logElement.getElementType())) {
 						System.out.println(scheduleElement.getElementType());
 						System.out.println(logElement.getElementType());
-						for (int j = 0; j < shipment.getShipmentPlan().getPlanElements().size(); j++) {
+						for (int j = 0; j < ShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().size(); j++) {
 							System.out.println("Scheduled: " + scheduleElements.get(j).getLogisticChainElement().getId() + "  " + scheduleElements.get(j).getResourceId() + "  " + scheduleElements.get(j).getElementType() + " Start: " + scheduleElements.get(j).getStartTime() + " End: " + scheduleElements.get(j).getEndTime());
 						}
 						System.out.println();

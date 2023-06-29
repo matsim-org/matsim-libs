@@ -23,7 +23,7 @@ package logisticChainElementTests;
 import lsp.LSPResource;
 import lsp.LSPUtils;
 import lsp.LogisticChainElement;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -78,8 +78,8 @@ public class MainRunElementTest {
 		Carrier mainRunCarrierResourceBuilder = CarrierUtils.createCarrier(carrierId);
 		mainRunCarrierResourceBuilder.setCarrierCapabilities(capabilities);
 
-		mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrierResourceBuilder, network)
-				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+		mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrierResourceBuilder, network)
+				.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
 				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
 				.build();

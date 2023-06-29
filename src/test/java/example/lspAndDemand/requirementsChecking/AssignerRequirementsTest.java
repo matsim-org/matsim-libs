@@ -21,9 +21,10 @@
 package example.lspAndDemand.requirementsChecking;
 
 import lsp.*;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -80,8 +81,8 @@ public class AssignerRequirementsTest {
 		Carrier redCarrier = CarrierUtils.createCarrier(redCarrierId);
 		redCarrier.setCarrierCapabilities(redCapabilities);
 
-		LSPResource redCollectionResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource redCollectionResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -112,8 +113,8 @@ public class AssignerRequirementsTest {
 		Carrier blueCarrier = CarrierUtils.createCarrier(blueCarrierId);
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 
-		LSPResource blueCollectionResource  = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource blueCollectionResource  = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -134,7 +135,7 @@ public class AssignerRequirementsTest {
 		resourcesList.add(redCollectionResource);
 		resourcesList.add(blueCollectionResource);
 
-		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		LSP collectionLSP = collectionLSPBuilder.build();
 

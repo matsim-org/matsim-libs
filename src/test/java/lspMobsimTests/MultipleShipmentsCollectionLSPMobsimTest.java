@@ -21,10 +21,11 @@
 package lspMobsimTests;
 
 import lsp.*;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -98,8 +99,8 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-				UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
-		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+				CollectionCarrierUtils.CollectionCarrierResourceBuilder adapterBuilder = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
+		adapterBuilder.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
 
@@ -113,7 +114,7 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 		collectionSolutionBuilder.addLogisticChainElement(collectionElement);
 		LogisticChain collectionSolution = collectionSolutionBuilder.build();
 
-		ShipmentAssigner assigner = UsecaseUtils.createSingleLogisticChainShipmentAssigner();
+		ShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addLogisticChain(collectionSolution);
@@ -123,7 +124,7 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionResource);
 
-		LogisticChainScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
+		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
@@ -188,8 +189,8 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 
 		for (LSPShipment shipment : collectionLSP.getShipments()) {
 			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
-			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			assertEquals(ShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());

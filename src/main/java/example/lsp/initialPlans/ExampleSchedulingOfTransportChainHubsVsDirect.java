@@ -21,9 +21,12 @@
 package example.lsp.initialPlans;
 
 import lsp.*;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,8 +38,8 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
+import org.matsim.contrib.freight.events.CarrierTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.config.CommandLine;
@@ -161,7 +164,7 @@ import java.util.*;
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
-		UsecaseUtils.printResults_shipmentPlan(config.controler().getOutputDirectory(), lsp);
+		ResourceImplementationUtils.printResults_shipmentPlan(config.controler().getOutputDirectory(), lsp);
 
 		log.info("Done.");
 
@@ -191,13 +194,13 @@ import java.util.*;
 			log.info("Create depot");
 
 			//The scheduler for the first reloading point is created --> this will be the depot in this use case
-			LSPResourceScheduler depotScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+			LSPResourceScheduler depotScheduler = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
 					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
 					.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
 					.build();
 
 			//The scheduler is added to the Resource and the Resource is created
-			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Depot", LSPResource.class), depotLinkId, scenario)
+			LSPResource depotResource = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(Id.create("Depot", LSPResource.class), depotLinkId, scenario)
 					.setTransshipmentHubScheduler(depotScheduler)
 					.build();
 
@@ -233,10 +236,10 @@ import java.util.*;
 							.build());
 
 			//The scheduler for the main run Resource is created and added to the Resource
-			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+			LSPResource mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
 					.setFromLinkId(depotLinkId)
 					.setToLinkId(hubLinkId)
-					.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+					.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 					.build();
 
 			mainRunElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("MainRunElement", LogisticChainElement.class))
@@ -250,7 +253,7 @@ import java.util.*;
 			log.info("");
 			log.info("The second reloading adapter (hub) i.e. the Resource is created");
 			//The scheduler for the second reloading point is created
-			LSPResourceScheduler hubScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+			LSPResourceScheduler hubScheduler = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
 					.setCapacityNeedFixed(10)
 					.setCapacityNeedLinear(1)
 					.build();
@@ -258,7 +261,7 @@ import java.util.*;
 			//The scheduler is added to the Resource and the Resource is created
 			//The second reloading adapter i.e. the Resource is created
 			Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
-			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, hubLinkId,scenario )
+			LSPResource hubResource = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, hubLinkId,scenario )
 					.setTransshipmentHubScheduler(hubScheduler)
 					.build();
 
@@ -285,9 +288,9 @@ import java.util.*;
 							.build());
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource distributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+			LSPResource distributionResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
 					.setLocationLinkId(hubLinkId)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 			// (The scheduler is where jsprit comes into play.)
 
@@ -319,9 +322,9 @@ import java.util.*;
 			directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource directDistributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(directDistributionCarrier, network)
+			LSPResource directDistributionResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(directDistributionCarrier, network)
 					.setLocationLinkId(depotLinkId)
-					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
 			// (The scheduler is where jsprit comes into play.)
 
@@ -349,7 +352,7 @@ import java.util.*;
 				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
 
 				return lspBuilder.setInitialPlan(lspPlan_Reloading)
-						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_Reloading)))
+						.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_Reloading)))
 						.build();
 
 			}
@@ -361,7 +364,7 @@ import java.util.*;
 
 				return lspBuilder
 						.setInitialPlan(lspPlan_direct)
-						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
+						.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
 						.build();
 			}
 			case twoPlans_directAndHub -> {
@@ -382,7 +385,7 @@ import java.util.*;
 
 				final LSP lsp = lspBuilder
 						.setInitialPlan(lspPlan_direct)
-						.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList))
+						.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList))
 						.build();
 
 				lsp.addPlan(lspPlan_Reloading); //adding the second plan
@@ -428,7 +431,7 @@ import java.util.*;
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
 		return LSPUtils.createLSPPlan()
-				.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner())
+				.setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
 				.addLogisticChain(completeSolutionDirect);
 	}
 
@@ -454,7 +457,7 @@ import java.util.*;
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
 		return LSPUtils.createLSPPlan()
-				.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner())
+				.setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
 				.addLogisticChain(completeSolutionWithReloading);
 	}
 
@@ -521,7 +524,7 @@ import java.util.*;
 		}
 
 		@Override
-		public void handleEvent(FreightTourEndEvent event) {
+		public void handleEvent(CarrierTourEndEvent event) {
 			score++;
 			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 		}
@@ -532,7 +535,7 @@ import java.util.*;
 		}
 
 		@Override
-		public void handleEvent(FreightServiceEndEvent event) {
+		public void handleEvent(CarrierServiceEndEvent event) {
 			score++;
 			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 		}

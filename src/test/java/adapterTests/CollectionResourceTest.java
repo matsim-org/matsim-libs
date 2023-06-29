@@ -21,7 +21,7 @@
 package adapterTests;
 
 import lsp.LSPCarrierResource;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -84,8 +84,8 @@ public class CollectionResourceTest {
 		collectionCarrier.setCarrierCapabilities(capabilities);
 
 
-		carrierResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		carrierResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 	}

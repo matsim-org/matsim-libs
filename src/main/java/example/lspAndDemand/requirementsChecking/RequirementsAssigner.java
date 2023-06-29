@@ -53,7 +53,7 @@ class RequirementsAssigner implements ShipmentAssigner {
 			feasibleLogisticChains.add(solution);
 		}
 		LogisticChain chosenSolution = feasibleLogisticChains.iterator().next();
-		chosenSolution.assignShipment(shipment);
+		chosenSolution.addShipmentToChain(shipment);
 	}
 
 	@Override

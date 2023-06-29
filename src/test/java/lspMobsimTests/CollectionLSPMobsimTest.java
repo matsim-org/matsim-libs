@@ -21,6 +21,7 @@
 package lspMobsimTests;
 
 import lsp.*;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -53,7 +54,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static lsp.usecase.UsecaseUtils.*;
+import static lsp.resourceImplementations.ResourceImplementationUtils.*;
 import static org.junit.Assert.*;
 
 public class CollectionLSPMobsimTest {
@@ -110,8 +111,8 @@ public class CollectionLSPMobsimTest {
 
 
 
-		collectionResource  = CollectionCarrierResourceBuilder.newInstance(carrier, scenario.getNetwork())
-				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setLocationLinkId(collectionLinkId)
+		collectionResource  = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, scenario.getNetwork())
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler()).setLocationLinkId(collectionLinkId)
 				.build();
 
 		final LogisticChainElement collectionElement;
@@ -211,7 +212,7 @@ public class CollectionLSPMobsimTest {
 
 			log.warn("");
 			log.warn("shipment schedule plan elements:");
-			for (ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values()) {
+			for (ShipmentPlanElement planElement : ShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values()) {
 				log.warn(planElement);
 			}
 			log.warn("");
@@ -221,8 +222,8 @@ public class CollectionLSPMobsimTest {
 			}
 			log.warn("");
 
-			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			assertEquals(ShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().size(), shipment.getShipmentLog().getPlanElements().size());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());

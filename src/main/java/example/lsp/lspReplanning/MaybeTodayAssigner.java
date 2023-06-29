@@ -41,7 +41,7 @@ import java.util.Random;
 		boolean assignToday = random.nextBoolean();
 		if (assignToday) {
 			Gbl.assertIf(lsp.getSelectedPlan().getLogisticChains().size() == 1);
-			lsp.getSelectedPlan().getLogisticChains().iterator().next().assignShipment(shipment);
+			lsp.getSelectedPlan().getLogisticChains().iterator().next().addShipmentToChain(shipment);
 		}
 	}
 

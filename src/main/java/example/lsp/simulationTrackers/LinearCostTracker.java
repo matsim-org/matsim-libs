@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.contrib.freight.events.FreightServiceStartEvent;
-import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceStartEvent;
+import org.matsim.contrib.freight.events.CarrierTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
@@ -153,21 +153,21 @@ import java.util.Collection;
 			}
 		}
 	}
-	@Override public void handleEvent( FreightTourStartEvent event ){
+	@Override public void handleEvent( CarrierTourStartEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
 			if ( eventHandler instanceof FreightTourStartEventHandler) {
 				((FreightTourStartEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
-	@Override public void handleEvent( FreightServiceEndEvent event ){
+	@Override public void handleEvent( CarrierServiceEndEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
 			if ( eventHandler instanceof FreightServiceEndEventHandler) {
 				((FreightServiceEndEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
-	@Override public void handleEvent( FreightServiceStartEvent event ){
+	@Override public void handleEvent( CarrierServiceStartEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
 			if ( eventHandler instanceof FreightServiceStartEventHandler) {
 				((FreightServiceStartEventHandler) eventHandler).handleEvent( event );

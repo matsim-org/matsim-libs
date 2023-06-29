@@ -38,6 +38,6 @@ public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTra
 
 	Collection<LogisticChainElement> getClientElements();
 
-	void schedule(int bufferTime);
+	void schedule(int bufferTime, LSPPlan lspPlan);
 
 }

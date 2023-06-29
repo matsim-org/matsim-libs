@@ -62,7 +62,7 @@ import java.util.ArrayList;
 		setResourceNeighbours();
 		sortResources();
 		for (LSPResource resource : sortedResourceList) {
-			resource.schedule(bufferTime);
+			resource.schedule(bufferTime, lsp.getSelectedPlan() );
 		}
 	}
 

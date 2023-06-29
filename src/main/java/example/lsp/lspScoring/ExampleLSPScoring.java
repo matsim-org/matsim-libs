@@ -21,9 +21,10 @@
 package example.lsp.lspScoring;
 
 import lsp.*;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,7 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -75,8 +76,8 @@ import java.util.*;
 
 		//The Resource i.e. the Resource is created
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
-		LSPResource lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
-				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
+		LSPResource lspResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
+				.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler())
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -93,14 +94,14 @@ import java.util.*;
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan lspPlan = LSPUtils.createLSPPlan()
-				.setAssigner(UsecaseUtils.createSingleLogisticChainShipmentAssigner())
+				.setAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
 				.addLogisticChain(logisticChain);
 
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
 
 		return LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 				.setInitialPlan(lspPlan)
-				.setLogisticChainScheduler(UsecaseUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.singletonList(lspResource)))
+				.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(Collections.singletonList(lspResource)))
 //				.setSolutionScorer(new TipScorer())
 				.build();
 	}
@@ -228,7 +229,7 @@ import java.util.*;
 			// backpointer not needed here, therefor not memorizing it.  kai, jun'22
 		}
 
-		@Override public void handleEvent( FreightServiceEndEvent event ) {
+		@Override public void handleEvent( CarrierServiceEndEvent event ) {
 			double tip = tipRandom.nextDouble() * 5;
 			log.warn("tipSum=" + tipSum + "; tip=" + tip);
 			tipSum += tip;

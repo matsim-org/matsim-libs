@@ -27,7 +27,7 @@ import java.util.Map;
 
 public interface ShipmentPlan extends HasBackpointer<Id<LSPShipment>> {
 
-	Id<LSPShipment> getEmbeddingContainer();
+	Id<LSPShipment> getLspShipmentId();
 
 	Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements();
 

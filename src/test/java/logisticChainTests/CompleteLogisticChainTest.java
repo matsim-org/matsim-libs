@@ -24,7 +24,10 @@ import lsp.LSPResource;
 import lsp.LSPUtils;
 import lsp.LogisticChain;
 import lsp.LogisticChainElement;
-import lsp.usecase.UsecaseUtils;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -84,9 +87,9 @@ public class CompleteLogisticChainTest {
 		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder
+		CollectionCarrierUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = CollectionCarrierUtils.CollectionCarrierResourceBuilder
 				.newInstance(collectionCarrier, network);
-		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+		collectionResourceBuilder.setCollectionScheduler(CollectionCarrierUtils.createDefaultCollectionCarrierScheduler());
 		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 
 		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement",
@@ -96,14 +99,14 @@ public class CompleteLogisticChainTest {
 		collectionBuilder.setResource(collectionResourceBuilder.build());
 		collectionElement = collectionBuilder.build();
 
-		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
 		firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
 
 		Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
 		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId,
+		TranshipmentHubUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId,
 				firstTransshipmentHub_LinkId, scenario)
 				.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 
@@ -132,8 +135,8 @@ public class CompleteLogisticChainTest {
 		Carrier mainRunCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
-		LSPResource mainRunResource  = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler())
+		LSPResource mainRunResource  = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+				.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
 				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
 				.build();
@@ -144,14 +147,14 @@ public class CompleteLogisticChainTest {
 		mainRunBuilder.setResource(mainRunResource);
 		mainRunElement = mainRunBuilder.build();
 
-		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		TranshipmentHubUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
 		secondSchedulerBuilder.setCapacityNeedLinear(1);
 
 		Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
 		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
 
-		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId,
+		TranshipmentHubUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId,
 				secondTransshipmentHub_LinkId, scenario);
 		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
 
@@ -185,9 +188,9 @@ public class CompleteLogisticChainTest {
 		Carrier carrier = CarrierUtils.createCarrier(distributionCarrierId);
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
-		final LSPResource distributionCarrierResource = UsecaseUtils.DistributionCarrierResourceBuilder
+		final LSPResource distributionCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder
 				.newInstance(carrier, network)
-				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+				.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 				.setLocationLinkId(distributionLinkId)
 				.build();
 
