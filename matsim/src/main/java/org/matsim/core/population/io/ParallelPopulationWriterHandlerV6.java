@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ParallelPopulationWriterHandlerV6.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.core.population.io;
 
 import org.matsim.api.core.v01.Coord;
@@ -33,7 +52,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 /**
  * @author steffenaxer
  */
-public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandler{
+public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandler {
 	private static final int THREAD_LIMIT = 2;
 	private static final int MAX_QUEUE_LENGTH = 1000;
 	private final BlockingQueue<PersonData> inputQueue = new LinkedBlockingQueue<>();
@@ -52,9 +71,8 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 
 
 	private void tryInitWorkerThreads() {
-		if(threads==null)
-		{
-			int computeThreads = Math.min(THREAD_LIMIT,Runtime.getRuntime().availableProcessors());
+		if (threads == null) {
+			int computeThreads = Math.min(THREAD_LIMIT, Runtime.getRuntime().availableProcessors());
 			threads = new Thread[computeThreads];
 			runners = new PersonStringCreator[computeThreads];
 			for (int i = 0; i < computeThreads; i++) {
@@ -75,38 +93,33 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		}
 	}
 
-	private void tryInitWriterThread(BufferedWriter out)
-	{
-		if(this.writeThread == null)
-		{
+	private void tryInitWriterThread(BufferedWriter out) {
+		if (this.writeThread == null) {
 			this.writer = new ParallelPopulationWriterV6(this.outputQueue, out);
 			writeThread = new Thread(this.writer);
 			writeThread.setDaemon(true);
 			writeThread.setName(ParallelPopulationWriterV6.class.toString() + 0);
 			writeThread.start();
 		}
-
 	}
 
-	private void initObjectAttributeConverters(PersonStringCreator runner)
-	{
+	private void initObjectAttributeConverters(PersonStringCreator runner) {
 		runner.putAttributeConverters(this.converters);
 	}
 
-	private void joinThreads()  {
+	private void joinThreads() {
 		try {
-		for (int i = 0; i < threads.length; i++) {
+			for (int i = 0; i < threads.length; i++) {
 
 				runners[i].finish();
 				threads[i].join();
-		}
-		this.writer.finish();
-		this.writeThread.join();
+			}
+			this.writer.finish();
+			this.writeThread.join();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 	}
-
 
 	@Override
 	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
@@ -121,9 +134,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			out.write(" desc=\"" + encodeAttributeValue(plans.getName()) + "\"");
 		}
 		out.write(">\n\n");
-
-		this.attributesWriter.writeAttributes( "\t" , out , plans.getAttributes() );
-
+		this.attributesWriter.writeAttributes("\t", out, plans.getAttributes());
 		out.write("\n\n");
 	}
 
@@ -139,20 +150,16 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 
 
 		// Initialize worker threads
-		// It might happen that this write person method is not called due to empty population
+		// It might happen that this writePerson method is not called due to an empty population
 		tryInitWorkerThreads();
 		tryInitWriterThread(out);
 	}
 
 	@Override
 	public void endPlans(final BufferedWriter out) throws IOException {
-		// Initialize at least here if it has not been done beforehand
+		// Initialize at least here, if it has not been done beforehand
 		tryInitWorkerThreads();
 		tryInitWriterThread(out);
-
-		// Let's start parallel person serialization...
-
-		// Ok, we are finished...
 		joinThreads();
 		out.write("</population>\n");
 	}
@@ -163,20 +170,20 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	}
 
 	@Override
-	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
-		this.attributesWriter.putAttributeConverters( converters );
+	public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
+		this.attributesWriter.putAttributeConverters(converters);
 
 		// Store converters to forward them to processing threads
 		this.converters.putAll(converters);
 	}
 
-	public record PersonData(Person person, CompletableFuture<String> futurePersonString){}
+	public record PersonData(Person person, CompletableFuture<String> futurePersonString) {
+	}
 
 	public static class ParallelPopulationWriterV6 implements Runnable {
 		private final Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 		private final BlockingQueue<CompletableFuture<String>> outputQueue;
 		private final BufferedWriter out;
-
 		private boolean finish = false;
 
 
@@ -190,8 +197,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			do {
 				try {
 					CompletableFuture<String> f = outputQueue.poll();
-					if(f!=null)
-					{
+					if (f != null) {
 						out.write(f.get());
 						counter.incCounter();
 					}
@@ -219,7 +225,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			this.queue = queue;
 		}
 
-		private static void endPerson(final StringBuilder out)  {
+		private static void endPerson(final StringBuilder out) {
 			out.append("\t</person>\n\n");
 		}
 
@@ -227,7 +233,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			out.append("\t\t</plan>\n\n");
 		}
 
-		private static void endLeg(final StringBuilder out)  {
+		private static void endLeg(final StringBuilder out) {
 			out.append("\t\t\t</leg>\n");
 		}
 
@@ -330,7 +336,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			this.attributesWriter.writeAttributes("\t\t", out, person.getAttributes());
 		}
 
-		private void startPlan(final Plan plan, final StringBuilder out)  {
+		private void startPlan(final Plan plan, final StringBuilder out) {
 			out.append("\t\t<plan");
 			if (plan.getScore() != null) {
 				out.append(" score=\"");
