@@ -45,13 +45,9 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 
 /**
- * @author thibautd
- * @author mrieser
- * @author balmermi
  * @author steffenaxer
  */
 /*package*/ class ParallelPopulationCreatorV6 implements Runnable {
-	//static final Logger LOG = LogManager.getLogger(ParallelPopulationCreatorV6.class);
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 	private final CoordinateTransformation coordinateTransformation;
 	private final BlockingQueue<ParallelPopulationWriterHandlerV6.PersonData> queue;
@@ -127,7 +123,6 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 
 	private void process() throws IOException {
 		do {
-			//LOG.info("{} Current queue size # {}",this.getClass().getName() ,this.inputQueue.size());
 			ParallelPopulationWriterHandlerV6.PersonData personData = this.queue.poll();
 			if (personData != null) {
 				Person person = personData.person();
@@ -161,10 +156,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 				// Reset stringBuilder instead of instantiate
 				stringBuilder.setLength(0);
 			}
-
-
 		} while (!(this.queue.isEmpty() && finish));
-
 	}
 
 	public void finish() {
