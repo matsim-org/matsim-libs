@@ -10,8 +10,11 @@ import java.util.concurrent.ExecutionException;
 
 public class ParallelPopulationWriterV6 implements Runnable {
 	private final Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
-	BlockingQueue<CompletableFuture<String>> outputQueue;
-	BufferedWriter out;
+	private BlockingQueue<CompletableFuture<String>> outputQueue;
+	private BufferedWriter out;
+
+	private boolean finish = false;
+
 
 	ParallelPopulationWriterV6(BlockingQueue<CompletableFuture<String>> outputQueue, BufferedWriter out) {
 		this.outputQueue = outputQueue;
@@ -20,15 +23,21 @@ public class ParallelPopulationWriterV6 implements Runnable {
 
 	@Override
 	public void run() {
-		while (!this.outputQueue.isEmpty()) {
+		do {
 			try {
-				String personString = outputQueue.poll().get();
-				out.write(personString);
-				counter.incCounter();
-
+				CompletableFuture<String> f = outputQueue.poll();
+				if(f!=null)
+				{
+					out.write(f.get());
+					counter.incCounter();
+				}
 			} catch (InterruptedException | ExecutionException | IOException e) {
 				throw new RuntimeException(e);
 			}
-		}
+		} while (!(this.outputQueue.isEmpty() && finish));
+	}
+
+	public void finish() {
+		this.finish = true;
 	}
 }

@@ -33,6 +33,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	private Thread[] threads;
 	private Thread writeThread;
 	private ParallelPopulationCreatorV6[] runners;
+	private ParallelPopulationWriterV6 writer;
 	private final Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
 	ParallelPopulationWriterHandlerV6(CoordinateTransformation coordinateTransformation) {
@@ -68,7 +69,8 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	{
 		if(this.writeThread == null)
 		{
-			writeThread = new Thread(new ParallelPopulationWriterV6(this.outputQueue,out));
+			this.writer = new ParallelPopulationWriterV6(this.outputQueue,out);
+			writeThread = new Thread(this.writer);
 			writeThread.setDaemon(true);
 			writeThread.setName(ParallelPopulationWriterV6.class.toString() + 0);
 			writeThread.start();
@@ -88,6 +90,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 				runners[i].finish();
 				threads[i].join();
 		}
+		this.writer.finish();
 		this.writeThread.join();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
@@ -146,7 +149,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 
 	@Override
 	public void writeSeparator(BufferedWriter out) throws IOException {
-		// Do nothing, is part of the ParallelPopulationCreatorV6
+		out.append("<!-- ====================================================================== -->\n\n");
 	}
 
 	@Override
