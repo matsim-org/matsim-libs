@@ -41,7 +41,6 @@ import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 import java.util.Collection;
 import java.util.HashMap;
