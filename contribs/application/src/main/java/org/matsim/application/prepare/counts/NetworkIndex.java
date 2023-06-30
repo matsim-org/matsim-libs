@@ -39,7 +39,7 @@ public final class NetworkIndex<T> {
 	private GeometryDistance<T> distance;
 
 	/**
-	 * TODO: docs
+	 * Create network index from links in the network.
 	 */
 	public NetworkIndex(Network network, double range, GeometryGetter<T> getter) {
 		this(network, new HashMap<>(), range, getter);
@@ -47,7 +47,7 @@ public final class NetworkIndex<T> {
 
 
 	/**
-	 * TODO docs
+	 * Create network index from links in the network with additional geometries.
 	 */
 	public NetworkIndex(Network network, Map<Id<Link>, Geometry> geometries, double range, GeometryGetter<T> getter) {
 
@@ -88,6 +88,23 @@ public final class NetworkIndex<T> {
 	 */
 	public static double angle(Coordinate v, Coordinate u) {
 		return Math.atan2(u.getY() - v.getY(), u.getX() - v.getX());
+	}
+
+	/**
+	 * Angle between two line strings in radians -pi to pi.
+	 */
+	public static double angle(LineString u, LineString v) {
+
+		double ux = u.getEndPoint().getCoordinate().getX() - u.getStartPoint().getCoordinate().getX();
+		double uy = u.getEndPoint().getCoordinate().getY() - u.getStartPoint().getCoordinate().getY();
+
+		double vx = v.getEndPoint().getCoordinate().getX() - v.getStartPoint().getCoordinate().getX();
+		double vy = v.getEndPoint().getCoordinate().getY() - v.getStartPoint().getCoordinate().getY();
+
+		double cross = ux * vy - uy * vx;
+		double dot = ux * vx + uy * vy;
+
+		return Math.atan2(cross, dot);
 	}
 
 	/**
@@ -150,6 +167,7 @@ public final class NetworkIndex<T> {
 	/**
 	 * Uses an STRtree to match an Object to a network link. Custom filters are applied to filter the query results.
 	 * The closest link to the object, based on the distance function is returned.
+	 *
 	 * @param filter optional filter, only for this query.
 	 */
 	@SuppressWarnings("unchecked")
@@ -221,7 +239,8 @@ public final class NetworkIndex<T> {
 
 	private void applyFilter(List<LinkGeometryRecord> result, T toMatch, BiPredicate<Link, T> filter) {
 
-		outer: for (var it = result.iterator(); it.hasNext(); ) {
+		outer:
+		for (var it = result.iterator(); it.hasNext(); ) {
 			LinkGeometryRecord next = it.next();
 			Link link = next.link;
 			for (BiPredicate<Link, T> predicate : this.filter) {
