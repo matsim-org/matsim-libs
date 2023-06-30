@@ -365,7 +365,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		});
 
 		index.addLinkFilter((link, station) -> {
-			String linkDir = BAStCountStation.getLinkDirection(link);
+			String linkDir = BAStCountStation.getLinkDirection(link.link());
 			String stationDir = station.getDirection();
 			return linkDir.contains(stationDir);
 		});

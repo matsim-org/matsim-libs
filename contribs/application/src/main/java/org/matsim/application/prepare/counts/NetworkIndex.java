@@ -31,11 +31,11 @@ public final class NetworkIndex<T> {
 	private final double range;
 	private final GeometryFactory factory = new GeometryFactory();
 	private final GeometryGetter<T> getter;
-	private final List<BiPredicate<Link, T>> filter = new ArrayList<>();
+	private final List<BiPredicate<LinkGeometry, T>> filter = new ArrayList<>();
 	/**
 	 * Stores references to all records in the tree.
 	 */
-	private final Map<Id<Link>, LinkGeometryRecord> records = new HashMap<>();
+	private final Map<Id<Link>, LinkGeometry> records = new HashMap<>();
 	private GeometryDistance<T> distance;
 
 	/**
@@ -58,7 +58,7 @@ public final class NetworkIndex<T> {
 
 		for (Link link : network.getLinks().values()) {
 			Geometry geom = geometries.getOrDefault(link.getId(), this.link2LineString(link));
-			LinkGeometryRecord r = new LinkGeometryRecord(link, geom);
+			LinkGeometry r = new LinkGeometry(link, geom);
 			this.index.insert(r.geometry.getEnvelopeInternal(), r);
 			this.records.put(link.getId(), r);
 		}
@@ -171,13 +171,13 @@ public final class NetworkIndex<T> {
 	 * @param filter optional filter, only for this query.
 	 */
 	@SuppressWarnings("unchecked")
-	public Link query(T toMatch, @Nullable BiPredicate<Link, T> filter) {
+	public Link query(T toMatch, @Nullable BiPredicate<LinkGeometry, T> filter) {
 
 		Geometry geometry = getter.getGeometry(toMatch);
 
 		Envelope searchArea = geometry.buffer(this.range).getEnvelopeInternal();
 
-		List<LinkGeometryRecord> result = index.query(searchArea);
+		List<LinkGeometry> result = index.query(searchArea);
 
 		if (result.isEmpty())
 			return null;
@@ -208,11 +208,11 @@ public final class NetworkIndex<T> {
 	 * Removes a Link from the index.
 	 */
 	public void remove(Link link) {
-		LinkGeometryRecord r = records.get(link.getId());
+		LinkGeometry r = records.get(link.getId());
 		index.remove(r.geometry.getEnvelopeInternal(), r);
 	}
 
-	private Link getClosestCandidate(List<LinkGeometryRecord> result, T toMatch, BiPredicate<Link, T> filter) {
+	private Link getClosestCandidate(List<LinkGeometry> result, T toMatch, BiPredicate<LinkGeometry, T> filter) {
 
 		if (result.isEmpty())
 			return null;
@@ -233,25 +233,24 @@ public final class NetworkIndex<T> {
 	/**
 	 * Add a Predicate to test if query results are a valid candidate. Should return false if element should NOT be returned.
 	 */
-	public void addLinkFilter(BiPredicate<Link, T> filter) {
+	public void addLinkFilter(BiPredicate<LinkGeometry, T> filter) {
 		this.filter.add(filter);
 	}
 
-	private void applyFilter(List<LinkGeometryRecord> result, T toMatch, BiPredicate<Link, T> filter) {
+	private void applyFilter(List<LinkGeometry> result, T toMatch, BiPredicate<LinkGeometry, T> filter) {
 
 		outer:
 		for (var it = result.iterator(); it.hasNext(); ) {
-			LinkGeometryRecord next = it.next();
-			Link link = next.link;
-			for (BiPredicate<Link, T> predicate : this.filter) {
-				if (!predicate.test(link, toMatch)) {
+			LinkGeometry next = it.next();
+			for (BiPredicate<LinkGeometry, T> predicate : this.filter) {
+				if (!predicate.test(next, toMatch)) {
 					it.remove();
 					// No further filter should be checked
 					continue outer;
 				}
 			}
 
-			if (filter != null && !filter.test(link, toMatch))
+			if (filter != null && !filter.test(next, toMatch))
 				it.remove();
 		}
 	}
@@ -276,7 +275,9 @@ public final class NetworkIndex<T> {
 
 	}
 
-	private record LinkGeometryRecord(Link link, Geometry geometry) {
-	}
+	/**
+	 * Holding link and its geometry.
+	 */
+	public record LinkGeometry(Link link, Geometry geometry) { }
 }
 
