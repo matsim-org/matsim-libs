@@ -164,7 +164,7 @@ public class WorstPlanSelectorTest {
 					.addLogisticChain(singleChain)
 					.setAssigner(singleSolutionShipmentAssigner);
 
-			lspPlan_singleChain.setType(Utils.LspPlanTypes.ONE_ECHELON_SINGLE_CHAIN.toString());
+			lspPlan_singleChain.setType(Utils.LspPlanTypes.SINGLE_ONE_ECHELON_CHAIN.toString());
 		}
 
 		// A plan with two different logistic chains in the south and north, with respective carriers is created
@@ -214,7 +214,7 @@ public class WorstPlanSelectorTest {
 					.addLogisticChain(northChain)
 					.setAssigner(shipmentAssigner);
 
-			lspPlan_twoChains.setType(Utils.LspPlanTypes.ONE_ECHELON_MULTIPLE_CHAINS.toString());
+			lspPlan_twoChains.setType(Utils.LspPlanTypes.MULTIPLE_ONE_ECHELON_CHAINS.toString());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
