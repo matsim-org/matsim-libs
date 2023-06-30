@@ -449,8 +449,8 @@ public final class NetworkUtils {
         Link nearestLink = null;
         Node nearestNode = NetworkUtils.getNearestNode((network),coord);
         if ( nearestNode == null ) {
-            log.warn("[nearestNode not found.  Will probably crash eventually. Maybe run NetworkCleaner?  " +
-							 "Also may mean that network for mode is not defined.]" + network) ;
+            log.warn("nearestNode not found. Will probably crash eventually.  Maybe network for requested mode does not exist (i.e. links not annotated accordingly)?  Maybe run NetworkCleaner?  " +
+							 network) ;
             return null ;
         }
 
@@ -663,6 +663,37 @@ public final class NetworkUtils {
 //			throw new RuntimeException( "getType not possible for this implementation of interface Link" ) ;
 //		}
 		return (String) link.getAttributes().getAttribute(TYPE);
+	}
+
+	/**
+	 * Returns the road type of a highway link. In OSM highway links contain links for car traffic.
+	 * If not set this method will return "unclassified".
+	 */
+	public static String getHighwayType(Link link) {
+
+		String type = (String) link.getAttributes().getAttribute(TYPE);
+
+		if (type != null)
+			type = type.replaceFirst("^highway\\.", "");
+
+		if (type == null || type.isBlank())
+			type = "unclassified";
+
+		return type;
+	}
+
+	/**
+	 * Return the allowed speed attribute if set, otherwise freeflow speed.
+	 */
+	public static double getAllowedSpeed(Link link) {
+
+		Object speed = link.getAttributes().getAttribute(ALLOWED_SPEED);
+		if (speed == null)
+			return link.getFreespeed();
+
+		if (speed instanceof Double s)
+			return s;
+		return Double.parseDouble(speed.toString());
 	}
 
 	public static String getOrigId( Link link ) {

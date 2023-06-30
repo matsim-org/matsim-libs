@@ -167,7 +167,6 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		output = Path.of(config.controler().getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		String carriersFileLocation;
 		FreightConfigGroup freightConfigGroup;
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution -> {
@@ -206,7 +205,8 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 								shapeFileBuildingsPath, shapeCRS, buildingsPerZone);
 				ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
 				Map<String, HashMap<Id<Link>, Link>> regionLinksMap = filterLinksForZones(scenario, shpZones,
-						SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS));
+						SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS), buildingsPerZone);
+
 				switch (usedTrafficType) {
 					case businessTraffic, freightTraffic ->
 							createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, usedTrafficType.toString(),
@@ -765,25 +765,11 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 					.get(rnd.nextInt(buildingsPerZone.get(zone).get(selectedCategory).size()));
 			Coord centroidPointOfBuildingPolygon = MGC
 					.point2Coord(((Geometry) possibleBuilding.getDefaultGeometry()).getCentroid());
-			double minDistance = Double.MAX_VALUE;
+
 			int numberOfPossibleLinks = regionLinksMap.get(zone).size();
 
 			// searches and selects the nearest link of the possible links in this zone
-			searchLink: for (Link possibleLink : regionLinksMap.get(zone).values()) {
-				if (noPossibleLinks != null && numberOfPossibleLinks > noPossibleLinks.size())
-					for (String depotLink : noPossibleLinks) {
-						if (depotLink.equals(possibleLink.getId().toString())
-								|| (NetworkUtils.findLinkInOppositeDirection(possibleLink) != null && depotLink.equals(
-										NetworkUtils.findLinkInOppositeDirection(possibleLink).getId().toString())))
-							continue searchLink;
-					}
-				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-						(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
-				if (distance < minDistance) {
-					newLink = possibleLink.getId();
-					minDistance = distance;
-				}
-			}
+			newLink = SmallScaleCommercialTrafficUtils.findNearestPossibleLink(zone, noPossibleLinks, regionLinksMap, newLink, centroidPointOfBuildingPolygon, numberOfPossibleLinks);
 		}
 		if (newLink == null)
 			throw new RuntimeException("No possible link for buildings with type '" + selectedCategory + "' in zone '"
@@ -794,7 +780,8 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 
 	/** Filters links by used mode "car" and creates Map with all links in each zone
 	 */
-	static Map<String, HashMap<Id<Link>, Link>> filterLinksForZones(Scenario scenario, ShpOptions shpZones, Index indexZones) throws URISyntaxException {
+	static Map<String, HashMap<Id<Link>, Link>> filterLinksForZones(Scenario scenario, ShpOptions shpZones, Index indexZones,
+																	HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone) throws URISyntaxException {
 		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		List<Link> links;
 		log.info("Filtering and assign links to zones. This take some time...");
@@ -816,7 +803,30 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		links.forEach(l -> regionLinksMap
 				.computeIfAbsent((String) l.getAttributes().getAttribute("zone"), (k) -> new HashMap<>())
 				.put(l.getId(), l));
+		if (regionLinksMap.size() != shpZones.readFeatures().size())
+			findNearestLinkForZonesWithoutLinks(networkToChange, regionLinksMap, shpZones, buildingsPerZone);
 		return regionLinksMap;
+	}
+	/**
+	 * Finds for areas without links the nearest Link, if the area contains any building.
+	 */
+	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, HashMap<Id<Link>, Link>> regionLinksMap,
+															ShpOptions shpZones,
+															HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone) {
+		for (SimpleFeature singleArea : shpZones.readFeatures()) {
+			String zoneID = (String) singleArea.getAttribute("areaID");
+			if (!regionLinksMap.containsKey(zoneID) && buildingsPerZone.get(zoneID) != null) {
+					for (ArrayList<SimpleFeature> buildingList : buildingsPerZone.get(zoneID).values()) {
+						for (SimpleFeature building : buildingList) {
+							Link l = NetworkUtils.getNearestLink(networkToChange,
+								MGC.point2Coord(((Geometry) building.getDefaultGeometry()).getCentroid()));
+							regionLinksMap
+								.computeIfAbsent(zoneID, (k) -> new HashMap<>())
+								.put(l.getId(), l);
+						}
+					}
+			}
+		}
 	}
 
 	/**
