@@ -19,11 +19,11 @@ public class Utils {
 	}
 
 	public enum LspPlanTypes {
-		ONE_ECHELON_SINGLE_CHAIN("oneEchelonSingleChain"),
-		TWO_ECHELON_SINGLE_CHAIN("twoEchelonSingleChain"),
-		ONE_ECHELON_MULTIPLE_CHAINS("oneEchelonMultipleChains"),
-		TWO_ECHELON_MULTIPLE_CHAINS("twoEchelonMultipleChains"),
-		HYBRID_PLAN ("hybridPlan");
+		SINGLE_ONE_ECHELON_CHAIN("singleOneEchelonChain"),
+		SINGLE_TWO_ECHELON_CHAIN("singleTwoEchelonChain"),
+		MULTIPLE_ONE_ECHELON_CHAINS("multipleOneEchelonChains"),
+		MULTIPLE_TWO_ECHELON_CHAINS("multipleTwoEchelonChains"),
+		MULTIPLE_MIXED_ECHELON_CHAINS("multipleMixedEchelonChains");
 
 		private final String label;
 		LspPlanTypes(String label) {this.label = label;}
