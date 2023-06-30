@@ -38,8 +38,8 @@ class RebalancingShipmentsStrategyFactory {
 
 				LSP lsp = lspPlan.getLSP();
 				Map<LogisticChain, Integer> shipmentCountByChain = new HashMap<>();
-				LogisticChain minChain = null;
-				LogisticChain maxChain = null;
+				LogisticChain minChain;
+				LogisticChain maxChain;
 
 				// fill the shipmentCountByChain map with each chain's shipment count
 				for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
@@ -49,6 +49,9 @@ class RebalancingShipmentsStrategyFactory {
 				// find the chains with the minimum and maximum shipment counts
 				minChain = Collections.min(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue()).getKey();
 				maxChain = Collections.max(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue()).getKey();
+
+				// If min and max chains are the same, no need to shift shipments
+				if(minChain.equals(maxChain)) return;
 
 				// get the first shipment ID from the chain with the maximum shipment count
 				Id<LSPShipment> shipmentIdForReplanning = maxChain.getShipmentIds().iterator().next();
