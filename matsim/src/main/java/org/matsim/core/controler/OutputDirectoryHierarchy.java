@@ -198,7 +198,7 @@ public final class OutputDirectoryHierarchy {
 	 */
 	public final void createIterationDirectory(final int iteration) {
 		File dir = new File(getIterationPath(iteration));
-		if (!dir.mkdir()) {
+		if (dir.exists() || !dir.mkdir()) {
 			if (this.overwriteFiles == OverwriteFileSetting.overwriteExistingFiles && dir.exists()) {
 				log.info("Iteration directory "
 						+ getIterationPath(iteration)
