@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonHouseholdMapping
+ * VehicleHouseholdMapping
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,37 +21,37 @@ package org.matsim.households;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.population.Person;
-
+import org.matsim.vehicles.Vehicle;
 
 /**
- * Tiny helper to get the household associated with a person's id.
+ * Tiny helper to get the household associated with a vehicle's id.
+ * 
  * @author dgrether
  *
  */
-public class PersonHouseholdMapping {
+public class VehicleHouseholdMapping {
 
-	private final Map<Id<Person>, Household> phMap = new IdMap<>(Person.class);
-	
-	public PersonHouseholdMapping(Households hhs) {
+	private final Map<Id<Vehicle>, Household> vhMap = new IdMap<>(Vehicle.class);
+
+	public VehicleHouseholdMapping(Households hhs) {
 		this.reinitialize(hhs);
 	}
 
 	public void reinitialize(Households hhs) {
-		this.phMap.clear();
-		for (Household h : hhs.getHouseholds().values()){
-			for (Id<Person> member : h.getMemberIds()){
-				this.phMap.put(member, h);
+		this.vhMap.clear();
+		for (Household h : hhs.getHouseholds().values()) {
+			for (Id<Vehicle> vehicle : h.getVehicleIds()) {
+				this.vhMap.put(vehicle, h);
 			}
 		}
-		
 	}
-	
-	public Household getHousehold(Id<Person> personId) {
-		return this.phMap.get(personId);
+
+	public @Nullable Household getHousehold(Id<Vehicle> vehicleId) {
+		return this.vhMap.get(vehicleId);
 	}
-	
-	
+
 }

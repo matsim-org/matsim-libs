@@ -68,6 +68,11 @@ public class ObjectAttributesConverter {
 		return converter == null ? null : converter.convert(value);
 	}
 
+	public Map<String, AttributeConverter<?>> getConverters()
+	{
+		return this.converters;
+	}
+
 	private AttributeConverter getConverter(String className) {
 		if (converters.containsKey(className)) return converters.get(className);
 		try {
