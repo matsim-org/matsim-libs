@@ -183,7 +183,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		private final Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 		private final BlockingQueue<CompletableFuture<String>> outputQueue;
 		private final BufferedWriter out;
-		private boolean finish = false;
+		private volatile boolean finish = false;
 
 
 		ParallelPopulationWriterV6(BlockingQueue<CompletableFuture<String>> outputQueue, BufferedWriter out) {
@@ -216,7 +216,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		private final CoordinateTransformation coordinateTransformation;
 		private final BlockingQueue<ParallelPopulationWriterHandlerV6.PersonData> queue;
 		private final StringBuilder stringBuilder = new StringBuilder(100_000);
-		private boolean finish = false;
+		private volatile boolean finish = false;
 
 		PersonStringCreator(CoordinateTransformation coordinateTransformation, BlockingQueue<ParallelPopulationWriterHandlerV6.PersonData> queue) {
 			this.coordinateTransformation = coordinateTransformation;
