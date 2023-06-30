@@ -1184,16 +1184,21 @@ public final class PopulationUtils {
 		person.getAttributes().clear();
 	}
 
-        public static String getSubpopulation( HasPlansAndId<?,?> person ){
+	public static String getSubpopulation( HasPlansAndId<?,?> person ){
 		if ( person==null ) {
 			return null;
 		}
 		// (This originally delegated to getPersonAttribute.  See comment there.  kai, jul'22)
 
 		return (String) person.getAttributes().getAttribute( SUBPOPULATION_ATTRIBUTE_NAME );
-        }
-        public static void putSubpopulation( HasPlansAndId<?,?> person, String subpopulation ) {
+	}
+
+	public static void putSubpopulation( HasPlansAndId<?,?> person, String subpopulation ) {
 		putPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation );
+	}
+
+	public static void removeSubpopulation(Person person) {
+		person.getAttributes().removeAttribute(SUBPOPULATION_ATTRIBUTE_NAME);
 	}
 
 	public static Population getOrCreateAllpersons( Scenario  scenario ) {
