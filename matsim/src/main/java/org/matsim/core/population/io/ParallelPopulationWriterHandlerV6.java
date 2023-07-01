@@ -158,6 +158,10 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		out.write(">\n\n");
 		this.attributesWriter.writeAttributes("\t", out, plans.getAttributes());
 		out.write("\n\n");
+
+		// Initialize worker threads
+		tryInitWorkerThreads();
+		tryInitWriterThread(out);
 	}
 
 	@Override
@@ -169,19 +173,10 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
-
-		// Initialize worker threads
-		// It might happen that this writePerson method is not called due to an empty population
-		tryInitWorkerThreads();
-		tryInitWriterThread(out);
 	}
 
 	@Override
 	public void endPlans(final BufferedWriter out) throws IOException {
-		// Initialize at least here, if it has not been done beforehand
-		tryInitWorkerThreads();
-		tryInitWriterThread(out);
 		joinThreads();
 		out.write("</population>\n");
 	}
@@ -230,6 +225,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 					// Comment in PopulationUtils.openPopulationInputStream
 				}
 			} while (!(this.outputQueue.isEmpty() && finish));
+			counter.printCounter();
 		}
 
 		public void finish() {
