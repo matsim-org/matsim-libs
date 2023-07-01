@@ -20,24 +20,17 @@ package org.matsim.contrib.roadpricing.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.roadpricing.RoadPricingModule;
-import org.matsim.contrib.roadpricing.RoadPricingUtils;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.net.URL;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import static org.junit.Assert.fail;
 
@@ -49,7 +42,7 @@ public class RoadPricingByConfigfileTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	private static final Logger log = LogManager.getLogger( RoadPricingByConfigfileTest.class );
-	
+
 	@Test
 	public final void testMain() {
 
@@ -62,14 +55,14 @@ public class RoadPricingByConfigfileTest {
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				EventsUtils.compareEventsFiles( expected, actual );
+				Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, EventsUtils.compareEventsFiles( expected, actual ));
 			}
 			{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
 				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
-				PopulationUtils.comparePopulations( expected, actual ) ;
+				Assert.assertTrue("Populations are different", PopulationUtils.comparePopulations( expected, actual ));
 			}
 
 
