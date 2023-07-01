@@ -53,7 +53,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
  */
 public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandler {
 	private static final int THREAD_LIMIT = 2;
-	private static final int MAX_QUEUE_LENGTH = 3000;
+	private static final int MAX_QUEUE_LENGTH = 1000;
 	private final BlockingQueue<PersonData> inputQueue = new LinkedBlockingQueue<>();
 	private final BlockingQueue<CompletableFuture<String>> outputQueue = new LinkedBlockingQueue<>(MAX_QUEUE_LENGTH);
 	private final CoordinateTransformation coordinateTransformation;
