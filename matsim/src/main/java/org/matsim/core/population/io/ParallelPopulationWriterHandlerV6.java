@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.population.io;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
@@ -27,6 +29,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
@@ -52,6 +55,9 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
  * @author steffenaxer
  */
 public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandler {
+
+	private static final Logger LOG = LogManager.getLogger(ParallelPopulationWriterHandlerV6.class);
+
 	private static final int THREAD_LIMIT = 2;
 	private static final int MAX_QUEUE_LENGTH = 1000;
 	private final BlockingQueue<PersonData> inputQueue = new LinkedBlockingQueue<>();
@@ -62,6 +68,8 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	private Thread writeThread;
 	private PersonStringCreator[] runners;
 	private ParallelPopulationWriterV6 writer;
+	private Throwable runnerException = null;
+	private Throwable writerException = null;
 	private final Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
 	ParallelPopulationWriterHandlerV6(CoordinateTransformation coordinateTransformation) {
@@ -86,6 +94,10 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 				Thread thread = new Thread(runner);
 				thread.setDaemon(true);
 				thread.setName(PersonStringCreator.class.toString() + i);
+				thread.setUncaughtExceptionHandler((failedThread, exception) -> {
+					LOG.warn("Exception while writing population.", exception);
+					runnerException = exception;
+				});
 				threads[i] = thread;
 				thread.start();
 			}
@@ -98,6 +110,10 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			writeThread = new Thread(this.writer);
 			writeThread.setDaemon(true);
 			writeThread.setName(ParallelPopulationWriterV6.class.toString() + 0);
+			writeThread.setUncaughtExceptionHandler((thread, exception) -> {
+				LOG.warn("Exception while writing population.", exception);
+				writerException = exception;
+			});
 			writeThread.start();
 		}
 	}
@@ -117,6 +133,13 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			this.writeThread.join();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
+		}
+		// pass on potential exceptions
+		if (runnerException != null) {
+			throw new UncheckedIOException(runnerException);
+		}
+		if (writerException != null) {
+			throw new UncheckedIOException(writerException);
 		}
 	}
 
