@@ -200,8 +200,11 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 						out.write(f.get());
 						counter.incCounter();
 					}
-				} catch (InterruptedException | ExecutionException | IOException e) {
+				} catch (InterruptedException | ExecutionException e) {
 					throw new RuntimeException(e);
+				} catch (IOException e) {
+					// Do nothing, as this seems to happen regularly, see
+					// Comment in PopulationUtils.openPopulationInputStream
 				}
 			} while (!(this.outputQueue.isEmpty() && finish));
 		}
