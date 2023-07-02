@@ -41,12 +41,11 @@ import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.UUID;
+import java.util.concurrent.*;
 
 import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 import static org.matsim.core.utils.io.XmlUtils.encodeContent;
@@ -64,12 +63,14 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	private final BlockingQueue<CompletableFuture<String>> outputQueue = new LinkedBlockingQueue<>(MAX_QUEUE_LENGTH);
 	private final CoordinateTransformation coordinateTransformation;
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
-	private Thread[] threads;
+	private Thread[] workerThreads;
 	private Thread writeThread;
 	private PersonStringCreator[] runners;
 	private ParallelPopulationWriterV6 writer;
 	private Throwable runnerException = null;
 	private Throwable writerException = null;
+
+	public static String FINISH_MARKER = UUID.randomUUID().toString();
 	private final Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
 	ParallelPopulationWriterHandlerV6(CoordinateTransformation coordinateTransformation) {
@@ -78,9 +79,9 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 
 
 	private void tryInitWorkerThreads() {
-		if (threads == null) {
+		if (workerThreads == null) {
 			int computeThreads = Math.min(THREAD_LIMIT, Runtime.getRuntime().availableProcessors());
-			threads = new Thread[computeThreads];
+			workerThreads = new Thread[computeThreads];
 			runners = new PersonStringCreator[computeThreads];
 			for (int i = 0; i < computeThreads; i++) {
 
@@ -98,7 +99,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 					LOG.warn("Exception while writing population.", exception);
 					runnerException = exception;
 				});
-				threads[i] = thread;
+				workerThreads[i] = thread;
 				thread.start();
 			}
 		}
@@ -122,15 +123,30 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		runner.putAttributeConverters(this.converters);
 	}
 
+	void submitClosingMarkerWorker() {
+		Arrays.stream(workerThreads).<CompletableFuture<String>>map(thread -> new CompletableFuture<>()).forEach(workerClose -> {
+			workerClose.complete(FINISH_MARKER);
+			this.inputQueue.add(new PersonData(null, workerClose));
+		});
+	}
+
+	void submitClosingMarkerWriter() {
+		CompletableFuture<String> writerClose = new CompletableFuture<>();
+		writerClose.complete(FINISH_MARKER);
+		this.outputQueue.add(writerClose);
+	}
+
 	private void joinThreads() {
 		try {
-			for (int i = 0; i < threads.length; i++) {
-
-				runners[i].finish();
-				threads[i].join();
+			this.submitClosingMarkerWorker();
+			//Join worker threads
+			for (Thread worker : workerThreads) {
+				worker.join();
 			}
-			this.writer.finish();
+			// Finish writer
+			this.submitClosingMarkerWriter();
 			this.writeThread.join();
+
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
@@ -201,7 +217,6 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		private final Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 		private final BlockingQueue<CompletableFuture<String>> outputQueue;
 		private final BufferedWriter out;
-		private volatile boolean finish = false;
 
 
 		ParallelPopulationWriterV6(BlockingQueue<CompletableFuture<String>> outputQueue, BufferedWriter out) {
@@ -211,22 +226,21 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 
 		@Override
 		public void run() {
-			do {
+			while (true) {
 				try {
-					CompletableFuture<String> f = outputQueue.poll();
-					if (f != null) {
+					CompletableFuture<String> f = outputQueue.take();
+					String word = f.get();
+					if (word.equals(FINISH_MARKER)) {
+						counter.printCounter();
+						return;
+					} else {
 						out.write(f.get());
 						counter.incCounter();
 					}
 				} catch (InterruptedException | ExecutionException | IOException e) {
 					throw new RuntimeException(e);
 				}
-			} while (!(this.outputQueue.isEmpty() && finish));
-			counter.printCounter();
-		}
-
-		public void finish() {
-			this.finish = true;
+			}
 		}
 	}
 
@@ -235,11 +249,10 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		private final CoordinateTransformation coordinateTransformation;
 		private final BlockingQueue<ParallelPopulationWriterHandlerV6.PersonData> queue;
 		private final StringBuilder stringBuilder = new StringBuilder(100_000);
-		private volatile boolean finish = false;
 
-		PersonStringCreator(CoordinateTransformation coordinateTransformation, BlockingQueue<ParallelPopulationWriterHandlerV6.PersonData> queue) {
+		PersonStringCreator(CoordinateTransformation coordinateTransformation, BlockingQueue<ParallelPopulationWriterHandlerV6.PersonData> inputQueue) {
 			this.coordinateTransformation = coordinateTransformation;
-			this.queue = queue;
+			this.queue = inputQueue;
 		}
 
 		private static void endPerson(final StringBuilder out) {
@@ -298,46 +311,50 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			this.attributesWriter.putAttributeConverters(converters);
 		}
 
-		private void process() throws IOException {
-			do {
-				ParallelPopulationWriterHandlerV6.PersonData personData = this.queue.poll();
-				if (personData != null) {
-					Person person = personData.person();
-					StringBuilder out = stringBuilder;
+		private void process() throws IOException, InterruptedException, ExecutionException {
 
-					this.startPerson(person, out);
-					for (Plan plan : person.getPlans()) {
-						startPlan(plan, out);
-						// act/leg
-						for (PlanElement pe : plan.getPlanElements()) {
-							if (pe instanceof Activity act) {
-								this.writeAct(act, out);
-							} else if (pe instanceof Leg leg) {
-								this.startLeg(leg, out);
-								// route
-								Route route = leg.getRoute();
-								if (route != null) {
-									startRoute(route, out);
-									endRoute(out);
-								}
-								endLeg(out);
-							}
-						}
-						endPlan(out);
+			while (true) {
+				ParallelPopulationWriterHandlerV6.PersonData personData = this.queue.take();
+
+				//Happens only when closing
+				if (personData.person == null) {
+					String closeWord = personData.futurePersonString().get();
+					if (closeWord.equals(FINISH_MARKER)) {
+						return;
 					}
-					endPerson(out);
-					this.writeSeparator(out);
-					CompletableFuture<String> completableFuture = personData.futurePersonString();
-					completableFuture.complete(out.toString());
-
-					// Reset stringBuilder instead of instantiate
-					stringBuilder.setLength(0);
 				}
-			} while (!(this.queue.isEmpty() && finish));
-		}
 
-		public void finish() {
-			this.finish = true;
+				Person person = personData.person();
+				StringBuilder out = stringBuilder;
+
+				this.startPerson(person, out);
+				for (Plan plan : person.getPlans()) {
+					startPlan(plan, out);
+					// act/leg
+					for (PlanElement pe : plan.getPlanElements()) {
+						if (pe instanceof Activity act) {
+							this.writeAct(act, out);
+						} else if (pe instanceof Leg leg) {
+							this.startLeg(leg, out);
+							// route
+							Route route = leg.getRoute();
+							if (route != null) {
+								startRoute(route, out);
+								endRoute(out);
+							}
+							endLeg(out);
+						}
+					}
+					endPlan(out);
+				}
+				endPerson(out);
+				this.writeSeparator(out);
+				CompletableFuture<String> completableFuture = personData.futurePersonString();
+				completableFuture.complete(out.toString());
+
+				// Reset stringBuilder instead of instantiate
+				stringBuilder.setLength(0);
+			}
 		}
 
 		private void startPerson(final Person person, final StringBuilder out) {
@@ -451,7 +468,11 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		@Override
 		public void run() {
 			try {
-				this.process();
+				try {
+					this.process();
+				} catch (InterruptedException | ExecutionException e) {
+					throw new RuntimeException(e);
+				}
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
