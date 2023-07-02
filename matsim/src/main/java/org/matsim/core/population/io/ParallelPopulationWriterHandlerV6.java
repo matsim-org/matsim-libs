@@ -123,17 +123,18 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		runner.putAttributeConverters(this.converters);
 	}
 
-	void submitClosingMarkerWorker() {
-		Arrays.stream(workerThreads).<CompletableFuture<String>>map(thread -> new CompletableFuture<>()).forEach(workerClose -> {
+	void submitClosingMarkerWorker() throws InterruptedException {
+		for (Thread ignore : this.workerThreads) {
+			CompletableFuture<String> workerClose = new CompletableFuture<>();
 			workerClose.complete(FINISH_MARKER);
-			this.inputQueue.add(new PersonData(null, workerClose));
-		});
+			this.inputQueue.put(new PersonData(null, workerClose));
+		}
 	}
 
-	void submitClosingMarkerWriter() {
+	void submitClosingMarkerWriter() throws InterruptedException {
 		CompletableFuture<String> writerClose = new CompletableFuture<>();
 		writerClose.complete(FINISH_MARKER);
-		this.outputQueue.add(writerClose);
+		this.outputQueue.put(writerClose);
 	}
 
 	private void joinThreads() {
