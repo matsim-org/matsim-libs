@@ -41,7 +41,6 @@ import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -65,7 +64,7 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 	private Thread[] workerThreads;
 	private Thread writeThread;
-	private PersonStringCreator[] runners;
+	private PersonStringCreator[] workers;
 	private ParallelPopulationWriterV6 writer;
 	private Throwable runnerException = null;
 	private Throwable writerException = null;
@@ -82,17 +81,17 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		if (workerThreads == null) {
 			int computeThreads = Math.min(THREAD_LIMIT, Runtime.getRuntime().availableProcessors());
 			workerThreads = new Thread[computeThreads];
-			runners = new PersonStringCreator[computeThreads];
+			workers = new PersonStringCreator[computeThreads];
 			for (int i = 0; i < computeThreads; i++) {
 
-				PersonStringCreator runner =
+				PersonStringCreator worker =
 						new PersonStringCreator(
 								this.coordinateTransformation,
 								this.inputQueue);
 
-				initObjectAttributeConverters(runner);
-				this.runners[i] = runner;
-				Thread thread = new Thread(runner);
+				initObjectAttributeConverters(worker);
+				this.workers[i] = worker;
+				Thread thread = new Thread(worker);
 				thread.setDaemon(true);
 				thread.setName(PersonStringCreator.class.toString() + i);
 				thread.setUncaughtExceptionHandler((failedThread, exception) -> {
@@ -234,10 +233,9 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 					if (word.equals(FINISH_MARKER)) {
 						counter.printCounter();
 						return;
-					} else {
-						out.write(f.get());
-						counter.incCounter();
 					}
+					out.write(f.get());
+					counter.incCounter();
 				} catch (InterruptedException | ExecutionException | IOException e) {
 					throw new RuntimeException(e);
 				}
@@ -312,50 +310,37 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 			this.attributesWriter.putAttributeConverters(converters);
 		}
 
-		private void process() throws IOException, InterruptedException, ExecutionException {
+		private void writePerson(PersonData personData) throws IOException, InterruptedException, ExecutionException {
+			StringBuilder out = stringBuilder;
+			Person person = personData.person();
 
-			while (true) {
-				ParallelPopulationWriterHandlerV6.PersonData personData = this.queue.take();
-
-				//Happens only when closing
-				if (personData.person == null) {
-					String closeWord = personData.futurePersonString().get();
-					if (closeWord.equals(FINISH_MARKER)) {
-						return;
-					}
-				}
-
-				Person person = personData.person();
-				StringBuilder out = stringBuilder;
-
-				this.startPerson(person, out);
-				for (Plan plan : person.getPlans()) {
-					startPlan(plan, out);
-					// act/leg
-					for (PlanElement pe : plan.getPlanElements()) {
-						if (pe instanceof Activity act) {
-							this.writeAct(act, out);
-						} else if (pe instanceof Leg leg) {
-							this.startLeg(leg, out);
-							// route
-							Route route = leg.getRoute();
-							if (route != null) {
-								startRoute(route, out);
-								endRoute(out);
-							}
-							endLeg(out);
+			this.startPerson(person, out);
+			for (Plan plan : person.getPlans()) {
+				startPlan(plan, out);
+				// act/leg
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Activity act) {
+						this.writeAct(act, out);
+					} else if (pe instanceof Leg leg) {
+						this.startLeg(leg, out);
+						// route
+						Route route = leg.getRoute();
+						if (route != null) {
+							startRoute(route, out);
+							endRoute(out);
 						}
+						endLeg(out);
 					}
-					endPlan(out);
 				}
-				endPerson(out);
-				this.writeSeparator(out);
-				CompletableFuture<String> completableFuture = personData.futurePersonString();
-				completableFuture.complete(out.toString());
-
-				// Reset stringBuilder instead of instantiate
-				stringBuilder.setLength(0);
+				endPlan(out);
 			}
+			endPerson(out);
+			this.writeSeparator(out);
+			CompletableFuture<String> completableFuture = personData.futurePersonString();
+			completableFuture.complete(out.toString());
+
+			// Reset stringBuilder instead of instantiate
+			stringBuilder.setLength(0);
 		}
 
 		private void startPerson(final Person person, final StringBuilder out) {
@@ -469,12 +454,21 @@ public class ParallelPopulationWriterHandlerV6 implements PopulationWriterHandle
 		@Override
 		public void run() {
 			try {
-				try {
-					this.process();
-				} catch (InterruptedException | ExecutionException e) {
-					throw new RuntimeException(e);
+				while (true) {
+					ParallelPopulationWriterHandlerV6.PersonData personData = this.queue.take();
+
+					//Happens only when closing
+					if (personData.person == null) {
+						String closeWord = personData.futurePersonString().get();
+						if (closeWord.equals(FINISH_MARKER)) {
+							return;
+						}
+						throw new RuntimeException("Inconsistent state, person must not be null.");
+					}
+
+					this.writePerson(personData);
 				}
-			} catch (IOException e) {
+			} catch (InterruptedException | ExecutionException | IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
