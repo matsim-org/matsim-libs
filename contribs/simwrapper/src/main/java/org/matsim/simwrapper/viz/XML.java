@@ -13,6 +13,11 @@ public class XML extends Viz {
 	@JsonProperty(required = true)
 	public String file;
 
+	/**
+	 * Descriptive how many levels should be unfolded at the beginning.
+	 */
+	public int unfoldLevel;
+
 	public XML() {
 		super("xml");
 	}
