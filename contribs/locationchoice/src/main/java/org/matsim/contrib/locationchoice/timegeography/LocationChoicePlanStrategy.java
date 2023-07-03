@@ -17,12 +17,12 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 public class LocationChoicePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
-	
+
 	public LocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
 		final DestinationChoiceConfigGroup destinationChoiceConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), DestinationChoiceConfigGroup.class ) ;
 		if ( DestinationChoiceConfigGroup.Algotype.bestResponse== destinationChoiceConfigGroup.getAlgorithm() ) {
@@ -46,7 +46,7 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 		delegate.addStrategyModule(new DestinationChoice( tripRouterProvider, scenario, timeInterpretation) );
 		delegate.addStrategyModule(new ReRoute(scenario, tripRouterProvider, timeInterpretation));
 	}
-	
+
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
 		delegate.run(person);
@@ -61,5 +61,5 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 	public void finish() {
 		delegate.finish();
 	}
-	
+
 }

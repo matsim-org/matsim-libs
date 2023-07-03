@@ -44,7 +44,7 @@ import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -175,23 +175,23 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 		return (iterationMod > (this.config.getWriteCountsInterval() - this.config.getAverageCountsOverIterations())
 				&& (effectiveIteration + (this.config.getWriteCountsInterval() - iterationMod) >= averaging));
 	}
-	
+
 	/*package*/ boolean createCountsInIteration(final int iteration) {
-		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));		
+		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));
 	}
 
 	private void addVolumes(final VolumesAnalyzer volumes) {
 		this.iterationsUsed++;
 		for (Map.Entry<Id<Link>, double[]> e : this.linkStats.entrySet()) {
 			Id<Link> linkId = e.getKey();
-			double[] volumesPerHour = e.getValue(); 
-			double[] newVolume = getVolumesPerHourForLink(volumes, linkId); 
+			double[] volumesPerHour = e.getValue();
+			double[] newVolume = getVolumesPerHourForLink(volumes, linkId);
 			for (int i = 0; i < 24; i++) {
 				volumesPerHour[i] += newVolume[i];
 			}
 		}
 	}
-	
+
 	private double[] getVolumesPerHourForLink(final VolumesAnalyzer volumes, final Id<Link> linkId) {
 		if (this.config.isFilterModes()) {
 			double[] newVolume = new double[24];
@@ -207,7 +207,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 			return volumes.getVolumesPerHourForLink(linkId);
 		}
 	}
-	
+
 	private void reset() {
 		this.iterationsUsed = 0;
 		for (double[] hours : this.linkStats.values()) {

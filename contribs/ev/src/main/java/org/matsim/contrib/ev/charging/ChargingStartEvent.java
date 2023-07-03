@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.vehicles.Vehicle;
 
@@ -31,20 +30,16 @@ public class ChargingStartEvent extends Event {
 	public static final String EVENT_TYPE = "charging_start";
 	public static final String ATTRIBUTE_CHARGER = "charger";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_CHARGER_TYPE = "chargerType";
 	public static final String ATTRIBUTE_CHARGE = "charge";
 
 	private final Id<Charger> chargerId;
 	private final Id<Vehicle> vehicleId;
-	private final String chargerType;
 	private final double charge;
 
-	public ChargingStartEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId, String chargerType,
-			double charge) {
+	public ChargingStartEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId, double charge) {
 		super(time);
 		this.chargerId = chargerId;
 		this.vehicleId = vehicleId;
-		this.chargerType = chargerType;
 		this.charge = charge;
 	}
 
@@ -61,10 +56,6 @@ public class ChargingStartEvent extends Event {
 		return vehicleId;
 	}
 
-	public String getChargerType() {
-		return chargerType;
-	}
-
 	public double getCharge() {
 		return charge;
 	}
@@ -74,8 +65,7 @@ public class ChargingStartEvent extends Event {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_CHARGER, chargerId.toString());
 		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
-		attr.put(ATTRIBUTE_CHARGER_TYPE, chargerType);
-		attr.put(ATTRIBUTE_CHARGE, charge +"");
+		attr.put(ATTRIBUTE_CHARGE, charge + "");
 		return attr;
 	}
 }

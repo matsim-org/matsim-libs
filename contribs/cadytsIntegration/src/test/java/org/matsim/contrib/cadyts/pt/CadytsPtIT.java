@@ -67,7 +67,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -94,7 +94,7 @@ public class CadytsPtIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding("ccc").toProvider(new jakarta.inject.Provider<PlanStrategy>() {
 					@Inject CadytsPtContext context;
 					@Override
 					public PlanStrategy get() {
@@ -133,7 +133,7 @@ public class CadytsPtIT {
 		Assert.assertEquals(3600.0, context.getCalibrator().getTimeBinSize_s(), MatsimTestUtils.EPSILON);
 	}
 
-	
+
 	@Test
 	public final void testCalibrationAsScoring() throws IOException {
 		final double beta=30. ;
@@ -264,7 +264,7 @@ public class CadytsPtIT {
 			final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
-			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
+			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader
 			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
@@ -287,7 +287,7 @@ public class CadytsPtIT {
 		}
 	}
 
-	
+
 	@Test
 	public final void testCalibration() throws IOException {
 		final double beta = 30. ;
@@ -319,7 +319,7 @@ public class CadytsPtIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding("ccc").toProvider(new jakarta.inject.Provider<PlanStrategy>() {
 					@Inject CadytsPtContext context;
 					@Override
 					public PlanStrategy get() {
@@ -409,7 +409,7 @@ public class CadytsPtIT {
 			final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
-			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
+			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader
 			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
@@ -434,9 +434,9 @@ public class CadytsPtIT {
 	/**
 	 * @author mmoyo
 	 */
-	@Test 
+	@Test
 	public final void testCalibrationTwo() throws IOException {
-		// yyyy I cannot fully certify that this test is doing something reasonable, since simCountComparisonOccupancy.txt and 
+		// yyyy I cannot fully certify that this test is doing something reasonable, since simCountComparisonOccupancy.txt and
 		// cadytsSimCountComparisonOccupancy.txt are returning different results.  kai, feb'13
 		// There is a comment in CadytsContext that the "cadyts" version may be wrong for time bins different from one hour. kai, dec'13
 
@@ -470,7 +470,7 @@ public class CadytsPtIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding("ccc").toProvider(new jakarta.inject.Provider<PlanStrategy>() {
 					@Inject Scenario scenario;
 					@Inject CadytsPtContext context;
 					@Override
@@ -512,7 +512,7 @@ public class CadytsPtIT {
 
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
 		// yy I don't know why it says "hour 4" but "getVolume(7)". kai, sep'14
-		
+
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 
 		// test resulting simulation volumes
@@ -581,9 +581,9 @@ public class CadytsPtIT {
 
 		//test link offsets
 		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
-		CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader = 
+		CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader =
 				new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
-		DynamicData<TransitStopFacility> stopOffsets = 
+		DynamicData<TransitStopFacility> stopOffsets =
 				offsetReader.read(outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml");
 
 		TransitStopFacility stop1 = schedule.getFacilities().get(stopId1);
@@ -603,7 +603,7 @@ public class CadytsPtIT {
 		Assert.assertEquals("Wrong link offset of stop 1", 0.0, stopOffsets.getBinValue(stop1 , binIndex), MatsimTestUtils.EPSILON);
 //		Assert.assertEquals("Wrong link offset of stop 2", -0.0028383120802772956, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
 //		Assert.assertEquals("Wrong link offset of stop 10", 0.00878939456017082, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
-		
+
 		Assert.assertTrue("Offset at stop 2 has wrong sign.", stopOffsets.getBinValue(stop2, binIndex) < 0. ) ;
 		Assert.assertTrue("Offset at stop 10 has wrong sign.", stopOffsets.getBinValue(stop10, binIndex) > 0. ) ;
 	}

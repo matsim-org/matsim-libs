@@ -15,7 +15,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-  
+
 package org.matsim.contrib.freight.utils;
 
 import java.util.Collection;
@@ -54,7 +54,7 @@ import org.junit.Assert;
  *
  */
 public class FreightUtilsIT {
-	
+
 	private final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
 
@@ -63,13 +63,13 @@ public class FreightUtilsIT {
 
 	private Carrier carrierWShipmentsOnlyFromCarrierWServices;
 	private Carrier carrierWShipmentsOnlyFromCarrierWShipments;
-	
+
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+
 	@Before
 	public void setUp() {
-		
+
 		//Create carrier with services and shipments
 		Carriers carriersWithServicesAndShpiments = new Carriers();
 		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
@@ -77,7 +77,7 @@ public class FreightUtilsIT {
 		CarrierUtils.addService(carrierWServices, service1);
 		CarrierService service2 = createMatsimService("Service2", "i(4,9)", 2);
 		CarrierUtils.addService(carrierWServices, service2);
-		
+
 		//Create carrier with shipments
 		carrierWShipments = CarrierUtils.createCarrier(CARRIER_SHIPMENTS_ID );
 		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
@@ -102,13 +102,13 @@ public class FreightUtilsIT {
 
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
-		
+
 		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
 				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
-		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance() 
+		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance()
 				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)
-				.setFleetSize(FleetSize.INFINITE);				
+				.setFleetSize(FleetSize.INFINITE);
 		carrierWServices.setCarrierCapabilities(ccBuilder.build());
 		carrierWShipments.setCarrierCapabilities(ccBuilder.build());
 
@@ -125,18 +125,18 @@ public class FreightUtilsIT {
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
-		
+
 		for (Carrier carrier : carriersWithServicesAndShpiments.getCarriers().values()) {
 			//Build VRP
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
 			VehicleRoutingProblem problem = vrpBuilder.build();
-	
+
 				// get the algorithm out-of-the-box, search solution and get the best one.
 			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 			Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
 			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
-	
+
 				//Routing bestPlan to Network
 			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
 			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
@@ -152,31 +152,31 @@ public class FreightUtilsIT {
 				carriersWithServicesAndShpiments );
 
 		// assign vehicle types to the carriers
-		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;	
-		
+		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;
+
 		for (Carrier carrier : carriersWithShipmentsOnly.getCarriers().values()) {
 			//Build VRP
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
 			VehicleRoutingProblem problem = vrpBuilder.build();
-	
+
 				// get the algorithm out-of-the-box, search solution and get the best one.
 			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 			Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
 			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
-	
+
 				//Routing bestPlan to Network
 			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
 			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
 			carrier.setSelectedPlan(carrierPlanServicesAndShipments) ;
 		}
-		
+
 		carrierWShipmentsOnlyFromCarrierWServices = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SERVICES_ID);		//with converted Service
 		carrierWShipmentsOnlyFromCarrierWShipments = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SHIPMENTS_ID);		//with copied Shipments
 
 	}
-	
-	
+
+
 	@Test
 	public void numberOfToursIsCorrect() {
 		Assert.assertEquals(2, carrierWServices.getSelectedPlan().getScheduledTours().size());
@@ -184,19 +184,19 @@ public class FreightUtilsIT {
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours().size());
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours().size());
 	}
-	
-	
+
+
 	/**
-	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18 
+	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18
 	 */
 	@Test
 	public void toursInitialCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-270.462, carrierWServices.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-270.462, carrierWServices.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
 //			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
 //		}
-//		Assert.assertEquals(9564.0 , tourDurationSum, 0);													
+//		Assert.assertEquals(9564.0 , tourDurationSum, 0);
 //		double tourLengthSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
 //			for (TourElement te : scheduledTour.getTour().getTourElements()) {
@@ -205,46 +205,46 @@ public class FreightUtilsIT {
 //				}
 //			}
 //		}
-//		Assert.assertEquals(52000, tourLengthSum, 0);													
-	}
-	
-	/**
-	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18 
-	 */
-	@Test
-	public void toursInitialCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.87, carrierWShipments.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
-		
-//		double tourDurationSum = 0;
-//		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
-//			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
-//		}
-//		Assert.assertEquals(5260.0 , tourDurationSum, 0);													
-//		
-//		double tourLengthSum = 0;
-//		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
-//			for (TourElement te : scheduledTour.getTour().getTourElements()) {
-//				if (te instanceof Leg) {
-//					tourLengthSum += ((Leg) te).getRoute().getDistance();
-//				}
-//			}
-//		}
-//		Assert.assertEquals(34000, tourLengthSum, 0);													
+//		Assert.assertEquals(52000, tourLengthSum, 0);
 	}
 
 	/**
-	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18 
+	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18
+	 */
+	@Test
+	public void toursInitialCarrierWShipmentsIsCorrect() {
+		Assert.assertEquals(-136.87, carrierWShipments.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+
+//		double tourDurationSum = 0;
+//		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
+//			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
+//		}
+//		Assert.assertEquals(5260.0 , tourDurationSum, 0);
+//
+//		double tourLengthSum = 0;
+//		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
+//			for (TourElement te : scheduledTour.getTour().getTourElements()) {
+//				if (te instanceof Leg) {
+//					tourLengthSum += ((Leg) te).getRoute().getDistance();
+//				}
+//			}
+//		}
+//		Assert.assertEquals(34000, tourLengthSum, 0);
+	}
+
+	/**
+	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18
 	 */
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-140.462, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
-		
+		Assert.assertEquals(-140.462, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours()){
 //			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
 //		}
-//		Assert.assertEquals(7563.0 , tourDurationSum, 0);												
-		
+//		Assert.assertEquals(7563.0 , tourDurationSum, 0);
+
 //		double tourLengthSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours()){
 //			for (TourElement te : scheduledTour.getTour().getTourElements()) {
@@ -255,22 +255,22 @@ public class FreightUtilsIT {
 //				}
 //			}
 //		}
-//		Assert.assertEquals(52000, tourLengthSum, 0);			
+//		Assert.assertEquals(52000, tourLengthSum, 0);
 	}
-	
+
 	/**
-	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18 
+	 * TODO Calculation of tour distance and duration are commented out, because ...tour.getEnd() has no values -> need for fixing in NetworkRouter or somewhere else kmt/okt18
 	 */
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.87, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
-		
+		Assert.assertEquals(-136.87, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours()){
 //			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
 //		}
-//		Assert.assertEquals(5260.0 , tourDurationSum, 0);													
-//		
+//		Assert.assertEquals(5260.0 , tourDurationSum, 0);
+//
 //		double tourLengthSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours()){
 //			for (TourElement te : scheduledTour.getTour().getTourElements()) {
@@ -279,17 +279,17 @@ public class FreightUtilsIT {
 //				}
 //			}
 //		}
-//		Assert.assertEquals(34000, tourLengthSum, 0);		
+//		Assert.assertEquals(34000, tourLengthSum, 0);
 	}
-	
+
 	private static CarrierShipment createMatsimShipment(String id, String from, String to, int size) {
 		Id<CarrierShipment> shipmentId = Id.create(id, CarrierShipment.class);
-		Id<Link> fromLinkId = null; 
+		Id<Link> fromLinkId = null;
 		Id<Link> toLinkId= null;
 
 		if(from != null ) {
 			fromLinkId = Id.create(from, Link.class);
-		} 
+		}
 		if(to != null ) {
 			toLinkId = Id.create(to, Link.class);
 		}

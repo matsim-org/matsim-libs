@@ -65,7 +65,7 @@ import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 import playground.vsp.andreas.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.Collection;
 
 public class DataPrepare {
@@ -158,7 +158,7 @@ public class DataPrepare {
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
-		
+
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore()
 				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
@@ -184,11 +184,11 @@ public class DataPrepare {
 	}
 
 	protected void visualizeRouterNetwork() {
-		
+
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore()
 				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
-		
+
 		TransitRouterImpl router = new TransitRouterImpl(transitRouterConfig, this.scenario.getTransitSchedule() );
 		Network routerNet = router.getTransitRouterNetwork();
 

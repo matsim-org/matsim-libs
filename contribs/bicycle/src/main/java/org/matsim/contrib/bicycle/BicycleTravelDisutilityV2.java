@@ -73,7 +73,7 @@ class BicycleTravelDisutilityV2 implements TravelDisutility {
 
 		double distance = linkWithAttributes.getLength();
 
-		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface, type);
+		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface);
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
 
 		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype);

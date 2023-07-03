@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import cadyts.demand.PlanBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,14 +43,14 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 class ModalCountsPlansTranslatorBasedOnEvents implements PlansTranslator<ModalCountsLinkIdentifier>, LinkLeaveEventHandler,
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
-	
+
 	private static final Logger log = LogManager.getLogger(ModalCountsPlansTranslatorBasedOnEvents.class);
 
 	private final Scenario scenario;
 
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	private final Map<Id<Person>,String> personId2Mode = new HashMap<>();
-	
+
 	private int iteration = -1;
 
 	// this is _only_ there for output:
@@ -91,7 +91,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
 				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
 		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
-		
+
 		delegate.reset(iteration);
 	}
 
@@ -100,38 +100,38 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			delegate.handleEvent(event);
 			this.personId2Mode.put(event.getPersonId(), event.getNetworkMode());
 	}
-	
+
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		delegate.handleEvent(event);
 		this.personId2Mode.remove(event.getPersonId());
 	}
-	
+
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		
+
 		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 		String mode = this.personId2Mode.get(driverId);
 		// should not happen since all modes are considered now
-		if (driverId == null) throw new RuntimeException("Link leave event "+ event.toString() + ". However, "+event.getVehicleId()+" is not entered traffic."); 
-		
+		if (driverId == null) throw new RuntimeException("Link leave event "+ event.toString() + ". However, "+event.getVehicleId()+" is not entered traffic.");
+
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
 
 		Id<ModalCountsLinkIdentifier> mlId = ModalCountsUtils.getModalCountLinkId(mode, event.getLinkId());
 		if (!calibratedLinks.contains(mlId))
 			return;
-		
+
 		// get the "Person" behind the id:
 		Person person = this.scenario.getPopulation().getPersons().get(driverId);
-		
+
 		// get the selected plan:
 		Plan selectedPlan = person.getSelectedPlan();
-		
+
 		// get the planStepFactory for the plan (or create one):
 		PlanBuilder<ModalCountsLinkIdentifier> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
-		
+
 		if (tmpPlanStepFactory != null) {
-						
+
 			// add the "turn" to the planStepfactory
 			tmpPlanStepFactory.addTurn(modalLinkContainer.get(mlId), (int) event.getTime());
 		}

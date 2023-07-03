@@ -26,7 +26,8 @@ public class SpeedyALTFactory implements LeastCostPathCalculatorFactory {
 		}
 		SpeedyALTData landmarks = this.landmarksData.get(graph);
 		if (landmarks == null) {
-			landmarks = new SpeedyALTData(graph, 16, travelCosts);
+			int landmarksCount = Math.min(16, graph.nodeCount);
+			landmarks = new SpeedyALTData(graph, landmarksCount, travelCosts);
 			this.landmarksData.put(graph, landmarks);
 		}
 		return new SpeedyALT(landmarks, travelTimes, travelCosts);

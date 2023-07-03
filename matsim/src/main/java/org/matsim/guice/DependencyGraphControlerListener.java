@@ -46,7 +46,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -97,12 +97,12 @@ class DependencyGraphControlerListener implements StartupListener {
 			}
 		}
 	}
-	
+
 	private static List<Alias> getMultibinderAliases(Type aClass, Iterable<Binding<?>> bindings) {
 		List<Alias> aliases = Lists.newArrayList();
 		NodeId toId = NodeId.newTypeId(Key.get(Types.setOf(aClass)));
 		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(Provider.class, aClass);
-		ParameterizedType javaxInjectProvider = Types.newParameterizedType(javax.inject.Provider.class, aClass);
+		ParameterizedType javaxInjectProvider = Types.newParameterizedType(jakarta.inject.Provider.class, aClass);
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.setOf(aClass))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, aClass))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, comGoogleInjectProvider))), toId));
@@ -120,7 +120,7 @@ class DependencyGraphControlerListener implements StartupListener {
 		List<Alias> aliases = Lists.newArrayList();
 		NodeId toId = NodeId.newTypeId(Key.get(Types.mapOf(keyType, aClass)));
 		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(Provider.class, aClass);
-		ParameterizedType javaxInjectProvider = Types.newParameterizedType(javax.inject.Provider.class, aClass);
+		ParameterizedType javaxInjectProvider = Types.newParameterizedType(jakarta.inject.Provider.class, aClass);
 		ParameterizedType stringToComGoogleInjectProviderMapEntry = Types.newParameterizedTypeWithOwner(Map.class, Map.Entry.class, keyType, comGoogleInjectProvider);
 		ParameterizedType stringToJavaxInjectProviderMapEntry = Types.newParameterizedTypeWithOwner(Map.class, Map.Entry.class, keyType, javaxInjectProvider);
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.setOf(stringToComGoogleInjectProviderMapEntry))), toId));
@@ -130,7 +130,7 @@ class DependencyGraphControlerListener implements StartupListener {
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.mapOf(keyType, aClass))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.setOf(stringToComGoogleInjectProviderMapEntry))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.setOf(stringToJavaxInjectProviderMapEntry))), toId));
-		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(javax.inject.Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));
+		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(jakarta.inject.Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));
 		for (Binding<?> binding : bindings) {

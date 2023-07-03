@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.ev.temperature;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Assert;
 import org.junit.Rule;

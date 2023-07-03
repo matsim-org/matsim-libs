@@ -404,4 +404,19 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		return this.theSource;
 	}
 
+	/** Parses a String into a double, taking into account the special encoding for Infinity according to the xsd-specifications for the xs:double data type
+	 */
+	public static double parseDouble(String value) throws NumberFormatException {
+		if ("INF".equals(value)) {
+			return Double.POSITIVE_INFINITY;
+		}
+		if ("-INF".equals(value)) {
+			return Double.NEGATIVE_INFINITY;
+		}
+		if ("NaN".equals(value)) {
+			return Double.NaN;
+		}
+		return Double.parseDouble(value);
+	}
+
 }

@@ -42,7 +42,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;

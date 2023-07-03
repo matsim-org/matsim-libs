@@ -25,7 +25,7 @@ package org.matsim.withinday.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;

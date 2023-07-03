@@ -26,14 +26,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.Map;
 
 public class TransitWalkTravelTimeFactory implements Provider<TravelTime> {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	private final Map<Id<Link>, Double> linkSlopes;	// slope information in %
-	
+
 	public TransitWalkTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
 		this(plansCalcRouteConfigGroup, null);
 	}
@@ -42,7 +42,7 @@ public class TransitWalkTravelTimeFactory implements Provider<TravelTime> {
 			Map<Id<Link>, Double> linkSlopes) {
 		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
 		this.linkSlopes = linkSlopes;
-		
+
 		if (plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.transit_walk) == null) {
 			throw new RuntimeException("No speed was found for mode transit_walk! Aborting.");
 		}
@@ -52,5 +52,5 @@ public class TransitWalkTravelTimeFactory implements Provider<TravelTime> {
 	public TravelTime get() {
 		return new WalkTravelTime(plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.transit_walk), this.linkSlopes);
 	}
-	
+
 }

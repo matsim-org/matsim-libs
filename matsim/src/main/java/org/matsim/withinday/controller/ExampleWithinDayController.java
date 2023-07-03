@@ -22,9 +22,9 @@ package org.matsim.withinday.controller;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -73,7 +73,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
  *
  * The path to a config file is needed as argument to run the
  * simulation.
- * 
+ *
  * It should be possible to run this class with
  * "src/test/resources/test/scenarios/berlin/config_withinday.xml"
  * as argument.
@@ -92,7 +92,7 @@ public final class ExampleWithinDayController implements StartupListener {
 	private double pInitialReplanning = 0.0;
 	private double pDuringActivityReplanning = 1.0;
 	private double pDuringLegReplanning = 0.10;
-	
+
 	private InitialIdentifierFactory initialIdentifierFactory;
 	private DuringActivityIdentifierFactory duringActivityIdentifierFactory;
 	private DuringLegIdentifierFactory duringLegIdentifierFactory;
@@ -105,7 +105,7 @@ public final class ExampleWithinDayController implements StartupListener {
 	private ProbabilityFilterFactory initialProbabilityFilterFactory;
 	private ProbabilityFilterFactory duringActivityProbabilityFilterFactory;
 	private ProbabilityFilterFactory duringLegProbabilityFilterFactory;
-	
+
 	@Inject private Scenario scenario;
 	@Inject private Provider<TripRouter> tripRouterProvider;
 	@Inject private MobsimDataProvider mobsimDataProvider;
@@ -130,13 +130,13 @@ public final class ExampleWithinDayController implements StartupListener {
 			System.out.println("Usage: Controler config-file");
 			System.out.println();
 			System.exit(-1);
-		} 
-		
+		}
+
 		Config config = ConfigUtils.loadConfig( args[0] , new WithinDayConfigGroup() ) ;
 		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config) ;
-		
+
 		final Controler controler = new Controler(scenario);
 		configure(controler);
 		controler.run();
@@ -163,17 +163,17 @@ public final class ExampleWithinDayController implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		this.initReplanners(  );
 	}
-	
+
 	private void initReplanners( ) {
 		Network network = this.scenario.getNetwork() ;
-		
+
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
 
 		TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( TransportMode.car ) ;
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime ) ;
 
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
-		
+
 		this.initialIdentifierFactory = new InitialIdentifierImplFactory(this.mobsimDataProvider);
 		this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);
 		this.initialIdentifierFactory.addAgentFilterFactory(this.initialProbabilityFilterFactory);

@@ -29,7 +29,7 @@ import org.matsim.core.replanning.StrategyManager;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
@@ -45,7 +45,7 @@ final class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
 	private final Provider<ReplanningContext> replanningContextProvider;
 	private final Population population;
 	private final StrategyManager strategyManager;
-	
+
 	@Inject
 	PlansReplanningImpl(StrategyManager strategyManager, Population pop, Provider<ReplanningContext> replanningContextProvider) {
 		this.population = pop;

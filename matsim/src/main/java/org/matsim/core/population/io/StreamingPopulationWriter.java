@@ -33,11 +33,13 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class StreamingPopulationWriter implements PersonAlgorithm {
@@ -47,6 +49,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 
 	private PopulationWriterHandler handler = null;
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
+	private final Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
 	private static class DummyMatsimWriter extends AbstractMatsimWriter {
 		BufferedWriter getWriter() {
@@ -60,8 +63,8 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 		}
 	}
 	private DummyMatsimWriter matsimWriter = new DummyMatsimWriter() ;
-	
-	
+
+
 	public StreamingPopulationWriter() {
 		this(1.0);
 	}
@@ -80,7 +83,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			final CoordinateTransformation coordinateTransformation,
 			final double fraction) {
 		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
+		this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
 	}
 
 	/**
@@ -91,7 +94,13 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 		this( new IdentityTransformation() , fraction );
 	}
 
+	public <T> void putAttributeConverter(Class<T> clazz, AttributeConverter<T> converter) {
+		this.attributeConverters.put(clazz, converter);
+	}
 
+	public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
+		this.attributeConverters.putAll(converters);
+	}
 
 	// implementation of PersonAlgorithm
 	// this is primarily to use the PlansWriter with filters and other algorithms.
@@ -153,6 +162,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 		} ;
 		try {
 			matsimWriter.openHere(filename);
+			this.handler.putAttributeConverters(this.attributeConverters);
 			this.handler.writeHeaderAndStartElement(matsimWriter.getWriter());
 			this.handler.startPlans(fakepop, matsimWriter.getWriter());
 			this.handler.writeSeparator(matsimWriter.getWriter());
@@ -197,5 +207,5 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 	public final void setWriterHandler(final PopulationWriterHandler handler) {
 		this.handler = handler;
 	}
-	
+
 }

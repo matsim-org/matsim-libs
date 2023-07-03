@@ -38,7 +38,7 @@ import java.util.Objects;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.testcases.fakes.FakeLink;
 
@@ -118,7 +118,6 @@ public class DvrpOfflineTravelTimesTest {
 		assertThat(travelTime.getLinkTravelTime(linkA, 0, null, null)).isEqualTo(100);
 		assertThat(travelTime.getLinkTravelTime(linkA, 99, null, null)).isEqualTo(100);
 		assertThat(travelTime.getLinkTravelTime(linkA, 100, null, null)).isEqualTo(150);
-		assertThat(travelTime.getLinkTravelTime(linkA, 9999, null, null)).isEqualTo(150);
 
 		assertThatThrownBy(() -> travelTime.getLinkTravelTime(linkB, 0, null, null)).isExactlyInstanceOf(
 				NullPointerException.class)

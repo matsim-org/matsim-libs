@@ -27,7 +27,7 @@ import static org.junit.Assume.assumeThat;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -85,7 +85,7 @@ public class AgentNotificationTest {
 
 		@Inject
 		MessageQueue messageQueue;
-		
+
 		@Inject
 		TimeInterpretation timeInterpretation;
 
@@ -265,11 +265,11 @@ public class AgentNotificationTest {
 	@Test
 	public void testAgentNotification() {
 		Scenario scenario = createSimpleScenario();
-		
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
-		
+
 		new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.removeModule(PopulationModule.class) //
@@ -277,7 +277,7 @@ public class AgentNotificationTest {
 				@Override
 				protected void configureQSim() {
 					bind(PopulationAgentSource.class).asEagerSingleton();
-					addNamedComponent(PopulationAgentSource.class, PopulationModule.COMPONENT_NAME);
+					addQSimComponentBinding( PopulationModule.COMPONENT_NAME ).to( PopulationAgentSource.class );
 					bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
 					bind( QVehicleFactory.class ).toProvider( () -> QVehicleImpl::new ) ;
 				}
@@ -287,7 +287,7 @@ public class AgentNotificationTest {
 			} ) //
 			.build(scenario, eventsManager) //
 			.run();
-		
+
 		assumeThat(handler.getEvents(), hasItem(
 				is(both(eventWithTime(25200.0)).and(instanceOf(PersonDepartureEvent.class)))));
 		assertThat(handler.getEvents(), hasItem(

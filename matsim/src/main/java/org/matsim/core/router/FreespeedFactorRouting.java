@@ -21,8 +21,8 @@
 
  package org.matsim.core.router;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -55,7 +55,7 @@ class FreespeedFactorRouting implements Provider<RoutingModule> {
 
 	@Override
 	public RoutingModule get() {
-		
+
 //		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		// I wanted to introduce the freespeed limit.  Decided to locally re-implement rather than making the FreespeedTravelTimeAndDisutility
 		// class longer. kai, nov'16
@@ -69,7 +69,7 @@ class FreespeedFactorRouting implements Provider<RoutingModule> {
 		} ;
 		TravelDisutility travelDisutility = new TravelDisutility(){
 			@Override public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-				return travelTime.getLinkTravelTime(link, time, person, vehicle) ; 
+				return travelTime.getLinkTravelTime(link, time, person, vehicle) ;
 			}
 			@Override public double getLinkMinimumTravelDisutility(Link link) {
 				return link.getLength() / Math.min( link.getFreespeed() , params.getTeleportedModeFreespeedLimit() ) ;

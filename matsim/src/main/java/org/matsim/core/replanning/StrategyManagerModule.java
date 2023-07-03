@@ -39,26 +39,26 @@ import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 public class StrategyManagerModule extends AbstractModule {
 	@Override
 	public void install() {
 		int externalCounter = 0;
-		
+
 		install(new DefaultPlanStrategiesModule());
 		// (does commands of type "bind(PlanStrategy.class).annotatedWith(Names.named(strategyName))", i.e.
 		// plan strategies can be looked up under their names (*))
-		
+
 		bind(StrategyManager.class).in(Singleton.class);
 		bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {}).to(new TypeLiteral<WeightedStrategyChooser<Plan, Person>>() {}).asEagerSingleton();
 		bind(ReplanningContext.class).to(ReplanningContextImpl.class).asEagerSingleton();
-		
+
 		MapBinder<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategyMapBinder = MapBinder.newMapBinder(binder(), StrategyConfigGroup.StrategySettings.class, PlanStrategy.class);
 		// (this will bind a Map that has StrategySettings as key, and PlanStrategy as value.  Not sure why StrategySettings as key, and not just the name, but possibly this is mean to allow adding
 		// the same strategy multiple times, with possibly different settings.)
-		
+
 		for (StrategyConfigGroup.StrategySettings settings : getConfig().strategy().getStrategySettings()) {
 			String name = settings.getStrategyName() ;
 			if (name.equals("ExternalModule")) {
@@ -93,7 +93,7 @@ public class StrategyManagerModule extends AbstractModule {
 			}
 		}
 	}
-	
+
 	/**
 	 * If plan strategy comes from some external executable.  E.g. some external router that is not in Java.
 	 */

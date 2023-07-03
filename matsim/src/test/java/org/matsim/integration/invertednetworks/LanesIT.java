@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.integration.invertednetworks;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -133,11 +133,11 @@ public class LanesIT {
 		}
 
 		@Override
-		public void notifyShutdown(ShutdownEvent event) {			
+		public void notifyShutdown(ShutdownEvent event) {
 			log.info( "link34:" + percent34 );
 			log.info( "link35:" + percent35 );
 			log.info( "link36:" + percent36 );
-			
+
 			// The lanes attached to link 23 should distribute the 3600 veh/h capacity as follows:
 			Assert.assertEquals("lane to link 34 should have approx. 600 veh/h, i.e. 16.6% of the total flow", 16.6, percent34, 1);
 			Assert.assertEquals("lane to link 35 should have approx. 1200 veh/h, i.e. 33.3% of the total flow", 33.3, percent35, 1);

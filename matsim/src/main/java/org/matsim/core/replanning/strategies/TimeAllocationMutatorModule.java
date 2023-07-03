@@ -38,7 +38,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +56,7 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 	private static boolean ACTIVITY_DURATION_WARNING_SHOWN = false;
 
 	private static final Logger log = LogManager.getLogger( TimeAllocationMutatorModule.class );
-	
+
 	private final double mutationRange;
 	private final boolean affectingDuration;
 //	private final String subpopulationAttribute;
@@ -79,18 +79,18 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 		this.subpopulationAffectingDuration = null;
 		log.warn("deprecated constructor was used - individual time allocation mutator settings for subpopulations is not supported!");
 	}
-	
+
 	TimeAllocationMutatorModule( Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup ) {
 		this(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup, null);
 	}
-	
+
 	TimeAllocationMutatorModule( Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup,
 							final Population population ) {
 		super(globalConfigGroup);
 		this.activityDurationInterpretation = plansConfigGroup.getActivityDurationInterpretation();
 		this.mutationRange = timeAllocationMutatorConfigGroup.getMutationRange();
 		this.affectingDuration = timeAllocationMutatorConfigGroup.isAffectingDuration();
-		
+
 		// in case we have subpopulations and individual settings for them
 		if (
 //				plansConfigGroup.getSubpopulationAttributeName() != null &&

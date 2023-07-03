@@ -48,7 +48,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * @author mrieser
@@ -93,7 +93,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	TransitQSimEngine(QSim queueSimulation) {
 		this(queueSimulation, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(queueSimulation.getScenario()) );
 	}
-	
+
 	@Inject
 	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory, UmlaufBuilder umlaufBuilder) {
 		this.qSim = queueSimulation;

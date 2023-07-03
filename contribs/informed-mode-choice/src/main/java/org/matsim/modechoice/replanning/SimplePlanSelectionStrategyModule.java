@@ -5,7 +5,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.modechoice.CandidateGenerator;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * Module for {@link SelectFromGeneratorStrategy}.

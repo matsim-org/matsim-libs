@@ -4,7 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.matsim.modechoice.*;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.*;
 import java.util.function.Predicate;
 

@@ -38,7 +38,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +59,7 @@ public final class PopulationAgentSource implements AgentSource {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qVehicleFactory = qVehicleFactory;
-		this.qsim = qsim;  
+		this.qsim = qsim;
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
 	}
 
@@ -77,15 +77,15 @@ public final class PopulationAgentSource implements AgentSource {
 	private void insertVehicles(Person person) {
 		// this is called in every iteration.  So if a route without a vehicle id is found (e.g. after mode choice),
 		// then the id is generated here.  kai/amit, may'18
-		
+
 		Map<String,Id<Vehicle>> seenModes = new HashMap<>();
 		for ( Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan()) ) {
-			
+
 			// only simulated modes get vehicles:
 			if ( !this.mainModes.contains(leg.getMode()) ) {
 				continue ;
 			}
-			
+
 			// determine the vehicle ID
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			Id<Vehicle> vehicleId = null ;
@@ -98,7 +98,7 @@ public final class PopulationAgentSource implements AgentSource {
 					route.setVehicleId( vehicleId );
 				}
 			}
-			
+
 			// determine the vehicle (not the same as just its ID):
 
 			final QSimConfigGroup.VehiclesSource vehiclesSource = qsim.getScenario().getConfig().qsim().getVehiclesSource();
@@ -128,12 +128,12 @@ public final class PopulationAgentSource implements AgentSource {
 					continue;
 				}
 			}
-			
+
 			// if we are here, we haven't seen the mode before in this plan
-			
+
 			// now memorizing mode and its vehicle ID:
 			seenModes.put(leg.getMode(),vehicleId);
-			
+
 			// find the vehicle from the vehicles container.  It should be there, see automatic vehicle creation in PrepareForSim.
 			Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
 			if ( vehicle==null ) {
@@ -153,10 +153,10 @@ public final class PopulationAgentSource implements AgentSource {
 				}
 				throw new RuntimeException( msg ) ;
 			}
-				
+
 			// find the link ID of where to place the vehicle:
 			Id<Link> vehicleLinkId = findVehicleLink(person);
-				
+
 			// Checking if the vehicle has been seen before:
 			Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
 			if ( result != null ) {
@@ -176,7 +176,7 @@ public final class PopulationAgentSource implements AgentSource {
 				// method here is sorted by persons, not departure times, and so we don't know
 				// which plan needs the vehicle first. (Looks to me that it should actually be possible
 				// to resolve this.)
-				
+
 			} else {
 				this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
 //				qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
@@ -192,7 +192,7 @@ public final class PopulationAgentSource implements AgentSource {
 	 */
 	private Id<Link> findVehicleLink(Person person ) {
 		/* Cases that come to mind:
-		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.  
+		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.
 		 *      This is treated by the following algo.
 		 * (2) person starts day with non-car leg and has car parked somewhere else.  This is NOT treated by the following algo.
 		 *      It could be treated by placing the vehicle at the beginning of the first link where it is needed, but this would not

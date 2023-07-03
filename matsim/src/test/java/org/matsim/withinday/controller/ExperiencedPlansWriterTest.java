@@ -62,7 +62,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.File;
 import java.util.*;
 
@@ -72,19 +72,19 @@ import java.util.*;
 public class ExperiencedPlansWriterTest {
 
 private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTest.class);
-	
-	@Rule 
+
+	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-	
+
 	@Test
 	public void testWriteFile() {
-		
+
 		Config config = ConfigUtils.createConfig();
 
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-		
+
 		config.qsim().setEndTime(24 * 3600);
-		
+
 		config.controler().setLastIteration(0);
 		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
@@ -95,11 +95,11 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		createNetwork(scenario);
-		
+
 		Population population = scenario.getPopulation();
 		population.addPerson(createPerson(scenario, "p01"));
 		population.addPerson(createPerson(scenario, "p02"));
-		
+
 		Controler controler = new Controler(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
@@ -122,29 +122,29 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		 * After running the scenario, load experienced plans file and check whether the
 		 * routes match what we expect (route 01 unchanged, route 02 adapted).
 		 */
-		File file = new File(this.utils.getOutputDirectory() + "/ITERS/it.0/0." + 
+		File file = new File(this.utils.getOutputDirectory() + "/ITERS/it.0/0." +
 				ExecutedPlansServiceImpl.EXECUTEDPLANSFILE);
 		Assert.assertTrue(file.exists());
-		
+
 		Config experiencedConfig = ConfigUtils.createConfig();
-		experiencedConfig.plans().setInputFile(this.utils.getOutputDirectory() + "/ITERS/it.0/0." + 
+		experiencedConfig.plans().setInputFile(this.utils.getOutputDirectory() + "/ITERS/it.0/0." +
 				ExecutedPlansServiceImpl.EXECUTEDPLANSFILE);
-		
+
 		Scenario experiencedScenario = ScenarioUtils.loadScenario(experiencedConfig);
-		
+
 		Person p01 = experiencedScenario.getPopulation().getPersons().get(Id.create("p01", Person.class));
 		Person p02 = experiencedScenario.getPopulation().getPersons().get(Id.create("p02", Person.class));
-		
+
 		Leg leg01 = (Leg) p01.getSelectedPlan().getPlanElements().get(1);
 		Leg leg02 = (Leg) p02.getSelectedPlan().getPlanElements().get(1);
-		
+
 		// expect leg from p01 to be unchanged
 		Assert.assertEquals(1, ((NetworkRoute) leg01.getRoute()).getLinkIds().size());
-		
+
 		// expect leg from p02 to be adapted
 		Assert.assertEquals(3, ((NetworkRoute) leg02.getRoute()).getLinkIds().size());
 	}
-	
+
 	private static class WriterInitializer implements StartupListener {
 
 		@Inject private Scenario scenario;
@@ -163,13 +163,13 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 			replannerFactory.addIdentifier(identifierFactory.createIdentifier());
 			this.withinDayEngine.addDuringActivityReplannerFactory(replannerFactory);
 		}
-		
+
 	}
 
 	private static class Filter implements AgentFilter {
 
 		private final Id<Person> id = Id.create("p02", Person.class);
-		
+
 		// Agents that do not match the filter criteria are removed from the set.
 		@Override
 		public void applyAgentFilter(Set<Id<Person>> set, double time) {
@@ -187,15 +187,15 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 			return false;
 		}
 	}
-	
+
 	private static class FilterFactory implements AgentFilterFactory {
-		
+
 		@Override
 		public AgentFilter createAgentFilter() {
 			return new Filter();
 		}
 	}
-	
+
 	/*
 	 * Replace agent's route "l0 - l1 - l2" with "l0 - l3 - l4 - l5 - l2".
 	 */
@@ -204,17 +204,17 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		public Replanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface) {
 			super(id, scenario, internalInterface);
 		}
-		
+
 		@Override
 		public boolean doReplanning(MobsimAgent withinDayAgent) {
-			
+
 			log.info("Replanning agent " + withinDayAgent.getId());
-			
+
  			Plan plan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
-			
+
 			Leg leg = (Leg) plan.getPlanElements().get(1);
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
-			
+
 			Id<Link> startLinkId = Id.create("l0", Link.class);
 			Id<Link> endLinkId = Id.create("l2", Link.class);
 			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
@@ -222,7 +222,7 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 			linkIds.add(Id.create("l4", Link.class));
 			linkIds.add(Id.create("l5", Link.class));
 			route.setLinkIds(startLinkId, linkIds, endLinkId);
-			
+
 			return true;
 		}
 	}
@@ -230,7 +230,7 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 	private static class ReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 		private final Scenario scenario;
-		
+
 		public ReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
 			super(withinDayEngine);
 			this.scenario = scenario;
@@ -239,22 +239,22 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		@Override
 		public WithinDayDuringActivityReplanner createReplanner() {
 			Id<WithinDayReplanner> id = super.getId();
-			WithinDayDuringActivityReplanner replanner = new Replanner(id, scenario, 
+			WithinDayDuringActivityReplanner replanner = new Replanner(id, scenario,
 					this.getWithinDayEngine().getActivityRescheduler());
 			return replanner;
 		}
 	}
-	
+
 	/*
 	 * Network looks like:
-	 *          l4 
+	 *          l4
 	 *       n4----n5
 	 *     l3|     |l5
 	 * n0----n1----n2----n3
 	 *    l0    l1    l2
 	 */
 	private void createNetwork(Scenario scenario) {
-		
+
 		Network network = scenario.getNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 
@@ -264,14 +264,14 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		Node node3 = networkFactory.createNode(Id.create("n3", Node.class), new Coord(3.0, 0.0));
 		Node node4 = networkFactory.createNode(Id.create("n4", Node.class), new Coord(1.0, 1.0));
 		Node node5 = networkFactory.createNode(Id.create("n5", Node.class), new Coord(2.0, 1.0));
-		
+
 		Link link0 = networkFactory.createLink(Id.create("l0", Link.class), node0, node1);
 		Link link1 = networkFactory.createLink(Id.create("l1", Link.class), node1, node2);
 		Link link2 = networkFactory.createLink(Id.create("l2", Link.class), node2, node3);
 		Link link3 = networkFactory.createLink(Id.create("l3", Link.class), node1, node4);
 		Link link4 = networkFactory.createLink(Id.create("l4", Link.class), node4, node5);
 		Link link5 = networkFactory.createLink(Id.create("l5", Link.class), node5, node2);
-		
+
 		link0.setLength(1000.0);
 		link1.setLength(1000.0);
 		link2.setLength(1000.0);
@@ -292,21 +292,21 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		network.addLink(link4);
 		network.addLink(link5);
 	}
-	
+
 	/*
 	 * Create a person with default route l0 - l1 - l2
 	 */
 	private Person createPerson(Scenario scenario, String id) {
-		
+
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
-		
+
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
 		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
 		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l2", Link.class));
 
 		from.setEndTime(8*3600);
 		leg.setDepartureTime(8*3600);
-		
+
 		RouteFactory routeFactory = new LinkNetworkRouteFactory();
 		Id<Link> startLinkId = Id.create("l0", Link.class);
 		Id<Link> endLinkId = Id.create("l2", Link.class);
@@ -315,17 +315,17 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		linkIds.add(Id.create("l1", Link.class));
 		route.setLinkIds(startLinkId, linkIds, endLinkId);
 		leg.setRoute(route);
-		
+
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 		plan.addActivity(from);
 		plan.addLeg(leg);
 		plan.addActivity(to);
-		
+
 		person.addPlan(plan);
-		
+
 		return person;
 	}
-	
+
 	// for debugging
 	private static class EventsPrinter implements BasicEventHandler {
 
@@ -345,7 +345,7 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 				eventXML.append("\" ");
 			}
 			eventXML.append("/>");
-			
+
 			log.info(eventXML.toString());
 		}
 	}

@@ -62,7 +62,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
@@ -193,7 +193,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 	private final Injector childInjector;
 //	private QVehicleFactory qVehicleFactory;
-	
+
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
 		for( ActivityHandler activityHandler : this.activityHandlers ){
@@ -221,7 +221,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		this.listenerManager = new MobsimListenerManager( this );
 		this.agentCounter = new org.matsim.core.mobsim.qsim.AgentCounter();
 		this.simTimer = new MobsimTimer( sc.getConfig().qsim().getTimeStepSize());
-		
+
 		this.childInjector = childInjector ;
 //		this.qVehicleFactory = qVehicleFactory;
 	}
@@ -342,7 +342,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		}
 		// yy one might want to check if the types/vehicles here are the same as in previous iterations. kai/kai, jan'20
 	}
-	
+
 	public Map<Id<Vehicle>,MobsimVehicle> getVehicles() {
 		return Collections.unmodifiableMap( this.vehicles ) ;
 	}
@@ -367,7 +367,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		if (analyzeRunTimes) {
 			log.info("qsim internal cpu time (nanos): " + qSimInternalTime);
 			for (Entry<MobsimEngine, AtomicLong> entry : this.mobsimEngineRunTimes.entrySet()) {
-				log.info(entry.getKey().getClass().toString() + " cpu time (nanos): " + entry.getValue().get());				
+				log.info(entry.getKey().getClass().toString() + " cpu time (nanos): " + entry.getValue().get());
 			}
 			log.info("");
 			if ( this.netEngine instanceof QNetsimEngineI ) {
@@ -388,9 +388,9 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		final double now = this.getSimTimer().getTimeOfDay();
 
 		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(now);
-		
+
 		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startClockTime;
-		
+
 		/*
 		 * The WithinDayEngine has to perform its replannings before
 		 * the other engines simulate the sim step.
@@ -468,7 +468,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 			// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
 			// register abort handlers.  If someone ever comes to this place here and needs this.  kai, nov'17
-			
+
 			this.agents.remove(agent.getId()) ;
 			this.agentCounter.decLiving();
 			this.agentCounter.incLost();
@@ -496,14 +496,14 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		double now = this.getSimTimer().getTimeOfDay();
 		Id<Link> linkId = agent.getCurrentLinkId();
 		Gbl.assertIf( linkId!=null );
-		
+
 		String routingMode = null;
-		
+
 		if (agent instanceof PlanAgent) {
 			Leg currentLeg = (Leg) ((PlanAgent) agent).getCurrentPlanElement();
 			routingMode = TripStructureUtils.getRoutingMode(currentLeg);
 		}
-		
+
 		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode(), routingMode));
 
 		for (DepartureHandler departureHandler : this.departureHandlers) {
@@ -603,7 +603,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	public void addMobsimEngine(MobsimEngine mobsimEngine) {
 		// yy in all of the instanceof expressions below, the implementation class needs to be replaced
 		// by a meaningful interface.  kai, oct'17
-		
+
 //		if (mobsimEngine instanceof TransitQSimEngine) {
 //			if (this.transitEngine != null) {
 //				log.warn("pre-existing transitEngine != null; will be overwritten; with the current design, " +
@@ -635,7 +635,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		}
 		mobsimEngine.setInternalInterface(this.internalInterface);
 		this.mobsimEngines.add(mobsimEngine);
-		
+
 		if (analyzeRunTimes) this.mobsimEngineRunTimes.put(mobsimEngine, new AtomicLong());
 	}
 
@@ -673,7 +673,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		// consequence, it is assumed that a "Set<MobsimListener>" was bound before, and is used here.  I think that the results of
 		// multibinding will be provided in several ways, one of them as this kind of set.  Thus, the working assumption is that the
 		// <MobsimListener> multibinder that is constructed in AbstractModule is retrieved here.  kai, sep'20
-		
+
 		for (MobsimListener listener : listeners) {
 			this.listenerManager.addQueueSimulationListener(listener);
 		}
@@ -719,14 +719,14 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	public Collection<AgentTracker> getAgentTrackers() {
 		return Collections.unmodifiableCollection(agentTrackers) ;
 	}
-	
+
 	public Injector getChildInjector() {
 		return this.childInjector  ;
 	}
-	
+
 	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {
 		// used (and thus implicitly tested) by bdi-abm-integration project.  A separate core test would be good. kai, feb'18
-		
+
 		boolean processed = false ;
 		for ( MobsimEngine engine : this.mobsimEngines ) {
 			if ( engine instanceof NetworkChangeEventsEngineI ) {
@@ -739,5 +739,5 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 											   "the network change events engine was not set up for the qsim?  Aborting ...") ;
 		}
 	}
-	
+
 }
