@@ -298,7 +298,7 @@ public class ExampleMultipleMixedEchelonChains {
 
 				builder.setCapacityDemand(capacityDemand);
 				builder.setFromLinkId(DEPOT_LINK_ID);
-				final Id<Link> toLinkId = Id.createLinkId("i(6,0)");
+				final Id<Link> toLinkId = Id.createLinkId("i(9,0)");
 				builder.setToLinkId(toLinkId);
 
 				builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
