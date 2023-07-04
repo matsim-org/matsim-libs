@@ -43,13 +43,14 @@ class ProximityStrategyFactory {
 				double minDistance = Double.MAX_VALUE;
 				LSPResource minDistanceResource = null;
 
-				// get all shipments assigned to the plan
-				// These should be all shipments of the lsp, but not necessarily if shipments got lost
+				// get all shipments assigned to the LSP
 				Map<Id<LSPShipment>, LSPShipment> shipmentById = new HashMap<>();
 				for (LSPShipment lspShipment : lsp.getShipments()) {
 					shipmentById.put(lspShipment.getId(), lspShipment);
 				}
 
+				// Retrieve all shipments in the logistic chains of the plan
+				// These should be all shipments of the lsp, but not necessarily if shipments got lost
 				ArrayList<LSPShipment> shipments = new ArrayList<>();
 				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
 					for (Id<LSPShipment> id : logisticChain.getShipmentIds()) {
@@ -64,13 +65,13 @@ class ProximityStrategyFactory {
 				int shipmentIndex = MatsimRandom.getRandom().nextInt(shipments.size());
 				LSPShipment shipment = shipments.get(shipmentIndex);
 
+				// Collect all resources of the logistic chains of the LSP plan
 				ArrayList<LSPResource> resources = new ArrayList<>();
 				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
 					for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
 						resources.add(logisticChainElement.getResource());
 					}
 				}
-
 
 				// get the resource with the smallest distance to the shipment
 				for (LSPResource resource : resources) {
@@ -83,7 +84,7 @@ class ProximityStrategyFactory {
 					}
 				}
 
-				// add shipment to chain with resource of the smallest distance
+				// add randomly picked shipment to chain with resource of the smallest distance
 				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
 					for (LogisticChainElement logisticChainElement : logisticChain.getLogisticChainElements()) {
 						if (logisticChainElement.getResource().equals(minDistanceResource)) {
