@@ -85,7 +85,7 @@ import java.util.stream.Collectors;
  *
  */
 @CommandLine.Command(name = "generate-small-scale-commercial-traffic", description = "Generates plans for a small scale commercial traffic model", showDefaultValues = true)
-public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand {
+public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppCommand {
 	// freightTraffic --> goodsTraffic
 	// businessTraffic --> commercialPersonTraffic
 
@@ -101,7 +101,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 
 	// Option 3: Leerkamp (nur in RVR Modell).
 
-	private static final Logger log = LogManager.getLogger(CreateSmallScaleCommercialTrafficDemand.class);
+	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 	private static final HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 	private static final HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 
@@ -165,7 +165,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	private SplittableRandom rnd;
 
 	public static void main(String[] args) {
-		System.exit(new CommandLine(new CreateSmallScaleCommercialTrafficDemand()).execute(args));
+		System.exit(new CommandLine(new GenerateSmallScaleCommercialTrafficDemand()).execute(args));
 	}
 
 	@Override

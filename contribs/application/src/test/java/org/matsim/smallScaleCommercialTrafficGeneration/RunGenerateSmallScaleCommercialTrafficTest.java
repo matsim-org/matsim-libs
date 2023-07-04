@@ -41,7 +41,7 @@ import java.util.Objects;
  * @author Ricardo Ewert
  *
  */
-public class RunCreateSmallScaleCommercialTrafficTest {
+public class RunGenerateSmallScaleCommercialTrafficTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -61,7 +61,7 @@ public class RunCreateSmallScaleCommercialTrafficTest {
 		String landuseShapeFileName = utils.getPackageInputDirectory() + "/shp/testLanduse.shp";
 		String shapeCRS = "EPSG:4326";
 
-		new CreateSmallScaleCommercialTrafficDemand().execute(
+		new GenerateSmallScaleCommercialTrafficDemand().execute(
 				inputDataDirectory,
 				"--sample", sample,
 				"--jspritIterations", jspritIterations,

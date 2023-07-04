@@ -400,7 +400,7 @@ public class TrafficVolumeGenerationTest {
 		config.network().setInputCRS("EPSG:4326");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
+		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
@@ -465,7 +465,7 @@ public class TrafficVolumeGenerationTest {
 		config.network().setInputCRS("EPSG:4326");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
+		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
@@ -536,7 +536,7 @@ public class TrafficVolumeGenerationTest {
 		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
+		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
@@ -695,7 +695,7 @@ public class TrafficVolumeGenerationTest {
 		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
+		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
