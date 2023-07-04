@@ -284,23 +284,34 @@ public class TripDistributionMatrix {
 	 * @param trafficType freight or business traffic
 	 * @param regionLinksMap links in each zone
 	 */
-	void setTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, String trafficType, Network network, Map<String, HashMap<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
+	void setTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, String trafficType, Network network,
+								  Map<String, HashMap<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
 		double volumeStart = trafficVolume_start.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).getDouble(purpose);
 		double volumeStop = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(purpose);
-		double resistanceValue = getResistanceFunktionValue(startZone, stopZone, network, regionLinksMap, resistanceFactor);
-		double gravityConstantA = getGravityConstant(stopZone, trafficVolume_start, modeORvehType, purpose, network, regionLinksMap, resistanceFactor);
-		roundingError.computeIfAbsent(stopZone, (k) -> new Object2DoubleOpenHashMap<>());
+		int roundedVolume;
+		if (volumeStart != 0 && volumeStop != 0) {
 
-		//Bisher: Gravity model mit fixem Zielverkehr
-		double volume = gravityConstantA * volumeStart * volumeStop * resistanceValue;
-		int roundedVolume = (int) Math.floor(volume);
-		double certainRoundingError = (roundedVolume - volume) * -1;
-		// roundingError based on stopZone, because gravity model is stopVolume fixed
-		roundingError.get(stopZone).merge((modeORvehType + "_" + purpose), certainRoundingError, Double::sum);
-		if (roundingError.get(stopZone).getDouble((modeORvehType + "_" + purpose)) >= 1) {
-			roundedVolume++;
-			roundingError.get(stopZone).merge((modeORvehType + "_" + purpose), -1, Double::sum);
-		}
+			double resistanceValue = getResistanceFunktionValue(startZone, stopZone, network, regionLinksMap, resistanceFactor);
+			double gravityConstantA = getGravityConstant(stopZone, trafficVolume_start, modeORvehType, purpose, network, regionLinksMap,
+				resistanceFactor);
+			roundingError.computeIfAbsent(stopZone, (k) -> new Object2DoubleOpenHashMap<>());
+
+			//Bisher: Gravity model mit fixem Zielverkehr
+			double volume = gravityConstantA * volumeStart * volumeStop * resistanceValue;
+			roundedVolume = (int) Math.floor(volume);
+			double certainRoundingError = (roundedVolume - volume) * -1;
+			// roundingError based on stopZone, because gravity model is stopVolume fixed
+			roundingError.get(stopZone).merge((modeORvehType + "_" + purpose), certainRoundingError, Double::sum);
+			if (roundingError.get(stopZone).getDouble((modeORvehType + "_" + purpose)) >= 1) {
+				roundedVolume++;
+				roundingError.get(stopZone).merge((modeORvehType + "_" + purpose), -1, Double::sum);
+			}
+			if (!listOfZones.contains(startZone))
+				listOfZones.add(startZone);
+			if (!listOfZones.contains(stopZone))
+				listOfZones.add(stopZone);
+		} else
+			roundedVolume = 0;
 		TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType, purpose, trafficType);
 		matrixCache.put(matrixKey, roundedVolume);
 	}
@@ -445,9 +456,13 @@ public class TripDistributionMatrix {
 			for (TrafficVolumeKey trafficVolumeKey : trafficVolume.keySet()) {
 				if (trafficVolumeKey.getModeORvehType().equals(modeORvehType)) {
 					double volume = trafficVolume.get(trafficVolumeKey).getDouble(purpose);
-					double resistanceValue = getResistanceFunktionValue(baseZone, trafficVolumeKey.getZone(), network,
+					if (volume == 0)
+						continue;
+					else {
+						double resistanceValue = getResistanceFunktionValue(baseZone, trafficVolumeKey.getZone(), network,
 							regionLinksMap, resistanceFactor);
-					sum = sum + (volume * resistanceValue);
+						sum = sum + (volume * resistanceValue);
+					}
 				}
 			}
 			double gravityConstant = 1 / sum;
@@ -500,13 +515,16 @@ public class TripDistributionMatrix {
 	 * @return listOfZones
 	 */
 	ArrayList<String> getListOfZones() {
-		if (listOfZones.isEmpty())
-			for (TripDistributionMatrixKey key : matrixCache.keySet()) {
-				if (!listOfZones.contains(key.getFromZone()))
-					listOfZones.add(key.getFromZone());
-				if (!listOfZones.contains(key.getToZone()))
-					listOfZones.add(key.getToZone());
-			}
+//		int count = 0;
+//		if (listOfZones.isEmpty())
+//			for (TripDistributionMatrixKey key : matrixCache.keySet()) {
+//				count++;
+//				System.out.println(count);
+//				if (!listOfZones.contains(key.getFromZone()))
+//					listOfZones.add(key.getFromZone());
+//				if (!listOfZones.contains(key.getToZone()))
+//					listOfZones.add(key.getToZone());
+//			}
 		return listOfZones;
 	}
 
