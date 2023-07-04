@@ -21,7 +21,9 @@
 package lsp;
 
 
+import jakarta.inject.Inject;
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -38,7 +40,6 @@ import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
 
 import javax.annotation.Nullable;
-import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,7 +128,24 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 //			// yyyyyy Means IMO that something is incomplete with the plans copying.  kai, jul'22
 //		}
 //
-//		LSPRescheduler.notifyReplanning(lsps, event);
+		if (event.getIteration() != 0) {
+			for (LSP lsp : lsps.getLSPs().values()) {
+				for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
+					solution.getShipmentIds().clear();
+					for (LogisticChainElement element : solution.getLogisticChainElements()) {
+						element.getIncomingShipments().clear();
+						element.getOutgoingShipments().clear();
+					}
+				}
+
+				for (LSPShipment shipment : lsp.getShipments()) {
+					ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).clear();
+					shipment.getShipmentLog().clear();
+					lsp.getSelectedPlan().getAssigner().assignToPlan(lsp.getSelectedPlan(), shipment);
+				}
+				lsp.scheduleLogisticChains();
+			}
+		}
 //
 		//Update carriers in scenario and CarrierAgentTracker
 		carrierAgentTracker.getCarriers().getCarriers().clear();
@@ -135,9 +153,10 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 			FreightUtils.getCarriers(scenario).addCarrier(carrier);
 			carrierAgentTracker.getCarriers().addCarrier(carrier);
 		}
-		for (LSP lsp : lsps.getLSPs().values()) {
-			lsp.scheduleLogisticChains();
-		}
+
+//		for (LSP lsp : lsps.getLSPs().values()) {
+//			lsp.scheduleLogisticChains();
+//		}
 
 	}
 
