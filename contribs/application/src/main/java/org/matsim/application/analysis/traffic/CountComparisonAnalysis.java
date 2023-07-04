@@ -48,6 +48,9 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--labels", split = ",", description = "Labels for quality categories", defaultValue = "major under,under,ok,over,major over")
 	private List<String> labels;
 
+	@CommandLine.Option(names = "--mode", description = "Mode to analyze", defaultValue = TransportMode.car)
+	private String mode;
+
 	public static void main(String[] args) {
 		new CountComparisonAnalysis().execute(args);
 	}
@@ -120,7 +123,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			if (countVolume.isEmpty())
 				continue;
 
-			int[] volumesForLink = volumes.getVolumesForLink(key, TransportMode.car);
+			int[] volumesForLink = volumes.getVolumesForLink(key, mode);
 
 			if (countVolume.isEmpty())
 				continue;
