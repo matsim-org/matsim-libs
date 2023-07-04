@@ -86,6 +86,20 @@ import java.util.stream.Collectors;
  */
 @CommandLine.Command(name = "generate-small-scale-commercial-traffic", description = "Generates plans for a small scale commercial traffic model", showDefaultValues = true)
 public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand {
+	// freightTraffic --> goodsTraffic
+	// businessTraffic --> commercialPersonTraffic
+
+	// small scale commercial person traffic ... "Krankenschwester" ... in "commercialPersonTraffic".
+	// small scale commercial goods traffic ... "Essen auf Rädern" ... in "goodsTraffic'.
+
+	// freight traffic from extern:
+
+	// Option 1: take "as is" from Chengqi code.
+
+	// Option 2: differentiate FTL and LTL by Gütergruppe.  FTL as in option 1.  LTL per Gütergruppe _ein_ Ziel in Zone, = "Hub".  Verteilverkehr
+	// von dort.  Startseite genauso.
+
+	// Option 3: Leerkamp (nur in RVR Modell).
 
 	private static final Logger log = LogManager.getLogger(CreateSmallScaleCommercialTrafficDemand.class);
 	private static final HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
