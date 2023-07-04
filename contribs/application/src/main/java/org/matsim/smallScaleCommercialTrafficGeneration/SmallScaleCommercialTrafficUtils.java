@@ -162,7 +162,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
 
-	static void createPlansBasedOnCarrierPlans(Scenario scenario, String usedTrafficType, Path output,
+	static void createPlansBasedOnCarrierPlans(Scenario scenario, String smallScaleCommercialTrafficType, Path output,
 											   String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 
 		Population population = scenario.getPopulation();
@@ -179,9 +179,9 @@ public class SmallScaleCommercialTrafficUtils {
 					.get(Id.create(carrierName, Carrier.class));
 			String subpopulation = relatedCarrier.getAttributes().getAttribute("subpopulation").toString();
 			final String mode;
-			if (subpopulation.contains("businessTraffic"))
+			if (subpopulation.contains("commercialPersonTraffic"))
 				mode = "car";
-			else if (subpopulation.contains("freightTraffic"))
+			else if (subpopulation.contains("goodsTraffic"))
 				mode = "freight";
 			else
 				mode = relatedCarrier.getAttributes().getAttribute("networkMode").toString();
@@ -233,7 +233,11 @@ public class SmallScaleCommercialTrafficUtils {
 
 		String outputPopulationFile;
 		if (nameOutputPopulation == null)
-			outputPopulationFile = output.toString() + "/"+modelName +"_" + usedTrafficType + "_" + sampleName + "pct_plans.xml.gz";
+			if (smallScaleCommercialTrafficType.equals("completeSmallScaleCommercialTraffic"))
+				outputPopulationFile = output.toString() + "/"+modelName +"_" + "smallScaleCommercialTraffic" + "_" + sampleName + "pct_plans.xml.gz";
+			else
+				outputPopulationFile = output.toString() + "/"+modelName +"_" + smallScaleCommercialTrafficType + "_" + sampleName + "pct_plans.xml.gz";
+
 		else {
 			if (numberOfPlanVariantsPerAgent > 1)
 				CreateDifferentPlansForFreightPopulation.createPlanVariantsForPopulations("changeStartingTimes", population, numberOfPlanVariantsPerAgent, 6*3600, 14*3600, 8*3600);
@@ -254,7 +258,7 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 	/**
 	 * Reads existing scenarios and add them to the scenario. If the scenario is
-	 * part of the freightTraffic or businessTraffic the demand of the existing
+	 * part of the goodsTraffic or commercialPersonTraffic the demand of the existing
 	 * scenario reduces the demand of the small scale commercial traffic. The
 	 * dispersedTraffic will be added additionally.
 	 */
@@ -268,7 +272,7 @@ public class SmallScaleCommercialTrafficUtils {
 		for (CSVRecord record : parse) {
 			String modelName = record.get("model");
 			double sampleSizeExistingScenario = Double.parseDouble(record.get("sampleSize"));
-			String modelTrafficType = record.get("trafficType");
+			String modelTrafficType = record.get("smallScaleCommercialTrafficType");
 			final Integer modelPurpose;
 			if (!Objects.equals(record.get("purpose"), ""))
 				modelPurpose = Integer.parseInt(record.get("purpose"));

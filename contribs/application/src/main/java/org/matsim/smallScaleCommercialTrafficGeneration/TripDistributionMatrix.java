@@ -63,22 +63,22 @@ public class TripDistributionMatrix {
 	private final List<SimpleFeature> zonesFeatures;
 	private final HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start;
 	private final HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
-	private final String trafficType;
+	private final String smallScaleCommercialTrafficType;
 
 	private static class TripDistributionMatrixKey {
 		private final String fromZone;
 		private final String toZone;
 		private final String modeORvehType;
 		private final int purpose;
-		private final String trafficType;
+		private final String smallScaleCommercialTrafficType;
 
-		public TripDistributionMatrixKey(String fromZone, String toZone, String modeORvehType, int purpose, String trafficType) {
+		public TripDistributionMatrixKey(String fromZone, String toZone, String modeORvehType, int purpose, String smallScaleCommercialTrafficType) {
 			super();
 			this.fromZone = fromZone;
 			this.toZone = toZone;
 			this.modeORvehType = modeORvehType;
 			this.purpose = purpose;
-			this.trafficType = trafficType;
+			this.smallScaleCommercialTrafficType = smallScaleCommercialTrafficType;
 		}
 
 		public String getFromZone() {
@@ -107,7 +107,7 @@ public class TripDistributionMatrix {
 			result = prime * result + (int) (temp ^ (temp >>> 32));
 			result = prime * result + ((toZone == null) ? 0 : toZone.hashCode());
 			result = prime * result + ((modeORvehType == null) ? 0 : modeORvehType.hashCode());
-			result = prime * result + ((trafficType == null) ? 0 : trafficType.hashCode());
+			result = prime * result + ((smallScaleCommercialTrafficType == null) ? 0 : smallScaleCommercialTrafficType.hashCode());
 			return result;
 		}
 
@@ -137,9 +137,9 @@ public class TripDistributionMatrix {
 					return false;
 			} else if (!modeORvehType.equals(other.modeORvehType))
 				return false;
-			if (trafficType == null) {
-				return other.trafficType == null;
-			} else return trafficType.equals(other.trafficType);
+			if (smallScaleCommercialTrafficType == null) {
+				return other.smallScaleCommercialTrafficType == null;
+			} else return smallScaleCommercialTrafficType.equals(other.smallScaleCommercialTrafficType);
 		}
 	}
 
@@ -234,24 +234,24 @@ public class TripDistributionMatrix {
 		private final List<SimpleFeature> zonesFeatures;
 		private final HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start;
 		private final HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
-		private final String trafficType;
+		private final String smallScaleCommercialTrafficType;
 
 		public static Builder newInstance(ShpOptions shpZones,
 										  HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 										  HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
-										  String trafficType) {
-			return new Builder(shpZones, trafficVolume_start, trafficVolume_stop, trafficType);
+										  String smallScaleCommercialTrafficType) {
+			return new Builder(shpZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType);
 		}
 
 		private Builder(ShpOptions shpZones,
 						HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 						HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
-						String trafficType) {
+						String smallScaleCommercialTrafficType) {
 			super();
 			this.zonesFeatures = shpZones.readFeatures();
 			this.trafficVolume_start = trafficVolume_start;
 			this.trafficVolume_stop = trafficVolume_stop;
-			this.trafficType = trafficType;
+			this.smallScaleCommercialTrafficType = smallScaleCommercialTrafficType;
 		}
 
 		public TripDistributionMatrix build() {
@@ -263,7 +263,7 @@ public class TripDistributionMatrix {
 		zonesFeatures = builder.zonesFeatures;
 		trafficVolume_start = builder.trafficVolume_start;
 		trafficVolume_stop = builder.trafficVolume_stop;
-		trafficType = builder.trafficType;
+		smallScaleCommercialTrafficType = builder.smallScaleCommercialTrafficType;
 	}
 
 	private final ConcurrentHashMap<TripDistributionMatrixKey, Integer> matrixCache = new ConcurrentHashMap<>();
@@ -281,10 +281,10 @@ public class TripDistributionMatrix {
 	 * @param stopZone       stop zone
 	 * @param modeORvehType  selected mode or vehicle type
 	 * @param purpose        selected purpose
-	 * @param trafficType freight or business traffic
+	 * @param smallScaleCommercialTrafficType goodsTraffic or commercialPersonTraffic
 	 * @param regionLinksMap links in each zone
 	 */
-	void setTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, String trafficType, Network network,
+	void setTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, String smallScaleCommercialTrafficType, Network network,
 								  Map<String, HashMap<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
 		double volumeStart = trafficVolume_start.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).getDouble(purpose);
 		double volumeStop = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(purpose);
@@ -312,7 +312,7 @@ public class TripDistributionMatrix {
 				listOfZones.add(stopZone);
 		} else
 			roundedVolume = 0;
-		TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType, purpose, trafficType);
+		TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
 		matrixCache.put(matrixKey, roundedVolume);
 	}
 
@@ -323,10 +323,10 @@ public class TripDistributionMatrix {
 	 * @param stopZone      stop zone
 	 * @param modeORvehType selected mode or vehicle type
 	 * @param purpose       selected purpose
-	 * @param trafficType   freight or business traffic
+	 * @param smallScaleCommercialTrafficType   goodsTraffic or commercialPersonTraffic
 	 */
-	Integer getTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, String trafficType) {
-		TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType, purpose, trafficType);
+	Integer getTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, String smallScaleCommercialTrafficType) {
+		TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
 		return matrixCache.get(matrixKey);
 	}
 
@@ -399,19 +399,20 @@ public class TripDistributionMatrix {
 			for (String modeORvehType : getListOfModesOrVehTypes()) {
 				for (Integer purpose : getListOfPurposes()) {
 					double trafficVolume = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(purpose);
-					int generatedTrafficVolume = getSumOfServicesForStopZone(stopZone, modeORvehType, purpose, trafficType);
+					int generatedTrafficVolume = getSumOfServicesForStopZone(stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
 					if (trafficVolume > generatedTrafficVolume) {
 						if (generatedTrafficVolume == 0) {
 							TripDistributionMatrixKey matrixKey = makeKey(stopZone, stopZone, modeORvehType, purpose,
-									trafficType);
+								smallScaleCommercialTrafficType);
 							matrixCache.replace(matrixKey, matrixCache.get(matrixKey) + 1);
-							generatedTrafficVolume = getSumOfServicesForStopZone(stopZone, modeORvehType, purpose, trafficType);
+							generatedTrafficVolume = getSumOfServicesForStopZone(stopZone, modeORvehType, purpose,
+								smallScaleCommercialTrafficType);
 						} else {
 							ArrayList<String> shuffledZones = new ArrayList<>(getListOfZones());
 							Collections.shuffle(shuffledZones);
 							for (String startZone : shuffledZones) {
 								TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType,
-										purpose, trafficType);
+										purpose, smallScaleCommercialTrafficType);
 								if (matrixCache.get(matrixKey) > 0) {
 									matrixCache.replace(matrixKey, matrixCache.get(matrixKey) + 1);
 									break;
@@ -440,7 +441,7 @@ public class TripDistributionMatrix {
 	 * Calculates the gravity constant.
 	 *
 	 * @param baseZone       base zone
-	 * @param trafficVolume  freight or business traffic
+	 * @param trafficVolume  volume of the traffic
 	 * @param modeORvehType  selected mode or vehicle type
 	 * @param purpose        selected purpose
 	 * @param regionLinksMap links for each zone
@@ -479,11 +480,11 @@ public class TripDistributionMatrix {
 	 * @param toZone        to zone
 	 * @param modeORvehType selected mode or vehicle type
 	 * @param purpose       selected purpose
-	 * @param trafficType   freight or business traffic
+	 * @param smallScaleCommercialTrafficType   goodsTraffic or commercialPersonTraffic
 	 * @return TripDistributionMatrixKey
 	 */
-	private TripDistributionMatrixKey makeKey(String fromZone, String toZone, String modeORvehType, int purpose, String trafficType) {
-		return new TripDistributionMatrixKey(fromZone, toZone, modeORvehType, purpose, trafficType);
+	private TripDistributionMatrixKey makeKey(String fromZone, String toZone, String modeORvehType, int purpose, String smallScaleCommercialTrafficType) {
+		return new TripDistributionMatrixKey(fromZone, toZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
 	}
 
 	/**
@@ -562,14 +563,14 @@ public class TripDistributionMatrix {
 	 * @param startZone     start Zone
 	 * @param modeORvehType selected mode or vehicle type
 	 * @param purpose       selected purpose
-	 * @param trafficType   freight or business traffic
+	 * @param smallScaleCommercialTrafficType   goodsTraffic or commercialPersonTraffic
 	 * @return numberOfTrips
 	 */
-	int getSumOfServicesForStartZone(String startZone, String modeORvehType, int purpose, String trafficType) {
+	int getSumOfServicesForStartZone(String startZone, String modeORvehType, int purpose, String smallScaleCommercialTrafficType) {
 		int numberOfTrips = 0;
 		ArrayList<String> zones = getListOfZones();
 		for (String stopZone : zones)
-			numberOfTrips = numberOfTrips + Math.round(matrixCache.get(makeKey(startZone, stopZone, modeORvehType, purpose, trafficType)));
+			numberOfTrips = numberOfTrips + Math.round(matrixCache.get(makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType)));
 		return numberOfTrips;
 	}
 
@@ -577,21 +578,21 @@ public class TripDistributionMatrix {
 	 * @param stopZone      stop zone
 	 * @param modeORvehType selected mode or vehicle type
 	 * @param purpose       selected purpose
-	 * @param trafficType   freight or business traffic
+	 * @param smallScaleCommercialTrafficType   goodsTraffic or commercialPersonTraffic
 	 * @return numberOfTrips
 	 */
-	int getSumOfServicesForStopZone(String stopZone, String modeORvehType, int purpose, String trafficType) {
+	int getSumOfServicesForStopZone(String stopZone, String modeORvehType, int purpose, String smallScaleCommercialTrafficType) {
 		int numberOfTrips = 0;
 		ArrayList<String> zones = getListOfZones();
 		for (String startZone : zones)
-			numberOfTrips = numberOfTrips + Math.round(matrixCache.get(makeKey(startZone, stopZone, modeORvehType, purpose, trafficType)));
+			numberOfTrips = numberOfTrips + Math.round(matrixCache.get(makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType)));
 		return numberOfTrips;
 	}
 
 	/**
 	 * Writes every matrix for each mode and purpose
 	 */
-	void writeODMatrices(Path output, String trafficType) throws UncheckedIOException, MalformedURLException {
+	void writeODMatrices(Path output, String smallScaleCommercialTrafficType) throws UncheckedIOException, MalformedURLException {
 		ArrayList<String> usedModesORvehTypes = getListOfModesOrVehTypes();
 		ArrayList<String> usedZones = getListOfZones();
 		ArrayList<Integer> usedPurposes = getListOfPurposes();
@@ -600,7 +601,7 @@ public class TripDistributionMatrix {
 			for (int purpose : usedPurposes) {
 
 				Path outputFolder = output.resolve("calculatedData")
-						.resolve("odMatrix_" + trafficType + "_" + modeORvehType + "_purpose" + purpose + ".csv");
+						.resolve("odMatrix_" + smallScaleCommercialTrafficType + "_" + modeORvehType + "_purpose" + purpose + ".csv");
 
 				BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder.toUri().toURL(), StandardCharsets.UTF_8,
 						true);
@@ -616,11 +617,11 @@ public class TripDistributionMatrix {
 						List<String> row = new ArrayList<>();
 						row.add(startZone);
 						for (String stopZone : usedZones) {
-							if (getTripDistributionValue(startZone, stopZone, modeORvehType, purpose, trafficType) == null)
+							if (getTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType) == null)
 								throw new RuntimeException("OD pair is missing; start: " + startZone + "; stop: "
-										+ stopZone + "; modeORvehType: " + modeORvehType + "; purpose: " + purpose + "; trafficType: " + trafficType);
+										+ stopZone + "; modeORvehType: " + modeORvehType + "; purpose: " + purpose + "; smallScaleCommercialTrafficType: " + smallScaleCommercialTrafficType);
 							row.add(String
-									.valueOf(getTripDistributionValue(startZone, stopZone, modeORvehType, purpose, trafficType)));
+									.valueOf(getTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType)));
 						}
 						JOIN.appendTo(writer, row);
 						writer.write("\n");
