@@ -50,7 +50,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private ShpOptions shp;
 
-	@CommandLine.Option(names = "--transport-modes", description = "transport modes to analyze", split = ",")
+	@CommandLine.Option(names = "--transport-modes", description = "transport modes to analyze", defaultValue = "", split = ",")
 	private Set<String> modes;
 
 	public static void main(String[] args) {
@@ -76,7 +76,11 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		Network network = filterNetwork();
 
 		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
-		builder.setAnalyzedModes(modes);
+		if (modes != null && !modes.isEmpty()) {
+			builder.setFilterModes(true);
+			builder.setAnalyzedModes(modes);
+		}
+
 		builder.setCalculateLinkTravelTimes(true);
 		builder.setMaxTime(86400);
 		builder.setTimeslice(900);
