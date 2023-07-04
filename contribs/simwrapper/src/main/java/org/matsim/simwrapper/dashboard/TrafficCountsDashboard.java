@@ -143,6 +143,37 @@ public class TrafficCountsDashboard implements Dashboard {
 
 			});
 
+		layout.row("errors")
+			.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Avg. error / bias";
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Hour").build())
+					.yAxis(Axis.builder().title("Mean rel. error [%]").build())
+					.yAxis2(Axis.builder().title("Mean abs. error [veh/h]")
+						.side(Axis.Side.right)
+						.overlaying(ScatterTrace.YAxis.Y)
+						.build())
+					.build();
+
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_error_by_hour.csv"));
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE)
+					.name("Rel. error")
+					.build(), ds.mapping()
+					.x("hour")
+					.y("rel_error"));
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.mode(ScatterTrace.Mode.LINE).yAxis(ScatterTrace.YAxis.Y2)
+					.name("Abs. error")
+					.build(), ds.mapping()
+					.x("hour")
+					.y("abs_error"));
+
+			});
+
 		layout.row("details")
 			.el(Plotly.class, (viz, data) -> {
 
