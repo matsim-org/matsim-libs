@@ -141,7 +141,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 				for (LSPShipment shipment : lsp.getShipments()) {
 					ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).clear();
 					shipment.getShipmentLog().clear();
-					lsp.getSelectedPlan().getAssigner().assignToPlan(lsp.getSelectedPlan(), shipment);
+//					lsp.getSelectedPlan().getAssigner().assignToPlan(lsp.getSelectedPlan(), shipment);
 				}
 				lsp.scheduleLogisticChains();
 			}
