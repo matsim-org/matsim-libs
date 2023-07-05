@@ -106,6 +106,7 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 		if (crs.getTargetCRS() != null)
 			ProjectionUtils.putCRS(network, crs.getTargetCRS());
 
+		NetworkUtils.writeNetwork(network, output.toAbsolutePath().toString());
 		new NetworkWriter(network).write(output.toAbsolutePath().toString());
 		new LanesWriter(lanes).write(output.toAbsolutePath().toString().replace(".xml", "-lanes.xml"));
 
