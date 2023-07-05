@@ -151,7 +151,7 @@ public class TripsAndLegsCSVWriter {
             if (mainModeIdentifier != null) {
                 try {
                     mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
-					if (mainMode != null)
+					if (mainMode == null)
 						mainMode = "";
                 } catch (Exception e) {
                     // leave field empty
