@@ -111,6 +111,8 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.description = "simulated vs. observed";
 				viz.fixedRatio = true;
 				viz.interactive = Plotly.Interactive.slider;
+				viz.height = 8.0;
+
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Observed traffic count").build())
@@ -132,6 +134,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.title = "Daily traffic volumes";
 				viz.description = "simulated vs. observed";
 				viz.fixedRatio = true;
+				viz.height = 8.0;
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Observed traffic count").build())
@@ -165,9 +168,7 @@ public class TrafficCountsDashboard implements Dashboard {
 
 				// 8px
 				viz.display.lineWidth.dataset = "@8";
-			});
-
-		layout.row("errors")
+			})
 			.el(Plotly.class, (viz, data) -> {
 
 				viz.title = "Avg. error / bias";
@@ -175,7 +176,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Hour").build())
 					.yAxis(Axis.builder().title("Mean rel. error [%]").build())
-					.yAxis2(Axis.builder().title("Mean abs. error [veh/h]")
+					.yAxis2(Axis.builder().title("Mean (abs.) error [veh/h]")
 						.side(Axis.Side.right)
 						.overlaying(ScatterTrace.YAxis.Y)
 						.build())
@@ -184,17 +185,24 @@ public class TrafficCountsDashboard implements Dashboard {
 				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_error_by_hour.csv"));
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE)
-					.name("Rel. error")
+					.name("Mean Rel. error")
 					.build(), ds.mapping()
 					.x("hour")
-					.y("rel_error"));
+					.y("mean_rel_error"));
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
 					.mode(ScatterTrace.Mode.LINE).yAxis(ScatterTrace.YAxis.Y2)
-					.name("Abs. error")
+					.name("Mean Abs. error")
 					.build(), ds.mapping()
 					.x("hour")
-					.y("abs_error"));
+					.y("mean_abs_error"));
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.mode(ScatterTrace.Mode.LINE).yAxis(ScatterTrace.YAxis.Y2)
+					.name("Mean Bias")
+					.build(), ds.mapping()
+					.x("hour")
+					.y("mean_bias"));
 
 			});
 

@@ -211,17 +211,29 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	private void writeErrorMetrics(Table byHour, Path path) {
 
 		byHour.addColumns(
-			byHour.doubleColumn("observed_traffic_volume").subtract(byHour.doubleColumn("simulated_traffic_volume")).abs().setName("abs_error")
+			byHour.doubleColumn("simulated_traffic_volume").subtract(byHour.doubleColumn("observed_traffic_volume")).setName("error")
 		);
 
 		byHour.addColumns(
-			byHour.doubleColumn("abs_error").multiply(100).divide(byHour.doubleColumn("observed_traffic_volume")).setName("rel_error")
+			byHour.doubleColumn("error").abs().setName("abs_error")
 		);
 
-		Table aggr = byHour.summarize("abs_error", "rel_error", mean).by("hour");
+		DoubleColumn relError = byHour.doubleColumn("abs_error")
+			.multiply(100)
+			.divide(byHour.doubleColumn("observed_traffic_volume"))
+			.setName("rel_error");
 
-		aggr.column("Mean [rel_error]").setName("rel_error");
-		aggr.column("Mean [abs_error]").setName("abs_error");
+		// Cut-off at Max error
+		relError = relError.set(relError.isMissing(), 1000d);
+		relError = relError.map(d -> Math.min(d, 1000d));
+
+		byHour.addColumns(relError);
+
+		Table aggr = byHour.summarize("error", "abs_error", "rel_error", mean).by("hour");
+
+		aggr.column("Mean [error]").setName("mean_bias");
+		aggr.column("Mean [rel_error]").setName("mean_rel_error");
+		aggr.column("Mean [abs_error]").setName("mean_abs_error");
 
 		aggr.write().csv(path.toFile());
 	}
