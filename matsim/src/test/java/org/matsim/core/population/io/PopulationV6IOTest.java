@@ -53,7 +53,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
@@ -90,7 +89,7 @@ public class PopulationV6IOTest {
 		Assert.assertTrue( "did expect T value in "+readTweet.getCoord() ,
 				readTweet.getCoord().hasZ() );
 
-		assertEquals( "unexpected Z value in "+readTweet.getCoord(),
+		Assert.assertEquals( "unexpected Z value in "+readTweet.getCoord(),
 				-100,
 				readTweet.getCoord().getZ(),
 				MatsimTestUtils.EPSILON );
@@ -133,15 +132,15 @@ public class PopulationV6IOTest {
 
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 
-		assertEquals( "Unexpected boolean attribute in " + readPerson.getAttributes(),
+		Assert.assertEquals( "Unexpected boolean attribute in " + readPerson.getAttributes(),
 				person.getAttributes().getAttribute( "brain" ) ,
 				readPerson.getAttributes().getAttribute( "brain" ) );
 
-		assertEquals( "Unexpected String attribute in " + readPerson.getAttributes(),
+		Assert.assertEquals( "Unexpected String attribute in " + readPerson.getAttributes(),
 				person.getAttributes().getAttribute( "party" ) ,
 				readPerson.getAttributes().getAttribute( "party" ) );
 
-		assertEquals( "Unexpected PersonVehicle attribute in " + readPerson.getAttributes(),
+		Assert.assertEquals( "Unexpected PersonVehicle attribute in " + readPerson.getAttributes(),
 				VehicleUtils.getVehicleIds(person) ,
 				VehicleUtils.getVehicleIds(readPerson) );
 	}
@@ -170,11 +169,11 @@ public class PopulationV6IOTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 		final Activity readAct = (Activity) readPerson.getSelectedPlan().getPlanElements().get( 0 );
 
-		assertEquals( "Unexpected boolean attribute in " + readAct.getAttributes(),
+		Assert.assertEquals( "Unexpected boolean attribute in " + readAct.getAttributes(),
 				act.getAttributes().getAttribute( "makes sense" ) ,
 				readAct.getAttributes().getAttribute( "makes sense" ) );
 
-		assertEquals( "Unexpected Long attribute in " + readAct.getAttributes(),
+		Assert.assertEquals( "Unexpected Long attribute in " + readAct.getAttributes(),
 				act.getAttributes().getAttribute( "length" ) ,
 				readAct.getAttributes().getAttribute( "length" ) );
 	}
@@ -205,12 +204,12 @@ public class PopulationV6IOTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 		final Leg readLeg = (Leg) readPerson.getSelectedPlan().getPlanElements().get( 1 );
 
-		assertEquals("Expected a single leg attribute.", 1, readLeg.getAttributes().size());
-		assertEquals( "Unexpected Double attribute in " + readLeg.getAttributes(),
+		Assert.assertEquals("Expected a single leg attribute.", 1, readLeg.getAttributes().size());
+		Assert.assertEquals( "Unexpected Double attribute in " + readLeg.getAttributes(),
 				leg.getAttributes().getAttribute( "mpg" ) ,
 				readLeg.getAttributes().getAttribute( "mpg" ) );
 
-		assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
+		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
 	}
 
 	@Test
@@ -239,12 +238,12 @@ public class PopulationV6IOTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 		final Leg readLeg = (Leg) readPerson.getSelectedPlan().getPlanElements().get( 1 );
 
-		assertEquals("Expected a single leg attribute.", 1, readLeg.getAttributes().size());
-		assertEquals( "Unexpected Double attribute in " + readLeg.getAttributes(),
+		Assert.assertEquals("Expected a single leg attribute.", 1, readLeg.getAttributes().size());
+		Assert.assertEquals( "Unexpected Double attribute in " + readLeg.getAttributes(),
 				leg.getAttributes().getAttribute( "mpg" ) ,
 				readLeg.getAttributes().getAttribute( "mpg" ) );
 
-		assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
+		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
 	}
 
 	@Test
@@ -272,7 +271,7 @@ public class PopulationV6IOTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
 		final Plan readPlan = readPerson.getSelectedPlan() ;
 
-		assertEquals( 				plan.getAttributes().getAttribute( "beauty" ) ,
+		Assert.assertEquals( 				plan.getAttributes().getAttribute( "beauty" ) ,
 				readPlan.getAttributes().getAttribute( "beauty" ) );
 	}
 
@@ -289,11 +288,11 @@ public class PopulationV6IOTest {
 		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new PopulationReader( readScenario ).readFile( file );
 
-		assertEquals( "Unexpected numeric attribute in " + readScenario.getPopulation().getAttributes(),
+		Assert.assertEquals( "Unexpected numeric attribute in " + readScenario.getPopulation().getAttributes(),
 				population.getAttributes().getAttribute( "number" ) ,
 				readScenario.getPopulation().getAttributes().getAttribute( "number" ) );
 
-		assertEquals( "Unexpected String attribute in " + readScenario.getPopulation().getAttributes(),
+		Assert.assertEquals( "Unexpected String attribute in " + readScenario.getPopulation().getAttributes(),
 				population.getAttributes().getAttribute( "type" ) ,
 				readScenario.getPopulation().getAttributes().getAttribute( "type" ) );
 	}
@@ -330,7 +329,7 @@ public class PopulationV6IOTest {
 		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 		new PopulationReader(scenario).parse(in);
 
-		assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
+		Assert.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
 	}
 
 	// inspired from MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
@@ -374,10 +373,10 @@ public class PopulationV6IOTest {
 
 		Person p1 = scenario.getPopulation().getPersons().get(person1.getId()); // this already checks the id
 		Plan pl1 = p1.getSelectedPlan();
-		assertEquals(act1.getType(), ((Activity) pl1.getPlanElements().get(0)).getType());
-		assertEquals(act1.getLinkId(), ((Activity) pl1.getPlanElements().get(0)).getLinkId());
+		Assert.assertEquals(act1.getType(), ((Activity) pl1.getPlanElements().get(0)).getType());
+		Assert.assertEquals(act1.getLinkId(), ((Activity) pl1.getPlanElements().get(0)).getLinkId());
 
-		assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
+		Assert.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
 	}
 
 	@Test
@@ -420,17 +419,17 @@ public class PopulationV6IOTest {
 		Person p1 = scenario.getPopulation().getPersons().get(person1.getId());
 		Plan pp1 = p1.getPlans().get(0);
 
-		assertEquals(((Activity) pp1.getPlanElements().get(0)).getFacilityId(), facilityId);
+		Assert.assertEquals(((Activity) pp1.getPlanElements().get(0)).getFacilityId(), facilityId);
 		Assert.assertNull(((Activity) pp1.getPlanElements().get(0)).getCoord());
 		Assert.assertNull(((Activity) pp1.getPlanElements().get(0)).getLinkId());
 
 		Assert.assertNull(((Activity) pp1.getPlanElements().get(2)).getFacilityId());
-		assertEquals(((Activity) pp1.getPlanElements().get(2)).getCoord(), coord);
+		Assert.assertEquals(((Activity) pp1.getPlanElements().get(2)).getCoord(), coord);
 		Assert.assertNull(((Activity) pp1.getPlanElements().get(2)).getLinkId());
 
 		Assert.assertNull(((Activity) pp1.getPlanElements().get(4)).getFacilityId());
 		Assert.assertNull(((Activity) pp1.getPlanElements().get(4)).getCoord());
-		assertEquals(((Activity) pp1.getPlanElements().get(4)).getLinkId(), linkId);
+		Assert.assertEquals(((Activity) pp1.getPlanElements().get(4)).getLinkId(), linkId);
 	}
 
 	@Test
@@ -458,8 +457,8 @@ public class PopulationV6IOTest {
 		reader.readFile(outputDirectory + "output.xml");
 		Person inputPerson = scenario.getPopulation().getPersons().values().iterator().next();
 		Activity act = (Activity) inputPerson.getPlans().get(0).getPlanElements().get(0);
-		assertEquals(10.911495969392414, act.getCoord().getX(), MatsimTestUtils.EPSILON);
-		assertEquals(2.3202288392002424, act.getCoord().getY(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(10.911495969392414, act.getCoord().getX(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(2.3202288392002424, act.getCoord().getY(), MatsimTestUtils.EPSILON);
 
 	}
 

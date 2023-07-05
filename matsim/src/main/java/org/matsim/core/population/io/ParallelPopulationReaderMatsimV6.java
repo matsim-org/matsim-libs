@@ -71,7 +71,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 		this.inputCRS = inputCRS;
 		this.targetCRS = targetCRS;
 
-
 		/*
 		 * Check whether population streaming is activated
 		 */
@@ -122,7 +121,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-
 		//Reached first time a person
 		if (PERSON.equals(name) && !this.reachedPersons) {
 			this.reachedPersons = true;
