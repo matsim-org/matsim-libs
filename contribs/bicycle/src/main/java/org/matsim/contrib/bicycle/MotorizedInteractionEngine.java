@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.vehicles.Vehicle;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * @author dziemke
@@ -57,8 +57,8 @@ final class MotorizedInteractionEngine implements MobsimBeforeSimStepListener {
 		double endTime = 12. * 60 * 60;
 		double frequency = 3.;
 		Id<Link> linkId = Id.createLinkId("6"); // The central link
-		
-		
+
+
 		if ((currentTime % frequency == 0) && (currentTime >= startTime) && (currentTime <= endTime)) {
 //			LOG.info("Current time = " + currentTime + " -- " + currentTime / 3600.);
 //			for (Id<Link> linkId : links) {

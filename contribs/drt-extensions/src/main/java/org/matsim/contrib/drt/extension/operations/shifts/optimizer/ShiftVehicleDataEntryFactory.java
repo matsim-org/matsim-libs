@@ -10,7 +10,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.core.config.Config;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * @author nkuehnel / MOIA

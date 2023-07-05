@@ -20,8 +20,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.*;
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +59,7 @@ import org.matsim.testcases.utils.EventsLogger;
 public class LinkSpeedCalculatorIntegrationTest {
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
-	
+
 	@Test
 	public void testIntegration_Default() {
 		Fixture f = new Fixture();
@@ -72,7 +72,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 			.useDefaults() //
 			.build(f.scenario, f.events) //
 			.run();
-		
+
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
@@ -83,11 +83,11 @@ public class LinkSpeedCalculatorIntegrationTest {
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
 		Assert.assertEquals("1", lle.getVehicleId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
-		
+
 		// by default, the link takes 10 seconds to travel along, plus 1 second in the buffer, makes total of 11 seconds
 		Assert.assertEquals(11, lle.getTime() - lee.getTime(), 1e-8);
 	}
-	
+
 	@SuppressWarnings("static-method")
 	@Test
 	public void testIntegration_Slow() {
@@ -99,7 +99,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new EventsManagerModule() ) ;
 		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
 		eventsManager.initProcessing();
-		
+
 		EventsCollector collector = new EventsCollector();
 		eventsManager.addHandler(collector);
 		eventsManager.addHandler(new EventsLogger());
@@ -111,20 +111,20 @@ public class LinkSpeedCalculatorIntegrationTest {
 					@Inject private EventsManager events ;
 					@Override public QNetworkFactory get() {
 						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
-						factory.setLinkSpeedCalculator(linkSpeedCalculator); 
+						factory.setLinkSpeedCalculator(linkSpeedCalculator);
 						return factory ;
 					}
 				} ) ;
 			}
 		} ;
-		
+
 		QSimBuilder builder = new QSimBuilder( scenario.getConfig() ).useDefaults() ;
 		builder.addOverridingQSimModule( overrides ) ;
-		
+
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 
 		builder.build( scenario, eventsManager ).run() ;
-		
+
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
@@ -135,11 +135,11 @@ public class LinkSpeedCalculatorIntegrationTest {
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
 		Assert.assertEquals("1", lle.getVehicleId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
-		
+
 		// with 5 per second, the link takes 20 seconds to travel along, plus 1 second in the buffer, makes total of 21 seconds
 		Assert.assertEquals(21, lle.getTime() - lee.getTime(), 1e-8);
 	}
-	
+
 	@SuppressWarnings("static-method")
 	@Test
 	public void testIntegration_Fast() {
@@ -148,12 +148,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 		final Scenario scenario = f.scenario ;
 		final Config config = scenario.getConfig() ;
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		
+
 //		Collection<AbstractModule> defaultsModules = new ArrayList<>() ;
 //		defaultsModules.add( new ScenarioByInstanceModule( scenario ) ) ;
 //		defaultsModules.add( new EventsManagerModule() ) ;
 //		defaultsModules.add( new DefaultMobsimModule() ) ;
-		
+
 		AbstractQSimModule overrides = new AbstractQSimModule() {
 			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(20.0) ;
 			@Override public void configureQSim() {
@@ -161,27 +161,27 @@ public class LinkSpeedCalculatorIntegrationTest {
 					@Inject private EventsManager events ;
 					@Override public QNetworkFactory get() {
 						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
-						factory.setLinkSpeedCalculator(linkSpeedCalculator); 
+						factory.setLinkSpeedCalculator(linkSpeedCalculator);
 						return factory ;
 					}
 				} ) ;
 			}
 		} ;
-		
+
 //		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override( defaultsModules, overrides ) ) ;
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new EventsManagerModule() ) ;
 		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
-		eventsManager.initProcessing(); 
+		eventsManager.initProcessing();
 
 		EventsCollector collector = new EventsCollector();
 		eventsManager.addHandler(collector);
 		eventsManager.addHandler(new EventsLogger());
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		
+
 //		injector.getInstance( Mobsim.class ).run();
 		new QSimBuilder( config ).useDefaults().addOverridingQSimModule( overrides ).build( scenario, eventsManager ).run() ;
-		
+
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
@@ -192,29 +192,29 @@ public class LinkSpeedCalculatorIntegrationTest {
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
 		Assert.assertEquals("1", lle.getVehicleId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
-		
+
 		// the link should take 5 seconds to travel along, plus 1 second in the buffer, makes total of 6 seconds
 		Assert.assertEquals(6, lle.getTime() - lee.getTime(), 1e-8);
 	}
-	
+
 	static class CustomLinkSpeedCalculator implements LinkSpeedCalculator {
 
 		final double maxSpeed;
-		
+
 		public CustomLinkSpeedCalculator(final double maxSpeed) {
 			this.maxSpeed = maxSpeed;
 		}
-		
+
 		@Override
 		public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
 			return this.maxSpeed;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Creates a simple network (3 links in a row) and a single person travelling from the first link to the third.
-	 * 
+	 *
 	 * @author mrieser / Senozon AG
 	 */
 	static class Fixture {
@@ -232,7 +232,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 			for (int i = 0; i < linkIds.length; i++) {
 				linkIds[i] = Id.create(i, Link.class);
 			}
-	
+
 			/* create Network */
 			Network network = this.scenario.getNetwork();
 			NetworkFactory nf = network.getFactory();
@@ -250,7 +250,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 			Link l1 = nf.createLink(linkIds[1], n1, n2);
 			Link l2 = nf.createLink(linkIds[2], n2, n3);
 			Link l3 = nf.createLink(linkIds[3], n3, n4);
-			
+
 			Set<String> modes = new HashSet<String>();
 			modes.add("car");
 			for (Link l : new Link[] {l1, l2, l3}) {
@@ -279,7 +279,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 			plan.addActivity(workAct);
 
 			person.addPlan(plan);
-			
+
 			population.addPerson(person);
 		}
 	}

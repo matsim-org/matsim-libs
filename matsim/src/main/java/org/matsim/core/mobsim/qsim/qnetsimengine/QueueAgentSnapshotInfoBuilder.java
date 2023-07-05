@@ -27,7 +27,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collection;
 
 
@@ -35,7 +35,7 @@ import java.util.Collection;
  * Calculates the positions of all vehicles on this link according to the queue-logic: Vehicles are placed on the link
  * according to the ratio between the free-travel time and the time the vehicles are already on the link. If they could have
  * left the link already (based on the time), the vehicles start to build a traffic-jam (queue) at the end of the link.
- 
+
  * @author dgrether
  * @author nagel
  *
@@ -53,7 +53,7 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 	double calculateVehicleSpacing(double curvedLength, double overallStorageCapacity,
 			Collection<? extends VisVehicle> vehs) {
 		// the length of a vehicle in visualization
-		
+
 		double sum = 0. ;
 		for ( VisVehicle veh : vehs ) {
 			sum += veh.getSizeInEquivalents() ;

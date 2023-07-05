@@ -39,7 +39,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.*;
 

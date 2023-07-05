@@ -21,7 +21,7 @@ package org.matsim.core.events;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -187,7 +187,7 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		// list which threads had which handlers to debug performance issues
 		printEventHandlers();
 
@@ -218,7 +218,7 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 			this.threads[i].setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
 			this.threads[i].start();
 		}
-		
+
 		// (re-)activate parallel mode while the mobsim is running
 		this.parallelMode = true;
 	}

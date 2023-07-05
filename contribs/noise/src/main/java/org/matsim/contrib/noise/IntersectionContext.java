@@ -9,7 +9,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Separate from {@link NoiseContextImpl} for better testability.

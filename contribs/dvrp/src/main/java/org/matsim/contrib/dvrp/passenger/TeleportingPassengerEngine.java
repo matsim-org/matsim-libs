@@ -25,8 +25,8 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;

@@ -26,31 +26,31 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.Map;
 
 public class BikeTravelTimeFactory implements Provider<TravelTime> {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	private final Map<Id<Link>, Double> linkSlopes;	// slope information in %
-	
+
 	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
 		this(plansCalcRouteConfigGroup, null);
 	}
-	
+
 	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup,
 			Map<Id<Link>, Double> linkSlopes) {
 		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
 		this.linkSlopes = linkSlopes;
-		
+
 		if (plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.bike) == null) {
 			throw new RuntimeException("No speed was found for mode bike! Aborting.");
 		}
 	}
-	
+
 	@Override
 	public TravelTime get() {
 		return new BikeTravelTime(this.plansCalcRouteConfigGroup, this.linkSlopes);
 	}
-	
+
 }

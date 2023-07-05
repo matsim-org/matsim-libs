@@ -15,7 +15,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 
 public class RandomTripToCarsharingStrategy implements PlanStrategy{
@@ -24,7 +24,7 @@ public class RandomTripToCarsharingStrategy implements PlanStrategy{
 	@Inject
 	public RandomTripToCarsharingStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider, MembershipContainer memberships, TimeInterpretation timeInterpretation) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
-		 	
+
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   //lets try without this, not sure if it is needed
 		CarsharingTripModeChoice smc = new CarsharingTripModeChoice(tripRouterProvider, scenario, memberships);
 		addStrategyModule(smc );
@@ -37,13 +37,13 @@ public class RandomTripToCarsharingStrategy implements PlanStrategy{
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
 		strategy.run(person);
-		
+
 	}
 
 	@Override
 	public void init(ReplanningContext replanningContext) {
 		strategy.init(replanningContext);
-		
+
 	}
 
 	@Override
@@ -54,5 +54,5 @@ public class RandomTripToCarsharingStrategy implements PlanStrategy{
 	public String toString() {
 		return strategy.toString();
 	}
-	
+
 }

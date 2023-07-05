@@ -12,7 +12,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Singleton
 public class PSimStopStopTimeCalculator extends StopStopTimeCalculatorSerializable {

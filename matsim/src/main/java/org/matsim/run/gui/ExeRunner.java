@@ -41,7 +41,7 @@ import org.matsim.core.utils.io.IOUtils;
 /*package*/ class ExeRunner {
 
 	/*package*/ final static Logger log = LogManager.getLogger(ExeRunner.class);
-	
+
 	private final ExternalExecutor executor;
 
 	public static ExeRunner run(final String[] cmdArgs, final JTextArea stdOut, final JTextArea errOut, final String workingDirectory) {
@@ -50,15 +50,15 @@ import org.matsim.core.utils.io.IOUtils;
 		myExecutor.start();
 		return runner;
 	}
-	
+
 	private ExeRunner(ExternalExecutor executor) {
 		this.executor = executor;
 	}
-	
+
 	public void killProcess() {
 		this.executor.killProcess();
 	}
-	
+
 	public int waitForFinish() {
 		synchronized (this.executor) {
 			try {
@@ -67,15 +67,11 @@ import org.matsim.core.utils.io.IOUtils;
 				log.info("Got interrupted while waiting for external exe to finish.", e);
 			}
 		}
-		
+
 		return this.executor.erg;
 	}
 
 	private static class ExternalExecutor extends Thread {
-
-		// Environmental variables passed to process
-		final String[] envp = {"MATSIM_GUI=true"};
-
 		final String[] cmdArgs;
 		final JTextArea stdOut;
 		final JTextArea errOut;
@@ -90,7 +86,7 @@ import org.matsim.core.utils.io.IOUtils;
 			this.errOut = errOut;
 			this.workingDirectory = workingDirectory;
 		}
-		
+
 		public void killProcess() {
 			if (this.p != null) {
 				this.p.destroy();
@@ -99,16 +95,19 @@ import org.matsim.core.utils.io.IOUtils;
 
 		@Override
 		public void run()  {
+			var processBuilder = new ProcessBuilder();
+			processBuilder.environment().put("MATSIM_GUI", "true"); // add "MATSIM_GUI" to the inherited vars
+			if (workingDirectory != null) {
+				processBuilder.directory(new File(workingDirectory));
+			}
+			processBuilder.command(cmdArgs);
+
 			try {
-				if (this.workingDirectory == null) {
-					this.p = Runtime.getRuntime().exec(this.cmdArgs, this.envp);
-				} else {
-					this.p = Runtime.getRuntime().exec(this.cmdArgs, this.envp, new File(this.workingDirectory));
-				}
-				
+				this.p = processBuilder.start();
+
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.p.getInputStream()));
 				BufferedReader err = new BufferedReader(new InputStreamReader(this.p.getErrorStream()));
-				
+
 				StreamHandler outputHandler = new StreamHandler(in, this.stdOut);
 				outputHandler.start();
 
@@ -144,7 +143,7 @@ import org.matsim.core.utils.io.IOUtils;
 			}
 		}
 	}
-	
+
 	static class StreamHandler extends Thread {
 		private final BufferedReader in;
 		private final JTextArea[] textArea;
@@ -164,7 +163,7 @@ import org.matsim.core.utils.io.IOUtils;
 						out.append(IOUtils.NATIVE_NEWLINE);
 						int length = out.getDocument().getLength();
 						out.setCaretPosition(length);
-						
+
 						if (length > 512*1024) {
 							out.setText(out.getText().substring(256*1024));
 						}

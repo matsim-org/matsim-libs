@@ -28,7 +28,7 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 public class InitialReplannerFactory extends WithinDayInitialReplannerFactory {
 
@@ -46,7 +46,7 @@ public class InitialReplannerFactory extends WithinDayInitialReplannerFactory {
 
 	@Override
 	public WithinDayInitialReplanner createReplanner() {
-		WithinDayInitialReplanner replanner = new InitialReplanner(super.getId(), scenario, 
+		WithinDayInitialReplanner replanner = new InitialReplanner(super.getId(), scenario,
 				this.getWithinDayEngine().getActivityRescheduler(),
 				new PlanRouter(this.tripRouterFactory.get(),
 						this.scenario.getActivityFacilities(), timeInterpretation));

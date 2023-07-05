@@ -29,7 +29,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.core.router.TripRouter;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * Copy/Paste of TimeAllocationMutator, that calls TransitPlanMutateTimeAllocation instead

@@ -7,7 +7,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * @author balacm
@@ -22,7 +22,7 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 
 	private String[] availableModes = null;
 	private final Scenario scenario;
-	private MembershipContainer memberships; 
+	private MembershipContainer memberships;
 	public CarsharingTripModeChoice(Provider<TripRouter> tripRouterProvider, final Scenario scenario, MembershipContainer memberships ) {
 		super(scenario.getConfig().global().getNumberOfThreads());
 		this.tripRouterProvider = tripRouterProvider;
@@ -32,9 +32,9 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 		this.scenario = scenario;
 		// try to get the modes from the "changeLegMode" module of the config file
 
-		
+
 		if (Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
-			
+
 			this.availableModes = new String[1];
 			this.availableModes[0] = "oneway";
 		}
@@ -49,17 +49,17 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 			this.availableModes[1] = "freefloating";
 			}
 		}
-		
+
 		if (!Boolean.parseBoolean(this.scenario.getConfig().getModule("FreeFloating").getValue("useFreeFloating") ) && !Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
 			this.availableModes = new String[1];
 		}
-				
 
-		
+
+
 
 	}
-	
-	
+
+
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = tripRouterProvider.get();

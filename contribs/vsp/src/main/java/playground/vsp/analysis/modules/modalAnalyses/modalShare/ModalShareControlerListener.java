@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -58,7 +58,7 @@ public class ModalShareControlerListener implements StartupListener, IterationEn
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		String outputDir = event.getServices().getConfig().controler().getOutputDirectory();
-		
+
 		SortedMap<String, Integer > mode2legs = this.modalShareHandler.getMode2numberOflegs();
 		modeHistory.addAll(mode2legs.keySet());
 		modeHistory.stream().filter(e -> ! mode2legs.containsKey(e)).forEach(e -> mode2legs.put(e, 0));
@@ -89,14 +89,14 @@ public class ModalShareControlerListener implements StartupListener, IterationEn
 		for (int i = 0; i <= itNrIndex; i++) {
 			iterations[i] = i + this.firstIteration;
 		}
-		
+
 		//y series
 		for(String mode : this.mode2numberofLegs.keySet()){
 			double [] values = new double [itNrIndex+1]; // array of only available data
 			System.arraycopy(this.mode2numberofLegs.get(mode), 0, values, 0, itNrIndex + 1);
 			chart.addSeries(mode, iterations, values);
 		}
-		
+
 		// others--
 		chart.addMatsimLogo();
         chart.saveAsPng(outputDir+"/modalShare.png", 800, 600);

@@ -21,7 +21,7 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,7 +66,7 @@ import static org.matsim.contrib.commercialTrafficApplications.jointDemand.Joint
  * Generates carriers and tours depending on next iteration's freight demand
  */
 class DefaultCommercialJobGenerator implements CommercialJobGenerator {
-	
+
 	private final double firstTourTraveltimeBuffer;
     private Scenario scenario;
     private Carriers carriers;

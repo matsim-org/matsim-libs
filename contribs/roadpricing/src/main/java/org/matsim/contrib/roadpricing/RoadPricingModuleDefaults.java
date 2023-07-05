@@ -31,8 +31,8 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.net.URL;
 import java.util.Collections;
 

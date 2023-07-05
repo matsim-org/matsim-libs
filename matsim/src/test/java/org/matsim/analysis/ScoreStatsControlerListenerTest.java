@@ -1,15 +1,11 @@
-/**
- * 
- */
 package org.matsim.analysis;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,25 +40,26 @@ public class ScoreStatsControlerListenerTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-	
+
 	private int avgexecuted;
 	private int avgworst;
 	private int avgaverage;
 	private int avgbest;
-	
+
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private Population population = scenario.getPopulation();
-	
+
 	@Test
-	public void testScoreStatsControlerListner() {
+	public void testScoreStatsControlerListner() throws IOException {
 
 		/************************************
 		 * Person - creating person 1
 		 ************************************/
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+		PopulationUtils.putSubpopulation(person1, "group1");
 		final Plan person1_plan1 = PopulationUtils
 				.createPlan(person1);
-        
+
 		final Id<Link> link1 = Id.create(10723, Link.class);
 		final Id<Link> link2 = Id.create(123160, Link.class);
 		final Id<Link> link3 = Id.create(130181, Link.class);
@@ -89,7 +86,7 @@ public class ScoreStatsControlerListenerTest {
 		Route route1_1_3 = RouteUtils.createGenericRouteImpl(link2, link2);
 		route1_1_3.setDistance(300);
 		leg1_1_3.setRoute(route1_1_3);
-		person1_plan1.addLeg(leg1_1_3);	
+		person1_plan1.addLeg(leg1_1_3);
 		Activity act1_1_4 = PopulationUtils.createActivityFromLinkId("work", link2);
 		person1_plan1.addActivity(act1_1_4);
 		Leg leg1_1_4 = PopulationUtils.createLeg(TransportMode.walk);
@@ -111,10 +108,10 @@ public class ScoreStatsControlerListenerTest {
 		person1_plan1.addLeg(leg1_1_6);
 		Activity act1_1_7 = PopulationUtils.createActivityFromLinkId("home", link1);
 		person1_plan1.addActivity(act1_1_7);
-		
+
 		person1_plan1.setScore(123.0);
 		person1.addPlan(person1_plan1);
-		
+
 		/************************************
 		 * Second plan of person 1
 		 ************************************/
@@ -140,7 +137,7 @@ public class ScoreStatsControlerListenerTest {
 		Route route1_2_3 = RouteUtils.createGenericRouteImpl(link5, link2);
 		route1_2_3.setDistance(300);
 		leg1_1_3.setRoute(route1_2_3);
-		person1_plan2.addLeg(leg1_2_3);	
+		person1_plan2.addLeg(leg1_2_3);
 		Activity act1_2_4 = PopulationUtils.createActivityFromLinkId("work", link2);
 		person1_plan2.addActivity(act1_2_4);
 		Leg leg1_2_4 = PopulationUtils.createLeg(TransportMode.walk);
@@ -162,17 +159,18 @@ public class ScoreStatsControlerListenerTest {
 		person1_plan2.addLeg(leg1_2_6);
 		Activity act1_2_7 = PopulationUtils.createActivityFromLinkId("home", link1);
 		person1_plan2.addActivity(act1_2_7);
-		
+
 		person1_plan2.setScore(105.0);
 		person1.addPlan(person1_plan2);
 
 		population.addPerson(person1);
-		
+
 
 		/********************************
 		 * Person 2 - creating person 2
 		 ********************************/
 		Person person2 = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));
+		PopulationUtils.putSubpopulation(person2, "group2");
 		final Plan person2_plan1 = PopulationUtils
 				.createPlan(person2);
 
@@ -219,7 +217,7 @@ public class ScoreStatsControlerListenerTest {
 
 		person2_plan1.setScore(135.0);
 		person2.addPlan(person2_plan1);
-		
+
 		final Plan person2_plan2 = PopulationUtils
 				.createPlan(person2);
 
@@ -266,14 +264,15 @@ public class ScoreStatsControlerListenerTest {
 
 		person2_plan2.setScore(101.0);
 		person2.addPlan(person2_plan2);
-		
+
 		population.addPerson(person2);
-		
+
 
 		/************************************
 		 * Person 3 - creating person 3
 		 ************************************/
 		Person person3 = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));
+		PopulationUtils.putSubpopulation(person3, "group1");
 		final Plan person3_plan1 = PopulationUtils
 				.createPlan(person3);
 
@@ -318,8 +317,8 @@ public class ScoreStatsControlerListenerTest {
 
 		person3_plan1.setScore(111.00);
 		person3.addPlan(person3_plan1);
-		
-		
+
+
 		final Plan person3_plan2 = PopulationUtils
 				.createPlan(person3);
 
@@ -364,14 +363,15 @@ public class ScoreStatsControlerListenerTest {
 
 		person3_plan2.setScore(165.00);
 		person3.addPlan(person3_plan2);
-		
+
 		population.addPerson(person3);
-		
+
 
 		/************************
 		 * Person 4-----creating person 4
 		 **************************************/
 		Person person4 = PopulationUtils.getFactory().createPerson(Id.create("4", Person.class));
+		PopulationUtils.putSubpopulation(person4, "group2");
 		final Plan person4_plan1 = PopulationUtils
 				.createPlan(person4);
 
@@ -416,8 +416,8 @@ public class ScoreStatsControlerListenerTest {
 
 		person4_plan1.setScore(134.00);
 		person4.addPlan(person4_plan1);
-		
-		
+
+
 		final Plan person4_plan2 = PopulationUtils
 				.createPlan(person4);
 
@@ -463,17 +463,17 @@ public class ScoreStatsControlerListenerTest {
 		//person4.setSelectedPlan(selectedPlan);
 		person4_plan2.setScore(124.00);
 		person4.addPlan(person4_plan2);
-		
+
 		population.addPerson(person4);
-		
-		
+
+
 		performTest(utils.getOutputDirectory() + "/ScoreStatsControlerListener", population);
-	
-		
+
+
 	}
-	
-	
-	private void performTest(String outputDirectory, Population population) {
+
+
+	private void performTest(String outputDirectory, Population population) throws IOException {
 		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
@@ -481,80 +481,84 @@ public class ScoreStatsControlerListenerTest {
 		controlerConfigGroup.setFirstIteration(0);
 		controlerConfigGroup.setLastIteration(10);
 		ScoreStatsControlerListener scoreStatsControlerListener = new ScoreStatsControlerListener(controlerConfigGroup, population, controlerIO, null, null);
-		
+
+		String outDir = utils.getOutputDirectory() + "/ScoreStatsControlerListener";
+
 		StartupEvent eventStart = new StartupEvent(null);
 		scoreStatsControlerListener.notifyStartup(eventStart);
-		
+
 		IterationEndsEvent event0 = new IterationEndsEvent(null, 0, false);
 		scoreStatsControlerListener.notifyIterationEnds(event0);
-		
-		readAndValidateValues(0, population);
-		
+
+		readAndValidateValues(outDir, 0, population);
+
 		population.getPersons().remove(Id.create("2", Person.class));
-		
+
 		IterationEndsEvent event1 = new IterationEndsEvent(null, 1, false);
 		scoreStatsControlerListener.notifyIterationEnds(event1);
-		
-		readAndValidateValues(1, population);
-		
+
+		readAndValidateValues(outDir, 1, population);
+
 		population.getPersons().remove(Id.create("3", Person.class));
-		
+
 		IterationEndsEvent event2 = new IterationEndsEvent(null, 2, false);
 		scoreStatsControlerListener.notifyIterationEnds(event2);
-		
-		readAndValidateValues(2, population);
-		
+
+		readAndValidateValues(outDir, 2, population);
+
 		population.getPersons().remove(Id.create("4", Person.class));
-		
+
 		IterationEndsEvent event3 = new IterationEndsEvent(null, 3, true);
 		scoreStatsControlerListener.notifyIterationEnds(event3);
-		
-		readAndValidateValues(3, population);
-		
+
+		readAndValidateValues(outDir,3, population);
+
 		ShutdownEvent eventShutdown = new ShutdownEvent(null, false, 3);
 		scoreStatsControlerListener.notifyShutdown(eventShutdown);
 
 	}
-	
-	private void readAndValidateValues(int itr, Population population) {
-		
-		String file = utils.getOutputDirectory() + "/ScoreStatsControlerListener" + "/scorestats.txt";
+
+	private void readAndValidateValues(String outDir,  int itr, Population population) throws IOException {
+
+		String file = outDir + "/scorestats.txt";
 		BufferedReader br;
 		String line;
-		try {
-			br = new BufferedReader(new FileReader(file));
-			String firstRow = br.readLine();
-			String[] columnNames = firstRow.split("	");
-			decideColumns(columnNames);
-			int iteration = 0;
-			while ((line = br.readLine()) != null) {
-				if (iteration == itr) {
-					String[] column = line.split("	");
-					
-					// checking if column number in greater than 0, because 0th column is always
-					// 'Iteration' and we don't need that --> see decideColumns() method
-					Double avgExecuted = (avgexecuted > 0) ? Double.valueOf(column[avgexecuted]) : 0;
-					Double avgWorst = (avgworst > 0) ? Double.valueOf(column[avgworst]) : 0;
-					Double avgBest = (avgbest > 0) ? Double.valueOf(column[avgbest]) : 0;
-					Double avgAverage = (avgaverage > 0) ? Double.valueOf(column[avgaverage]) : 0;
-					
-					Assert.assertEquals("avg. executed score does not match", (getScore(population, "avgexecuted")/(4-itr)), avgExecuted,
-							0);
-					Assert.assertEquals("avg. worst score does not match", (getScore(population, "avgworst")/(4-itr)), avgWorst,
-							0);
-					Assert.assertEquals("avg. best score does not match", (getScore(population, "avgbest")/(4-itr)), avgBest,
-							0);
-					Assert.assertEquals("avg average score does not match", (getScore(population, "avgaverage")/getNoOfPlans(population)), avgAverage,
-							0);
-				}
-				iteration++;
+
+		br = new BufferedReader(new FileReader(file));
+		String firstRow = br.readLine();
+		String[] columnNames = firstRow.split("	");
+		decideColumns(columnNames);
+		int iteration = 0;
+		while ((line = br.readLine()) != null) {
+			if (iteration == itr) {
+				String[] column = line.split("	");
+
+				// checking if column number in greater than 0, because 0th column is always
+				// 'Iteration' and we don't need that --> see decideColumns() method
+				Double avgExecuted = (avgexecuted > 0) ? Double.valueOf(column[avgexecuted]) : 0;
+				Double avgWorst = (avgworst > 0) ? Double.valueOf(column[avgworst]) : 0;
+				Double avgBest = (avgbest > 0) ? Double.valueOf(column[avgbest]) : 0;
+				Double avgAverage = (avgaverage > 0) ? Double.valueOf(column[avgaverage]) : 0;
+
+				Assert.assertEquals("avg. executed score does not match", (getScore(population, "avgexecuted")/(4-itr)), avgExecuted,
+						0);
+				Assert.assertEquals("avg. worst score does not match", (getScore(population, "avgworst")/(4-itr)), avgWorst,
+						0);
+				Assert.assertEquals("avg. best score does not match", (getScore(population, "avgbest")/(4-itr)), avgBest,
+						0);
+				Assert.assertEquals("avg average score does not match", (getScore(population, "avgaverage")/getNoOfPlans(population)), avgAverage,
+						0);
 			}
-		}catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			iteration++;
 		}
+
+		Assertions.assertThat(new File(outDir, "scorestats_group1.txt"))
+			.isFile();
+
+		Assertions.assertThat(new File(outDir, "scorestats_group2.txt"))
+			.isFile();
 	}
-	
+
 	private double getScore(Population population, String condition) {
 
 		Double score = 0.0;
@@ -578,20 +582,20 @@ public class ScoreStatsControlerListenerTest {
 				}else if(condition == "avgaverage"){
 					score += scorelist.stream().mapToDouble(a -> a).sum();
 				}
-			}	
+			}
 		}
 		return score;
 	}
-	
+
 	private int getNoOfPlans(Population population) {
-		
+
 		int size = 0;
 		for (Person person : population.getPersons().values()) {
 			size += person.getPlans().size();
 		}
 		return size;
 	}
-	
+
 	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
@@ -606,11 +610,11 @@ public class ScoreStatsControlerListenerTest {
 			case "avg. WORST":
 				avgworst = i;
 				break;
-				
+
 			case "avg. AVG":
 				avgaverage = i;
 				break;
-				
+
 			case "avg. BEST":
 				avgbest = i;
 				break;

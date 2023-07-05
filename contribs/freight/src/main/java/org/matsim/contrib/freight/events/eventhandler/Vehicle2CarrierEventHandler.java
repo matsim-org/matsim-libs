@@ -22,8 +22,8 @@ package org.matsim.contrib.freight.events.eventhandler;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.events.FreightTourEndEvent;
-import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.events.CarrierTourEndEvent;
+import org.matsim.contrib.freight.events.CarrierTourStartEvent;
 import org.matsim.vehicles.Vehicle;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Basic event handler that collects the relation between vehicles and carrier.
  * Necessary since link enter and leave events do not contain any information of the carrier.
  * For the connection between driver and Vehicle the {@link Vehicle2CarrierEventHandler} can be used.
- * 
+ *
  * @author kturner
  */
 public final class Vehicle2CarrierEventHandler implements FreightTourStartEventHandler, FreightTourEndEventHandler {
@@ -43,19 +43,19 @@ public final class Vehicle2CarrierEventHandler implements FreightTourStartEventH
 	// At least the default events manager guarantees single threaded invocation of your handler.
 	// --> we can check this. Currently, it was made only analogous to Vehicle2DriverEventHandler  kmt sep'22
 	private final Map<Id<Vehicle>, Id<Carrier>> carrierVehicles = new ConcurrentHashMap<>();
-	
+
 	@Override
 	public void reset(int iteration) {
 		carrierVehicles.clear();
 	}
 
 	@Override
-	public void handleEvent(FreightTourStartEvent event) {
+	public void handleEvent(CarrierTourStartEvent event) {
 		carrierVehicles.put(event.getVehicleId(), event.getCarrierId());
 	}
 
 	@Override
-	public void handleEvent(FreightTourEndEvent event) {
+	public void handleEvent(CarrierTourEndEvent event) {
 		carrierVehicles.remove(event.getVehicleId());
 	}
 

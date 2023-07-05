@@ -1,0 +1,14 @@
+type: plotly
+traces:
+- x:
+  - sheep
+  - cows
+  - fish
+  - tree sloths
+  "y":
+  - 1.0
+  - 4.0
+  - 9.0
+  - 16.0
+  orientation: v
+  type: bar

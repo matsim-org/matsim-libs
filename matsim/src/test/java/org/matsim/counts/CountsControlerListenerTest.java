@@ -23,8 +23,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -60,17 +60,17 @@ import com.google.inject.Provider;
 public class CountsControlerListenerTest {
 
 	@Rule public MatsimTestUtils util = new MatsimTestUtils();
-	
+
 	@Test
 	public void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		CountsControlerListener ccl = new CountsControlerListener(config.global(), scenario.getNetwork(), config.controler(), config.counts(), null, null, null);
-		
+
 		// test defaults
 		Assert.assertEquals(10, config.counts().getWriteCountsInterval());
 		Assert.assertEquals(5, config.counts().getAverageCountsOverIterations());
-		
+
 		// now the real tests
 		Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
@@ -94,7 +94,7 @@ public class CountsControlerListenerTest {
 		Assert.assertTrue(ccl.useVolumesOfIteration(19, 0));
 		Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
-		
+
 		// change some values
 		config.counts().setWriteCountsInterval(8);
 		config.counts().setAverageCountsOverIterations(2);
@@ -120,7 +120,7 @@ public class CountsControlerListenerTest {
 		Assert.assertFalse(ccl.useVolumesOfIteration(19, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(20, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
-		
+
 		// change some values: averaging = 1
 		config.counts().setWriteCountsInterval(5);
 		config.counts().setAverageCountsOverIterations(1);
@@ -224,7 +224,7 @@ public class CountsControlerListenerTest {
 		Assert.assertTrue(ccl.useVolumesOfIteration(19, 0));
 		Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
 		Assert.assertTrue(ccl.useVolumesOfIteration(21, 0));
-		
+
 		// change some values: different firstIteration
 		config.counts().setWriteCountsInterval(5);
 		config.counts().setAverageCountsOverIterations(3);
@@ -247,17 +247,17 @@ public class CountsControlerListenerTest {
 		Assert.assertTrue(ccl.useVolumesOfIteration(20, 4));
 		Assert.assertFalse(ccl.useVolumesOfIteration(21, 4));
 	}
-	
+
 	@Test
 	public void test_writeCountsInterval() {
 		Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
 		CountsConfigGroup cConfig = config.counts();
-		
+
 		cConfig.setWriteCountsInterval(3);
 		cConfig.setAverageCountsOverIterations(1);
 		cConfig.setOutputFormat("txt");
 		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
-		
+
 		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -273,7 +273,7 @@ public class CountsControlerListenerTest {
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
-		
+
 		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.0/0.countscompare.txt").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.1/1.countscompare.txt").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.2/2.countscompare.txt").exists());
@@ -283,19 +283,19 @@ public class CountsControlerListenerTest {
 		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.6/6.countscompare.txt").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.7/7.countscompare.txt").exists());
 	}
-	
+
 	@Test
 	public void testReset_CorrectlyExecuted() throws IOException {
 		Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
 		config.network().setInputFile("network.xml");	// network file which is used by the counts file
-		
+
 		CountsConfigGroup cConfig = config.counts();
-		
+
 		cConfig.setWriteCountsInterval(3);
 		cConfig.setAverageCountsOverIterations(2);
 		cConfig.setOutputFormat("txt");
 		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
-		
+
 		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -311,7 +311,7 @@ public class CountsControlerListenerTest {
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
-		
+
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.0/0.countscompareAWTV.txt").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.1/1.countscompareAWTV.txt").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.2/2.countscompareAWTV.txt").exists());
@@ -320,30 +320,30 @@ public class CountsControlerListenerTest {
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.5/5.countscompareAWTV.txt").exists());
 		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt").exists());
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.7/7.countscompareAWTV.txt").exists());
-		
+
 		Assert.assertEquals(3.5, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
 		Assert.assertEquals(6.5, getVolume(config.controler().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt"), 1e-8);
 	}
-	
+
 	@Test
 	public void testFilterAnalyzedModes() throws IOException {
 		Config config = util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
 		config.network().setInputFile("network.xml");	// network file which is used by the counts file
-		
+
 		CountsConfigGroup cConfig = config.counts();
-		
+
 		cConfig.setWriteCountsInterval(3);
 		cConfig.setAverageCountsOverIterations(2);
 		cConfig.setOutputFormat("txt");
 		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
-		
+
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(3);
 
 		createAndRunControler(config);
 		Assert.assertEquals(150, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
-		
+
 		// enable modes filtering and count only car
 		cConfig.setAnalyzedModes(TransportMode.car);
 		cConfig.setFilterModes(true);
@@ -355,7 +355,7 @@ public class CountsControlerListenerTest {
 		cConfig.setFilterModes(true);
 		createAndRunControler(config);
 		Assert.assertEquals(50, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
-		
+
 		// enable modes filtering and count only bike
 		cConfig.setAnalyzedModes(TransportMode.bike);
 		cConfig.setFilterModes(true);
@@ -393,7 +393,7 @@ public class CountsControlerListenerTest {
 		String[] parts = line.split("\t");// [0] = linkId, [1] = Count Station Id, [2] = matsim volume, [3] = real volume, [4] = normalized relative error
 		return Double.parseDouble(parts[2]);
 	}
-	
+
 	private static class DummyMobsim implements Mobsim {
 		private final EventsManager eventsManager;
 		private final int nOfEvents;
@@ -401,7 +401,7 @@ public class CountsControlerListenerTest {
 			this.eventsManager = eventsManager;
 			this.nOfEvents = nOfEvents;
 		}
-		
+
 		@Override
 		public void run() {
 			Id<Link> linkId = Id.create("100", Link.class);
@@ -421,7 +421,7 @@ public class CountsControlerListenerTest {
 			return new DummyMobsim(eventsManager, count++);
 		}
 	}
-	
+
 	private static class DummyMobsim2 implements Mobsim {
 		@Inject EventsManager eventsManager;
 
@@ -444,5 +444,5 @@ public class CountsControlerListenerTest {
 			}
 		}
 	}
-	
+
 }

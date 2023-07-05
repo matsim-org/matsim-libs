@@ -36,7 +36,7 @@ import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -353,10 +353,10 @@ public class ModalDistanceAndCountsCadytsIT {
 			assertTrue("expected more than 500 car trips on the long route but the number of trips was " + modalDistanceCount.get("car_2250.0"),
 					modalDistanceCount.get("car_2250.0") > 500); // don't know. one would assume a stronger impact when only running the cadyts count correction but there isn't
 		} else if (this.modalDistanceWeight > 0 && this.countsWeight > 0) {
-			/* This assumes that counts have a higher impact than distance distributions 
+			/* This assumes that counts have a higher impact than distance distributions
 			 * (because counts request 1000 on car_2250 and the distance distribution requests 100 on car_2050 and car_2150 but 0 on car_2250).
 			 * Probably this should rather depend on the weight that is set for counts and distance distributions...
-			 * Since the values are almost the same as before and at the moment nobody seems to understand exactly why cadyts is not working 
+			 * Since the values are almost the same as before and at the moment nobody seems to understand exactly why cadyts is not working
 			 * properly for illustrative scenarios, we allow an error of 6 here...
 			 * TODO In the future somebody should investigate into cadyts on illustrative scenarios;
 			 * might be that cadyts has some assumptions in it's values that only hold for real-world plans or scores.

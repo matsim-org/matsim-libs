@@ -22,7 +22,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;

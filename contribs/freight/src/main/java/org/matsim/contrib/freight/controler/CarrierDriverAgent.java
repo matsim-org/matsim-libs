@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.events.FreightEventCreator;
+import org.matsim.contrib.freight.events.CarrierEventCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -50,18 +50,18 @@ final class CarrierDriverAgent{
 	private final ScoringFunction scoringFunction;
 	private final Carrier carrier;
 	private final EventsManager events;
-	private final Collection<FreightEventCreator> freightEventCreators;
+	private final Collection<CarrierEventCreator> carrierEventCreators;
 
 	private final Driver2VehicleEventHandler driver2EventHandler = new Driver2VehicleEventHandler() ;
 
 
 
 	CarrierDriverAgent( Id<Person> driverId, ScheduledTour tour, ScoringFunction scoringFunction, Carrier carrier,
-			    EventsManager events, Collection<FreightEventCreator> freightEventCreators){
+			    EventsManager events, Collection<CarrierEventCreator> carrierEventCreators){
 		this.scoringFunction = scoringFunction;
 		this.carrier = carrier;
 		this.events = events;
-		this.freightEventCreators = freightEventCreators;
+		this.carrierEventCreators = carrierEventCreators;
 		log.debug( "creating CarrierDriverAgent with driverId=" + driverId );
 		this.driverId = driverId;
 		this.scheduledTour = tour;
@@ -185,8 +185,8 @@ final class CarrierDriverAgent{
 
 			// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
 			// filled from just listening to events.  kai, jul'22
-			for( FreightEventCreator freightEventCreator : freightEventCreators) {
-				Event freightEvent = freightEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter, vehicleId );
+			for( CarrierEventCreator carrierEventCreator : carrierEventCreators) {
+				Event freightEvent = carrierEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter, vehicleId );
 				if(freightEvent != null) {
 					this.events.processEvent( freightEvent );
 					if( scoringFunction != null ){

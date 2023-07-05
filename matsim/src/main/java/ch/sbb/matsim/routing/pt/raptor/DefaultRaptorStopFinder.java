@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -164,7 +164,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
             } else {
                 filteredStopsQT = data.stopsQT;
             }
-            
+
             double distance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord());
             double tripBasedSearchRadius = distance * paramset.getShareTripSearchRadius();
             double searchRadius = Math.min(paramset.getInitialSearchRadius(), paramset.getMaxRadius());

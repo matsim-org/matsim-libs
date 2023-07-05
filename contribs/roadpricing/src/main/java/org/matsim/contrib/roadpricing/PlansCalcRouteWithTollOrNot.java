@@ -17,7 +17,7 @@
  *  *   (at your option) any later version.                                   *
  *  *   See also COPYING, LICENSE and WARRANTY file                           *
  *  *                                                                         *
- *  * *********************************************************************** 
+ *  * ***********************************************************************
  */
 
 package org.matsim.contrib.roadpricing;
@@ -33,8 +33,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
  class PlansCalcRouteWithTollOrNot implements PlanAlgorithm {
 
@@ -70,7 +70,7 @@ import javax.inject.Provider;
 		}
 	}
 
-	// This most likely will not work for intermodal setups with car e.g. as access mode to pt and routing mode of the trip 
+	// This most likely will not work for intermodal setups with car e.g. as access mode to pt and routing mode of the trip
 	// something else than car.
 	// However, it did not work before the switch to routing mode either. - gl-nov'19
 	private void replaceCarModeWithTolledCarMode(Plan plan) {

@@ -16,7 +16,7 @@ import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 
 import javax.annotation.Nullable;
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.*;
 
 /**

@@ -44,7 +44,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

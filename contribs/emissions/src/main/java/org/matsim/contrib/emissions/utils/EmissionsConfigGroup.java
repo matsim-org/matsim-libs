@@ -165,33 +165,10 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	public URL getAverageColdEmissionFactorsFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.averageFleetColdEmissionFactorsFile);
 	}
-	// ===============
-	// ===============
-	@Deprecated
-	private static final String USING_DETAILED_EMISSION_CALCULATION = "usingDetailedEmissionCalculation";
-	private static final String message = "The " + USING_DETAILED_EMISSION_CALCULATION + " switch is now disabled.  ";
+
 	private static final String messageTrue = "Please use <param name=\"detailedVsAverageLookupBehavior\" value=\"tryDetailedThenTechnologyAverageThenAverageTable\" />";
 	private static final String messageFalse = "Please use <param name=\"detailedVsAverageLookupBehavior\" value=\"directlyTryAverageTable\" />";
-	/** @noinspection MethodMayBeStatic*/ // ---
-	@StringGetter(USING_DETAILED_EMISSION_CALCULATION)
-	@Deprecated
-	Boolean isUsingDetailedEmissionCalculationStringGetter(){
-		log.info(message);
-		log.info("returning null so that config writer does not abort");
-		return null ;
-	}
-	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
-	void setUsingDetailedEmissionCalculationStringSetter(final Boolean usingDetailedEmissionCalculation) {
-		log.error( message );
-		if ( usingDetailedEmissionCalculation==null ){
-			log.warn( "null as entry in " + USING_DETAILED_EMISSION_CALCULATION + " has no meaning; ignoring it." );
-		} else if ( usingDetailedEmissionCalculation ) {
-			log.warn( messageTrue );
-		} else {
-			log.warn( messageFalse );
-		}
-		throw new RuntimeException( );
-	}
+
 	// ===============
 	// ===============
 	/**

@@ -12,9 +12,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 public class CadytsCarModule extends AbstractModule {
 	static final String CALIBRATION="calibration";
@@ -39,7 +39,7 @@ public class CadytsCarModule extends AbstractModule {
 		}
 		// In principle this is bind(Counts<Link>).to...  But it wants to keep the option of multiple counts, under different names, open.
 		// I think.  kai, jan'16
-		
+
 		bind(CadytsContext.class).in( Singleton.class );
 		addControlerListenerBinding().to(CadytsContext.class);
 	}

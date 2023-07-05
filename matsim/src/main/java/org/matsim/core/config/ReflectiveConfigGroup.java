@@ -40,7 +40,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -247,7 +250,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			var rawType = pType.getRawType();
 			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
 				var typeArgument = pType.getActualTypeArguments()[0];
-				return typeArgument.equals(String.class);
+				return typeArgument.equals(String.class) || (typeArgument instanceof Class && ((Class<?>) typeArgument).isEnum());
 			}
 
 			if (rawType.equals(Class.class))
@@ -290,7 +293,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		boolean accessible = enforceAccessible(setter);
 		try {
 			var type = setter.getParameterTypes()[0];
-			setter.invoke(this, fromString(value, type));
+			setter.invoke(this, fromString(value, type, null));
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
@@ -304,7 +307,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		boolean accessible = enforceAccessible(paramField);
 		try {
 			var type = paramField.getType();
-			paramField.set(this, fromString(value, type));
+			paramField.set(this, fromString(value, type, paramField));
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -334,7 +337,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		return (cause instanceof RuntimeException runtimeException) ? runtimeException : new RuntimeException(cause);
 	}
 
-	private Object fromString(String value, Class<?> type) {
+	private Object fromString(String value, Class<?> type, @Nullable Field paramField) {
 		if (value.equals("null")) {
 			return null;
 		} else if (type.equals(String.class)) {
@@ -374,9 +377,25 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				throw new IllegalArgumentException(comment, e);
 			}
 		} else if (type.equals(Set.class)) {
-			return value.isBlank() ? ImmutableSet.of() : splitStringToStream(value).collect(toImmutableSet());
+			if (value.isBlank()) {
+				return ImmutableSet.of();
+			}
+			Stream<String> stream = splitStringToStream(value);
+			if (paramField != null && isCollectionOfEnumsWithUniqueStringValues(paramField)) {
+				List<? extends Enum<?>> enumConstants = getEnumConstants(paramField);
+				return stream.map(s -> stringToEnumValue(s, enumConstants)).collect(toImmutableSet());
+			}
+			return stream.collect(toImmutableSet());
 		} else if (type.equals(List.class)) {
-			return value.isBlank() ? List.of() : splitStringToStream(value).toList();
+			if (value.isBlank()) {
+				return List.of();
+			}
+			Stream<String> stream = splitStringToStream(value);
+			if (paramField != null && isCollectionOfEnumsWithUniqueStringValues(paramField)) {
+				List<? extends Enum<?>> enumConstants = getEnumConstants(paramField);
+				return stream.map(s -> stringToEnumValue(s, enumConstants)).toList();
+			}
+			return stream.toList();
 		} else if (type.equals(Class.class)) {
 			try {
 				return ClassLoader.getSystemClassLoader().loadClass(value);
@@ -432,7 +451,13 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	private String getParamField(Field paramField) {
 		boolean accessible = enforceAccessible(paramField);
 		try {
-			return toString(paramField.get(this));
+			var result = paramField.get(this);
+			if (result != null && isCollectionOfEnumsWithUniqueStringValues(paramField)) {
+				result = ((Collection<Object>) result).stream()
+						.map(Object::toString) // map enum values to string
+						.collect(Collectors.toList());
+			}
+			return toString(result);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -577,6 +602,61 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		private InconsistentModuleException(final String msg) {
 			super(msg);
 		}
+	}
+
+	// Helpers to support List<Enum> and Set<Enum> as fields
+
+	private static <E extends Enum<?>> List<E> getEnumConstants(Field paramField) {
+		var type = paramField.getGenericType();
+		if (type instanceof ParameterizedType pType) {
+			var rawType = pType.getRawType();
+			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
+				var typeArgument = pType.getActualTypeArguments()[0];
+				if (typeArgument instanceof Class && ((Class<?>) typeArgument).isEnum()) {
+					return Arrays.asList(((Class<E>) typeArgument).getEnumConstants());
+				}
+			}
+		}
+		return Collections.emptyList(); // no enum -> empty list
+	}
+
+	private static boolean isCollectionOfEnumsWithUniqueStringValues(Field paramField) {
+		// This checks
+		// (1) whether the paramField is a list/set of Enum values, and
+		// (2) whether the enum constants of that Enum class have a differentiable string representation
+		var type = paramField.getGenericType();
+		if (type instanceof ParameterizedType pType) {
+			var rawType = pType.getRawType();
+			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
+				var typeArgument = pType.getActualTypeArguments()[0];
+				if (typeArgument instanceof Class && ((Class<?>) typeArgument).isEnum()) {
+					// here, paramField *is* collection of Enums
+					return enumStringsAreUnique(((Class<?>) typeArgument));
+				}
+			}
+		}
+		return false;
+	}
+
+	private static <T> boolean enumStringsAreUnique(Class<T> enumClass) {
+		T[] enumConstants = enumClass.getEnumConstants();
+		long uniqueStringValues = Arrays.stream(enumConstants)
+				.map(Object::toString)
+				.distinct()
+				.count();
+		if (uniqueStringValues != enumConstants.length) {
+			throw new IllegalArgumentException("Enum class " + enumClass + " has values with identical string value");
+		}
+		return true; // if true, then we can reconstruct a List<Enum> from List<String>
+	}
+
+	private static Enum<?> stringToEnumValue(String s, List<? extends Enum<?>> enumConstants) {
+		for (Enum<?> e : enumConstants) {
+			if (e.toString().equals(s)) {
+				return e;
+			}
+		}
+		return null;
 	}
 }
 

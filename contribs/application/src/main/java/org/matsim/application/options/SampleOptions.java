@@ -16,7 +16,10 @@ import java.util.regex.Pattern;
 public final class SampleOptions {
 
 	private static final Pattern PATTERN = Pattern.compile("\\d+pct");
-
+	/**
+	 * Available sample sizes
+	 */
+	private final int[] sizes;
 	/**
 	 * Needs to be present or the mixin will not be processed at all.
 	 */
@@ -24,14 +27,9 @@ public final class SampleOptions {
 	private String unused;
 
 	/**
-	 * Available sample sizes
+	 * The selected sample size in (0, 1)
 	 */
-	private final int[] sizes;
-
-	/**
-	 * The selected sample size
-	 */
-	private int sample;
+	private double sample;
 
 	/**
 	 * Whether sample size was set explicitly.
@@ -49,48 +47,86 @@ public final class SampleOptions {
 		this.sample = sizes[0];
 	}
 
+	/**
+	 * Create sample options with arbitrary possible sample size. The sample size option will be indicated as required.
+	 */
+	public SampleOptions() {
+		this.sizes = null;
+		this.sample = 0;
+	}
+
 	@CommandLine.Spec(CommandLine.Spec.Target.MIXEE)
-	public void setSpec(CommandLine.Model.CommandSpec spec) {
+	void setSpec(CommandLine.Model.CommandSpec spec) {
 
-		CommandLine.Model.ArgGroupSpec.Builder group = CommandLine.Model.ArgGroupSpec.builder()
-				.exclusive(true)
-				.heading("\nSample sizes:\n")
-				.multiplicity("0..1");
-
-		for (int i = 0; i < sizes.length; i++) {
-
-			int size = sizes[i];
-
+		// Build simple sample option without predefined sizes
+		if (sizes == null) {
 			CommandLine.Model.OptionSpec.Builder arg = CommandLine.Model.OptionSpec.
-					builder(String.format("--%dpct", size))
-					.type(Boolean.class)
-					.order(i)
-					.description("Run scenario with " + size + " pct sample size")
+					builder("--sample-size")
+					.type(Double.class)
+					.description("Specify sample size fraction in (0, 1).")
 					.setter(new CommandLine.Model.ISetter() {
 						@Override
 						public <T> T set(T value) {
-							setSize(size);
+							if (value == null)
+								return null;
+
+							setSize((double) value);
 							return value;
 						}
 					})
-					.defaultValue(i == 0 ? "true" : "false");
+					.required(true);
 
-			group.addArg(arg.build());
+			spec.add(arg.build());
+
+		} else {
+
+			CommandLine.Model.ArgGroupSpec.Builder group = CommandLine.Model.ArgGroupSpec.builder()
+					.exclusive(true)
+					.heading("\nSample sizes:\n")
+					.multiplicity("0..1");
+
+			for (int i = 0; i < sizes.length; i++) {
+
+				int size = sizes[i];
+
+				CommandLine.Model.OptionSpec.Builder arg = CommandLine.Model.OptionSpec.
+						builder(String.format("--%dpct", size))
+						.type(Boolean.class)
+						.order(i)
+						.description("Run scenario with " + size + " pct sample size")
+						.setter(new CommandLine.Model.ISetter() {
+							@Override
+							public <T> T set(T value) {
+								setSize(size / 100d);
+								return value;
+							}
+						})
+						.defaultValue(i == 0 ? "true" : "false");
+
+				group.addArg(arg.build());
+			}
+
+			spec.addArgGroup(group.build());
 		}
-
-		spec.addArgGroup(group.build());
-	}
-
-	private void setSize(int sample) {
-		this.set = true;
-		this.sample = sample;
 	}
 
 	/**
-	 * Returns the specified sample size.
+	 * Returns the specified sample size as percent between 1 and 100
 	 */
 	public int getSize() {
+		return (int) (sample * 100);
+	}
+
+	/**
+	 * Return sample size as fraction between 0 and 1.
+	 */
+	public double getSample() {
 		return sample;
+	}
+
+	private void setSize(double sample) {
+		this.set = true;
+		this.sample = sample;
 	}
 
 	/**

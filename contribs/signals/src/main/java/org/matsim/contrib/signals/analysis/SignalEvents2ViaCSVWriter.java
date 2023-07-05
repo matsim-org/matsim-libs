@@ -42,7 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -50,7 +50,7 @@ import java.util.Map;
 
 /**
  * Write a csv file for visualizing signals in via based on the events.
- * 
+ *
  * @author tthunig
  *
  */
@@ -63,7 +63,7 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 	private static final String Y_COORD = "y";
 	private static final String TIME = "time";
 	private static final String SIGNAL_STATE = "signal state";
-	
+
 	private int countWarnings = 0;
 
 	/**

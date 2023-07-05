@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -96,7 +96,7 @@ public class PHbyModeCalculator {
                         if (Double.isNaN(travelTime)) {travelTime = 0.0; }
 
                         return new AbstractMap.SimpleEntry<>(leg.getMode(),new TravelTimeAndWaitTime(travelTime, waitTime));
-                        
+
                 	} else if (pe instanceof Activity) {
                 		Activity act = (Activity) pe;
                 		if (StageActivityTypeIdentifier.isStageActivity(act.getType())) {
@@ -130,7 +130,7 @@ public class PHbyModeCalculator {
                 csvPrinter.print(mode + WAIT_TIME_SUFFIX);
             }
             csvPrinter.println();
-            
+
             for (Map.Entry<Integer,Map<String,TravelTimeAndWaitTime>> e : phtPerIteration.entrySet()){
                 csvPrinter.print(e.getKey());
                 for (String mode : allModes){
@@ -172,16 +172,16 @@ public class PHbyModeCalculator {
         }
 
     }
-    
+
     private static class TravelTimeAndWaitTime {
     	private double travelTime;
     	private double waitTime;
-    	
+
     	private TravelTimeAndWaitTime(double travelTime, double waitTime) {
     		this.travelTime = travelTime;
     		this.waitTime = waitTime;
     	}
-    	
+
     	private static TravelTimeAndWaitTime sum(TravelTimeAndWaitTime object1, TravelTimeAndWaitTime object2) {
     		return new TravelTimeAndWaitTime(object1.travelTime + object2.travelTime, object1.waitTime + object2.waitTime);
     	}

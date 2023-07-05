@@ -34,13 +34,13 @@ import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.Arrays;
 
 public class TripRouterFactoryBuilderWithDefaults {
 
 	private Provider<TransitRouter> transitRouterFactory;
-	
+
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
     private TravelTime carTravelTime;
     private TravelDisutility carTravelDisutility;
@@ -62,7 +62,7 @@ public class TripRouterFactoryBuilderWithDefaults {
 	public void setLeastCostPathCalculatorFactory(LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
 		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
 	}
-	
+
 	public Provider<TripRouter> build(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
                 AbstractModule.override(

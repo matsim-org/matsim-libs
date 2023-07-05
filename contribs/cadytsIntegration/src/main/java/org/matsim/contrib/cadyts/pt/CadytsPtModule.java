@@ -3,7 +3,7 @@ package org.matsim.contrib.cadyts.pt;
 
 import org.matsim.core.controler.AbstractModule;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 public class CadytsPtModule extends AbstractModule {
 	@Override

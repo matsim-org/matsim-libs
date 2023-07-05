@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -61,11 +61,11 @@ public class ScoreStatsModuleTest {
 
 	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}; isInsertingAccessEgressWalk = {1}")
 	public static Collection<Object[]> parameterObjects () {
-		Object [] [] os = new Object [][] { 
+		Object [] [] os = new Object [][] {
 			//											{ false, true },
 			//											{ true, true },
 			{ false, false },
-			{ true, false } 
+			{ true, false }
 		};
 		return Arrays.asList(os);
 	}

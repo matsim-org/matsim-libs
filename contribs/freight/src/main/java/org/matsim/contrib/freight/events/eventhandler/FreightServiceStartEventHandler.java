@@ -21,12 +21,12 @@
 
 package org.matsim.contrib.freight.events.eventhandler;
 
-import org.matsim.contrib.freight.events.FreightServiceStartEvent;
+import org.matsim.contrib.freight.events.CarrierServiceStartEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 
 public interface FreightServiceStartEventHandler extends EventHandler {
 
-	void handleEvent( FreightServiceStartEvent event );
+	void handleEvent( CarrierServiceStartEvent event );
 
 }

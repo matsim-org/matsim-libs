@@ -49,7 +49,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.junit.Assert.assertEquals;
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;
@@ -59,12 +59,12 @@ import static org.matsim.testcases.MatsimTestUtils.EPSILON;
  * to check the calculation of scores and traveltimes in the framework.
  * The scores and traveltimes calculated by MATSim are compared
  * with values analytically computed by hand.
- * 
+ *
  * Note: This used to be a "white box" test, where intermediate results were pulled
  * from the scoring function. However, this is an undefined state of the scoring
  * function -- the contract says you have to call finish on the scoring function
  * before it delivers a meaningful result. -- michaz 2012
- * 
+ *
  * @author dgrether
  */
 public class EquilTwoAgentsTest {
@@ -98,7 +98,7 @@ public class EquilTwoAgentsTest {
         params.setTypicalDuration(123456789.0) ; // probably dummy
 		params.setScoringThisActivityAtAll(false);
 		pcsConfig.addActivityParams(params) ;
-		
+
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);

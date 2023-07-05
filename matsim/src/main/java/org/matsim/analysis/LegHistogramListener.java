@@ -30,7 +30,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Integrates the {@link org.matsim.analysis.LegHistogram} into the

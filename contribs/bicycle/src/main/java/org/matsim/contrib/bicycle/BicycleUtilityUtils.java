@@ -34,7 +34,7 @@ class BicycleUtilityUtils {
 
 		double distance = link.getLength();
 
-		double comfortFactor = getComfortFactor(surface, type);
+		double comfortFactor = getComfortFactor(surface);
 		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
 
 		double infrastructureFactor = getInfrastructureFactor(type, cyclewaytype);
@@ -55,117 +55,72 @@ class BicycleUtilityUtils {
 	}
 
 	static double getGradient(Link link ) {
-		double gradient = 0.;
 
-		if (link.getFromNode().getCoord().hasZ() && link.getToNode().getCoord().hasZ()) {
-			Double fromNodeZ = link.getFromNode().getCoord().getZ();
-			Double toNodeZ = link.getToNode().getCoord().getZ();
-			if ((fromNodeZ != null) && (toNodeZ != null)) {
-				if (toNodeZ > fromNodeZ) { // No positive utility for downhill, only negative for uphill
-					gradient = (toNodeZ - fromNodeZ) / link.getLength();
-				}
-			}
-		}
-		return gradient;
+		if (!link.getFromNode().getCoord().hasZ() || !link.getToNode().getCoord().hasZ()) return 0.;
+
+		var fromZ = link.getFromNode().getCoord().getZ();
+		var toZ = link.getToNode().getCoord().getZ();
+		var gradient = (toZ - fromZ) / link.getLength();
+		// No positive utility for downhill, only negative for uphill
+		return Math.max(0, gradient);
 	}
 
 	// TODO Combine this with speeds?
-	static double getComfortFactor( String surface, String type ) {
-		double comfortFactor = 1.0;
-		if (surface != null) {
-			switch (surface) {
-			case "paved":
-			case "asphalt": comfortFactor = 1.0; break;
-			case "cobblestone": comfortFactor = .40; break;
-			case "cobblestone (bad)": comfortFactor = .30; break;
-			case "sett": comfortFactor = .50; break;
-			case "cobblestone;flattened":
-			case "cobblestone:flattened": comfortFactor = .50; break;
-			case "concrete": comfortFactor = .100; break;
-			case "concrete:lanes": comfortFactor = .95; break;
-			case "concrete_plates":
-			case "concrete:plates": comfortFactor = .90; break;
-			case "paving_stones": comfortFactor = .80; break;
-			case "paving_stones:35":
-			case "paving_stones:30": comfortFactor = .80; break;
-			case "unpaved": comfortFactor = .60; break;
-			case "compacted": comfortFactor = .70; break;
-			case "dirt":
-			case "earth": comfortFactor = .30; break;
-			case "fine_gravel": comfortFactor = .90; break;
-			case "gravel":
-			case "ground": comfortFactor = .60; break;
-			case "wood":
-			case "pebblestone":
-			case "sand": comfortFactor = .30; break;
-			case "bricks": comfortFactor = .60; break;
-			case "stone":
-			case "grass":
-			case "compressed": comfortFactor = .40; break;
-			case "asphalt;paving_stones:35": comfortFactor = .60; break;
-			case "paving_stones:3": comfortFactor = .40; break;
-			default: comfortFactor = .85;
-			}
-		} else {
-			// For many primary and secondary roads, no surface is specified because they are by default assumed to be is asphalt.
-			// For tertiary roads street this is not true, e.g. Friesenstr. in Kreuzberg
-			if (type != null) {
-				if (type.equals("primary") || type.equals("primary_link") || type.equals("secondary") || type.equals("secondary_link")) {
-					comfortFactor = 1.0;
-				}
-			}
-		}
-		return comfortFactor;
+	static double getComfortFactor( String surface ) {
+
+		// This method included another if/els branch with some conditions on road types which could never be reached. The following comment was
+		// written above this branch. Deleting it, because I don't know what it was supposed to do. janek may '23
+		//
+		// For many primary and secondary roads, no surface is specified because they are by default assumed to be is asphalt.
+		// For tertiary roads street this is not true, e.g. Friesenstr. in Kreuzberg
+
+		if (surface == null) return 1.0;
+
+		return switch (surface) {
+				case "paved", "asphalt" -> 1.0;
+				case "concrete:lanes" -> .95;
+				case "concrete_plates", "concrete:plates", "fine_gravel" -> .9;
+				case "paving_stones", "paving_stones:35", "paving_stones:30" -> .8;
+				case "compacted" -> .7;
+				case "unpaved", "asphalt;paving_stones:35", "bricks", "gravel", "ground" -> .6;
+				case "sett", "cobblestone;flattened", "cobblestone:flattened" -> .5;
+				case "cobblestone", "stone", "grass", "compressed", "paving_stones:3" -> .4;
+				case "cobblestone (bad)", "dirt", "earth", "wood", "pebblestone", "sand" -> .3;
+				case "concrete" -> .1;
+				default -> .85;
+			};
 	}
 
 	static double getInfrastructureFactor( String type, String cyclewaytype ) {
-		double infrastructureFactor = 1.0;
-		if (type != null) {
-			if (type.equals("trunk")) {
-				if (cyclewaytype == null || cyclewaytype.equals("no") || cyclewaytype.equals("none")) { // No cycleway
-					infrastructureFactor = .05;
-				} else { // Some kind of cycleway
-					infrastructureFactor = .95;
-				}
-			} else if (type.equals("primary") || type.equals("primary_link")) {
-				if (cyclewaytype == null || cyclewaytype.equals("no") || cyclewaytype.equals("none")) { // No cycleway
-					infrastructureFactor = .10;
-				} else { // Some kind of cycleway
-					infrastructureFactor = .95;
-				}
-			} else if (type.equals("secondary") || type.equals("secondary_link")) {
-				if (cyclewaytype == null || cyclewaytype.equals("no") || cyclewaytype.equals("none")) { // No cycleway
-					infrastructureFactor = .30;
-				} else { // Some kind of cycleway
-					infrastructureFactor = .95;
-				}
-			} else if (type.equals("tertiary") || type.equals("tertiary_link")) {
-				if (cyclewaytype == null || cyclewaytype.equals("no") || cyclewaytype.equals("none")) { // No cycleway
-					infrastructureFactor = .40;
-				} else { // Some kind of cycleway
-					infrastructureFactor = .95;
-				}
-			} else if (type.equals("unclassified")) {
-				if (cyclewaytype == null || cyclewaytype.equals("no") || cyclewaytype.equals("none")) { // No cycleway
-					infrastructureFactor = .90;
-				} else { // Some kind of cycleway
-					infrastructureFactor = .95;
-				}
-			} else if (type.equals("unclassified")) {
-				infrastructureFactor = .95;
-			} else if (type.equals("service") || type.equals("living_street") || type.equals("minor")) {
-				infrastructureFactor = .95;
-			} else if (type.equals("cycleway") || type.equals("path")) {
-				infrastructureFactor = 1.00;
-			} else if (type.equals("footway") || type.equals("track") || type.equals("pedestrian")) {
-				infrastructureFactor = .95;
-			} else if (type.equals("steps")) {
-				infrastructureFactor = .10;
-			}
+
+		// The method was unreadable before, so I hope I got the logic right. basically this differentiates between explicit cycleway tags, where the
+		// road type has an influence on the factor, i.e. cycling along a primary road without cycle lane is less attractive compared to a tertiary road.
+		// On the other hand if cycleways are present the factor is always 0.95, exept the cycle tracks has steps (horrible) or the road type is a
+		// cycleway anyway (very nice)
+		// in case there is no road type a medium factor of 0.85 is assigned
+		// janek may '23
+
+		if (type == null) return 0.85;
+		if (hasNoCycleway(cyclewaytype)) {
+			return switch (type) {
+				case "trunk" -> 0.05;
+				case "primary", "primary_link" -> 0.1;
+				case "secondary", "secondary_link" -> 0.3;
+				case "tertiary", "tertiary_link" -> 0.4;
+				case "unclassified" -> 0.9;
+				default -> 0.95;
+			};
 		} else {
-			infrastructureFactor = .85;
+			return switch (type) {
+				case "cycleway", "path" -> 1.0;
+				case "steps" -> 0.1;
+				default -> 0.95;
+			};
 		}
-		return infrastructureFactor;
+	}
+
+	private static boolean hasNoCycleway(String cyclewayType) {
+		return (cyclewayType == null || cyclewayType.equals("no") || cyclewayType.equals("none"));
 	}
 
 	static double getUserDefinedNetworkAttributeFactor( String userDefinedNetworkAttributeString, double userDefinedNetworkAttributeDefaultValue ) {

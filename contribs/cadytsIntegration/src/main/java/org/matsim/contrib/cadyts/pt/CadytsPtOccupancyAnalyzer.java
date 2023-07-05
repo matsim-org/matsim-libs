@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -50,9 +50,9 @@ import org.matsim.vehicles.Vehicle;
 /**
  * Collects occupancy data of transit-line stations
  * <p></p>
- * This is probably similar to code elsewhere.  However, it makes some sense to keep this here since the correct workings of cadyts 
+ * This is probably similar to code elsewhere.  However, it makes some sense to keep this here since the correct workings of cadyts
  * (obviously) depends on the fact that the counts are actually what it thinks, and so it makes sense to decouple this from the upstream
- * counting method and leave it here. kai, sep'13 
+ * counting method and leave it here. kai, sep'13
  */
 final class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 	// can be/remain public as long as constructor is package-private.  kai, feb'20
@@ -287,11 +287,11 @@ final class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 
 	public static Set<Id<TransitLine>> toTransitLineIdSet(Set<String> list) {
 		Set<Id<TransitLine>> converted = new LinkedHashSet<>();
-		
+
 		for ( String id : list) {
 			converted.add(Id.create(id, TransitLine.class));
 		}
-		
+
 		return converted;
 	}
 

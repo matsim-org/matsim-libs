@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.HashMap;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

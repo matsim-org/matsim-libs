@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -54,23 +54,23 @@ public class RunFlexibleQNetworkFactoryExample {
 		@Override
 		public final void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 			double effectiveCellSize = ((Network)network).getEffectiveCellSize() ;
-			
+
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 			linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
 			if (! Double.isNaN(network.getEffectiveLaneWidth())){
 				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 			}
 			AbstractAgentSnapshotInfoBuilder snapshotBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
-			
+
 			this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
-			
+
 			this.netsimEngine = netsimEngine1 ;
 		}
 		@Override
 		public final QNodeI createNetsimNode( Node node ) {
 			QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, qsimConfig ) ;
 			return builder.build( node ) ;
-			
+
 		}
 		@Override
 		public final QLinkI createNetsimLink( Link link, QNodeI queueNode ) {
@@ -89,19 +89,19 @@ public class RunFlexibleQNetworkFactoryExample {
 	 */
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig() ;
-		
+
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
-		
+
 		Controler controler = new Controler( scenario ) ;
-		
+
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
 				bind( QNetworkFactory.class ).to( MyQNetworkFactory.class ) ;
 			}
 		});
-		
+
 		controler.run();
-		
+
 	}
 
 }

@@ -142,14 +142,14 @@ public class ConfigUtils implements MatsimExtensionPoint {
 
 	public static Config loadConfig(final URL url, ConfigGroup... customModules) throws UncheckedIOException {
 		Gbl.assertNotNull(url);
-		
+
 		Config config = new Config();
 		config.addCoreModules();
 
 		for (ConfigGroup customModule : customModules) {
 			config.addModule(customModule);
 		}
-		
+
 		new ConfigReader(config).parse(url);
 		config.setContext(url);
 		return config;
@@ -164,7 +164,7 @@ public class ConfigUtils implements MatsimExtensionPoint {
 	 * ConfigUtils.loadConfig( config, filename ) ; // read user-defined options
 	 * config.aaa().bbb() ; // set config options which you don't want the user to potentially overwrite.
 	 * ...
-	 * </pre>  
+	 * </pre>
 	 */
 	public static void loadConfig(final Config config, final String filename) throws UncheckedIOException {
 		if (config.global() == null) {
@@ -186,7 +186,7 @@ public class ConfigUtils implements MatsimExtensionPoint {
 			// yyyyyy the above probably works, but has ramifications across many test
 			// cases.  Need to discuss first (and then find some time again).
 			// See MATSIM-776 and MATSIM-777.  kai, feb'18
-			
+
 			new ConfigReader(config).readFile(filename);
 		}
 	}
@@ -269,9 +269,9 @@ public class ConfigUtils implements MatsimExtensionPoint {
 		}
 		return Id.create(maxStrategyId + 1, StrategySettings.class);
 	}
-	
-	
-	/** 
+
+
+	/**
 	 * Convenience method to all addOrGetModule with only two arguments.
 	 * <br/>
 	 * Notes:<ul>
@@ -315,6 +315,19 @@ public class ConfigUtils implements MatsimExtensionPoint {
 		return moduleClass.cast(module);
 	}
 
+	/**
+	 * Checks whether a specific module is present in the config.
+	 */
+	public static boolean hasModule(Config config, Class<? extends ConfigGroup> moduleClass) {
+		String groupName;
+		try {
+			groupName = moduleClass.getDeclaredConstructor().newInstance().getName();
+			return config.getModules().containsKey(groupName);
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e) ;
+		}
+	}
+
 	public static void setVspDefaults(final Config config) {
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
@@ -322,7 +335,7 @@ public class ConfigUtils implements MatsimExtensionPoint {
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
 	}
-	
+
 	public static void writeConfig( final Config config, String filename ) {
 		new ConfigWriter(config).write(filename);
 	}

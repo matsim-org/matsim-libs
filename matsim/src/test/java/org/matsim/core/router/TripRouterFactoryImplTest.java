@@ -47,7 +47,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import java.util.Arrays;
 import java.util.Collections;

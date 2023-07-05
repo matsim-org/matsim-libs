@@ -44,7 +44,7 @@ public class MatsimTransformerTest {
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = VehicleTypeImpl.Builder
 				.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0)
 				.setFixedCost(100.0).build();
-		VehicleType matsimType = MatsimJspritFactory.createCarrierVehicleType(jspritType);
+		VehicleType matsimType = MatsimJspritFactory.createMatsimVehicleType(jspritType);
 		assertNotNull(matsimType);
 		assertEquals("myType", matsimType.getId().toString());
 		assertEquals(50., (double) matsimType.getCapacity().getWeightInTons(), Double.MIN_VALUE);
@@ -58,15 +58,15 @@ public class MatsimTransformerTest {
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = VehicleTypeImpl.Builder
 				.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0)
 				.setFixedCost(100.0).build();
-		VehicleType matsimType = MatsimJspritFactory.createCarrierVehicleType(jspritType);
-		assertThat(matsimType, is(not(MatsimJspritFactory.createCarrierVehicleType(jspritType))));
+		VehicleType matsimType = MatsimJspritFactory.createMatsimVehicleType(jspritType);
+		assertThat(matsimType, is(not(MatsimJspritFactory.createMatsimVehicleType(jspritType))));
 	}
 
 	@Test
 	public void whenTransforming_matsimType2jSpritType_itIsMadeCorrectly() {
 		VehicleType matsimType = getMatsimVehicleType();
 		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = MatsimJspritFactory
-				.createVehicleType(matsimType);
+				.createJspritVehicleType(matsimType);
 		assertNotNull(jspritType);
 		assertEquals(50, jspritType.getCapacityDimensions().get(0));
 		assertEquals(10.0, jspritType.getVehicleCostParams().perDistanceUnit, 0.01);
@@ -94,7 +94,7 @@ public class MatsimTransformerTest {
 	public void whenTransforming_matsimVehicle2jspritVehicle_itIsMadeCorrectly() {
 		VehicleType matsimType = getMatsimVehicleType();
 		CarrierVehicle matsimVehicle = getMatsimVehicle("matsimVehicle", "loc", matsimType);
-		Vehicle jspritVehicle = MatsimJspritFactory.createVehicle(matsimVehicle, null);
+		Vehicle jspritVehicle = MatsimJspritFactory.createJspritVehicle(matsimVehicle, null);
 		assertNotNull(jspritVehicle);
 		assertEquals("matsimType", jspritVehicle.getType().getTypeId());
 		assertEquals("matsimVehicle", jspritVehicle.getId());
@@ -109,14 +109,14 @@ public class MatsimTransformerTest {
 				.newInstance(Id.create("serviceId", CarrierService.class), Id.create("locationId", Link.class))
 				.setCapacityDemand(50).setServiceDuration(30.0)
 				.setServiceStartTimeWindow(TimeWindow.newInstance(10.0, 20.0)).build();
-		Service service = MatsimJspritFactory.createService(carrierService, null);
+		Service service = MatsimJspritFactory.createJspritService(carrierService, null);
 		assertNotNull(service);
 		assertEquals("locationId", service.getLocation().getId());
 		assertEquals(30.0, service.getServiceDuration(), 0.01);
 		assertEquals(50, service.getSize().get(0));
 		assertEquals(10.0, service.getTimeWindow().getStart(), 0.01);
 
-		Service service2 = MatsimJspritFactory.createService(carrierService, null);
+		Service service2 = MatsimJspritFactory.createJspritService(carrierService, null);
 		assertTrue(service != service2);
 		assertTrue(service.equals(service2));
 	}
@@ -148,7 +148,7 @@ public class MatsimTransformerTest {
 						Id.createLinkId("DeliveryLocationId"), 50)
 				.setPickupServiceTime(30.0).setPickupTimeWindow(TimeWindow.newInstance(10.0, 20.0))
 				.setDeliveryServiceTime(40.0).setDeliveryTimeWindow(TimeWindow.newInstance(50.0, 60.0)).build();
-		Shipment shipment = MatsimJspritFactory.createShipment(carrierShipment);
+		Shipment shipment = MatsimJspritFactory.createJspritShipment(carrierShipment);
 		assertNotNull(shipment);
 		assertEquals("PickupLocationId", shipment.getPickupLocation().getId());
 		assertEquals(30.0, shipment.getPickupServiceTime(), 0.01);
@@ -160,7 +160,7 @@ public class MatsimTransformerTest {
 		assertEquals(60.0, shipment.getDeliveryTimeWindow().getEnd(), 0.01);
 		assertEquals(50, shipment.getSize().get(0));
 
-		Shipment shipment2 = MatsimJspritFactory.createShipment(carrierShipment);
+		Shipment shipment2 = MatsimJspritFactory.createJspritShipment(carrierShipment);
 		assertTrue(shipment != shipment2);
 		assertTrue(shipment.equals(shipment2));
 	}

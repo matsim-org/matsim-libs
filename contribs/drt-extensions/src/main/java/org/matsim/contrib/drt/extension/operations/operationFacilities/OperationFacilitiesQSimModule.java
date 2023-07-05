@@ -57,7 +57,7 @@ public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 		}).asEagerSingleton();
 
 		addModalQSimComponentBinding().toProvider(
-				modalProvider((Function<ModalProviders.InstanceGetter<DvrpMode>, QSimComponent>)dvrpModeInstanceGetter -> {
+				modalProvider(dvrpModeInstanceGetter -> {
 					List<OperationFacility> facilitiesList = new ArrayList<>(
 							dvrpModeInstanceGetter.getModal(OperationFacilities.class).getDrtOperationFacilities().values());
 					var header = facilitiesList.stream().map(f -> f.getId() + "").collect(toImmutableList());

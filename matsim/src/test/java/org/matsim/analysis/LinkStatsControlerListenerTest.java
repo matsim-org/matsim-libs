@@ -44,8 +44,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;

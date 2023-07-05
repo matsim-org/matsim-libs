@@ -32,10 +32,10 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.FreightServiceEndEvent;
-import org.matsim.contrib.freight.events.FreightServiceStartEvent;
-import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndEvent;
-import org.matsim.contrib.freight.events.FreightShipmentPickupEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
+import org.matsim.contrib.freight.events.CarrierServiceStartEvent;
+import org.matsim.contrib.freight.events.CarrierShipmentDeliveryEndEvent;
+import org.matsim.contrib.freight.events.CarrierShipmentPickupEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEventHandler;
@@ -157,12 +157,12 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 
 	// LSP Events for Shipments and Services, those are UNTESTED
 	@Override
-	public void handleEvent(FreightShipmentDeliveryEndEvent event) {
+	public void handleEvent(CarrierShipmentDeliveryEndEvent event) {
 		shipmentTracking.trackDeliveryEvent(event);
 	}
 
 	@Override
-	public void handleEvent(FreightShipmentPickupEndEvent event) {
+	public void handleEvent(CarrierShipmentPickupEndEvent event) {
 		shipmentTracking.trackPickedUpEvent(event);
 		// as we know the driver of the shipment now, we can assign the shipment's carrier to the driver's vehicle.
 		//FIXME: We do not have the driver in the events anymore. Need to collect them from other places (if we still need them)
@@ -173,12 +173,12 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 	}
 
 	@Override
-	public void handleEvent(FreightServiceEndEvent event) {
+	public void handleEvent(CarrierServiceEndEvent event) {
 		serviceTracking.handleEndEvent(event);
 	}
 
 	@Override
-	public void handleEvent(FreightServiceStartEvent event) {
+	public void handleEvent(CarrierServiceStartEvent event) {
 		serviceTracking.handleStartEvent(event);
 		// as we know the driver of a service now, we can assign the shipment's carrier to the driver's vehicle.
 		//FIXME: We do not have the driver in the events anymore. Need to collect them from other places (if we still need them)
