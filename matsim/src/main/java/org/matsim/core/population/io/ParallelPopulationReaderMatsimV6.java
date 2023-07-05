@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.xml.sax.Attributes;
@@ -49,14 +50,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 /* deliberately package */  class ParallelPopulationReaderMatsimV6 extends PopulationReaderMatsimV6 {
 
 	static final Logger log = LogManager.getLogger(ParallelPopulationReaderMatsimV6.class);
-	private static int THREADS_LIMIT = 4;
+	private static final int THREADS_LIMIT = 4;
 	private final boolean isPopulationStreaming;
 	private final int numThreads;
 	private final BlockingQueue<List<Tag>> queue;
 	private Thread[] threads;
 	private List<Tag> currentPersonXmlData;
 
-	private final String inputCRS;
+	private String inputCRS;
 	private final String targetCRS;
 
 	private boolean reachedPersons = false;
@@ -160,6 +161,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
+		if(ATTRIBUTES.equals(name)&&context.peek().equals(POPULATION))
+		{
+			this.inputCRS = ProjectionUtils.getCRS(scenario.getPopulation());
+		}
 
 		// if population streaming is activated, use non-parallel reader
 		// or if not reached the persons in the xml
