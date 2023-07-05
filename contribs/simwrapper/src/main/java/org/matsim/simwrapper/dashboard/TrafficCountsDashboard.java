@@ -185,21 +185,21 @@ public class TrafficCountsDashboard implements Dashboard {
 				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_error_by_hour.csv"));
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE)
-					.name("Mean Rel. error")
+					.name("Mean rel. error")
 					.build(), ds.mapping()
 					.x("hour")
 					.y("mean_rel_error"));
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
 					.mode(ScatterTrace.Mode.LINE).yAxis(ScatterTrace.YAxis.Y2)
-					.name("Mean Abs. error")
+					.name("Mean abs. error")
 					.build(), ds.mapping()
 					.x("hour")
 					.y("mean_abs_error"));
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
 					.mode(ScatterTrace.Mode.LINE).yAxis(ScatterTrace.YAxis.Y2)
-					.name("Mean Bias")
+					.name("Mean bias")
 					.build(), ds.mapping()
 					.x("hour")
 					.y("mean_bias"));

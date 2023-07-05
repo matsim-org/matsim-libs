@@ -25,7 +25,7 @@ public class SimWrapperConfigGroupTest {
 		p.set("dynamic", "value");
 
 		Assertions.assertThat(p.sampleSize)
-			.isEqualTo("0.5");
+			.isEqualTo(0.5);
 
 		String path = utils.getOutputDirectory() + "/config.xml";
 
