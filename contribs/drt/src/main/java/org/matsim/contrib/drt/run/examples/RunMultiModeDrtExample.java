@@ -30,9 +30,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeLimitedMaxSpeedTravelTi
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -57,12 +55,6 @@ public class RunMultiModeDrtExample {
 		controler.addOverridingModule(
 				new DvrpModeLimitedMaxSpeedTravelTimeModule("drt_autonomous", config.qsim().getTimeStepSize(),
 						maxSpeed));
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(AnalysisMainModeIdentifier.class).to(DrtExamplesAnalysisMainModeIdentifier.class);
-			}
-		});
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
