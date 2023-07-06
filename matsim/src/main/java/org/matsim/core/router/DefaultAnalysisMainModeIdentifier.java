@@ -71,8 +71,6 @@ public final class DefaultAnalysisMainModeIdentifier implements AnalysisMainMode
 		// trip as two separate trips. kai, sep'16
 	}
 
-	private int walkIndex = modeHierarchy.indexOf( TransportMode.walk ) ;
-
 	@Override public String identifyMainMode( List<? extends PlanElement> planElements ) {
 		int mainModeIndex = -1 ;
 		String unknownMode = null;
@@ -104,7 +102,7 @@ public final class DefaultAnalysisMainModeIdentifier implements AnalysisMainMode
 		}
 
 		if (unknownMode != null) {
-			if (mainModeIndex > walkIndex) {
+			if (mainModeIndex > modeHierarchy.indexOf( TransportMode.walk )) {
 				// another mode besides walk and our unknown mode was found before, we don't know which of them is the main mode
 				log.error("Unknown mode " + unknownMode + " and " + modeHierarchy.get( mainModeIndex ) + " found in the same trip. The " +
 					"AnalysisMainModeIdentifier cannot determine which of those is the main mode because they are both unknown to it. " +
