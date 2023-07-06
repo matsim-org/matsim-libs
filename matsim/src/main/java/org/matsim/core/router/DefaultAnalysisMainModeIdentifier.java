@@ -71,21 +71,50 @@ public final class DefaultAnalysisMainModeIdentifier implements AnalysisMainMode
 		// trip as two separate trips. kai, sep'16
 	}
 
+	private int walkIndex = modeHierarchy.indexOf( TransportMode.walk ) ;
+
 	@Override public String identifyMainMode( List<? extends PlanElement> planElements ) {
 		int mainModeIndex = -1 ;
+		String unknownMode = null;
 		for ( PlanElement pe : planElements ) {
 			if (pe instanceof Leg leg) {
 				int index = modeHierarchy.indexOf( leg.getMode() ) ;
 				if ( index < 0 ) {
-					log.error("unknown mode=" + leg.getMode() + ". You are using a mode not included in matsim per default. Please bind your own " +
-						"AnalysisMainModeIdentifier that interprets all modes used in your scenario correctly.");
-					throw new RuntimeException("unknown mode in AnalysisMainModeIdentifier: " + leg.getMode() ) ;
+					/*
+					 * The current leg mode is not included in the hierarchy above.
+					 *
+					 * If besides this unknown mode there are only (access/egress) non_network_walk and walk, we can assume that this unknown mode
+					 * is the main mode. That assumption saves creating custom AnalysisMainModeIdentifier if new modes not included in the hierarchy
+					 * above are used. However, with multiple modes besides walk and non_network_walk we need to know the hierarchy of those modes
+					 * to determine which of those is the main mode.
+					 */
+					if (unknownMode != null) {
+						log.error("Multiple unknown modes in one trip: " + leg.getMode() + " and " + unknownMode + ". The AnalysisMainModeIdentifier" +
+							"cannot determine which of those is the main mode because they are both unknown to it. Please bind your own " +
+							"AnalysisMainModeIdentifier that interprets all modes used in your scenario correctly.");
+						throw new RuntimeException("unknown modes in AnalysisMainModeIdentifier: " + leg.getMode() + " and " + unknownMode ) ;
+					} else {
+						unknownMode = leg.getMode();
+					}
 				}
 				if ( index > mainModeIndex ) {
 					mainModeIndex = index ;
 				}
 			}
 		}
+
+		if (unknownMode != null) {
+			if (mainModeIndex > walkIndex) {
+				// another mode besides walk and our unknown mode was found before, we don't know which of them is the main mode
+				log.error("Unknown mode " + unknownMode + " and " + modeHierarchy.get( mainModeIndex ) + " found in the same trip. The " +
+					"AnalysisMainModeIdentifier cannot determine which of those is the main mode because they are both unknown to it. " +
+					"Please bind your own AnalysisMainModeIdentifier that interprets all modes used in your scenario correctly.");
+				throw new RuntimeException("unknown mode in AnalysisMainModeIdentifier: " + unknownMode);
+			} else {
+				return unknownMode;
+			}
+		}
+
 		return modeHierarchy.get( mainModeIndex ) ;
 	}
 }
