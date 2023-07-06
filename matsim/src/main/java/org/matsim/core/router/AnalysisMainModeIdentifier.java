@@ -20,9 +20,9 @@
 package org.matsim.core.router;
 
 /**
- * Marker interface for MainModeIdentifier intended to be used in analysis code (e.g. {@link ModeStatsControlerListener}).
+ * Marker interface for MainModeIdentifier intended to be used in analysis code (e.g. {@link org.matsim.analysis.ModeStatsControlerListener}).
  * Separate from {@link MainModeIdentifier} which is only used for retrofitting old plans without the attribute routing mode.
- * 
+ *
  * @author vsp-gleich
  */
 public interface AnalysisMainModeIdentifier extends MainModeIdentifier {
