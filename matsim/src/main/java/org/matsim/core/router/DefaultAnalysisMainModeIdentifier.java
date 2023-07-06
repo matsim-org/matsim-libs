@@ -49,6 +49,7 @@ public final class DefaultAnalysisMainModeIdentifier implements AnalysisMainMode
 		// If you want to change the mode hierarchy, please create your own copy for that.
 		modeHierarchy.add( TransportMode.non_network_walk ) ;
 		modeHierarchy.add( "undefined" ) ;
+		modeHierarchy.add( TransportMode.transit_walk) ;
 		modeHierarchy.add( TransportMode.other ) ;
 		modeHierarchy.add( TransportMode.walk ) ;
 		modeHierarchy.add( TransportMode.bike ) ;
@@ -107,7 +108,7 @@ public final class DefaultAnalysisMainModeIdentifier implements AnalysisMainMode
 				log.error("Unknown mode " + unknownMode + " and " + modeHierarchy.get( mainModeIndex ) + " found in the same trip. The " +
 					"AnalysisMainModeIdentifier cannot determine which of those is the main mode because they are both unknown to it. " +
 					"Please bind your own AnalysisMainModeIdentifier that interprets all modes used in your scenario correctly.");
-				throw new RuntimeException("unknown mode in AnalysisMainModeIdentifier: " + unknownMode);
+				throw new IllegalStateException("unknown mode in AnalysisMainModeIdentifier: " + unknownMode);
 			} else {
 				return unknownMode;
 			}
