@@ -95,12 +95,11 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 		@Parameter
 		@Comment("Sample size of the run, which may be required by certain analysis functions.")
-		public String sampleSize = "1.0";
+		public Double sampleSize = 1.0d;
 
 		@Parameter
 		@Comment("Shp file that may be used by analysis functions that support shp file input.")
 		public String shp = null;
-
 
 		@Parameter
 		@Comment("Tuple of two coordinate separated with ',' that may be used to define the center of map views.")

@@ -32,7 +32,7 @@ public final class CommandRunner {
 	private Path output;
 	private String defaultShp = null;
 	private String defaultCrs = null;
-	private String defaultSampleSize = null;
+	private Double defaultSampleSize = null;
 
 
 	/**
@@ -212,7 +212,7 @@ public final class CommandRunner {
 		if (ApplicationUtils.acceptsOptions(command, SampleOptions.class) && !ArrayUtils.contains(existingArgs, "--sample-size")) {
 			if (defaultSampleSize != null) {
 				args.add("--sample-size");
-				args.add(defaultSampleSize);
+				args.add(String.valueOf(defaultSampleSize));
 			}
 		}
 
@@ -322,7 +322,7 @@ public final class CommandRunner {
 	/**
 	 * Set the default sample size that is passed as input to commands.
 	 */
-	public void setSampleSize(String sampleSize) {
+	public void setSampleSize(double sampleSize) {
 		this.defaultSampleSize = sampleSize;
 	}
 }
