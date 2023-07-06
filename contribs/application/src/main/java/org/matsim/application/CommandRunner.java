@@ -88,12 +88,9 @@ public final class CommandRunner {
 		while (it.hasNext()) {
 			Class<? extends MATSimAppCommand> clazz = it.next();
 			try {
-				MATSimAppCommand command = clazz.getDeclaredConstructor().newInstance();
-				String[] args = this.args.get(clazz);
-				args = ArrayUtils.addAll(args, createArgs(clazz, args, input));
-				log.info("Running {} with arguments: {}", clazz, Arrays.toString(args));
-
-				command.execute(args);
+				// Collect garbage between commands, because they might use quite some memory
+				System.gc();
+				runCommand(clazz, input);
 
 			} catch (ReflectiveOperationException ex) {
 				log.error("Command {} could not be crated.", clazz, ex);
@@ -101,6 +98,19 @@ public final class CommandRunner {
 				log.error("Command {} threw an error.", clazz, e);
 			}
 		}
+	}
+
+	/**
+	 * Execute the command with configured arguments.
+	 */
+	private void runCommand(Class<? extends MATSimAppCommand> clazz, Path input) throws ReflectiveOperationException {
+
+		MATSimAppCommand command = clazz.getDeclaredConstructor().newInstance();
+		String[] args = this.args.get(clazz);
+		args = ArrayUtils.addAll(args, createArgs(clazz, args, input));
+		log.info("Running {} with arguments: {}", clazz, Arrays.toString(args));
+
+		command.execute(args);
 	}
 
 	/**
@@ -270,7 +280,7 @@ public final class CommandRunner {
 			String[] existing = this.args.get(command);
 			if (existing != null && existing.length > 0 && !Arrays.equals(existing, args)) {
 				throw new IllegalArgumentException(String.format("Command %s already registered with args %s, can not define different args as %s",
-						command.toString(), Arrays.toString(existing), Arrays.toString(args)));
+					command.toString(), Arrays.toString(existing), Arrays.toString(args)));
 			}
 		}
 
