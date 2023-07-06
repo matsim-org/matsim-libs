@@ -27,9 +27,6 @@ import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiControlerCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunMultiModeTaxiExample {
@@ -39,15 +36,6 @@ public class RunMultiModeTaxiExample {
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
 
-		Controler controler = TaxiControlerCreator.createControler(config, otfvis);
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(AnalysisMainModeIdentifier.class).to(TaxiExamplesAnalysisMainModeIdentifier.class);
-			}
-		});
-
-		controler.run();
+		TaxiControlerCreator.createControler(config, otfvis).run();
 	}
 }
