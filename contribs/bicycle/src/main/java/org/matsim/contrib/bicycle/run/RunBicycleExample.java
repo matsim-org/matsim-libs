@@ -31,10 +31,9 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -132,15 +131,6 @@ public class RunBicycleExample {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new BicycleModule() );
-
-		// If the bicycle contrib would simply use TransportMode.bike tehre would be no need to install a new analysis main mode identifier just to
-		// add the mode "bicycle"
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(AnalysisMainModeIdentifier.class).to(BicycleAnalysisMainModeIdentifier.class);
-			}
-		});
 
 		controler.run();
 	}
