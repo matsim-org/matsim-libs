@@ -215,12 +215,6 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         // set up a controler with individual main mode identifier at the point of this writing the default one seems broken
         Controler controler = createControler(scenario);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(AnalysisMainModeIdentifier.class).to(SimpleMainModeIdentifier.class);
-			}
-		});
         controler.run();
 
         // Assert that the slow agent takes the direct route
@@ -307,7 +301,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(90.0,legs.get(0).getTravelTime().seconds());
         Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
     }
-
+    
     @Test
     public void routingModeInEvents() {
 
@@ -324,10 +318,10 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         scenario.getPopulation().addPerson(person);
 
         Controler controler = createControler(scenario);
-
+        
         Set<String> legModes = new HashSet<>();
         Set<String> routingModes = new HashSet<>();
-
+        
         controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -340,9 +334,9 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 				});
 			}
 		});
-
+        
         controler.run();
-
+        
         Assert.equals(2, legModes.size());
         Assert.equals(1, routingModes.size());
         Assert.isTrue(legModes.contains("walk"));
@@ -429,7 +423,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
      * returns the mode of the first leg in a plan, which is not a walk (walk is now used as access/egress mode to network modes,
      * except if walk is routed on the network as network mode).
      */
-    private static class SimpleMainModeIdentifier implements AnalysisMainModeIdentifier {
+    private static class SimpleMainModeIdentifier implements MainModeIdentifier {
 
         @Override
         public String identifyMainMode(List<? extends PlanElement> tripElements) {
