@@ -1,7 +1,7 @@
 
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransportPlanningMainModeIdentifier.java
+ * DefaultAnalysisMainModeIdentifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -77,9 +77,9 @@ public final class DefaultAnalysisMainModeIdentifier implements AnalysisMainMode
 			if (pe instanceof Leg leg) {
 				int index = modeHierarchy.indexOf( leg.getMode() ) ;
 				if ( index < 0 ) {
-					log.error("unknown mode=" + leg.getMode() + "You are using a mode not included in matsim per default. Please bind your own " +
+					log.error("unknown mode=" + leg.getMode() + ". You are using a mode not included in matsim per default. Please bind your own " +
 						"AnalysisMainModeIdentifier that interprets all modes used in your scenario correctly.");
-					throw new RuntimeException("unknown mode=" + leg.getMode() ) ;
+					throw new RuntimeException("unknown mode in AnalysisMainModeIdentifier: " + leg.getMode() ) ;
 				}
 				if ( index > mainModeIndex ) {
 					mainModeIndex = index ;
