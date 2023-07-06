@@ -91,6 +91,8 @@ public class DrtAbortTest{
 
 		boolean rejectionModule = true;
 		config.controler().setLastIteration(50);
+		config.plans().setInputFile("plans_only_drt_4.0.xml.gz");
+//		config.global().setRandomSeed(9999);
 		{
 			StrategyConfigGroup.StrategySettings settings = new StrategyConfigGroup.StrategySettings();
 			settings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode);
@@ -103,16 +105,18 @@ public class DrtAbortTest{
 		}
 		{
 			ModeParams params = new ModeParams( TransportMode.bike );
-			params.setMarginalUtilityOfTraveling(-12.);
+			params.setMarginalUtilityOfTraveling(-6.);
 			config.planCalcScore().addModeParams( params );
 		}
 
 		for ( DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get( config ).getModalElements()) {
-			drtCfg.vehiclesFile = "vehicles-2-cap-4.xml";
+//			drtCfg.vehiclesFile = "vehicles-2-cap-4.xml";
+//			drtCfg.vehiclesFile = "vehicles-10-cap-4.xml";
+			drtCfg.vehiclesFile = "vehicles-20-cap-2.xml";
 
-			drtCfg.maxTravelTimeAlpha = 1.5;
-			drtCfg.maxTravelTimeBeta = 600.;
-			drtCfg.maxWaitTime = 300.;
+			drtCfg.maxTravelTimeAlpha = 1.0;
+			drtCfg.maxTravelTimeBeta = 900.;
+			drtCfg.maxWaitTime = 900.;
 			drtCfg.stopDuration = 10.;
 		}
 
@@ -350,9 +354,9 @@ public class DrtAbortTest{
 		// Key parameters
 		private final double timeBinSize = 900;
 		// Time bin to analyze the probability of being rejected
-		private final double rejectionCost = 12;
+		private final double rejectionCost = 6;
 		// 12 -> 2 hour of default performing score
-		private final double learningRate = 0.75;
+		private final double learningRate = 0.25;
 		// (1 - alpha) * old probability + alpha * new probability (0 < alpha <= 1)
 
 		@Inject private EventsManager events;
@@ -372,6 +376,7 @@ public class DrtAbortTest{
 		public void reset(int iteration) {
 			PassengerRequestRejectedEventHandler.super.reset(iteration);
 			if (iteration != 0) {
+				log.warn(probabilityOfRejectionPerTimeBin.values());
 				numberOfSubmissionsPerTimeBin.clear();
 				numberOfRejectionsPerTimeBin.clear();
 			}
