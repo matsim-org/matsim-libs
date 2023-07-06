@@ -45,6 +45,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -123,6 +124,12 @@ public class RunCarsharingIT {
 
 		final Controler controler = new Controler(scenario);
 		//		controler.setDirtyShutdown(true);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(CarSharingContribAnalysisMainModeIdentifier.class);
+			}
+		});
 
 		RunCarsharing.installCarSharing(controler);
 
