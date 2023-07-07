@@ -87,11 +87,11 @@ public final class DefaultAnalysisMainModeIdentifier implements AnalysisMainMode
 					 * above are used. However, with multiple modes besides walk and non_network_walk we need to know the hierarchy of those modes
 					 * to determine which of those is the main mode.
 					 */
-					if (unknownMode != null) {
+					if (unknownMode != null && !unknownMode.equals(leg.getMode())) {
 						log.error("Multiple unknown modes in one trip: " + leg.getMode() + " and " + unknownMode + ". The AnalysisMainModeIdentifier" +
-							"cannot determine which of those is the main mode because they are both unknown to it. Please bind your own " +
+							" cannot determine which of those is the main mode because they are both unknown to it. Please bind your own " +
 							"AnalysisMainModeIdentifier that interprets all modes used in your scenario correctly.");
-						throw new RuntimeException("unknown modes in AnalysisMainModeIdentifier: " + leg.getMode() + " and " + unknownMode ) ;
+						throw new IllegalStateException("unknown modes in AnalysisMainModeIdentifier: " + leg.getMode() + " and " + unknownMode ) ;
 					} else {
 						unknownMode = leg.getMode();
 					}
