@@ -47,16 +47,16 @@ public class DefaultAnalysisMainModeIdentifierTest {
 	public void failingModes() {
 
 		assertThatThrownBy(() -> mmi.identifyMainMode(legs("new_mode", TransportMode.walk, "other_new_mode"))).
-			hasCauseInstanceOf(IllegalStateException.class);
+			isInstanceOf(IllegalStateException.class);
 
 		assertThatThrownBy(() -> mmi.identifyMainMode(legs("new_mode", "other_new_mode"))).
-			hasCauseInstanceOf(IllegalStateException.class);
+			isInstanceOf(IllegalStateException.class);
 
 		assertThatThrownBy(() -> mmi.identifyMainMode(legs("new_mode", TransportMode.car))).
-			hasCauseInstanceOf(IllegalStateException.class);
+			isInstanceOf(IllegalStateException.class);
 
 		assertThatThrownBy(() -> mmi.identifyMainMode(legs(TransportMode.car, "new_mode"))).
-			hasCauseInstanceOf(IllegalStateException.class);
+			isInstanceOf(IllegalStateException.class);
 
 	}
 }
