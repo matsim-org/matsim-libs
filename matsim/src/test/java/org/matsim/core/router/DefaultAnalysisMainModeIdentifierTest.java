@@ -59,4 +59,14 @@ public class DefaultAnalysisMainModeIdentifierTest {
 			isInstanceOf(IllegalStateException.class);
 
 	}
+
+	@Test
+	public final void testIntermodalPtDrtTrip() {
+
+		assertThat(mmi.identifyMainMode(legs(TransportMode.non_network_walk, TransportMode.walk, TransportMode.non_network_walk,
+			TransportMode.drt, TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.walk)))
+			.isEqualTo(TransportMode.pt);
+
+	}
+
 }
