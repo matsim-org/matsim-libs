@@ -40,17 +40,20 @@ import java.util.concurrent.CompletableFuture;
 
 	private final BlockingQueue<List<Tag>> queue;
 	private final BlockingQueue<CompletableFuture<Person>> finishedPersonsQueue;
-
+	private final boolean isStreaming;
 
 	public ParallelPopulationReaderMatsimV6Runner(
 			final String inputCRS,
 			final String targetCRS,
 			final Scenario scenario,
 			final BlockingQueue<List<Tag>> tagQueue,
-			final BlockingQueue<CompletableFuture<Person>> finishedPersonsQueue) {
+			final BlockingQueue<CompletableFuture<Person>> finishedPersonsQueue,
+			final boolean isStreaming) {
 		super(inputCRS ,targetCRS, scenario);
 		this.queue = tagQueue;
 		this.finishedPersonsQueue = finishedPersonsQueue;
+		this.isStreaming = isStreaming;
+
 
 	}
 
@@ -78,9 +81,12 @@ import java.util.concurrent.CompletableFuture;
 						 * to the population.
 						 */
 						if (PERSON.equals(tag.name)) {
-							CompletableFuture<Person> cf = currentPersonTag.futurePerson;
-							cf.complete(currentPersonTag.person);
-							this.finishedPersonsQueue.put(cf);
+							if(isStreaming)
+							{
+								CompletableFuture<Person> cf = currentPersonTag.futurePerson;
+								cf.complete(currentPersonTag.person);
+								this.finishedPersonsQueue.put(cf);
+							}
 							this.currperson = null;
 							currentPersonTag = null;
 						}

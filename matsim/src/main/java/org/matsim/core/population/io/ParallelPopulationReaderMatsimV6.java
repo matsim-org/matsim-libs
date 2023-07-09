@@ -106,7 +106,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 							this.targetCRS,
 							this.scenario,
 							this.tagQueue,
-							this.personInsertionQueue);
+							this.personInsertionQueue,
+							this.isPopulationStreaming);
 			initObjectAttributeConverters(runner,this.getObjectAttributesConverter());
 
 			Thread thread = new Thread(runner);
@@ -195,9 +196,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 			for (int i = 0; i < this.numThreads; i++) {
 				this.tagQueue.add(List.of(new EndProcessingTag()));
 			}
-			CompletableFuture<Person> finishPerson = new CompletableFuture<>();
-			finishPerson.complete(null);
-			this.personInsertionQueue.add(finishPerson);
+			if(isPopulationStreaming)
+			{
+				CompletableFuture<Person> finishPerson = new CompletableFuture<>();
+				finishPerson.complete(null);
+				this.personInsertionQueue.add(finishPerson);
+			}
 
 			// wait for the threads to finish
 			try {
