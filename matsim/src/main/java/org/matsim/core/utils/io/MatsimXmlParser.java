@@ -192,8 +192,6 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 				SAXParser parser = factory.newSAXParser();
 				XMLReader reader = parser.getXMLReader();
 				reader.setContentHandler(this);
-//				reader.setErrorHandler(getErrorHandler());      // (**)
-//				reader.setEntityResolver(getEntityResolver()); // (**)
 				reader.setErrorHandler(this);
 				reader.setEntityResolver(this);
 				reader.parse(input);
@@ -205,17 +203,6 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 			throw new UncheckedIOException(e);
 		}
 	}
-
-	// the following may be useful.  But it is nowhere used, so I am not sure if we fully understand its longterm maintenance implications,
-	// so I rather comment it out. If it is needed somewhere, just comment it back in (and probably (**) above)
-	// and leave a comment.  kai, jul'16
-//	protected ErrorHandler getErrorHandler() {
-//		return this;
-//	}
-//
-//	protected EntityResolver getEntityResolver() {
-//		return this;
-//	}
 
 	public final String getDoctype() {
 		return this.doctype;
@@ -231,7 +218,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	@Override
 	public final InputSource resolveEntity(final String publicId, final String systemId) {
-		// ConfigReader* did override this.  Not sure if it did that for good reaons.  kai, jul'16
+		// ConfigReader* did override this.  Not sure if it did that for good reasons.  kai, jul'16
 
 		// extract the last part of the systemId
 		int index = systemId.replace('\\', '/').lastIndexOf('/');

@@ -87,11 +87,12 @@ public class MatsimXmlParserTest {
 	 */
 	@Test
 	public void testParsing_WindowsLinebreaks() {
-		String str = "<?xml version='1.0' encoding='UTF-8'?>\r\n" +
-				"<root>\r\n" +
-				"<dummy someAttribute=\"value1\">content</dummy>\r\n" +
-				"<dummy2 someAttribute2=\"value2\">content2</dummy2>\r\n" +
-				"</root>";
+		String str = """
+			<?xml version='1.0' encoding='UTF-8'?>\r
+			<root>\r
+			<dummy someAttribute="value1">content</dummy>\r
+			<dummy2 someAttribute2="value2">content2</dummy2>\r
+			</root>""";
 
 		TestParser parser = new TestParser();
 		parser.setValidating(false);
@@ -145,15 +146,16 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParse_parseEntities() throws IOException {
-		String xml = "<?xml version='1.0' encoding='UTF-8'?>\n" +
-				"<!DOCTYPE a SYSTEM \"network_v1.dtd\" [\n" +
-				"<!ENTITY B_VALUE  \"b2\">\n" +
-				"]>\n" +
-				"<a>\n" +
-				"<b>b1</b>\n" +
-				"<b>&B_VALUE;</b>\n" +
-				"</a>";
+	public void testParse_parseEntities() {
+		String xml = """
+			<?xml version='1.0' encoding='UTF-8'?>
+			<!DOCTYPE a SYSTEM "network_v1.dtd" [
+			<!ENTITY B_VALUE  "b2">
+			]>
+			<a>
+			<b>b1</b>
+			<b>&B_VALUE;</b>
+			</a>""";
 
 		InputStream stream = new ByteArrayInputStream(xml.getBytes());
 		final List<String> log = new ArrayList<>();
