@@ -274,7 +274,7 @@ import com.google.inject.Inject;
 		}
 		else {
 			throw new IllegalArgumentException(
-					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no', is " + sel);
 		}
 		this.routeDescription = null;
 		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
