@@ -24,6 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXParseException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -48,10 +49,10 @@ public class MatsimXmlParserTest {
 	public void testParsingReservedEntities_AttributeValue() {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value&quot;&amp;&lt;&gt;value\">content</dummy>";
-		
+
 		TestParser parser = new TestParser();
 		parser.setValidating(false);
-		
+
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
 		Assert.assertEquals("dummy", parser.lastStartTag);
 		Assert.assertEquals("dummy", parser.lastEndTag);
@@ -66,10 +67,10 @@ public class MatsimXmlParserTest {
 	public void testParsingReservedEntities_Content() {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value\">content&quot;&amp;&lt;&gt;content</dummy>";
-		
+
 		TestParser parser = new TestParser();
 		parser.setValidating(false);
-		
+
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
 		Assert.assertEquals("dummy", parser.lastStartTag);
 		Assert.assertEquals("dummy", parser.lastEndTag);
@@ -82,7 +83,7 @@ public class MatsimXmlParserTest {
 
 	/**
 	 * Tests that reading XML files with CRLF as newline characters works as expected.
-	 * Based on a (non-reproducible) bug message on the users-mailing list 2012-04-26. 
+	 * Based on a (non-reproducible) bug message on the users-mailing list 2012-04-26.
 	 */
 	@Test
 	public void testParsing_WindowsLinebreaks() {
@@ -94,7 +95,7 @@ public class MatsimXmlParserTest {
 
 		TestParser parser = new TestParser();
 		parser.setValidating(false);
-		
+
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
 		Assert.assertEquals("dummy2", parser.lastStartTag);
 		Assert.assertEquals("root", parser.lastEndTag);
@@ -103,14 +104,14 @@ public class MatsimXmlParserTest {
 		Assert.assertEquals("value2", parser.lastAttributes.getValue(0));
 		Assert.assertEquals("value2", parser.lastAttributes.getValue("someAttribute2"));
 	}
-	
+
 	private static class TestParser extends MatsimXmlParser {
 
 		public String lastStartTag = null;
 		public String lastEndTag = null;
 		public Attributes lastAttributes = null;
 		public String lastContent = null;
-		
+
 		@Override
 		public void startTag(String name, Attributes atts, Stack<String> context) {
 			this.lastStartTag = name;
@@ -122,14 +123,14 @@ public class MatsimXmlParserTest {
 			this.lastEndTag = name;
 			this.lastContent = content;
 		}
-		
+
 	}
-	
+
 	@Test
 	public void testParsingPlusSign() {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value+value\">content+content</dummy>";
-		
+
 		TestParser parser = new TestParser();
 		parser.setValidating(false);
 
@@ -171,6 +172,120 @@ public class MatsimXmlParserTest {
 
 		Assert.assertEquals("b1", log.get(0));
 		Assert.assertEquals("b2", log.get(1));
+	}
+
+	@Test
+	public void testParse_dtdValidation() {
+		String xml = """
+			<?xml version='1.0' encoding='UTF-8'?>
+			<!DOCTYPE network SYSTEM "network_v2.dtd" ><network>
+			<nodes>
+			<node id="abc" x="123" y="abc" />
+			<link id="def" from="abc" to="def" length="123" freespeed="13.33" capacity="2000" permlanes="1" />
+			</nodes>
+			</network>""";
+
+		InputStream stream = new ByteArrayInputStream(xml.getBytes());
+		final List<String> log = new ArrayList<>();
+
+		try {
+			new MatsimXmlParser() {
+				@Override
+				public void startTag(String name, Attributes atts, Stack<String> context) {
+					log.add(name);
+				}
+
+				@Override
+				public void endTag(String name, String content, Stack<String> context) {
+				}
+			}.parse(stream);
+			Assert.fail("expected exception.");
+		} catch (UncheckedIOException e) {
+			Assert.assertTrue(e.getCause() instanceof SAXParseException); // expected
+		}
+
+		Assert.assertEquals(4, log.size());
+		Assert.assertEquals("network", log.get(0));
+		Assert.assertEquals("nodes", log.get(1));
+		Assert.assertEquals("node", log.get(2));
+		Assert.assertEquals("link", log.get(3));
+	}
+
+	@Test
+	public void testParse_xsdValidationSuccess() {
+		String xml = """
+			<?xml version="1.0" encoding="UTF-8"?>
+
+			<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+				<vehicleType id="bus">
+					<capacity seats="70" standingRoomInPersons="0" />
+					<length meter="18.0"/>
+					<width meter="2.5"/>
+				</vehicleType>
+			</vehicleDefinitions>
+			""";
+
+		InputStream stream = new ByteArrayInputStream(xml.getBytes());
+		final List<String> log = new ArrayList<>();
+		new MatsimXmlParser() {
+			@Override
+			public void startTag(String name, Attributes atts, Stack<String> context) {
+				log.add(name);
+			}
+
+			@Override
+			public void endTag(String name, String content, Stack<String> context) {
+			}
+		}.parse(stream);
+
+		Assert.assertEquals(5, log.size());
+		Assert.assertEquals("vehicleDefinitions", log.get(0));
+		Assert.assertEquals("vehicleType", log.get(1));
+		Assert.assertEquals("capacity", log.get(2));
+		Assert.assertEquals("length", log.get(3));
+		Assert.assertEquals("width", log.get(4));
+	}
+
+	@Test
+	public void testParse_xsdValidationFailure() {
+		String xml = """
+			<?xml version="1.0" encoding="UTF-8"?>
+
+			<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+				<vehicleType id="bus">
+					<capacity seats="70" standingRoomInPersons="0" />
+					<length meter="18.0"/>
+					<width meter="2.5"/>
+					<foo meter="123.4"/> <!-- must not exist -->
+				</vehicleType>
+			</vehicleDefinitions>
+			""";
+
+		InputStream stream = new ByteArrayInputStream(xml.getBytes());
+		final List<String> log = new ArrayList<>();
+
+		try {
+			new MatsimXmlParser() {
+				@Override
+				public void startTag(String name, Attributes atts, Stack<String> context) {
+					log.add(name);
+				}
+
+				@Override
+				public void endTag(String name, String content, Stack<String> context) {
+				}
+			}.parse(stream);
+			Assert.fail("expected exception.");
+		} catch (UncheckedIOException e) {
+			Assert.assertTrue(e.getCause() instanceof SAXParseException); // expected
+		}
+
+		Assert.assertEquals(5, log.size());
+		Assert.assertEquals("vehicleDefinitions", log.get(0));
+		Assert.assertEquals("vehicleType", log.get(1));
+		Assert.assertEquals("capacity", log.get(2));
+		Assert.assertEquals("length", log.get(3));
+		Assert.assertEquals("width", log.get(4));
 	}
 
 	@Test
