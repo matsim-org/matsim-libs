@@ -22,7 +22,6 @@ package org.matsim.core.population.io;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.ParallelPopulationReaderMatsimV6.*;
 
 import java.util.List;
@@ -39,22 +38,14 @@ import java.util.concurrent.CompletableFuture;
 /* deliberately package */  class ParallelPopulationReaderMatsimV6Runner extends PopulationReaderMatsimV6 implements Runnable {
 
 	private final BlockingQueue<List<Tag>> queue;
-	private final BlockingQueue<CompletableFuture<Person>> finishedPersonsQueue;
-	private final boolean isStreaming;
 
 	public ParallelPopulationReaderMatsimV6Runner(
 			final String inputCRS,
 			final String targetCRS,
 			final Scenario scenario,
-			final BlockingQueue<List<Tag>> tagQueue,
-			final BlockingQueue<CompletableFuture<Person>> finishedPersonsQueue,
-			final boolean isStreaming) {
+			final BlockingQueue<List<Tag>> tagQueue) {
 		super(inputCRS ,targetCRS, scenario);
 		this.queue = tagQueue;
-		this.finishedPersonsQueue = finishedPersonsQueue;
-		this.isStreaming = isStreaming;
-
-
 	}
 
 	@Override
@@ -81,12 +72,8 @@ import java.util.concurrent.CompletableFuture;
 						 * to the population.
 						 */
 						if (PERSON.equals(tag.name)) {
-							if(isStreaming)
-							{
-								CompletableFuture<Person> cf = currentPersonTag.futurePerson;
-								cf.complete(currentPersonTag.person);
-								this.finishedPersonsQueue.put(cf);
-							}
+							CompletableFuture<Person> cf = currentPersonTag.futurePerson;
+							cf.complete(currentPersonTag.person);
 							this.currperson = null;
 							currentPersonTag = null;
 						}

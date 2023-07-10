@@ -105,9 +105,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 							this.inputCRS,
 							this.targetCRS,
 							this.scenario,
-							this.tagQueue,
-							this.personInsertionQueue,
-							this.isPopulationStreaming);
+							this.tagQueue);
 			initObjectAttributeConverters(runner,this.getObjectAttributesConverter());
 
 			Thread thread = new Thread(runner);
@@ -145,7 +143,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 		// If it is a new person, create a new person and a list for its attributes.
 		if (PERSON.equals(name)) {
 			// Just create a person, but do not add it here!
-			Person person = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
+			Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 			currentPersonXmlData = new ArrayList<>();
 			PersonTag personTag = new PersonTag();
 			personTag.person = person;
@@ -200,7 +198,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 			{
 				CompletableFuture<Person> finishPerson = new CompletableFuture<>();
 				finishPerson.complete(null);
-				this.personInsertionQueue.add(finishPerson);
+				try {
+					this.personInsertionQueue.put(finishPerson);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
 			}
 
 			// wait for the threads to finish
