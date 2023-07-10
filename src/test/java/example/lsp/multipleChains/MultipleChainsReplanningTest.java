@@ -5,6 +5,7 @@ import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,10 +32,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class MultipleChainsReplanningTest {
 
@@ -51,13 +49,13 @@ public class MultipleChainsReplanningTest {
 			.setCostPerTimeUnit(0.01)
 			.build();
 
-	Integer planCountBefore;
-	Integer planCountAfter;
+	Integer initialPlanCount;
+	Integer initialShipmentPlanCount;
+	Integer updatedPlanCount;
 
-	Integer shipmentCountBefore;
-	Integer shipmentCountAfter;
-
-	LSP lsp;
+	Integer initialShipmentsAssignedToChainCount;
+	Integer updatedShipmentPlanCount;
+	Integer updatedShipmentsAssignedToChainCount;
 
 	@Before
 	public void initialize() {
@@ -95,15 +93,17 @@ public class MultipleChainsReplanningTest {
 
 		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
-		lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
+		LSP lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
 
-		planCountBefore = lsp.getPlans().size();
-		shipmentCountBefore = lsp.getPlans().get(0).getLogisticChains().iterator().next().getShipmentIds().size();
+		initialPlanCount = lsp.getPlans().size();
+		initialShipmentPlanCount = lsp.getPlans().iterator().next().getShipmentPlans().size();
+		initialShipmentsAssignedToChainCount = lsp.getPlans().get(0).getLogisticChains().iterator().next().getShipmentIds().size();
 
 		controler.run();
 
-		planCountAfter = lsp.getPlans().size();
-		shipmentCountAfter = lsp.getPlans().get(1).getLogisticChains().iterator().next().getShipmentIds().size();
+		updatedPlanCount = lsp.getPlans().size();
+		updatedShipmentPlanCount = lsp.getPlans().iterator().next().getShipmentPlans().size();
+		updatedShipmentsAssignedToChainCount = lsp.getPlans().get(1).getLogisticChains().iterator().next().getShipmentIds().size();
 	}
 
 	private Config prepareConfig() {
@@ -179,7 +179,7 @@ public class MultipleChainsReplanningTest {
 					.addLogisticChainElement(rightCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = Utils.createRandomLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = Utils.createRoundRobinLogisticChainShipmentAssigner();
 			multipleOneEchelonChainsPlan = LSPUtils.createLSPPlan()
 					.addLogisticChain(leftChain)
 					.addLogisticChain(rightChain)
@@ -255,14 +255,19 @@ public class MultipleChainsReplanningTest {
 		return resourceList;
 	}
 
+	@Test
+	public void constantNumberOfShipments() {
+		assert initialShipmentPlanCount.equals(updatedShipmentPlanCount);
+	}
 
 	@Test
 	public void generatedInnovatedPlan() {
-		assert planCountBefore != planCountAfter;
+		assert !Objects.equals(initialPlanCount, updatedPlanCount);
 	}
 
 	@Test
 	public void shipmentDistributionChanged() {
-		assert shipmentCountBefore != shipmentCountAfter;
+		Assert.assertTrue("More shipments assigned chain than to LSP", updatedShipmentsAssignedToChainCount >= 0 && updatedShipmentsAssignedToChainCount <= 10);
+		assert !Objects.equals(initialShipmentsAssignedToChainCount, updatedShipmentsAssignedToChainCount);
 	}
 }
