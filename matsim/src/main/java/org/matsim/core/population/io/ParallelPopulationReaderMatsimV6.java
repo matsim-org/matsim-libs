@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
@@ -63,7 +62,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	private boolean reachedPersons = false;
 
-	private BlockingQueue<CompletableFuture<Person>> personInsertionQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<CompletableFuture<Person>> personInsertionQueue = new LinkedBlockingQueue<>();
 	private Thread personInsertionThread;
 
 	public ParallelPopulationReaderMatsimV6(
@@ -93,7 +92,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 	private static void initObjectAttributeConverters(ParallelPopulationReaderMatsimV6Runner runner, ObjectAttributesConverter converter)
 	{
 		Map<String, AttributeConverter<?>> targetConverter = runner.getObjectAttributesConverter().getConverters();
-		converter.getConverters().entrySet().forEach( e -> targetConverter.put(e.getKey(), e.getValue()));
+		targetConverter.putAll(converter.getConverters());
 	}
 
 	private void initThreads() {
