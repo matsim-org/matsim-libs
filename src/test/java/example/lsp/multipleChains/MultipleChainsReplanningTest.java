@@ -4,6 +4,7 @@ import lsp.*;
 import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlan;
 import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,6 +37,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 public class MultipleChainsReplanningTest {
 
 	@Rule
@@ -51,13 +54,13 @@ public class MultipleChainsReplanningTest {
 			.setCostPerTimeUnit(0.01)
 			.build();
 
-	Integer planCountBefore;
-	Integer planCountAfter;
+	int initialPlanCount;
+	int initialPlanShipmentPlanCount = 0;
 
-	Integer shipmentCountBefore;
-	Integer shipmentCountAfter;
-
-	LSP lsp;
+	int updatedPlanCount = 0;
+	int innovatedPlanShipmentPlanCount = 0;
+	int innovatedPlanFirstLogisticChainShipmentCount = 0;
+	boolean innovatedPlanHasEmptyShipmentPlanElements = false;
 
 	@Before
 	public void initialize() {
@@ -95,15 +98,24 @@ public class MultipleChainsReplanningTest {
 
 		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
-		lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
+		LSP lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
 
-		planCountBefore = lsp.getPlans().size();
-		shipmentCountBefore = lsp.getPlans().get(0).getLogisticChains().iterator().next().getShipmentIds().size();
+		initialPlanCount = lsp.getPlans().size();
+		initialPlanShipmentPlanCount = lsp.getPlans().get(0).getShipmentPlans().size();
 
 		controler.run();
 
-		planCountAfter = lsp.getPlans().size();
-		shipmentCountAfter = lsp.getPlans().get(1).getLogisticChains().iterator().next().getShipmentIds().size();
+		updatedPlanCount = lsp.getPlans().size();
+		innovatedPlanShipmentPlanCount = lsp.getPlans().get(1).getShipmentPlans().size();
+
+		innovatedPlanFirstLogisticChainShipmentCount = lsp.getPlans().get(1).getLogisticChains().iterator().next().getShipmentIds().size();
+		for (ShipmentPlan shipmentPlan : lsp.getPlans().get(1).getShipmentPlans()) {
+			if (shipmentPlan.getPlanElements().isEmpty()) {
+				innovatedPlanHasEmptyShipmentPlanElements = true;
+			}
+		}
+
+
 	}
 
 	private Config prepareConfig() {
@@ -257,12 +269,22 @@ public class MultipleChainsReplanningTest {
 
 
 	@Test
-	public void generatedInnovatedPlan() {
-		assert planCountBefore != planCountAfter;
+	public void testGeneratedInnovatedPlan() {
+		// a new innovative plan should have been added
+		assertEquals(initialPlanCount + 1, updatedPlanCount);
+
+		// number of shipmentPlans should remain the same
+		assertEquals(initialPlanShipmentPlanCount, innovatedPlanShipmentPlanCount);
 	}
 
 	@Test
-	public void shipmentDistributionChanged() {
-		assert shipmentCountBefore != shipmentCountAfter;
+	public void testShipmentDistributionChanged() {
+		// starting from 5 shipments, exactly one shipment should have shifted the logistic chain
+		assertTrue(innovatedPlanFirstLogisticChainShipmentCount == 4 || innovatedPlanFirstLogisticChainShipmentCount == 6);
+	}
+
+	@Test
+	public void testScheduledLogisticChains() {
+		assertFalse(innovatedPlanHasEmptyShipmentPlanElements);
 	}
 }
