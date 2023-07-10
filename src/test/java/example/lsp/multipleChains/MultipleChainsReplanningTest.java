@@ -55,11 +55,11 @@ public class MultipleChainsReplanningTest {
 			.build();
 
 	int initialPlanCount;
-	int initialPlanShipmentPlanCount = 0;
+	int initialPlanShipmentPlanCount;
 
-	int updatedPlanCount = 0;
-	int innovatedPlanShipmentPlanCount = 0;
-	int innovatedPlanFirstLogisticChainShipmentCount = 0;
+	int updatedPlanCount;
+	int innovatedPlanShipmentPlanCount;
+	int innovatedPlanFirstLogisticChainShipmentCount;
 	boolean innovatedPlanHasEmptyShipmentPlanElements = false;
 
 	@Before
@@ -191,7 +191,7 @@ public class MultipleChainsReplanningTest {
 					.addLogisticChainElement(rightCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = Utils.createRandomLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = Utils.createRoundRobinLogisticChainShipmentAssigner();
 			multipleOneEchelonChainsPlan = LSPUtils.createLSPPlan()
 					.addLogisticChain(leftChain)
 					.addLogisticChain(rightChain)
