@@ -53,13 +53,14 @@ public final class ConfigReader extends MatsimXmlParser {
 	/**
 	 * Creates a new reader for MATSim configuration files.
 	 *
-	 * @param config The Config-object to store the configuration settings in. 
+	 * @param config The Config-object to store the configuration settings in.
 	 * <p></p>
 	 * As far as I can tell, pre-existing settings in config are preserved
 	 * except if they are explicitly overwritten by entries in the config file.  The MATSim4UrbanSim initialization sequence depends on this
-	 * behavior.  kn, mar'13 
+	 * behavior.  kn, mar'13
 	 */
 	public ConfigReader(final Config config) {
+		super(ValidationType.DTD_ONLY);
 		this.config = config;
 	}
 
@@ -83,7 +84,7 @@ public final class ConfigReader extends MatsimXmlParser {
 	 */
 	public void readFile(final String filename, final String dtdFilename) throws UncheckedIOException {
 		// yyyyyy if this is a necessary/useful method, I would prefer it in the superclass.  kai, jul'16
-		
+
 		log.info("trying to read config from " + filename);
 	  this.localDtd = dtdFilename;
 		readFile(filename);

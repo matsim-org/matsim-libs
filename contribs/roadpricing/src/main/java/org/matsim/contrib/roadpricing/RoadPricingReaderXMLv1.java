@@ -55,6 +55,7 @@ public final class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	private boolean hasLinkCosts = false;
 
 	public RoadPricingReaderXMLv1(RoadPricingSchemeImpl scheme){
+		super(ValidationType.DTD_ONLY);
 		this.scheme = scheme;
 	}
 

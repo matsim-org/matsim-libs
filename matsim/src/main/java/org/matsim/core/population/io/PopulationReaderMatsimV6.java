@@ -131,14 +131,15 @@ import com.google.inject.Inject;
             final String inputCRS,
 			final String targetCRS,
 			final Scenario scenario) {
-		this.externalInputCRS = inputCRS;
-		this.targetCRS = targetCRS;
-		this.scenario = scenario;
-		this.plans = scenario.getPopulation();
-	    if (targetCRS != null && externalInputCRS !=null) {
-		    this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-		    ProjectionUtils.putCRS(this.plans, targetCRS);
-	    }
+			super(ValidationType.DTD_ONLY);
+			this.externalInputCRS = inputCRS;
+			this.targetCRS = targetCRS;
+			this.scenario = scenario;
+			this.plans = scenario.getPopulation();
+			if (targetCRS != null && externalInputCRS !=null) {
+				this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+				ProjectionUtils.putCRS(this.plans, targetCRS);
+			}
 	}
 
 	public ObjectAttributesConverter getObjectAttributesConverter()

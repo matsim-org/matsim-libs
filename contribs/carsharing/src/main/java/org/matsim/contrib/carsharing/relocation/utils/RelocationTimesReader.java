@@ -18,6 +18,10 @@ public class RelocationTimesReader extends MatsimXmlParser {
 
 	private Counter counter;
 
+	public RelocationTimesReader() {
+		super(ValidationType.DTD_ONLY);
+	}
+
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if ( name.equals("relocationTimes" ) ) {

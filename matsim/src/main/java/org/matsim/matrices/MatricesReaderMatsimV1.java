@@ -41,6 +41,7 @@ public class MatricesReaderMatsimV1<T> extends MatsimXmlParser {
 	private Matrix currMatrix = null;
 
 	public MatricesReaderMatsimV1(final Matrices matrices) {
+		super(ValidationType.DTD_ONLY);
 		this.matrices = matrices;
 	}
 

@@ -50,7 +50,7 @@ public class MatsimXmlParserTest {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value&quot;&amp;&lt;&gt;value\">content</dummy>";
 
-		TestParser parser = new TestParser();
+		TestParser parser = new TestParser(MatsimXmlParser.ValidationType.DTD_ONLY);
 		parser.setValidating(false);
 
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
@@ -68,7 +68,7 @@ public class MatsimXmlParserTest {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value\">content&quot;&amp;&lt;&gt;content</dummy>";
 
-		TestParser parser = new TestParser();
+		TestParser parser = new TestParser(MatsimXmlParser.ValidationType.DTD_ONLY);
 		parser.setValidating(false);
 
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
@@ -94,7 +94,7 @@ public class MatsimXmlParserTest {
 			<dummy2 someAttribute2="value2">content2</dummy2>\r
 			</root>""";
 
-		TestParser parser = new TestParser();
+		TestParser parser = new TestParser(MatsimXmlParser.ValidationType.DTD_ONLY);
 		parser.setValidating(false);
 
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
@@ -112,6 +112,10 @@ public class MatsimXmlParserTest {
 		public String lastEndTag = null;
 		public Attributes lastAttributes = null;
 		public String lastContent = null;
+
+		public TestParser(ValidationType validationType) {
+			super(validationType);
+		}
 
 		@Override
 		public void startTag(String name, Attributes atts, Stack<String> context) {
@@ -132,7 +136,7 @@ public class MatsimXmlParserTest {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value+value\">content+content</dummy>";
 
-		TestParser parser = new TestParser();
+		TestParser parser = new TestParser(MatsimXmlParser.ValidationType.DTD_ONLY);
 		parser.setValidating(false);
 
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
@@ -159,7 +163,7 @@ public class MatsimXmlParserTest {
 
 		InputStream stream = new ByteArrayInputStream(xml.getBytes());
 		final List<String> log = new ArrayList<>();
-		new MatsimXmlParser() {
+		new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_ONLY) {
 			{
 				this.setValidating(false);
 			}
@@ -191,7 +195,7 @@ public class MatsimXmlParserTest {
 		final List<String> log = new ArrayList<>();
 
 		try {
-			new MatsimXmlParser() {
+			new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_ONLY) {
 				@Override
 				public void startTag(String name, Attributes atts, Stack<String> context) {
 					log.add(name);
@@ -229,7 +233,7 @@ public class MatsimXmlParserTest {
 
 		InputStream stream = new ByteArrayInputStream(xml.getBytes());
 		final List<String> log = new ArrayList<>();
-		new MatsimXmlParser() {
+		new MatsimXmlParser(MatsimXmlParser.ValidationType.XSD_ONLY) {
 			@Override
 			public void startTag(String name, Attributes atts, Stack<String> context) {
 				log.add(name);
@@ -267,7 +271,7 @@ public class MatsimXmlParserTest {
 		final List<String> log = new ArrayList<>();
 
 		try {
-			new MatsimXmlParser() {
+			new MatsimXmlParser(MatsimXmlParser.ValidationType.XSD_ONLY) {
 				@Override
 				public void startTag(String name, Attributes atts, Stack<String> context) {
 					log.add(name);
@@ -314,7 +318,7 @@ public class MatsimXmlParserTest {
 
 		InputStream stream = new ByteArrayInputStream(xml.getBytes());
 		final List<String> log = new ArrayList<>();
-		new MatsimXmlParser() {
+		new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_ONLY) {
 			{
 				this.setValidating(false);
 			}
