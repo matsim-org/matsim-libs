@@ -189,10 +189,12 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	public final void parse(final InputSource input) throws UncheckedIOException {
 		try {
+			boolean useWstxParser = false;
 			SAXParserFactory factory;
 			if (!this.isValidating || this.validationType == ValidationType.DTD_ONLY || this.validationType == ValidationType.NO_VALIDATION) {
 				// use Woodstox-library as XML parser when no validation or only DTD-validation is required, as it is much faster than the default
 				factory = new WstxSAXParserFactory();
+				useWstxParser = true;
 			} else {
 				factory = SAXParserFactory.newInstance();
 			}
@@ -201,7 +203,9 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 			factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
 			if (this.isValidating) {
 				// enable optional support for XML Schemas
-				factory.setFeature("http://apache.org/xml/features/validation/schema", true);
+				if (!useWstxParser) {
+					factory.setFeature("http://apache.org/xml/features/validation/schema", true);
+				}
 				SAXParser parser = factory.newSAXParser();
 				XMLReader reader = parser.getXMLReader();
 				reader.setContentHandler(this);
