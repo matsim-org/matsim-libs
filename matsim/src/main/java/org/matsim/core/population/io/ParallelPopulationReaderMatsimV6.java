@@ -78,12 +78,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 		 * Check whether population streaming is activated
 		 */
 
-		if (scenario.getPopulation() instanceof StreamingPopulationReader.StreamingPopulation) {
-			// log.warn("Population streaming is activated - cannot use " + ParallelPopulationReaderMatsimV6.class.getName() + "!");
-			this.isPopulationStreaming = true;
-		} else {
-			isPopulationStreaming = false;
-		}
+		this.isPopulationStreaming = scenario.getPopulation() instanceof StreamingPopulationReader.StreamingPopulation;
+
+		// Set threads
 		if (scenario.getConfig().global().getNumberOfThreads() > 0) {
 			this.numThreads = Math.min(THREADS_LIMIT,scenario.getConfig().global().getNumberOfThreads());
 		} else this.numThreads = 1;
