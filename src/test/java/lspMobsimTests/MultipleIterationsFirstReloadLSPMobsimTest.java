@@ -20,7 +20,7 @@
 
 package lspMobsimTests;
 
-import example.lsp.multipleChains.AssignmentStrategyFactory;
+import example.lsp.lspReplanning.AssignmentStrategyFactory;
 import lsp.*;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;

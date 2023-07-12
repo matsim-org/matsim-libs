@@ -20,7 +20,7 @@
 
 package example.lsp.initialPlans;
 
-import example.lsp.multipleChains.AssignmentStrategyFactory;
+import example.lsp.lspReplanning.AssignmentStrategyFactory;
 import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;

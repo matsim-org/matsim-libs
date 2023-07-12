@@ -1,4 +1,4 @@
-package example.lsp.multipleChains;
+package example.lsp.lspReplanning;
 
 import lsp.LSP;
 import lsp.LSPPlan;
