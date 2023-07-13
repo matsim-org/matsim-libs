@@ -115,6 +115,21 @@ public final class VehicleUtils {
 	}
 
 	/**
+	 * Checks whether a person has a vehicle id for mode - without throwing an
+	 * exception if not.
+	 * 
+	 * @param person the person one wants to check for a vehicle id
+	 * @param mode   the mode for the vehicle id to check
+	 * @return whether person has a vehicle id for that mode
+	 * 
+	 * @see {@link VehicleUtils#getVehicleId(Person, String)}
+	 */
+	public static boolean hasVehicleId(Person person, String mode) {
+		PersonVehicles personVehicles = (PersonVehicles) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
+		return personVehicles != null && personVehicles.getVehicle(mode) != null;
+	}
+
+	/**
 	 * Retrieves vehicleIds of all vehicles that are assigned to the person.
 	 *
 	 * @param person the person one wants to retrieve vehicles for

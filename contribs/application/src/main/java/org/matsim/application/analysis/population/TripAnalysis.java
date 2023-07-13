@@ -101,7 +101,6 @@ public class TripAnalysis implements MATSimAppCommand {
 			persons = persons.where(persons.textColumn("person").matchesRegex(matchId));
 		}
 
-
 		// Home filter by standard attribute
 		if (shp.isDefined() && filter == LocationFilter.home) {
 			Geometry geometry = shp.getGeometry();

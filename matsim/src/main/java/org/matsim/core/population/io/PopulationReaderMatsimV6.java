@@ -74,7 +74,7 @@ import com.google.inject.Inject;
 
 	/* package */ final static String POPULATION = "population";
 	/* package */ final static String PERSON = "person";
-	private final static String ATTRIBUTES = "attributes";
+	/* package */ final static String ATTRIBUTES = "attributes";
 	private final static String ATTRIBUTE = "attribute";
 	private final static String PLAN = "plan";
 	private final static String ACT = "activity";

@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * PopulationAttributeConversionTest.java
@@ -62,11 +61,15 @@ public class StreamingPopulationAttributeConversionTest {
 		final Population population = scenario.getPopulation();
 		final PopulationFactory populationFactory = population.getFactory();
 
-		final Id<Person> personId = Id.createPersonId("Gaston");
-		final Person person = populationFactory.createPerson(personId);
+		final Id<Person> personId0 = Id.createPersonId("Gaston0");
 		final CustomClass attribute = new CustomClass("homme à tout faire");
-		person.getAttributes().putAttribute("job", attribute);
-		population.addPerson(person);
+		// create 10 test persons so we can actually test parallelism better
+		for (int i = 0; i < 10; i++) {
+			final Id<Person> personId = Id.createPersonId("Gaston" + i);
+			final Person person = populationFactory.createPerson(personId);
+			person.getAttributes().putAttribute("job", attribute);
+			population.addPerson(person);
+		}
 
 		final StreamingPopulationWriter writer = new StreamingPopulationWriter();
 		writer.putAttributeConverter(CustomClass.class, new CustomClassConverter());
@@ -79,7 +82,7 @@ public class StreamingPopulationAttributeConversionTest {
 		reader.putAttributeConverter(CustomClass.class, new CustomClassConverter());
 		readMethod.accept(reader);
 
-		final Person readPerson = readScenario.getPopulation().getPersons().get(personId);
+		final Person readPerson = readScenario.getPopulation().getPersons().get(personId0);
 		final Object readAttribute = readPerson.getAttributes().getAttribute("job");
 
 		Assert.assertEquals(
