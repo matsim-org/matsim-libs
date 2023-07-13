@@ -20,6 +20,7 @@
 
 package org.matsim.core.utils.io;
 
+import com.ctc.wstx.sax.WstxSAXParserFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
@@ -52,6 +53,8 @@ import java.util.zip.GZIPInputStream;
  */
 public abstract class MatsimXmlParser extends DefaultHandler implements MatsimReader {
 
+	public enum ValidationType { NO_VALIDATION, DTD_ONLY, XSD_ONLY, DTD_OR_XSD }
+
 	private static final Logger log = LogManager.getLogger(MatsimXmlParser.class);
 
 	private final Stack<StringBuffer> buffers = new Stack<>();
@@ -59,6 +62,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
+	private final ValidationType validationType;
 
 	private String localDtdBase = null;
 	// yy this is NOT working for me with "dtd", but it IS working with null.
@@ -75,8 +79,11 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	/**
 	 * Creates a validating XML-parser.
+	 *
+	 * @param validationType hint whether DTD or XSD is expected for validation, helps to optimize the parser for performance.
 	 */
-	public MatsimXmlParser() {
+	public MatsimXmlParser(ValidationType validationType) {
+		this.validationType = validationType;
 		String localDtd = System.getProperty("matsim.preferLocalDtds");
 		if (localDtd != null) {
 			this.preferLocalDtds = Boolean.parseBoolean(localDtd);
@@ -182,40 +189,56 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	public final void parse(final InputSource input) throws UncheckedIOException {
 		try {
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			factory.setValidating(this.isValidating);
-			factory.setNamespaceAware(this.isNamespaceAware);
-			factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
-			if (this.isValidating) {
-				// enable optional support for XML Schemas
-				factory.setFeature("http://apache.org/xml/features/validation/schema", true);
-				SAXParser parser = factory.newSAXParser();
-				XMLReader reader = parser.getXMLReader();
-				reader.setContentHandler(this);
-//				reader.setErrorHandler(getErrorHandler());      // (**)
-//				reader.setEntityResolver(getEntityResolver()); // (**)
-				reader.setErrorHandler(this);
-				reader.setEntityResolver(this);
-				reader.parse(input);
+			boolean validating = this.isValidating && this.validationType != ValidationType.NO_VALIDATION;
+			boolean useWstxParser = !validating || this.validationType == ValidationType.DTD_ONLY;
+
+			if (useWstxParser) {
+				// use Woodstox-library as XML parser when no validation or only DTD-validation is required, as it is much faster than the default (xerces)
+
+				WstxSAXParserFactory factory = new WstxSAXParserFactory();
+				factory.setValidating(validating);
+				factory.setNamespaceAware(this.isNamespaceAware);
+				factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
+
+				if (validating) {
+					factory.setFeature("validation", true); // required to enable DTD validation in Woodstox
+					SAXParser parser = factory.newSAXParser();
+					XMLReader reader = parser.getXMLReader();
+					reader.setContentHandler(this);
+					reader.setErrorHandler(this);
+					reader.setEntityResolver(this);
+					reader.parse(input);
+				} else {
+					SAXParser parser = factory.newSAXParser();
+					parser.parse(input, this);
+				}
+
 			} else {
-				SAXParser parser = factory.newSAXParser();
-				parser.parse(input, this);
+				// use the default (Xerces) SAX parser, it is slower than Woodstox, but supports XSD validation
+
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				factory.setValidating(validating);
+				factory.setNamespaceAware(this.isNamespaceAware);
+				factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
+
+				if (validating) {
+					// enable optional support for XML Schemas
+					factory.setFeature("http://apache.org/xml/features/validation/schema", true);
+					SAXParser parser = factory.newSAXParser();
+					XMLReader reader = parser.getXMLReader();
+					reader.setContentHandler(this);
+					reader.setErrorHandler(this);
+					reader.setEntityResolver(this);
+					reader.parse(input);
+				} else {
+					SAXParser parser = factory.newSAXParser();
+					parser.parse(input, this);
+				}
 			}
 		} catch (SAXException | ParserConfigurationException | IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
-
-	// the following may be useful.  But it is nowhere used, so I am not sure if we fully understand its longterm maintenance implications,
-	// so I rather comment it out. If it is needed somewhere, just comment it back in (and probably (**) above)
-	// and leave a comment.  kai, jul'16
-//	protected ErrorHandler getErrorHandler() {
-//		return this;
-//	}
-//
-//	protected EntityResolver getEntityResolver() {
-//		return this;
-//	}
 
 	public final String getDoctype() {
 		return this.doctype;
@@ -231,7 +254,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 
 	@Override
 	public final InputSource resolveEntity(final String publicId, final String systemId) {
-		// ConfigReader* did override this.  Not sure if it did that for good reaons.  kai, jul'16
+		// ConfigReader* did override this.  Not sure if it did that for good reasons.  kai, jul'16
 
 		// extract the last part of the systemId
 		int index = systemId.replace('\\', '/').lastIndexOf('/');
@@ -287,7 +310,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 			urlConn.setAllowUserInteraction(false);
 
 			InputStream is = urlConn.getInputStream();
-			/* If there was no exception until here, than the path is valid.
+			/* If there was no exception until here, then the path is valid.
 			 * Return the opened stream as a source. If we would return null, then the SAX-Parser
 			 * would have to fetch the same file again, requiring two accesses to the webserver */
 			return new InputSource(is);

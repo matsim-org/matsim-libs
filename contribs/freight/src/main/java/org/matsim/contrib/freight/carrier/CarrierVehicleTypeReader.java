@@ -40,7 +40,7 @@ import java.util.Stack;
 
 /**
  * Reader reading carrierVehicleTypes from a xml-file.
- * 
+ *
  * @author sschroeder
  *
  */
@@ -116,7 +116,8 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 		private MatsimXmlParser delegate = null;
 
 		CarrierVehicleTypeParser(CarrierVehicleTypes vehicleTypes) {
-			this.vehicleTypes = vehicleTypes ;
+			super(ValidationType.XSD_ONLY);
+			this.vehicleTypes = vehicleTypes;
 		}
 
 		@Override

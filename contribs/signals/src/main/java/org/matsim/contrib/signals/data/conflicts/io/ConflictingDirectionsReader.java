@@ -50,18 +50,19 @@ public final class ConflictingDirectionsReader extends MatsimXmlParser {
 	final static String DIRECTIONS_WITH_RIGHT_OF_WAY = "directionsWithRightOfWay";
 	final static String DIRECTIONS_WHICH_MUST_YIELD = "directionsWhichMustYield";
 	final static String NON_CONFLICTING_DIRECTIONS = "nonConflictingDirections";
-	
+
 	private ConflictData conflictData;
-	
+
 	private IntersectionDirections currentIntersection;
 	private Direction currentDirection;
-	
+
 	public ConflictingDirectionsReader(ConflictData conflictData) {
+		super(ValidationType.NO_VALIDATION);
 		this.conflictData = conflictData;
 		this.setValidating(false);
 	}
-	
-	
+
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		switch (name) {

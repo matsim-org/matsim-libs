@@ -34,7 +34,7 @@ import java.util.Stack;
 
 /**
  * A reader that reads carriers and their plans.
- * 
+ *
  * @author sschroeder
  *
  */
@@ -102,7 +102,8 @@ public class CarrierPlanXmlReader implements MatsimReader {
 		private MatsimXmlParser delegate = null;
 
 		CarriersPlanReader( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
-			this.carriers = carriers ;
+			super(ValidationType.XSD_ONLY);
+			this.carriers = carriers;
 			this.carrierVehicleTypes = carrierVehicleTypes;
 		}
 

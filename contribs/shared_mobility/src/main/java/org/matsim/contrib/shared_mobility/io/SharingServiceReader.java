@@ -12,13 +12,14 @@ public class SharingServiceReader extends MatsimXmlParser {
 	private final SharingServiceSpecification service;
 
 	public SharingServiceReader(SharingServiceSpecification service) {
+		super(ValidationType.DTD_ONLY);
 		this.service = service;
 	}
 
 	@Override
 	public void startTag(String name, Attributes attributes, Stack<String> context) {
 		if (name.equals("vehicle")) {
-			
+
 			service.addVehicle(ImmutableSharingVehicleSpecification.newBuilder() //
 					.id(Id.create(attributes.getValue("id"), SharingVehicle.class)) //
 					.startLinkId(attributes.getValue("startLink")==null ? null : Id.createLinkId(attributes.getValue("startLink"))) //
