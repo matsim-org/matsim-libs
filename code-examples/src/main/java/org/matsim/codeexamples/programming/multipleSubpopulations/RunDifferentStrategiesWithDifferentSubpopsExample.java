@@ -22,7 +22,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public final class RunDifferentStrategiesWithDifferentSubpopsExample{
 	// I haven't tested this.  kai, feb'19

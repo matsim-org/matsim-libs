@@ -54,7 +54,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.net.URL;
 
 public class RunWithinDayReplanningAgentExample {

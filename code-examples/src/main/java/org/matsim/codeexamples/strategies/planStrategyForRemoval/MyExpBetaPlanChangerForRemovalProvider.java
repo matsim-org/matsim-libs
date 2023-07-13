@@ -19,8 +19,8 @@
 
 package org.matsim.codeexamples.strategies.planStrategyForRemoval;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;

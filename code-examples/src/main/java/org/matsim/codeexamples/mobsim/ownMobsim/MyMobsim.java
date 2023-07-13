@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.mobsim.ownMobsim;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

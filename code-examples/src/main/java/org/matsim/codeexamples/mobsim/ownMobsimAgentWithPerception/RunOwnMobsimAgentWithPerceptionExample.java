@@ -22,7 +22,7 @@ package org.matsim.codeexamples.mobsim.ownMobsimAgentWithPerception;
 
 import java.net.URL;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

@@ -35,8 +35,8 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class RunWithMultithreadedModule {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("myStrategy").toProvider(new javax.inject.Provider<>() {
+				addPlanStrategyBinding("myStrategy").toProvider(new jakarta.inject.Provider<>() {
 					@Override
 					public PlanStrategy get() {
 
