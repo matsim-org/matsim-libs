@@ -210,11 +210,10 @@ public class MatsimXmlParserTest {
 			Assert.assertTrue(e.getCause() instanceof SAXParseException); // expected
 		}
 
-		Assert.assertEquals(4, log.size());
+		Assert.assertEquals(3, log.size());
 		Assert.assertEquals("network", log.get(0));
 		Assert.assertEquals("nodes", log.get(1));
 		Assert.assertEquals("node", log.get(2));
-		Assert.assertEquals("link", log.get(3));
 	}
 
 	@Test
@@ -295,7 +294,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParse_preventXEEattack() throws IOException {
+	public void testParse_preventXEEattack_woodstox() throws IOException {
 		// XEE: XML eXternal Entity attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
 
 		String secretValue = "S3CR3T";
@@ -318,23 +317,75 @@ public class MatsimXmlParserTest {
 
 		InputStream stream = new ByteArrayInputStream(xml.getBytes());
 		final List<String> log = new ArrayList<>();
-		new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_ONLY) {
+		try {
+			new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_ONLY) {
+				{
+					this.setValidating(false);
+				}
+
+				@Override
+				public void startTag(String name, Attributes atts, Stack<String> context) {
+				}
+
+				@Override
+				public void endTag(String name, String content, Stack<String> context) {
+					log.add(content);
+				}
+			}.parse(stream);
+			Assert.fail("Expected exception, got none.");
+		} catch (UncheckedIOException expected) {}
+
+		Assert.assertEquals(2, log.size());
+		Assert.assertEquals("b1", log.get(0));
+		Assert.assertEquals(" - b2 - ", log.get(1));
+	}
+
+	@Test
+	public void testParse_preventXEEattack_xerces() throws IOException {
+		// XEE: XML eXternal Entity attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
+
+		String secretValue = "S3CR3T";
+
+		File secretsFile = this.tempFolder.newFile("file-with-secrets.txt");
+		try (OutputStream out = new FileOutputStream(secretsFile)) {
+			out.write(secretValue.getBytes(StandardCharsets.UTF_8));
+		}
+
+		String xml = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+				"<!DOCTYPE objectattributes SYSTEM \"objectattributes_v1.dtd\" [\n" +
+				"<!ENTITY A_VALUE  \"a2\">\n" +
+				"<!ENTITY SECRET_VALUE SYSTEM \"file://" + secretsFile.getAbsolutePath() + "\">\n" +
+				"]>\n" +
+				"<objectattributes>\n" +
+				"<object id=\"one\">\n" +
+				"<attribute name=\"a\" class=\"java.lang.String\">&A_VALUE;</attribute>\n" +
+				"<attribute name=\"b\" class=\"java.lang.String\">&SECRET_VALUE;</attribute>\n" +
+				"</object>\n" +
+				"</objectattributes>";
+
+		InputStream stream = new ByteArrayInputStream(xml.getBytes());
+		final List<String> log = new ArrayList<>();
+		new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_OR_XSD) {
 			{
-				this.setValidating(false);
+				this.setValidating(true);
 			}
+
 			@Override
 			public void startTag(String name, Attributes atts, Stack<String> context) {
 			}
+
 			@Override
 			public void endTag(String name, String content, Stack<String> context) {
-				log.add(content);
+				System.out.println(name + "-" + content);
+				log.add(name + "-" + content);
 			}
 		}.parse(stream);
 
-		Assert.assertEquals("b1", log.get(0));
-		Assert.assertEquals(" - b2 - ", log.get(1));
-		Assert.assertEquals(" -  - ", log.get(2));
+		Assert.assertEquals(4, log.size());
+		Assert.assertEquals("attribute-a2", log.get(0));
+		Assert.assertEquals("attribute-", log.get(1));
+		Assert.assertEquals("object-", log.get(2));
+		Assert.assertEquals("objectattributes-", log.get(3));
 	}
-
 
 }
