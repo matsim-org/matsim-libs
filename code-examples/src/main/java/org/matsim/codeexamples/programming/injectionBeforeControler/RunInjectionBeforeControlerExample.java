@@ -15,6 +15,8 @@ import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModu
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import static org.matsim.core.controler.Injector.createMinimalMatsimInjector;
+
 /**
  * See NewControlerTest (which cannot be referenced via javadoc because tests cannot be referenced).
  * 
@@ -28,7 +30,7 @@ public class RunInjectionBeforeControlerExample {
 		config.controler().setLastIteration(1);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
-		com.google.inject.Injector injector = RunInjectionWithoutControlerExample.createMinimalMatsimInjector( config, scenario );
+		com.google.inject.Injector injector = createMinimalMatsimInjector( config, scenario );
 
 		ControlerI controler = injector.getInstance(ControlerI.class);
 		// So the trick is, other then with config and scenario, not to pass the injector into the controler.  But to get the controler out of the injector.
