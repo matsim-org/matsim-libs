@@ -101,8 +101,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 							this.inputCRS,
 							this.targetCRS,
 							this.scenario,
-							this.tagQueue);
-			initObjectAttributeConverters(runner,this.getObjectAttributesConverter());
+							this.tagQueue,
+							this.isPopulationStreaming);
+			initObjectAttributeConverters(runner, this.getObjectAttributesConverter());
 
 			Thread thread = new Thread(runner);
 			thread.setDaemon(true);

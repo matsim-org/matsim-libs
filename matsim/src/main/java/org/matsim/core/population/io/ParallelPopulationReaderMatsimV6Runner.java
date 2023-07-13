@@ -38,14 +38,17 @@ import java.util.concurrent.CompletableFuture;
 /* deliberately package */  class ParallelPopulationReaderMatsimV6Runner extends PopulationReaderMatsimV6 implements Runnable {
 
 	private final BlockingQueue<List<Tag>> queue;
+	private boolean isStreaming;
 
 	public ParallelPopulationReaderMatsimV6Runner(
 			final String inputCRS,
 			final String targetCRS,
 			final Scenario scenario,
-			final BlockingQueue<List<Tag>> tagQueue) {
+			final BlockingQueue<List<Tag>> tagQueue,
+			boolean isStreaming) {
 		super(inputCRS ,targetCRS, scenario);
 		this.queue = tagQueue;
+		this.isStreaming = isStreaming;
 	}
 
 	@Override
@@ -72,8 +75,12 @@ import java.util.concurrent.CompletableFuture;
 						 * to the population.
 						 */
 						if (PERSON.equals(tag.name)) {
-							CompletableFuture<Person> cf = currentPersonTag.futurePerson;
-							cf.complete(currentPersonTag.person);
+							if(isStreaming)
+							{
+								CompletableFuture<Person> cf = currentPersonTag.futurePerson;
+								cf.complete(currentPersonTag.person);
+							}
+
 							this.currperson = null;
 							currentPersonTag = null;
 						}
