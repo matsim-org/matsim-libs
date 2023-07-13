@@ -28,37 +28,6 @@ public final class RunAbcSimpleExample{
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		for( Person person : scenario.getPopulation().getPersons().values() ){
-			person.getAttributes().putAttribute( "income", 20. );
-
-		}
-
-
-
-		NetworkFactory nf = scenario.getNetwork().getFactory();
-
-
-		List<NetworkChangeEvent> changeEvents = new ArrayList<>();
-
-		for( Link link : scenario.getNetwork().getLinks().values() ){
-
-//			NetworkChangeEvent changeEvent = new NetworkChangeEvent( 8*3600. );
-//			changeEvent.addLink( link );
-//			NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue( OFFSET_IN_SI_UNITS, -10.*3.6 );
-//			changeEvent.setFreespeedChange( changeValue );
-//
-//			changeEvents.add( changeEvent );
-
-			link.getAttributes().putAttribute( "cobblestone", 20 );
-
-		}
-
-		NetworkUtils.writeNetwork( scenario.getNetwork(), "abc.xml" );
-
-		System.exit(-1);
-
-		NetworkUtils.setNetworkChangeEvents( scenario.getNetwork(), changeEvents );
-
 		Controler controler = new Controler( scenario );
 
 		controler.run() ;
