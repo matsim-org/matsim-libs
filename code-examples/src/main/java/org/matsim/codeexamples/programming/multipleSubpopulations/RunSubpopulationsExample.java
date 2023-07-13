@@ -79,7 +79,7 @@ public class RunSubpopulationsExample {
 				
 		// building and running the simulation based on the example scenario:
 		Config config;
-		if ( args != null && args.length!=0 && args[0]==null ) {
+		if ( args != null && args.length>0 && args[0]!=null ) {
 			config = ConfigUtils.loadConfig( args );
 		} else {
 			config = ConfigUtils.loadConfig( "scenarios/equil-extended/config-with-subpopulation.xml" );

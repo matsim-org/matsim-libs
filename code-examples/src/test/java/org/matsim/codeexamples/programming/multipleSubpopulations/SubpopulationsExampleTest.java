@@ -59,19 +59,22 @@ public class SubpopulationsExampleTest {
 					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
 					, "--config:controler.lastIteration=1"
 			} );
-			{
-				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
-				Assert.assertEquals( result, EventsFileComparator.Result.FILES_ARE_EQUAL );
-			}
+//			{
+//				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
+//				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
+//				EventsFileComparator.Result result = EventsUtils.compareEventsFiles( expected, actual );
+//				Assert.assertEquals( result, EventsFileComparator.Result.FILES_ARE_EQUAL );
+//			}
+			// (important that the subpopulations undergo different replanning, which is visible in the plans file.  The events file would
+			// also check for smallish other changes, which is (IMO) not needed here.  kai, jul'23)
+
 			{
 				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
 				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
 				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
 				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
 				boolean result = PopulationUtils.equalPopulation( expected, actual );
-				Assert.assertTrue( result );
+				Assert.assertTrue( "populations are different", result );
 
 				for( Person expectedPerson : expected.getPersons().values() ){
 					Person actualPerson = actual.getPersons().get( Id.createPersonId( expectedPerson.getId() ) );
