@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.matsim.core.controler.Injector.createMinimalMatsimInjector;
 import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists;
 
 /**
@@ -43,24 +44,6 @@ public class RunInjectionWithoutControlerExample{
 		TripRouter tripRouter = injector.getInstance( TripRouter.class ) ;
 		tripRouter.getRoutingModule( "car" ) ;
 		
-	}
-
-	static com.google.inject.Injector createMinimalMatsimInjector( Config config, Scenario scenario, Module... modules ){
-		// yyyyyy TODO move into org.matsim.core.Injector
-
-		final Collection<Module> theModules = new ArrayList<>();
-		theModules.add( new AbstractModule(){
-			@Override
-			public void install(){
-				install( new NewControlerModule() );
-				install( new ControlerDefaultCoreListenersModule() );
-				install( new ControlerDefaultsModule() );
-				install( new ScenarioByInstanceModule( scenario ) );
-			}
-		});
-		theModules.addAll( Arrays.asList( modules ) );
-
-		return Injector.createInjector( config, theModules.toArray(new Module[0]) );
 	}
 
 }
