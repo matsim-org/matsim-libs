@@ -20,6 +20,7 @@
 
 package example.lsp.initialPlans;
 
+import example.lsp.lspReplanning.AssignmentStrategyFactory;
 import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
@@ -146,7 +147,7 @@ import java.util.*;
 				// The above means there will be no replanning.  The below needs at least one strategy to be happy.  kai, jul'22
 				bind( LSPStrategyManager.class ).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1. );
+					strategyManager.addStrategy(new AssignmentStrategyFactory().createStrategy(), null, 1);
 					return strategyManager;
 				});
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
