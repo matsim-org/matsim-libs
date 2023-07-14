@@ -201,7 +201,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 				factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
 
 				if (validating) {
-					factory.setFeature("validation", true); // required to enable DTD validation in Woodstox
+					factory.setFeature("http://xml.org/sax/features/validation", true); // required to enable DTD validation in Woodstox
 					SAXParser parser = factory.newSAXParser();
 					XMLReader reader = parser.getXMLReader();
 					reader.setContentHandler(this);
