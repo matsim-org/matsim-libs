@@ -23,7 +23,6 @@ package lsp;
 
 import jakarta.inject.Inject;
 import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -45,21 +44,17 @@ import java.util.List;
 
 
 class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
-							  ReplanningListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+		ReplanningListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private static final Logger log = LogManager.getLogger( LSPControlerListener.class );
 	private final Scenario scenario;
-
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();
-//	private CarrierAgentTracker carrierResourceTracker;
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
 	@Inject private LSPScorerFactory lspScoringFunctionFactory;
 	@Inject @Nullable private LSPStrategyManager strategyManager;
 	@Inject private OutputDirectoryHierarchy controlerIO;
-
 	@Inject private CarrierAgentTracker carrierAgentTracker;
-
 	@Inject LSPControlerListener( Scenario scenario ) {
 		this.scenario = scenario;
 	}
@@ -123,9 +118,9 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 		strategyManager.run(lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext());
 
-			for (LSP lsp : lsps.getLSPs().values()) {
-				lsp.scheduleLogisticChains();
-			}
+		for (LSP lsp : lsps.getLSPs().values()) {
+			lsp.scheduleLogisticChains();
+		}
 
 		//Update carriers in scenario and CarrierAgentTracker
 		carrierAgentTracker.getCarriers().getCarriers().clear();
@@ -149,9 +144,9 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	}
 
 
-
 	Carriers getCarriersFromLSP() {
 		LSPs lsps = LSPUtils.getLSPs(scenario);
+		assert ! lsps.getLSPs().isEmpty();
 
 		Carriers carriers = new Carriers();
 		for (LSP lsp : lsps.getLSPs().values()) {
