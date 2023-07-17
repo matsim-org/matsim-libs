@@ -137,8 +137,6 @@ public class FixSubtourModes implements MATSimAppCommand, PersonAlgorithm {
 				}
 
 				fixed++;
-
-				throw e;
 			}
 		}
 
