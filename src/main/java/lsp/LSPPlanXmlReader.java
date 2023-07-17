@@ -79,6 +79,7 @@ public final class LSPPlanXmlReader implements MatsimReader {
 		private MatsimXmlParser delegate = null;
 
 		LSPsPlanParser(LSPs lsPs, Carriers carriers) {
+			super(ValidationType.XSD_ONLY);
 			this.lsPs = lsPs;
 			this.carriers = carriers;
 		}
