@@ -51,6 +51,7 @@ public class ExtractDriverBeeflyDetours {
 		private final Counter counter = new Counter( "reading person # " );
 
 		public PlansParser(final String outFile) {
+			super(ValidationType.DTD_OR_XSD);
 			writer = IOUtils.getBufferedWriter( outFile );
 			try {
 				writer.write( "driverId\tdirectDistance\taccessDistance\tjointDistance\tegressDistance" );

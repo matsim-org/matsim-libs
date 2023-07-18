@@ -40,6 +40,7 @@ public class OperationFacilitiesReader extends MatsimXmlParser {
 	private OperationFacilitySpecificationImpl.Builder currentBuilder;
 
 	public OperationFacilitiesReader(final OperationFacilitiesSpecification operationFacilities) {
+        super(ValidationType.NO_VALIDATION);
         log.info("Using " + this.getClass().getName());
         this.operationFacilities = operationFacilities;
         this.setValidating(false);
