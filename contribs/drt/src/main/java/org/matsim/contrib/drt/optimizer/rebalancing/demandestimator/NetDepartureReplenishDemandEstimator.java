@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
@@ -28,10 +27,9 @@ public class NetDepartureReplenishDemandEstimator
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
 	private final int timeBinSize;
-	private final Map<Double, Map<DrtZone, MutableInt>> currentZoneNetDepartureMap = new HashMap<>();
-	private final Map<Double, Map<DrtZone, MutableInt>> previousZoneNetDepartureMap = new HashMap<>();
+	private final Map<Double, Map<DrtZone, Integer>> currentZoneNetDepartureMap = new HashMap<>();
+	private final Map<Double, Map<DrtZone, Integer>> previousZoneNetDepartureMap = new HashMap<>();
 	private final Map<Id<Request>, Trip> potentialDrtTripsMap = new HashMap<>();
-	private static final MutableInt ZERO = new MutableInt(0);
 
 	public NetDepartureReplenishDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg,
 			FeedforwardRebalancingStrategyParams strategySpecificParams) {
@@ -70,8 +68,8 @@ public class NetDepartureReplenishDemandEstimator
 			var trip = potentialDrtTripsMap.remove(event.getRequestId());
 
 			var zoneNetDepartureMapSlice = currentZoneNetDepartureMap.computeIfAbsent(trip.timeBin, t -> new HashMap<>());
-			zoneNetDepartureMapSlice.computeIfAbsent(trip.fromZone, z -> new MutableInt()).increment();
-			zoneNetDepartureMapSlice.computeIfAbsent(trip.toZone, z -> new MutableInt()).decrement();
+			zoneNetDepartureMapSlice.merge(trip.fromZone, 1, Integer::sum);
+			zoneNetDepartureMapSlice.merge(trip.toZone, -1, Integer::sum);
 		}
 	}
 
@@ -84,7 +82,7 @@ public class NetDepartureReplenishDemandEstimator
 	}
 
 	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double timeBin) {
-		Map<DrtZone, MutableInt> expectedDemandForTimeBin = previousZoneNetDepartureMap.getOrDefault(timeBin, Collections.emptyMap());
-		return zone -> expectedDemandForTimeBin.getOrDefault(zone, ZERO).intValue();
+		var expectedDemandForTimeBin = previousZoneNetDepartureMap.getOrDefault(timeBin, Collections.emptyMap());
+		return zone -> expectedDemandForTimeBin.getOrDefault(zone, 0);
 	}
 }
