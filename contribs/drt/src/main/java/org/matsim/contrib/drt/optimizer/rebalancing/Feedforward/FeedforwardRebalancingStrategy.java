@@ -126,9 +126,9 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		if (feedforwardSignal.containsKey(timeBin)) {
 			// Generate relocations based on the "rebalancePlanCore"
 			for (Flow<DrtZone, DrtZone> rebalanceInfo : feedforwardSignal.get(timeBin)) {
-				DrtZone departureZone = rebalanceInfo.origin;
-				DrtZone arrivalZone = rebalanceInfo.destination;
-				int vehicleToSend = (int) Math.floor(scaling * rebalanceInfo.amount + rnd.nextDouble());
+				DrtZone departureZone = rebalanceInfo.origin();
+				DrtZone arrivalZone = rebalanceInfo.destination();
+				int vehicleToSend = (int) Math.floor(scaling * rebalanceInfo.amount() + rnd.nextDouble());
 				// Note: we use probability to solve the problem of non-integer value of
 				// vehileToSend after scaling.
 
