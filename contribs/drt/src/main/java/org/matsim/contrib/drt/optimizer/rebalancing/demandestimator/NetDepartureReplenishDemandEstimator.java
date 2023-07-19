@@ -76,10 +76,12 @@ public class NetDepartureReplenishDemandEstimator implements PassengerRequestSch
 		}
 	}
 
-	public void update(int iteration) {
+	public void updateForNextIteration() {
 		previousZoneNetDepartureMap.clear();
 		previousZoneNetDepartureMap.putAll(currentZoneNetDepartureMap);
 		currentZoneNetDepartureMap.clear();
+
+		potentialDrtTripsMap.clear();
 	}
 
 	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double timeBin) {

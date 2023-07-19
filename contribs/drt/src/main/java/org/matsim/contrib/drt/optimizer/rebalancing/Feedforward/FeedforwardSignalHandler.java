@@ -39,7 +39,7 @@ public class FeedforwardSignalHandler implements IterationStartsListener {
 	}
 
 	private void calculateFeedforwardSignal() {
-		netDepartureReplenishDemandEstimator.update(1);
+		netDepartureReplenishDemandEstimator.updateForNextIteration();
 		feedforwardSignal.clear();
 		int progressCounter = 0;
 		int numOfTimeBin = simulationEndTime * 3600 / timeBinSize;
@@ -67,8 +67,7 @@ public class FeedforwardSignalHandler implements IterationStartsListener {
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		int iteration = event.getIteration();
-		if (iteration > 0) {
+		if (event.getIteration() > 0) {
 			calculateFeedforwardSignal();
 		}
 	}
