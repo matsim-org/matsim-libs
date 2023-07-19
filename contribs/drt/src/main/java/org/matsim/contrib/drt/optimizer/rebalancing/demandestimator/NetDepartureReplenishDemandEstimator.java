@@ -42,16 +42,15 @@ public class NetDepartureReplenishDemandEstimator
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
 		if (event.getMode().equals(mode)) {
-			// If a request is rejected, remove the request info from the temporary storage place
+			// Ignore rejected request.
 			potentialDrtTripsMap.remove(event.getPersonId());
 		}
 	}
 
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
-		// Here, we get a potential DRT trip. We will first note it down in the
-		// temporary data base (Potential DRT Trips Map)
 		if (event.getMode().equals(mode)) {
+			// At the submission time, this is only a potential trip.
 			int timeBin = (int)Math.floor(event.getTime() / timeBinSize);
 			DrtZone departureZoneId = zonalSystem.getZoneForLinkId(event.getFromLinkId());
 			DrtZone arrivalZoneId = zonalSystem.getZoneForLinkId(event.getToLinkId());
@@ -61,10 +60,8 @@ public class NetDepartureReplenishDemandEstimator
 
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
-		// When the request is scheduled (i.e. accepted), add this travel information to
-		// the database;
-		// Then remove the travel information from the potential trips Map
 		if (event.getMode().equals(mode)) {
+			// A potential trip has been scheduled and needs to be considered in the departure maps.
 			var trip = potentialDrtTripsMap.remove(event.getRequestId());
 
 			var zoneNetDepartureMapSlice = currentZoneNetDepartureMap.computeIfAbsent(trip.timeBin, t -> new HashMap<>());
