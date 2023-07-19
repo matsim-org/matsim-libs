@@ -21,14 +21,14 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 public class NetDepartureReplenishDemandEstimator
 		implements PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
 
-	private record Trip(double timeBin, DrtZone fromZone, DrtZone toZone) {
+	private record Trip(int timeBin, DrtZone fromZone, DrtZone toZone) {
 	}
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
 	private final int timeBinSize;
-	private final Map<Double, Map<DrtZone, Integer>> currentZoneNetDepartureMap = new HashMap<>();
-	private final Map<Double, Map<DrtZone, Integer>> previousZoneNetDepartureMap = new HashMap<>();
+	private final Map<Integer, Map<DrtZone, Integer>> currentZoneNetDepartureMap = new HashMap<>();
+	private final Map<Integer, Map<DrtZone, Integer>> previousZoneNetDepartureMap = new HashMap<>();
 	private final Map<Id<Request>, Trip> potentialDrtTripsMap = new HashMap<>();
 
 	public NetDepartureReplenishDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg,
@@ -52,7 +52,7 @@ public class NetDepartureReplenishDemandEstimator
 		// Here, we get a potential DRT trip. We will first note it down in the
 		// temporary data base (Potential DRT Trips Map)
 		if (event.getMode().equals(mode)) {
-			double timeBin = Math.floor(event.getTime() / timeBinSize);
+			int timeBin = (int)Math.floor(event.getTime() / timeBinSize);
 			DrtZone departureZoneId = zonalSystem.getZoneForLinkId(event.getFromLinkId());
 			DrtZone arrivalZoneId = zonalSystem.getZoneForLinkId(event.getToLinkId());
 			potentialDrtTripsMap.put(event.getRequestId(), new Trip(timeBin, departureZoneId, arrivalZoneId));
@@ -81,7 +81,7 @@ public class NetDepartureReplenishDemandEstimator
 		potentialDrtTripsMap.clear();
 	}
 
-	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double timeBin) {
+	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(int timeBin) {
 		var expectedDemandForTimeBin = previousZoneNetDepartureMap.getOrDefault(timeBin, Collections.emptyMap());
 		return zone -> expectedDemandForTimeBin.getOrDefault(zone, 0);
 	}
