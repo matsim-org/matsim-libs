@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -24,6 +26,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.core.events.MobsimScopeEventHandler;
 
+import com.google.common.base.Preconditions;
+
 /**
  * This strategy is based on the Plus One Rebalancing Algorithm in AMoDeus.
  * At each rebalancing period, the algorithm will send idling vehicles to the departure places of the request departed
@@ -40,7 +44,10 @@ public class PlusOneRebalancingStrategy
 	private final Network network;
 	private final LinkBasedRelocationCalculator linkBasedRelocationCalculator;
 
-	private final List<Id<Link>> targetLinks = new ArrayList<>();
+	private record Target(Id<Link> link, double scheduledTime) {
+	}
+
+	private final Queue<Target> targets = new ConcurrentLinkedQueue<>();
 	private final Map<Id<Request>, Id<Link>> potentialTargetLinks = new HashMap<>();
 
 	public PlusOneRebalancingStrategy(String mode, Network network, LinkBasedRelocationCalculator linkBasedRelocationCalculator) {
@@ -49,24 +56,36 @@ public class PlusOneRebalancingStrategy
 		this.linkBasedRelocationCalculator = linkBasedRelocationCalculator;
 	}
 
+	private double lastCalculationTime = Double.NEGATIVE_INFINITY;
+
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
-		List<? extends DvrpVehicle> rebalancableVehicleList = rebalancableVehicles.collect(toList());
+		var targetLinks = new ArrayList<Link>();
+		double prevTime = lastCalculationTime;
 
-		final List<Id<Link>> copiedTargetLinks;
-		synchronized (this) {
-			//may happen in parallel to handling PassengerRequestScheduledEvent emitted by UnplannedRequestInserter
-			copiedTargetLinks = new ArrayList<>(targetLinks);
-			targetLinks.clear(); // clear the target map for next rebalancing cycle
+		// Because events can be received at the same time we calculate relocations, we want to only consider target links from events that are older
+		// than the current time
+		while (!targets.isEmpty() && targets.peek().scheduledTime < time) {
+			var targetLink = targets.poll();
+
+			// These state checks are meant to ensure we correctly reason about concurrency:
+			// 1. ensure all old target links (from previous rebalancing calculations are processed)
+			Preconditions.checkState(targetLink.scheduledTime >= lastCalculationTime);
+			// 2. ensure target links are sorted by scheduled time
+			Preconditions.checkState(targetLink.scheduledTime >= prevTime);
+
+			targetLinks.add(network.getLinks().get(targetLink.link));
+			prevTime = targetLink.scheduledTime;
 		}
 
-		final List<Link> targetLinkList = copiedTargetLinks.stream().map(network.getLinks()::get).collect(toList());
+		lastCalculationTime = time;
 
-		log.debug("There are in total " + targetLinkList.size() + " rebalance targets at this time period");
+		log.debug("There are in total " + targetLinks.size() + " rebalance targets at this time period");
+		var rebalancableVehicleList = rebalancableVehicles.collect(toList());
 		log.debug("There are " + rebalancableVehicleList.size() + " vehicles that can be rebalanced");
 
 		// calculate the matching result
-		return linkBasedRelocationCalculator.calcRelocations(targetLinkList, rebalancableVehicleList);
+		return linkBasedRelocationCalculator.calcRelocations(targetLinks, rebalancableVehicleList);
 	}
 
 	@Override
@@ -80,10 +99,7 @@ public class PlusOneRebalancingStrategy
 	public void handleEvent(PassengerRequestScheduledEvent event) {
 		if (event.getMode().equals(mode)) {
 			Id<Link> linkId = potentialTargetLinks.remove(event.getRequestId());
-			synchronized (this) {
-				// event was emitted by UnplannedRequestInserter, it may arrive during calcRelocations()
-				targetLinks.add(linkId);
-			}
+			targets.add(new Target(linkId, event.getTime()));
 		}
 	}
 
