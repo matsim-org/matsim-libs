@@ -79,7 +79,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 	private final List<LogisticChain> logisticChains = new LinkedList<>();
 
 	LSPPlanXmlParserV1( LSPs lsPs, Carriers carriers ) {
-		super();
+		super(ValidationType.XSD_ONLY);
 		this.lsPs = lsPs;
 		this.carriers = carriers;
 	}
