@@ -49,10 +49,10 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	private PopulationWriterHandler handler;
 	private final Population population;
 	private final Network network;
-	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
+	private final Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 
 	private final static Logger log = LogManager.getLogger(PopulationWriter.class);
-	private Map<Class<?>,AttributeConverter<?>> converters = new HashMap<>();
+	private final Map<Class<?>,AttributeConverter<?>> converters = new HashMap<>();
 
 
 	public PopulationWriter(final Population population) {
@@ -138,7 +138,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	 * Writes all plans to the file.
 	 */
 	@Override
-	public final void write(final String filename) {
+	public void write(final String filename) {
 		try {
 			this.handler.putAttributeConverters(converters);
 			this.openFile(filename);
@@ -161,7 +161,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	 * Writes all plans to the output stream and closes it.
 	 *
 	 */
-	public final void write(OutputStream outputStream) {
+	public void write(OutputStream outputStream) {
 		try {
 			this.handler.putAttributeConverters(converters);
 			this.openOutputStream(outputStream);
@@ -180,13 +180,13 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	}
 
 
-	private  final void writePersons() {
+	private void writePersons() {
 		for (Person p : PopulationUtils.getSortedPersons(this.population).values()) {
 			writePerson(p);
 		}
 	}
 
-	private final void writePerson(final Person person) {
+	private void writePerson(final Person person) {
 		try {
 			if ((this.write_person_fraction < 1.0) && (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction)) {
 				return;
@@ -198,22 +198,22 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 		}
 	}
 
-	public final void writeV0(final String filename) {
+	public void writeV0(final String filename) {
 		this.handler = new PopulationWriterHandlerImplV0( coordinateTransformation , this.network);
 		write(filename);
 	}
 
-	public final void writeV4(final String filename) {
+	public void writeV4(final String filename) {
 		this.handler = new PopulationWriterHandlerImplV4( coordinateTransformation , this.network );
 		write(filename);
 	}
 
-	public final void writeV5(final String filename) {
+	public void writeV5(final String filename) {
 		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
 		write(filename);
 	}
 
-	public final void writeV6(final String filename) {
+	public void writeV6(final String filename) {
 		if (FeatureFlags.useParallelIO()) {
 			this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
 			write(filename);
@@ -223,7 +223,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 		}
 	}
 
-	public final void writeV6(final OutputStream stream) {
+	public void writeV6(final OutputStream stream) {
 		if (FeatureFlags.useParallelIO()) {
 			this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
 			write(stream);
@@ -233,7 +233,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 		}
 	}
 
-	public final void setWriterHandler(final PopulationWriterHandler handler) {
+	public void setWriterHandler(final PopulationWriterHandler handler) {
 		this.handler = handler;
 	}
 
