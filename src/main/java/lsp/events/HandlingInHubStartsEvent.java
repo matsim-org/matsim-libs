@@ -40,6 +40,8 @@ public final class HandlingInHubStartsEvent extends AbstractLspEvent {
 	public static final String EVENT_TYPE = "Handling_started";
 	private final Id<LSPResource> hubId;
 
+	//TODO: Add more information about the handling, e.g. expected duration of handling.  KMT after mtg with kn, jul' 23
+
 	public HandlingInHubStartsEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId, Id<LSPResource> hubId) {
 		super(time, linkId, lspShipmentId);
 		this.hubId = hubId;
@@ -52,7 +54,6 @@ public final class HandlingInHubStartsEvent extends AbstractLspEvent {
 	public Id<LSPResource> getHubId() {
 		return hubId;
 	}
-
 
 	@Override
 	public Map<String, String> getAttributes() {

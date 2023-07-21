@@ -23,7 +23,6 @@ package lsp.resourceImplementations.transshipmentHub;
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
 import lsp.LogisticChainElement;
-import lsp.events.HandlingInHubEndsEvent;
 import lsp.events.HandlingInHubStartsEvent;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
@@ -166,7 +165,6 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 		{ // New event-based approach
 			//  Könnte sein, dass das jetzt funktioniert.  kai, may'23
 			eventsManager.processEvent(new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId));
-//			eventsManager.processEvent(new HandlingInHubEndsEvent(endTime, linkId, lspShipment.getId(), resourceId)); //TODO: vermutlich auch problematisch, weil in der Zwischenzeit noch weitere Events sind -> Chronologie ist nicht mehr gegeben :(
 		}
 
 	}

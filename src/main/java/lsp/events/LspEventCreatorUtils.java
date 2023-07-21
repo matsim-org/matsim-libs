@@ -41,7 +41,6 @@ public final class LspEventCreatorUtils {
 	public static Collection<LspEventCreator> getStandardEventCreators(){
 		List<LspEventCreator> creators = new ArrayList<>();
 		creators.add(new HandlingInHubStartsEventCreator());
-		creators.add(new HandlingInHubEndsEventCreator());
 		return creators;
 	}
 	
