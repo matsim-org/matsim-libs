@@ -38,6 +38,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.FeatureFlags;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 public final class PopulationWriter extends AbstractMatsimWriter implements MatsimWriter {
@@ -45,7 +46,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	private final double write_person_fraction;
 
 	private final CoordinateTransformation coordinateTransformation;
-	private PopulationWriterHandler handler = null;
+	private PopulationWriterHandler handler;
 	private final Population population;
 	private final Network network;
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
@@ -102,7 +103,11 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 		this.population = population;
 		this.network = network;
 		this.write_person_fraction = fraction;
-		this.handler = new ParallelPopulationWriterHandlerV6( coordinateTransformation );
+		if (FeatureFlags.useParallelIO()) {
+			this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
+		} else {
+			this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
+		}
 	}
 
 	/**
@@ -209,13 +214,23 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	}
 
 	public final void writeV6(final String filename) {
-		this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
-		write(filename);
+		if (FeatureFlags.useParallelIO()) {
+			this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
+			write(filename);
+		} else {
+			this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
+			write(filename);
+		}
 	}
 
 	public final void writeV6(final OutputStream stream) {
-		this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
-		write(stream);
+		if (FeatureFlags.useParallelIO()) {
+			this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
+			write(stream);
+		} else {
+			this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
+			write(stream);
+		}
 	}
 
 	public final void setWriterHandler(final PopulationWriterHandler handler) {

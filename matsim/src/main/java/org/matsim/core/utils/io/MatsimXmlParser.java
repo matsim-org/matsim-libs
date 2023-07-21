@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.utils.FeatureFlags;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -84,10 +85,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	 */
 	public MatsimXmlParser(ValidationType validationType) {
 		this.validationType = validationType;
-		String localDtd = System.getProperty("matsim.preferLocalDtds");
-		if (localDtd != null) {
-			this.preferLocalDtds = Boolean.parseBoolean(localDtd);
-		}
+		this.preferLocalDtds = FeatureFlags.preferLocalDTDs();
 	}
 
 	/**
