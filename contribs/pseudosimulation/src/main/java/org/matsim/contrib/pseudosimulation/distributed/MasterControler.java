@@ -405,7 +405,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         waitForSlaveThreads();
         linkTravelTimes = new SerializableLinkTravelTimes(matsimControler.getLinkTravelTimes(),
                 config.travelTimeCalculator().getTraveltimeBinSize(),
-                config.qsim().getEndTime().seconds(),
+				(int) config.qsim().getEndTime().seconds(),
                 scenario.getNetwork().getLinks().values());
         startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
         if (SelectedSimulationMode.equals(SimulationMode.SERIAL)) {
@@ -615,7 +615,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             maxMemory[i] = maxMemory[i] - bytesPerSlaveBuffer;
             overheadMemory[i] = usedMemory[i] - (personsPerSlave[i] * bytesPerPerson);
         }
-        fastestTimePerPlan = fastestTimePerPlan > 0 && !new Double(fastestTimePerPlan).equals(Double.POSITIVE_INFINITY) ? fastestTimePerPlan : 1;
+        fastestTimePerPlan = fastestTimePerPlan > 0 && !Double.valueOf(fastestTimePerPlan).equals(Double.POSITIVE_INFINITY) ? fastestTimePerPlan : 1;
         for (int i : newSlaves)
             timesPerPlan[i] = fastestTimePerPlan;
 //        adjust numbers taking account of memory avail on slaveHandlerTreeMap

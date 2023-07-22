@@ -48,7 +48,7 @@ public class ProfileWriter implements IterationEndsListener {
 
 	public interface ProfileView {
 		// times at which profile samples were collected
-		int[] times();
+		double[] times();
 
 		// map of sampled time profiles
 		ImmutableMap<String, double[]> profiles();
@@ -97,7 +97,7 @@ public class ProfileWriter implements IterationEndsListener {
 		return profiles.values().stream().map(profile -> profile[idx] + "");
 	}
 
-	private DefaultTableXYDataset createXYDataset(int[] times, Map<String, double[]> profiles) {
+	private DefaultTableXYDataset createXYDataset(double[] times, Map<String, double[]> profiles) {
 		List<XYSeries> seriesList = new ArrayList<>(profiles.size());
 		profiles.forEach((name, profile) -> {
 			XYSeries series = new XYSeries(name, true, false);
