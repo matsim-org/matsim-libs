@@ -319,12 +319,30 @@ public class TravelTimeCalculatorTest {
 		ttcalc.handleEvent(new LinkLeaveEvent(firstTimeBinStart + 3*timeBinSize + linkTravelTime2, vehId, link1.getId()));
 
 		double offset = 0.2; // offset of 0.2 seconds to test another time in the same time bin
+//		System.out.println("firstTimeBinStart - offset (" + (firstTimeBinStart - offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart - offset, null, null));
+//		System.out.println("firstTimeBinStart + offset (" + (firstTimeBinStart + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + offset, null, null));
+//		System.out.println("firstTimeBinStart + 1xtimeBinSize + offset (" + (firstTimeBinStart + 1*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 1*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + 2xtimeBinSize + offset (" + (firstTimeBinStart + 2*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 2*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + 3xtimeBinSize + offset (" + (firstTimeBinStart + 3*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 3*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + 4xtimeBinSize + offset (" + (firstTimeBinStart + 4*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 4*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + 5xtimeBinSize + offset (" + (firstTimeBinStart + 5*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 5*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + linkTravelTime1 + offset (" + (firstTimeBinStart + linkTravelTime1 + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + linkTravelTime1 + offset, null, null));
+//		System.out.println("firstTimeBinStart + 3xtimeBinSize + linkTravelTime2 + offset (" + (firstTimeBinStart + 3*timeBinSize + linkTravelTime2 + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 3*timeBinSize + linkTravelTime2 + offset, null, null));
 		assertEquals(linkTravelTime1, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + offset, null, null), MatsimTestUtils.EPSILON);
 		assertEquals(linkTravelTime1-timeBinSize, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 1*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
 		assertEquals(linkTravelTime1-2*timeBinSize, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 2*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
 		assertEquals(linkTravelTime2, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 3*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
 		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 4*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
 		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 5*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+
+		/*
+		 * This test results in strange rounding errors when 10.1 or 10.3 are used as linkTravelTime2.
+		 * The measured travel time in the fourth time bin is then 10.099 or 10.299 respectively.
+		 * For a linkTravelTime2 of 10.2 it works fine without rounding errors.
+		 * I assume this results from some double vs. float issue in the way travel times are calculated within MATSim, but I can't find it.
+		 * KN suggested to still commit it with 10.2 and write this comment... :-)
+		 * Theresa, Jul'23
+		 */
 	}
 
 	/**
