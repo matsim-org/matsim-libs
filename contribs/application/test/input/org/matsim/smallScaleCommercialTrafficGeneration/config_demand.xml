@@ -44,7 +44,7 @@
 		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
 		For 'qsim', add a module 'qsim' to the config. -->
 		<param name="mobsim" value="qsim" />
-		<param name="outputDirectory" value="test/output/org/matsim/smallScaleCommercialTrafficGeneration/RunCreateSmallScaleCommercialTrafficTest/testMainRunAndResults/" />
+		<param name="outputDirectory" value="test/output/org/matsim/smallScaleCommercialTrafficGeneration/RunGenerateSmallScaleCommercialTrafficTest/testMainRunAndResults/" />
 		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
 		<param name="overwriteFiles" value="overwriteExistingFiles" />
 		<!-- The type of routing (least cost path) algorithm used, may have the values: [Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks, SpeedyALT] -->

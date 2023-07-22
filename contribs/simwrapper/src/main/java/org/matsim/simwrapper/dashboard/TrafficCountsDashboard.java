@@ -102,6 +102,54 @@ public class TrafficCountsDashboard implements Dashboard {
 
 			});
 
+		layout.row("scatter")
+			.el(Plotly.class, (viz, data) -> {
+
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv"));
+
+				viz.title = "Traffic volumes by hour";
+				viz.description = "simulated vs. observed";
+				viz.fixedRatio = true;
+				viz.interactive = Plotly.Interactive.slider;
+				viz.height = 8.0;
+
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Observed traffic count").build())
+					.yAxis(Axis.builder().title("Simulated traffic count").build())
+					.build();
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(), ds.mapping()
+					.x("observed_traffic_volume")
+					.y("simulated_traffic_volume")
+					.text("name")
+					.name("hour")
+				);
+
+			})
+			.el(Plotly.class, (viz, data) -> {
+
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv"));
+
+				viz.title = "Daily traffic volumes";
+				viz.description = "simulated vs. observed";
+				viz.fixedRatio = true;
+				viz.height = 8.0;
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Observed traffic count").build())
+					.yAxis(Axis.builder().title("Simulated traffic count").build())
+					.build();
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(), ds.mapping()
+					.x("observed_traffic_volume")
+					.y("simulated_traffic_volume")
+					.text("name")
+					.name("road_type")
+				);
+
+			});
+
 		layout.row("map")
 			.el(MapPlot.class, (viz, data) -> {
 				viz.title = "Relative traffic volumes";
@@ -123,23 +171,38 @@ public class TrafficCountsDashboard implements Dashboard {
 			})
 			.el(Plotly.class, (viz, data) -> {
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv"));
-
-				viz.title = "Daily traffic volumes";
-				viz.description = "simulated vs. observed";
-				viz.fixedRatio = true;
+				viz.title = "Avg. error / bias";
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Observed traffic count").build())
-					.yAxis(Axis.builder().title("Simulated traffic count").build())
+					.xAxis(Axis.builder().title("Hour").build())
+					.yAxis(Axis.builder().title("Mean rel. error [%]").build())
+					.yAxis2(Axis.builder().title("Mean (abs.) error [veh/h]")
+						.side(Axis.Side.right)
+						.overlaying(ScatterTrace.YAxis.Y)
+						.build())
 					.build();
 
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(), ds.mapping()
-					.x("observed_traffic_volume")
-					.y("simulated_traffic_volume")
-					.text("name")
-					.name("road_type")
-				);
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_error_by_hour.csv"));
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE)
+					.name("Mean rel. error")
+					.build(), ds.mapping()
+					.x("hour")
+					.y("mean_rel_error"));
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.mode(ScatterTrace.Mode.LINE).yAxis(ScatterTrace.YAxis.Y2)
+					.name("Mean abs. error")
+					.build(), ds.mapping()
+					.x("hour")
+					.y("mean_abs_error"));
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.mode(ScatterTrace.Mode.LINE).yAxis(ScatterTrace.YAxis.Y2)
+					.name("Mean bias")
+					.build(), ds.mapping()
+					.x("hour")
+					.y("mean_bias"));
 
 			});
 
@@ -148,7 +211,7 @@ public class TrafficCountsDashboard implements Dashboard {
 
 				viz.title = "Count stations";
 				viz.description = "hourly comparison";
-				viz.dropdownMenu = true;
+				viz.interactive = Plotly.Interactive.dropdown;
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv"));
 

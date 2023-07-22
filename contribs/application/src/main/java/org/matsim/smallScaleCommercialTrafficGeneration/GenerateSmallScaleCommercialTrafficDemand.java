@@ -85,9 +85,23 @@ import java.util.stream.Collectors;
  *
  */
 @CommandLine.Command(name = "generate-small-scale-commercial-traffic", description = "Generates plans for a small scale commercial traffic model", showDefaultValues = true)
-public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand {
+public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppCommand {
+	// goodsTraffic --> goodsTraffic -> Done: RE
+	// commercialPersonTraffic --> commercialPersonTraffic -> Done: RE
 
-	private static final Logger log = LogManager.getLogger(CreateSmallScaleCommercialTrafficDemand.class);
+	// small scale commercial person traffic ... "Krankenschwester" ... in "commercialPersonTraffic". -> Done: RE
+	// small scale commercial goods traffic ... "Essen auf Rädern" ... in "goodsTraffic'. -> Done: RE
+
+	// freight traffic from extern:
+
+	// Option 1: take "as is" from Chengqi code.
+
+	// Option 2: differentiate FTL and LTL by Gütergruppe.  FTL as in option 1.  LTL per Gütergruppe _ein_ Ziel in Zone, = "Hub".  Verteilverkehr
+	// von dort.  Startseite genauso.
+
+	// Option 3: Leerkamp (nur in RVR Modell).
+
+	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 	private static final HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 	private static final HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 
@@ -99,14 +113,14 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		useOnlyOSMLanduse, useOSMBuildingsAndLanduse, useExistingDataDistribution
 	}
 
-	private enum TrafficType {
-		businessTraffic, freightTraffic, commercialTraffic
+	private enum SmallScaleCommercialTrafficType {
+		commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic
 	}
 
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the freight data directory")
 	private Path inputDataDirectory;
 
-	@CommandLine.Option(names = "--sample", description = "Scaling factor of the freight traffic (0, 1)", required = true)
+	@CommandLine.Option(names = "--sample", description = "Scaling factor of the small scale commercial traffic (0, 1)", required = true)
 	private double sample;
 
 	@CommandLine.Option(names = "--jspritIterations", description = "Set number of jsprit iterations", required = true)
@@ -118,8 +132,8 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	@CommandLine.Option(names = "--landuseConfiguration", description = "Set option of used OSM data. Options: useOnlyOSMLanduse, useOSMBuildingsAndLanduse, useExistingDataDistribution")
 	private LanduseConfiguration usedLanduseConfiguration;
 
-	@CommandLine.Option(names = "--trafficType", description = "Select traffic type. Options: businessTraffic, freightTraffic, commercialTraffic (contains both types)")
-	private TrafficType usedTrafficType;
+	@CommandLine.Option(names = "--smallScaleCommercialTrafficType", description = "Select traffic type. Options: commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic (contains both types)")
+	private SmallScaleCommercialTrafficType usedSmallScaleCommercialTrafficType;
 
 	@CommandLine.Option(names = "--includeExistingModels", description = "If models for some segments exist they can be included.")
 	private boolean includeExistingModels;
@@ -145,13 +159,13 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	@CommandLine.Option(names = "--numberOfPlanVariantsPerAgent", description = "If an agent should have variant plans, you should set this paramter.", defaultValue = "1")
 	private int numberOfPlanVariantsPerAgent;
 
-	@CommandLine.Option(names = "--PathOutput", description = "Path for the output")
+	@CommandLine.Option(names = "--pathOutput", description = "Path for the output")
 	private Path output;
 
 	private SplittableRandom rnd;
 
 	public static void main(String[] args) {
-		System.exit(new CommandLine(new CreateSmallScaleCommercialTrafficDemand()).execute(args));
+		System.exit(new CommandLine(new GenerateSmallScaleCommercialTrafficDemand()).execute(args));
 	}
 
 	@Override
@@ -167,7 +181,6 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		output = Path.of(config.controler().getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		String carriersFileLocation;
 		FreightConfigGroup freightConfigGroup;
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution -> {
@@ -206,16 +219,17 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 								shapeFileBuildingsPath, shapeCRS, buildingsPerZone);
 				ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
 				Map<String, HashMap<Id<Link>, Link>> regionLinksMap = filterLinksForZones(scenario, shpZones,
-						SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS));
-				switch (usedTrafficType) {
-					case businessTraffic, freightTraffic ->
-							createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, usedTrafficType.toString(),
+						SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS), buildingsPerZone);
+
+				switch (usedSmallScaleCommercialTrafficType) {
+					case commercialPersonTraffic, goodsTraffic ->
+							createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, usedSmallScaleCommercialTrafficType.toString(),
 									inputDataDirectory, includeExistingModels);
-					case commercialTraffic -> {
-						createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "businessTraffic",
+					case completeSmallScaleCommercialTraffic -> {
+						createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "commercialPersonTraffic",
 								inputDataDirectory, includeExistingModels);
 						includeExistingModels = false; // because already included in the step before
-						createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "freightTraffic",
+						createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "goodsTraffic",
 								inputDataDirectory, includeExistingModels);
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
@@ -239,7 +253,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		Controler controler = prepareControler(scenario);
 		controler.run();
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
-				usedTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
+				usedSmallScaleCommercialTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
 		return 0;
 	}
 
@@ -380,33 +394,33 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 
 	private void createCarriersAndDemand(Config config, Path output, Scenario scenario, ShpOptions shpZones,
 			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone,
-			Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String usedTrafficType, Path inputDataDirectory,
+			Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType, Path inputDataDirectory,
 			boolean includeExistingModels) throws Exception {
 
 		ArrayList<String> modesORvehTypes;
-		if (usedTrafficType.equals("freightTraffic"))
+		if (smallScaleCommercialTrafficType.equals("goodsTraffic"))
 			modesORvehTypes = new ArrayList<>(
 					Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
-		else if (usedTrafficType.equals("businessTraffic"))
+		else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic"))
 			modesORvehTypes = new ArrayList<>(List.of("total"));
 		else
 			throw new Exception("Invalid traffic type selected!");
 
-		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
+		TrafficVolumeGeneration.setInputParameters(smallScaleCommercialTrafficType);
 
 		HashMap<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start = TrafficVolumeGeneration
-				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_start(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType);
 		HashMap<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
-				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
+				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType);
 
 		if (includeExistingModels) {
 			SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
-			TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, usedTrafficType,
+			TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, smallScaleCommercialTrafficType,
 					trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
 		final TripDistributionMatrix odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
-				trafficVolumePerTypeAndZone_stop, shpZones, usedTrafficType, scenario, output, regionLinksMap);
-		createCarriers(config, scenario, odMatrix, resultingDataPerZone, usedTrafficType, regionLinksMap);
+				trafficVolumePerTypeAndZone_stop, shpZones, smallScaleCommercialTrafficType, scenario, output, regionLinksMap);
+		createCarriers(config, scenario, odMatrix, resultingDataPerZone, smallScaleCommercialTrafficType, regionLinksMap);
 	}
 
 	/** Reads and checks config if all necessary parameter are set.
@@ -416,7 +430,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		Config config = ConfigUtils.loadConfig(inputDataDirectory.resolve("config_demand.xml").toString());
 		if (output == null)
 			config.controler().setOutputDirectory(Path.of(config.controler().getOutputDirectory()).resolve(modelName)
-				.resolve(usedTrafficType.toString() + "_" + sampleName + "pct" + "_"
+				.resolve(usedSmallScaleCommercialTrafficType.toString() + "_" + sampleName + "pct" + "_"
 						+ java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay() + "_" + resistanceFactor)
 				.toString());
 		else
@@ -461,7 +475,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	 * TripDistributionMatrix.
 	 */
 	private void createCarriers(Config config, Scenario scenario, TripDistributionMatrix odMatrix,
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, String trafficType,
+			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, String smallScaleCommercialTrafficType,
 			Map<String, HashMap<Id<Link>, Link>> regionLinksMap) {
 		int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
 				* odMatrix.getListOfModesOrVehTypes().size();
@@ -486,7 +500,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 						for (String possibleStopZone : odMatrix.getListOfZones()) {
 							if (!modeORvehType.equals("pt") && !modeORvehType.equals("op"))
 								if (odMatrix.getTripDistributionValue(startZone, possibleStopZone, modeORvehType,
-										purpose, trafficType) != 0) {
+										purpose, smallScaleCommercialTrafficType) != 0) {
 									isStartingLocation = true;
 									break checkIfIsStartingPosition;
 								}
@@ -499,9 +513,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 						ArrayList<String> startCategory = new ArrayList<>();
 						ArrayList<String> stopCategory = new ArrayList<>();
 						if (purpose == 1) {
-							if (trafficType.equals("freightTraffic")) {
+							if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 								occupancyRate = 1.;
-							} else if (trafficType.equals("businessTraffic")) {
+							} else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[] { "vwCaddy", "e_SpaceTourer"};
 								serviceTimePerStop = (int) Math.round(71.7 * 60);
 								occupancyRate = 1.5;
@@ -509,9 +523,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 							startCategory.add("Employee Secondary Sector Rest");
 							stopCategory.add("Employee Secondary Sector Rest");
 						} else if (purpose == 2) {
-							if (trafficType.equals("freightTraffic")) {
+							if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 								occupancyRate = 1.;
-							} else if (trafficType.equals("businessTraffic")) {
+							} else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[] { "vwCaddy", "e_SpaceTourer"};
 								serviceTimePerStop = (int) Math.round(70.4 * 60); // Durschnitt aus Handel,Transp.,Einw.
 								occupancyRate = 1.6;
@@ -525,9 +539,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 							stopCategory.add("Employee Tertiary Sector Rest");
 							stopCategory.add("Inhabitants");
 						} else if (purpose == 3) {
-							if (trafficType.equals("freightTraffic")) {
+							if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 								occupancyRate = 1.;
-							} else if (trafficType.equals("businessTraffic")) {
+							} else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[] { "golf1.4", "c_zero" };
 								serviceTimePerStop = (int) Math.round(70.4 * 60);
 								occupancyRate = 1.2;
@@ -542,9 +556,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 							stopCategory.add("Employee Tertiary Sector Rest");
 							stopCategory.add("Inhabitants");
 						} else if (purpose == 4) {
-							if (trafficType.equals("freightTraffic")) {
+							if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 								occupancyRate = 1.;
-							} else if (trafficType.equals("businessTraffic")) {
+							} else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[] { "golf1.4", "c_zero" };
 								serviceTimePerStop = (int) Math.round(100.6 * 60);
 								occupancyRate = 1.2;
@@ -558,9 +572,9 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 							stopCategory.add("Employee Tertiary Sector Rest");
 							stopCategory.add("Inhabitants");
 						} else if (purpose == 5) {
-							if (trafficType.equals("freightTraffic")) {
+							if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 								occupancyRate = 1.;
-							} else if (trafficType.equals("businessTraffic")) {
+							} else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[] { "mercedes313", "e_SpaceTourer" };
 								serviceTimePerStop = (int) Math.round(214.7 * 60);
 								occupancyRate = 1.7;
@@ -584,7 +598,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 							stopCategory.add("Employee Tertiary Sector Rest");
 							stopCategory.add("Inhabitants");
 						}
-						if (trafficType.equals("freightTraffic")) {
+						if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 							switch (modeORvehType) {
 								case "vehTyp1" -> {
 									possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"}; // possible to add more types, see source
@@ -622,12 +636,12 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 							selectedStartCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
 
 						String carrierName = null;
-						if (trafficType.equals("freightTraffic")) {
+						if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 							carrierName = "Carrier_Freight_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
-						} else if (trafficType.equals("businessTraffic"))
+						} else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic"))
 							carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
 						int numberOfDepots = odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType, purpose,
-								trafficType);
+								smallScaleCommercialTrafficType);
 						FleetSize fleetSize = FleetSize.FINITE;
 						int fixedNumberOfVehiclePerTypeAndLocation = 1; //TODO possible improvement
 						ArrayList<String> vehicleDepots = new ArrayList<>();
@@ -636,14 +650,14 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 								+ maxNumberOfCarrier + " carriers.");
 						log.info("Carrier: " + carrierName + "; depots: " + numberOfDepots + "; services: "
 								+ (int) Math.ceil(odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType,
-										purpose, trafficType) / occupancyRate));
+										purpose, smallScaleCommercialTrafficType) / occupancyRate));
 						createNewCarrierAndAddVehicleTypes(scenario, purpose, startZone,
 								selectedStartCategory, carrierName, vehicleTypes, numberOfDepots, fleetSize,
-								fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, regionLinksMap, trafficType);
+								fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, regionLinksMap, smallScaleCommercialTrafficType);
 						log.info("Create services for carrier: " + carrierName);
 						for (String stopZone : odMatrix.getListOfZones()) {
 							int trafficVolumeForOD = Math.round(odMatrix.getTripDistributionValue(startZone,
-									stopZone, modeORvehType, purpose, trafficType));
+									stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
 							int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / occupancyRate);
 							if (numberOfJobs == 0)
 								continue;
@@ -693,7 +707,7 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	private void createNewCarrierAndAddVehicleTypes(Scenario scenario, Integer purpose, String startZone,
 													String selectedStartCategory, String carrierName,
 													List<String> vehicleTypes, int numberOfDepots, FleetSize fleetSize, int fixedNumberOfVehiclePerTypeAndLocation,
-													ArrayList<String> vehicleDepots, Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String trafficType) {
+													ArrayList<String> vehicleDepots, Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType) {
 
 		Carriers carriers = FreightUtils.addOrGetCarriers(scenario);
 		CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
@@ -701,10 +715,10 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		CarrierCapabilities carrierCapabilities;
 
 		Carrier thisCarrier = CarrierUtils.createCarrier(Id.create(carrierName, Carrier.class));
-		if (trafficType.equals("businessTraffic") && purpose == 3)
-			thisCarrier.getAttributes().putAttribute("subpopulation", trafficType+"_service");
+		if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic") && purpose == 3)
+			thisCarrier.getAttributes().putAttribute("subpopulation", smallScaleCommercialTrafficType+"_service");
 		else
-			thisCarrier.getAttributes().putAttribute("subpopulation", trafficType);
+			thisCarrier.getAttributes().putAttribute("subpopulation", smallScaleCommercialTrafficType);
 
 		thisCarrier.getAttributes().putAttribute("purpose", purpose);
 		thisCarrier.getAttributes().putAttribute("tourStartArea", startZone);
@@ -765,25 +779,11 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 					.get(rnd.nextInt(buildingsPerZone.get(zone).get(selectedCategory).size()));
 			Coord centroidPointOfBuildingPolygon = MGC
 					.point2Coord(((Geometry) possibleBuilding.getDefaultGeometry()).getCentroid());
-			double minDistance = Double.MAX_VALUE;
+
 			int numberOfPossibleLinks = regionLinksMap.get(zone).size();
 
 			// searches and selects the nearest link of the possible links in this zone
-			searchLink: for (Link possibleLink : regionLinksMap.get(zone).values()) {
-				if (noPossibleLinks != null && numberOfPossibleLinks > noPossibleLinks.size())
-					for (String depotLink : noPossibleLinks) {
-						if (depotLink.equals(possibleLink.getId().toString())
-								|| (NetworkUtils.findLinkInOppositeDirection(possibleLink) != null && depotLink.equals(
-										NetworkUtils.findLinkInOppositeDirection(possibleLink).getId().toString())))
-							continue searchLink;
-					}
-				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-						(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
-				if (distance < minDistance) {
-					newLink = possibleLink.getId();
-					minDistance = distance;
-				}
-			}
+			newLink = SmallScaleCommercialTrafficUtils.findNearestPossibleLink(zone, noPossibleLinks, regionLinksMap, newLink, centroidPointOfBuildingPolygon, numberOfPossibleLinks);
 		}
 		if (newLink == null)
 			throw new RuntimeException("No possible link for buildings with type '" + selectedCategory + "' in zone '"
@@ -794,7 +794,8 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 
 	/** Filters links by used mode "car" and creates Map with all links in each zone
 	 */
-	static Map<String, HashMap<Id<Link>, Link>> filterLinksForZones(Scenario scenario, ShpOptions shpZones, Index indexZones) throws URISyntaxException {
+	static Map<String, HashMap<Id<Link>, Link>> filterLinksForZones(Scenario scenario, ShpOptions shpZones, Index indexZones,
+																	HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone) throws URISyntaxException {
 		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = new HashMap<>();
 		List<Link> links;
 		log.info("Filtering and assign links to zones. This take some time...");
@@ -816,7 +817,30 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 		links.forEach(l -> regionLinksMap
 				.computeIfAbsent((String) l.getAttributes().getAttribute("zone"), (k) -> new HashMap<>())
 				.put(l.getId(), l));
+		if (regionLinksMap.size() != shpZones.readFeatures().size())
+			findNearestLinkForZonesWithoutLinks(networkToChange, regionLinksMap, shpZones, buildingsPerZone);
 		return regionLinksMap;
+	}
+	/**
+	 * Finds for areas without links the nearest Link, if the area contains any building.
+	 */
+	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, HashMap<Id<Link>, Link>> regionLinksMap,
+															ShpOptions shpZones,
+															HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone) {
+		for (SimpleFeature singleArea : shpZones.readFeatures()) {
+			String zoneID = (String) singleArea.getAttribute("areaID");
+			if (!regionLinksMap.containsKey(zoneID) && buildingsPerZone.get(zoneID) != null) {
+					for (ArrayList<SimpleFeature> buildingList : buildingsPerZone.get(zoneID).values()) {
+						for (SimpleFeature building : buildingList) {
+							Link l = NetworkUtils.getNearestLink(networkToChange,
+								MGC.point2Coord(((Geometry) building.getDefaultGeometry()).getCentroid()));
+							regionLinksMap
+								.computeIfAbsent(zoneID, (k) -> new HashMap<>())
+								.put(l.getId(), l);
+						}
+					}
+			}
+		}
 	}
 
 	/**
@@ -825,11 +849,11 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 	private TripDistributionMatrix createTripDistribution(
 			HashMap<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 			HashMap<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop, ShpOptions shpZones,
-			String usedTrafficType, Scenario scenario, Path output, Map<String, HashMap<Id<Link>, Link>> regionLinksMap)
+			String smallScaleCommercialTrafficType, Scenario scenario, Path output, Map<String, HashMap<Id<Link>, Link>> regionLinksMap)
 			throws Exception {
 
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(shpZones, trafficVolume_start, trafficVolume_stop, usedTrafficType).build();
+				.newInstance(shpZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType).build();
 		ArrayList<String> listOfZones = new ArrayList<>();
 		trafficVolume_start.forEach((k, v) -> {
 			if (!listOfZones.contains(k.getZone()))
@@ -848,13 +872,13 @@ public class CreateSmallScaleCommercialTrafficDemand implements MATSimAppCommand
 			for (Integer purpose : trafficVolume_start.get(trafficVolumeKey).keySet()) {
 				Collections.shuffle(listOfZones);
 				for (String stopZone : listOfZones) {
-					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, usedTrafficType,
+					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
 							network, regionLinksMap, resistanceFactor);
 				}
 			}
 		}
 		odMatrix.clearRoundingError();
-		odMatrix.writeODMatrices(output, usedTrafficType);
+		odMatrix.writeODMatrices(output, smallScaleCommercialTrafficType);
 		return odMatrix;
 	}
 

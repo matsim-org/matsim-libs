@@ -126,7 +126,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	 * Run dashboard creation and execution. This method is useful when used outside MATSim.
 	 */
 	public void run(Path output) throws IOException {
-		simWrapper.generate(output);
+		generate(output);
 		simWrapper.run(output);
 	}
 

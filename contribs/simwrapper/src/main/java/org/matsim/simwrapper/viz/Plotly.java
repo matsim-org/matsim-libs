@@ -62,9 +62,9 @@ public final class Plotly extends Viz {
 	public Boolean fixedRatio;
 
 	/**
-	 * Create dropdown menu for individual traces.
+	 * Add UI element to make individual traces interactive.
 	 */
-	public Boolean dropdownMenu;
+	public Interactive interactive;
 
 	/**
 	 * Merge two column as index. Column name as key will be merged with the column name value.
@@ -333,6 +333,15 @@ public final class Plotly extends Viz {
 	}
 
 	/**
+	 * Specifies if plot should contain an interactive element.
+	 */
+	public enum Interactive {
+		none,
+		dropdown,
+		slider
+	}
+
+	/**
 	 * Class to specify a single dataset.
 	 */
 	public static final class DataSet {
@@ -549,6 +558,7 @@ public final class Plotly extends Viz {
 		public static final String Tableau10 = "Tableau10";
 		public static final String RdGy = "RdGy";
 		public static final String RdYlBu = "RdYlBu";
+		public static final String RdBu = "RdBu";
 		public static final String PiYG = "PiYG";
 		public static final String RdYlGn = "RdYlGn";
 		public static final String Spectral = "Spectral";
@@ -560,7 +570,7 @@ public final class Plotly extends Viz {
 		public static final String Rainbow = "Rainbow";
 
 
-		private ColorScheme() {
+        private ColorScheme() {
 		}
 	}
 

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
-/** 
+/**
  * @author balac
  */
 public class MembershipReader extends MatsimXmlParser{
@@ -21,44 +21,48 @@ public class MembershipReader extends MatsimXmlParser{
 	private String companyId;
 	private HashMap<String, String> stringCache = new HashMap<>();
 
+	public MembershipReader() {
+		super(ValidationType.DTD_ONLY);
+	}
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 
 		if (name.equals("person")) {
-			
+
 			personId = atts.getValue("id");
 			memberships = new HashMap<>();
 			membershipPerCSType = new HashMap<>();
 		}
 		else if (name.equals("company")) {
-			
+
 			companyId = atts.getValue("id");
 			companyId = stringCache.computeIfAbsent(companyId, id -> id);
 			carsharingTypes = new TreeSet<>();
 		}
 		else if (name.equals("carsharing")) {
-			
+
 			String csType = atts.getValue("name");
 			csType = stringCache.computeIfAbsent(csType, type -> type);
 			if (this.membershipPerCSType.containsKey(csType)) {
-				
+
 				Set<String> companies = this.membershipPerCSType.get(csType);
 				companies.add(companyId);
 				this.membershipPerCSType.put(csType, companies);
-				
+
 			}
 			else {
 				Set<String> companies = new TreeSet<>();
 				companies.add(companyId);
-				this.membershipPerCSType.put(csType, companies);				
+				this.membershipPerCSType.put(csType, companies);
 			}
 			carsharingTypes.add(csType);
-		}		
+		}
 	}
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		
+
 		if (name.equals("person")) {
 			PersonMembership personMembership = new PersonMembership(memberships, membershipPerCSType);
 			membershipContainer.addPerson(personId, personMembership);
@@ -66,7 +70,7 @@ public class MembershipReader extends MatsimXmlParser{
 		else if (name.equals("company")) {
 			memberships.put(companyId, carsharingTypes);
 
-		}		
+		}
 	}
 	public MembershipContainer getMembershipContainer() {
 		return membershipContainer;

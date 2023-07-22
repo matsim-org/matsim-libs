@@ -19,10 +19,15 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.events;
+package org.matsim.core.events;
 
 import org.matsim.core.utils.io.MatsimXmlParser;
 
 abstract class MatsimXmlEventsParser extends MatsimXmlParser {
-	public abstract void addCustomEventMapper( String key, MatsimEventsReader.CustomEventMapper value );
+
+	public MatsimXmlEventsParser() {
+		super(ValidationType.NO_VALIDATION);
+	}
+
+	public abstract void addCustomEventMapper(String key, MatsimEventsReader.CustomEventMapper value );
 }

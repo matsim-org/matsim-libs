@@ -33,6 +33,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -47,6 +48,7 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
@@ -102,7 +104,28 @@ public class SmallScaleCommercialTrafficUtils {
 		writeCSVWithCategoryHeader(resultingDataPerZone, outputFileInOutputFolder, zoneIdNameConnection);
 		log.info("The data distribution is finished and written to: " + outputFileInOutputFolder);
 	}
-
+	static Id<Link> findNearestPossibleLink(String zone, ArrayList<String> noPossibleLinks, Map<String, HashMap<Id<Link>, Link>> regionLinksMap,
+													Id<Link> newLink, Coord centroidPointOfBuildingPolygon, int numberOfPossibleLinks) {
+		double minDistance = Double.MAX_VALUE;
+		searchLink: for (Link possibleLink : regionLinksMap.get(zone).values()) {
+			if(possibleLink.getToNode().getOutLinks() == null)
+				continue;
+			if (noPossibleLinks != null && numberOfPossibleLinks > noPossibleLinks.size())
+				for (String depotLink : noPossibleLinks) {
+					if (depotLink.equals(possibleLink.getId().toString())
+						|| (NetworkUtils.findLinkInOppositeDirection(possibleLink) != null && depotLink.equals(
+						NetworkUtils.findLinkInOppositeDirection(possibleLink).getId().toString())))
+						continue searchLink;
+				}
+			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
+				(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+			if (distance < minDistance) {
+				newLink = possibleLink.getId();
+				minDistance = distance;
+			}
+		}
+		return newLink;
+	}
 	/**
 	 * Writer of data distribution data.
 	 */
@@ -139,7 +162,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
 
-	static void createPlansBasedOnCarrierPlans(Scenario scenario, String usedTrafficType, Path output,
+	static void createPlansBasedOnCarrierPlans(Scenario scenario, String smallScaleCommercialTrafficType, Path output,
 											   String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 
 		Population population = scenario.getPopulation();
@@ -156,9 +179,9 @@ public class SmallScaleCommercialTrafficUtils {
 					.get(Id.create(carrierName, Carrier.class));
 			String subpopulation = relatedCarrier.getAttributes().getAttribute("subpopulation").toString();
 			final String mode;
-			if (subpopulation.contains("businessTraffic"))
+			if (subpopulation.contains("commercialPersonTraffic"))
 				mode = "car";
-			else if (subpopulation.contains("freightTraffic"))
+			else if (subpopulation.contains("goodsTraffic"))
 				mode = "freight";
 			else
 				mode = relatedCarrier.getAttributes().getAttribute("networkMode").toString();
@@ -169,12 +192,16 @@ public class SmallScaleCommercialTrafficUtils {
 				if (tourElement instanceof Activity activity) {
 					activity.setCoord(
 							scenario.getNetwork().getLinks().get(activity.getLinkId()).getFromNode().getCoord());
-					if (!activity.getType().equals("start"))
-						activity.setEndTimeUndefined();
-					else
+					if (activity.getType().equals("start")) {
 						tourStartTime = activity.getEndTime().seconds();
-					if (activity.getType().equals("end"))
+						activity.setType("commercial_start");
+					}
+					else
+						activity.setEndTimeUndefined();
+					if (activity.getType().equals("end")) {
 						activity.setStartTime(tourStartTime + 8 * 3600);
+						activity.setType("commercial_end");
+					}
 					plan.addActivity(activity);
 				}
 				if (tourElement instanceof Leg) {
@@ -183,7 +210,7 @@ public class SmallScaleCommercialTrafficUtils {
 				}
 			}
 
-			String key = String.format("%s_%s_%s", relatedCarrier.getAttributes().getAttribute("tourStartArea"), relatedCarrier.getAttributes().getAttribute("purpose"), subpopulation);
+			String key = String.format("%s_%s_%s", subpopulation, relatedCarrier.getAttributes().getAttribute("tourStartArea"), relatedCarrier.getAttributes().getAttribute("purpose")); //TODO
 
 			long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
 
@@ -206,7 +233,11 @@ public class SmallScaleCommercialTrafficUtils {
 
 		String outputPopulationFile;
 		if (nameOutputPopulation == null)
-			outputPopulationFile = output.toString() + "/"+modelName +"_" + usedTrafficType + "_" + sampleName + "pct_plans.xml.gz";
+			if (smallScaleCommercialTrafficType.equals("completeSmallScaleCommercialTraffic"))
+				outputPopulationFile = output.toString() + "/"+modelName +"_" + "smallScaleCommercialTraffic" + "_" + sampleName + "pct_plans.xml.gz";
+			else
+				outputPopulationFile = output.toString() + "/"+modelName +"_" + smallScaleCommercialTrafficType + "_" + sampleName + "pct_plans.xml.gz";
+
 		else {
 			if (numberOfPlanVariantsPerAgent > 1)
 				CreateDifferentPlansForFreightPopulation.createPlanVariantsForPopulations("changeStartingTimes", population, numberOfPlanVariantsPerAgent, 6*3600, 14*3600, 8*3600);
@@ -227,7 +258,7 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 	/**
 	 * Reads existing scenarios and add them to the scenario. If the scenario is
-	 * part of the freightTraffic or businessTraffic the demand of the existing
+	 * part of the goodsTraffic or commercialPersonTraffic the demand of the existing
 	 * scenario reduces the demand of the small scale commercial traffic. The
 	 * dispersedTraffic will be added additionally.
 	 */
@@ -241,7 +272,7 @@ public class SmallScaleCommercialTrafficUtils {
 		for (CSVRecord record : parse) {
 			String modelName = record.get("model");
 			double sampleSizeExistingScenario = Double.parseDouble(record.get("sampleSize"));
-			String modelTrafficType = record.get("trafficType");
+			String modelTrafficType = record.get("smallScaleCommercialTrafficType");
 			final Integer modelPurpose;
 			if (!Objects.equals(record.get("purpose"), ""))
 				modelPurpose = Integer.parseInt(record.get("purpose"));

@@ -35,6 +35,10 @@ public class ZoneXmlReader extends MatsimXmlParser {
 		return zones;
 	}
 
+	public ZoneXmlReader() {
+		super(ValidationType.DTD_ONLY);
+	}
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (ZONE.equals(name)) {

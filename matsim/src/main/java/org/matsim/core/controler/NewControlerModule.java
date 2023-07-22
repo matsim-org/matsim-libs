@@ -21,6 +21,7 @@
 
  package org.matsim.core.controler;
 
+import com.google.inject.multibindings.Multibinder;
 import org.matsim.analysis.IterationStopWatch;
 
 public final class NewControlerModule extends AbstractModule {
@@ -43,6 +44,6 @@ public final class NewControlerModule extends AbstractModule {
 		bind(PrepareForMobsim.class).to(PrepareForMobsimImpl.class);
 
 		// Explicitly create the set binder so that it always available (even if empty)
-		addPersonPrepareForSimAlgorithm();
+		Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
 	}
 }

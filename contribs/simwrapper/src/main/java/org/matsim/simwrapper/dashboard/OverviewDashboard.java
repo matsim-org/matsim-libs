@@ -1,6 +1,8 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.LogFileAnalysis;
+import org.matsim.application.analysis.traffic.TrafficAnalysis;
+import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
@@ -20,53 +22,67 @@ public class OverviewDashboard implements Dashboard {
 		header.title = "Overview";
 		header.description = "General overview of the MATSim run.";
 
-		layout.row("first")
-			.el(Table.class, (viz, data) -> {
-				viz.title = "Run Info";
-				viz.showAllRows = true;
-				viz.dataset = data.compute(LogFileAnalysis.class, "run_info.csv");
-				viz.width = 1d;
-			})
-			.el(Line.class, (viz, data) -> {
+		layout.row("first").el(Table.class, (viz, data) -> {
+			viz.title = "Run Info";
+			viz.showAllRows = true;
+			viz.dataset = data.compute(LogFileAnalysis.class, "run_info.csv");
+			viz.width = 1d;
+		}).el(MapPlot.class, (viz, data) -> {
 
-				viz.title = "Score";
-				viz.dataset = data.output("*.scorestats.txt");
-				viz.description = "per Iteration";
-				viz.x = "ITERATION";
-				viz.columns = List.of("avg. EXECUTED", "avg. WORST", "avg. BEST");
-				viz.xAxisName = "Iteration";
-				viz.yAxisName = "Score";
-				viz.width = 2d;
+			viz.title = "Simulated traffic volume";
+			viz.center = data.context().getCenter();
+			viz.zoom = data.context().mapZoomLevel;
+			viz.height = 7.5;
+			viz.width = 2.0;
 
-			});
+			viz.setShape(data.compute(CreateGeoJsonNetwork.class, "network.geojson", "--with-properties"), "id");
+			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
 
-		layout.row("warnings")
-			.el(TextBlock.class, (viz, data) -> {
-				viz.file = data.compute(LogFileAnalysis.class, "status.md");
-				// Force minimal height
-				viz.height = 0.1d;
-			});
+			viz.display.lineColor.dataset = "traffic";
+			viz.display.lineColor.columnName = "simulated_traffic_volume";
+			viz.display.lineColor.join = "link_id";
+			viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlBu, 5, true);
 
-		/*
-		Not yet finalized in SimWrapper
-		layout.row("config")
-			.el(XML.class, (viz, data) -> {
-				viz.file = data.output("*.output_config.xml");
-				viz.height = 5d;
-			});
-		 */
+			viz.display.lineWidth.dataset = "traffic";
+			viz.display.lineWidth.columnName = "simulated_traffic_volume";
+			viz.display.lineWidth.scaleFactor = 20000d;
+			viz.display.lineWidth.join = "link_id";
 
-		// modeshare + mode progression
-		layout.row("second")
-			.el(PieChart.class, (viz, data) -> {
-				viz.title = "Mode Share";
-				viz.description = "at final Iteration";
-				viz.dataset = data.output("*.modestats.txt");
-				viz.ignoreColumns = List.of("Iteration");
-				viz.useLastRow = true;
-				viz.width = 1d;
+		});
 
-			})
+		layout.row("warnings").el(TextBlock.class, (viz, data) -> {
+			viz.file = data.compute(LogFileAnalysis.class, "status.md");
+			// Force minimal height
+			viz.height = 0.1d;
+		});
+
+		layout.row("config").el(XML.class, (viz, data) -> {
+			viz.file = data.output("*.output_config.xml");
+			viz.height = 6d;
+			viz.width = 2d;
+
+		}).el(PieChart.class, (viz, data) -> {
+			viz.title = "Mode Share";
+			viz.description = "at final Iteration";
+			viz.dataset = data.output("*.modestats.txt");
+			viz.ignoreColumns = List.of("Iteration");
+			viz.useLastRow = true;
+		});
+
+
+		layout.row("second").el(Line.class, (viz, data) -> {
+
+			viz.title = "Score";
+			viz.dataset = data.output("*.scorestats.txt");
+			viz.description = "per Iteration";
+			viz.x = "ITERATION";
+			viz.columns = List.of("avg. EXECUTED", "avg. WORST", "avg. BEST");
+			viz.xAxisName = "Iteration";
+			viz.yAxisName = "Score";
+
+		});
+
+		layout.row("third")
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Mode Share Progression";
 				viz.description = "per Iteration";
@@ -77,34 +93,21 @@ public class OverviewDashboard implements Dashboard {
 				viz.width = 2d;
 			});
 
-		layout.row("third")
-			.el(Bar.class, (viz, data) -> {
-				viz.title = "Runtime";
-				viz.x = "Iteration";
-				viz.xAxisName = "Iteration";
-				viz.yAxisName = "Runtime [s]";
-				viz.columns = List.of("seconds");
-				viz.dataset = data.compute(LogFileAnalysis.class, "runtime_stats.csv");
+		layout.row("perf").el(Bar.class, (viz, data) -> {
+			viz.title = "Runtime";
+			viz.x = "Iteration";
+			viz.xAxisName = "Iteration";
+			viz.yAxisName = "Runtime [s]";
+			viz.columns = List.of("seconds");
+			viz.dataset = data.compute(LogFileAnalysis.class, "runtime_stats.csv");
 
-			})
-			.el(Plotly.class, (viz, data) -> {
-				viz.title = "Memory Usage";
+		}).el(Plotly.class, (viz, data) -> {
+			viz.title = "Memory Usage";
 
-				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Time").build())
-					.yAxis(Axis.builder().title("MB").build())
-					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-					.build();
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder().xAxis(Axis.builder().title("Time").build()).yAxis(Axis.builder().title("MB").build()).barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK).build();
 
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(data.compute(LogFileAnalysis.class, "memory_stats.csv"))
-						.pivot(List.of("time"), "names", "values")
-						.mapping()
-						.name("names")
-						.x("time")
-						.y("values")
-				);
-			});
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), viz.addDataset(data.compute(LogFileAnalysis.class, "memory_stats.csv")).pivot(List.of("time"), "names", "values").mapping().name("names").x("time").y("values"));
+		});
 	}
 
 	@Override

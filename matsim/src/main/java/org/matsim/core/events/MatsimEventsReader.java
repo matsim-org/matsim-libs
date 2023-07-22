@@ -130,6 +130,7 @@ public final class MatsimEventsReader implements MatsimReader {
 		private final Map<String, CustomEventMapper> map ;
 
 		private XmlEventsReader( final EventsManager events, Map<String, CustomEventMapper> map ) {
+			super(ValidationType.NO_VALIDATION);
 			this.events = events;
 			this.map = map;
 			this.setValidating(false); // events-files have no DTD, thus they cannot validate
