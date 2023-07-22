@@ -146,8 +146,8 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 	private void logHandlingInHub(CarrierService carrierService, double startTime) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 
-		double handlingTime = transshipmentHubResource.getCapacityNeedFixed() + transshipmentHubResource.getCapacityNeedLinear() * lspShipment.getSize();
-		double endTime = startTime + handlingTime;
+		double expHandlingDuration = transshipmentHubResource.getCapacityNeedFixed() + transshipmentHubResource.getCapacityNeedLinear() * lspShipment.getSize();
+		double endTime = startTime + expHandlingDuration;
 
 		{ //Old logging approach - will be removed at some point in time
 			ShipmentPlanElement handle = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance()
@@ -164,7 +164,7 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 		}
 		{ // New event-based approach
 			//  Könnte sein, dass das jetzt funktioniert.  kai, may'23
-			eventsManager.processEvent(new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId));
+			eventsManager.processEvent(new HandlingInHubStartsEvent(startTime, linkId, lspShipment.getId(), resourceId, expHandlingDuration));
 		}
 
 	}

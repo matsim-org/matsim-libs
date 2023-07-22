@@ -14,6 +14,7 @@ public class HandlingInHubStartsEventCreator implements LspEventCreator {
     @Override
     public Event createEvent(Event event, Id<LSPShipment> lspShipmentId, Activity activity) {
         //TODO: This is just a first dummy implementation, KMT May'23
-        return new HandlingInHubStartsEvent(event.getTime(), activity.getLinkId(), lspShipmentId, Id.create("DummyHubId", LSPResource.class));
+        //TODO: expHandlingDuration is temporarily set to minValue. Will decide later wether this creater is needed anyways or not. KMT jul'23
+        return new HandlingInHubStartsEvent(event.getTime(), activity.getLinkId(), lspShipmentId, Id.create("DummyHubId", LSPResource.class), Double.MIN_VALUE);
     }
 }

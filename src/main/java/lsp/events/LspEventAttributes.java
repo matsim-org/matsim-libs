@@ -28,5 +28,6 @@ package lsp.events;
  */
 public class LspEventAttributes {
 	public static final String ATTRIBUTE_HUB_ID = "hubId";
+	public static final String ATTRIBUTE_EXP_HANDLING_DURATION = "expHandlingDuration";
 
 }

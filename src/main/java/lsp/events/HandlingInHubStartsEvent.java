@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import java.util.Map;
 
+import static lsp.events.LspEventAttributes.ATTRIBUTE_EXP_HANDLING_DURATION;
 import static lsp.events.LspEventAttributes.ATTRIBUTE_HUB_ID;
 
 /**
@@ -39,12 +40,14 @@ public final class HandlingInHubStartsEvent extends AbstractLspEvent {
 
 	public static final String EVENT_TYPE = "Handling_started";
 	private final Id<LSPResource> hubId;
+	private final double expHandlingDuration;
 
 	//TODO: Add more information about the handling, e.g. expected duration of handling.  KMT after mtg with kn, jul' 23
 
-	public HandlingInHubStartsEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId, Id<LSPResource> hubId) {
+	public HandlingInHubStartsEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId, Id<LSPResource> hubId, double expHandlingDuration) {
 		super(time, linkId, lspShipmentId);
 		this.hubId = hubId;
+		this.expHandlingDuration = expHandlingDuration;
 	}
 
 	@Override public String getEventType() {
@@ -55,10 +58,15 @@ public final class HandlingInHubStartsEvent extends AbstractLspEvent {
 		return hubId;
 	}
 
+	public double getExpHandlingDuration(){
+		return expHandlingDuration;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_HUB_ID, hubId.toString());
+		attr.put(ATTRIBUTE_EXP_HANDLING_DURATION, String.valueOf(expHandlingDuration));
 		return attr;
 	}
 
