@@ -47,9 +47,11 @@ public class TrafficCountsDashboardTest {
 
 		SimWrapper sw = SimWrapper.create(config)
 			.addDashboard(new TrafficCountsDashboard())
-			.addDashboard(Dashboard.customize(new TrafficCountsDashboard(
-				List.of(0.0, 0.3, 1.7, 2.5),
-				List.of("way too few", "fewer", "exact", "too much", "way too much"))
+			.addDashboard(Dashboard.customize(new TrafficCountsDashboard()
+				.withQualityLabels(
+					List.of(0.0, 0.3, 1.7, 2.5),
+					List.of("way too few", "fewer", "exact", "too much", "way too much")
+				)
 			).context("custom"));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);

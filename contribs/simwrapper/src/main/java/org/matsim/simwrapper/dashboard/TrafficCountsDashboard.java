@@ -11,6 +11,8 @@ import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -21,23 +23,42 @@ import java.util.stream.Collectors;
  */
 public class TrafficCountsDashboard implements Dashboard {
 
-	private final List<Double> limits;
-	private final List<String> labels;
+	@Nullable
+	private final String countsPath;
+
+	@Nullable
+	private final String transportMode;
+	private  List<Double> limits = List.of(0.6, 0.8, 1.2, 1.4);
+	private List<String> labels = List.of("major under", "under", "ok", "over", "major over");
+
+	/**
+	 * Create counts with a given counts file and specific transport mode.
+	 * @param countsPath overwrite default counts file
+	 * @param transportMode overwrite default transportMode to analyze
+	 */
+	public TrafficCountsDashboard(@Nullable String countsPath, @Nullable String transportMode) {
+		this.countsPath = countsPath;
+		this.transportMode = transportMode;
+	}
 
 	/**
 	 * Constructor with default arguments.
 	 */
 	public TrafficCountsDashboard() {
-		this(List.of(0.6, 0.8, 1.2, 1.4), List.of("major under", "under", "ok", "over", "major over"));
+		this(null, null);
 	}
 
+
 	/**
-	 * Constructor with custom limits and categories.
+	 * Set the quality thresholds and labels
+	 * @param limits thresholds for labels
+	 * @param labels text representation of labels
+	 * @return same instance
 	 */
-	public TrafficCountsDashboard(List<Double> limits, List<String> labels) {
+	public TrafficCountsDashboard withQualityLabels(List<Double> limits, List<String> labels) {
 		this.limits = limits;
 		this.labels = labels;
-
+		return this;
 	}
 
 	@Override
@@ -45,7 +66,6 @@ public class TrafficCountsDashboard implements Dashboard {
 
 		header.title = "Traffic Counts";
 		header.description = "Comparison of observed and simulated daily traffic volumes.\nError metrics: ";
-
 
 		for (int i = 0; i < labels.size(); i++) {
 			if (i == 0)
@@ -56,10 +76,18 @@ public class TrafficCountsDashboard implements Dashboard {
 				header.description += String.format(Locale.US, "%s: %.2f - %.2f; ", labels.get(i), limits.get(i - 1), limits.get(i));
 		}
 
-		String[] args = new String[]{
+		List<String> argList = new ArrayList<>(List.of(
 			"--limits", limits.stream().map(String::valueOf).collect(Collectors.joining(",")),
 			"--labels", String.join(",", labels)
-		};
+		));
+
+		if (countsPath != null)
+			argList.addAll(List.of("--counts", countsPath));
+
+		if (transportMode != null)
+			argList.addAll(List.of("--transport-mode", transportMode));
+
+		String[] args = argList.toArray(new String[0]);
 
 		layout.row("overview")
 			.el(Plotly.class, (viz, data) -> {
