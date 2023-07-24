@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.routes.DefaultTransitPassengerRouteFactory;
 import org.matsim.pt.routes.TransitPassengerRoute;
@@ -52,14 +53,15 @@ import java.util.Map;
 
 /**
  * Save waiting times of agents while mobsim is running
- * 
+ *
  * @author sergioo
  */
 @Singleton
 public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler, WaitTimeCalculator {
-	
+
 	//Attributes
 	private final double timeSlot;
+	private final int totalTime;
 	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, WaitTimeData>> waitTimes = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, WaitTimeData>>(1000);
 	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, double[]>> scheduledWaitTimes = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, double[]>>(1000);
 	private final Map<Id<Person>, Double> agentsWaitingData = new HashMap<Id<Person>, Double>();
@@ -72,9 +74,10 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 		this(population, transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds()-config.qsim().getStartTime().seconds()));
 		eventsManager.addHandler(this);
 	}
-	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
+	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final double timeSlot, final int totalTime) {
 		this.population = population;
 		this.timeSlot = timeSlot;
+		this.totalTime = totalTime;
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
 				double[] sortedDepartures = new double[route.getDepartures().size()];
@@ -85,8 +88,8 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				Map<Id<TransitStopFacility>, WaitTimeData> stopsMap = new HashMap<Id<TransitStopFacility>, WaitTimeData>(100);
 				Map<Id<TransitStopFacility>, double[]> stopsScheduledMap = new HashMap<Id<TransitStopFacility>, double[]>(100);
 				for(TransitRouteStop stop:route.getStops()) {
-					stopsMap.put(stop.getStopFacility().getId(), new WaitTimeDataArray(totalTime/timeSlot+1));
-					double[] cacheWaitTimes = new double[totalTime/timeSlot+1];
+					stopsMap.put(stop.getStopFacility().getId(), new WaitTimeDataArray(TimeBinUtils.getTimeBinCount(totalTime, timeSlot)));
+					double[] cacheWaitTimes = new double[TimeBinUtils.getTimeBinCount(totalTime, timeSlot)];
 					for(int i=0; i<cacheWaitTimes.length; i++) {
 						double endTime = timeSlot*(i+1);
 						if(endTime>24*3600)
@@ -115,12 +118,13 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 		Tuple<Id<TransitLine>, Id<TransitRoute>> key = new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, routeId);
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId);
-		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
+		int timeBinIndex = TimeBinUtils.getTimeBinIndex(time, timeSlot, TimeBinUtils.getTimeBinCount(totalTime, timeSlot));
+		if(waitTimeData.getNumData(timeBinIndex)==0) {
 			double[] waitTimes = scheduledWaitTimes.get(key).get(stopId);
-			return waitTimes[(int) (time/timeSlot)<waitTimes.length?(int) (time/timeSlot):(waitTimes.length-1)];
+			return waitTimes[timeBinIndex<waitTimes.length?timeBinIndex:(waitTimes.length-1)];
 		}
 		else
-			return waitTimeData.getWaitTime((int) (time/timeSlot));
+			return waitTimeData.getWaitTime(timeBinIndex);
 	}
 	@Override
 	public void reset(int iteration) {
@@ -153,12 +157,14 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						Route route = (((Leg)planElement).getRoute());
-						TransitPassengerRoute eRoute = (TransitPassengerRoute) new DefaultTransitPassengerRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
+						TransitPassengerRoute eRoute = (TransitPassengerRoute) new DefaultTransitPassengerRouteFactory().
+								createRoute(route.getStartLinkId(), route.getEndLinkId());
 						eRoute.setStartLinkId(route.getStartLinkId());
 						eRoute.setEndLinkId(route.getEndLinkId());
 						eRoute.setRouteDescription(route.getRouteDescription());
-						WaitTimeData data = waitTimes.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(eRoute.getLineId(), eRoute.getRouteId())).get(eRoute.getAccessStopId());
-						data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+						WaitTimeData data = waitTimes.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(eRoute.getLineId(),
+								eRoute.getRouteId())).get(eRoute.getAccessStopId());
+						data.addWaitTime(TimeBinUtils.getTimeBinIndex(startWaitingTime, timeSlot, totalTime), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
 					}
@@ -167,7 +173,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				}
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
@@ -178,13 +184,15 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						Route route = ((Leg)planElement).getRoute();
-						TransitPassengerRoute eRoute = (TransitPassengerRoute) new DefaultTransitPassengerRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
+						TransitPassengerRoute eRoute = (TransitPassengerRoute) new DefaultTransitPassengerRouteFactory().
+								createRoute(route.getStartLinkId(), route.getEndLinkId());
 						eRoute.setStartLinkId(route.getStartLinkId());
 						eRoute.setEndLinkId(route.getEndLinkId());
 						eRoute.setRouteDescription(route.getRouteDescription());
-						WaitTimeData data = waitTimes.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(eRoute.getLineId(), eRoute.getRouteId())).get(eRoute.getAccessStopId());
+						WaitTimeData data = waitTimes.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(eRoute.getLineId(),
+								eRoute.getRouteId())).get(eRoute.getAccessStopId());
 						if(data!=null)
-							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+							data.addWaitTime(TimeBinUtils.getTimeBinIndex(startWaitingTime, timeSlot, totalTime), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
 					}
