@@ -38,7 +38,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Stack;
-import java.util.zip.GZIPInputStream;
 
 /**
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
