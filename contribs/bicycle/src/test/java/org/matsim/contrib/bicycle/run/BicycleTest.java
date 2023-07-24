@@ -67,8 +67,7 @@ import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.
 /**
  * @author dziemke
  */
-public class
-BicycleTest {
+public class BicycleTest {
 	private static final Logger LOG = LogManager.getLogger(BicycleTest.class);
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();

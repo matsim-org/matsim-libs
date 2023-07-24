@@ -35,8 +35,8 @@ import org.matsim.core.scoring.functions.*;
  * @author dziemke
  */
 /**
-* @deprecated -- The {@link BicycleScoringType#linkBased} is already running through {@link BicycleScoreEventsCreator}; for {@link
-* BicycleScoringType#legBased} the same should be done.  However, the {@link MotorizedInteractionEngine} is also not implemented in a way that it will
+* @deprecated -- The {@link BicycleScoringType#legBased} is already running through {@link BicycleScoreEventsCreator}; for {@link
+* BicycleScoringType#linkBased} the same should be done.  However, the {@link MotorizedInteractionEngine} is also not implemented in a way that it will
 * actually work.
  */
 final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
