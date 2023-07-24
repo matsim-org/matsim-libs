@@ -107,8 +107,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	/**
 	 * @deprecated -- use {@link TeleportedModeParams} to be consistent with xml config.  kai, jun'23
 	 */
-	// ---
-	public static class ModeRoutingParams extends TeleportedModeParams{
+	public final static class ModeRoutingParams extends TeleportedModeParams{
 		public ModeRoutingParams( String mode ){
 			super( mode );
 		}
