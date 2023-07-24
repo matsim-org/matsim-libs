@@ -74,7 +74,7 @@ public class BicycleTest {
 
 	@Test
 	public void testNormal() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -108,7 +108,7 @@ public class BicycleTest {
 
 	@Test
 	public void testCobblestone() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -139,7 +139,7 @@ public class BicycleTest {
 
 	@Test
 	public void testPedestrian() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -168,7 +168,7 @@ public class BicycleTest {
 
 	@Test
 	public void testLane() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -197,7 +197,7 @@ public class BicycleTest {
 
 	@Test
 	public void testGradient() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -226,7 +226,7 @@ public class BicycleTest {
 
 	@Test
 	public void testGradientLane() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -256,7 +256,7 @@ public class BicycleTest {
 
 	@Test
 	public void testNormal10It() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -286,9 +286,50 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 
-	@Test
-	public void testMotorizedInteraction() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+	@Test public void testLinkBasedScoring() {
+//		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
+		config.addModule(new BicycleConfigGroup());
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+
+		// Normal network
+		config.network().setInputFile("network_normal.xml");
+		config.plans().setInputFile("population_1200.xml");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(0);
+		config.controler().setWriteEventsInterval(10);
+		config.controler().setWritePlansInterval(10);
+		config.controler().setCreateGraphs(false);
+
+		// Activate link-based scoring
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get("bicycle");
+		bicycleConfigGroup.setBicycleScoringType(BicycleScoringType.linkBased);
+
+		// Interaction with motor vehicles
+		new RunBicycleExample().run(config, false);
+
+//		LOG.info("Checking MATSim events file ...");
+//		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+//		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+//		assertEquals("Different event files.", FILES_ARE_EQUAL,
+//				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
+
+		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
+			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
+			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
+			Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+		}
+//		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+	}
+	@Test public void testMotorizedInteraction() {
+//		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -320,12 +361,17 @@ public class BicycleTest {
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
+			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
+			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
+			Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+		}
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 
 	@Test
 	public void testInfrastructureSpeedFactor() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 
 		config.controler().setWriteEventsInterval(0);
@@ -417,7 +463,7 @@ public class BicycleTest {
 
 	@Test
 	public void testInfrastructureSpeedFactorDistanceMoreRelevantThanTravelTime() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 
 		config.controler().setWriteEventsInterval(0);
