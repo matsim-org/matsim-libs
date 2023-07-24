@@ -38,6 +38,7 @@ public class FleetReader extends MatsimXmlParser {
 	private final FleetSpecification fleet;
 
 	public FleetReader(FleetSpecification fleet) {
+		super(ValidationType.DTD_ONLY);
 		this.fleet = fleet;
 	}
 

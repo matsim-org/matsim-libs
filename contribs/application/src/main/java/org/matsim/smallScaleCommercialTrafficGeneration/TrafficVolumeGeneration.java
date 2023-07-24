@@ -245,23 +245,23 @@ public class TrafficVolumeGeneration {
 	}
 
 	/**
-	 * Loads the input data based on the selected trafficType.
+	 * Loads the input data based on the selected smallScaleCommercialTrafficType.
 	 *
-	 * @param trafficType used trafficType (freight or business traffic)
+	 * @param smallScaleCommercialTrafficType used smallScaleCommercialTrafficType (freight or business traffic)
 	 */
-	static void setInputParameters(String trafficType) {
+	static void setInputParameters(String smallScaleCommercialTrafficType) {
 
 		// Set generation rates for start potentials
-		generationRatesStart = setGenerationRates(trafficType, "start");
+		generationRatesStart = setGenerationRates(smallScaleCommercialTrafficType, "start");
 
 		// Set generation rates for stop potentials
-		generationRatesStop = setGenerationRates(trafficType, "stop");
+		generationRatesStop = setGenerationRates(smallScaleCommercialTrafficType, "stop");
 
 		// Set commitment rates for start potentials
-		commitmentRatesStart = setCommitmentRates(trafficType, "start");
+		commitmentRatesStart = setCommitmentRates(smallScaleCommercialTrafficType, "start");
 
 		// Set commitment rates for stop potentials
-		commitmentRatesStop = setCommitmentRates(trafficType, "stop");
+		commitmentRatesStop = setCommitmentRates(smallScaleCommercialTrafficType, "stop");
 	}
 
 	/**
@@ -269,21 +269,21 @@ public class TrafficVolumeGeneration {
 	 *
 	 * @param scenario scenario
 	 * @param regionLinksMap links for each zone
-	 * @param usedTrafficType used trafficType (freight or business traffic)
+	 * @param smallScaleCommercialTrafficType used trafficType (commercialPersonTraffic or goodsTraffic)
 	 * @param trafficVolumePerTypeAndZone_start trafficVolume for start potentials for each zone
 	 * @param trafficVolumePerTypeAndZone_stop trafficVolume for stop potentials for each zone
 	 */
 	static void reduceDemandBasedOnExistingCarriers(Scenario scenario,
-			Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String usedTrafficType,
+			Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
 			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
 			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
 
 		for (Carrier carrier : FreightUtils.addOrGetCarriers(scenario).getCarriers().values()) {
 			if (!carrier.getAttributes().getAsMap().containsKey("subpopulation")
-					|| !carrier.getAttributes().getAttribute("subpopulation").equals(usedTrafficType))
+					|| !carrier.getAttributes().getAttribute("subpopulation").equals(smallScaleCommercialTrafficType))
 				continue;
 			String modeORvehType;
-			if (usedTrafficType.equals("freightTraffic"))
+			if (smallScaleCommercialTrafficType.equals("goodsTraffic"))
 				modeORvehType = (String) carrier.getAttributes().getAttribute("vehicleType");
 			else
 				modeORvehType = "total";
@@ -423,10 +423,10 @@ public class TrafficVolumeGeneration {
 	/**
 	 * Sets the generation rates based on the IVV 2005
 	 *
-	 * @param trafficType used trafficType (freight or business traffic)
+	 * @param smallScaleCommercialTrafficType used trafficType (freight or business traffic)
 	 * @param generationType start or stop rates
 	 */
-	private static HashMap<Integer, HashMap<String, Double>> setGenerationRates(String trafficType,
+	private static HashMap<Integer, HashMap<String, Double>> setGenerationRates(String smallScaleCommercialTrafficType,
 			String generationType) {
 
 		HashMap<Integer, HashMap<String, Double>> generationRates = new HashMap<>();
@@ -436,7 +436,7 @@ public class TrafficVolumeGeneration {
 		HashMap<String, Double> ratesPerPurpose4 = new HashMap<>();
 		HashMap<String, Double> ratesPerPurpose5 = new HashMap<>();
 		HashMap<String, Double> ratesPerPurpose6 = new HashMap<>();
-		if (trafficType.equals("businessTraffic")) {
+		if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 			if (generationType.equals("start")) {
 				ratesPerPurpose1.put("Inhabitants", 0.0);
 				ratesPerPurpose1.put("Employee", 0.0);
@@ -529,7 +529,7 @@ public class TrafficVolumeGeneration {
 				ratesPerPurpose5.put("Employee Tertiary Sector Rest", 0.015);
 
 			}
-		} else if (trafficType.equals("freightTraffic")) {
+		} else if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 			if (generationType.equals("start")) {
 				ratesPerPurpose1.put("Inhabitants", 0.0);
 				ratesPerPurpose1.put("Employee", 0.0);
@@ -651,18 +651,18 @@ public class TrafficVolumeGeneration {
 	}
 
 	/**
-	 * Sets the commitment rates based on the IVV 2005 for the freight traffic. The
-	 * commitment rate for the businessTraffic is 1, because mode choice will be
+	 * Sets the commitment rates based on the IVV 2005 for the goodsTraffic. The
+	 * commitment rate for the commercialPersonTraffic is 1, because mode choice will be
 	 * done in MATSim.
 	 *
-	 * @param trafficType used trafficType (freight or business traffic)
+	 * @param smallScaleCommercialTrafficType used trafficType (freight or business traffic)
 	 * @param commitmentType start or stop parameter
 	 */
-	private static HashMap<String, HashMap<String, Double>> setCommitmentRates(String trafficType,
+	private static HashMap<String, HashMap<String, Double>> setCommitmentRates(String smallScaleCommercialTrafficType,
 			String commitmentType) {
 		HashMap<String, HashMap<String, Double>> commitmentRates = new HashMap<>();
 
-		if (trafficType.equals("freightTraffic")) {
+		if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 
 			// the first number is the purpose; second number the vehicle type
 			HashMap<String, Double> ratesPerPurpose1_1 = new HashMap<>();

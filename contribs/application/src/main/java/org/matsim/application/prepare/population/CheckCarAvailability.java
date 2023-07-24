@@ -113,7 +113,7 @@ public class CheckCarAvailability implements MATSimAppCommand, PersonAlgorithm {
 		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
 			for (Leg leg : trip.getLegsOnly()) {
 
-				if (leg.getMode().equals(TransportMode.car) || TripStructureUtils.getRoutingMode(leg).equals(TransportMode.car)) {
+				if (TransportMode.car.equals(leg.getMode()) || TransportMode.car.equals(TripStructureUtils.getRoutingMode(leg))) {
 					correct = false;
 
 					// replace this whole trip now

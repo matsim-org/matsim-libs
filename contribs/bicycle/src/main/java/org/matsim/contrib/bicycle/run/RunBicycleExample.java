@@ -91,8 +91,9 @@ public class RunBicycleExample {
 
 		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
 
+
 		List<String> mainModeList = new ArrayList<>();
-		mainModeList.add("bicycle");
+		mainModeList.add( bicycleConfigGroup.getBicycleMode() );
 		mainModeList.add(TransportMode.car);
 
 		config.qsim().setMainModes(mainModeList);
@@ -115,10 +116,12 @@ public class RunBicycleExample {
 
 		config.plansCalcRoute().setRoutingRandomness(3.);
 
+		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
 		if (considerMotorizedInteraction) {
-			BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
 			bicycleConfigGroup.setMotorizedInteraction(considerMotorizedInteraction);
 		}
+
+		final String bicycle = bicycleConfigGroup.getBicycleMode();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -128,7 +131,8 @@ public class RunBicycleExample {
 		// now put hte mode vehicles into the vehicles data:
 		final VehiclesFactory vf = VehicleUtils.getFactory();
 		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) ) );
-		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create("bicycle", VehicleType.class ) ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
+		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create( bicycle, VehicleType.class ) )
+							 .setNetworkMode( bicycle ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new BicycleModule() );

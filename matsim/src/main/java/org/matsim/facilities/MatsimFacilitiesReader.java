@@ -52,7 +52,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 	 *   () sometimes, it is there, and sometimes not
 	 *   () sometimes, it is read(), sometimes it is readFile( file), sometimes ...
 	 *   () sometimes it throws an i/o exception, sometimes not
-	 * Oh well.  
+	 * Oh well.
 	 * At least it seems indeed that the MatsimReader is indeed usually there. kai, jul09
 	 */
 
@@ -106,6 +106,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
             final String externalInputCRS,
             final String targetCRS,
             final ActivityFacilities facilities) {
+        super(ValidationType.DTD_ONLY);
         this.externalInputCRS = externalInputCRS;
         this.targetCRS = targetCRS;
         this.facilities = facilities;

@@ -56,10 +56,6 @@ import java.util.*;
 
 	private final Collection<Carrier> carriers;
 
-	private final Map<CarrierShipment, Id<CarrierShipment>> registeredShipments = new HashMap<>();
-
-	private final Map<CarrierService, Id<CarrierService>> serviceMap = new HashMap<>();
-
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 
 
@@ -150,7 +146,6 @@ import java.util.*;
 		this.writeStartTag("shipments", null);
 		for (CarrierShipment s : carrier.getShipments().values()) {
 			Id<CarrierShipment> shipmentId = s.getId();
-			registeredShipments.put(s, shipmentId);
 			if (s.getAttributes().isEmpty()) {
 				writeShipment(s, shipmentId, true, false);
 			} else {
@@ -181,7 +176,6 @@ import java.util.*;
 		if(carrier.getServices().isEmpty()) return;
 		this.writeStartTag("services", null);
 		for (CarrierService s : carrier.getServices().values()) {
-			serviceMap.put(s, s.getId());
 			if (s.getAttributes().isEmpty()) {
 				writeService(s, true, false);
 			} else {
@@ -285,14 +279,22 @@ import java.util.*;
 					else if (tourElement instanceof ShipmentBasedActivity act) {
 						this.writeStartTag("act", List.of(
 								createTuple("type", act.getActivityType()),
-								createTuple("shipmentId", registeredShipments.get(act.getShipment()).toString())), true
+								createTuple("shipmentId", act.getShipment().getId().toString())), true
 						);
+						if (!carrier.getShipments().containsKey(act.getShipment().getId())) {
+							logger.error("Shipment with id " + act.getShipment().getId().toString() + " is contained in the carriers plan, " +
+								"but not available in the list of shipments. Carrier with carrierId: " + carrier.getId());
+						}
 					}
 					else if (tourElement instanceof ServiceActivity act) {
 						this.writeStartTag("act", List.of(
 								createTuple("type", act.getActivityType()),
-								createTuple("serviceId", serviceMap.get(act.getService()).toString())), true
+								createTuple("serviceId", act.getService().getId().toString())), true
 						);
+						if (!carrier.getServices().containsKey(act.getService().getId())) {
+							logger.error("service with id " + act.getService().getId().toString() + " is contained in the carriers plan, " +
+								"but not available in the list of services. Carrier with carrierId: " + carrier.getId());
+						}
 					}
 				}
 				this.writeStartTag("act", List.of(
@@ -307,7 +309,6 @@ import java.util.*;
 
 	private void endCarrier() throws IOException {
 		this.writeEndTag("carrier");
-		registeredShipments.clear();
 	}
 
 	private void writeEndElement() throws IOException {

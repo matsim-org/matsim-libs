@@ -31,8 +31,8 @@ public class FISSQSimModule extends AbstractQSimModule {
 
     @Override
     protected void configureQSim() {
-        addNamedComponent(FISS.class, COMPONENT_NAME);
-	}
+	    addQSimComponentBinding( COMPONENT_NAME ).to( FISS.class );
+    }
 
     @Provides
     @Singleton

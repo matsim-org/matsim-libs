@@ -55,14 +55,17 @@ public class RunFreightAnalysisEventbased {
 	//Were is your simulation output, that should be analysed?
 	private final String SIM_OUTPUT_PATH ;
 	private final String ANALYSIS_OUTPUT_PATH;
+	private final String GLOBAL_CRS;
 
 	/**
-	 * @param simOutputPath The output directory of the simulation run
+	 * @param simOutputPath      The output directory of the simulation run
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
+	 * @param globalCrs
 	 */
-	public RunFreightAnalysisEventbased(String simOutputPath, String analysisOutputPath) {
+	public RunFreightAnalysisEventbased(String simOutputPath, String analysisOutputPath, String globalCrs) {
 		this.SIM_OUTPUT_PATH = simOutputPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
+		this.GLOBAL_CRS = globalCrs;
 	}
 
 	public void runAnalysis() throws IOException {
@@ -70,6 +73,7 @@ public class RunFreightAnalysisEventbased {
 		Config config = ConfigUtils.createConfig();
 		config.vehicles().setVehiclesFile(SIM_OUTPUT_PATH + "output_allVehicles.xml.gz");
 		config.network().setInputFile(SIM_OUTPUT_PATH + "output_network.xml.gz");
+		config.global().setCoordinateSystem(GLOBAL_CRS);
 		config.plans().setInputFile(null);
 		config.parallelEventHandling().setNumberOfThreads(null);
 		config.parallelEventHandling().setEstimatedNumberOfEvents(null);

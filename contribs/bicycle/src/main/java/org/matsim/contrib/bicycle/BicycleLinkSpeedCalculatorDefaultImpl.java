@@ -1,35 +1,42 @@
 package org.matsim.contrib.bicycle;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.Vehicle;
 
 import jakarta.inject.Inject;
+import org.matsim.vehicles.VehicleType;
+
 import java.util.Objects;
 
-public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCalculator {
-
-	@Inject
-	private BicycleConfigGroup bicycleConfigGroup;
-
-	@Inject
-	private BicycleLinkSpeedCalculatorDefaultImpl() {
-	}
-
+public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCalculator {
+	private static final Logger log = LogManager.getLogger(BicycleLinkSpeedCalculatorDefaultImpl.class );
+	@Inject private BicycleConfigGroup bicycleConfigGroup;
+	@Inject private QSimConfigGroup qSimConfigGroup;
+	@Inject private BicycleLinkSpeedCalculatorDefaultImpl() { }
 	/**
 	 * for unit testing
 	 */
-	BicycleLinkSpeedCalculatorDefaultImpl( BicycleConfigGroup configGroup ) {
-		this.bicycleConfigGroup = configGroup;
+	BicycleLinkSpeedCalculatorDefaultImpl( Config config ) {
+		this.bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
+		this.qSimConfigGroup = config.qsim();
 	}
 
 	@Override
 	public double getMaximumVelocity(QVehicle qVehicle, Link link, double time) {
+		if (isBike(qVehicle)){
+			return getMaximumVelocityForLink( link, qVehicle.getVehicle() );
+		} else{
+			return Double.NaN;
+			// (this now works because the link speed calculator returns the default for all combinations of (vehicle, link, time) that
+			// are not answered by a specialized link speed calculator.  kai, jun'23)
+		}
 
-		if (isBike(qVehicle))
-			return getMaximumVelocityForLink(link, qVehicle.getVehicle());
-		else
-			return getDefaultMaximumVelocity(qVehicle, link, time);
 	}
 	@Override
 	public double getMaximumVelocityForLink(Link link, Vehicle vehicle) {
@@ -43,9 +50,9 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 		return Math.min(speed, link.getFreespeed());
 	}
 
-	private double getDefaultMaximumVelocity(QVehicle qVehicle, Link link, double time) {
-		return Math.min(qVehicle.getMaximumVelocity(), link.getFreespeed(time));
-	}
+//	private double getDefaultMaximumVelocity(QVehicle qVehicle, Link link, double time) {
+//		return Math.min(qVehicle.getMaximumVelocity(), link.getFreespeed(time));
+//	}
 
 	/**
 	 * Based on "Flügel et al. -- Empirical speed models for cycling in the Oslo road network" (not yet published!)
@@ -136,6 +143,33 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 	}
 
 	private boolean isBike(QVehicle qVehicle) {
-		return qVehicle.getVehicle().getType().getId().toString().equals(bicycleConfigGroup.getBicycleMode());
+//		return qVehicle.getVehicle().getType().getId().toString().equals(bicycleConfigGroup.getBicycleMode());
+
+		// the above is what I found.  With mode vehicles, the vehicle ID is indeed abused for the model.  But we should not rely on this.
+		// Unfortunately, backwards compatibility may now fail ... I have seen mode vehicles different from car but having car as network
+		// mode.  kai, jun'23
+
+		final VehicleType vehicleType = qVehicle.getVehicle().getType();
+
+		// the below consistentcy check is to broad; need a version that is more narrow ...
+		
+//		if ( qSimConfigGroup.getVehiclesSource()== QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData ) {
+//			if ( !vehicleType.getId().toString().equals( vehicleType.getNetworkMode() ) ) {
+//				throw new RuntimeException( "You are using mode vehicles but the network mode of the vehicle type is wrong: vehType.id=" + vehicleType.getId()
+//									    + "; vehType.mode=" + vehicleType.getNetworkMode() );
+//			}
+//		}
+
+		// ... more narrow version coming here ...
+		if (
+				qVehicle.getVehicle().getType().getId().toString().equals( bicycleConfigGroup.getBicycleMode() )
+									      && !vehicleType.getNetworkMode().equals( bicycleConfigGroup.getBicycleMode() )
+		) {
+				throw new RuntimeException( "You are using mode vehicles but the network mode of the vehicle type is wrong: vehType.id=" + vehicleType.getId()
+									    + "; vehType.mode=" + vehicleType.getNetworkMode() );
+		}
+
+
+		return vehicleType.getNetworkMode().equals(bicycleConfigGroup.getBicycleMode() );
 	}
 }

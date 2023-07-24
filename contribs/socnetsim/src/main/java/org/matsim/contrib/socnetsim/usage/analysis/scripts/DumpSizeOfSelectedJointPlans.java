@@ -53,7 +53,7 @@ public class DumpSizeOfSelectedJointPlans {
 		writer.write( "personId\tsize" );
 
 		final Counter counter = new Counter( "parse joint plan # " );
-		new MatsimXmlParser( ) {
+		new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_ONLY) {
 			{
 				setValidating(false) ;
 			}
@@ -122,7 +122,7 @@ public class DumpSizeOfSelectedJointPlans {
 		final Map<Id, Integer> map = new HashMap<Id, Integer>();
 
 		final Counter counter = new Counter( "parse person # " );
-		new MatsimXmlParser() {
+		new MatsimXmlParser(MatsimXmlParser.ValidationType.DTD_ONLY) {
 			private Id<Person> currentAgent = null;
 			private int currIndex = -1;
 

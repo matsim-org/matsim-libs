@@ -3,9 +3,9 @@ package org.matsim.application.prepare.population;
 import com.google.common.collect.Lists;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
+import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import picocli.CommandLine;
 
 import java.nio.file.Files;
@@ -50,7 +50,7 @@ public class RemoveRoutesFromPlans implements MATSimAppCommand {
 			output = Path.of(plans.toAbsolutePath().toString().replace(".xml", "-no-routes.xml"));
 
 		Files.createDirectories(output.getParent());
-		
+
 		// Using the analysis main mode identifier instead of the routing mode based one on purpose
 		// to be able to process older population files without any routing modes!
 		TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new DefaultAnalysisMainModeIdentifier());
