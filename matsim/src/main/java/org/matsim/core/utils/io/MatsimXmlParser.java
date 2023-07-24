@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.utils.FeatureFlags;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -68,7 +69,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	// yy this is NOT working for me with "dtd", but it IS working with null.
 	// Note that I am typically NOT running java from the root of the classpath. kai, mar'15
 
-	private boolean preferLocalDtds = false;
+	private final boolean preferLocalDtds;
 
 	private String doctype = null;
 	/**
@@ -84,10 +85,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	 */
 	public MatsimXmlParser(ValidationType validationType) {
 		this.validationType = validationType;
-		String localDtd = System.getProperty("matsim.preferLocalDtds");
-		if (localDtd != null) {
-			this.preferLocalDtds = Boolean.parseBoolean(localDtd);
-		}
+		this.preferLocalDtds = FeatureFlags.preferLocalDTDs();
 	}
 
 	/**
@@ -125,7 +123,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	 * By default the value of this is set to <code>false</code>.
 	 *
 	 * @param awareness true if the parser produced by this code will provide support for XML namespaces; false otherwise.
-	 * @see{javax.xml.parsers.SAXParserFactory.setNamespaceAware(boolean)}
+	 * @see javax.xml.parsers.SAXParserFactory#setNamespaceAware(boolean)
 	 */
 	public final void setNamespaceAware(final boolean awareness) {
 		this.isNamespaceAware = awareness;
@@ -367,7 +365,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	}
 
 	@Override
-	public final void startElement(final String uri, final String localName, final String qName, Attributes atts) throws SAXException {
+	public final void startElement(final String uri, final String localName, final String qName, Attributes atts) {
 		// I have not good intuition if making this one non-final might be ok.  kai, jul'16
 
 		String tag = (uri.length() == 0) ? qName : localName;
@@ -414,7 +412,9 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	private String getInputSource(final SAXParseException ex) {
 		System.out.println(ex.getPublicId());
 		System.out.println(ex.getSystemId());
-		System.out.println(ex.getCause());
+		if (ex.getCause() != null) {
+			System.out.println(ex.getCause().getMessage());
+		}
 		System.out.println(ex.getLocalizedMessage());
 		System.out.println(ex.getMessage());
 		if (ex.getSystemId() != null) {

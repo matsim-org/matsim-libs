@@ -31,6 +31,7 @@ import jakarta.inject.Inject;
  * @author dziemke
  * @deprecated -- it might be possible to repair this, but as of now it is not working.  kai, nov'22
  */
+@Deprecated
 final class MotorizedInteractionEngine implements MobsimBeforeSimStepListener {
 	// ok to have this public final when ctor is package-private/injected: can only be used through injection
 
