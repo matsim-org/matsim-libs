@@ -117,15 +117,6 @@ public class TripsAndLegsCSVWriter {
         Tuple<Iterable<?>, Iterable<?>> record = new Tuple<>(tripRecords, legRecords);
         List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(experiencedPlan);
 
-        /*
-         * The (unlucky) default RoutingModeMainModeIdentifier needs routing modes set in the legs. Unfortunately the
-         * plans recreated based on events do not have the routing mode attribute, because routing mode is not transmitted
-         * in any event. So RoutingModeMainModeIdentifier cannot identify a main mode and throws log errors.
-         * Avoid this and check if the AnalysisMainModeIdentifier was bound to something more useful before calling it.
-         */
-        boolean workingMainModeIdentifier = mainModeIdentifier != null &&
-                !mainModeIdentifier.getClass().equals(RoutingModeMainModeIdentifier.class);
-
         for (int i = 0; i < trips.size(); i++) {
             TripStructureUtils.Trip trip = trips.get(i);
             List<String> tripRecord = new ArrayList<>();
@@ -157,9 +148,11 @@ public class TripsAndLegsCSVWriter {
             String lastPtEgressStop = null;
 
             String mainMode = "";
-            if (workingMainModeIdentifier) {
+            if (mainModeIdentifier != null) {
                 try {
                     mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
+					if (mainMode == null)
+						mainMode = "";
                 } catch (Exception e) {
                     // leave field empty
                 }

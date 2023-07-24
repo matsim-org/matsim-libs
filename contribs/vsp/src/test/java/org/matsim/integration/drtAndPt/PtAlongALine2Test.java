@@ -51,6 +51,7 @@ import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
 import org.matsim.core.mobsim.qsim.PreplanningEngine;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -419,6 +420,13 @@ public class PtAlongALine2Test {
 			// !! does not work together with parameterized tests :-( !!
 		}
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(PtAlongALineAnalysisMainModeIdentifier.class);
+			}
+		});
+
 		controler.run();
 
 		/*
@@ -729,6 +737,13 @@ public class PtAlongALine2Test {
 			}
 		});
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(PtAlongALineAnalysisMainModeIdentifier.class);
+			}
+		});
+
 		controler.run();
 	}
 
@@ -794,6 +809,13 @@ public class PtAlongALine2Test {
 
 		// This will start otfvis.  Comment out if not needed.
 		//		controler.addOverridingModule( new OTFVisLiveModule() );
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(PtAlongALineAnalysisMainModeIdentifier.class);
+			}
+		});
 
 		controler.run();
 	}

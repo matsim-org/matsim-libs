@@ -21,7 +21,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 public class FeedforwardSignalHandler implements IterationStartsListener {
 	private static final Logger log = LogManager.getLogger(FeedforwardSignalHandler.class);
 	private final DrtZonalSystem zonalSystem;
-	private final Map<Double, List<Flow<DrtZone, DrtZone>>> feedforwardSignal = new HashMap<>();
+	private final Map<Integer, List<Flow<DrtZone, DrtZone>>> feedforwardSignal = new HashMap<>();
 	private final int timeBinSize;
 	private final NetDepartureReplenishDemandEstimator netDepartureReplenishDemandEstimator;
 
@@ -39,36 +39,33 @@ public class FeedforwardSignalHandler implements IterationStartsListener {
 	}
 
 	private void calculateFeedforwardSignal() {
-		netDepartureReplenishDemandEstimator.update(1);
+		netDepartureReplenishDemandEstimator.updateForNextIteration();
 		feedforwardSignal.clear();
 		int progressCounter = 0;
 		int numOfTimeBin = simulationEndTime * 3600 / timeBinSize;
 		log.info("Start calculating rebalnace plan now");
-		for (int i = 0; i < numOfTimeBin; i++) {
-			double timeBin = i;
-			ToDoubleFunction<DrtZone> netDepartureInputFunction = netDepartureReplenishDemandEstimator.getExpectedDemandForTimeBin(
-					timeBin);
+		for (int t = 0; t < numOfTimeBin; t++) {
+			ToDoubleFunction<DrtZone> netDepartureInputFunction = netDepartureReplenishDemandEstimator.getExpectedDemandForTimeBin(t);
 			List<DrtZoneVehicleSurplus> vehicleSurpluses = zonalSystem.getZones()
 					.values()
 					.stream()
 					.map(z -> new DrtZoneVehicleSurplus(z, (int)netDepartureInputFunction.applyAsDouble(z) * -1))
 					.collect(toList());
 
-			feedforwardSignal.put(timeBin, TransportProblem.solveForVehicleSurplus(vehicleSurpluses));
+			feedforwardSignal.put(t, TransportProblem.solveForVehicleSurplus(vehicleSurpluses));
 			progressCounter++;
 			log.debug("Calculating: " + (double)progressCounter * timeBinSize / simulationEndTime / 36 + "% complete");
 		}
 		log.info("Rebalance plan calculation is now complete! ");
 	}
 
-	public Map<Double, List<Flow<DrtZone, DrtZone>>> getFeedforwardSignal() {
+	public Map<Integer, List<Flow<DrtZone, DrtZone>>> getFeedforwardSignal() {
 		return feedforwardSignal;
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		int iteration = event.getIteration();
-		if (iteration > 0) {
+		if (event.getIteration() > 0) {
 			calculateFeedforwardSignal();
 		}
 	}

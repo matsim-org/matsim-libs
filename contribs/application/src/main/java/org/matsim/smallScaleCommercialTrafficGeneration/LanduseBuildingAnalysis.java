@@ -210,6 +210,7 @@ public class LanduseBuildingAnalysis {
 					totalEmployeesInCategoriesPerZone.get(investigationArea).mergeDouble(zoneId,
 							resultingNumberPerCategory, Double::sum);
 			}
+			if (totalEmployeesInCategoriesPerZone.get(investigationArea).getDouble(zoneId) != 0)
 			resultingDataPerZone.get(zoneId).mergeDouble("Employee",
 					totalEmployeesInCategoriesPerZone.get(investigationArea).getDouble(zoneId), Double::sum);
 		}

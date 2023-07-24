@@ -75,6 +75,7 @@ public final class PopulationReader extends MatsimXmlParser {
 				final String targetCRS,
 				final Scenario scenario,
 				boolean streaming ) {
+		super(ValidationType.DTD_ONLY);
 		if ( !streaming && scenario.getPopulation() instanceof StreamingPopulation ) {
 			throw new RuntimeException("MatsimPopulationReader called directly with an instance of StreamingPopulation "
 					+ "in scenario.  Call via StreamingPopulationReader or ask for help.  kai, jul'16") ;
@@ -116,7 +117,7 @@ public final class PopulationReader extends MatsimXmlParser {
 		switch ( doctype ) {
 			case POPULATION_V6:
 				this.delegate =
-						new PopulationReaderMatsimV6(
+						new ParallelPopulationReaderMatsimV6(
 						        inputCRS,
 						        targetCRS,
 								this.scenario);

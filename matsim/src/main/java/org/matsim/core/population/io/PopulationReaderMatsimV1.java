@@ -88,6 +88,7 @@ import org.xml.sax.Attributes;
 	public PopulationReaderMatsimV1(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.coordinateTransformation = coordinateTransformation;
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
@@ -147,9 +148,9 @@ import org.xml.sax.Attributes;
 	private void startPerson(final Attributes atts) {
 		this.currperson = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
 		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
-		
+
 		PersonUtils.setAge(this.currperson, Integer.parseInt(atts.getValue("age")));
-		
+
 		PersonUtils.setLicence(this.currperson, atts.getValue("license"));
 		PersonUtils.setCarAvail(this.currperson, atts.getValue("car_avail"));
 		String employed = atts.getValue("employed");

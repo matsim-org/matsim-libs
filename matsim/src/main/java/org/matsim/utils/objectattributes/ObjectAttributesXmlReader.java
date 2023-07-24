@@ -64,6 +64,7 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 
 
 	public ObjectAttributesXmlReader(final ObjectAttributes attributes) {
+		super(ValidationType.NO_VALIDATION);
 		this.attributes = attributes;
 		super.setValidating(false);
 	}
