@@ -91,6 +91,7 @@ import org.xml.sax.Attributes;
 	protected PopulationReaderMatsimV0(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.coordinateTransformation = coordinateTransformation;
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();

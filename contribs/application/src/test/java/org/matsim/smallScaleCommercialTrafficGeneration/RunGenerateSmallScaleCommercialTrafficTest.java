@@ -41,7 +41,7 @@ import java.util.Objects;
  * @author Ricardo Ewert
  *
  */
-public class RunCreateSmallScaleCommercialTrafficTest {
+public class RunGenerateSmallScaleCommercialTrafficTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -54,20 +54,20 @@ public class RunCreateSmallScaleCommercialTrafficTest {
 		String jspritIterations = "2";
 		String creationOption = "createNewCarrierFile";
 		String landuseConfiguration = "useExistingDataDistribution";
-		String trafficType = "commercialTraffic";
+		String smallScaleCommercialTrafficType = "commercialPersonTraffic";
 		String includeExistingModels = "true";
 		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
 		String buildingsShapeFileName = utils.getPackageInputDirectory() + "/shp/testBuildings.shp";
 		String landuseShapeFileName = utils.getPackageInputDirectory() + "/shp/testLanduse.shp";
 		String shapeCRS = "EPSG:4326";
 
-		new CreateSmallScaleCommercialTrafficDemand().execute(
+		new GenerateSmallScaleCommercialTrafficDemand().execute(
 				inputDataDirectory,
 				"--sample", sample,
 				"--jspritIterations", jspritIterations,
 				"--creationOption", creationOption,
 				"--landuseConfiguration", landuseConfiguration,
-				"--trafficType", trafficType,
+				"--smallScaleCommercialTrafficType", smallScaleCommercialTrafficType,
 				"--includeExistingModels",
 				"--zoneShapeFileName", zoneShapeFileName,
 				"--buildingsShapeFileName", buildingsShapeFileName,

@@ -55,7 +55,7 @@ import org.xml.sax.Attributes;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v4.dtd</code>.
- * 
+ *
  * @author mrieser
  * @author balmermi
  */
@@ -106,6 +106,7 @@ import org.xml.sax.Attributes;
 	public PopulationReaderMatsimV4(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.coordinateTransformation = coordinateTransformation;
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();

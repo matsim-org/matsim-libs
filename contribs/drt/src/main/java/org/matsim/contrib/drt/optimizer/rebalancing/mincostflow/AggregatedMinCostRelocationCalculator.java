@@ -64,11 +64,11 @@ public class AggregatedMinCostRelocationCalculator implements ZonalRelocationCal
 			List<TransportProblem.Flow<DrtZone, DrtZone>> flows) {
 		List<Relocation> relocations = new ArrayList<>();
 		for (TransportProblem.Flow<DrtZone, DrtZone> flow : flows) {
-			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(flow.origin);
+			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(flow.origin());
 
-			Link targetLink = targetLinkSelector.selectTargetLink(flow.destination);
+			Link targetLink = targetLinkSelector.selectTargetLink(flow.destination());
 
-			for (int f = 0; f < flow.amount; f++) {
+			for (int f = 0; f < flow.amount(); f++) {
 				// TODO use BestDispatchFinder (needs to be moved from taxi to dvrp) instead
 				DvrpVehicle nearestVehicle = findNearestVehicle(rebalancableVehicles, targetLink);
 				relocations.add(new Relocation(nearestVehicle, targetLink));

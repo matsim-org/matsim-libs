@@ -21,6 +21,7 @@ package org.matsim.utils.eventsfilecomparison;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -128,16 +129,24 @@ public final class EventsFileComparator {
 
 			boolean problem = false ;
 
+			int logCounter = 0;
+
 			// check that map2 contains all keys of map1, with the same values
 			for (Entry<String, Counter> entry : map1.entrySet()) {
 
 				Counter counter = map2.get(entry.getKey());
 				if (counter == null) {
-					log.warn("The event:" ) ;
-					log.warn( entry.getKey() );
-					log.warn("is missing in events file:" + worker2.getEventsFile());
-					setExitCode(Result.MISSING_EVENT);
-					problem = true ;
+					if (logCounter < 50) {
+						logCounter++;
+						log.warn("The event:");
+						log.warn(entry.getKey());
+						log.warn("is missing in events file:" + worker2.getEventsFile());
+						setExitCode(Result.MISSING_EVENT);
+						problem = true;
+						if (logCounter == 50) {
+							log.warn(Gbl.FUTURE_SUPPRESSED);
+						}
+					}
 				} else{
 					if( counter.getCount() != entry.getValue().getCount() ){
 						log.warn(
@@ -149,15 +158,22 @@ public final class EventsFileComparator {
 				}
 			}
 
+			logCounter = 0;
 			// also check that map1 contains all keys of map2
 			for (Entry<String, Counter> e : map2.entrySet()) {
 				Counter counter = map1.get(e.getKey());
 				if (counter == null) {
-					log.warn("The event:");
-					log.warn(e.getKey());
-					log.warn("is missing in events file:" + worker1.getEventsFile());
-					setExitCode(Result.MISSING_EVENT);
-					problem = true ;
+					if (logCounter < 50) {
+						logCounter++;
+						log.warn("The event:");
+						log.warn(e.getKey());
+						log.warn("is missing in events file:" + worker1.getEventsFile());
+						setExitCode(Result.MISSING_EVENT);
+						problem = true;
+						if (logCounter == 50) {
+							log.warn(Gbl.FUTURE_SUPPRESSED);
+						}
+					}
 				}
 			}
 
