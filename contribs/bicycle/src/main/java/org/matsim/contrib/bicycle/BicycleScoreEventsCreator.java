@@ -25,10 +25,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonScoreEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
@@ -48,46 +47,97 @@ import java.util.*;
  */
 class BicycleScoreEventsCreator implements
 //		SumScoringFunction.LegScoring, SumScoringFunction.ArbitraryEventScoring
-		VehicleEntersTrafficEventHandler, LinkLeaveEventHandler,VehicleLeavesTrafficEventHandler
+		VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,VehicleLeavesTrafficEventHandler
 {
 	private static final Logger log = LogManager.getLogger( BicycleScoreEventsCreator.class ) ;
 	private final Network network;
 	private final EventsManager eventsManager;
 	private final AdditionalBicycleLinkScore additionalBicycleLinkScore;
+	private final String bicycleMode;
 
 	private final Vehicle2DriverEventHandler vehicle2driver = new Vehicle2DriverEventHandler();
 	private final Map<Id<Vehicle>,Id<Link>> firstLinkIdMap = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>,String> modeFromVehicle = new LinkedHashMap<>();
+	private final Map<String,Map<Id<Link>,Double>> numberOfVehiclesOnLinkByMode = new LinkedHashMap<>();
+	private final BicycleConfigGroup bicycleConfig;
 
 	@Inject BicycleScoreEventsCreator( Scenario scenario, EventsManager eventsManager, AdditionalBicycleLinkScore additionalBicycleLinkScore ) {
 		this.eventsManager = eventsManager;
 		this.network = scenario.getNetwork();
 		this.additionalBicycleLinkScore = additionalBicycleLinkScore;
+		this.bicycleConfig = ConfigUtils.addOrGetModule( scenario.getConfig(), BicycleConfigGroup.class );
+		this.bicycleMode = bicycleConfig.getBicycleMode();
 	}
 
 	@Override public void reset( int iteration ){
 		vehicle2driver.reset( iteration );
 	}
+
 	@Override public void handleEvent( VehicleEntersTrafficEvent event ){
 		vehicle2driver.handleEvent( event );
-		// ---
-		this.firstLinkIdMap.put( event.getVehicleId(), event.getLinkId() );
-	}
-	@Override public void handleEvent( LinkLeaveEvent event ){
-		if ( vehicle2driver.getDriverOfVehicle( event.getVehicleId() ) != null ){
-			// can be null on first link (why?)
 
+		this.firstLinkIdMap.put( event.getVehicleId(), event.getLinkId() );
+
+		if ( this.bicycleConfig.isMotorizedInteraction() ){
+			modeFromVehicle.put( event.getVehicleId(), event.getNetworkMode() );
+
+			// inc count by one:
+			numberOfVehiclesOnLinkByMode.putIfAbsent( event.getNetworkMode(), new LinkedHashMap<>() );
+			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get( event.getNetworkMode() );
+			map.merge( event.getLinkId(), 1., Double::sum );
+		}
+	}
+
+	@Override public void handleEvent( LinkEnterEvent event ) {
+		if ( this.bicycleConfig.isMotorizedInteraction() ){
+			// inc count by one:
+			String mode = this.modeFromVehicle.get( event.getVehicleId() );
+			numberOfVehiclesOnLinkByMode.putIfAbsent( mode, new LinkedHashMap<>() );
+			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get( mode );
+			map.merge( event.getLinkId(), 1., Double::sum );
+		}
+	}
+
+	@Override public void handleEvent( LinkLeaveEvent event ){
+		if ( this.bicycleConfig.isMotorizedInteraction() ){
+			// dec count by one:
+			String mode = this.modeFromVehicle.get( event.getVehicleId() );
+			numberOfVehiclesOnLinkByMode.putIfAbsent( mode, new LinkedHashMap<>() );
+			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get( mode );
+			Gbl.assertIf( map.merge( event.getLinkId(), -1., Double::sum ) >= 0 );
+		}
+
+		if ( vehicle2driver.getDriverOfVehicle( event.getVehicleId() ) != null ){
 			double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ) );
+
+			if ( this.bicycleConfig.isMotorizedInteraction() ) {
+				var carCounts = this.numberOfVehiclesOnLinkByMode.get( TransportMode.car );
+				if ( carCounts != null ){
+					amount -= 0.004 * carCounts.getOrDefault( event.getLinkId(), 0. );
+				}
+			}
 
 			final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );
 			Gbl.assertNotNull( driverOfVehicle );
 			this.eventsManager.processEvent( new PersonScoreEvent( event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore" ) );
+		} else {
+			log.warn( "no driver found for vehicleId=" + event.getVehicleId() + "; not clear why this could happen");
 		}
 	}
+
 	@Override public void handleEvent( VehicleLeavesTrafficEvent event ){
-		vehicle2driver.handleEvent( event );
-		// ---
+		if ( this.bicycleConfig.isMotorizedInteraction() ){
+			// dec count by one:
+			String mode = this.modeFromVehicle.get( event.getVehicleId() );
+			numberOfVehiclesOnLinkByMode.putIfAbsent( mode, new LinkedHashMap<>() );
+			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get( mode );
+			Gbl.assertIf( map.merge( event.getLinkId(), -1., Double::sum ) >= 0. );
+		}
 		if ( vehicle2driver.getDriverOfVehicle( event.getVehicleId() ) != null ){
 			if( !Objects.equals( this.firstLinkIdMap.get( event.getVehicleId() ), event.getLinkId() ) ){
+				// what is this good for?  maybe that bicycles that enter and leave on the same link should not receive the additional score?  kai, jul'23
+
+				// yyyy in the link based scoring, it actually uses event.getReleativePositionOnLink.  Good idea!  kai, jul'23
 
 				double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ) );
 
@@ -95,7 +145,11 @@ class BicycleScoreEventsCreator implements
 				Gbl.assertNotNull( driverOfVehicle );
 				this.eventsManager.processEvent( new PersonScoreEvent( event.getTime(), driverOfVehicle, amount, "bicycleAdditionalLinkScore" ) );
 			}
+		} else {
+			log.warn( "no driver found for vehicleId=" + event.getVehicleId() + "; not clear why this could happen" );
 		}
+		// ---
+		vehicle2driver.handleEvent( event );
 	}
 
 }

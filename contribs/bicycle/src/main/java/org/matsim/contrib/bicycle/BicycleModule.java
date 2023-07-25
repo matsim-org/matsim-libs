@@ -48,7 +48,6 @@ public final class BicycleModule extends AbstractModule {
 		// * link speeds are computed via a plugin handler to the DefaultLinkSpeedCalculator.  If the plugin handler returns a speed, it is
 		// used, otherwise the default speed is used. This has the advantage that multiple plugins can register such special link speed calculators.
 
-
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
 

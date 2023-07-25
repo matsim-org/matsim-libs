@@ -36,7 +36,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -75,7 +74,7 @@ public class RunBicycleExample {
 		config.controler().setLastIteration(100); // Modify if motorized interaction is used
 		boolean considerMotorizedInteraction = false;
 
-		new RunBicycleExample().run(config, considerMotorizedInteraction);
+		new RunBicycleExample().run(config );
 	}
 
 	static void fillConfigWithBicycleStandardValues(Config config) {
@@ -110,16 +109,13 @@ public class RunBicycleExample {
 		config.plansCalcRoute().setNetworkModes(mainModeList);
 	}
 
-	public void run(Config config, boolean considerMotorizedInteraction) {
+	public void run(Config config ) {
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		config.plansCalcRoute().setRoutingRandomness(3.);
 
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
-		if (considerMotorizedInteraction) {
-			bicycleConfigGroup.setMotorizedInteraction(considerMotorizedInteraction);
-		}
 
 		final String bicycle = bicycleConfigGroup.getBicycleMode();
 

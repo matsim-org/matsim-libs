@@ -42,24 +42,14 @@ import org.matsim.core.scoring.functions.*;
 final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 	// ok to have this public final when the constructor is package-private/injected: can only used through injection
 
-	@Inject
-	private ScoringParametersForPerson parameters;
-
-	@Inject
-	private Scenario scenario;
-
-	@Inject
-	private EventsManager eventsManager;
-
-	@Inject
-	private BicycleConfigGroup bicycleConfigGroup;
-
-	@Inject
-	private BicycleScoringFunctionFactory() {
+	@Inject private ScoringParametersForPerson parameters;
+	@Inject private Scenario scenario;
+	@Inject private EventsManager eventsManager;
+	@Inject private BicycleConfigGroup bicycleConfigGroup;
+	@Inject private BicycleScoringFunctionFactory() {
 	}
 	
-	@Override
-	public ScoringFunction createNewScoringFunction(Person person) {
+	@Override public ScoringFunction createNewScoringFunction(Person person) {
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 
 		final ScoringParameters params = parameters.getScoringParameters(person);
@@ -77,6 +67,9 @@ final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 			BicycleLinkScoring bicycleLinkScoring = new BicycleLinkScoring(params, scenario, bicycleConfigGroup);
 
 			// pass motorized interaction event to scoring.  find more elegant way to do this!
+			// yyyyyy this is a problem.  It passes every motorized interaction event (which is effectively a link leave event) to every
+			// agent.  This does not scale to large scenarios!!  kai, jul'23
+			// I am now thinking that this can be quite easily resolved in BicycleScoreEventsCreator.  kai, jul'23
 			eventsManager.addHandler( new BasicEventHandler(){
 				@Override public void handleEvent( Event event ){
 					if ( event instanceof MotorizedInteractionEvent ){

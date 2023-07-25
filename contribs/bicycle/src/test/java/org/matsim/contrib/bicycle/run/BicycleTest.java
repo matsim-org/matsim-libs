@@ -31,7 +31,10 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleConfigGroup.BicycleScoringType;
 import org.matsim.contrib.bicycle.BicycleModule;
@@ -46,11 +49,14 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.ArrayList;
@@ -86,7 +92,7 @@ public class BicycleTest {
 		config.controler().setLastIteration(0);
 		config.controler().setCreateGraphs(false);
 
-		new RunBicycleExample().run(config, false);
+		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -122,7 +128,7 @@ public class BicycleTest {
 		config.controler().setLastIteration(0);
 		config.controler().setCreateGraphs(false);
 
-		new RunBicycleExample().run(config, false);
+		new RunBicycleExample().run(config );
 		{
 			Scenario scenarioReference = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 			Scenario scenarioCurrent = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
@@ -153,7 +159,7 @@ public class BicycleTest {
 		config.controler().setLastIteration(0);
 		config.controler().setCreateGraphs(false);
 
-		new RunBicycleExample().run(config, false);
+		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -182,7 +188,7 @@ public class BicycleTest {
 		config.controler().setLastIteration(0);
 		config.controler().setCreateGraphs(false);
 
-		new RunBicycleExample().run(config, false);
+		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -211,7 +217,7 @@ public class BicycleTest {
 		config.controler().setLastIteration(0);
 		config.controler().setCreateGraphs(false);
 
-		new RunBicycleExample().run(config, false);
+		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -241,7 +247,7 @@ public class BicycleTest {
 		config.controler().setLastIteration(0);
 		config.controler().setCreateGraphs(false);
 
-		new RunBicycleExample().run(config, false);
+		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -273,7 +279,7 @@ public class BicycleTest {
 		config.controler().setWritePlansInterval(10);
 		config.controler().setCreateGraphs(false);
 
-		new RunBicycleExample().run(config, false);
+		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -289,28 +295,22 @@ public class BicycleTest {
 	}
 
 	@Test public void testLinkBasedScoring() {
-//		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
-		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
-		config.addModule(new BicycleConfigGroup());
-		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
-
-		// Normal network
-		config.network().setInputFile("network_normal.xml");
-		config.plans().setInputFile("population_1200.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setLastIteration(0);
-		config.controler().setWriteEventsInterval(10);
-		config.controler().setWritePlansInterval(10);
-		config.controler().setCreateGraphs(false);
-
-		// Activate link-based scoring
-		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get("bicycle");
-		bicycleConfigGroup.setBicycleScoringType(BicycleScoringType.linkBased);
-
-		// Interaction with motor vehicles
-		new RunBicycleExample().run(config, false);
+		{
+			Config config = createConfig( 0 );
+			BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get( "bicycle" );
+			bicycleConfigGroup.setBicycleScoringType( BicycleScoringType.legBased );
+			new RunBicycleExample().run( config );
+		}
+		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new PopulationReader(scenarioReference).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		{
+			Config config2 = createConfig( 0 );
+			BicycleConfigGroup bicycleConfigGroup2 = (BicycleConfigGroup) config2.getModules().get( "bicycle" );
+			bicycleConfigGroup2.setBicycleScoringType( BicycleScoringType.linkBased );
+			new RunBicycleExample().run( config2 );
+		}
+		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
 
 //		LOG.info("Checking MATSim events file ...");
 //		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -318,10 +318,81 @@ public class BicycleTest {
 //		assertEquals("Different event files.", FILES_ARE_EQUAL,
 //				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
 
+		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
+			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
+			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
+			Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+		}
+//		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+	}
+	@Test public void testLinkVsLegMotorizedScoring() {
+		{
+			Config config = createConfig( 0 );
+			BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
+			bicycleConfigGroup.setBicycleScoringType( BicycleScoringType.legBased );
+			bicycleConfigGroup.setMotorizedInteraction( true );
+			new RunBicycleExample();
+			config.global().setNumberOfThreads(1 );
+			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists );
+
+			config.plansCalcRoute().setRoutingRandomness(3. );
+
+			final String bicycle = bicycleConfigGroup.getBicycleMode();
+
+			Scenario scenario = ScenarioUtils.loadScenario( config );
+
+			for( Link link : scenario.getNetwork().getLinks().values() ){
+				link.setAllowedModes( CollectionUtils.stringArrayToSet( new String[]{ bicycleMode, TransportMode.car}) );
+			}
+
+			PopulationFactory pf = scenario.getPopulation().getFactory();
+			List<Person> newPersons = new ArrayList<>();
+			for( Person oldPerson : scenario.getPopulation().getPersons().values() ){
+				Person newPerson = pf.createPerson( Id.createPersonId( oldPerson.getId() + "_car" ) );
+				Plan newPlan = pf.createPlan();
+				PopulationUtils.copyFromTo( oldPerson.getSelectedPlan(), newPlan );
+				for( Leg leg : TripStructureUtils.getLegs( newPlan ) ){
+					leg.setMode( TransportMode.car );
+				}
+				newPerson.addPlan( newPlan );
+				newPersons.add( newPerson );
+			}
+			for( Person newPerson : newPersons ){
+				scenario.getPopulation().addPerson( newPerson );
+			}
+
+			// set config such that the mode vehicles come from vehicles data:
+			scenario.getConfig().qsim().setVehiclesSource( VehiclesSource.modeVehicleTypesFromVehiclesData );
+
+			// now put hte mode vehicles into the vehicles data:
+			final VehiclesFactory vf = VehicleUtils.getFactory();
+			scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) ) );
+			scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create( bicycle, VehicleType.class ) )
+								 .setNetworkMode( bicycle ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
+
+			Controler controler = new Controler(scenario);
+			controler.addOverridingModule(new BicycleModule() );
+
+			controler.run();
+		}
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new PopulationReader(scenarioReference).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		{
+			Config config2 = createConfig( 0 );
+			BicycleConfigGroup bicycleConfigGroup2 = ConfigUtils.addOrGetModule( config2, BicycleConfigGroup.class );
+			bicycleConfigGroup2.setBicycleScoringType( BicycleScoringType.linkBased );
+			bicycleConfigGroup2.setMotorizedInteraction( true );
+			new RunBicycleExample().run( config2 );
+		}
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+
+//		LOG.info("Checking MATSim events file ...");
+//		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+//		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+//		assertEquals("Different event files.", FILES_ARE_EQUAL,
+//				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
+
 		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
 			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
@@ -331,27 +402,14 @@ public class BicycleTest {
 	}
 	@Test public void testMotorizedInteraction() {
 //		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
-		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
-		config.addModule(new BicycleConfigGroup());
-		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
-
-		// Normal network
-		config.network().setInputFile("network_normal.xml");
-		config.plans().setInputFile("population_1200.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(10);
-		config.controler().setLastIteration(10);
-		config.controler().setWriteEventsInterval(10);
-		config.controler().setWritePlansInterval(10);
-		config.controler().setCreateGraphs(false);
+		Config config = createConfig( 10 );
 
 		// Activate link-based scoring
 		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get("bicycle");
 		bicycleConfigGroup.setBicycleScoringType(BicycleScoringType.linkBased);
 
 		// Interaction with motor vehicles
-		new RunBicycleExample().run(config, true);
+		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
@@ -548,6 +606,26 @@ public class BicycleTest {
 		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(2), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(3), MatsimTestUtils.EPSILON);
 	}
+
+	private Config createConfig( int lastIteration ){
+		//		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		Config config = ConfigUtils.createConfig( utils.getClassInputDirectory() );
+		config.addModule( new BicycleConfigGroup() );
+		RunBicycleExample.fillConfigWithBicycleStandardValues( config );
+
+		// Normal network
+		config.network().setInputFile( "network_normal.xml" );
+		config.plans().setInputFile( "population_1200.xml" );
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controler().setLastIteration( lastIteration );
+		config.controler().setLastIteration( lastIteration );
+		config.controler().setWriteEventsInterval( 10 );
+		config.controler().setWritePlansInterval( 10 );
+		config.controler().setCreateGraphs( false );
+		return config;
+	}
+
 
 }
 

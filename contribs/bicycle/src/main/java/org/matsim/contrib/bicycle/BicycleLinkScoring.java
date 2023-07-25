@@ -47,7 +47,7 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 	private final BicycleConfigGroup bicycleConfigGroup;
 
 	private Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
-	private Id<Link> previousLink;
+	private Id<Link> currentLinkId;
 	private double previousLinkRelativePosition;
 	private double previousLinkEnterTime;
 	private double score;
@@ -77,7 +77,7 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 			vehicle2Driver.handleEvent(vehEvent);
 
 			// No LinkEnterEvent on first link of a leg
-			previousLink = vehEvent.getLinkId();
+			currentLinkId = vehEvent.getLinkId();
 			carCountOnLink = 0;
 			previousLinkRelativePosition = vehEvent.getRelativePositionOnLink();
 			previousLinkEnterTime =vehEvent.getTime();
@@ -102,15 +102,15 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 			Id<Vehicle> vehId = linkEnterEvent.getVehicleId();
 			double enterTime = previousLinkEnterTime;
 			double travelTime = linkEnterEvent.getTime() - enterTime;
-			calculateScoreForPreviousLink(previousLink, enterTime, vehId, travelTime, previousLinkRelativePosition);
+			calculateScoreForPreviousLink( currentLinkId, enterTime, vehId, travelTime, previousLinkRelativePosition );
 
-			previousLink = linkEnterEvent.getLinkId();
+			currentLinkId = linkEnterEvent.getLinkId();
 			carCountOnLink = 0;
 			previousLinkRelativePosition = 0.;
 			previousLinkEnterTime = linkEnterEvent.getTime();
 		}
 		if ( event instanceof MotorizedInteractionEvent ) {
-			if ( ((MotorizedInteractionEvent) event).getLinkId().equals(previousLink )){
+			if ( ((MotorizedInteractionEvent) event).getLinkId().equals( currentLinkId )){
 				this.carCountOnLink++;
 			}
 		}
