@@ -73,7 +73,7 @@ public final class BicycleModule extends AbstractModule {
 		// this is still needed because the bicycle travel time calculator for routing needs to use the same bicycle speed as the mobsim.  kai, jun'23
 
 		if (bicycleConfigGroup.isMotorizedInteraction()) {
-			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
+			addMobsimListenerBinding().to( MotorizedInteractionEngineForATest.class );
 		}
 
 		this.installOverridingQSimModule( new AbstractQSimModule(){

@@ -32,23 +32,11 @@ import jakarta.inject.Inject;
  * @deprecated -- it might be possible to repair this, but as of now it is not working.  kai, nov'22
  */
 @Deprecated
-final class MotorizedInteractionEngine implements MobsimBeforeSimStepListener {
-	// ok to have this public final when ctor is package-private/injected: can only be used through injection
+final class MotorizedInteractionEngineForATest implements MobsimBeforeSimStepListener {
 
-	private EventsManager eventsManager;
-//	private List<Id<Link>> links;
-//	private double startTime;
-//	private double endTime;
-//	private double frequency;
-
-	@Inject
-//	MotorizedInteractionEngine(EventsManager eventsManager, List<Id<Link>> links, double startTime, double endTime, double frequency) {
-	MotorizedInteractionEngine(EventsManager eventsManager) {
+	private final EventsManager eventsManager;
+	@Inject MotorizedInteractionEngineForATest( EventsManager eventsManager ) {
 		this.eventsManager = eventsManager;
-//		this.links = links;
-//		this.startTime = startTime;
-//		this.endTime = endTime;
-//		this.frequency = frequency;
 	}
 
 	@Override
@@ -59,12 +47,9 @@ final class MotorizedInteractionEngine implements MobsimBeforeSimStepListener {
 		double frequency = 3.;
 		Id<Link> linkId = Id.createLinkId("6"); // The central link
 
-
+		// this generates motorized interaction events with a certain frequency, but without looking at actual cars.
 		if ((currentTime % frequency == 0) && (currentTime >= startTime) && (currentTime <= endTime)) {
-//			LOG.info("Current time = " + currentTime + " -- " + currentTime / 3600.);
-//			for (Id<Link> linkId : links) {
-				eventsManager.processEvent(new MotorizedInteractionEvent(e.getSimulationTime(), linkId, Id.create("evilCar", Vehicle.class)));
-//			}
+			eventsManager.processEvent(new MotorizedInteractionEvent(e.getSimulationTime(), linkId, Id.create("evilCar", Vehicle.class)));
 		}
 	}
 }

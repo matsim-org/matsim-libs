@@ -20,35 +20,39 @@ package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasLinkId;
+import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dziemke
- * @deprecated -- it might be possible to use this, but as of now {@link MotorizedInteractionEngine} is not implemented in a meaningful way.  kai, dec'22
+ * @deprecated -- it might be possible to use this, but as of now {@link MotorizedInteractionEngineForATest} is not implemented in a meaningful way.  kai, dec'22
  */
-public final class MotorizedInteractionEvent extends Event {
-	// plausible to have this public
+public final class MotorizedInteractionEvent extends Event
+		implements HasLinkId, HasVehicleId
+		{
+	// (plausible to have this public)
 
-	private Id<Link> linkId;
-	private Id<Vehicle> vehId;
-
+	private final Id<Link> linkId;
+	private final Id<Vehicle> vehId;
 	public MotorizedInteractionEvent(double time, Id<Link> linkId, Id<Vehicle> vehId) {
 		super(time);
 		this.linkId = linkId;
 		this.vehId = vehId;
 	}
 
+	@Override
 	public Id<Link> getLinkId() {
 		return linkId;
 	}
 
-	public Id<Vehicle> getVehId() {
+	@Override
+	public Id<Vehicle> getVehicleId() {
 		return vehId;
 	}
 
-	@Override
-	public String getEventType() {
+	@Override public String getEventType() {
 		return "motorizedInteraction";
 	}
 }
