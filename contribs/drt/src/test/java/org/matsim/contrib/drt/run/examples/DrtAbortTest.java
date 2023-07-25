@@ -111,12 +111,12 @@ public class DrtAbortTest{
 
 		for ( DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get( config ).getModalElements()) {
 //			drtCfg.vehiclesFile = "vehicles-2-cap-4.xml";
-//			drtCfg.vehiclesFile = "vehicles-10-cap-4.xml";
-			drtCfg.vehiclesFile = "vehicles-20-cap-2.xml";
+			drtCfg.vehiclesFile = "vehicles-10-cap-4.xml";
+//			drtCfg.vehiclesFile = "vehicles-20-cap-2.xml";
 
-			drtCfg.maxTravelTimeAlpha = 1.0;
-			drtCfg.maxTravelTimeBeta = 900.;
-			drtCfg.maxWaitTime = 900.;
+			drtCfg.maxTravelTimeAlpha = 1.5;
+			drtCfg.maxTravelTimeBeta = 600.;
+			drtCfg.maxWaitTime = 300.;
 			drtCfg.stopDuration = 10.;
 		}
 
