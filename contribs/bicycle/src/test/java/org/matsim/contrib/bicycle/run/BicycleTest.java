@@ -21,7 +21,6 @@ package org.matsim.contrib.bicycle.run;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -40,11 +39,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
@@ -54,7 +51,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.ArrayList;
@@ -71,6 +67,8 @@ import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.
  */
 public class BicycleTest {
 	private static final Logger LOG = LogManager.getLogger(BicycleTest.class);
+
+	private static final String bicycleMode = "bicycle";
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -470,8 +468,8 @@ public class BicycleTest {
 
 	@Test
 	public void testInfrastructureSpeedFactorDistanceMoreRelevantThanTravelTime() {
-		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
-		config.addModule(new BicycleConfigGroup());
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
+		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
 
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
