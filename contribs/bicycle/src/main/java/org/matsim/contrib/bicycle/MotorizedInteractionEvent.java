@@ -27,11 +27,8 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dziemke
- * @deprecated -- it might be possible to use this, but as of now {@link MotorizedInteractionEngineForATest} is not implemented in a meaningful way.  kai, dec'22
  */
-public final class MotorizedInteractionEvent extends Event
-		implements HasLinkId, HasVehicleId
-		{
+public final class MotorizedInteractionEvent extends Event implements HasLinkId, HasVehicleId{
 	// (plausible to have this public)
 
 	private final Id<Link> linkId;
@@ -42,13 +39,11 @@ public final class MotorizedInteractionEvent extends Event
 		this.vehId = vehId;
 	}
 
-	@Override
-	public Id<Link> getLinkId() {
+	@Override public Id<Link> getLinkId() {
 		return linkId;
 	}
 
-	@Override
-	public Id<Vehicle> getVehicleId() {
+	@Override public Id<Vehicle> getVehicleId() {
 		return vehId;
 	}
 

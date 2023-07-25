@@ -24,9 +24,30 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 
 	}
 	@Override public double computeLinkBasedScore( Link link ){
-		return BicycleUtilityUtils.computeLinkBasedScore( link, marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m,
-		marginalUtilityOfGradient_m_100m, marginalUtilityOfUserDefinedNetworkAttribute_m, nameOfUserDefinedNetworkAttribute,
-		userDefinedNetworkAttributeDefaultValue );
+		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE );
+		String type = (String) link.getAttributes().getAttribute("type" );
+		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY );
+
+		double distance = link.getLength();
+
+		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface );
+		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
+
+		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype );
+		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
+
+		double gradient = BicycleUtilityUtils.getGradient( link );
+		double gradientScore = marginalUtilityOfGradient_m_100m * gradient * distance;
+
+		String userDefinedNetworkAttributeString;
+		double userDefinedNetworkAttributeScore = 0.;
+		if ( nameOfUserDefinedNetworkAttribute != null) {
+			userDefinedNetworkAttributeString = BicycleUtils.getUserDefinedNetworkAttribute( link, nameOfUserDefinedNetworkAttribute );
+			double userDefinedNetworkAttributeFactor = BicycleUtilityUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString, userDefinedNetworkAttributeDefaultValue );
+			userDefinedNetworkAttributeScore = marginalUtilityOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
+		}
+
+		return (infrastructureScore + comfortScore + gradientScore + userDefinedNetworkAttributeScore);
 	}
 }
 

@@ -25,35 +25,6 @@ import org.matsim.api.core.v01.network.Link;
  */
 class BicycleUtilityUtils {
 
-	static double computeLinkBasedScore( Link link, double marginalUtilityOfComfort_m, double marginalUtilityOfInfrastructure_m,
-										 double marginalUtilityOfGradient_m_100m, double marginalUtilityOfUserDefinedNetworkAttribute_m,
-										 String nameOfUserDefinedNetworkAttribute, double userDefinedNetworkAttributeDefaultValue) {
-		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
-		String type = (String) link.getAttributes().getAttribute("type");
-		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
-
-		double distance = link.getLength();
-
-		double comfortFactor = getComfortFactor(surface);
-		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
-
-		double infrastructureFactor = getInfrastructureFactor(type, cyclewaytype);
-		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
-
-		double gradient = getGradient(link);
-		double gradientScore = marginalUtilityOfGradient_m_100m * gradient * distance;
-
-		String userDefinedNetworkAttributeString;
-		double userDefinedNetworkAttributeScore = 0.;
-		if (nameOfUserDefinedNetworkAttribute != null) {
-			userDefinedNetworkAttributeString = BicycleUtils.getUserDefinedNetworkAttribute(link, nameOfUserDefinedNetworkAttribute);
-			double userDefinedNetworkAttributeFactor = getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString, userDefinedNetworkAttributeDefaultValue);
-			userDefinedNetworkAttributeScore = marginalUtilityOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
-		}
-
-		return (infrastructureScore + comfortScore + gradientScore + userDefinedNetworkAttributeScore);
-	}
-
 	static double getGradient(Link link ) {
 
 		if (!link.getFromNode().getCoord().hasZ() || !link.getToNode().getCoord().hasZ()) return 0.;
