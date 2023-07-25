@@ -99,6 +99,7 @@ public class DrtAbortTest{
 			settings.setWeight(0.1);
 			config.strategy().addStrategySettings(settings);
 			config.strategy().setFractionOfIterationsToDisableInnovation(0.9);
+			config.strategy().setMaxAgentPlanMemorySize(5);
 		}
 		{
 			config.changeMode().setModes( new String[] { TransportMode.drt, TransportMode.bike });
