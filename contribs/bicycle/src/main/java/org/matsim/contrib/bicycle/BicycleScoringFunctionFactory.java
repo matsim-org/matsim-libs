@@ -36,7 +36,7 @@ import org.matsim.core.scoring.functions.*;
  */
 /**
 * @deprecated -- The {@link BicycleScoringType#legBased} is already running through {@link BicycleScoreEventsCreator}; for {@link
-* BicycleScoringType#linkBased} the same should be done.  However, the {@link MotorizedInteractionEngine} is also not implemented in a way that it will
+* BicycleScoringType#linkBased} the same should be done.  However, the {@link MotorizedInteractionEngineForATest} is also not implemented in a way that it will
 * actually work.
  */
 final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
@@ -73,11 +73,20 @@ final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 			throw new RuntimeException( "this execution path should no longer be used.");
 //			sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), scenario.getConfig().transit().getTransitModes(), bicycleConfigGroup));
 		} else if (bicycleScoringType == BicycleScoringType.linkBased) {
+
 			BicycleLinkScoring bicycleLinkScoring = new BicycleLinkScoring(params, scenario, bicycleConfigGroup);
+
+			// pass motorized interaction event to scoring.  find more elegant way to do this!
+			eventsManager.addHandler( new BasicEventHandler(){
+				@Override public void handleEvent( Event event ){
+					if ( event instanceof MotorizedInteractionEvent ){
+						bicycleLinkScoring.handleEvent(event);
+					}
+				}
+			} );
+
 			sumScoringFunction.addScoringFunction(bicycleLinkScoring);
 
-			CarCounter carCounter = new CarCounter( bicycleLinkScoring );
-			eventsManager.addHandler(carCounter);
 		} else {
 			throw new IllegalArgumentException("Bicycle scoring type " + bicycleScoringType + " not known.");
 		}
@@ -85,19 +94,4 @@ final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		return sumScoringFunction;
 	}
 
-	
-	private static class CarCounter implements BasicEventHandler{
-		private final BicycleLinkScoring bicycleLinkScoring;
-
-		private CarCounter( BicycleLinkScoring bicycleLinkScoring ) {
-			this.bicycleLinkScoring = bicycleLinkScoring;
-		}
-
-		@Override
-		public void handleEvent( Event event ) {
-			if ( event instanceof MotorizedInteractionEvent ){
-				bicycleLinkScoring.handleEvent(event);
-			}
-		}
-	}
 }
