@@ -49,6 +49,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * @author Michal Maciejewski (michalm)
+ * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 class OneToManyPathCalculator {
 	private final IdMap<Node, Node> nodeMap;
