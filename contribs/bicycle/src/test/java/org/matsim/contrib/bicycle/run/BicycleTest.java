@@ -325,24 +325,25 @@ public class BicycleTest {
 //		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 	@Test public void testLinkVsLegMotorizedScoring() {
+		// --- withOUT additional car traffic:
+//		{
+//			Config config2 = createConfig( 0 );
+//			BicycleConfigGroup bicycleConfigGroup2 = ConfigUtils.addOrGetModule( config2, BicycleConfigGroup.class );
+////			bicycleConfigGroup2.setBicycleScoringType( BicycleScoringType.linkBased );
+//			bicycleConfigGroup2.setMotorizedInteraction( false );
+//			new RunBicycleExample().run( config2 );
+//		}
+		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		// ---
-		{
-			Config config2 = createConfig( 0 );
-			BicycleConfigGroup bicycleConfigGroup2 = ConfigUtils.addOrGetModule( config2, BicycleConfigGroup.class );
-//			bicycleConfigGroup2.setBicycleScoringType( BicycleScoringType.linkBased );
-			bicycleConfigGroup2.setMotorizedInteraction( true );
-			new RunBicycleExample().run( config2 );
-		}
-		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
-		// ---
-		// ---
+		// --- WITH additional car traffic:
 		{
 			Config config = createConfig( 0 );
 			BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
 //			bicycleConfigGroup.setBicycleScoringType( BicycleScoringType.legBased );
 			bicycleConfigGroup.setMotorizedInteraction( true );
-			new RunBicycleExample();
+
+			// the following comes from inlining RunBicycleExample, which we need since we need to modify scenario data:
 			config.global().setNumberOfThreads(1 );
 			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists );
 
@@ -356,21 +357,26 @@ public class BicycleTest {
 				link.setAllowedModes( CollectionUtils.stringArrayToSet( new String[]{ bicycleMode, TransportMode.car}) );
 			}
 
-			PopulationFactory pf = scenario.getPopulation().getFactory();
-			List<Person> newPersons = new ArrayList<>();
-			for( Person oldPerson : scenario.getPopulation().getPersons().values() ){
-				Person newPerson = pf.createPerson( Id.createPersonId( oldPerson.getId() + "_car" ) );
-				Plan newPlan = pf.createPlan();
-				PopulationUtils.copyFromTo( oldPerson.getSelectedPlan(), newPlan );
-				for( Leg leg : TripStructureUtils.getLegs( newPlan ) ){
-					leg.setMode( TransportMode.car );
+			// add car traffic:
+			{
+				PopulationFactory pf = scenario.getPopulation().getFactory();
+				List<Person> newPersons = new ArrayList<>();
+				for( Person oldPerson : scenario.getPopulation().getPersons().values() ){
+					Person newPerson = pf.createPerson( Id.createPersonId( oldPerson.getId() + "_car" ) );
+					Plan newPlan = pf.createPlan();
+					PopulationUtils.copyFromTo( oldPerson.getSelectedPlan(), newPlan );
+					for( Leg leg : TripStructureUtils.getLegs( newPlan ) ){
+						leg.setMode( TransportMode.car );
+					}
+					newPerson.addPlan( newPlan );
+					newPersons.add( newPerson );
 				}
-				newPerson.addPlan( newPlan );
-				newPersons.add( newPerson );
+				for( Person newPerson : newPersons ){
+					scenario.getPopulation().addPerson( newPerson );
+				}
 			}
-			for( Person newPerson : newPersons ){
-				scenario.getPopulation().addPerson( newPerson );
-			}
+
+			// go again back to RunBicycleExample material:
 
 			// set config such that the mode vehicles come from vehicles data:
 			scenario.getConfig().qsim().setVehiclesSource( VehiclesSource.modeVehicleTypesFromVehiclesData );
@@ -386,8 +392,8 @@ public class BicycleTest {
 
 			controler.run();
 		}
-		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
 		// ---
 		// ---
 
@@ -400,7 +406,7 @@ public class BicycleTest {
 		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
 			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-			Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Scores of person=" + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
 		}
 //		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}

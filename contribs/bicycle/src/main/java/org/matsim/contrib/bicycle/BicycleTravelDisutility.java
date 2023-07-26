@@ -132,10 +132,15 @@ class BicycleTravelDisutility implements TravelDisutility {
 				throw new RuntimeException("you cannot use the randomzing travel disutility without person.  If you need this without a person, set"
 						+ "sigma to zero.") ;
 			}
-			normalRndLink = 0.05 * random.nextGaussian();
-			// yyyyyy are we sure that this is a good approach?  In high resolution networks, this leads to quirky detours ...  kai, sep'19
+//			normalRndLink = 0.05 * random.nextGaussian();
+			// are we sure that this is a good approach?  In high resolution networks, this leads to quirky detours ...  kai, sep'19
+			// --> see below.  kai, jul'23
 			if (person != prevPerson) {
 				prevPerson = person;
+
+				normalRndLink = 0.05 * random.nextGaussian();
+				// are we sure that this is a good approach?  In high resolution networks, this leads to quirky detours ...  kai, sep'19
+				// --> addressed with moving it to down here, i.e. into the person.  Also caused race conditions. kai, jul'23
 
 				logNormalRndDist = Math.exp(sigma * random.nextGaussian());
 				logNormalRndInf = Math.exp(sigma * random.nextGaussian());
