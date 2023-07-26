@@ -60,6 +60,7 @@ import com.google.common.base.MoreObjects;
 
 /**
  * @author jbischoff
+ * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 public class RunDrtExampleIT {
 

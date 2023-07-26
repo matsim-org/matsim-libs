@@ -54,6 +54,7 @@ import com.google.common.base.Verify;
 
 /**
  * @author michalm
+ * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 public class DefaultRequestInsertionScheduler implements RequestInsertionScheduler {
 
