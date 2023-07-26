@@ -30,20 +30,20 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 
 		double distance = link.getLength();
 
-		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface );
+		double comfortFactor = BicycleUtils.getComfortFactor(surface );
 		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
 
-		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype );
+		double infrastructureFactor = BicycleUtils.getInfrastructureFactor(type, cyclewaytype );
 		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
-		double gradient = BicycleUtilityUtils.getGradient( link );
+		double gradient = BicycleUtils.getGradient( link );
 		double gradientScore = marginalUtilityOfGradient_m_100m * gradient * distance;
 
 		String userDefinedNetworkAttributeString;
 		double userDefinedNetworkAttributeScore = 0.;
 		if ( nameOfUserDefinedNetworkAttribute != null) {
 			userDefinedNetworkAttributeString = BicycleUtils.getUserDefinedNetworkAttribute( link, nameOfUserDefinedNetworkAttribute );
-			double userDefinedNetworkAttributeFactor = BicycleUtilityUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString, userDefinedNetworkAttributeDefaultValue );
+			double userDefinedNetworkAttributeFactor = BicycleUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString, userDefinedNetworkAttributeDefaultValue );
 			userDefinedNetworkAttributeScore = marginalUtilityOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
 		}
 

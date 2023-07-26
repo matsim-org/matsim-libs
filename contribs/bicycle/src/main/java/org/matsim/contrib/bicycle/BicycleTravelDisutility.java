@@ -102,20 +102,20 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
 
-		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface);
+		double comfortFactor = BicycleUtils.getComfortFactor(surface );
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
 
-		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype);
+		double infrastructureFactor = BicycleUtils.getInfrastructureFactor(type, cyclewaytype );
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
-		double gradientFactor = BicycleUtilityUtils.getGradient(link);
+		double gradientFactor = BicycleUtils.getGradient(link );
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 
 		double userDefinedNetworkAttritubeDisutility = 0.;
 		if (nameOfUserDefinedNetworkAttribute != null) {
 			String userDefinedNetworkAttributeString = BicycleUtils.getUserDefinedNetworkAttribute(link, nameOfUserDefinedNetworkAttribute);
-			double userDefinedNetworkAttributeFactor = BicycleUtilityUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString,
-					this.userDefinedNetworkAttributeDefaultValue);
+			double userDefinedNetworkAttributeFactor = BicycleUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString,
+					this.userDefinedNetworkAttributeDefaultValue );
 			userDefinedNetworkAttritubeDisutility = marginalCostOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
 		}
 
