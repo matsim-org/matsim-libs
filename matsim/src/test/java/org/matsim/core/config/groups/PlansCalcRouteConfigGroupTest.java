@@ -22,7 +22,6 @@ package org.matsim.core.config.groups;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -34,7 +33,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class PlansCalcRouteConfigGroupTest {
@@ -215,7 +214,7 @@ public class PlansCalcRouteConfigGroupTest {
 	public void testConsistencyCheckIfNoTeleportedSpeed() {
 		final Config config = ConfigUtils.createConfig();
 
-		final ModeRoutingParams params = new ModeRoutingParams( "skateboard" );
+		final TeleportedModeParams params = new TeleportedModeParams( "skateboard" );
 		config.plansCalcRoute().addModeRoutingParams( params );
 		// (one needs to set one of the teleported speed settings)
 
@@ -224,14 +223,14 @@ public class PlansCalcRouteConfigGroupTest {
 
 	@Test( expected=IllegalStateException.class )
 	public void testCannotAddSpeedAfterFactor() {
-		final ModeRoutingParams params = new ModeRoutingParams( "overboard" );
+		final TeleportedModeParams params = new TeleportedModeParams( "overboard" );
 		params.setTeleportedModeFreespeedFactor( 2.0 );
 		params.setTeleportedModeSpeed( 12.0 );
 	}
 
 	@Test( expected=IllegalStateException.class )
 	public void testCannotAddFactorAfterSpeed() {
-		final ModeRoutingParams params = new ModeRoutingParams( "overboard" );
+		final TeleportedModeParams params = new TeleportedModeParams( "overboard" );
 		params.setTeleportedModeSpeed( 12.0 );
 		params.setTeleportedModeFreespeedFactor( 2.0 );
 	}
@@ -269,7 +268,7 @@ public class PlansCalcRouteConfigGroupTest {
 			module.addParam( e.getKey() , e.getValue() );
 		}
 		
-		for ( ModeRoutingParams settings : initialGroup.getModeRoutingParams().values() ) {
+		for ( TeleportedModeParams settings : initialGroup.getModeRoutingParams().values() ) {
 			final String mode = settings.getMode();
 			module.addParam( "teleportedModeSpeed_"+mode , ""+settings.getTeleportedModeSpeed() );
 			module.addParam( "teleportedModeFreespeedFactor_"+mode , ""+settings.getTeleportedModeFreespeedFactor() );
@@ -277,7 +276,7 @@ public class PlansCalcRouteConfigGroupTest {
 
 		Double val = null ;
 		boolean first = true ;
-		for ( ModeRoutingParams settings : initialGroup.getModeRoutingParams().values() ) {
+		for ( TeleportedModeParams settings : initialGroup.getModeRoutingParams().values() ) {
 			if ( first ) {
 				first = false ;
 				val = settings.getBeelineDistanceFactor() ;

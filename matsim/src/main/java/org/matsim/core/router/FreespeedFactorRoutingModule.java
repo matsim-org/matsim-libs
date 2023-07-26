@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -40,14 +40,14 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 
 	private final Network network;
 	private final LeastCostPathCalculator routeAlgo;
-	private final ModeRoutingParams params;
+	private final TeleportedModeParams params;
 
 	FreespeedFactorRoutingModule(
 			final String mode,
 			final PopulationFactory populationFactory,
             final Network network,
 			final LeastCostPathCalculator routeAlgo,
-			ModeRoutingParams params) {
+			TeleportedModeParams params ) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.params = params;

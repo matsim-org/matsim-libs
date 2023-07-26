@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.Injector;
@@ -53,7 +53,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class PseudoTransitRoutingModuleTest {
@@ -75,7 +74,7 @@ public class PseudoTransitRoutingModuleTest {
 		toAct.setLinkId(Id.create("3", Link.class));
 
 		{
-			ModeRoutingParams params = new ModeRoutingParams("mode") ;
+			TeleportedModeParams params = new TeleportedModeParams("mode") ;
 			params.setTeleportedModeFreespeedFactor(2.);
 			params.setBeelineDistanceFactor(1.);
 			double tt = new FreespeedFactorRoutingModule(
@@ -86,7 +85,7 @@ public class PseudoTransitRoutingModuleTest {
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
-			ModeRoutingParams params = new ModeRoutingParams("mode") ;
+			TeleportedModeParams params = new TeleportedModeParams("mode") ;
 			params.setTeleportedModeFreespeedFactor(3.);
 			params.setBeelineDistanceFactor(2.);
 			double tt = new FreespeedFactorRoutingModule(
@@ -100,7 +99,7 @@ public class PseudoTransitRoutingModuleTest {
 			// above since it is not in FreespeedTravelTimeAndDisutility.  Could have modified that disutility.  But preferred to test in context.
 			// Thus the more complicated injector thing.  kai, nov'16
 			
-			ModeRoutingParams params = new ModeRoutingParams("mode") ;
+			TeleportedModeParams params = new TeleportedModeParams("mode") ;
 			params.setTeleportedModeFreespeedFactor(2.);
 			params.setBeelineDistanceFactor(1.);
 			params.setTeleportedModeFreespeedLimit(5.);
@@ -136,7 +135,7 @@ public class PseudoTransitRoutingModuleTest {
 
 		public Fixture() {
 			s.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			ModeRoutingParams walk = new ModeRoutingParams(TransportMode.walk);
+			TeleportedModeParams walk = new TeleportedModeParams(TransportMode.walk);
 			walk.setBeelineDistanceFactor(1.3);
 			walk.setTeleportedModeSpeed(3.0 / 3.6);
 			s.getConfig().plansCalcRoute().addModeRoutingParams(walk);
