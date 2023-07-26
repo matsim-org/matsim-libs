@@ -49,6 +49,10 @@ class BicycleScoreEventsCreator implements
 //		SumScoringFunction.LegScoring, SumScoringFunction.ArbitraryEventScoring
 		VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,VehicleLeavesTrafficEventHandler
 {
+// yyyy The car interaction is still somewhat primitive -- a vehicle leaving a link gets a penalty that is multiplied with the number of cars that
+// are on the link at that moment.  Evidently, this could be improved, by counting the cars that actually overtake the bicycle.  Not very difficult
+// ...
+
 	private static final Logger log = LogManager.getLogger( BicycleScoreEventsCreator.class ) ;
 	private final Network network;
 	private final EventsManager eventsManager;
@@ -111,6 +115,8 @@ class BicycleScoreEventsCreator implements
 			double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ) );
 
 			if ( this.bicycleConfig.isMotorizedInteraction() ) {
+				// yyyy this is the place where instead a data structure would need to be build that counts interaction with every car
+				// that entered the link after the bicycle, and left it before.  kai, jul'23
 				var carCounts = this.numberOfVehiclesOnLinkByMode.get( TransportMode.car );
 				if ( carCounts != null ){
 					amount -= 0.004 * carCounts.getOrDefault( event.getLinkId(), 0. );
