@@ -206,6 +206,7 @@ class OneToManyPathCalculator {
 								prevNode.getId().toString(), link.getToNode().getId().toString());
 
 						if (parallelLinksWarningCount > 20) {
+							logger.warn("Consider using NetworkSegmentDoubleLinks.run on your network");
 							logger.warn("Only showing 20 of these warnings ...");
 							return;
 						}
