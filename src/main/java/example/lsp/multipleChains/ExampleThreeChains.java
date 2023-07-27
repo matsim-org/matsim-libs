@@ -34,7 +34,7 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 
-public class ExampleThreeChains {
+class ExampleThreeChains {
 
 	static final double HUBCOSTS_FIX = 100;
 	private static final double TOLL_VALUE = 0;

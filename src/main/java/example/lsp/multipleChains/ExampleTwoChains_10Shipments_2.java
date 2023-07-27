@@ -32,7 +32,7 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 
-public class ExampleTwoChains_10Shipments_2 {
+class ExampleTwoChains_10Shipments_2 {
 
 	private static final double TOLL_VALUE = 0;
 

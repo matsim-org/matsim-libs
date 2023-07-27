@@ -18,7 +18,7 @@ import java.util.Map;
  * Requirements: There must be at least one logisticChain in the plan
  */
 
-public class RoundRobinLogisticChainShipmentAssigner implements ShipmentAssigner {
+class RoundRobinLogisticChainShipmentAssigner implements ShipmentAssigner {
 
 	private LSP lsp;
 

@@ -34,7 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ExampleTwoChains {
+class ExampleTwoChains {
 
 	private static final double TOLL_VALUE = 0;
 
