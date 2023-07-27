@@ -22,10 +22,7 @@ import tech.tablesaw.api.*;
 import tech.tablesaw.selection.Selection;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 import static tech.tablesaw.aggregate.AggregateFunctions.mean;
@@ -50,8 +47,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--labels", split = ",", description = "Labels for quality categories", defaultValue = "major under,under,ok,over,major over")
 	private List<String> labels;
 
-	@CommandLine.Option(names = "--transport-mode", description = "Mode to analyze", defaultValue = TransportMode.car)
-	private String mode;
+	@CommandLine.Option(names = "--transport-mode", description = "Mode to analyze", split = ",", defaultValue = TransportMode.car)
+	private Set<String> modes;
 
 	public static void main(String[] args) {
 		new CountComparisonAnalysis().execute(args);
@@ -66,6 +63,15 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 
 		int ins = -(idx + 1);
 		return labels.get(ins);
+	}
+
+	private static int[] sum(int[] a, int[] b) {
+		int[] counts = new int[a.length];
+		for (int i = 0; i < counts.length; i++) {
+			counts[i] = a[i] + b[i];
+		}
+
+		return counts;
 	}
 
 	@Override
@@ -127,10 +133,14 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			if (countVolume.isEmpty())
 				continue;
 
-			int[] volumesForLink = volumes.getVolumesForLink(key, mode);
+			Optional<int[]> opt = modes.stream()
+				.map(mode -> volumes.getVolumesForLink(key, mode))
+				.reduce(CountComparisonAnalysis::sum);
 
-			if (countVolume.isEmpty())
+			if (countVolume.isEmpty() || opt.isEmpty())
 				continue;
+
+			int[] volumesForLink = opt.get();
 
 			double simulatedTrafficVolumeByDay = 0;
 			double observedTrafficVolumeByDay = 0;
@@ -140,8 +150,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 				for (int hour = 1; hour < 25; hour++) {
 
 					double observedTrafficVolumeAtHour = countVolume.get(hour).getValue();
-					double simulatedTrafficVolumeAtHour = volumesForLink == null ? 0.0 :
-						((double) volumesForLink[hour - 1]) / this.sample.getSample();
+					double simulatedTrafficVolumeAtHour = (double) volumesForLink[hour - 1] / this.sample.getSample();
 
 					simulatedTrafficVolumeByDay += simulatedTrafficVolumeAtHour;
 					observedTrafficVolumeByDay += observedTrafficVolumeAtHour;

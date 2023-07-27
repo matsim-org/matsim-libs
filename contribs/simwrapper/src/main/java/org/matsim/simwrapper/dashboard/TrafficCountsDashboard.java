@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -27,18 +28,19 @@ public class TrafficCountsDashboard implements Dashboard {
 	private final String countsPath;
 
 	@Nullable
-	private final String transportMode;
-	private  List<Double> limits = List.of(0.6, 0.8, 1.2, 1.4);
+	private final Set<String> networkModes;
+	private List<Double> limits = List.of(0.6, 0.8, 1.2, 1.4);
 	private List<String> labels = List.of("major under", "under", "ok", "over", "major over");
 
 	/**
 	 * Create counts with a given counts file and specific transport mode.
-	 * @param countsPath overwrite default counts file
-	 * @param transportMode overwrite default transportMode to analyze
+	 *
+	 * @param countsPath   overwrite default counts file
+	 * @param networkModes overwrite default mode to analyze
 	 */
-	public TrafficCountsDashboard(@Nullable String countsPath, @Nullable String transportMode) {
+	public TrafficCountsDashboard(@Nullable String countsPath, @Nullable Set<String> networkModes) {
 		this.countsPath = countsPath;
-		this.transportMode = transportMode;
+		this.networkModes = networkModes;
 	}
 
 	/**
@@ -51,6 +53,7 @@ public class TrafficCountsDashboard implements Dashboard {
 
 	/**
 	 * Set the quality thresholds and labels
+	 *
 	 * @param limits thresholds for labels
 	 * @param labels text representation of labels
 	 * @return same instance
@@ -84,8 +87,8 @@ public class TrafficCountsDashboard implements Dashboard {
 		if (countsPath != null)
 			argList.addAll(List.of("--counts", countsPath));
 
-		if (transportMode != null)
-			argList.addAll(List.of("--transport-mode", transportMode));
+		if (networkModes != null)
+			argList.addAll(List.of("--transport-mode", String.join(",", networkModes)));
 
 		String[] args = argList.toArray(new String[0]);
 
