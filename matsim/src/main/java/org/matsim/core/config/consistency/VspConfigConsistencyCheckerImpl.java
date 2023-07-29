@@ -53,9 +53,9 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 	// VSP says that people < 18J should not use car, and implements that via car availability.  How to handle that?
 
-	// 
+	//
 	private static final  Logger log = LogManager.getLogger(VspConfigConsistencyCheckerImpl.class);
-	
+
 	public VspConfigConsistencyCheckerImpl() {
 		// empty.  only here to find out where it is called.
 	}
@@ -75,11 +75,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			default -> throw new RuntimeException( "not implemented" );
 		}
 		log.info("running checkConsistency ...");
-		
+
 		boolean problem = false ; // ini
-		
+
 		// yy: sort the config groups alphabetically
-		
+
 		// === controler:
 
 		problem = checkControlerConfigGroup( config, lvl, problem );
@@ -129,6 +129,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		checkTravelTimeCalculatorConfigGroup( config, lvl );
 
+		// === costs and pricing
+
+		problem = checkCostsAndPricing(config, lvl, problem);
+
+
 		// === interaction between config groups:
 		boolean containsModeChoice = false ;
 		for ( StrategySettings settings : config.strategy().getStrategySettings() ) {
@@ -136,12 +141,12 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				containsModeChoice = true ;
 			}
 		}
-		
+
 		// added jun'16
-		if ( config.qsim().getVehiclesSource()==VehiclesSource.fromVehiclesData 
-				&& config.qsim().getUsePersonIdForMissingVehicleId() 
-				&& containsModeChoice 
-				&& config.qsim().getMainModes().size() > 1 ) 
+		if ( config.qsim().getVehiclesSource()==VehiclesSource.fromVehiclesData
+				&& config.qsim().getUsePersonIdForMissingVehicleId()
+				&& containsModeChoice
+				&& config.qsim().getMainModes().size() > 1 )
 		{
 			problem = true ;
 			log.log( lvl, "You can't use more than one main (=vehicular) mode while using the agent ID as missing vehicle ID ... "
@@ -149,15 +154,16 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// === zzz:
-		
+
 		if ( problem && config.vspExperimental().getVspDefaultsCheckingLevel() == VspDefaultsCheckingLevel.abort ) {
-			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 
+			String str = "found a situation that leads to vsp-abort.  aborting ..." ;
 			System.out.flush() ;
-			log.fatal( str ) ; 
+			log.fatal( str ) ;
 			throw new RuntimeException( str ) ;
 		}
-		
+
 	}
+
 	private boolean checkSubtourModeChoiceConfigGroup( Config config, Level lvl, boolean problem ){
 		if ( config.subtourModeChoice().considerCarAvailability() ) {
 //			problem = true;
@@ -356,7 +362,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			System.out.flush() ;
 			log.log( lvl, "found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
 		}
-		
+
 		// added apr'15:
 		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
 			if ( PtConstants.TRANSIT_ACTIVITY_TYPE.equals( params.getActivityType() ) ) {
@@ -442,6 +448,17 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		return problem;
 	}
+
+	private boolean checkCostsAndPricing(Config config, Level lvl, boolean problem) {
+
+		// TODO
+		// check if prices are correct if pricing year is set
+		// check if ride costs adhere to new standard
+
+		return problem;
+	}
+
+
 	private static boolean checkLocationChoiceConfigGroup( Config config, boolean problem ){
 		boolean usingLocationChoice = false ;
 		if ( config.getModule("locationchoice" )!=null ) {
