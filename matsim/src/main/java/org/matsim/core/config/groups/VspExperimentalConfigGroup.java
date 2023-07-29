@@ -31,13 +31,13 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author nagel
  */
 public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
-	
+
 	@SuppressWarnings("unused")
 	private final static Logger log = LogManager.getLogger(VspExperimentalConfigGroup.class);
 
 	public static final String GROUP_NAME = "vspExperimental";
 
-	
+
 
 	// ---
 
@@ -93,8 +93,8 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		this.isGeneratingBoardingDeniedEvent = isGeneratingBoardingDeniedEvent;
 	}
 	// ---
-	private static final String ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS = "isAbleToOverwritePtInteractionParams" ; 
-	private boolean isAbleToOverwritePtInteractionParams = false ; // default is that this NOT allowed.  kai, nov'12 
+	private static final String ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS = "isAbleToOverwritePtInteractionParams" ;
+	private boolean isAbleToOverwritePtInteractionParams = false ; // default is that this NOT allowed.  kai, nov'12
 	@StringGetter(ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS)
 	public boolean isAbleToOverwritePtInteractionParams() {
 		return isAbleToOverwritePtInteractionParams;
@@ -105,7 +105,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		this.isAbleToOverwritePtInteractionParams = isAbleToOverwritePtInteractionParams;
 	}
 	// ---
-	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE = "isUsingOpportunityCostOfTimeForLocationChoice" ; 
+	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE = "isUsingOpportunityCostOfTimeForLocationChoice" ;
 	private boolean isUsingOpportunityCostOfTimeForLocationChoice = true ;
 	@StringGetter(USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE)
 	public boolean isUsingOpportunityCostOfTimeForLocationChoice() {
@@ -128,7 +128,21 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	// ---
 
 
+	private static final String PRICING_YEAR = "pricingYear";
 
+	private int pricingYear = 0;
+
+	@StringGetter(PRICING_YEAR)
+	public void setPricingYear(int pricingYear) {
+		this.pricingYear = pricingYear;
+	}
+
+	@StringGetter(PRICING_YEAR)
+	public int getPricingYear() {
+		return pricingYear;
+	}
+
+	// ---
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -146,10 +160,11 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		for ( VspDefaultsCheckingLevel option : VspDefaultsCheckingLevel.values() ) {
 			options.append(option + " | ") ;
 		}
-		map.put( VSP_DEFAULTS_CHECKING_LEVEL, 
+		map.put( VSP_DEFAULTS_CHECKING_LEVEL,
 				"Options: | " + options + ".  When violating VSP defaults, this results in " +
 		"nothing, logfile infos, logfile warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
+		map.put(PRICING_YEAR, "Base year of prices that are used in the model.");
 //		map.put(INPUT_MZ05_FILE, "(do not use) Set this filename of MZ05 daily analysis");
 
 		return map;
@@ -172,7 +187,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		testForLocked() ;
 		this.writingOutputEvents = writingOutputEvents;
 	}
-	
+
 	@Override
 	protected void checkConsistency(Config config) {
 	}
