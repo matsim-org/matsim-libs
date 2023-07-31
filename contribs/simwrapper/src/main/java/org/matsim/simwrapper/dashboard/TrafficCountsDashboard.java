@@ -52,7 +52,7 @@ public class TrafficCountsDashboard implements Dashboard {
 
 
 	/**
-	 * Set the quality thresholds and labels
+	 * Set the quality thresholds and labels.
 	 *
 	 * @param limits thresholds for labels
 	 * @param labels text representation of labels
@@ -98,7 +98,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.title = "Count estimation quality";
 				viz.description = "over all count stations";
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_quality.csv"))
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_quality.csv", args))
 					.aggregate(List.of("quality"), "n", Plotly.AggrFunc.SUM)
 					// No need to show axis label
 					.constant("source", "");
@@ -118,7 +118,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.title = "Count estimation quality";
 				viz.description = "by road type";
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_quality.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_quality.csv", args));
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.yAxis(Axis.builder().title("Share").build())
@@ -136,7 +136,7 @@ public class TrafficCountsDashboard implements Dashboard {
 		layout.row("scatter")
 			.el(Plotly.class, (viz, data) -> {
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv", args));
 
 				viz.title = "Traffic volumes by hour";
 				viz.description = "simulated vs. observed";
@@ -160,7 +160,7 @@ public class TrafficCountsDashboard implements Dashboard {
 			})
 			.el(Plotly.class, (viz, data) -> {
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
 
 				viz.title = "Daily traffic volumes";
 				viz.description = "simulated vs. observed";
@@ -213,7 +213,7 @@ public class TrafficCountsDashboard implements Dashboard {
 						.build())
 					.build();
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_error_by_hour.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_error_by_hour.csv", args));
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE)
 					.name("Mean rel. error")
@@ -244,7 +244,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.description = "hourly comparison";
 				viz.interactive = Plotly.Interactive.dropdown;
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv", args));
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(), ds.mapping()
 					.x("hour")
