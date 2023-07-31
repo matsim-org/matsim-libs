@@ -139,7 +139,6 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 					.reduce(CountComparisonAnalysis::sum);
 
 			int[] volumesForLink;
-
 			if (countVolume.isEmpty() || opt.isEmpty()) {
 				volumesForLink = new int[24];
 			} else {

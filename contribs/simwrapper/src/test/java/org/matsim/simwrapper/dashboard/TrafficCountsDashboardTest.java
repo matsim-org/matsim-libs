@@ -56,8 +56,9 @@ public class TrafficCountsDashboardTest {
 						)
 				).context("custom"))
 				.addDashboard(Dashboard.customize(new TrafficCountsDashboard(
-						Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml",
-						Set.of(TransportMode.car, "freight"))).context("freight"));
+					Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml",
+						Set.of(TransportMode.car, "freight"))
+				).context("freight").title("Freight counts"));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
