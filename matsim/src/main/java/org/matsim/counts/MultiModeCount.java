@@ -13,6 +13,7 @@ import java.util.Set;
 
 public class MultiModeCount<T> implements Identifiable<T>, Attributable {
 
+	public static final String ELEMENT_NAME = "multiModeCount";
 	private final Id<T> id;
 	private final Map<String, Volumes> volumes = new HashMap<>();
 	private final Set<String> modes = new HashSet<>();

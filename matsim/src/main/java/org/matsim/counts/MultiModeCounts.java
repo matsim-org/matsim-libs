@@ -10,7 +10,7 @@ import java.util.TreeMap;
 
 public class MultiModeCounts<T> implements Attributable {
 
-	public static final String ELEMENT_NAME = "multi_mode_counts";
+	public static final String ELEMENT_NAME = "multiModeCounts";
 
 	private String name;
 	private String description;
@@ -23,11 +23,20 @@ public class MultiModeCounts<T> implements Attributable {
 	@Inject
 	private Attributes attributes;
 
-	public MultiModeCounts(){
-
+	public MultiModeCounts(String name, int year){
+		this.year = year;
+		this.name = name;
 	}
 
+	/**
+	 * Creates a MultiModeCount object and adds to count tree map. Argument has to be an id for an matsim network object (link or node e.g).
+	 * A year can be passed as argument if count sources from different years are used, if not the year of the counts collection will be handed over.
+	 * */
 	public MultiModeCount<T> createAndAddCount(final Id<T> id, String stationName, @Nullable Integer year){
+
+		if (this.counts.containsKey(id)) {
+			throw new RuntimeException("There is already a counts object for location " + id.toString());
+		}
 
 		MultiModeCount<T> count = year == null ? new MultiModeCount<>(id, stationName, this.year): new MultiModeCount<>(id, stationName, year);
 		this.counts.put(id, count);
@@ -73,6 +82,11 @@ public class MultiModeCounts<T> implements Attributable {
 
 	@Override
 	public Attributes getAttributes() {
-		return null;
+		return attributes;
+	}
+
+	@Override
+	public final String toString() {
+		return "[name=" + this.name + "]" + "[nof_counts=" + this.counts.size() + "]";
 	}
 }

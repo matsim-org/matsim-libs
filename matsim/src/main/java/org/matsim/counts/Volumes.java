@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 
 public class Volumes {
 
+	public static final String ELEMENT_NAME = "volumes";
+
 	private final String mode;
 	private final Int2DoubleMap hourlyVolume;
 	private final boolean dailyVolumesOnly;
