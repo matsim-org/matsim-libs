@@ -246,6 +246,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		double maxDistance = travelSpeedCrowFly * maxTravelTime; 
 
 		// define a maximum distance choice set manually
+		// yyyy it is quite stupid to do the following at the end of this method and not at the beginning.  Can probably be moved up, but would need to be tested.  kai, jul'23
 		if ( this.dccg.getMaxDistanceDCScore() > 0.0) {
 			maxDistance = this.dccg.getMaxDistanceDCScore();
 		}
