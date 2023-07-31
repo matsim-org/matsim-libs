@@ -29,7 +29,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.mean;
 
 @CommandLine.Command(name = "count-comparison", description = "Produces comparisons of observed and simulated counts.")
 @CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true,
-	produces = {"count_comparison_by_hour.csv", "count_comparison_daily.csv", "count_comparison_quality.csv", "count_error_by_hour.csv"})
+		produces = {"count_comparison_by_hour.csv", "count_comparison_daily.csv", "count_comparison_quality.csv", "count_error_by_hour.csv"})
 public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
@@ -107,19 +107,19 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 
 		Table byHour = Table.create(
-			StringColumn.create("link_id"),
-			StringColumn.create("name"),
-			StringColumn.create("road_type"),
-			IntColumn.create("hour"),
-			DoubleColumn.create("observed_traffic_volume"),
-			DoubleColumn.create("simulated_traffic_volume")
+				StringColumn.create("link_id"),
+				StringColumn.create("name"),
+				StringColumn.create("road_type"),
+				IntColumn.create("hour"),
+				DoubleColumn.create("observed_traffic_volume"),
+				DoubleColumn.create("simulated_traffic_volume")
 		);
 
 		Table dailyTrafficVolume = Table.create(StringColumn.create("link_id"),
-			StringColumn.create("name"),
-			StringColumn.create("road_type"),
-			DoubleColumn.create("observed_traffic_volume"),
-			DoubleColumn.create("simulated_traffic_volume")
+				StringColumn.create("name"),
+				StringColumn.create("road_type"),
+				DoubleColumn.create("observed_traffic_volume"),
+				DoubleColumn.create("simulated_traffic_volume")
 		);
 
 		for (Map.Entry<Id<Link>, Count<Link>> entry : counts.getCounts().entrySet()) {
@@ -134,13 +134,17 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 				continue;
 
 			Optional<int[]> opt = modes.stream()
-				.map(mode -> volumes.getVolumesForLink(key, mode))
-				.reduce(CountComparisonAnalysis::sum);
+					.map(mode -> volumes.getVolumesForLink(key, mode))
+					.filter(Objects::nonNull)
+					.reduce(CountComparisonAnalysis::sum);
 
-			if (countVolume.isEmpty() || opt.isEmpty())
-				continue;
+			int[] volumesForLink;
 
-			int[] volumesForLink = opt.get();
+			if (countVolume.isEmpty() || opt.isEmpty()) {
+				volumesForLink = new int[24];
+			} else {
+				volumesForLink = opt.get();
+			}
 
 			double simulatedTrafficVolumeByDay = 0;
 			double observedTrafficVolumeByDay = 0;
@@ -175,12 +179,12 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		}
 
 		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")
-			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
-			.setName("rel_error");
+				.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
+				.setName("rel_error");
 
 		StringColumn qualityLabel = relError.copy()
-			.map(err -> cut(err, limits, labels), ColumnType.STRING::create)
-			.setName("quality");
+				.map(err -> cut(err, limits, labels), ColumnType.STRING::create)
+				.setName("quality");
 
 		dailyTrafficVolume.addColumns(relError, qualityLabel);
 
@@ -220,17 +224,17 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	private void writeErrorMetrics(Table byHour, Path path) {
 
 		byHour.addColumns(
-			byHour.doubleColumn("simulated_traffic_volume").subtract(byHour.doubleColumn("observed_traffic_volume")).setName("error")
+				byHour.doubleColumn("simulated_traffic_volume").subtract(byHour.doubleColumn("observed_traffic_volume")).setName("error")
 		);
 
 		byHour.addColumns(
-			byHour.doubleColumn("error").abs().setName("abs_error")
+				byHour.doubleColumn("error").abs().setName("abs_error")
 		);
 
 		DoubleColumn relError = byHour.doubleColumn("abs_error")
-			.multiply(100)
-			.divide(byHour.doubleColumn("observed_traffic_volume"))
-			.setName("rel_error");
+				.multiply(100)
+				.divide(byHour.doubleColumn("observed_traffic_volume"))
+				.setName("rel_error");
 
 		// Cut-off at Max error
 		relError = relError.set(relError.isMissing(), 1000d);
