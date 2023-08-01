@@ -35,6 +35,7 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.zone.skims.AdaptiveTravelTimeMatrixModule;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -86,5 +87,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				(vehicle, dropoffRequests, pickupRequests) -> drtCfg.stopDuration);
 		bindModal(IncrementalStopDurationEstimator.class).toInstance(
 				new DefaultIncrementalStopDurationEstimator(drtCfg.stopDuration));
+
+		install(new AdaptiveTravelTimeMatrixModule(drtCfg.mode));
 	}
 }
