@@ -99,7 +99,8 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
             double insertionCost = insertionCostCalculator.calculate(drtRequest, insertion,
                     insertionWithDetourData.detourTimeInfo);
 
-            // For each realized routing, we update lazily a correction matrix
+            // For each realized routing, we update the adaptiveTravelTimeMatrix
+			// The idea is to get a passively updated travel time estimation, without additional routing costs
             updateMatrix(drtRequest, travelTimeMatrix, adaptiveTravelTimeMatrix, insertionWithDetourData);
 
             Optional<InsertionWithDetourData> solution = insertionCost >= INFEASIBLE_SOLUTION_COST ? Optional.empty()
