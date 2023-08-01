@@ -103,10 +103,8 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 			// The idea is to get a passively updated travel time estimation, without additional routing costs
             updateMatrix(drtRequest, travelTimeMatrix, adaptiveTravelTimeMatrix, insertionWithDetourData);
 
-            Optional<InsertionWithDetourData> solution = insertionCost >= INFEASIBLE_SOLUTION_COST ? Optional.empty()
-                    : Optional.of(insertionWithDetourData);
-            if (solution.isPresent()) {
-                return solution;
+            if (insertionCost < INFEASIBLE_SOLUTION_COST) {
+                return Optional.of(insertionWithDetourData);
             }
         }
         return Optional.empty();
