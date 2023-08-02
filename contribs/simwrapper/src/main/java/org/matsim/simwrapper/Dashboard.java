@@ -42,6 +42,9 @@ public interface Dashboard {
 		private Double priority;
 		private String context;
 
+		private String title;
+		private String description;
+
 		private Customizable(Dashboard delegate) {
 			this.delegate = delegate;
 		}
@@ -49,6 +52,10 @@ public interface Dashboard {
 		@Override
 		public void configure(Header header, Layout layout) {
 			delegate.configure(header, layout);
+			if (title != null)
+				header.title = title;
+			if (description != null)
+				header.description = description;
 		}
 
 		@Override
@@ -81,6 +88,20 @@ public interface Dashboard {
 			return this;
 		}
 
-	}
+		/**
+		 * Overwrite the default title.
+		 */
+		public Customizable title(String title) {
+			this.title = title;
+			return this;
+		}
 
+		/**
+		 * Overwrite the default description.
+		 */
+		public Customizable description(String description) {
+			this.description = description;
+			return this;
+		}
+	}
 }

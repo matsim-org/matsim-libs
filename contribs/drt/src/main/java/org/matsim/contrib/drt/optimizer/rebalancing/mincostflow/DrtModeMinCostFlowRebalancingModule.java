@@ -25,7 +25,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDRTDemandEstimator;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDrtDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.DemandEstimatorAsTargetCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.EqualRebalancableVehicleDistributionTargetCalculator;
@@ -100,11 +100,11 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 		switch (strategyParams.zonalDemandEstimatorType) {
 			case PreviousIterationDemand:
-				bindModal(PreviousIterationDRTDemandEstimator.class).toProvider(modalProvider(
-						getter -> new PreviousIterationDRTDemandEstimator(getter.getModal(DrtZonalSystem.class), drtCfg,
+				bindModal(PreviousIterationDrtDemandEstimator.class).toProvider(modalProvider(
+						getter -> new PreviousIterationDrtDemandEstimator(getter.getModal(DrtZonalSystem.class), drtCfg,
 								strategyParams.demandEstimationPeriod))).asEagerSingleton();
-				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDRTDemandEstimator.class));
-				addEventHandlerBinding().to(modalKey(PreviousIterationDRTDemandEstimator.class));
+				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDrtDemandEstimator.class));
+				addEventHandlerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				break;
 
 			case None:

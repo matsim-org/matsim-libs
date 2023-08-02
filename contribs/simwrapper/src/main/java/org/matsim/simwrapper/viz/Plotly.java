@@ -62,9 +62,9 @@ public final class Plotly extends Viz {
 	public Boolean fixedRatio;
 
 	/**
-	 * Create dropdown menu for individual traces.
+	 * Add UI element to make individual traces interactive.
 	 */
-	public Boolean dropdownMenu;
+	public Interactive interactive;
 
 	/**
 	 * Merge two column as index. Column name as key will be merged with the column name value.
@@ -330,6 +330,15 @@ public final class Plotly extends Viz {
 	 */
 	public enum AggrFunc {
 		SUM
+	}
+
+	/**
+	 * Specifies if plot should contain an interactive element.
+	 */
+	public enum Interactive {
+		none,
+		dropdown,
+		slider
 	}
 
 	/**

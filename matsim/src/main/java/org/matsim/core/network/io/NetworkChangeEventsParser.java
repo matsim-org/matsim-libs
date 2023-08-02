@@ -38,65 +38,66 @@ import org.xml.sax.Attributes;
 
 /**
  * A parser building a list of {@link NetworkChangeEvent} out of a xml file.
- * 
+ *
  * @author illenberger
- * 
+ *
  */
 public final class NetworkChangeEventsParser extends MatsimXmlParser {
-	
+
 	// ========================================================================
 	// static fields
 	// ========================================================================
-	
+
 	private static final Logger log = LogManager.getLogger(NetworkChangeEventsParser.class);
-	
+
 	static final String NETWORK_CHANGE_EVENTS_TAG = "networkChangeEvents";
-	
+
 	static final String NETWORK_CHANGE_EVENT_TAG = "networkChangeEvent";
-	
+
 	static final String START_TIME_TAG = "startTime";
-	
+
 	static final String LINK_TAG = "link";
-	
+
 	static final String REF_ID_TAG = "refId";
-	
+
 	static final String FLOW_CAPACITY_TAG = "flowCapacity";
-	
+
 	static final String FREESPEED_TAG = "freespeed";
-	
+
 	static final String LANES_TAG = "lanes";
-	
+
 	static final String CHANGE_TYPE_TAG = "type";
-	
+
 	static final String VALUE_TAG = "value";
-	
+
 	// ========================================================================
 	// private members
 	// ========================================================================
 
 	private final Network network;
-	
+
 	private NetworkChangeEvent currentEvent;
-	
+
 	private final List<NetworkChangeEvent> events ;
-	
+
 	// ========================================================================
 	// constructor
 	// ========================================================================
 
 	public NetworkChangeEventsParser(Network network, List<NetworkChangeEvent> events ) {
+		super(ValidationType.XSD_ONLY);
 		this.network = network;
 		this.events = events;
 	}
-	
+
 	// ========================================================================
 	// parsing
 	// ========================================================================
-	
+
 //	/**
 //	 * Parses a file with network change events and returns a list with
 //	 * instances of {@link NetworkChangeEvent}.
-//	 * 
+//	 *
 //	 * @param file
 //	 *            a xml file containing network change events.
 //	 */
@@ -105,7 +106,7 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 //		super.parse(file);
 //		return events;
 //	}
-//	
+//
 //
 //	@Override
 //	public void parse(String filename) throws UncheckedIOException {
@@ -118,7 +119,7 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 //		events = new ArrayList<>();
 //		super.parse(url);
 //	}
-	
+
 	// ========================================================================
 	// accessor
 	// ========================================================================
@@ -127,7 +128,7 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 //	 * Returns the list with network change events. Be sure to call
 //	 * {@link #parseEvents(String)}, {@link #parse(String)} or
 //	 * {@link #parse(URL)} before.
-//	 * 
+//	 *
 //	 * @return a list of network change events, or <tt>null</tt> if
 //	 *         {@link #parseEvents(String)}, {@link #parse(String)} nor
 //	 *         {@link #parse(URL)} has been called before.
@@ -135,7 +136,7 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 //	public List<NetworkChangeEvent> getEvents() {
 //		return events;
 //	}
-	
+
 	// ========================================================================
 	// parsing methods
 	// ========================================================================
@@ -174,7 +175,7 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 					log.warn(String.format("Link %1$s not found!", value));
 			}
 		/*
-		 * flow capacity changes 
+		 * flow capacity changes
 		 */
 		} else if(name.equalsIgnoreCase(FLOW_CAPACITY_TAG) && this.currentEvent != null) {
 			this.currentEvent.setFlowCapacityChange(newNetworkChangeType(atts
@@ -192,7 +193,7 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 			this.currentEvent.setLanesChange(newNetworkChangeType(atts
 					.getValue(CHANGE_TYPE_TAG), atts.getValue(VALUE_TAG)));
 		}
-		
+
 	}
 
 	static final String ABSOLUTE_VALUE = "absolute";

@@ -37,7 +37,7 @@ import org.xml.sax.Attributes;
  *
  */
 abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
-	
+
 	private List<Id<Person>> currentmembers = null;
 
 	private Income currentincome = null;
@@ -53,7 +53,7 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 	private String currentincomeCurrency;
 
 	private final Households households;
-	
+
 	private Counter counter = new Counter("  households # ");
 
 	private Household currentHousehold = null;
@@ -63,6 +63,7 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 			new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 
 	public AbstractHouseholdsReaderV10(Households households) {
+		super(ValidationType.XSD_ONLY);
 		if (households == null) {
 			throw new IllegalArgumentException("Container for households must not be null!");
 		}
@@ -189,8 +190,8 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 		}
 		throw new IllegalArgumentException("Not known income period!");
 	}
-	
+
 	/*package*/ Households getHouseholds(){
 		return this.households;
-	}	
+	}
 }

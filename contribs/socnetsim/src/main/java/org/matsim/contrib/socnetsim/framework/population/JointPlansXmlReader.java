@@ -44,6 +44,7 @@ public class JointPlansXmlReader extends MatsimXmlParser {
 
 	public JointPlansXmlReader(
 			final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.scenario = scenario;
 		this.jointPlans = new JointPlans();
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , jointPlans );

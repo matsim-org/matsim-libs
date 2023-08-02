@@ -103,38 +103,38 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 																		"Setting this switch to \"true\" will clear them.  Note that this will also clear " +
 																		"settings for helper modes such as for " + TransportMode.non_network_walk;
 	private boolean clearingDefaultModeRoutingParams = false ;
-	// ---
-	public static class TeleportedModeParams extends ModeRoutingParams {
-		public TeleportedModeParams( String mode ){
+
+	/**
+	 * @deprecated -- use {@link TeleportedModeParams} to be consistent with xml config.  kai, jun'23
+	 */
+	public final static class ModeRoutingParams extends TeleportedModeParams{
+		public ModeRoutingParams( String mode ){
 			super( mode );
 		}
 
 		// repeating the setters so that they return the right type with chaining.  kai, jan'23
-		@Override public TeleportedModeParams setMode( String mode ) {
+		@Override public ModeRoutingParams setMode( String mode ) {
 			super.setMode( mode );
 			return this;
 		}
-		@Override public TeleportedModeParams setTeleportedModeSpeed( Double teleportedModeSpeed ) {
+		@Override public ModeRoutingParams setTeleportedModeSpeed( Double teleportedModeSpeed ) {
 			super.setTeleportedModeSpeed( teleportedModeSpeed );
 			return this;
 		}
-		@Override public TeleportedModeParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
+		@Override public ModeRoutingParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
 			super.setTeleportedModeFreespeedLimit( teleportedModeFreespeedLimit );
 			return this;
 		}
-		@Override public TeleportedModeParams setTeleportedModeFreespeedFactor( Double teleportedModeFreespeedFactor ) {
+		@Override public ModeRoutingParams setTeleportedModeFreespeedFactor( Double teleportedModeFreespeedFactor ) {
 			super.setTeleportedModeFreespeedFactor( teleportedModeFreespeedFactor );
 			return this;
 		}
-		@Override public TeleportedModeParams setBeelineDistanceFactor( Double beelineDistanceFactor ) {
+		@Override public ModeRoutingParams setBeelineDistanceFactor( Double beelineDistanceFactor ) {
 			super.setBeelineDistanceFactor( beelineDistanceFactor );
 			return this;
 		}
 	}
-	/**
-	 * @deprecated -- try to use {@link TeleportedModeParams} to be consistent with xml config (not always possible).
-	 */
-	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
+	public static class TeleportedModeParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
 		public static final String MODE = "mode";
 		public static final String TELEPORTED_MODE_FREESPEED_FACTOR = "teleportedModeFreespeedFactor";
@@ -157,12 +157,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		private static final String TELEPORTED_MODE_FREESPEED_LIMIT_CMT = "When using freespeed factor, a speed limit on the free speed. "
 				+ "Link travel time will be $= factor * [ min( link_freespeed, freespeed_limit) ]" ;
 
-		public ModeRoutingParams(final String mode) {
+		public TeleportedModeParams( final String mode ) {
 			super( SET_TYPE );
 			setMode( mode );
 		}
 
-		public ModeRoutingParams() {
+		public TeleportedModeParams() {
 			super( SET_TYPE );
 		}
 
@@ -206,7 +206,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		 * 
 		 * @param teleportedModeFreespeedLimit -- {@value #TELEPORTED_MODE_FREESPEED_LIMIT_CMT}
 		 */
-		public ModeRoutingParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
+		public TeleportedModeParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
 			this.teleportedModeFreespeedLimit = teleportedModeFreespeedLimit;
 			return this;
 		}
@@ -217,7 +217,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(MODE)
-		public ModeRoutingParams setMode(String mode) {
+		public TeleportedModeParams setMode( String mode ) {
 			testForLocked() ;
 			this.mode = mode;
 			return this ;
@@ -229,7 +229,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "teleportedModeSpeed" )
-		public ModeRoutingParams setTeleportedModeSpeed(Double teleportedModeSpeed) {
+		public TeleportedModeParams setTeleportedModeSpeed( Double teleportedModeSpeed ) {
 			testForLocked() ;
 			if ( getTeleportedModeFreespeedFactor() != null && teleportedModeSpeed != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
@@ -250,8 +250,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		 * @param teleportedModeFreespeedFactor -- {@value #TELEPORTED_MODE_FREESPEED_FACTOR_CMT}
 		 */
 		@StringSetter(TELEPORTED_MODE_FREESPEED_FACTOR)
-		public ModeRoutingParams setTeleportedModeFreespeedFactor(
-				Double teleportedModeFreespeedFactor) {
+		public TeleportedModeParams setTeleportedModeFreespeedFactor(
+				Double teleportedModeFreespeedFactor ) {
 			testForLocked() ;
 			if ( getTeleportedModeSpeed() != null && teleportedModeFreespeedFactor != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
@@ -261,7 +261,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 		
 		@StringSetter("beelineDistanceFactor")
-		public ModeRoutingParams setBeelineDistanceFactor( Double val ) {
+		public TeleportedModeParams setBeelineDistanceFactor( Double val ) {
 			testForLocked() ;
 			this.beelineDistanceFactorForMode = val ;
 			return this ;
@@ -278,13 +278,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 		acceptModeParamsWithoutClearing = true;
 		{
-			final ModeRoutingParams bike = new ModeRoutingParams( TransportMode.bike );
+			final TeleportedModeParams bike = new TeleportedModeParams( TransportMode.bike );
 			bike.setTeleportedModeSpeed( 15.0 / 3.6 ); // 15.0 km/h --> m/s
 			addParameterSet( bike );
 		}
 
 		{
-			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.walk );
+			final TeleportedModeParams walk = new TeleportedModeParams( TransportMode.walk );
 			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
 			addParameterSet( walk );
 		}
@@ -292,7 +292,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		// the following two are deliberately different from "walk" since "walk" may become a network routing mode, but these two
 		// will not. kai, dec'15
 		{
-			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.non_network_walk );
+			final TeleportedModeParams walk = new TeleportedModeParams( TransportMode.non_network_walk );
 			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
 			addParameterSet( walk );
 		}
@@ -316,13 +316,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 //		}
 
 		{
-			final ModeRoutingParams ride = new ModeRoutingParams( TransportMode.ride );
+			final TeleportedModeParams ride = new TeleportedModeParams( TransportMode.ride );
 			ride.setTeleportedModeFreespeedFactor(1.0);
 			addParameterSet( ride );
 		}
 
 		{
-			final ModeRoutingParams pt = new ModeRoutingParams( TransportMode.pt );
+			final TeleportedModeParams pt = new TeleportedModeParams( TransportMode.pt );
 			pt.setTeleportedModeFreespeedFactor( 2.0 );
 			addParameterSet( pt );
 		}
@@ -340,8 +340,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	@Override
 	public ConfigGroup createParameterSet( final String type ) {
 		switch ( type ) {
-			case ModeRoutingParams.SET_TYPE:
-				return new ModeRoutingParams();
+			case TeleportedModeParams.SET_TYPE:
+				return new TeleportedModeParams();
 			default:
 				throw new IllegalArgumentException( type );
 		}
@@ -350,8 +350,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	@Override
 	protected void checkParameterSet( final ConfigGroup module ) {
 		switch ( module.getName() ) {
-			case ModeRoutingParams.SET_TYPE:
-				if ( !(module instanceof ModeRoutingParams) ) {
+			case TeleportedModeParams.SET_TYPE:
+				if ( !(module instanceof TeleportedModeParams) ) {
 					throw new RuntimeException( "unexpected class for module "+module );
 				}
 				break;
@@ -382,7 +382,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		this.acceptModeParamsWithoutClearing = true;
 
 		// do the clearing:
-		clearParameterSetsForType( ModeRoutingParams.SET_TYPE );
+		clearParameterSetsForType( TeleportedModeParams.SET_TYPE );
 
 		// memorize that we have cleared; this is what will be written into the output config (once we have one):
 		this.clearingDefaultModeRoutingParams = true ;
@@ -390,7 +390,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
-		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
+		if ( set.getName().equals( TeleportedModeParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
 			clearParameterSetsForType( set.getName() );
 			this.acceptModeParamsWithoutClearing = true;
 			log.warn( "The first mode routing (= teleported mode) params that are explicitly defined clear the default mode routing (= teleported mode) params.  If you want to avoid this " );
@@ -409,7 +409,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			// we add to and remove from the default entries, and write the final result to file, then re-reading these entries
 			// needs to trigger removal of the defaults since otherwise they will exist in addition. kai, nov'19
 		}
-		ModeRoutingParams pars = (ModeRoutingParams) set ;
+		TeleportedModeParams pars = (TeleportedModeParams) set ;
 		// for the time being pushing the "global" factor into the local ones if they are not initialized by
 		// themselves.  Necessary for some tests; maybe we should eventually disable them.  kai, feb'15
 		if ( pars.getBeelineDistanceFactor()== null ) {
@@ -418,13 +418,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		super.addParameterSet( set );
 	}
 
-	public void addTeleportedModeParams( final TeleportedModeParams pars ) {
+	public void addTeleportedModeParams( final ModeRoutingParams pars ) {
 		this.addModeRoutingParams( pars );
 	}
 	/**
-	 * @deprecated -- use {@link #addTeleportedModeParams(TeleportedModeParams)} instead.
+	 * @deprecated -- use {@link #addTeleportedModeParams(ModeRoutingParams)} instead.
 	 */
-	public void addModeRoutingParams(final ModeRoutingParams pars) {
+	public void addModeRoutingParams(final TeleportedModeParams pars ) {
 		testForLocked() ;
 		addParameterSet( pars );
 	}
@@ -436,46 +436,46 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	 */
 	public void removeModeRoutingParams( String key ) {
 		testForLocked() ;
-		for ( ConfigGroup pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
-			final String mode = ((ModeRoutingParams) pars).getMode();
+		for ( ConfigGroup pars : getParameterSets( TeleportedModeParams.SET_TYPE ) ) {
+			final String mode = ((TeleportedModeParams) pars).getMode();
 			if ( key.equals(mode) ) {
 				this.removeParameterSet(pars) ;
 				break ;
 			}
 		}
-		if ( getParameterSets( ModeRoutingParams.SET_TYPE ).isEmpty() ) {
+		if ( getParameterSets( TeleportedModeParams.SET_TYPE ).isEmpty() ) {
 			log.warn( "You have removed the last mode routing (= teleported mode) parameter with the removeModeRoutingParams method.  If you wrote the resulting config to " ) ;
 			log.warn("    file, and read it back in, all default teleported modes would be resurrected.  The code will therefore also call  " );
 			log.warn( "    \"clearTeleportedModeParams()\".  It would be better if you did this yourself." ) ;
 			this.clearModeRoutingParams();
 		}
 	}
-	public Map<String, ModeRoutingParams> getTeleportedModeParams() {
+	public Map<String, TeleportedModeParams> getTeleportedModeParams() {
 		return getModeRoutingParams();
 	}
 	/**
 	 * @deprecated -- use {@link #getTeleportedModeParams()} instead.
 	 */
-	public Map<String, ModeRoutingParams> getModeRoutingParams() {
-		final Map<String, ModeRoutingParams> map = new LinkedHashMap< >();
+	public Map<String, TeleportedModeParams> getModeRoutingParams() {
+		final Map<String, TeleportedModeParams> map = new LinkedHashMap< >();
 
-		for ( ConfigGroup pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
+		for ( ConfigGroup pars : getParameterSets( TeleportedModeParams.SET_TYPE ) ) {
 			if ( this.isLocked() ) {
 				pars.setLocked(); 
 			}
-			final String mode = ((ModeRoutingParams) pars).getMode();
-			final ModeRoutingParams old = map.put( mode , (ModeRoutingParams)	pars );
+			final String mode = ((TeleportedModeParams) pars).getMode();
+			final TeleportedModeParams old = map.put( mode , (TeleportedModeParams)	pars );
 			if ( old != null ) throw new IllegalStateException( "several parameter sets for mode "+mode );
 		}
 
 		return map;
 	}
 
-	public ModeRoutingParams getOrCreateModeRoutingParams(final String mode) {
-		ModeRoutingParams pars = getModeRoutingParams().get( mode );
+	public TeleportedModeParams getOrCreateModeRoutingParams( final String mode ) {
+		TeleportedModeParams pars = getModeRoutingParams().get( mode );
 
 		if ( pars == null ) {
-			pars = (ModeRoutingParams) createParameterSet( ModeRoutingParams.SET_TYPE );
+			pars = (TeleportedModeParams) createParameterSet( TeleportedModeParams.SET_TYPE );
 			pars.setMode( mode );
 			addParameterSet( pars );
 		}
@@ -560,7 +560,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	public Map<String, Double> getTeleportedModeSpeeds() {
 		final Map<String, Double> map = new LinkedHashMap< >();
-		for ( ModeRoutingParams pars : getModeRoutingParams().values() ) {
+		for ( TeleportedModeParams pars : getModeRoutingParams().values() ) {
 			if ( this.isLocked() ) {
 				pars.setLocked(); 
 			}
@@ -573,7 +573,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	public Map<String, Double> getTeleportedModeFreespeedFactors() {
 		final Map<String, Double> map = new LinkedHashMap< >();
-		for ( ModeRoutingParams pars : getModeRoutingParams().values() ) {
+		for ( TeleportedModeParams pars : getModeRoutingParams().values() ) {
 			if ( this.isLocked() ) {
 				pars.setLocked(); 
 			}
@@ -586,7 +586,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	public Map<String,Double> getBeelineDistanceFactors() {
 		final Map<String,Double> map = new LinkedHashMap<>() ;
-		for ( ModeRoutingParams pars : getModeRoutingParams().values() ) {
+		for ( TeleportedModeParams pars : getModeRoutingParams().values() ) {
 			if ( this.isLocked() ) {
 				pars.setLocked(); 
 			}
@@ -601,7 +601,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (see acceptModeParamsWithoutClearing)
-		final ModeRoutingParams pars = new ModeRoutingParams( mode );
+		final TeleportedModeParams pars = new TeleportedModeParams( mode );
 		pars.setTeleportedModeFreespeedFactor( freespeedFactor );
 		addParameterSet( pars );
 	}
@@ -610,7 +610,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public void setTeleportedModeSpeed(String mode, double speed) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (see acceptModeParamsWithoutClearing)
-		final ModeRoutingParams pars = new ModeRoutingParams( mode );
+		final TeleportedModeParams pars = new TeleportedModeParams( mode );
 		pars.setTeleportedModeSpeed( speed );
 		addParameterSet( pars );
 	}
@@ -625,7 +625,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		this.beelineDistanceFactor = val ;
 		
 		// push the global factor to the local ones for all ModeRoutingParams that are already there:
-		for ( ModeRoutingParams params : this.getModeRoutingParams().values() ) {
+		for ( TeleportedModeParams params : this.getModeRoutingParams().values() ) {
 			params.setBeelineDistanceFactor( val );
 		}
 	}
@@ -665,7 +665,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	}
 
 	public void printModeRoutingParams(){
-		for( Map.Entry<String, PlansCalcRouteConfigGroup.ModeRoutingParams> entry : this.getModeRoutingParams().entrySet() ){
+		for( Map.Entry<String, TeleportedModeParams> entry : this.getModeRoutingParams().entrySet() ){
 			log.warn( "key=" + entry.getKey() + "; value=" + entry.getValue() );
 		}
 	}

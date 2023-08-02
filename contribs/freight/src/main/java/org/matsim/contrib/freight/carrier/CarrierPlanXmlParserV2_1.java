@@ -102,7 +102,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	 * @param carrierVehicleTypes
 	 */
 	CarrierPlanXmlParserV2_1(Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
-		super();
+		super(ValidationType.XSD_ONLY);
 		this.carriers = carriers;
 		this.carrierVehicleTypes = carrierVehicleTypes;
 	}

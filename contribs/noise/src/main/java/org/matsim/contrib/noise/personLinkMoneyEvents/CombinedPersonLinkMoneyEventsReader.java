@@ -38,17 +38,17 @@ public class CombinedPersonLinkMoneyEventsReader extends MatsimXmlParser {
 	private PersonLinkMoneyEventsReader personLinkMoneyEventsReader;
 
 	public CombinedPersonLinkMoneyEventsReader(EventsManager eventsManager) {
-		super();
-		
+		super(ValidationType.NO_VALIDATION);
+
 		this.eventsManager = eventsManager;
 		setValidating(false);
-		
+
 		defaultEventsReader = new EventsReaderXMLv1(this.eventsManager);
 		personLinkMoneyEventsReader = new PersonLinkMoneyEventsReader(this.eventsManager);
 	}
 
 	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {	
+	public void startTag(String name, Attributes atts, Stack<String> context) {
 		this.defaultEventsReader.startTag(name, atts, context);
 		this.personLinkMoneyEventsReader.startTag(name, atts, context);
 	}

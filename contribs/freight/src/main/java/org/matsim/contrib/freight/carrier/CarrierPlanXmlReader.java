@@ -34,7 +34,7 @@ import java.util.Stack;
 
 /**
  * A reader that reads carriers and their plans.
- * 
+ *
  * @author sschroeder
  *
  */
@@ -47,7 +47,6 @@ public class CarrierPlanXmlReader implements MatsimReader {
 	private final CarriersPlanReader reader;
 
 	public CarrierPlanXmlReader( final Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
-		System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefinition_v2.0.xsd is online
 		this.reader = new CarriersPlanReader( carriers, carrierVehicleTypes ) ;
 	}
 
@@ -102,7 +101,8 @@ public class CarrierPlanXmlReader implements MatsimReader {
 		private MatsimXmlParser delegate = null;
 
 		CarriersPlanReader( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
-			this.carriers = carriers ;
+			super(ValidationType.XSD_ONLY);
+			this.carriers = carriers;
 			this.carrierVehicleTypes = carrierVehicleTypes;
 		}
 
