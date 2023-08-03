@@ -42,7 +42,7 @@ public class InsertionDetourTimeCalculator {
 		double toPickupTT = detourData.detourToPickup.getTravelTime();
 		double fromPickupTT = detourData.detourFromPickup.getTravelTime();
 		var pickupDetourInfo = calcPickupDetourInfo(insertion.vehicleEntry, insertion.pickup, toPickupTT, fromPickupTT,
-				drtRequest);
+				drtRequest, followedByDropoff);
 
 		double toDropoffTT = followedByDropoff ? fromPickupTT : detourData.detourToDropoff.getTravelTime();
 		double fromDropoffTT = detourData.detourFromDropoff.getTravelTime();
@@ -53,7 +53,7 @@ public class InsertionDetourTimeCalculator {
 	}
 
 	public PickupDetourInfo calcPickupDetourInfo(VehicleEntry vEntry, InsertionPoint pickup, double toPickupTT,
-			double fromPickupTT, DrtRequest drtRequest) {
+			double fromPickupTT, DrtRequest drtRequest, boolean followedByDropoff) {
 		/*
 		 * This method calculates the timing information when inserting a new pickup
 		 * into the task sequence of a vehicle. There are two cases:
@@ -92,8 +92,11 @@ public class InsertionDetourTimeCalculator {
 			double departureTime = stopTimeCalculator.updateEndTimeForPickup(vEntry.vehicle, stopTask, arrivalTime,
 					drtRequest);
 			
+			// calculate the drive time of the slot where we insert the pickup + drive + dropoff + fromDropoffDrive
+			double replacedDriveTT = !followedByDropoff ? 0.0 : calculateReplacedDriveDuration(vEntry, pickup.index, pickup.previousWaypoint.getDepartureTime());
+			
 			double additionalStopDuration = departureTime - stopTask.getEndTime();
-			double pickupTimeLoss = additionalStopDuration + fromPickupTT;
+			double pickupTimeLoss = additionalStopDuration + fromPickupTT - replacedDriveTT;
 			
 			return new PickupDetourInfo(departureTime, pickupTimeLoss);
 		} else {
@@ -103,7 +106,7 @@ public class InsertionDetourTimeCalculator {
 			// calculate expected departure time for a newly created stop
 			double departureTime = stopTimeCalculator.initEndTimeForPickup(vEntry.vehicle, arrivalTime, drtRequest);
 			
-			// calculate the drive time that we replace by inserting the new pickup + access and egress route
+			// calculate the drive time of the slot where we insert the toPickupDrive + pickup + fromPickupDrive
 			double replacedDriveTT = sameLinkAsPrevious ?  0.0 : //
 					calculateReplacedDriveDuration(vEntry, pickup.index, pickup.previousWaypoint.getDepartureTime());
 			
@@ -178,7 +181,7 @@ public class InsertionDetourTimeCalculator {
 			// calculate the expected departure time when creating a new stop for the dropoff
 			double departureTime = stopTimeCalculator.initEndTimeForDropoff(vEntry.vehicle, arrivalTime, drtRequest);
 			
-			// calculate the drive time that we replace by inserting the new pickup + access and egress route
+			// calculate the drive time that we replace by inserting the new dropoff + access and egress route
 			double replacedDriveTT = sameLinkAsPrevious ? 0.0 : //
 					calculateReplacedDriveDuration(vEntry, dropoff.index, dropoff.previousWaypoint.getDepartureTime());
 			
