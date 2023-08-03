@@ -161,7 +161,12 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				// add pickup request to stop task
 				stopTask.addPickupRequest(request);
 				
-				// IRTX TODO: Update as in InsertionDetourTimeCalculator
+				/*
+				 * TODO: insertionTime should be set to "now" here to avoid adding pickups to
+				 * ongoing tasks "for free" and generating requests with zero wait time. See 
+				 * InsertionDetourTimeCalculator.calculatePickupIfSameLink for more details.
+				 */
+				
 				double insertionTime = stopTask.getBeginTime();
 				stopTask.setEndTime(stopTimeCalculator.updateEndTimeForPickup(vehicleEntry.vehicle, stopTask,
 						insertionTime, request.getRequest()));
@@ -277,7 +282,12 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				// add dropoff request to stop task, and extend the stop task (when incremental stop task duration is used)
 				stopTask.addDropoffRequest(request);
 				
-				// IRTX TODO: Update as in InsertionDetourTimeCalculator
+				/*
+				 * TODO: insertionTime should be set to "now" here to avoid adding pickups to
+				 * ongoing tasks "for free" and generating requests with zero wait time. See 
+				 * InsertionDetourTimeCalculator.calculatePickupIfSameLink for more details.
+				 */
+				
 				double insertionTime = stopTask.getBeginTime();
 				stopTask.setEndTime(stopTimeCalculator.updateEndTimeForDropoff(vehicleEntry.vehicle, stopTask,
 						insertionTime, request.getRequest()));
