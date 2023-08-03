@@ -124,6 +124,17 @@ public class SmallScaleCommercialTrafficUtils {
 				minDistance = distance;
 			}
 		}
+		if (newLink == null && numberOfPossibleLinks > 0){
+			for (Link possibleLink : regionLinksMap.get(zone).values()) {
+				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
+					(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+				if (distance < minDistance) {
+					newLink = possibleLink.getId();
+					minDistance = distance;
+				}
+			}
+		}
+
 		return newLink;
 	}
 	/**
