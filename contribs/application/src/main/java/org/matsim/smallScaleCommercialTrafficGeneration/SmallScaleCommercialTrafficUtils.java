@@ -375,7 +375,7 @@ public class SmallScaleCommercialTrafficUtils {
 					}
 
 					// remove services/shipments from removed tours
-					if (carrier.getServices().size() != 0) {
+					if (!carrier.getServices().isEmpty()) {
 						for (ScheduledTour removedTour : toursToRemove) {
 							for (TourElement tourElement : removedTour.getTour().getTourElements()) {
 								if (tourElement instanceof ServiceActivity service) {
@@ -383,7 +383,7 @@ public class SmallScaleCommercialTrafficUtils {
 								}
 							}
 						}
-					} else if (carrier.getShipments().size() != 0) {
+					} else if (!carrier.getShipments().isEmpty()) {
 						for (ScheduledTour removedTour : toursToRemove) {
 							for (TourElement tourElement : removedTour.getTour().getTourElements()) {
 								if (tourElement instanceof Pickup pickup) {
@@ -423,7 +423,7 @@ public class SmallScaleCommercialTrafficUtils {
 				}
 				// carriers without solutions
 				else {
-					if (carrier.getServices().size() != 0) {
+					if (!carrier.getServices().isEmpty()) {
 						int numberOfServicesToRemove = carrier.getServices().size()
 								- (int) Math.round(carrier.getServices().size() * sampleFactor);
 						for (int i = 0; i < numberOfServicesToRemove; i++) {
@@ -431,7 +431,7 @@ public class SmallScaleCommercialTrafficUtils {
 							carrier.getServices().remove(services[MatsimRandom.getRandom().nextInt(services.length)]);
 						}
 					}
-					if (carrier.getShipments().size() != 0) {
+					if (!carrier.getShipments().isEmpty()) {
 						int numberOfShipmentsToRemove = carrier.getShipments().size()
 								- (int) Math.round(carrier.getShipments().size() * sampleFactor);
 						for (int i = 0; i < numberOfShipmentsToRemove; i++) {
@@ -456,9 +456,9 @@ public class SmallScaleCommercialTrafficUtils {
 					newCarrier.getAttributes().putAttribute("vehicleType", vehicleType);
 				newCarrier.setCarrierCapabilities(carrier.getCarrierCapabilities());
 
-				if (carrier.getServices().size() > 0)
+				if (!carrier.getServices().isEmpty())
 					newCarrier.getServices().putAll(carrier.getServices());
-				else if (carrier.getShipments().size() > 0)
+				else if (!carrier.getShipments().isEmpty())
 					newCarrier.getShipments().putAll(carrier.getShipments());
 				if (carrier.getSelectedPlan() != null) {
 					newCarrier.setSelectedPlan(carrier.getSelectedPlan());
