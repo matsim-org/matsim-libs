@@ -328,6 +328,9 @@ public class LanduseBuildingAnalysis {
 				log.info("Investigate Building " + countOSMObjects + " of " + buildingsFeatures.size() + " buildings: "
 						+ Math.round((double) countOSMObjects / buildingsFeatures.size() * 100) + " %");
 
+			if (singleBuildingFeature.getAttribute("levels") == null)
+				throw new RuntimeException("The buildings object should contain the attribute 'levels'.");
+
 			List<String> categoriesOfBuilding = new ArrayList<String>();
 			String[] buildingTypes;
 			Coord centroidPointOfBuildingPolygon = MGC
