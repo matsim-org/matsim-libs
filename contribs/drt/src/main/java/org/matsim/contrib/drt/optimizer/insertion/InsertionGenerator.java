@@ -179,7 +179,7 @@ public class InsertionGenerator {
 				pickupInsertion.nextWaypoint.getLink(),
 				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
 		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
-				fromPickupTT, request, true);
+				fromPickupTT, true, request);
 
 		int stopCount = vEntry.stops.size();
 		// i == j
@@ -205,7 +205,7 @@ public class InsertionGenerator {
 		fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(), pickupInsertion.nextWaypoint.getLink(),
 				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
 		pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT, fromPickupTT,
-				request, false);
+				false, request);
 
 		if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
 			return; // skip all insertions: i -> pickup -> dropoff
