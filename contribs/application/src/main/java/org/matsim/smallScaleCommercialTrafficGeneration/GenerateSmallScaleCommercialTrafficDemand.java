@@ -181,6 +181,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		output = Path.of(config.controler().getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		NetworkUtils.runNetworkCleaner(scenario.getNetwork()); // e.g. for vulkaneifel network
+
 		FreightConfigGroup freightConfigGroup;
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution -> {
@@ -807,6 +809,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			networkPath = scenario.getConfig().getContext().toURI().resolve(scenario.getConfig().network().getInputFile()).getPath();
 
 		Network networkToChange = NetworkUtils.readNetwork(networkPath);
+		NetworkUtils.runNetworkCleaner(networkToChange);
+
 		links = networkToChange.getLinks().values().stream().filter(l -> l.getAllowedModes().contains("car"))
 				.collect(Collectors.toList());
 		links.forEach(l -> l.getAttributes().putAttribute("newCoord",
