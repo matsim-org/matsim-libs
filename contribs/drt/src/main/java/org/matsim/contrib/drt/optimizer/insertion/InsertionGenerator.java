@@ -27,6 +27,8 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.stops.StopDurationProvider;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
 import com.google.common.base.MoreObjects;
 
@@ -140,9 +142,9 @@ public class InsertionGenerator {
 	private final DetourTimeEstimator detourTimeEstimator;
 	private final InsertionDetourTimeCalculator detourTimeCalculator;
 
-	public InsertionGenerator(IncrementalStopDurationEstimator stopDurationEstimator, DetourTimeEstimator detourTimeEstimator) {
+	public InsertionGenerator(StopTimeCalculator stopTimeCalculator, DetourTimeEstimator detourTimeEstimator) {
 		this.detourTimeEstimator = detourTimeEstimator;
-		detourTimeCalculator = new InsertionDetourTimeCalculator(stopDurationEstimator, detourTimeEstimator);
+		detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, detourTimeEstimator);
 	}
 
 	public List<InsertionWithDetourData> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
@@ -177,7 +179,7 @@ public class InsertionGenerator {
 				pickupInsertion.nextWaypoint.getLink(),
 				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
 		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
-				fromPickupTT, true, request);
+				fromPickupTT, request);
 
 		int stopCount = vEntry.stops.size();
 		// i == j
@@ -203,7 +205,7 @@ public class InsertionGenerator {
 		fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(), pickupInsertion.nextWaypoint.getLink(),
 				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
 		pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT, fromPickupTT,
-				false, request);
+				request);
 
 		if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
 			return; // skip all insertions: i -> pickup -> dropoff
