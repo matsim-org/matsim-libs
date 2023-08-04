@@ -10,11 +10,15 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -26,6 +30,25 @@ public class ApplicationUtils {
 	private static final Logger log = LogManager.getLogger(ApplicationUtils.class);
 
 	private ApplicationUtils() {
+	}
+
+	/**
+	 * Extends a context (usually config location) with an relative filename.
+	 * If the results is a local file, the path will be returned. Otherwise, it will be an url.
+	 * The results can be used as input for command line parameter or {@link IOUtils#resolveFileOrResource(String)}.
+	 * @return string with path or URL
+	 */
+	public static String resolve(URL context, String filename) {
+
+		URL refURL = IOUtils.extendUrl(context, filename);
+		String refData;
+		try {
+			refData = new File(refURL.toURI()).getAbsolutePath();
+		} catch (URISyntaxException e) {
+			refData = refURL.toString();
+		}
+		return refData;
+
 	}
 
 	/**

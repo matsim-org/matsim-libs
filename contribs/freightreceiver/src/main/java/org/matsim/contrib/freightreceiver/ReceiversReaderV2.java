@@ -93,6 +93,7 @@ import java.util.Stack;
 	private final Counter counter = new Counter("   receiver # ");
 
 	public ReceiversReaderV2(final Receivers receivers) {
+		super(ValidationType.DTD_ONLY);
 		this.receivers = receivers;
 	}
 

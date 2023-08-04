@@ -142,7 +142,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return this;
 	}
 
-	public enum BicycleScoringType {legBased, linkBased}
+	public enum BicycleScoringType {legBased, @Deprecated linkBased}
 	@StringGetter( BICYCLE_MODE )
 	public String getBicycleMode() {
 		return this.bicycleMode;

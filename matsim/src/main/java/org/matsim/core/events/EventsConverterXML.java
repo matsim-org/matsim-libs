@@ -43,12 +43,12 @@ import org.xml.sax.Attributes;
 
 /**
  * This class reads and completes event files regarding vehicle ids.
- * 
+ *
  * If the Wait2LinkEvents contain vehicle ids different from null, this ids are added to the LinkEnter- and LinkLeaveEvents.
  * If not, the person id is used as vehicle id in Wait2Link-, LinkLeave- and LinkEnterEvents.
- * 
+ *
  * Additionally, this class adds VehicleLeavesTrafficEvents if they are not existing.
- * 
+ *
  * @author tthunig
  *
  */
@@ -64,6 +64,7 @@ public final class EventsConverterXML extends MatsimXmlParser{
 	private Map<Id<Person>, String> personToLegMode = new HashMap<>();
 
 	public EventsConverterXML(final EventsManager events) {
+		super(ValidationType.NO_VALIDATION);
 		this.events = events;
 		this.setValidating(false);// events-files have no DTD, thus they cannot validate
 		this.basicEventsReader = new EventsReaderXMLv1(events);
@@ -74,7 +75,7 @@ public final class EventsConverterXML extends MatsimXmlParser{
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if ( EVENT.equals(name)) {
 			// (we are essentially ignoring the xml header)
-			
+
 			double time = Double.parseDouble(atts.getValue("time"));
 			String eventType = atts.getValue("type");
 
@@ -102,17 +103,17 @@ public final class EventsConverterXML extends MatsimXmlParser{
 				if (networkMode == null){
 					networkMode = personToLegMode.get(driverId);
 				}
-				
+
 				// remember driver to vehicle relation
-				driverToVeh.put(driverId, vehicleId);				
+				driverToVeh.put(driverId, vehicleId);
 				// process event with correct vehicleId
-				this.events.processEvent(new VehicleEntersTrafficEvent(time, driverId, Id.createLinkId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK)), 
+				this.events.processEvent(new VehicleEntersTrafficEvent(time, driverId, Id.createLinkId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK)),
 						vehicleId, networkMode, 1.0));
 				break;
 			case LinkEnterEvent.EVENT_TYPE:
 				if (atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE).equals("null")){
 					// create an link enter event with the correct vehicle id
-					this.events.processEvent(new LinkEnterEvent(time, driverToVeh.get(Id.createPersonId(atts.getValue(ATTRIBUTE_PERSON))), 
+					this.events.processEvent(new LinkEnterEvent(time, driverToVeh.get(Id.createPersonId(atts.getValue(ATTRIBUTE_PERSON))),
 							Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)));
 				} else {
 					// the event already contains the vehicle id and can be processed normally
@@ -141,7 +142,7 @@ public final class EventsConverterXML extends MatsimXmlParser{
 			case PersonLeavesVehicleEvent.EVENT_TYPE:
 				if (driverToVeh.containsKey(Id.createPersonId(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_PERSON))) && !this.containsVehicleLeavesTrafficEvents){
 					/* if the person is a driver and the vehicle leaves traffic event is missing ...
-					 * ... process the event later (during person arrival) to be able to collect 
+					 * ... process the event later (during person arrival) to be able to collect
 					 * some information about the missing vehicle leaves traffic event before */
 				} else {
 					// process normally
@@ -156,8 +157,8 @@ public final class EventsConverterXML extends MatsimXmlParser{
 				// create a vehicle leaves traffic event if it is missing
 				if (driverToVeh.containsKey(personId) && !this.containsVehicleLeavesTrafficEvents){
 //					Id<Vehicle> vehicleIdOfDriver = driverToVeh.get(personId);
-					// remove the person-car-mapping, otherwise every following (even non-vehicle) leg produces leave traffic/vehicle events 
-					Id<Vehicle> vehicleIdOfDriver = driverToVeh.remove(personId); 
+					// remove the person-car-mapping, otherwise every following (even non-vehicle) leg produces leave traffic/vehicle events
+					Id<Vehicle> vehicleIdOfDriver = driverToVeh.remove(personId);
 
 					this.events.processEvent(new VehicleLeavesTrafficEvent(time, personId, linkId, vehicleIdOfDriver, mode, 1.0));
 					this.events.processEvent(new PersonLeavesVehicleEvent(time, personId, vehicleIdOfDriver));

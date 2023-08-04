@@ -28,6 +28,7 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.*;
@@ -56,6 +57,7 @@ import com.google.common.base.Verify;
 
 /**
  * @author michalm
+ * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 public class DefaultRequestInsertionScheduler implements RequestInsertionScheduler {
 
@@ -93,8 +95,24 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		var dropoffTask = insertDropoff(request, insertion, pickupTask);
 		verifyTimes("Inconsistent dropoff arrival time", insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime,
 				dropoffTask.getBeginTime());
-
+		
+		verifyTaskContinuity(insertion);
 		return new PickupDropoffTaskPair(pickupTask, dropoffTask);
+	}
+	
+	private void verifyTaskContinuity(InsertionWithDetourData insertion) {
+		/*
+		 * During insertion of tasks the common sanity checks that happen when appending
+		 * to the schedule (next start time = previous end time) are not evaluated. This
+		 * method verifies that the timing remains intact after insertion.
+		 */
+		
+		Schedule schedule = insertion.insertion.vehicleEntry.vehicle.getSchedule();
+		for (int i = 1; i < schedule.getTaskCount(); i++) {
+			Task first = schedule.getTasks().get(i - 1);
+			Task second = schedule.getTasks().get(i);
+			Verify.verify(first.getEndTime() == second.getBeginTime());
+		}
 	}
 
 	private void verifyTimes(String messageStart, double timeFromInsertionData, double timeFromScheduler) {
@@ -202,6 +220,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 					scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
 							stopTask.getTaskIdx() + 2, driveFromPickupTask.getEndTime());
 					///////
+				} else {
+					scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
+							stopTask.getTaskIdx() + 1, stopTask.getEndTime());
 				}
 
 				return stopTask;
@@ -281,7 +302,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			if (request.getToLink() == stopTask.getLink()) { // no detour; no new stop task
 				// add dropoff request to stop task, and extend the stop task (when incremental stop task duration is used)
 				stopTask.addDropoffRequest(request);
-				
+
 				/*
 				 * TODO: insertionTime should be set to "now" here to avoid adding pickups to
 				 * ongoing tasks "for free" and generating requests with zero wait time. See 
@@ -291,7 +312,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				double insertionTime = stopTask.getBeginTime();
 				stopTask.setEndTime(stopTimeCalculator.updateEndTimeForDropoff(vehicleEntry.vehicle, stopTask,
 						insertionTime, request.getRequest()));
-				
+				scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
+						stopTask.getTaskIdx() + 1, stopTask.getEndTime());
+
 				return stopTask;
 			} else { // add drive task to dropoff location
 

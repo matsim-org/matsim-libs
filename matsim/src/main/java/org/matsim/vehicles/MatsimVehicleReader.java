@@ -66,7 +66,8 @@ public final class MatsimVehicleReader implements MatsimReader{
 		private Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
 		public VehicleReader( Vehicles vehicles ) {
-			this.vehicles = vehicles ;
+			super(ValidationType.XSD_ONLY);
+			this.vehicles = vehicles;
 		}
 
 		@Override
