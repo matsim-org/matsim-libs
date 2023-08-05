@@ -39,9 +39,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
-	
+
 	private static final Logger log = LogManager.getLogger(NetworkWriter.class);
-	
+
 	private final Network network;
 	private final CoordinateTransformation transformation;
 	private final Map<Class<?>,AttributeConverter<?>> converters = new HashMap<>();
@@ -74,19 +74,19 @@ public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter
 	}
 
 	public void writeFileV1(final String filename) {
-		String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
+		String dtd = "https://www.matsim.org/files/dtd/network_v1.dtd";
 		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
 		writeFile( dtd , handler , filename );
 	}
 
 	public void writeStreamV1(final OutputStream stream) {
-		String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
+		String dtd = "https://www.matsim.org/files/dtd/network_v1.dtd";
 		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
 		writeStream(dtd, handler, stream);
 	}
 
 	public void writeFileV2(final String filename) {
-		String dtd = "http://www.matsim.org/files/dtd/network_v2.dtd";
+		String dtd = "https://www.matsim.org/files/dtd/network_v2.dtd";
 		NetworkWriterHandlerImplV2 handler = new NetworkWriterHandlerImplV2(transformation);
 
 		handler.putAttributeConverters( converters );
@@ -95,7 +95,7 @@ public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter
 	}
 
 	public void writeStreamV2(final OutputStream stream) {
-		String dtd = "http://www.matsim.org/files/dtd/network_v2.dtd";
+		String dtd = "https://www.matsim.org/files/dtd/network_v2.dtd";
 		NetworkWriterHandlerImplV2 handler = new NetworkWriterHandlerImplV2(transformation);
 
 		handler.putAttributeConverters( converters );

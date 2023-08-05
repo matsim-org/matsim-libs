@@ -40,7 +40,7 @@ public class ConfigTest {
 		Assert.assertNull(group.getB());
 
 		String str = "<?xml version='1.0' encoding='UTF-8' ?>\n" +
-				"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v1.dtd\">\n" +
+				"<!DOCTYPE config SYSTEM \"https://www.matsim.org/files/dtd/config_v1.dtd\">\n" +
 				"<config>\n" +
 				"	<module name=\"ctg\">\n" +
 				"		<param name=\"a\" value=\"aaa\" />\n" +
@@ -62,7 +62,7 @@ public class ConfigTest {
 		Assert.assertNull(group.getB());
 
 		String str = "<?xml version='1.0' encoding='UTF-8' ?>\n" +
-				"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v1.dtd\">\n" +
+				"<!DOCTYPE config SYSTEM \"https://www.matsim.org/files/dtd/config_v1.dtd\">\n" +
 				"<config>\n" +
 				"	<module name=\"ctg\">\n" +
 				"		<param name=\"a\" value=\"aaa\" />\n" +

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+<!DOCTYPE transitSchedule SYSTEM "https://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
 
 <transitSchedule>
 	<transitStops>
@@ -52,7 +52,7 @@
 				<departure id="10022" departureTime="12:00:00" vehicleRefId="tr_0" />
 				<departure id="10023" departureTime="12:20:00" vehicleRefId="tr_0" />
 				<departure id="10024" departureTime="12:40:00" vehicleRefId="tr_0" />
-									
+
 				<departure id="11001" departureTime="05:10:00" vehicleRefId="tr_10" />
 				<departure id="11002" departureTime="05:30:00" vehicleRefId="tr_10" />
 				<departure id="11003" departureTime="05:50:00" vehicleRefId="tr_10" />

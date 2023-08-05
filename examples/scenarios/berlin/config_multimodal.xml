@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 
 	<module name="global">
@@ -30,13 +30,13 @@
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
-	
+
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		
+
 		<param name = "flowCapacityFactor" value="0.02" /> <!-- we simulate only 1% of the population, and reduce the network capacity to 2% -->
 		<param name = "storageCapacityFactor" value="0.05" />
 	</module>
-	
+
 	<module name="multimodal" >
 		<param name="createMultiModalNetwork" value="true" />
 		<param name="cuttoffValueForNonCarModes" value="25.0" />
@@ -45,7 +45,7 @@
 		<param name="simulatedModes" value="bike,walk" />
 		<param name="ensureActivityReachability" value ="true" />
 	</module>
-	
+
 	<module name="planCalcScore">
 		<param name="learningRate" value="1.0" />
 		<param name="BrainExpBeta" value="2.0" />
@@ -100,7 +100,7 @@
 			</parameterset>
 		</parameterset>
 	</module>
-	
+
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 

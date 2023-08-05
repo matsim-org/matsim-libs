@@ -37,11 +37,11 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 
 	/** The default location where dtds are stored on the internet. */
-	public static final String DEFAULT_DTD_LOCATION = "http://www.matsim.org/files/dtd/";
+	public static final String DEFAULT_DTD_LOCATION = "https://www.matsim.org/files/dtd/";
 	/**
 	 * The namespace used in the matsim xml formats
 	 */
-	public static final String MATSIM_NAMESPACE = "http://www.matsim.org/files/dtd";
+	public static final String MATSIM_NAMESPACE = "https://www.matsim.org/files/dtd";
 	/**
 	 * Constant for the xml namespace attribute
 	 */
@@ -49,7 +49,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	/**
 	 * Default location of the namespace of xml schema
 	 */
-	public static final String DEFAULTSCHEMANAMESPACELOCATION = "http://www.w3.org/2001/XMLSchema-instance";
+	public static final String DEFAULTSCHEMANAMESPACELOCATION = "https://www.w3.org/2001/XMLSchema-instance";
 
 	/**
 	 * Stores the current level of indentation

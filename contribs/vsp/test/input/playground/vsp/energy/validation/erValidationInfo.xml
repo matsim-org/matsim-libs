@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:validation_information xmlns:ns2="http://www.matsim.org/files/dtd">
+<ns2:validation_information xmlns:ns2="https://www.matsim.org/files/dtd">
     <poi_info>
         <poi_id>test1</poi_id>
         <maximum_capacity>5.0</maximum_capacity>

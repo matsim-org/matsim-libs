@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<!DOCTYPE network SYSTEM "https://www.matsim.org/files/dtd/network_v2.dtd">
 <network>
 
 <!-- ====================================================================== -->
@@ -38,7 +38,7 @@
    </nodes>
 
 <!-- ====================================================================== -->
-   
+
    <links capperiod="01:00:00">
       <link id="1" from="1" to="2" length="10000.00" capacity="36000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
@@ -191,7 +191,7 @@
 		</attributes>
 	  </link>
    </links>
-   
+
 <!-- ====================================================================== -->
 
 </network>

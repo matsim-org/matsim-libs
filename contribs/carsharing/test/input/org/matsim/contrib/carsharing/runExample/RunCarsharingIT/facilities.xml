@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE facilities SYSTEM "http://www.matsim.org/files/dtd/facilities_v1.dtd">
+<!DOCTYPE facilities SYSTEM "https://www.matsim.org/files/dtd/facilities_v1.dtd">
 
 <facilities name="barbell facilities">
 

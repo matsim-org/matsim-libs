@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 
 	<module name="global">
@@ -24,7 +24,7 @@
 		<param name="vehiclesFile" value="Szenarien/SimplifiedRandomizedPT/transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
-	
+
 
 	<module name="scenario">
 		<param name="useTransit" value="true" />
@@ -43,13 +43,13 @@
 		<param name="writePlansInterval" value="50" />
 		<param name="mobsim" value="qsim" />
 	</module>
-	
+
 	<module name="qsim">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="snapshotStyle" value="queue" />
 		<param name="startTime" value="06:55:00" />
 		<param name="endTime" value="18:00:00" />
-		<param name="snapshotperiod" value="00:00:00"/> 
+		<param name="snapshotperiod" value="00:00:00"/>
 		<param name="removeStuckVehicles" value="false" />
 		<param name="vehicleBehavior" value="wait" />
 		<param name="flowCapacityFactor" value="1.0" />
@@ -119,7 +119,7 @@
 		</parameterset>
 
 	</module>
-	
+
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
@@ -156,7 +156,7 @@
 		<!-- the radius in which stop locations are searched, given a start or target coordinate -->
 		<param name="searchRadius" value="1000.0" />
 	</module>
-	
+
 
 	<module name="TimeAllocationMutator">
 	  <param name="mutationRange" value="7200.0" />

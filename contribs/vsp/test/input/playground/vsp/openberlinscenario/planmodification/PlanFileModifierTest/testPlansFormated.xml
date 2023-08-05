@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+<!DOCTYPE population SYSTEM "https://www.matsim.org/files/dtd/population_v6.dtd">
 
 <population>
 
@@ -305,7 +305,7 @@
 			<activity type="h" link="1" x="-25000.0" y="0.0" >
 			</activity>
 		</plan>
-		
+
 		<plan selected="yes">
 			<activity type="h" link="1" x="-25000.0" y="0.0" >
 			</activity>

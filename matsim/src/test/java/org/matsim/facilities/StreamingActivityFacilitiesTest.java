@@ -13,7 +13,7 @@ public class StreamingActivityFacilitiesTest {
 	@Test
 	public void testFacilityIsComplete() {
 		String str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-				"<!DOCTYPE facilities SYSTEM \"http://www.matsim.org/files/dtd/facilities_v1.dtd\">\n" +
+				"<!DOCTYPE facilities SYSTEM \"https://www.matsim.org/files/dtd/facilities_v1.dtd\">\n" +
 				"<facilities name=\"test facilities for triangle network\">\n" +
 				"\n" +
 				"	<facility id=\"1\" x=\"60.0\" y=\"110.0\" linkId=\"Aa\">\n" +

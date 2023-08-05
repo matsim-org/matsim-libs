@@ -1,4 +1,4 @@
-<xs:schema targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
+<xs:schema targetNamespace="https://www.matsim.org/files/dtd" xmlns="https://www.matsim.org/files/dtd"
 		elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
 
 		<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->

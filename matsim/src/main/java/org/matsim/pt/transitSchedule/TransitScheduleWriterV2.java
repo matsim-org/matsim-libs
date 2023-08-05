@@ -87,7 +87,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 
 	private void writeData() throws IOException, UncheckedIOException {
 		this.writeXmlHead();
-		this.writeDoctype(Constants.TRANSIT_SCHEDULE, "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd");
+		this.writeDoctype(Constants.TRANSIT_SCHEDULE, "https://www.matsim.org/files/dtd/transitSchedule_v2.dtd");
 		this.writeStartTag(Constants.TRANSIT_SCHEDULE, null);
 		this.writer.write(NL);
 		this.attributesWriter.writeAttributes( "\t" , this.writer , this.schedule.getAttributes() );

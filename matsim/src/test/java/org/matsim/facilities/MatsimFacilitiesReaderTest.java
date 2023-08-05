@@ -39,7 +39,7 @@ public class MatsimFacilitiesReaderTest {
 	@Test
 	public void testReadLinkId() {
 		String str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-"<!DOCTYPE facilities SYSTEM \"http://www.matsim.org/files/dtd/facilities_v1.dtd\">\n" +
+"<!DOCTYPE facilities SYSTEM \"https://www.matsim.org/files/dtd/facilities_v1.dtd\">\n" +
 "<facilities name=\"test facilities for triangle network\">\n" +
 "\n" +
 "	<facility id=\"1\" x=\"60.0\" y=\"110.0\" linkId=\"Aa\">\n" +
@@ -66,17 +66,17 @@ public class MatsimFacilitiesReaderTest {
 "		</activity>\n" +
 "	</facility>\n" +
 "</facilities>";
-		
+
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
-		
+
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		Assert.assertEquals(3, facilities.getFacilities().size());
-		
+
 		ActivityFacility fac1 = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
 		Assert.assertEquals(Id.create("Aa", Link.class), fac1.getLinkId());
-		
+
 		ActivityFacility fac10 = facilities.getFacilities().get(Id.create(10, ActivityFacility.class));
 		Assert.assertEquals(Id.create("Bb", Link.class), fac10.getLinkId());
 
@@ -87,7 +87,7 @@ public class MatsimFacilitiesReaderTest {
 	@Test
 	public void testRead3DCoord() {
 		String str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-	"<!DOCTYPE facilities SYSTEM \"http://www.matsim.org/files/dtd/facilities_v2.dtd\">\n" +
+	"<!DOCTYPE facilities SYSTEM \"https://www.matsim.org/files/dtd/facilities_v2.dtd\">\n" +
 	"<facilities name=\"test facilities for triangle network\">\n" +
 	"\n" +
 	"	<facility id=\"1\" x=\"60.0\" y=\"110.0\" z=\"12.3\" linkId=\"Aa\">\n" +

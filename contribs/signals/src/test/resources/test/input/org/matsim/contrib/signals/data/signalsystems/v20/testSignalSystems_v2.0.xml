@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <signalSystems
-		xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+		xsi:schemaLocation="https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/signalSystems_v2.0.xsd"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://www.matsim.org/files/dtd">
 		<signalSystem id="1">
 				<signals>
 						<signal linkIdRef="1" id="1" />
@@ -30,4 +30,4 @@
 				</signals>
 		</signalSystem>
 
-</signalSystems>   
+</signalSystems>

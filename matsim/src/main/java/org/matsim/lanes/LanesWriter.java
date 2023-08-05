@@ -40,7 +40,7 @@ import org.matsim.jaxb.lanedefinitions20.*;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 
 /**
- * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
+ * Writer for the https://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
  * file format.
  * @author dgrether
  *
@@ -54,7 +54,7 @@ public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSome
 	private final ObjectAttributesConverter attributesConverter = new ObjectAttributesConverter();
 
 	/**
-	 * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
+	 * Writer for the https://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
 	 * file format.
 	 * @param lanedefs
 	 *
@@ -96,7 +96,7 @@ public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSome
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 
-				if ((bl.getToLinkIds() == null && bl.getToLaneIds() != null) || 
+				if ((bl.getToLinkIds() == null && bl.getToLaneIds() != null) ||
 						(bl.getToLinkIds() != null && bl.getToLaneIds() == null)){
 					xmllane.setLeadsTo(fac.createXMLLaneTypeXMLLeadsTo());
 				}
@@ -104,7 +104,7 @@ public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSome
 					throw new MarshalException("Either at least one toLinkId or (exclusive) one toLaneId must" +
 							"be set for Lane Id " + bl.getId() + " on link Id " + ltla.getLinkId() + "! Cannot write according to XML grammar.");
 				}
-				
+
 				if (bl.getToLinkIds() != null){
 					for (Id<Link> id : bl.getToLinkIds()) {
 						XMLIdRefType xmlToLink = fac.createXMLIdRefType();
@@ -119,7 +119,7 @@ public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSome
 						xmllane.getLeadsTo().getToLane().add(xmlToLink);
 					}
 				}
-				
+
 				XMLLaneType.XMLCapacity capacity = new XMLLaneType.XMLCapacity();
 				capacity.setVehiclesPerHour(bl.getCapacityVehiclesPerHour());
 				xmllane.setCapacity(capacity);

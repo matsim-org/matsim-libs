@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v1.dtd">
 <config>
 
 	<module name="global">
@@ -29,12 +29,12 @@
 		<param name="performing" value="+6" />
 		<param name="traveling" value="-6" />
 		<param name="waiting" value="-0" />
-		
+
 		<param name="activityType_0"            value="h" /> <!-- home -->
 		<param name="activityPriority_0"        value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />
 		<param name="activityMinimalDuration_0" value="08:00:00" />
-	
+
 		<param name="activityType_1"            value="w" /> <!-- work -->
 		<param name="activityPriority_1"        value="1" />
 		<param name="activityTypicalDuration_1" value="08:00:00" />
@@ -44,7 +44,7 @@
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />
 	</module>
-	
+
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
@@ -54,7 +54,7 @@
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ReRoute" />
 	</module>
-	
+
 	<module name="JDEQSim">
 	</module>
 

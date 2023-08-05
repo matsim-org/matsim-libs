@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+<!DOCTYPE config SYSTEM "https://www.matsim.org/files/dtd/config_v1.dtd"
   [
    <!ENTITY OUTPUTBASE	"./test/output/org/matsim/contrib/minibus/integration/PControlerTest/testPControler/">
    <!ENTITY SCENARIO	"corr_s1">
@@ -29,15 +29,15 @@
 		<param name="pricePerVehicleSold" value="100.0" />
 		<param name="startWith24Hours" value="false" />
 		<param name="minOperationTime" value="0.0" />
-		
+
 		<!--<param name="minX" value="4587600.0" />
 		<param name="maxX" value="4591900.0" />
 		<param name="minY" value="5819300.0" />
 		<param name="maxY" value="5827400.0" />-->
-		
+
 		<!--<param name="serviceAreaFile" value="&INPUTBASE;/paratransit_allowed.shp" />-->
-		
-		
+
+
 		<param name="useFranchise" value="true" />
 		<param name="writeStatsInterval" value="100" />
 		<param name="logOperators" value="true" />
@@ -54,47 +54,47 @@
 		<param name="passengersBoardEveryLine" value="false" /> <!-- This is not used anymore -->
 		<!--<param name="transitScheduleToStartWith" value="&INPUTBASE;/transitSchedule_onlyTxlBusLines.xml.gz" />-->
 		<!--<param name="ptEnabler" value="&INPUTBASE;/license.xml" />-->
-		
+
 		<!--<param name="Module_1" value="MaxRandomStartTimeAllocator" />
 		<param name="ModuleProbability_1" value="0.10" />
 		<param name="ModuleDisableInIteration_1" value="900" />
 		<param name="ModuleParameter_1" value="1800,900,false" />
-		
+
 		<param name="Module_2" value="MaxRandomEndTimeAllocator" />
 		<param name="ModuleProbability_2" value="0.10" />
 		<param name="ModuleDisableInIteration_2" value="900" />
 		<param name="ModuleParameter_2" value="1800,900,false" /> -->
-		
+
 		<param name="Module_1" value="WeightedStartTimeExtension" />
 		<param name="ModuleProbability_1" value="0.10" />
 		<param name="ModuleDisableInIteration_1" value="900" />
 		<param name="ModuleParameter_1" value="" />
-		
+
 		<param name="Module_2" value="WeightedEndTimeExtension" />
 		<param name="ModuleProbability_2" value="0.10" />
 		<param name="ModuleDisableInIteration_2" value="900" />
 		<param name="ModuleParameter_2" value="" />
-		
+
 		<param name="Module_3" value="ReduceTimeServedRFare" />
 		<param name="ModuleProbability_3" value="0.30" />
 		<param name="ModuleDisableInIteration_3" value="900" />
 		<param name="ModuleParameter_3" value="1.0,900,true,true" />
-		
+
 		<param name="Module_4" value="EndRouteExtension" />
 		<param name="ModuleProbability_4" value="0.10" />
 		<param name="ModuleDisableInIteration_4" value="900" />
 		<param name="ModuleParameter_4" value="1500.0,0.2" />
-		
+
 		<param name="Module_5" value="SidewaysRouteExtension" />
 		<param name="ModuleProbability_5" value="0.10" />
 		<param name="ModuleDisableInIteration_5" value="900" />
 		<param name="ModuleParameter_5" value="1500.0,0.2,true" />
-		
+
 		<param name="Module_6" value="ReduceStopsToBeServedRFare" />
 		<param name="ModuleProbability_6" value="0.30" />
 		<param name="ModuleDisableInIteration_6" value="900" />
 		<param name="ModuleParameter_6" value="1.0,true" />
-	</module> 
+	</module>
 
 <!-- ====================================================================== -->
 
@@ -151,7 +151,7 @@
 <!-- ====================================================================== -->
 
 	<module name="planCalcScore">
-	
+
 		<!-- [1/utils] conversion factor of utility model for use in logit-based choice model.  Set to 1 if your utl function is estimated -->
 		<param name="BrainExpBeta" value="2.0" />
 		<param name="PathSizeLogitBeta" value="1.0" />
@@ -193,13 +193,13 @@
 
 		<!-- [utils/hr] utility offset for waiting.  this comes on top of the opportunity cost of time.  Probably implemented correctly, but not tested. -->
 		<param name="waiting" value="-0.0" />
-		
-		
+
+
 		<param name="activityType_0"            value="h" /> <!-- home -->
 		<param name="activityPriority_0"        value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />
 		<param name="activityMinimalDuration_0" value="08:00:00" />
-	
+
 		<param name="activityType_1"            value="w" /> <!-- work -->
 		<param name="activityPriority_1"        value="1" />
 		<param name="activityTypicalDuration_1" value="08:00:00" />
@@ -233,9 +233,9 @@
 		<!-- write a plans file in each iteration directory which contains what each agent actually did, and the score it received. -->
 		<!--<param name="writeExperiencedPlans" value="true" />-->
 	</module>
-	
 
-	
+
+
 <!-- ====================================================================== -->
 
 	<module name="qsim" >
@@ -265,8 +265,8 @@
 		<param name="trafficDynamics" value="queue" />
 	</module>
 
-	
-<!-- ====================================================================== -->	
+
+<!-- ====================================================================== -->
 
 	<module name="strategy">
  		<param name="maxAgentPlanMemorySize" value="1" /> <!-- 0 means unlimited -->
@@ -276,7 +276,7 @@
 
 		<!-- <param name="ModuleProbability_2" value="1.0" />
 		<param name="Module_2" value="ReRoute" /> -->
-		
+
 		<param name="ModuleProbability_2" value="1.0" />
 		<param name="Module_2" value="org.matsim.contrib.minibus.performance.PReRoute" />
 	</module>
@@ -285,10 +285,10 @@
 		<param name="transitScheduleFile" value="input/transitSchedule.xml" />
 		<param name="vehiclesFile" value="input/transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
-		
+
 				<!-- Set this parameter to true if transit should be simulated, false if not. -->
 		<param name="useTransit" value="true" />
-		
+
 	</module>
 
 </config>

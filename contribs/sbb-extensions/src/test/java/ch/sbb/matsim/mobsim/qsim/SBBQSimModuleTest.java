@@ -40,7 +40,7 @@ public class SBBQSimModuleTest {
     @Test
     public void testIntegration() {
         String xmlConfig = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
+                "<!DOCTYPE config SYSTEM \"https://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
                 "<config>\n" +
                 "\t<module name=\"controler\" >\n" +
                 "\t\t<param name=\"createGraphs\" value=\"false\" />\n" +

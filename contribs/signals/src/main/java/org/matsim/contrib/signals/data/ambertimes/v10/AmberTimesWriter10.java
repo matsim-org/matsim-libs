@@ -51,21 +51,21 @@ import org.matsim.contrib.signals.model.Signal;
  * @author dgrether
  */
 public final class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
-	
+
 		private static final Logger log = LogManager.getLogger(AmberTimesWriter10.class);
-		
+
 		private AmberTimesData amberTimesData;
-	
-		public static final String AMBERTIMES10 = "http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd";
-		
+
+		public static final String AMBERTIMES10 = "https://www.matsim.org/files/dtd/amberTimes_v1.0.xsd";
+
 		public AmberTimesWriter10(AmberTimesData amberTimesData){
 			this.amberTimesData = amberTimesData;
 		}
-		
+
 		private XMLAmberTimes convertDataToXml() {
 			ObjectFactory fac = new ObjectFactory();
 			XMLAmberTimes xmlContainer = fac.createXMLAmberTimes();
-			
+
 			//global defaults
 			XMLGlobalDefaultsType gdt = fac.createXMLGlobalDefaultsType();
 			if (this.amberTimesData.getDefaultAmber() != null){
@@ -84,14 +84,14 @@ public final class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 				gdt.setAmberTimeGreen(gdatg);
 			}
 			xmlContainer.setGlobalDefaults(gdt);
-			
+
 			for (AmberTimeData atdata : this.amberTimesData.getAmberTimeDataBySystemId().values()){
-							
+
 				XMLSignalSystem xmlss = fac.createXMLAmberTimesXMLSignalSystem();
 				xmlss.setRefId(atdata.getSignalSystemId().toString());
-							
+
 				//Signal System Defaults
-				XMLAmberTimesType ssd = fac.createXMLAmberTimesType();	
+				XMLAmberTimesType ssd = fac.createXMLAmberTimesType();
 				if (atdata.getDefaultAmber() != null){
 					XMLAmber ssda = fac.createXMLAmberTimesTypeXMLAmber();
 					ssda.setSeconds(BigInteger.valueOf(atdata.getDefaultAmber()));
@@ -103,7 +103,7 @@ public final class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 					ssd.setRedAmber(ssdra);
 				}
 				xmlss.setSystemDefaults(ssd);
-				
+
 				for (Map.Entry<Id<Signal> ,Integer> amt : atdata.getSignalAmberMap().entrySet()){
 					XMLAmber lca = fac.createXMLAmberTimesTypeXMLAmber();
 					XMLRedAmber lcra = fac.createXMLAmberTimesTypeXMLRedAmber();
@@ -114,8 +114,8 @@ public final class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 					xmls.setAmber(lca);
 					xmls.setRedAmber(lcra);
 					xmlss.getSignal().add(xmls);
-					
-				}		
+
+				}
 				xmlContainer.getSignalSystem().add(xmlss);
 			}
 			return xmlContainer;
@@ -138,16 +138,16 @@ public final class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 
-		
+
 		@Override
 		public void write(final String filename) {
 			XMLAmberTimes xmlAmberTimes = convertDataToXml();
 			this.write(filename, xmlAmberTimes);
 		}
 
-		
+
 	}
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
+<carriers xmlns="https://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
 	<carrier id="testCarrier">
 		<attributes>
 			<attribute name="carrierMode" class="java.lang.String">drt</attribute>

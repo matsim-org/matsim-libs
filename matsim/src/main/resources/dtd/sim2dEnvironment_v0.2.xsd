@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
-	xmlns="http://www.matsim.org/files/dtd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+<xs:schema targetNamespace="https://www.matsim.org/files/dtd"
+	xmlns="https://www.matsim.org/files/dtd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	xmlns:gml="http://www.opengis.net/gml" elementFormDefault="qualified"
 	version="1.0">
 	<xs:import namespace="http://www.opengis.net/gml"

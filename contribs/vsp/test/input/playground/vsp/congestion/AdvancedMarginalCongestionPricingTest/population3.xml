@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<!DOCTYPE plans SYSTEM "https://www.matsim.org/files/dtd/plans_v4.dtd">
 
 <plans>
 
@@ -30,7 +30,7 @@
 			<act type="h" link="link01" x="0" y="0" />
 		</plan>
 	</person>
-	
+
 <!-- ====================================================================== -->
 
 	<person id="testAgent3" employed="no">

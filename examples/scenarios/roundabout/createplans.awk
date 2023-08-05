@@ -20,7 +20,7 @@ BEGIN {
   pfile = "plans.xml"
 
   print "<?xml version=\"1.0\" ?>" > pfile;
-  print "<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">" > pfile;
+  print "<!DOCTYPE plans SYSTEM \"https://www.matsim.org/files/dtd/plans_v4.dtd\">" > pfile;
   print "<plans>" > pfile;
 
   { 

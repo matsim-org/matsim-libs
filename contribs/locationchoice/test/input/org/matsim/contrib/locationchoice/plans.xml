@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<!DOCTYPE plans SYSTEM "https://www.matsim.org/files/dtd/plans_v4.dtd">
 <plans>
 <person id="1">
 
@@ -9,8 +9,8 @@
 
 		<knowledge desc="(hh_w:1955016)(hh_z:1955016)">
 		</knowledge>
-		
-		
+
+
 	<plan score="3.03682358697928" selected="yes">
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
 		<leg mode="car">

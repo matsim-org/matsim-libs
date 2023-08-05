@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
+<xs:schema targetNamespace="https://www.matsim.org/files/dtd" xmlns="https://www.matsim.org/files/dtd"
 		elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
-		
+
 		<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
-		
+
 		<xs:annotation><xs:documentation>GPL</xs:documentation></xs:annotation>
-		
+
 		<xs:include schemaLocation="matsimCommon.xsd" />
 
 		<xs:element name="amberTimes">
 				<xs:complexType>
 						<xs:sequence>
-								<xs:element name="globalDefaults" type="globalDefaultsType" minOccurs="0"	maxOccurs="1" />								
+								<xs:element name="globalDefaults" type="globalDefaultsType" minOccurs="0"	maxOccurs="1" />
 								<xs:element name="signalSystem" minOccurs="0"	maxOccurs="unbounded">
 										<xs:complexType>
 												<xs:complexContent>
@@ -65,4 +65,4 @@
 				</xs:complexContent>
 		</xs:complexType>
 
-</xs:schema>					 
+</xs:schema>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
-           xmlns="http://www.matsim.org/files/dtd"
+<xs:schema targetNamespace="https://www.matsim.org/files/dtd"
+           xmlns="https://www.matsim.org/files/dtd"
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xml:lang="en">
@@ -68,10 +68,10 @@ the simulation -->
           <xs:complexType>
             <xs:sequence>
               <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
-            </xs:sequence> 
+            </xs:sequence>
           </xs:complexType>
         </xs:element>
-      </xs:sequence>    
+      </xs:sequence>
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
-           xmlns="http://www.matsim.org/files/dtd"
+<xs:schema targetNamespace="https://www.matsim.org/files/dtd"
+           xmlns="https://www.matsim.org/files/dtd"
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
@@ -11,7 +11,7 @@
 <!-- Description of the traffic light system to be used in
 the simulation -->
 
-<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+<xs:include schemaLocation="https://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
 <xs:element name="lightSignalSystems">
   <xs:complexType>
@@ -50,7 +50,7 @@ the simulation -->
             <xs:attribute name="meter" type="xs:double" use="optional" default="45.0"></xs:attribute>
           </xs:complexType>
         </xs:element>
-      </xs:sequence>    
+      </xs:sequence>
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>
@@ -80,7 +80,7 @@ the simulation -->
   </xs:complexContent>
 </xs:complexType>
 
-<xs:complexType name="lightSignalGroupDefinitionType">  
+<xs:complexType name="lightSignalGroupDefinitionType">
   <xs:complexContent>
     <xs:extension base="matsimObjectType">
     <xs:sequence>

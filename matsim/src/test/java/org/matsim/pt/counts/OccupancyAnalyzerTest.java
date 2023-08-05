@@ -54,7 +54,7 @@ public class OccupancyAnalyzerTest {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 		"<?xml version='1.0' encoding='UTF-8'?>" +
-		"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
+		"<!DOCTYPE transitSchedule SYSTEM \"https://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
 		"<transitSchedule>" +
 		"	<transitStops>" +
 		"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
@@ -84,7 +84,7 @@ public class OccupancyAnalyzerTest {
 		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		String plansXml = "<?xml version=\"1.0\" ?>" +
-		"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">" +
+		"<!DOCTYPE plans SYSTEM \"https://www.matsim.org/files/dtd/plans_v4.dtd\">" +
 		"<plans>" +
 		"<person id=\"1\">" +
 		"	<plan>" +
@@ -123,7 +123,7 @@ public class OccupancyAnalyzerTest {
 		Set<Id<TransitStopFacility>> exitStops = oa.getAlightStopIds();
 		Assert.assertEquals(1, exitStops.size());
 		Assert.assertTrue(exitStops.contains(Id.create(4, TransitStopFacility.class)));
-		
+
 		int[] occupancy = oa.getOccupancyVolumesForStop(Id.create(1, TransitStopFacility.class));
 		Assert.assertEquals(0, occupancy[6]);
 		occupancy = oa.getOccupancyVolumesForStop(Id.create(2, TransitStopFacility.class));
@@ -132,7 +132,7 @@ public class OccupancyAnalyzerTest {
 		Assert.assertEquals(1, occupancy[6]);
 		occupancy = oa.getOccupancyVolumesForStop(Id.create(4, TransitStopFacility.class));
 		Assert.assertEquals(0, occupancy[6]);
-		
+
 		Assert.assertEquals(0, oa.getBoardVolumesForStop(Id.create(1, TransitStopFacility.class))[6]);
 		Assert.assertEquals(1, oa.getBoardVolumesForStop(Id.create(2, TransitStopFacility.class))[6]);
 		Assert.assertEquals(0, oa.getBoardVolumesForStop(Id.create(3, TransitStopFacility.class))[6]);
@@ -143,7 +143,7 @@ public class OccupancyAnalyzerTest {
 		Assert.assertEquals(0, oa.getAlightVolumesForStop(Id.create(3, TransitStopFacility.class))[6]);
 		Assert.assertEquals(1, oa.getAlightVolumesForStop(Id.create(4, TransitStopFacility.class))[6]);
 	}
-	
+
 	private static class Fixture {
 		public final MutableScenario scenario;
 		public Fixture() throws SAXException, ParserConfigurationException, IOException {
@@ -186,9 +186,9 @@ public class OccupancyAnalyzerTest {
 
 			// setup: vehicles
 			String vehiclesXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-			"<vehicleDefinitions xmlns=\"http://www.matsim.org/files/dtd\"" +
+			"<vehicleDefinitions xmlns=\"https://www.matsim.org/files/dtd\"" +
 			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
-			" xsi:schemaLocation=\"http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd\">" +
+			" xsi:schemaLocation=\"https://www.matsim.org/files/dtd https://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd\">" +
 			"	<vehicleType id=\"1\">" +
 			"		<description>Small Train</description>" +
 			"		<capacity>" +
