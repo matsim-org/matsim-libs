@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
@@ -54,6 +55,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	protected Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
 	protected Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
     protected Network network;
+	protected boolean canParkOnlyAtFacilities;
 	private final int maxSlotIndex;
 	private final int maxTime;
 	private final int timeBinSize;
@@ -61,6 +63,8 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	@Inject
 	public FacilityBasedParkingManager(Scenario scenario) {
+		ParkingSearchConfigGroup psConfigGroup = (ParkingSearchConfigGroup) scenario.getConfig().getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
+		canParkOnlyAtFacilities = psConfigGroup.getCanParkOnlyAtFacilities();
 		this.network = scenario.getNetwork();
 		parkingFacilities = scenario.getActivityFacilities()
 				.getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE);
@@ -107,7 +111,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	private boolean linkIdHasAvailableParkingForVehicle(Id<Link> linkId, Id<Vehicle> vid) {
 		// LogManager.getLogger(getClass()).info("link "+linkId+" vehicle "+vid);
-		if (!this.facilitiesPerLink.containsKey(linkId)) {
+		if (!this.facilitiesPerLink.containsKey(linkId) && !canParkOnlyAtFacilities) {
 			// this implies: If no parking facility is present, we suppose that
 			// we can park freely (i.e. the matsim standard approach)
 			// it also means: a link without any parking spaces should have a
@@ -115,7 +119,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			// LogManager.getLogger(getClass()).info("link not listed as parking
 			// space, we will say yes "+linkId);
 
-			return true; //TODO to make this runable for BENEn --> false --> configurable
+			return true;
 		}
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {

@@ -56,6 +56,9 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 	private static final String FRACTION_CAN_RESERVE_PARKING_IN_ADVANCED = "fractionCanReserveParkingInAdvanced";
 	private double fractionCanReserveParkingInAdvanced = 0.;
 
+	private static final String CAN_PARK_ONLY_AT_FACILITIES = "canParkOnlyAtFacilities";
+	private boolean canParkOnlyAtFacilities = false;
+
 	public ParkingSearchConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -95,6 +98,11 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 		return fractionCanReserveParkingInAdvanced;
 	}
 
+	@StringGetter(CAN_PARK_ONLY_AT_FACILITIES)
+	public boolean getCanParkOnlyAtFacilities() {
+		return canParkOnlyAtFacilities;
+	}
+
 	@StringSetter(UNPARKDURATION)
 	public void setUnparkDuration(double unparkDuration) {
 		this.unparkDuration = unparkDuration;
@@ -130,6 +138,11 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 		this.fractionCanReserveParkingInAdvanced = fractionCanReserveParkingInAdvanced;
 	}
 
+	@StringSetter(CAN_PARK_ONLY_AT_FACILITIES)
+	public void setCanParkOnlyAtFacilities(boolean canParkOnlyAtFacilities) {
+		this.canParkOnlyAtFacilities = canParkOnlyAtFacilities;
+	}
+
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -139,6 +152,7 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 		map.put(PARKINGSEARCH_MANAGER, "The type of the ParkingManager, may have the values: " + Arrays.toString(ParkingSearchManagerType.values()));
 		map.put(FRACTION_CAN_CHECK_FREE_CAPACITIES_IN_ADVANCED, "Fraction of agents who can check free capacities in advanced. This is currently developed for the FacilityBasedParkingManager");
 		map.put(FRACTION_CAN_RESERVE_PARKING_IN_ADVANCED, "Fraction of agents who can reserve free capacities in advanced. This is currently developed for the FacilityBasedParkingManager\"");
+		map.put(CAN_PARK_ONLY_AT_FACILITIES, "Set if a vehicle can park only at given parking facilities or it can park freely at a link without a facility.");
 
 		return map;
 	}
