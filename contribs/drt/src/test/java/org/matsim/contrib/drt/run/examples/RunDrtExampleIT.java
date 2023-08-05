@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +35,21 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.insertion.IncrementalStopDurationEstimator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculatorWithVariableDurationTest;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.StopDurationEstimator;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -49,6 +60,7 @@ import com.google.common.base.MoreObjects;
 
 /**
  * @author jbischoff
+ * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 public class RunDrtExampleIT {
 
@@ -186,6 +198,59 @@ public class RunDrtExampleIT {
 				.waitAverage(223.86)
 				.inVehicleTravelTimeMean(389.57)
 				.totalTravelTimeMean(613.44)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+	
+	@Test
+	public void testRunDrtExampleWithIncrementalStopDuration() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		
+		StopDurationEstimator stopDurationEstimator = new StopDurationEstimator() {
+			@Override
+			public double calcDuration(DvrpVehicle vehicle, Collection<AcceptedDrtRequest> dropoffRequests,
+					Collection<AcceptedDrtRequest> pickupRequests) {
+				return Math.max(60.0, pickupRequests.size() * 60.0 + dropoffRequests.size() * 5.0);
+			}
+		};
+		
+		IncrementalStopDurationEstimator incrementalStopDurationEstimator = new IncrementalStopDurationEstimator() {
+			@Override
+			public double calcForPickup(DvrpVehicle vehicle, DrtStopTask stopTask, DrtRequest pickupRequest) {
+				return 60.0;
+			}
+			
+			@Override
+			public double calcForDropoff(DvrpVehicle vehicle, DrtStopTask stopTask, DrtRequest dropoffRequest) {
+				return stopTask == null ? 65.0 : 5.0;
+			}
+		};
+		
+		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
+			@Override
+			public void install() {
+				bindModal(StopDurationEstimator.class).toInstance(stopDurationEstimator);
+				bindModal(IncrementalStopDurationEstimator.class).toInstance(incrementalStopDurationEstimator);
+			}
+		});
+		
+		controller.run();
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.04)
+				.rejections(16)
+				.waitAverage(276.78)
+				.inVehicleTravelTimeMean(383.47)
+				.totalTravelTimeMean(660.25)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
