@@ -29,7 +29,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -97,7 +96,7 @@ public final class RunDetailedEmissionToolOfflineExample{
 		EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
 
 		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
-		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + RunAverageEmissionToolOfflineExample.emissionEventsFilename ) ;
+		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + "emission.events.offline.xml.gz" ) ;
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
 		eventsManager.initProcessing();

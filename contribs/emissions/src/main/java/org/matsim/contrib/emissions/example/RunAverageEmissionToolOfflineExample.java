@@ -26,9 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -47,12 +45,6 @@ import org.matsim.vehicles.MatsimVehicleWriter;
  */
 public final class RunAverageEmissionToolOfflineExample{
 
-//	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_average.xml";
-
-	public static final String emissionEventsFilename = "emission.events.offline.xml.gz";
-
-	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
-
 	private Config config;
 
 	// =======================================================================================================		
@@ -60,16 +52,9 @@ public final class RunAverageEmissionToolOfflineExample{
 	public static void main (String[] args){
 		RunAverageEmissionToolOfflineExample emissionToolOfflineExampleV2 = new RunAverageEmissionToolOfflineExample();
 		emissionToolOfflineExampleV2.run();
+		// yyyy I think that this will fail (since config is null, see under run).  kai, apr'23
 	}
 
-//	public Config prepareConfig() {
-//		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-//		return config;
-//	}
-
-	public Config prepareConfig(String args){
-		throw new RuntimeException("execution path no longer exists");
-	}
 	public Config prepareConfig(String [] args) {
 		config = ConfigUtils.loadConfig(args, new EmissionsConfigGroup());
 		EmissionsConfigGroup ecg = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
@@ -106,7 +91,7 @@ public final class RunAverageEmissionToolOfflineExample{
 //		OutputDirectoryHierarchy outputDirectoryHierarchy = injector.getInstance( OutputDirectoryHierarchy.class );
 
 		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
-		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + emissionEventsFilename );
+		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + "emission.events.offline.xml.gz" );
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
 		eventsManager.initProcessing();

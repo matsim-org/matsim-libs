@@ -128,7 +128,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 										key.setTrafficSituation(trafficSituation);
 										key.setVehicleCategory(vehicleCategory);
 										key.setVehicleAttributes(vehicleAttribute);
-										key.setComponent(pollutant);
+										key.setComponent(pollutant); //TODO add key.setroadGradient here later kerseboom,jan'23
 										HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(key);
 										if (result == null) {
 											throw new RuntimeException("emissions factor for key=" + key + " is missing." +
@@ -228,10 +228,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		double freeVelocity = link.getFreespeed(); //TODO: what about time dependence
 
-		return calculateWarmEmissions(travelTime, EmissionUtils.getHbefaRoadType(link), freeVelocity, link.getLength(), vehicleInformationTuple);
+		return calculateWarmEmissions(travelTime, EmissionUtils.getHbefaRoadType(link),EmissionUtils.getHbefaRoadGradient(link),freeVelocity, link.getLength(), vehicleInformationTuple);
 	}
 
-	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, double freeVelocity_ms,
+	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, String roadGradient, double freeVelocity_ms,
 												  double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
 		Map<Pollutant, Double> warmEmissionsOfEvent = new EnumMap<>(Pollutant.class);
@@ -257,6 +257,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		HbefaWarmEmissionFactorKey efkey = new HbefaWarmEmissionFactorKey();
 		efkey.setVehicleCategory(vehicleInformationTuple.getFirst());
 		efkey.setRoadCategory(roadType);
+		efkey.setRoadGradient(roadGradient); //TODO make it work and then change and use the enum kerseboom, jan'23
 		if (this.detailedHbefaWarmTable != null) {
 			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());

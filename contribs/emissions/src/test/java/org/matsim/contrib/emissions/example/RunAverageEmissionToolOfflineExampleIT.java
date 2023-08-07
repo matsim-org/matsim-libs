@@ -30,7 +30,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result;
 
 import java.net.URL;
@@ -57,8 +56,8 @@ public class RunAverageEmissionToolOfflineExampleIT{
 
 		offlineExample.run();
 
-		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+		String expected = utils.getInputDirectory() + "emission.events.offline.xml.gz";
+		String actual = utils.getOutputDirectory() + "emission.events.offline.xml.gz";
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
 		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
 	}
@@ -79,8 +78,8 @@ public class RunAverageEmissionToolOfflineExampleIT{
 
 		offlineExample.run();
 
-		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+		String expected = utils.getInputDirectory() + "emission.events.offline.xml.gz";
+		String actual = utils.getOutputDirectory() + "emission.events.offline.xml.gz";
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
 		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
 	}
@@ -105,8 +104,8 @@ public class RunAverageEmissionToolOfflineExampleIT{
 
 		offlineExample.run();
 
-		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+		String expected = utils.getInputDirectory() + "emission.events.offline.xml.gz";
+		String actual = utils.getOutputDirectory() + "emission.events.offline.xml.gz";
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
 		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
 
@@ -129,8 +128,8 @@ public class RunAverageEmissionToolOfflineExampleIT{
 
 		offlineExample.run();
 
-		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+		String expected = utils.getInputDirectory() + "emission.events.offline.xml.gz";
+		String actual = utils.getOutputDirectory() + "emission.events.offline.xml.gz";
 		Result result = EventsUtils.compareEventsFiles( expected, actual );
 		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
 	}
