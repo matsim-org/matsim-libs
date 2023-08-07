@@ -9,7 +9,9 @@ import java.net.URL;
 
 /**
  * Dashboard for detailed insight into DRT service.
+ * @deprecated we decided to focus on one dashboard and not split into multiples
  */
+@Deprecated
 public class DrtDetailedDashboard implements Dashboard {
 
 	private final String mode;

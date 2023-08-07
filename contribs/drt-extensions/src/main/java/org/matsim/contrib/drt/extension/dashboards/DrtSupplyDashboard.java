@@ -8,6 +8,7 @@ import org.matsim.simwrapper.viz.Table;
 /**
  * The Supply of KEXI vehicles
  */
+@Deprecated
 public class DrtSupplyDashboard implements Dashboard {
 	@Override
 	public void configure(Header header, Layout layout) {

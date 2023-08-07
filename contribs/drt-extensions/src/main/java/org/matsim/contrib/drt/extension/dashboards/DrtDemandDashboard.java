@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * The simulation KEXI demand compared to real data
  */
+@Deprecated
 public class DrtDemandDashboard implements Dashboard {
 	@Override
 	public void configure(Header header, Layout layout) {

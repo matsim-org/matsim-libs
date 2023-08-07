@@ -84,6 +84,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 
 		// TODO: if there is no stop file, a pseudo-stop file needs to be generated from the legs
 		// tschlenther: why? i don'think so! please report back to me!
+		// rakow: currently the analysis is relying heavily on stops, one needs to think how the dashboard and analysis looks without stops
 
 		writeStopsShp(stops, output.getPath("stops.shp"));
 
