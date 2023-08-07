@@ -3,6 +3,7 @@ package org.matsim.simwrapper.dashboard;
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimApplication;
@@ -25,6 +26,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.SplittableRandom;
 
 public class TrafficCountsDashboardTest {
@@ -42,25 +44,36 @@ public class TrafficCountsDashboardTest {
 		SimWrapperConfigGroup simWrapperConfigGroup = new SimWrapperConfigGroup();
 		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.get("");
 		contextParams.mapCenter = "12, 48.95";
-		contextParams.sampleSize = "0.01";
+		contextParams.sampleSize = 0.01;
 		contextParams.mapZoomLevel = 9.0;
 
-		SimWrapper sw = SimWrapper.create(simWrapperConfigGroup)
-			.addDashboard(new TrafficCountsDashboard())
-			.addDashboard(Dashboard.customize(new TrafficCountsDashboard(
-				List.of(0.0, 0.3, 1.7, 2.5),
-				List.of("way too few", "fewer", "exact", "too much", "way too much"))
-			).context("custom"));
+		SimWrapper sw = SimWrapper.create(config)
+				.addDashboard(new TrafficCountsDashboard())
+				.addDashboard(Dashboard.customize(new TrafficCountsDashboard()
+						.withQualityLabels(
+								List.of(0.0, 0.3, 1.7, 2.5),
+								List.of("way too few", "fewer", "exact", "too much", "way too much")
+						)
+				).context("custom"))
+				.addDashboard(Dashboard.customize(new TrafficCountsDashboard(
+					Path.of(utils.getPackageInputDirectory()).normalize().toAbsolutePath() + "/dummy_counts.xml",
+						Set.of(TransportMode.car, "freight"))
+				).context("freight").title("Freight counts"));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());
 		controler.run();
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
+		Path defaultDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
+		Path freightDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic-freight");
 
-		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**count_comparison_daily.csv")
-			.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
+		Assertions.assertThat(defaultDir)
+				.isDirectoryContaining("glob:**count_comparison_daily.csv")
+				.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
+
+		Assertions.assertThat(freightDir)
+				.isDirectoryContaining("glob:**count_comparison_daily.csv")
+				.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
 
 	}
 

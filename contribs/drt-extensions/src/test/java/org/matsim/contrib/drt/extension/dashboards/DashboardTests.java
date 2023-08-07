@@ -4,6 +4,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -20,10 +22,19 @@ public class DashboardTests {
 	private void run() {
 
 		Config config = DrtTestScenario.loadConfig(utils);
-		config.controler().setLastIteration(2);
+		config.controler().setLastIteration(1);
+		config.controler().setWritePlansInterval(2);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.defaultParams().sampleSize = "0.001";
+		group.defaultParams().sampleSize = Double.valueOf("0.001");
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		for (DrtConfigGroup drtCfg : multiModeDrtConfigGroup.getModalElements()) {
+			if (drtCfg.getMode().equals("drt")){
+				drtCfg.operationalScheme = DrtConfigGroup.OperationalScheme.serviceAreaBased;
+				drtCfg.drtServiceAreaShapeFile = "drt-zones/drt-zonal-system.shp";
+			}
+		}
 
 		Controler controler = MATSimApplication.prepare(new DrtTestScenario(config), config);
 		controler.run();

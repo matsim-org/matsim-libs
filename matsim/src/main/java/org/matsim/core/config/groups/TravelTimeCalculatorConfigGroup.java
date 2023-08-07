@@ -25,11 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -61,7 +59,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	private TravelTimeCalculatorType travelTimeCalculator = TravelTimeCalculatorType.TravelTimeCalculatorArray;
 	private String travelTimeAggregator = "optimistic";
 	private String travelTimeGetter = "average";
-	private int traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
+	private double traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
 	private int maxTime = 30 * 3600;
 
 	private boolean calculateLinkTravelTimes = true;
@@ -134,7 +132,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	 * @param binSize The size of the time-window in seconds.
 	 */
 	@StringSetter( TRAVEL_TIME_BIN_SIZE )
-	public final void setTraveltimeBinSize(final int binSize) {
+	public final void setTraveltimeBinSize(final double binSize) {
 		this.traveltimeBinSize = binSize;
 	}
 	/**
@@ -143,7 +141,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	 * @return The size of the time-window in seconds.
 	 */
 	@StringGetter( TRAVEL_TIME_BIN_SIZE )
-	public final int getTraveltimeBinSize() {
+	public final double getTraveltimeBinSize() {
 		return this.traveltimeBinSize;
 	}
 	// ---

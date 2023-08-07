@@ -24,11 +24,25 @@ public class DrtDashboardProvider implements DashboardProvider {
 
 			for (DrtConfigGroup drtConfig : multiModeDrtConfigGroup.getModalElements()) {
 
-				URL transitStopFile = drtConfig.transitStopFile != null ? ConfigGroup.getInputFileURL(config.getContext(), drtConfig.transitStopFile) : null;
-				URL serviceAreaShapeFile = drtConfig.drtServiceAreaShapeFile != null ? ConfigGroup.getInputFileURL(config.getContext(), drtConfig.drtServiceAreaShapeFile) : null;
+				URL transitStopFile = null;
+				URL serviceAreaShapeFile = null;
+				//it might be, that a serviceArea file is provided in the config, but the drt service is configured to be stopbased, nevertheless
+				switch (drtConfig.operationalScheme) {
+					case stopbased -> {
+						transitStopFile = drtConfig.transitStopFile != null ? ConfigGroup.getInputFileURL(config.getContext(), drtConfig.transitStopFile) : null;
+					}
+					case door2door -> {
+						//TODO potentially show the entire drt network (all drt links have stops)
+					}
+					case serviceAreaBased -> {
+						 serviceAreaShapeFile = drtConfig.drtServiceAreaShapeFile != null ? ConfigGroup.getInputFileURL(config.getContext(), drtConfig.drtServiceAreaShapeFile) : null;
+					}
+				}
 
 				result.add(new DrtDashboard(drtConfig.mode, config.global().getCoordinateSystem(), transitStopFile, serviceAreaShapeFile));
 				result.add(new DrtDetailedDashboard(drtConfig.mode, transitStopFile));
+//				result.add(new DrtSupplyDashboard());
+//				result.add(new DrtDemandDashboard());
 			}
 		}
 

@@ -83,6 +83,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		List<TransitStopFacility> stops = readTransitStops(stopFile);
 
 		// TODO: if there is no stop file, a pseudo-stop file needs to be generated from the legs
+		// tschlenther: why? i don'think so! please report back to me!
 
 		writeStopsShp(stops, output.getPath("stops.shp"));
 

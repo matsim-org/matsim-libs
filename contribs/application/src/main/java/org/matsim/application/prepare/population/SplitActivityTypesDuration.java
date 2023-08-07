@@ -1,5 +1,6 @@
 package org.matsim.application.prepare.population;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -147,11 +148,20 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 		if (!firstActivity.getType().contains("_") || !lastActivity.getType().contains("_"))
 			return;
 
-		String firstBaseActivity = firstActivity.getType().split("_")[0];
-		String lastBaseActivity = lastActivity.getType().split("_")[0];
+		int idxFirst = firstActivity.getType().lastIndexOf("_");
+		int idxLast = lastActivity.getType().lastIndexOf("_");
+
+		String firstBaseActivity = firstActivity.getType().substring(0, idxFirst);
+		String lastBaseActivity = lastActivity.getType().substring(0, idxLast);
+
+		String firstDuration = firstActivity.getType().substring(idxFirst + 1);
+		String lastDuration = lastActivity.getType().substring(idxLast + 1);
+
+		if (!NumberUtils.isParsable(firstDuration) || !NumberUtils.isParsable(lastDuration))
+			return;
 
 		if (firstBaseActivity.equals(lastBaseActivity)) {
-			double mergedDuration = Double.parseDouble(firstActivity.getType().split("_")[1]) + Double.parseDouble(lastActivity.getType().split("_")[1]);
+			double mergedDuration = Double.parseDouble(firstDuration) + Double.parseDouble(lastDuration);
 
 			int merged = roundDuration(mergedDuration);
 

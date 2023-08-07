@@ -1,10 +1,13 @@
 package org.matsim.contrib.drt.extension.dashboards;
 
 
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Data;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.viz.CalculationTable;
+import org.matsim.simwrapper.viz.Line;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Table;
 
@@ -58,14 +61,42 @@ public class DrtDashboard implements Dashboard {
 		header.title = getTitle();
 
 		layout.row("overview")
-			.el(Table.class, (viz, data) -> {
-				viz.dataset = postProcess(data, "kpi.csv");
-				viz.showAllRows = true;
-			})
+//			.el(CalculationTable.class, (viz, data) -> {
+//				viz.title = mode + " supply stats";
+//				//TODO
+//				viz.configFile = data.resource("table-drt-supply.yaml");
+////				viz.dataset = postProcess(data, "kpi.csv");
+////				viz.showAllRows = true;
+//			})
 			.el(MapPlot.class, (viz, data) -> {
 
-				viz.setShape(postProcess(data, "stops.shp"), "id");
+				if (transitStopFile != null) {
+					viz.title = "Map of stops";
+					viz.setShape(postProcess(data, "stops.shp"), "id");
+				} else if (serviceAreaShapeFile != null){
+					viz.title = "Service area";
 
+					//TODO this does not work. we either need to copy the service area shp file to the output or mb need to set the path relatively to the output dir ??
+//					viz.setShape(data.resource(serviceAreaShapeFile.getFile()), "");
+					viz.setShape(serviceAreaShapeFile.getPath(), "");
+				}
+
+
+			});
+		layout.row("Vehicles")
+			.el(Table.class, ((viz, data) -> {
+					viz.dataset = data.output("*vehicle_stats_" + mode + ".csv");
+					viz.enableFilter = true;
+					viz.show = List.of("totalDistance", "emptyRatio", "totalPassengerDistanceTraveled");
+			}))
+			.el(Line.class, (viz, data) -> {
+				viz.title = "Fleet size";
+				viz.dataset = data.output("*vehicle_stats_" + mode + ".csv");
+				viz.description = "per Iteration";
+				viz.x = "iteration";
+				viz.columns = List.of("vehicles");
+				viz.xAxisName = "Iteration";
+				viz.yAxisName = "Nr of vehicles";
 			});
 
 

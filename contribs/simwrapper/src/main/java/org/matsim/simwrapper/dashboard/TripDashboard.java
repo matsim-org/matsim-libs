@@ -187,7 +187,7 @@ public class TripDashboard implements Dashboard {
 			});
 
 
-		layout.row("arrivals").el(Plotly.class, (viz, data) -> {
+		layout.row("departures").el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Departures";
 			viz.description = "by hour and purpose";
@@ -201,12 +201,12 @@ public class TripDashboard implements Dashboard {
 				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
 					.name("purpose", Plotly.ColorScheme.Spectral)
 					.x("h")
-					.y("arrival")
+					.y("departure")
 			);
 
 		});
 
-		layout.row("departure").el(Plotly.class, (viz, data) -> {
+		layout.row("arrivals").el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Arrivals";
 			viz.description = "by hour and purpose";
@@ -220,7 +220,7 @@ public class TripDashboard implements Dashboard {
 				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
 					.name("purpose", Plotly.ColorScheme.Spectral)
 					.x("h")
-					.y("departure")
+					.y("arrival")
 			);
 
 		});

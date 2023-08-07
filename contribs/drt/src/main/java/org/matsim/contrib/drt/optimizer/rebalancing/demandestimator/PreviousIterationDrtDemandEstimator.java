@@ -45,8 +45,8 @@ import com.google.common.base.Preconditions;
  * @author jbischoff
  * @author michalm
  */
-public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEstimator, PersonDepartureEventHandler {
-	private static final Logger logger = LogManager.getLogger(PreviousIterationDRTDemandEstimator.class);
+public final class PreviousIterationDrtDemandEstimator implements ZonalDemandEstimator, PersonDepartureEventHandler {
+	private static final Logger logger = LogManager.getLogger(PreviousIterationDrtDemandEstimator.class);
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
@@ -54,7 +54,7 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 	private Map<Integer, Map<DrtZone, MutableInt>> currentIterationDepartures = new HashMap<>();
 	private Map<Integer, Map<DrtZone, MutableInt>> previousIterationDepartures = new HashMap<>();
 
-	public PreviousIterationDRTDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg,
+	public PreviousIterationDrtDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg,
 			int demandEstimationPeriod) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();

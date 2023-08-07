@@ -38,6 +38,8 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
+import javax.xml.stream.events.DTD;
+
 /**
  * A reader for facilities-files of MATSim according to <code>facilities_v1.dtd</code>.
  *
@@ -70,6 +72,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
             final String externalInputCRS,
             final String targetCRS,
             final ActivityFacilities facilities) {
+        super(ValidationType.DTD_ONLY);
         this.externalInputCRS = externalInputCRS;
         this.targetCRS = targetCRS;
         this.facilities = facilities;

@@ -89,6 +89,7 @@ public class TransitScheduleReader implements MatsimReader {
 		private final Scenario scenario;
 
 		public XmlScheduleReader(String externalInputCRS, String targetCRS, Scenario scenario) {
+			super(ValidationType.DTD_ONLY);
 			this.externalInputCRS = externalInputCRS;
 			this.targetCRS = targetCRS;
 			this.scenario = scenario;
