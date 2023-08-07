@@ -21,17 +21,22 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 /**
  * @author michalm
  */
 public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	private final CostCalculationStrategy costCalculationStrategy;
+	private final DrtConfigGroup drtConfigGroup;
 
-	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy) {
+	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy,
+										  DrtConfigGroup drtConfigGroup) {
 		this.costCalculationStrategy = costCalculationStrategy;
+		this.drtConfigGroup = drtConfigGroup;
 	}
 
 	/**
@@ -53,6 +58,32 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 		if (vEntry.getSlackTime(insertion.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
 				|| vEntry.getSlackTime(insertion.dropoff.index) < detourTimeInfo.getTotalTimeLoss()) {
 			return INFEASIBLE_SOLUTION_COST;
+		}
+
+		// all stops after the new (potential) pickup but before the new dropoff
+		// are delayed by pickupDetourTimeLoss
+		double detour = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
+		if(vEntry.stops != null) {
+			for (int s = insertion.pickup.index; s < vEntry.stops.size(); s++) {
+				Waypoint.Stop stop = vEntry.stops.get(s);
+				// passengers are being dropped off == may be close to arrival
+				if (!stop.task.getDropoffRequests().isEmpty()) {
+					double nextArrival = stop.getArrivalTime();
+					double departureTime = insertion.vehicleEntry.start.getDepartureTime();
+					//arrival is very soon
+					if (nextArrival - departureTime < drtConfigGroup.allowDetourBeforeArrivalThreshold &&
+							detour > 0) {
+						return INFEASIBLE_SOLUTION_COST;
+					} else {
+						// all following stops are above the threshold
+						break;
+					}
+				}
+				if (s == insertion.dropoff.index) {
+					// all stops after the new (potential) dropoff are delayed by totalTimeLoss
+					detour = detourTimeInfo.getTotalTimeLoss();
+				}
+			}
 		}
 
 		return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
