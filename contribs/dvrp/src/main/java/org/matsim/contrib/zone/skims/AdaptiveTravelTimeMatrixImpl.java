@@ -117,7 +117,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 	}
 
 	int getBin(double departureTime) {
-		return Math.min((int) (departureTime / TIME_INTERVAL), this.numberOfBins);
+		return Math.min((int) (departureTime / TIME_INTERVAL), this.numberOfBins-1);
 	}
 
 	@Override
