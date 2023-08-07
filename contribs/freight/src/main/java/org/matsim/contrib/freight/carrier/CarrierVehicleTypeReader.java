@@ -50,7 +50,6 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 	private final CarrierVehicleTypeParser reader;
 
 	public CarrierVehicleTypeReader( final CarrierVehicleTypes types ) {
-		System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefinition_v2.0.xsd is online
 		this.reader = new CarrierVehicleTypeParser( types ) ;
 	}
 

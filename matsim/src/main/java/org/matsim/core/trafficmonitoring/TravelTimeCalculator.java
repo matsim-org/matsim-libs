@@ -56,7 +56,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Calculates actual travel times on link from events and optionally also the link-to-link 
+ * Calculates actual travel times on link from events and optionally also the link-to-link
  * travel times, e.g. if signaled nodes are used and thus turns in different directions
  * at a node may take a different amount of time.
  * <br>
@@ -78,7 +78,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
 											     "agent is not known the turning move travel time cannot be calculated!";
 
-	private final int timeSlice;
+	private final double timeSlice;
 	private final int numSlots;
 	TimeSlotComputation aggregator;
 
@@ -160,7 +160,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	}
 
 	@Deprecated // user builder instead.  kai, feb'19
-	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
+	public TravelTimeCalculator(final Network network, final double timeslice, final int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, timeslice, maxTime, ttconfigGroup.isCalculateLinkTravelTimes(), ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(),
 			  CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModesAsString() ) );
 	}
@@ -169,7 +169,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		// The idea here is that the config group will NOT be passed into this object any more. kai, feb'19
 
 		private final Network network ;
-		private int timeslice = 900 ;
+		private double timeslice = 900 ;
 		private int maxTime = 36*3600 ; // yy replace by long or double!
 		private boolean calculateLinkTravelTimes = true ;
 		private boolean calculateLinkToLinkTravelTimes = false ;
@@ -182,7 +182,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			this.network = network ;
 		}
 
-		public void setTimeslice( int timeslice ){
+		public void setTimeslice( double timeslice ){
 			this.timeslice = timeslice;
 		}
 
@@ -226,8 +226,8 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 	}
 
-	private TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
-				   boolean calculateLinkTravelTimes, boolean calculateLinkToLinkTravelTimes, boolean filterModes, Set<String> analyzedModes) {
+	private TravelTimeCalculator(final Network network, final double timeslice, final int maxTime,
+								 boolean calculateLinkTravelTimes, boolean calculateLinkToLinkTravelTimes, boolean filterModes, Set<String> analyzedModes) {
 		this.calculateLinkTravelTimes = calculateLinkTravelTimes;
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
 		this.filterAnalyzedModes = filterModes;
@@ -443,7 +443,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	 * Imagine short bin sizes (e.g. 5min), small links (e.g. 300 veh/hour)
 	 * and small sample sizes (e.g. 2%). This would mean that effectively
 	 * in the simulation only 6 vehicles can pass the link in one hour,
-	 * one every 10min. So, the travel time in one time slot could be 
+	 * one every 10min. So, the travel time in one time slot could be
 	 * >= 10min if two cars enter the link at the same time. If no car
 	 * enters in the next time bin, the travel time in that time bin should
 	 * still be >=5 minutes (10min - binSize), and not freespeedTraveltime,
@@ -542,7 +542,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 					}
 				}
 				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
-				
+
 				return Math.max(linkTTimeFromObservation, linkTtimeFromVehicle);
 			}
 		};

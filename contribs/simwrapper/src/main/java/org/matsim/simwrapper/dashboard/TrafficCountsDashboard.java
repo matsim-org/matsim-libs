@@ -11,8 +11,11 @@ import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -21,23 +24,44 @@ import java.util.stream.Collectors;
  */
 public class TrafficCountsDashboard implements Dashboard {
 
-	private final List<Double> limits;
-	private final List<String> labels;
+	@Nullable
+	private final String countsPath;
+
+	@Nullable
+	private final Set<String> networkModes;
+	private List<Double> limits = List.of(0.6, 0.8, 1.2, 1.4);
+	private List<String> labels = List.of("major under", "under", "ok", "over", "major over");
+
+	/**
+	 * Create counts with a given counts file and specific transport mode.
+	 *
+	 * @param countsPath   overwrite default counts file
+	 * @param networkModes overwrite default mode to analyze
+	 */
+	public TrafficCountsDashboard(@Nullable String countsPath, @Nullable Set<String> networkModes) {
+		this.countsPath = countsPath;
+		this.networkModes = networkModes;
+	}
 
 	/**
 	 * Constructor with default arguments.
 	 */
 	public TrafficCountsDashboard() {
-		this(List.of(0.6, 0.8, 1.2, 1.4), List.of("major under", "under", "ok", "over", "major over"));
+		this(null, null);
 	}
 
+
 	/**
-	 * Constructor with custom limits and categories.
+	 * Set the quality thresholds and labels.
+	 *
+	 * @param limits thresholds for labels
+	 * @param labels text representation of labels
+	 * @return same instance
 	 */
-	public TrafficCountsDashboard(List<Double> limits, List<String> labels) {
+	public TrafficCountsDashboard withQualityLabels(List<Double> limits, List<String> labels) {
 		this.limits = limits;
 		this.labels = labels;
-
+		return this;
 	}
 
 	@Override
@@ -45,7 +69,6 @@ public class TrafficCountsDashboard implements Dashboard {
 
 		header.title = "Traffic Counts";
 		header.description = "Comparison of observed and simulated daily traffic volumes.\nError metrics: ";
-
 
 		for (int i = 0; i < labels.size(); i++) {
 			if (i == 0)
@@ -56,10 +79,18 @@ public class TrafficCountsDashboard implements Dashboard {
 				header.description += String.format(Locale.US, "%s: %.2f - %.2f; ", labels.get(i), limits.get(i - 1), limits.get(i));
 		}
 
-		String[] args = new String[]{
+		List<String> argList = new ArrayList<>(List.of(
 			"--limits", limits.stream().map(String::valueOf).collect(Collectors.joining(",")),
 			"--labels", String.join(",", labels)
-		};
+		));
+
+		if (countsPath != null)
+			argList.addAll(List.of("--counts", countsPath));
+
+		if (networkModes != null)
+			argList.addAll(List.of("--transport-mode", String.join(",", networkModes)));
+
+		String[] args = argList.toArray(new String[0]);
 
 		layout.row("overview")
 			.el(Plotly.class, (viz, data) -> {
@@ -67,7 +98,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.title = "Count estimation quality";
 				viz.description = "over all count stations";
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_quality.csv"))
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_quality.csv", args))
 					.aggregate(List.of("quality"), "n", Plotly.AggrFunc.SUM)
 					// No need to show axis label
 					.constant("source", "");
@@ -87,7 +118,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.title = "Count estimation quality";
 				viz.description = "by road type";
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_quality.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_quality.csv", args));
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.yAxis(Axis.builder().title("Share").build())
@@ -105,7 +136,7 @@ public class TrafficCountsDashboard implements Dashboard {
 		layout.row("scatter")
 			.el(Plotly.class, (viz, data) -> {
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv", args));
 
 				viz.title = "Traffic volumes by hour";
 				viz.description = "simulated vs. observed";
@@ -129,7 +160,7 @@ public class TrafficCountsDashboard implements Dashboard {
 			})
 			.el(Plotly.class, (viz, data) -> {
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
 
 				viz.title = "Daily traffic volumes";
 				viz.description = "simulated vs. observed";
@@ -182,7 +213,7 @@ public class TrafficCountsDashboard implements Dashboard {
 						.build())
 					.build();
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_error_by_hour.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_error_by_hour.csv", args));
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE)
 					.name("Mean rel. error")
@@ -213,7 +244,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.description = "hourly comparison";
 				viz.interactive = Plotly.Interactive.dropdown;
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv", args));
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(), ds.mapping()
 					.x("hour")
