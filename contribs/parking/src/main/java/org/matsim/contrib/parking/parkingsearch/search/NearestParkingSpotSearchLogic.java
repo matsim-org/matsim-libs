@@ -31,6 +31,7 @@ import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -180,16 +181,13 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 					continue;
 			}
 			double latestEndOfParking = now + maxParkingDuration;
-
-			// checks if parking slot is now open and still open when the parking will finish
-			if (!(activityFacility.getActivityOptions().get(
-					"parking").getOpeningTimes().first().getStartTime() == 0 && activityFacility.getActivityOptions().get(
-					"parking").getOpeningTimes().first().getEndTime() == 24*3600))
-				if (activityFacility.getActivityOptions().get(
-						"parking").getOpeningTimes().first().getStartTime() > now || activityFacility.getActivityOptions().get(
-						"parking").getOpeningTimes().first().getEndTime() < latestEndOfParking)
-					continue;
-
+			ActivityOption parkingOptions = activityFacility.getActivityOptions().get("parking");
+			// checks if parking slot is now open and still open when the parking will finish; if no openingTime is set, we assume that it is open the hole day
+			if (!parkingOptions.getOpeningTimes().isEmpty()) {
+				if (!(parkingOptions.getOpeningTimes().first().getStartTime() == 0 && parkingOptions.getOpeningTimes().first().getEndTime() == 24 * 3600))
+					if (parkingOptions.getOpeningTimes().first().getStartTime() > now || parkingOptions.getOpeningTimes().first().getEndTime() < latestEndOfParking)
+						continue;
+			}
 			// create Euclidean distances to the parking activities to find routes only to the nearest facilities in the next step
 			Coord coordBaseLink = network.getLinks().get(baseLinkId).getCoord();
 			Coord coordCurrentLink = network.getLinks().get(currentLinkId).getCoord();
