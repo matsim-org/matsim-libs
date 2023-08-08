@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
 import org.matsim.contrib.parking.parkingsearch.events.RemoveParkingActivityEvent;
 import org.matsim.contrib.parking.parkingsearch.events.ReserveParkingLocationEvent;
 import org.matsim.contrib.parking.parkingsearch.events.SelectNewParkingLocationEvent;
@@ -107,10 +106,10 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 					double drivingDurationFromDropOff = timer.getTimeOfDay() - currentPlannedLeg.getDepartureTime().seconds();
 
 					if (nextSelectedParkingLink.equals(currentLinkId)) {
-						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelDuration(
+						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelTime(
 							followingActivity.getLinkId(), timer.getTimeOfDay(), currentLinkId);
 					} else {
-						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelDuration(
+						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelTime(
 							currentPlannedLeg.getRoute().getStartLinkId(), timer.getTimeOfDay(), currentLinkId);
 					}
 					parkingDuration = followingActivity.getMaximumDuration().seconds() - drivingDurationFromDropOff - expectedDrivingDurationToPickup;

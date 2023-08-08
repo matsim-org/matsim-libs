@@ -251,8 +251,14 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 		return actualRoute;
 	}
 
-	public double getExpectedTravelDuration(Id<Link> destinationLinkId, double now,
-											Id<Link> currentLinkId) {
+	/**
+	 * @param destinationLinkId
+	 * @param now
+	 * @param currentLinkId
+	 * @return
+	 */
+	public double getExpectedTravelTime(Id<Link> destinationLinkId, double now,
+										Id<Link> currentLinkId) {
 		NetworkRoute possibleRoute = this.parkingRouter.getRouteFromParkingToDestination(destinationLinkId, now,
 			currentLinkId);
 		return possibleRoute.getTravelTime().seconds();
