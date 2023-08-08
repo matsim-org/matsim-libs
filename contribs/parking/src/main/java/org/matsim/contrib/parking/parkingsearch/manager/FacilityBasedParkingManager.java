@@ -120,6 +120,8 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			// space, we will say yes "+linkId);
 
 			return true;
+		} else if (!this.facilitiesPerLink.containsKey(linkId)) {
+			return false;
 		}
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
