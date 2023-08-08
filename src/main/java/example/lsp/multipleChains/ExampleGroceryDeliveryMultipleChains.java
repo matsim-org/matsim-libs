@@ -27,7 +27,7 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 
-import static example.lsp.multipleChains.Utils.createLSPShipmentsFromCarrierShipments;
+import static example.lsp.multipleChains.MultipleChainsUtils.createLSPShipmentsFromCarrierShipments;
 
 public class ExampleGroceryDeliveryMultipleChains {
 
@@ -92,8 +92,8 @@ public class ExampleGroceryDeliveryMultipleChains {
 			config.controler().setLastIteration(0);
 		}
 
-//		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz")));
-		config.network().setInputFile("/Users/niclasrichter/Documents/Studium/Master/Thesis/groceryDeliveryScenario/berlin_v5.5-network.xml.gz");
+//		config.network().setInputFile("/Users/niclasrichter/Documents/Studium/Master/Thesis/groceryDeliveryScenario/berlin_v5.5-network.xml.gz");
+		config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin_v5.5-network.xml.gz");
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setWriteEventsInterval(1);
 
@@ -127,6 +127,7 @@ public class ExampleGroceryDeliveryMultipleChains {
 		carrierReader.readFile(carrierPlanFile);
 
 		Carrier carrier = carriers.getCarriers().get(Id.create("kaufland_VERBRAUCHERMARKT_TROCKEN", CarrierImpl.class));
+		// Depotlink vielleicht lieber von den Fahrzeugen nehmen, ist logischer
 		Id<Link> depotLink = carrier.getShipments().values().iterator().next().getFrom();
 
 		log.info("create LSP");
@@ -155,13 +156,12 @@ public class ExampleGroceryDeliveryMultipleChains {
 
 			singleOneEchelonChainPlan = LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
-					.setAssigner(Utils.createPrimaryLogisticChainShipmentAssigner());
+					.setAssigner(MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
 		lspPlans.add(singleOneEchelonChainPlan);
 
-		// TODO ggf. passenderen Namen für LSP vergeben
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
 				.setInitialPlan(singleOneEchelonChainPlan)
 				.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))

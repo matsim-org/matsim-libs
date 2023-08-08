@@ -191,13 +191,13 @@ public class MultipleChainsReplanningTest {
 					.addLogisticChainElement(rightCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = Utils.createRoundRobinLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = MultipleChainsUtils.createRoundRobinLogisticChainShipmentAssigner();
 			multipleOneEchelonChainsPlan = LSPUtils.createLSPPlan()
 					.addLogisticChain(leftChain)
 					.addLogisticChain(rightChain)
 					.setAssigner(shipmentAssigner);
 
-			multipleOneEchelonChainsPlan.setType(Utils.LspPlanTypes.MULTIPLE_ONE_ECHELON_CHAINS.toString());
+			multipleOneEchelonChainsPlan.setType(MultipleChainsUtils.LspPlanTypes.MULTIPLE_ONE_ECHELON_CHAINS.toString());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();

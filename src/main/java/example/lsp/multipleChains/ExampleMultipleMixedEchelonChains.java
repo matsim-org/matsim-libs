@@ -229,8 +229,8 @@ public class ExampleMultipleMixedEchelonChains {
 			ShipmentAssigner assigner;
 
 			switch (assignerSetting) {
-				case primary -> assigner = Utils.createPrimaryLogisticChainShipmentAssigner();
-				case roundRobin -> assigner = Utils.createRoundRobinLogisticChainShipmentAssigner();
+				case primary -> assigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
+				case roundRobin -> assigner = MultipleChainsUtils.createRoundRobinLogisticChainShipmentAssigner();
 				default -> throw new IllegalStateException("Unexpected value: " + assignerSetting);
 			}
 

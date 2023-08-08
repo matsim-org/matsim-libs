@@ -170,12 +170,12 @@ public class ExampleMultipleOneEchelonChainsReplanning {
 					.addLogisticChainElement(singleCarrierElement)
 					.build();
 
-			final ShipmentAssigner singleSolutionShipmentAssigner = Utils.createPrimaryLogisticChainShipmentAssigner();
+			final ShipmentAssigner singleSolutionShipmentAssigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
 			singleOneEchelonChainPlan = LSPUtils.createLSPPlan()
 					.addLogisticChain(singleChain)
 					.setAssigner(singleSolutionShipmentAssigner);
 
-			singleOneEchelonChainPlan.setType(Utils.LspPlanTypes.SINGLE_ONE_ECHELON_CHAIN.toString());
+			singleOneEchelonChainPlan.setType(MultipleChainsUtils.LspPlanTypes.SINGLE_ONE_ECHELON_CHAIN.toString());
 		}
 
 		// A plan with two different logistic chains on the left and right, with respective carriers is created
@@ -219,13 +219,13 @@ public class ExampleMultipleOneEchelonChainsReplanning {
 					.addLogisticChainElement(rightCarrierElement)
 					.build();
 
-			final ShipmentAssigner shipmentAssigner = Utils.createRandomLogisticChainShipmentAssigner();
+			final ShipmentAssigner shipmentAssigner = MultipleChainsUtils.createRandomLogisticChainShipmentAssigner();
 			multipleOneEchelonChainsPlan = LSPUtils.createLSPPlan()
 					.addLogisticChain(leftChain)
 					.addLogisticChain(rightChain)
 					.setAssigner(shipmentAssigner);
 
-			multipleOneEchelonChainsPlan.setType(Utils.LspPlanTypes.MULTIPLE_ONE_ECHELON_CHAINS.toString());
+			multipleOneEchelonChainsPlan.setType(MultipleChainsUtils.LspPlanTypes.MULTIPLE_ONE_ECHELON_CHAINS.toString());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();

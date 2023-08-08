@@ -9,12 +9,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
 
-public class Utils {
+public class MultipleChainsUtils {
 	public static RandomLogisticChainShipmentAssigner createRandomLogisticChainShipmentAssigner() {
 		return new RandomLogisticChainShipmentAssigner();
 	}
