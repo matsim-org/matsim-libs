@@ -22,8 +22,7 @@ package org.matsim.contrib.parking.parkingsearch.events;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author  Ricardo Ewert
- *
+ * @author Ricardo Ewert
  */
 
 public interface SelectNewParkingLocationEventHandler extends EventHandler {

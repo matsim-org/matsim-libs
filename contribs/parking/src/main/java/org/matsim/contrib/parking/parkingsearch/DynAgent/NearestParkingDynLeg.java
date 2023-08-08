@@ -24,7 +24,6 @@ import java.util.List;
 
 /**
  * @author Ricardo Ewert
- *
  */
 public class NearestParkingDynLeg extends ParkingDynLeg {
 	private boolean parkingAtEndOfLeg = true;
@@ -45,7 +44,8 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		this.currentPlannedLeg = currentPlannedLeg;
 		this.plan = plan;
 		this.planIndexNextActivity = planIndexNextActivity;
-		if (followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute("parking").equals("noParking"))
+		if (followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute("parking").equals(
+			"noParking"))
 			parkingAtEndOfLeg = false;
 	}
 
@@ -57,7 +57,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 			if (currentLinkId.equals(this.getDestinationLinkId())) {
 				if (!parkingAtEndOfLeg) {
 					reachedDestinationWithoutParking = true;
-				} else{
+				} else {
 					this.parkingMode = true;
 					this.events
 						.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
@@ -77,8 +77,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 				if (hasFoundParking) {
 					this.events.processEvent(new ReserveParkingLocationEvent(timer.getTimeOfDay(), vehicleId, currentLinkId, currentLinkId));
 					nextSelectedParkingLink = currentLinkId;
-				}
-				else
+				} else
 					((FacilityBasedParkingManager) parkingManager).registerRejectedReservation(timer.getTimeOfDay());
 			}
 		}
@@ -107,11 +106,10 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 					double expectedDrivingDurationToPickup;
 					double drivingDurationFromDropOff = timer.getTimeOfDay() - currentPlannedLeg.getDepartureTime().seconds();
 
-					if (nextSelectedParkingLink.equals(currentLinkId)){
+					if (nextSelectedParkingLink.equals(currentLinkId)) {
 						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelDuration(
 							followingActivity.getLinkId(), timer.getTimeOfDay(), currentLinkId);
-					}
-					else {
+					} else {
 						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelDuration(
 							currentPlannedLeg.getRoute().getStartLinkId(), timer.getTimeOfDay(), currentLinkId);
 					}
@@ -132,7 +130,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 				double maxParkingDuration = followingActivity.getMaximumDuration().seconds();
 				Id<Link> nextLinkId = ((NearestParkingSpotSearchLogic) this.logic).getNextLink(currentLinkId, route.getEndLinkId(), vehicleId, mode,
 					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime);
-				if (((NearestParkingSpotSearchLogic) this.logic).isNextParkingActivitySkipped() && parkingAtEndOfLeg){
+				if (((NearestParkingSpotSearchLogic) this.logic).isNextParkingActivitySkipped() && parkingAtEndOfLeg) {
 					removeNextActivityAndFollowingLeg();
 					parkingAtEndOfLeg = false;
 					parkingMode = false;
@@ -170,6 +168,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		plan.getPlanElements().remove(planIndexNextActivity);
 		plan.getPlanElements().remove(planIndexNextActivity);
 	}
+
 	public boolean driveToBaseWithoutParking() {
 		return driveToBaseWithoutParking;
 	}
