@@ -197,6 +197,15 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 					if (parkingOptions.getOpeningTimes().first().getStartTime() > now || parkingOptions.getOpeningTimes().first().getEndTime() < latestEndOfParking)
 						continue;
 			}
+			//check if approx. the max parking time at facility will not exceed
+			if (activityFacility.getAttributes().getAsMap().containsKey("maxParkingDurationInHours")) {
+				double maxParkingDurationAtFacility = 3600 * (double) activityFacility.getAttributes().getAsMap().get("maxParkingDurationInHours");
+				double expectedTravelTimeFromParkingToBase = getExpectedTravelTime(baseLinkId, now, activityFacility.getLinkId());
+				double expectedTravelTimeFromCurrentToParking = getExpectedTravelTime(activityFacility.getLinkId(), now, currentLinkId);
+				double expectedParkingTime = maxParkingDuration - expectedTravelTimeFromCurrentToParking - expectedTravelTimeFromParkingToBase;
+				if (expectedParkingTime > maxParkingDurationAtFacility)
+					continue;
+			}
 			// create Euclidean distances to the parking activities to find routes only to the nearest facilities in the next step
 			Coord coordBaseLink = network.getLinks().get(baseLinkId).getCoord();
 			Coord coordCurrentLink = network.getLinks().get(currentLinkId).getCoord();
