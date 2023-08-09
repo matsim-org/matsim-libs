@@ -95,7 +95,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 			final VehicleType vehicleType = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
 
 			double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
-			{ //limit fixed costs scoring
+			{ //limit fixed costs of vehicles if vehicles could be reused during shift
 				if (tourDuration > MAX_SHIFT_DURATION) {
 					throw new RuntimeException("Duration of tour is longer than max shift defined in scoring fct, caused by event:"
 							+ event + " tourDuration: " + tourDuration + " max shift duration:  " + MAX_SHIFT_DURATION);

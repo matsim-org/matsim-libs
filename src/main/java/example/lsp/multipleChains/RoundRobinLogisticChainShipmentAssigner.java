@@ -1,6 +1,7 @@
 package example.lsp.multipleChains;
 
 import lsp.LSP;
+import lsp.LSPPlan;
 import lsp.LogisticChain;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
@@ -38,11 +39,11 @@ public class RoundRobinLogisticChainShipmentAssigner implements ShipmentAssigner
 	}
 
 	@Override
-	public void assignToLogisticChain(LSPShipment shipment) {
-		Gbl.assertIf(lsp.getSelectedPlan().getLogisticChains().size() > 0);
+	public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+		Gbl.assertIf(lspPlan.getLogisticChains().size() > 0);
 		//prepare the map if empty for the first time with each number of assigned shipments being zero
 		if(shipmentCountByChain.isEmpty()) {
-			for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+			for (LogisticChain chain : lspPlan.getLogisticChains()) {
 				shipmentCountByChain.put(chain, 0);
 			}
 		}

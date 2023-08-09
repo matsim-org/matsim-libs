@@ -4,12 +4,13 @@ import lsp.LSP;
 import lsp.LSPPlan;
 import lsp.LogisticChain;
 import lsp.shipment.LSPShipment;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,7 +23,7 @@ class RandomShiftingStrategyFactory {
 
 	GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
 
-		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
+		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new PlanCalcScoreConfigGroup()));
 		GenericPlanStrategyModule<LSPPlan> randomModule = new GenericPlanStrategyModule<>() {
 
 			@Override
@@ -32,17 +33,10 @@ class RandomShiftingStrategyFactory {
 			@Override
 			public void handlePlan(LSPPlan lspPlan) {
 
-				LSP lsp = lspPlan.getLSP();
+				// Shifting shipments only makes sense for multiple chains
+				if (lspPlan.getLogisticChains().size() < 2) return;
 
-				// iterate through initial plan chains and add shipment IDs to corresponding new plan chains
-				for (LogisticChain initialPlanChain : lsp.getPlans().get(0).getLogisticChains()) {
-					for (LogisticChain newPlanChain : lspPlan.getLogisticChains()) {
-						if (newPlanChain.getId().equals(initialPlanChain.getId())) {
-							newPlanChain.getShipmentIds().addAll(new ArrayList<>(initialPlanChain.getShipmentIds()));
-							break;
-						}
-					}
-				}
+				LSP lsp = lspPlan.getLSP();
 
 				// Make a new list of shipments and pick a random shipment from it
 				List<LSPShipment> shipments = new ArrayList<>(lsp.getShipments());

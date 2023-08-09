@@ -1,6 +1,7 @@
 package example.lsp.multipleChains;
 
 import lsp.LSP;
+import lsp.LSPPlan;
 import lsp.LogisticChain;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
@@ -32,9 +33,9 @@ class PrimaryLogisticChainShipmentAssigner implements ShipmentAssigner {
 	}
 
 	@Override
-	public void assignToLogisticChain(LSPShipment shipment) {
-		Gbl.assertIf(lsp.getSelectedPlan().getLogisticChains().size() > 0);
-		LogisticChain firstLogisticChain = lsp.getSelectedPlan().getLogisticChains().iterator().next();
+	public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+		Gbl.assertIf(lspPlan.getLogisticChains().size() > 0);
+		LogisticChain firstLogisticChain = lspPlan.getLogisticChains().iterator().next();
 		firstLogisticChain.addShipmentToChain(shipment);
 	}
 }

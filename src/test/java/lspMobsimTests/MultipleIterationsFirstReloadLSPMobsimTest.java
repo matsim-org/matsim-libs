@@ -20,6 +20,7 @@
 
 package lspMobsimTests;
 
+import example.lsp.lspReplanning.AssignmentStrategyFactory;
 import lsp.*;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
@@ -213,7 +214,11 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		controler.addOverridingModule(new LSPModule());
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
+				bind( LSPStrategyManager.class ).toProvider(() -> {
+					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+					strategyManager.addStrategy(new AssignmentStrategyFactory().createStrategy(), null, 1);
+					return strategyManager;
+				});
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
 					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);

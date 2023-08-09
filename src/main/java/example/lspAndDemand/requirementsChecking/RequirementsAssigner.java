@@ -21,6 +21,7 @@
 package example.lspAndDemand.requirementsChecking;
 
 import lsp.LSP;
+import lsp.LSPPlan;
 import lsp.LogisticChain;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
@@ -39,11 +40,11 @@ class RequirementsAssigner implements ShipmentAssigner {
 	}
 
 	@Override
-	public void assignToLogisticChain(LSPShipment shipment) {
+	public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
 		feasibleLogisticChains.clear();
 
 		label:
-		for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
+		for (LogisticChain solution : lspPlan.getLogisticChains()) {
 			for (Requirement requirement : shipment.getRequirements()) {
 				if (!requirement.checkRequirement(solution)) {
 

@@ -95,32 +95,9 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 			final VehicleType vehicleType = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
 
 			double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
-			{ //limit fixexd costs scoring
-				if (tourDuration > MAX_SHIFT_DURATION) {
-					throw new RuntimeException("Duration of tour is longer than max shift defined in scoring fct, caused by event:"
-							+ event + " tourDuration: " + tourDuration + " max shift duration:  " + MAX_SHIFT_DURATION);
-				}
 
-				//sum up tour durations
-				if (vehicleType2TourDuration.containsKey(vehicleType)) {
-					vehicleType2TourDuration.put(vehicleType, vehicleType2TourDuration.get(vehicleType) + tourDuration);
-				} else {
-					vehicleType2TourDuration.put(vehicleType, tourDuration);
-				}
-
-				//scoring needed?
-				final double currentNuOfVehiclesNeeded = Math.ceil(vehicleType2TourDuration.get(vehicleType) / MAX_SHIFT_DURATION);
-				final Integer nuAlreadyScored = vehicleType2ScoredFixCosts.get(vehicleType);
-				if (nuAlreadyScored == null ) {
-					log.info("Score fixed costs for vehicle type: " + vehicleType.getId().toString());
-					score = score - vehicleType.getCostInformation().getFixedCosts();
-					vehicleType2ScoredFixCosts.put(vehicleType, 1);
-				} else if (currentNuOfVehiclesNeeded > nuAlreadyScored) {
-					log.info("Score fixed costs for vehicle type: " + vehicleType.getId().toString());
-					score = score - vehicleType.getCostInformation().getFixedCosts();
-					vehicleType2ScoredFixCosts.put(vehicleType, vehicleType2ScoredFixCosts.get(vehicleType) + 1);
-				}
-			}
+			log.info("Score fixed costs for vehicle type: " + vehicleType.getId().toString());
+			score = score - vehicleType.getCostInformation().getFixedCosts();
 
 			// variable costs per time
 			score = score - (tourDuration * vehicleType.getCostInformation().getCostsPerSecond());
