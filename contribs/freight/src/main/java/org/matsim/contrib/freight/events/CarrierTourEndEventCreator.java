@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.CarrierConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.vehicles.Vehicle;
 
@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if(event instanceof ActivityStartEvent startEvent && FreightConstants.END.equals(startEvent.getActType()) ) {
+		if(event instanceof ActivityStartEvent startEvent && CarrierConstants.END.equals(startEvent.getActType()) ) {
 				return new CarrierTourEndEvent(startEvent.getTime(), carrier.getId(), scheduledTour.getTour().getEndLinkId(), // TODO: If we have the tourId, we do not need to store the link here, kmt sep 22
 						vehicleId, scheduledTour.getTour().getId());
 		}
