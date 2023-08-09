@@ -25,9 +25,7 @@ import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
-import org.matsim.contrib.drt.stops.DefaultStopDurationProvider;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
-import org.matsim.contrib.drt.stops.StopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -36,6 +34,7 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.zone.skims.AdaptiveTravelTimeMatrixModule;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -89,5 +88,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		})).in(Singleton.class);
 		
 		bindModal(StopTimeCalculator.class).to(modalKey(DefaultStopTimeCalculator.class));
+
+		install(new AdaptiveTravelTimeMatrixModule(drtCfg.mode));
 	}
 }

@@ -34,6 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -126,6 +127,41 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
+	public void testRunDrtExampleWithNoRejections_RepeatedSelectiveSearch() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+			new OTFVisConfigGroup());
+
+		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			//replace extensive with repeated selective search
+			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
+			var repeatedSelectiveInsertionSearchParams = new RepeatedSelectiveInsertionSearchParams();
+			// using adaptive travel time matrix
+			repeatedSelectiveInsertionSearchParams.retryInsertion = 5;
+			drtCfg.addParameterSet(repeatedSelectiveInsertionSearchParams);
+
+			//disable rejections
+			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+		}
+
+		config.controler().setLastIteration(3);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+
+		var expectedStats = Stats.newBuilder()
+			.rejectionRate(0.0)
+			.rejections(0)
+			.waitAverage(261.57)
+			.inVehicleTravelTimeMean(382.74)
+			.totalTravelTimeMean(644.32)
+			.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+	@Test
 	public void testRunDrtExampleWithRequestRetry() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
@@ -199,7 +235,7 @@ public class RunDrtExampleIT {
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
-	
+
 	@Test
 	public void testRunDrtExampleWithIncrementalStopDuration() {
 		Id.resetCaches();
@@ -209,7 +245,7 @@ public class RunDrtExampleIT {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		
+
 		Controler controller = DrtControlerCreator.createControler(config, false);
 
 		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
@@ -221,7 +257,7 @@ public class RunDrtExampleIT {
 				bindModal(StopTimeCalculator.class).toInstance(stopTimeCalculator);
 			}
 		});
-		
+
 		controller.run();
 
 		var expectedStats = Stats.newBuilder()

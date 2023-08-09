@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.contrib.parking.parkingsearch.sim;
 
 import jakarta.inject.Inject;
@@ -33,14 +30,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic.BenensonParkingAgentLogic;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic.MemoryBasedParkingAgentLogic;
+import org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic.NearestParkingSpotAgentLogic;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic.ParkingAgentLogic;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
-import org.matsim.contrib.parking.parkingsearch.search.BenensonParkingSearchLogic;
-import org.matsim.contrib.parking.parkingsearch.search.DistanceMemoryParkingSearchLogic;
-import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
-import org.matsim.contrib.parking.parkingsearch.search.RandomParkingSearchLogic;
+import org.matsim.contrib.parking.parkingsearch.search.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -91,27 +86,38 @@ public class ParkingAgentFactory implements AgentFactory {
 		ParkingSearchLogic parkingLogic;
 		ParkingAgentLogic agentLogic = null;
 
-		switch(psConfigGroup.getParkingSearchStrategy()){
-		case Benenson:
-			parkingLogic  = new BenensonParkingSearchLogic(network,psConfigGroup);
-			agentLogic = new BenensonParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter, network,
-					parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, psConfigGroup);
-			break;
+		switch (psConfigGroup.getParkingSearchStrategy()) {
+            case Benenson -> {
+                parkingLogic = new BenensonParkingSearchLogic(network, psConfigGroup);
+				agentLogic = new BenensonParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter, network,
+                        parkingRouter, events, parkingLogic, ((QSim) qsim).getSimTimer(), teleportationLogic, psConfigGroup);
+            }
+            case Random -> {
+                parkingLogic = new RandomParkingSearchLogic(network);
+				agentLogic = new ParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter, network,
+                        parkingRouter, events, parkingLogic, ((QSim) qsim).getSimTimer(), teleportationLogic, psConfigGroup);
+            }
+            case DistanceMemory -> {
+                parkingLogic = new DistanceMemoryParkingSearchLogic(network);
+				agentLogic = new MemoryBasedParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter, network,
+                        parkingRouter, events, parkingLogic, ((QSim) qsim).getSimTimer(), teleportationLogic, psConfigGroup);
+            }
+			case NearestParkingSpot /*, NearestParkingSpotWithReservation, NearestParkingSpotWithCapacityCheck*/ -> {
 
-		case Random:
-			parkingLogic  = new RandomParkingSearchLogic(network);
-			agentLogic = new ParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter, network,
-					parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, psConfigGroup);
-			break;
+				if (psConfigGroup.getFractionCanReserveParkingInAdvanced() == 1.) { //TODO integrate fraction
+					parkingLogic = new NearestParkingSpotSearchLogic(network, parkingRouter, parkingManager, true, true);
+				} else if (psConfigGroup.getFractionCanCheckFreeCapacitiesInAdvanced() == 1.){ //TODO integrate fraction
+					parkingLogic = new NearestParkingSpotSearchLogic(network, parkingRouter, parkingManager, false, true);
+				}
+				else
+					parkingLogic = new NearestParkingSpotSearchLogic(network, parkingRouter, parkingManager, false, false);
+				agentLogic = new NearestParkingSpotAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter,
+					network, parkingRouter, events, parkingLogic, ((QSim) qsim).getSimTimer(),
+					teleportationLogic, psConfigGroup);
+			}
+        };
 
-		case DistanceMemory:
-			parkingLogic  = new DistanceMemoryParkingSearchLogic(network);
-			agentLogic = new MemoryBasedParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkRouter, network,
-					parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, psConfigGroup);
-			break;
-
-		}
-		Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
+        Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
 		if (startLinkId == null) {
 			throw new NullPointerException(" No start link found. Should not happen.");
 		}
