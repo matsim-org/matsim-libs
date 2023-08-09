@@ -20,16 +20,17 @@
 
 package lsp.io;
 
+import lsp.LSP;
 import lsp.*;
-import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -46,7 +47,6 @@ import org.xml.sax.Attributes;
 
 import java.util.*;
 
-import static lsp.LSPConstants.LSP;
 import static lsp.LSPConstants.*;
 
 /**

@@ -25,7 +25,9 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static example.lsp.multipleChains.MultipleChainsUtils.createLSPShipmentsFromCarrierShipments;
 

@@ -3,7 +3,8 @@ package example.lsp.multipleChains;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
 
 import java.util.ArrayList;
 import java.util.Collection;

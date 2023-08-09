@@ -21,10 +21,10 @@
 package example.lsp.lspScoring;
 
 import lsp.*;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;

@@ -31,7 +31,9 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /*package-private*/ class RoundRobinDistributionAllShipmentsStrategyFactory {
 
