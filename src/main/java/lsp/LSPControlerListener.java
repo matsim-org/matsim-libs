@@ -22,6 +22,7 @@ package lsp;
 
 
 import jakarta.inject.Inject;
+import lsp.io.LSPPlanXmlWriter;
 import lsp.shipment.LSPShipment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

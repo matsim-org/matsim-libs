@@ -20,7 +20,9 @@
 
 package lsp.resourceImplementations;
 
-import lsp.*;
+import lsp.LSP;
+import lsp.LSPPlan;
+import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
