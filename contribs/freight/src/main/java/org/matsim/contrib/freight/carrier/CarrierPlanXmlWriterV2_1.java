@@ -43,7 +43,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
 
-import static org.matsim.contrib.freight.carrier.FreightConstants.*;
+import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 
 /**
  * A writer that writes carriers and their plans in a xml-file.
@@ -251,7 +251,7 @@ import static org.matsim.contrib.freight.carrier.FreightConstants.*;
 						createTuple(VEHICLE_ID,  tour.getVehicle().getId().toString())
 				));
 				this.writeStartTag(ACTIVITY, List.of(
-						createTuple(TYPE, FreightConstants.START),
+						createTuple(TYPE, CarrierConstants.START),
 						createTuple(END_TIME, Time.writeTime(tour.getDeparture()))), true
 				);
 				for (TourElement tourElement : tour.getTour().getTourElements()) {
@@ -300,7 +300,7 @@ import static org.matsim.contrib.freight.carrier.FreightConstants.*;
 					}
 				}
 				this.writeStartTag(ACTIVITY, List.of(
-						createTuple(TYPE, FreightConstants.END)), true
+						createTuple(TYPE, CarrierConstants.END)), true
 				);
 				this.writeEndTag(TOUR);
 			}

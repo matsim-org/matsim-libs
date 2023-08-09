@@ -45,7 +45,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.*;
 import org.xml.sax.Attributes;
-import static org.matsim.contrib.freight.carrier.FreightConstants.*;
+import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 
 class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 

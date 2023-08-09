@@ -42,7 +42,7 @@ import org.xml.sax.Attributes;
 
 import java.util.*;
 
-import static org.matsim.contrib.freight.carrier.FreightConstants.*;
+import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 
 class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 

@@ -21,7 +21,7 @@
 
 package org.matsim.contrib.freight.carrier;
 
-public abstract class FreightConstants {
+public class CarrierConstants {
 
 	public static final String PICKUP = "pickup";
 	public static final String DELIVERY = "delivery";
