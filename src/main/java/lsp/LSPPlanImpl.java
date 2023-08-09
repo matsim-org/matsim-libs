@@ -26,7 +26,7 @@ import lsp.shipment.ShipmentPlan;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/* package-private */ class LSPPlanImpl implements LSPPlan {
+public class LSPPlanImpl implements LSPPlan {
 
 	private final Collection<LogisticChain> logisticChains;
 	private final Collection<ShipmentPlan> shipmentPlans;
@@ -35,7 +35,7 @@ import java.util.Collection;
 	private ShipmentAssigner assigner;
 	private String type = null;
 
-	LSPPlanImpl() {
+	public LSPPlanImpl() {
 		this.logisticChains = new ArrayList<>();
 		this.shipmentPlans = new ArrayList<>();
 	}

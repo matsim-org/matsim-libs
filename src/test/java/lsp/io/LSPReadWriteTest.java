@@ -1,5 +1,8 @@
-package lsp;
+package lsp.io;
 
+import lsp.LSPs;
+import lsp.io.LSPPlanXmlReader;
+import lsp.io.LSPPlanXmlWriter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;

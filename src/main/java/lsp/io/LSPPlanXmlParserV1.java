@@ -18,8 +18,9 @@
  *  * ***********************************************************************
  */
 
-package lsp;
+package lsp.io;
 
+import lsp.*;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
@@ -57,7 +58,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
 	public static final Logger logger = LogManager.getLogger( LSPPlanXmlParserV1.class );
 
-	private LSP currentLsp = null;
+	private lsp.LSP currentLsp = null;
 	private Carrier currentCarrier = null;
 	private LSPShipment currentShipment = null;
 	private LSPPlan currentLspPlan = null;

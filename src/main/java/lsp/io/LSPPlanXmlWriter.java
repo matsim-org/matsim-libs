@@ -18,8 +18,9 @@
  *  * ***********************************************************************
  */
 
-package lsp;
+package lsp.io;
 
+import lsp.*;
 import lsp.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
@@ -51,7 +52,7 @@ public class LSPPlanXmlWriter  extends MatsimXmlWriter {
 
 	private static final Logger logger = LogManager.getLogger(LSPPlanXmlWriter.class);
 
-	private final Collection<LSP> lsPs;
+	private final Collection<lsp.LSP> lsPs;
 
 	public LSPPlanXmlWriter(LSPs lsPs) {
 		super();
