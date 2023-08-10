@@ -21,6 +21,7 @@ package org.matsim.contrib.parking.parkingsearch.sim;
 
 import jakarta.inject.Inject;
 
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +47,7 @@ import org.matsim.core.router.RoutingModule;
 import com.google.inject.name.Named;
 
 /**
- * @author jbischoff
+ * @author jbischoff, extended by Ricardo Ewert
  *
  */
 
@@ -108,6 +109,12 @@ public class ParkingAgentFactory implements AgentFactory {
 				int numberReserved = (int)Math.round(psConfigGroup.getFractionCanReserveParkingInAdvanced() * numberOfAgents);
 				int numberCapacityCheck = (int)Math.round(psConfigGroup.getFractionCanCheckFreeCapacitiesInAdvanced() * numberOfAgents);
 
+				if (currentAgentNumber == 1){
+					LogManager.getLogger(getClass()).info("Number of agents, who can reserve a parking slot in advanced: " + numberReserved);
+					LogManager.getLogger(getClass()).info("Number of agents, who can check a free parking slot in advanced: " + numberCapacityCheck);
+					LogManager.getLogger(getClass()).info("Number of agents, who have no technical support to find a parking slot: " + (numberOfAgents - numberReserved -numberCapacityCheck));
+
+				}
 				if (numberReserved >= currentAgentNumber) {
 					parkingLogic = new NearestParkingSpotSearchLogic(network, parkingRouter, parkingManager, true, true);
 				} else if (numberCapacityCheck + numberReserved >= currentAgentNumber){
