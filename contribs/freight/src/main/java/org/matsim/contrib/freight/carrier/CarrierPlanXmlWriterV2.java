@@ -232,7 +232,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 				writer.write("\t\t\t\t<tour ");
 				writer.write("vehicleId=\"" + tour.getVehicle().getId()
 						+ "\">\n");
-				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START
+				writer.write("\t\t\t\t\t<act type=\"" + CarrierConstants.START
 						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())
 						+ "\"/>\n");
 				for (TourElement tourElement : tour.getTour().getTourElements()) {
@@ -275,7 +275,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 					}
 
 				}
-				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.END
+				writer.write("\t\t\t\t\t<act type=\"" + CarrierConstants.END
 						+ "\"/>\n");
 				writer.write("\t\t\t\t</tour>\n");
 			}
