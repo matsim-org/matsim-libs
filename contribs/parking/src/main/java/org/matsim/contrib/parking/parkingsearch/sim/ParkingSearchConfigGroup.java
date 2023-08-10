@@ -164,6 +164,10 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 
 		if (getFractionCanCheckFreeCapacitiesInAdvanced() != 0. && !getParkingSearchManagerType().equals(ParkingSearchManagerType.FacilityBasedParkingManager))
 			log.warn("Fraction of agents who can check free capacities in advanced has no impact on your selected ParkingSearchManagerType, because it is only implemented for the FacilityBasedParkingManager.");
+
+		if (getFractionCanCheckFreeCapacitiesInAdvanced() + getFractionCanReserveParkingInAdvanced() > 1.0)
+			throw new RuntimeException( "The sum of " + FRACTION_CAN_RESERVE_PARKING_IN_ADVANCED + " and " + FRACTION_CAN_CHECK_FREE_CAPACITIES_IN_ADVANCED + " is > 1.0. This should not happen.");
+
 	}
 
 }
