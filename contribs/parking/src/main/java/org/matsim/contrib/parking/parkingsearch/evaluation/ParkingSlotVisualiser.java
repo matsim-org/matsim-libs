@@ -48,18 +48,17 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler, IterationEndsListener{
+public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler, IterationEndsListener {
 
 	Network network;
 
-	protected Map<Id<Link>,ParkingSlotManager> slotsOnLink = new HashMap<Id<Link>,ParkingSlotManager>();
-	Map<Id<Vehicle>,Tuple<Id<Link>,MutableDouble>> vehicleParkingPosition = new HashMap<>();
-	protected Map<Id<Vehicle>,Double> midnightParkers = new HashMap<Id<Vehicle>,Double>();
-	protected Map<Id<Vehicle>,ParkingSlotManager> vehiclesResponsibleManager = new HashMap<>();
+	protected Map<Id<Link>, ParkingSlotManager> slotsOnLink = new HashMap<Id<Link>, ParkingSlotManager>();
+	protected Map<Id<Vehicle>, Double> midnightParkers = new HashMap<Id<Vehicle>, Double>();
+	protected Map<Id<Vehicle>, ParkingSlotManager> vehiclesResponsibleManager = new HashMap<>();
 	Random r = MatsimRandom.getLocalInstance();
 	protected List<String> parkings = new ArrayList<>();
 
-	Map<Id<Vehicle>,Id<Link>> parkedVehicles = new HashMap<Id<Vehicle>,Id<Link>>();
+	Map<Id<Vehicle>, Id<Link>> parkedVehicles = new HashMap<Id<Vehicle>, Id<Link>>();
 
 	/**
 	 *
@@ -67,7 +66,8 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 	@Inject
 	public ParkingSlotVisualiser(Scenario scenario) {
 		this.network = scenario.getNetwork();
-		Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities = scenario.getActivityFacilities().getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE);
+		Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities = scenario.getActivityFacilities().getFacilitiesForActivityType(
+			ParkingUtils.PARKACTIVITYTYPE);
 		initialize(parkingFacilities);
 	}
 
@@ -76,19 +76,18 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 		initialize(parkingFacilities);
 	}
 
-	private void initialize(Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities){
-		Map<Id<Link>,MutableDouble> nrOfSlotsPerLink = new HashMap<Id<Link>,MutableDouble>();
+	private void initialize(Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities) {
+		Map<Id<Link>, MutableDouble> nrOfSlotsPerLink = new HashMap<Id<Link>, MutableDouble>();
 		for (ActivityFacility fac : parkingFacilities.values()) {
 			Id<Link> linkId = fac.getLinkId();
-			if(nrOfSlotsPerLink.containsKey(linkId)){
+			if (nrOfSlotsPerLink.containsKey(linkId)) {
 				nrOfSlotsPerLink.get(linkId).add(fac.getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity());
-			}
-			else{
-				nrOfSlotsPerLink.put(linkId, new MutableDouble(fac.getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity() ) );
+			} else {
+				nrOfSlotsPerLink.put(linkId, new MutableDouble(fac.getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity()));
 			}
 		}
 
-		for(Id<Link> linkID : nrOfSlotsPerLink.keySet()){
+		for (Id<Link> linkID : nrOfSlotsPerLink.keySet()) {
 //			LogManager.getLogger(getClass()).info("initialize parking visualisation for link " + linkID);
 			this.slotsOnLink.put(linkID, new ParkingSlotManager(network.getLinks().get(linkID), nrOfSlotsPerLink.get(linkID).intValue()));
 		}
@@ -97,14 +96,14 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 
 	@Override
 	public void reset(int iteration) {
-		for(Id<Link> link : this.slotsOnLink.keySet()){
+		for (Id<Link> link : this.slotsOnLink.keySet()) {
 			this.slotsOnLink.get(link).setAllParkingTimesToZero();
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		if(this.slotsOnLink.containsKey(event.getLinkId())){
+		if (this.slotsOnLink.containsKey(event.getLinkId())) {
 			this.vehiclesResponsibleManager.put(event.getVehicleId(), this.slotsOnLink.get(event.getLinkId()));
 		}
 	}
@@ -112,22 +111,22 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		ParkingSlotManager manager = this.vehiclesResponsibleManager.remove(event.getVehicleId());
-		if(manager != null){
-			Tuple<Coord,Double> parkingTuple = manager.processParking(event.getTime(), event.getVehicleId());
+		if (manager != null) {
+			Tuple<Coord, Double> parkingTuple = manager.processParking(event.getTime(), event.getVehicleId());
 			this.parkings.add(manager.getLinkId() + ";" + parkingTuple.getSecond() + ";" + event.getTime() + ";" +
-					parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "free");
-			this.parkedVehicles.put(event.getVehicleId(),manager.getLinkId());
+				parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "free");
+			this.parkedVehicles.put(event.getVehicleId(), manager.getLinkId());
 		}
 	}
 
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (this.parkedVehicles.containsKey(event.getVehicleId())){
+		if (this.parkedVehicles.containsKey(event.getVehicleId())) {
 			ParkingSlotManager manager = this.slotsOnLink.get(this.parkedVehicles.get(event.getVehicleId()));
-			Tuple<Coord,Double> parkingTuple = manager.processUnParking(event.getTime(), event.getVehicleId());
+			Tuple<Coord, Double> parkingTuple = manager.processUnParking(event.getTime(), event.getVehicleId());
 			this.parkings.add(manager.getLinkId() + ";" + parkingTuple.getSecond() + ";" + event.getTime() + ";" +
-					parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "veh" + event.getVehicleId());
+				parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "veh" + event.getVehicleId());
 			this.parkedVehicles.remove(event.getVehicleId());
 		} else {
 			midnightParkers.put(event.getVehicleId(), event.getTime());
@@ -139,48 +138,48 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 	 */
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (this.midnightParkers.containsKey(event.getVehicleId())){
-			if(this.slotsOnLink.containsKey(event.getLinkId())){
+		if (this.midnightParkers.containsKey(event.getVehicleId())) {
+			if (this.slotsOnLink.containsKey(event.getLinkId())) {
 				ParkingSlotManager manager = this.slotsOnLink.get(event.getLinkId());
-				Tuple<Coord,Double> parkingTuple = manager.processUnParking(event.getTime(), event.getVehicleId());
-				if(parkingTuple != null){
+				Tuple<Coord, Double> parkingTuple = manager.processUnParking(event.getTime(), event.getVehicleId());
+				if (parkingTuple != null) {
 					this.parkings.add(manager.getLinkId() + ";" + parkingTuple.getSecond() + ";" + event.getTime() + ";" +
-							parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "veh" + event.getVehicleId());
+						parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "veh" + event.getVehicleId());
 				}
 			}
 			this.midnightParkers.remove(event.getVehicleId());
 		}
 	}
 
-	public void finishDay(){
+	public void finishDay() {
 
-		for(Id<Link> linkId : this.slotsOnLink.keySet()){
+		for (Id<Link> linkId : this.slotsOnLink.keySet()) {
 			ParkingSlotManager manager = this.slotsOnLink.get(linkId);
-			Map<Id<Vehicle>,Tuple<Coord,Double>> occupiedSlots = manager.getOccupiedSlots();
+			Map<Id<Vehicle>, Tuple<Coord, Double>> occupiedSlots = manager.getOccupiedSlots();
 
-			double endOfDay = 30*3600;
-			for(Entry<Id<Vehicle>,Tuple<Coord,Double>> e : occupiedSlots.entrySet()){
+			double endOfDay = 30 * 3600;
+			for (Entry<Id<Vehicle>, Tuple<Coord, Double>> e : occupiedSlots.entrySet()) {
 				Tuple<Coord, Double> parkingTuple = e.getValue();
 				this.parkings.add(manager.getLinkId() + ";" + parkingTuple.getSecond() + ";" + endOfDay + ";" +
-						parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "veh" + e.getKey());
+					parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "veh" + e.getKey());
 
 				// set back to 0
 			}
 
-			List<Tuple<Coord,Double>> freeSlots = manager.getFreeSlots();
-			for(Tuple<Coord,Double> parkingTuple : freeSlots){
+			List<Tuple<Coord, Double>> freeSlots = manager.getFreeSlots();
+			for (Tuple<Coord, Double> parkingTuple : freeSlots) {
 				this.parkings.add(manager.getLinkId() + ";" + parkingTuple.getSecond() + ";" + endOfDay + ";" +
-						parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "free");
+					parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "free");
 			}
 		}
 	}
 
-	public void plotSlotOccupation(String filename){
+	public void plotSlotOccupation(String filename) {
 		String head = "LinkId;from;To;X;Y;OccupiedByVehicle";
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
 			bw.write(head);
-			for (String s : this.parkings){
+			for (String s : this.parkings) {
 				bw.newLine();
 				bw.write(s);
 			}
@@ -189,12 +188,13 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		LogManager.getLogger(getClass()).info("FINISHED WRITING PARKING SLOT VISUALISATION FILE TO: " +filename);
+		LogManager.getLogger(getClass()).info("FINISHED WRITING PARKING SLOT VISUALISATION FILE TO: " + filename);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String path = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "ParkingSlots_it"+event.getIteration()+".csv");
+		String path = event.getServices().getControlerIO().getIterationFilename(event.getIteration(),
+			"ParkingSlots_it" + event.getIteration() + ".csv");
 		this.finishDay();
 		this.plotSlotOccupation(path);
 	}

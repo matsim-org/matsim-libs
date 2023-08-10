@@ -31,9 +31,8 @@ import java.util.List;
 
 /**
  * @author Ricardo Ewert
- *
  */
-public class NearestParkingSpotAgentLogic extends ParkingAgentLogic{
+public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 	public NearestParkingSpotAgentLogic(Plan plan, ParkingSearchManager parkingManager, RoutingModule walkRouter, Network network,
 										ParkingRouter parkingRouter, EventsManager events, ParkingSearchLogic parkingLogic, MobsimTimer timer,
 										VehicleTeleportationLogic teleportationLogic, ParkingSearchConfigGroup configGroup) {
@@ -52,30 +51,30 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic{
 		// unpark activity: find the way to the next route & start leg
 
 		//if a parking activity was skipped we need no change the nexParkActionState
-		if (lastParkActionState.equals(LastParkActionState.CARTRIP) && ((NearestParkingDynLeg)oldAction).driveToBaseWithoutParking())
+		if (lastParkActionState.equals(LastParkActionState.CARTRIP) && ((NearestParkingDynLeg) oldAction).driveToBaseWithoutParking())
 			this.lastParkActionState = LastParkActionState.WALKFROMPARK;
 
-		switch (lastParkActionState){
+		switch (lastParkActionState) {
 			case ACTIVITY:
 				return nextStateAfterActivity(oldAction, now);
 
 			case CARTRIP:
-				return nextStateAfterCarTrip(oldAction,now);
+				return nextStateAfterCarTrip(oldAction, now);
 
 			case NONCARTRIP:
-				return nextStateAfterNonCarTrip(oldAction,now);
+				return nextStateAfterNonCarTrip(oldAction, now);
 
 			case PARKACTIVITY:
-				return nextStateAfterParkActivity(oldAction,now);
+				return nextStateAfterParkActivity(oldAction, now);
 
 			case UNPARKACTIVITY:
-				return nextStateAfterUnParkActivity(oldAction,now);
+				return nextStateAfterUnParkActivity(oldAction, now);
 
 			case WALKFROMPARK:
-				return nextStateAfterWalkFromPark(oldAction,now);
+				return nextStateAfterWalkFromPark(oldAction, now);
 
 			case WALKTOPARK:
-				return nextStateAfterWalkToPark(oldAction,now);
+				return nextStateAfterWalkToPark(oldAction, now);
 
 		}
 		throw new RuntimeException("unreachable code");
@@ -91,18 +90,19 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic{
 		actualRoute.setVehicleId(currentlyAssignedVehicleId);
 		if (!plannedRoute.getStartLinkId().equals(actualRoute.getStartLinkId()))
 			currentPlannedLeg.setRoute(actualRoute);
-		if ((this.parkingManager.unParkVehicleHere(currentlyAssignedVehicleId, agent.getCurrentLinkId(), now))||(isinitialLocation)){
+		if ((this.parkingManager.unParkVehicleHere(currentlyAssignedVehicleId, agent.getCurrentLinkId(), now)) || (isinitialLocation)) {
 			this.lastParkActionState = LastParkActionState.CARTRIP;
 			isinitialLocation = false;
 //			Leg currentLeg = (Leg) this.currentPlanElement;
-			int planIndexNextActivity = planIndex+1;
+			int planIndexNextActivity = planIndex + 1;
 			Activity nextPlanElement = (Activity) plan.getPlanElements().get(planIndexNextActivity);
-			if (nextPlanElement.getAttributes().getAsMap().containsKey("parking") && nextPlanElement.getAttributes().getAttribute("parking").equals("noParking"))
+			if (nextPlanElement.getAttributes().getAsMap().containsKey("parking") && nextPlanElement.getAttributes().getAttribute("parking").equals(
+				"noParking"))
 				this.lastParkActionState = LastParkActionState.WALKFROMPARK;
 			//this could be Car, Carsharing, Motorcylce, or whatever else mode we have, so we want our leg to reflect this.
-			return new NearestParkingDynLeg(currentPlannedLeg, actualRoute, plan, planIndexNextActivity,  parkingLogic, parkingManager, currentlyAssignedVehicleId, timer, events);
-		}
-		else throw new RuntimeException("parking location mismatch");
+			return new NearestParkingDynLeg(currentPlannedLeg, actualRoute, plan, planIndexNextActivity, parkingLogic, parkingManager,
+				currentlyAssignedVehicleId, timer, events);
+		} else throw new RuntimeException("parking location mismatch");
 
 	}
 
@@ -111,9 +111,10 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic{
 		// add a walk leg after parking
 		Leg currentPlannedLeg = (Leg) currentPlanElement;
 		Facility fromFacility = new LinkWrapperFacility(network.getLinks().get(agent.getCurrentLinkId()));
-		Facility toFacility = new LinkWrapperFacility (network.getLinks().get(currentPlannedLeg.getRoute().getEndLinkId()));
-		List<? extends PlanElement> walkTrip = walkRouter.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, now, plan.getPerson()));
-		if (walkTrip.size() != 1 || ! (walkTrip.get(0) instanceof Leg)) {
+		Facility toFacility = new LinkWrapperFacility(network.getLinks().get(currentPlannedLeg.getRoute().getEndLinkId()));
+		List<? extends PlanElement> walkTrip = walkRouter.calcRoute(
+			DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, now, plan.getPerson()));
+		if (walkTrip.size() != 1 || !(walkTrip.get(0) instanceof Leg)) {
 			String message = "walkRouter returned something else than a single Leg, e.g. it routes walk on the network with non_network_walk to access the network. Not implemented in parking yet!";
 			log.error(message);
 			throw new RuntimeException(message);
@@ -124,31 +125,33 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic{
 		if (!walkLeg.getTravelTime().equals(OptionalTime.defined(0.)))
 			return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
 		else
-			return nextStateAfterWalkFromPark(oldAction,now);
+			return nextStateAfterWalkFromPark(oldAction, now);
 	}
 
 	@Override
 	protected DynAction nextStateAfterActivity(DynAction oldAction, double now) {
 		// we could either depart by car or not next
 
-		if (plan.getPlanElements().size() >= planIndex+1){
+		if (plan.getPlanElements().size() >= planIndex + 1) {
 			planIndex++;
 			this.currentPlanElement = plan.getPlanElements().get(planIndex);
 			Leg currentLeg = (Leg) currentPlanElement;
-			if (currentLeg.getMode().equals(TransportMode.car)){
+			if (currentLeg.getMode().equals(TransportMode.car)) {
 				Id<Vehicle> vehicleId = Id.create(this.agent.getId(), Vehicle.class);
 				Id<Link> parkLink = this.parkingManager.getVehicleParkingLocation(vehicleId);
 
-				if (parkLink == null){
+				if (parkLink == null) {
 					//this is the first activity of a day and our parking manager does not provide informations about initial stages. We suppose the car is parked where we are
 					parkLink = agent.getCurrentLinkId();
 				}
 
-				Facility fromFacility = new LinkWrapperFacility (network.getLinks().get(agent.getCurrentLinkId()));
-				Id<Link> teleportedParkLink = this.teleportationLogic.getVehicleLocation(agent.getCurrentLinkId(), vehicleId, parkLink, now, currentLeg.getMode());
-				Facility toFacility = new LinkWrapperFacility (network.getLinks().get(teleportedParkLink));
-				List<? extends PlanElement> walkTrip = walkRouter.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, now, plan.getPerson()));
-				if (walkTrip.size() != 1 || ! (walkTrip.get(0) instanceof Leg)) {
+				Facility fromFacility = new LinkWrapperFacility(network.getLinks().get(agent.getCurrentLinkId()));
+				Id<Link> teleportedParkLink = this.teleportationLogic.getVehicleLocation(agent.getCurrentLinkId(), vehicleId, parkLink, now,
+					currentLeg.getMode());
+				Facility toFacility = new LinkWrapperFacility(network.getLinks().get(teleportedParkLink));
+				List<? extends PlanElement> walkTrip = walkRouter.calcRoute(
+					DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, now, plan.getPerson()));
+				if (walkTrip.size() != 1 || !(walkTrip.get(0) instanceof Leg)) {
 					String message = "walkRouter returned something else than a single Leg, e.g. it routes walk on the network with non_network_walk to access the network. Not implemented in parking yet!";
 					log.error(message);
 					throw new RuntimeException(message);
@@ -159,37 +162,35 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic{
 				if (!walkLeg.getTravelTime().equals(OptionalTime.defined(0.))) {
 					this.lastParkActionState = LastParkActionState.WALKTOPARK;
 					return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
-				}
-				else
-				{
+				} else {
 					return nextStateAfterWalkToPark(oldAction, now);
 				}
-			}
-			else if (currentLeg.getMode().equals(TransportMode.pt)) {
-				if (currentLeg.getRoute() instanceof TransitPassengerRoute){
-					throw new IllegalStateException ("not yet implemented");
-				}
-				else {
+			} else if (currentLeg.getMode().equals(TransportMode.pt)) {
+				if (currentLeg.getRoute() instanceof TransitPassengerRoute) {
+					throw new IllegalStateException("not yet implemented");
+				} else {
 					this.lastParkActionState = LastParkActionState.NONCARTRIP;
 					return new StaticPassengerDynLeg(currentLeg.getRoute(), currentLeg.getMode());
 				}
 				//teleport or pt route
-			}
-			else {
+			} else {
 				//teleport
 				this.lastParkActionState = LastParkActionState.NONCARTRIP;
 				return new StaticPassengerDynLeg(currentLeg.getRoute(), currentLeg.getMode());
 			}
 
-		}else throw new RuntimeException("no more leg to follow but activity is ending\nLastPlanElement: "+currentPlanElement.toString()+"\n Agent "+this.agent.getId()+"\nTime: "+ Time.writeTime(now));
+		} else throw new RuntimeException(
+			"no more leg to follow but activity is ending\nLastPlanElement: " + currentPlanElement.toString() + "\n Agent " + this.agent.getId() + "\nTime: " + Time.writeTime(
+				now));
 	}
 
 	@Override
 	protected DynAction nextStateAfterWalkToPark(DynAction oldAction, double now) {
 		//walk2park is complete, we can unpark.
 		this.lastParkActionState = LastParkActionState.UNPARKACTIVITY;
-		PlanElement beforePlanElement = plan.getPlanElements().get(planIndex -1);
-		if (beforePlanElement.getAttributes().getAsMap().containsKey("parking") && beforePlanElement.getAttributes().getAttribute("parking").equals("noParking"))
+		PlanElement beforePlanElement = plan.getPlanElements().get(planIndex - 1);
+		if (beforePlanElement.getAttributes().getAsMap().containsKey("parking") && beforePlanElement.getAttributes().getAttribute("parking").equals(
+			"noParking"))
 			return nextStateAfterUnParkActivity(oldAction, now);
 		return new IdleDynActivity(this.stageInteractionType, now + configGroup.getUnparkduration());
 	}
