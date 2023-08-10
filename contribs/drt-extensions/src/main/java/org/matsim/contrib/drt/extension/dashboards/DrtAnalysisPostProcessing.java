@@ -30,14 +30,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import picocli.CommandLine;
-import tech.tablesaw.api.ColumnType;
-import tech.tablesaw.api.Row;
-import tech.tablesaw.api.Table;
+import tech.tablesaw.api.*;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 )
 @CommandSpec(
 	requireRunDirectory = true,
-	produces = {"kpi.csv", "stops.shp", "trips_per_stop.csv", "od.csv"},
+	produces = {"supply_kpi.csv", "stops.shp", "trips_per_stop.csv", "od.csv", "serviceArea.shp"},
 	group = "drt"
 )
 public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
@@ -70,8 +70,11 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 	@CommandLine.Option(names = "--drt-mode", required = true, description = "Name of the drt mode to analyze.")
 	private String drtMode;
 
-	@CommandLine.Option(names = "--stop-file", description = "URL to drt stop file")
-	private URL stopFile;
+	@CommandLine.Option(names = "--stops-file", description = "URL to drt stops file")
+	private URL stopsFile;
+
+	@CommandLine.Option(names = "--area-file", description = "URL to drt service area file")
+	private URL areaFile;
 
 	public static void main(String[] args) {
 		new DrtAnalysisPostProcessing().execute(args);
@@ -80,28 +83,103 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		List<TransitStopFacility> stops = readTransitStops(stopFile);
-
-		// TODO: if there is no stop file, a pseudo-stop file needs to be generated from the legs
-		// tschlenther: why? i don'think so! please report back to me!
-		// rakow: currently the analysis is relying heavily on stops, one needs to think how the dashboard and analysis looks without stops
-
-		writeStopsShp(stops, output.getPath("stops.shp"));
-
-		Map<String, TransitStopFacility> byLink = stops.stream().collect(Collectors.toMap(s -> s.getLinkId().toString(), Function.identity()));
-
 		Path legPath = ApplicationUtils.matchInput("drt_legs_" + drtMode + ".csv", input.getRunDirectory());
-
-		Table legs = Table.read().csv(CsvReadOptions.builder(legPath.toFile()).separator(';')
+		Table legs = Table.read().csv(CsvReadOptions.builder(legPath.toFile())
+			.separator(';')
 			.columnTypesPartial(Map.of(
 				"personId", ColumnType.TEXT, "vehicleId", ColumnType.TEXT,
 				"toLinkId", ColumnType.TEXT, "fromLinkId", ColumnType.TEXT
 			)).build());
 
-		writeTripsPerStop(stops, legs, output.getPath("trips_per_stop.csv"));
-		writeOD(byLink, legs, output.getPath("od.csv"));
+		//read vehicle stats
+		Path vehicleStatsPath = ApplicationUtils.matchInput("drt_vehicle_stats_" + drtMode + ".csv", input.getRunDirectory());
+		Table vehicleStats = Table.read().csv(CsvReadOptions.builder(vehicleStatsPath.toFile())
+			.columnTypesPartial(Map.of("vehicles", ColumnType.DOUBLE,
+				"totalDistance", ColumnType.DOUBLE,
+				"emptyRatio", ColumnType.DOUBLE,
+				"totalServiceDuration", ColumnType.DOUBLE,
+				"d_p/d_t", ColumnType.DOUBLE,
+				"totalPassengerDistanceTraveled", ColumnType.DOUBLE))
+			.separator(';').build());
+
+		//read customer stats
+		Path customerStatsPath = ApplicationUtils.matchInput("drt_customer_stats_" + drtMode + ".csv", input.getRunDirectory());
+		Table customerStats = Table.read().csv(CsvReadOptions.builder(customerStatsPath.toFile())
+			.columnTypesPartial(Map.of(
+				"rides", ColumnType.DOUBLE,
+				"wait_average", ColumnType.DOUBLE,
+				"wait_max", ColumnType.DOUBLE,
+				"inVehicleTravelTime_mean", ColumnType.DOUBLE,
+				"distance_m_mean", ColumnType.DOUBLE,
+				"directDistance_m_mean", ColumnType.DOUBLE,
+				"totalTravelTime_mean", ColumnType.DOUBLE,
+				"fareAllReferences_mean", ColumnType.DOUBLE,
+				"rejections", ColumnType.DOUBLE,
+				"rejectionRate", ColumnType.DOUBLE))
+			.separator(';').build());
+
+		Table tableSupplyKPI = prepareSupplyKPITable(vehicleStats, customerStats);
+
+		if(stopsFile != null){
+			List<TransitStopFacility> stops = readTransitStops(stopsFile);
+			writeStopsShp(stops, output.getPath("stops.shp"));
+			Map<String, TransitStopFacility> byLink = stops.stream().collect(Collectors.toMap(s -> s.getLinkId().toString(), Function.identity()));
+
+			//needs to be a DoubleColumn because transposing later forces us to have the same column type for all (new) value columns
+			tableSupplyKPI.addColumns(DoubleColumn.create("number of stops", new Integer[]{stops.size()}));
+
+			writeTripsPerStop(stops, legs, output.getPath("trips_per_stop.csv"));
+			writeOD(byLink, legs, output.getPath("od.csv"));
+		}
+
+		if(areaFile != null){
+			//TODO discuss whether this is our preferred practice, in general. (input file might not be accessible for simwrapper (web, different partition, ...)
+			Collection<SimpleFeature> allFeatures = ShapeFileReader.getAllFeatures(areaFile);
+			//do not convert coordinates! all MATSim output should be in the same CRS. if input was not in correct CRS, simulation would have crashed...
+			ShapeFileWriter.writeGeometries(allFeatures,output.getPath("serviceArea.shp").toString());
+			//needs to be a DoubleColumn because transposing later forces us to have the same column type for all (new) value columns
+			tableSupplyKPI.addColumns(DoubleColumn.create("number of areas", new Integer[]{allFeatures.size()}));
+		}
+
+		tableSupplyKPI = tableSupplyKPI.transpose(true, false);
+		tableSupplyKPI.column(0).setName("info");
+		tableSupplyKPI.column(1).setName("value");
+		tableSupplyKPI.write().csv(output.getPath("supply_kpi.csv").toFile());
 
 		return 0;
+	}
+
+	private static Table prepareSupplyKPITable(Table vehicleStats, Table customerStats) {
+		//only use last row (last iteration) and certain columns
+		Table tableSupplyKPI = vehicleStats.dropRange(vehicleStats.rowCount() - 1)
+			.selectColumns("vehicles", "totalDistance", "emptyRatio", "totalPassengerDistanceTraveled", "d_p/d_t", "totalServiceDuration" );
+
+		((DoubleColumn)tableSupplyKPI
+			.column("totalServiceDuration")
+			.setName("total service hours"))
+			.divide(3600);
+
+		((DoubleColumn)tableSupplyKPI
+			.column("totalDistance")
+			.setName("total fleet mileage [km]"))
+			.divide(1000);
+
+		((DoubleColumn)tableSupplyKPI
+			.column("totalPassengerDistanceTraveled")
+			.setName("total passenger km"))
+			.divide(1000);
+
+		//compute rides per vehicle-hour
+		DoubleColumn ridesPerVehH = ((DoubleColumn) customerStats
+			.dropRange(customerStats.rowCount() - 1)
+			.column("rides")
+			.copy())
+			.divide((DoubleColumn) tableSupplyKPI.column("total service hours"))
+			.setName("rides per veh-h");
+
+		tableSupplyKPI.addColumns(ridesPerVehH);
+
+		return tableSupplyKPI;
 	}
 
 	private void writeStopsShp(Collection<TransitStopFacility> stops, Path path) throws IOException, SchemaException {
@@ -112,6 +190,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		FileDataStoreFactorySpi factory = new ShapefileDataStoreFactory();
 		ShapefileDataStore shp = (ShapefileDataStore) factory.createNewDataStore(map);
 
+		//TODO all the MATSim output should be in the same CRS! So, do not transform stop coordinates!! (Simwrapper automatically picks up the crs from the resulting .prj file and does conversion itself)
 		SimpleFeatureType featureType = DataUtilities.createType("stop", "the_geom:Point:srid=4326,id:String,linkId:String,name:String");
 		shp.createSchema(featureType);
 
@@ -190,6 +269,8 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readURL(stopFile);
+
+
 
 		return new ArrayList<>(scenario.getTransitSchedule().getFacilities().values());
 	}
