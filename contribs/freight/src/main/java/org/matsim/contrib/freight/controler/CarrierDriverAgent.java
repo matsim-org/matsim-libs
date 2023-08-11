@@ -143,14 +143,14 @@ final class CarrierDriverAgent{
 		createAdditionalEvents( event, currentActivity, scheduledTour, driverId, planElementCounter );
 
 		log.debug( "handling activity end event=" + event );
-		if( FreightConstants.START.equals( event.getActType() ) ){
+		if( CarrierConstants.START.equals( event.getActType() ) ){
 			planElementCounter += 1;
 			return;
 		}
-		if( FreightConstants.END.equals( event.getActType() ) ) return;
-		if( FreightConstants.PICKUP.equals( event.getActType() ) ){
+		if( CarrierConstants.END.equals( event.getActType() ) ) return;
+		if( CarrierConstants.PICKUP.equals( event.getActType() ) ){
 			planElementCounter += 2;
-		} else if( FreightConstants.DELIVERY.equals( event.getActType() ) ){
+		} else if( CarrierConstants.DELIVERY.equals( event.getActType() ) ){
 			planElementCounter += 2;
 		} else{
 			planElementCounter += 2;
@@ -161,7 +161,7 @@ final class CarrierDriverAgent{
 		Activity activity = PopulationUtils.createActivityFromLinkId( event.getActType(), event.getLinkId() );
 		activity.setFacilityId( event.getFacilityId() );
 		activity.setStartTime( event.getTime() );
-		if( event.getActType().equals( FreightConstants.END ) ){
+		if( event.getActType().equals( CarrierConstants.END ) ){
 			activity.setEndTimeUndefined();
 			if( scoringFunction != null ){
 				scoringFunction.handleActivity( activity );

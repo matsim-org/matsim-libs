@@ -42,31 +42,11 @@ import org.xml.sax.Attributes;
 
 import java.util.*;
 
+import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
+
 class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 
 	public static final  Logger logger = LogManager.getLogger(CarrierPlanXmlParserV2_1.class);
-
-	private static final String CARRIER = "carrier";
-	private static final String SHIPMENTS = "shipments";
-	private static final String SHIPMENT = "shipment";
-	private static final String SERVICES = "services";
-	private static final String SERVICE = "service";
-	private static final String PLAN = "plan";
-	private static final String ID = "id";
-	private static final String FROM = "from";
-	private static final String TO = "to";
-	private static final String SIZE = "size";
-	private static final String ACTIVITY = "act";
-	private static final String TYPE = "type";
-	private static final String SHIPMENTID = "shipmentId";
-	private static final String VEHICLE = "vehicle";
-	private static final String VEHICLES = "vehicles";
-	private static final String VEHICLE_EARLIEST_START = "earliestStart";
-	private static final String VEHICLE_LATEST_END = "latestEnd";
-	private static final String VEHICLE_TYPES_MSG = "It used to be possible to have vehicle types both in the plans file, and in a separate file.  The " +
-										  "first option is no longer possible." ;
-	private static final String ATTRIBUTES = "attributes";
-	private static final String ATTRIBUTE = "attribute";
 
 	private Carrier currentCarrier = null;
 	private CarrierVehicle currentVehicle = null;
@@ -86,9 +66,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	private double currentLegTransTime;
 	private double currentLegDepTime;
 	private Builder capabilityBuilder;
-
 	private double currentStartTime;
-
 	private Map<Id<CarrierService>, CarrierService> serviceMap;
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
@@ -227,9 +205,9 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				}
 
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class), vehicleType);
-				String startTime = atts.getValue(VEHICLE_EARLIEST_START);
+				String startTime = atts.getValue(EARLIEST_START);
 				if (startTime != null) vehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
-				String endTime = atts.getValue(VEHICLE_LATEST_END);
+				String endTime = atts.getValue(LATEST_END);
 				if (endTime != null) vehicleBuilder.setLatestEnd(parseTimeToDouble(endTime));
 
 				CarrierVehicle vehicle = vehicleBuilder.build();
@@ -283,7 +261,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 						currentTourBuilder.scheduleStart(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
 					}
 					case "pickup" -> {
-						String id = atts.getValue(SHIPMENTID);
+						String id = atts.getValue(SHIPMENT_ID);
 						if (id == null) throw new IllegalStateException("pickup.shipmentId is missing.");
 						CarrierShipment s = currentShipments.get(id);
 						finishLeg(s.getFrom());
@@ -291,7 +269,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 						previousActLoc = s.getFrom();
 					}
 					case "delivery" -> {
-						String id = atts.getValue(SHIPMENTID);
+						String id = atts.getValue(SHIPMENT_ID);
 						if (id == null) throw new IllegalStateException("delivery.shipmentId is missing.");
 						CarrierShipment s = currentShipments.get(id);
 						finishLeg(s.getTo());

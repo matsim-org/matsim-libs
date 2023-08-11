@@ -19,29 +19,31 @@
 
 package org.matsim.contrib.parking.parkingsearch.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.Map;
+
 /**
- * @author jbischoff
+ * @author Ricardo Ewert
  */
 
-public class StartParkingSearchEvent extends Event {
-	public static final String EVENT_TYPE = "started parkingSearch";
+public class ReserveParkingLocationEvent extends Event {
+	public static final String EVENT_TYPE = "reserve parking location";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_LINK = "link";
-	private final Id<Link> linkId;
+	public static final String ATTRIBUTE_Current_LINK = "link";
+	public static final String ATTRIBUTE_Parking_LINK = "parkingLink";
+	private final Id<Link> currentLinkId;
+	private final Id<Link> parkingLinkId;
 	private final Id<Vehicle> vehicleId;
 
-	public StartParkingSearchEvent(final double time, Id<Vehicle> vehicleId, Id<Link> linkId) {
+	public ReserveParkingLocationEvent(final double time, Id<Vehicle> vehicleId, Id<Link> currentLinkId, Id<Link> parkingLinkId) {
 		super(time);
-		this.linkId = linkId;
+		this.currentLinkId = currentLinkId;
 		this.vehicleId = vehicleId;
-
+		this.parkingLinkId = parkingLinkId;
 	}
 
 	@Override
@@ -49,8 +51,12 @@ public class StartParkingSearchEvent extends Event {
 		return EVENT_TYPE;
 	}
 
-	public Id<Link> getLinkId() {
-		return linkId;
+	public Id<Link> getCurrentLinkId() {
+		return currentLinkId;
+	}
+
+	public Id<Link> getparkingLinkId() {
+		return parkingLinkId;
 	}
 
 	public Id<Vehicle> getVehicleId() {
@@ -61,7 +67,8 @@ public class StartParkingSearchEvent extends Event {
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		attr.put(ATTRIBUTE_Current_LINK, this.currentLinkId.toString());
+		attr.put(ATTRIBUTE_Parking_LINK, this.parkingLinkId.toString());
 		return attr;
 	}
 

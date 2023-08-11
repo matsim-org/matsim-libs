@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.parking.parkingsearch.events;
 
-import org.matsim.core.events.handler.EventHandler;
+package org.matsim.contrib.zone.skims;
+
+import org.matsim.api.core.v01.network.Node;
 
 /**
- * @author jbischoff
+ * @author steffenaxer
  */
-
-public interface StartParkingSearchEventHandler extends EventHandler {
-
-	public void handleEvent(StartParkingSearchEvent event);
-
+public interface AdaptiveTravelTimeMatrix {
+	 double getTravelTime(Node fromNode, Node toNode, double departureTime);
+	 void setTravelTime(Node fromNode, Node toNode, double travelTime, double departureTime);
 }

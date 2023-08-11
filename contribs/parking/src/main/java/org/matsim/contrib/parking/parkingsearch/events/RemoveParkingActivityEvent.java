@@ -19,14 +19,49 @@
 
 package org.matsim.contrib.parking.parkingsearch.events;
 
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
 
 /**
- * @author jbischoff
+ * @author Ricardo Ewert
  */
 
-public interface StartParkingSearchEventHandler extends EventHandler {
+public class RemoveParkingActivityEvent extends Event {
+	public static final String EVENT_TYPE = "planed parking activity is skipped";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String ATTRIBUTE_Current_LINK = "link";
+	private final Id<Link> currentLinkId;
+	private final Id<Vehicle> vehicleId;
 
-	public void handleEvent(StartParkingSearchEvent event);
+	public RemoveParkingActivityEvent(final double time, Id<Vehicle> vehicleId, Id<Link> currentLinkId) {
+		super(time);
+		this.currentLinkId = currentLinkId;
+		this.vehicleId = vehicleId;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	public Id<Link> getCurrentLinkId() {
+		return currentLinkId;
+	}
+
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		attr.put(ATTRIBUTE_Current_LINK, this.currentLinkId.toString());
+		return attr;
+	}
 
 }

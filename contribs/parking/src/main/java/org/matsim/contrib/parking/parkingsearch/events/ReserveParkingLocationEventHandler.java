@@ -22,11 +22,11 @@ package org.matsim.contrib.parking.parkingsearch.events;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author jbischoff
+ * @author Ricardo Ewert
  */
 
-public interface StartParkingSearchEventHandler extends EventHandler {
+public interface ReserveParkingLocationEventHandler extends EventHandler {
 
-	public void handleEvent(StartParkingSearchEvent event);
+	void handleEvent(ReserveParkingLocationEvent event);
 
 }

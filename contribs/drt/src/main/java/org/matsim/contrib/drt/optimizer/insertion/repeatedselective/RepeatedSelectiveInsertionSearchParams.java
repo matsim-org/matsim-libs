@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.parking.parkingsearch.events;
 
-import org.matsim.core.events.handler.EventHandler;
+package org.matsim.contrib.drt.optimizer.insertion.repeatedselective;
+
+import jakarta.validation.constraints.Positive;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 
 /**
- * @author jbischoff
+ * @author steffenaxer
  */
+public class RepeatedSelectiveInsertionSearchParams extends DrtInsertionSearchParams {
+	public static final String SET_NAME = "RepeatedSelectiveInsertionSearch";
 
-public interface StartParkingSearchEventHandler extends EventHandler {
+	@Parameter
+	@Positive
+	public int retryInsertion = 5;
 
-	public void handleEvent(StartParkingSearchEvent event);
-
+	public RepeatedSelectiveInsertionSearchParams() {
+		super(SET_NAME);
+	}
 }
