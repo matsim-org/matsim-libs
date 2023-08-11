@@ -3,15 +3,11 @@ package org.matsim.contrib.drt.extension.dashboards;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Data;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
-import org.matsim.simwrapper.viz.CalculationTable;
-import org.matsim.simwrapper.viz.Line;
-import org.matsim.simwrapper.viz.MapPlot;
-import org.matsim.simwrapper.viz.Table;
+import org.matsim.simwrapper.viz.*;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,18 +25,13 @@ public class DrtDashboard implements Dashboard {
 //	private final URL serviceAreaShapeFile;
 
 	private final DrtConfigGroup drtConfigGroup;
+	private final int lastIteration;
 
-//	public DrtDashboard(String mode, String crs, URL transitStopFile, URL serviceAreaShapeFile) {
-//		this.mode = mode;
-//		this.crs = crs;
-//		this.transitStopFile = transitStopFile;
-//		this.serviceAreaShapeFile = serviceAreaShapeFile;
-//	}
-
-	public DrtDashboard(DrtConfigGroup drtConfigGroup, URL matsimConfigContext, String crs){
+	public DrtDashboard(DrtConfigGroup drtConfigGroup, URL matsimConfigContext, String crs, int lastIteration){
 		this.drtConfigGroup = drtConfigGroup;
 		this.matsimConfigContext = matsimConfigContext;
 		this.crs = crs;
+		this.lastIteration = lastIteration;
 	}
 
 	/**
@@ -94,11 +85,9 @@ public class DrtDashboard implements Dashboard {
 			})
 			.el(MapPlot.class, (viz, data) -> {
 				switch (drtConfigGroup.operationalScheme){
-
 					case stopbased -> {
 						viz.title = "Map of stops";
 						viz.setShape(postProcess(data, "stops.shp"), "id");
-
 					}
 					case door2door -> {
 						//TODO add drtNetwork !?
@@ -108,6 +97,8 @@ public class DrtDashboard implements Dashboard {
 						viz.setShape(postProcess(data, "serviceArea.shp"), "something");
 					}
 				}
+				viz.center = data.context().getCenter();
+				viz.zoom = data.context().mapZoomLevel;
 			});
 		layout.row("Vehicles")
 			.el(Line.class, (viz, data) -> {
@@ -139,6 +130,26 @@ public class DrtDashboard implements Dashboard {
 				viz.xAxisName = "Iteration";
 				viz.yAxisName = "rides [1]";
 			});
+		layout.row("Vehicle occupancy")
+			.el(Area.class, (viz, data) -> {
+				viz.title = "Vehicle Occupancy"; //actually, without title the area plot won't work
+				viz.description = "WILL BE MOVED TO OTHER DASHBOARD";
+				viz.dataset = data.output("ITERS/it." + lastIteration + "/*occupancy_time_profiles_" +  drtConfigGroup.mode + ".txt");
+				viz.x = "time";
+				viz.xAxisName = "Time";
+				viz.yAxisName = "Vehicles [1]";
+		});
+		layout.row("Spatial demand distribution")
+			.el(Hexagons.class, ((viz, data) -> {
+				viz.title = drtConfigGroup.mode + " spatial demand distribution";
+				viz.description = "Origins and destinations. --- will be put into other dashboard, as well ---";
+				viz.projection = this.crs;
+				viz.file = data.output("*output_drt_legs_" + drtConfigGroup.mode + ".csv");
+				viz.addAggregation("OD", "origins", "fromX", "fromY", "destinations", "toX", "toY");
+
+				viz.center = data.context().getCenter();
+				viz.zoom = data.context().mapZoomLevel;
+			}));
 
 	}
 }
