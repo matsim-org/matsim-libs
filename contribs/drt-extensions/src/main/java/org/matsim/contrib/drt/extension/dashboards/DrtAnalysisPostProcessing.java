@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 )
 @CommandSpec(
 	requireRunDirectory = true,
-	produces = {"supply_kpi.csv", "stops.shp", "trips_per_stop.csv", "od.csv", "serviceArea.shp"},
+	produces = {"supply_kpi.csv", "demand_kpi.csv", "stops.shp", "trips_per_stop.csv", "od.csv", "serviceArea.shp"},
 	group = "drt"
 )
 public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
@@ -108,7 +108,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			.columnTypesPartial(Map.of(
 				"rides", ColumnType.DOUBLE,
 				"wait_average", ColumnType.DOUBLE,
-				"wait_max", ColumnType.DOUBLE,
+				"wait_p95", ColumnType.DOUBLE,
 				"inVehicleTravelTime_mean", ColumnType.DOUBLE,
 				"distance_m_mean", ColumnType.DOUBLE,
 				"directDistance_m_mean", ColumnType.DOUBLE,
@@ -118,8 +118,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 				"rejectionRate", ColumnType.DOUBLE))
 			.separator(';').build());
 
-		Table tableSupplyKPI = prepareSupplyKPITable(vehicleStats, customerStats);
-
+		Table tableSupplyKPI = Table.create("supplyKPI");
 		if(stopsFile != null){
 			List<TransitStopFacility> stops = readTransitStops(stopsFile);
 			writeStopsShp(stops, output.getPath("stops.shp"));
@@ -141,45 +140,110 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			tableSupplyKPI.addColumns(DoubleColumn.create("number of areas", new Integer[]{allFeatures.size()}));
 		}
 
+		tableSupplyKPI.addColumns(prepareSupplyKPITable(vehicleStats).columnArray());
+		Table tableDemandKPI = prepareDemandKPITable(customerStats, tableSupplyKPI);
+
+		//TODO format to 3 decimal points only
+
 		tableSupplyKPI = tableSupplyKPI.transpose(true, false);
 		tableSupplyKPI.column(0).setName("info");
 		tableSupplyKPI.column(1).setName("value");
 		tableSupplyKPI.write().csv(output.getPath("supply_kpi.csv").toFile());
 
+		tableDemandKPI = tableDemandKPI.transpose(true, false);
+		tableDemandKPI.column(0).setName("info");
+		tableDemandKPI.column(1).setName("value");
+		tableDemandKPI.write().csv(output.getPath("demand_kpi.csv").toFile());
+
 		return 0;
 	}
 
-	private static Table prepareSupplyKPITable(Table vehicleStats, Table customerStats) {
+	private static Table prepareSupplyKPITable(Table vehicleStats) {
 		//only use last row (last iteration) and certain columns
 		Table tableSupplyKPI = vehicleStats.dropRange(vehicleStats.rowCount() - 1)
 			.selectColumns("vehicles", "totalDistance", "emptyRatio", "totalPassengerDistanceTraveled", "d_p/d_t", "totalServiceDuration" );
 
-		((DoubleColumn)tableSupplyKPI
-			.column("totalServiceDuration")
-			.setName("total service hours"))
-			.divide(3600);
+		//important to know: divide function creates a copy of the column object, setName() does not!, so call divide first in order to avoid verbose code
 
-		((DoubleColumn)tableSupplyKPI
-			.column("totalDistance")
-			.setName("total fleet mileage [km]"))
-			.divide(1000);
+		tableSupplyKPI.replaceColumn("totalServiceDuration",  ((DoubleColumn)tableSupplyKPI
+			.column("totalServiceDuration"))
+			.divide(3600)
+			.setName("total service hours"));
 
-		((DoubleColumn)tableSupplyKPI
-			.column("totalPassengerDistanceTraveled")
-			.setName("total passenger km"))
-			.divide(1000);
+		tableSupplyKPI.replaceColumn("totalDistance", ((DoubleColumn)tableSupplyKPI
+			.column("totalDistance"))
+			.divide(1000)
+			.setName("total fleet mileage [km]"));
+
+		tableSupplyKPI.replaceColumn("totalPassengerDistanceTraveled",  ((DoubleColumn)tableSupplyKPI
+			.column("totalPassengerDistanceTraveled"))
+			.divide(1000)
+			.setName("total passenger km"));
+
+		return tableSupplyKPI;
+	}
+
+	private static Table prepareDemandKPITable(Table customerStats, Table tableSupplyKPI) {
+		//only use last row (last iteration) and certain columns
+		Table tableDemandKPI = customerStats.dropRange(customerStats.rowCount() - 1)
+			.selectColumns("rides", "rejections", "rejectionRate", "totalTravelTime_mean", "inVehicleTravelTime_mean", "wait_average", "wait_p95",
+				"distance_m_mean", "directDistance_m_mean",  "fareAllReferences_mean");
+
+		tableDemandKPI.replaceColumn("totalTravelTime_mean",  ((DoubleColumn)tableDemandKPI
+			.column("totalTravelTime_mean"))
+			.divide(60)
+			.setName("Avg. total travel time [min]"));
+
+		tableDemandKPI.replaceColumn("inVehicleTravelTime_mean",  ((DoubleColumn)tableDemandKPI
+			.column("inVehicleTravelTime_mean"))
+			.divide(60)
+			.setName("Avg. in-vehicle time [min]"));
+
+		tableDemandKPI.replaceColumn("wait_average",  ((DoubleColumn)tableDemandKPI
+			.column("wait_average"))
+			.divide(60)
+			.setName("Avg. wait time [min]"));
+
+		tableDemandKPI.replaceColumn("wait_p95", ((DoubleColumn)tableDemandKPI
+			.column("wait_p95"))
+			.divide(60)
+			.setName("95th percentile wait time [min]"));
+
+		tableDemandKPI.replaceColumn("distance_m_mean", ((DoubleColumn)tableDemandKPI
+			.column("distance_m_mean"))
+			.divide(1000)
+			.setName("Avg. driven distance [km]"));
+
+		tableDemandKPI.replaceColumn("directDistance_m_mean", ((DoubleColumn)tableDemandKPI
+			.column("directDistance_m_mean"))
+			.divide(1000)
+			.setName("Avg. direct distance [km]"));
+
+		tableDemandKPI.column("fareAllReferences_mean")
+			.setName("Avg. fare [MoneyUnit]");
 
 		//compute rides per vehicle-hour
-		DoubleColumn ridesPerVehH = ((DoubleColumn) customerStats
-			.dropRange(customerStats.rowCount() - 1)
+		DoubleColumn ridesPerVeh = ((DoubleColumn) tableDemandKPI
+			.column("rides")
+			.copy())
+			.divide((DoubleColumn) tableSupplyKPI.column("vehicles"))
+			.setName("rides per veh");
+
+		DoubleColumn ridesPerVehH = ((DoubleColumn) tableDemandKPI
 			.column("rides")
 			.copy())
 			.divide((DoubleColumn) tableSupplyKPI.column("total service hours"))
 			.setName("rides per veh-h");
 
-		tableSupplyKPI.addColumns(ridesPerVehH);
+		DoubleColumn ridesPerVehKm = ((DoubleColumn) tableDemandKPI
+			.column("rides")
+			.copy())
+			.divide((DoubleColumn) tableSupplyKPI.column("total fleet mileage [km]"))
+			.setName("rides per veh-km");
 
-		return tableSupplyKPI;
+		tableDemandKPI.addColumns(ridesPerVeh, ridesPerVehH, ridesPerVehKm);
+
+		return tableDemandKPI;
 	}
 
 	private void writeStopsShp(Collection<TransitStopFacility> stops, Path path) throws IOException, SchemaException {

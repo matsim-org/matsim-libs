@@ -86,6 +86,15 @@ public class DrtDashboard implements Dashboard {
 				viz.dataset = postProcess(data, "supply_kpi.csv");
 				viz.style = "topsheet";
 				viz.showAllRows = true;
+				viz.width = 1.;
+			})
+			.el(Table.class, (viz, data) -> {
+				viz.title = drtConfigGroup.mode + " results";
+				viz.description = "final demand statistics and KPI";
+				viz.dataset = postProcess(data, "demand_kpi.csv");
+				viz.style = "topsheet";
+				viz.showAllRows = true;
+				viz.width = 1.;
 			})
 			.el(MapPlot.class, (viz, data) -> {
 				switch (drtConfigGroup.operationalScheme){
@@ -103,46 +112,8 @@ public class DrtDashboard implements Dashboard {
 				}
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
+				viz.width = 2.;
 			});
-//		layout.row("Vehicles")
-//			.el(Line.class, (viz, data) -> {
-//				viz.title = "Fleet size";
-//				viz.dataset = data.output("*vehicle_stats_" + drtConfigGroup.mode + ".csv");
-//				viz.description = "per Iteration";
-//				viz.x = "iteration";
-//				viz.columns = List.of("vehicles");
-//				viz.xAxisName = "Iteration";
-//				viz.yAxisName = "Nr of vehicles";
-//			});
-//		layout.row("travel time") //
-//			.el(Line.class, (viz, data) -> {
-//				viz.title = "Travel Time stats - WILL GET MOVED TO OTHER DASHBOARD";
-//				viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
-//				viz.description = "per Iteration";
-//				viz.x = "iteration";
-//				viz.columns = List.of("totalTravelTime_mean", "inVehicleTravelTime_mean", "wait_average");
-//				viz.xAxisName = "Iteration";
-//				viz.yAxisName = "Time [s]";
-//			});
-//		layout.row("rides")
-//			.el(Line.class, (viz, data) -> {
-//				viz.title = "Rides - WILL GET MOVED TO OTHER DASHBOARD";
-//				viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
-//				viz.description = "per Iteration";
-//				viz.x = "iteration";
-//				viz.columns = List.of("rides");
-//				viz.xAxisName = "Iteration";
-//				viz.yAxisName = "rides [1]";
-//			});
-		layout.row("Vehicle occupancy")
-			.el(Area.class, (viz, data) -> {
-				viz.title = "Vehicle Occupancy"; //actually, without title the area plot won't work
-				viz.description = "WILL BE MOVED TO OTHER DASHBOARD";
-				viz.dataset = data.output("ITERS/it." + lastIteration + "/*occupancy_time_profiles_" +  drtConfigGroup.mode + ".txt");
-				viz.x = "time";
-				viz.xAxisName = "Time";
-				viz.yAxisName = "Vehicles [1]";
-		});
 
 		//TODO: discuss: should we make XYTime plots out of those ??
 		layout.row("Spatial demand distribution")
@@ -229,6 +200,14 @@ public class DrtDashboard implements Dashboard {
 						.color(Plotly.ColorScheme.Cividis)
 				);
 
+			})
+			.el(Area.class, (viz, data) -> {
+				viz.title = "Vehicle Occupancy"; //actually, without title the area plot won't work
+				viz.description = "Number of passengers on board at a time";
+				viz.dataset = data.output("ITERS/it." + lastIteration + "/*occupancy_time_profiles_" +  drtConfigGroup.mode + ".txt");
+				viz.x = "time";
+				viz.xAxisName = "Time";
+				viz.yAxisName = "Vehicles [1]";
 			});
 
 		//Demand stats over iterations
