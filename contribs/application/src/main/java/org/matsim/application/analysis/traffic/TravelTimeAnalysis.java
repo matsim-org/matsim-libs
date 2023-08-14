@@ -35,12 +35,16 @@ import java.util.function.Predicate;
 import static org.matsim.application.ApplicationUtils.globFile;
 import static org.matsim.application.ApplicationUtils.loadScenario;
 
+/**
+ * Based on old api and analysis. Consider using {@link org.matsim.application.analysis.traffic.traveltime.SampleValidationRoutes}.
+ */
 @CommandLine.Command(
         name = "travel-time",
         description = "Run travel time analysis on events file. pre-analysis: analyze the empty network to validate the free flow speed of the network." +
                 " post-analysis (default): validate the travel time and distance of executed trips." +
                 " Transit mode of MATSim trips and corresponding mode in API need to be configured separately, due to different naming conventions."
 )
+@Deprecated
 public class TravelTimeAnalysis implements MATSimAppCommand {
 
     private static final Logger log = LogManager.getLogger(TravelTimeAnalysis.class);
