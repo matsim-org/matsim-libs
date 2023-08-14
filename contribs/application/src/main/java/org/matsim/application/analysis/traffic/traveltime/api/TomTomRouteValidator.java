@@ -51,7 +51,16 @@ public class TomTomRouteValidator extends AbstractRouteValidator {
 			.build();
 
 		try {
-			JsonNode data = httpClient.execute(req, resp -> mapper.readTree(resp.getEntity().getContent()));
+			JsonNode data = httpClient.execute(req, resp -> {
+				// usually quota exhausted
+				if (resp.getCode() == 403) return null;
+
+				return mapper.readTree(resp.getEntity().getContent());
+			});
+
+			if (data == null)
+				throw new RouteValidator.Forbidden();
+
 			JsonNode route = data.get("routes").get(0).get("summary");
 			return new Result(hour, route.get("historicTrafficTravelTimeInSeconds").asInt(), route.get("lengthInMeters").asInt());
 		} catch (IOException e) {

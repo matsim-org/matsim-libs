@@ -93,6 +93,11 @@ final class FetchRoutesTask implements Runnable {
 
 							// reset errors when one request was successful
 							errors = 0;
+						} catch (RouteValidator.Forbidden ex1) {
+							csv.flush();
+							log.error("{}: stopping because API indicated key is not valid or quota exhausted", api);
+							return;
+
 						} catch (Exception ex) {
 							log.warn("Could not retrieve result for route {} {}", api, route, ex);
 							errors++;
@@ -121,6 +126,9 @@ final class FetchRoutesTask implements Runnable {
 	private RouteValidator.Result fetchWithBackoff(RouteValidator val, SampleValidationRoutes.Route route, int h, int i) throws InterruptedException {
 		try {
 			return val.retrieve(route.from(), route.to(), h);
+		} catch (RouteValidator.Forbidden fb) {
+			// No retry here
+			throw fb;
 		} catch (Exception e) {
 			if (i < 3) {
 				long backoff = (long) (10000d * Math.pow(2, i));
@@ -138,6 +146,7 @@ final class FetchRoutesTask implements Runnable {
 	public void run() {
 		try {
 			fetch();
+			log.info("API {} finished.", api);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

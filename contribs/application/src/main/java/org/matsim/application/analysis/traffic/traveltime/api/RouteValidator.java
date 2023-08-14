@@ -44,4 +44,9 @@ public interface RouteValidator extends AutoCloseable {
 	record Result(int hour, int travelTime, int dist) {
 	}
 
+	/**
+	 * Exception that can be throws if an API key is not valid and processing will stop immediately
+	 */
+	final class Forbidden extends RuntimeException {}
+
 }
