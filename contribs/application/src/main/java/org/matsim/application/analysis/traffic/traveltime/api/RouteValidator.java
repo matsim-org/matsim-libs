@@ -45,7 +45,7 @@ public interface RouteValidator extends AutoCloseable {
 	}
 
 	/**
-	 * Exception that can be throws if an API key is not valid and processing will stop immediately
+	 * Exception that can be thrown, if an API key is not valid and processing should stop immediately.
 	 */
 	final class Forbidden extends RuntimeException {}
 
