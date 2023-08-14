@@ -106,7 +106,7 @@ final class FetchRoutesTask implements Runnable {
 						log.info("{}: processed {} routes", api, i - 1);
 					}
 
-					if (errors > hours.size() * 2) {
+					if (errors > hours.size()) {
 						log.error("{}: stopping because of too many errors", api);
 						break;
 					}
@@ -124,7 +124,7 @@ final class FetchRoutesTask implements Runnable {
 		} catch (Exception e) {
 			if (i < 3) {
 				long backoff = (long) (10000d * Math.pow(2, i));
-				log.warn("Failed to fetch result for {} {}: {}, (retrying after {}s)", api, route, e.getMessage(), backoff / 1000);
+				log.warn("Failed to fetch result for {} {}: {} (retrying after {}s)", api, route, e.getMessage(), backoff / 1000);
 
 				Thread.sleep(backoff);
 				return fetchWithBackoff(val, route, h, ++i);
