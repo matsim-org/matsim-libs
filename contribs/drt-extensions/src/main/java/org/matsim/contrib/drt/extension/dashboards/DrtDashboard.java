@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.dashboards;
 
 
+import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.simwrapper.Dashboard;
@@ -8,6 +9,10 @@ import org.matsim.simwrapper.Data;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
+import org.w3c.dom.css.RGBColor;
+import tech.tablesaw.plotly.components.Axis;
+import tech.tablesaw.plotly.traces.BarTrace;
+import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -76,9 +81,8 @@ public class DrtDashboard implements Dashboard {
 
 		layout.row("Results")
 			.el(Table.class, (viz, data) -> {
-				viz.title = drtConfigGroup.mode + " supply statistics";
-				viz.description = "from last iteration";
-				//TODO
+				viz.title = drtConfigGroup.mode + " results";
+				viz.description = "final configuration and KPI";
 				viz.dataset = postProcess(data, "supply_kpi.csv");
 				viz.style = "topsheet";
 				viz.showAllRows = true;
@@ -100,36 +104,36 @@ public class DrtDashboard implements Dashboard {
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
 			});
-		layout.row("Vehicles")
-			.el(Line.class, (viz, data) -> {
-				viz.title = "Fleet size";
-				viz.dataset = data.output("*vehicle_stats_" + drtConfigGroup.mode + ".csv");
-				viz.description = "per Iteration";
-				viz.x = "iteration";
-				viz.columns = List.of("vehicles");
-				viz.xAxisName = "Iteration";
-				viz.yAxisName = "Nr of vehicles";
-			});
-		layout.row("travel time") //TODO: will be put in another dashboard later
-			.el(Line.class, (viz, data) -> {
-				viz.title = "Travel Time stats - WILL GET MOVED TO OTHER DASHBOARD";
-				viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
-				viz.description = "per Iteration";
-				viz.x = "iteration";
-				viz.columns = List.of("totalTravelTime_mean", "inVehicleTravelTime_mean", "wait_average");
-				viz.xAxisName = "Iteration";
-				viz.yAxisName = "Time [s]";
-			});
-		layout.row("rides") //TODO: will be put in another dashboard later
-			.el(Line.class, (viz, data) -> {
-				viz.title = "Rides - WILL GET MOVED TO OTHER DASHBOARD";
-				viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
-				viz.description = "per Iteration";
-				viz.x = "iteration";
-				viz.columns = List.of("rides");
-				viz.xAxisName = "Iteration";
-				viz.yAxisName = "rides [1]";
-			});
+//		layout.row("Vehicles")
+//			.el(Line.class, (viz, data) -> {
+//				viz.title = "Fleet size";
+//				viz.dataset = data.output("*vehicle_stats_" + drtConfigGroup.mode + ".csv");
+//				viz.description = "per Iteration";
+//				viz.x = "iteration";
+//				viz.columns = List.of("vehicles");
+//				viz.xAxisName = "Iteration";
+//				viz.yAxisName = "Nr of vehicles";
+//			});
+//		layout.row("travel time") //
+//			.el(Line.class, (viz, data) -> {
+//				viz.title = "Travel Time stats - WILL GET MOVED TO OTHER DASHBOARD";
+//				viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
+//				viz.description = "per Iteration";
+//				viz.x = "iteration";
+//				viz.columns = List.of("totalTravelTime_mean", "inVehicleTravelTime_mean", "wait_average");
+//				viz.xAxisName = "Iteration";
+//				viz.yAxisName = "Time [s]";
+//			});
+//		layout.row("rides")
+//			.el(Line.class, (viz, data) -> {
+//				viz.title = "Rides - WILL GET MOVED TO OTHER DASHBOARD";
+//				viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
+//				viz.description = "per Iteration";
+//				viz.x = "iteration";
+//				viz.columns = List.of("rides");
+//				viz.xAxisName = "Iteration";
+//				viz.yAxisName = "rides [1]";
+//			});
 		layout.row("Vehicle occupancy")
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Vehicle Occupancy"; //actually, without title the area plot won't work
@@ -139,17 +143,294 @@ public class DrtDashboard implements Dashboard {
 				viz.xAxisName = "Time";
 				viz.yAxisName = "Vehicles [1]";
 		});
+
+		//TODO: discuss: should we make XYTime plots out of those ??
 		layout.row("Spatial demand distribution")
-			.el(Hexagons.class, ((viz, data) -> {
+			.el(Hexagons.class, (viz, data) -> {
 				viz.title = drtConfigGroup.mode + " spatial demand distribution";
-				viz.description = "Origins and destinations. --- will be put into other dashboard, as well ---";
+				viz.description = "Origins and destinations.";
 				viz.projection = this.crs;
 				viz.file = data.output("*output_drt_legs_" + drtConfigGroup.mode + ".csv");
 				viz.addAggregation("OD", "origins", "fromX", "fromY", "destinations", "toX", "toY");
 
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
-			}));
+			})
+			.el(Hexagons.class, (viz, data) -> {
+				viz.title = drtConfigGroup.mode + " spatial rejection distribution";
+				viz.description = "Requested (and rejected) origins and destinations.";
+				viz.projection = this.crs;
+				viz.file = data.output("ITERS/it." + lastIteration + "/*rejections_" +  drtConfigGroup.mode + ".csv");
+				viz.addAggregation("rejections", "origins", "fromX", "fromY", "destinations", "toX", "toY");
+
+				viz.center = data.context().getCenter();
+				viz.zoom = data.context().mapZoomLevel;
+			})
+			//TODO group rejections per time bin. better put it into the plot with wait stats over daty time.
+//			.el(Line.class, (viz, data) -> {
+//				viz.dataset = data.output("ITERS/it." + lastIteration + "/*rejections_" +  drtConfigGroup.mode + ".csv");
+//				viz.x = "time";
+//			})
+		;
+
+		//Final Demand stats
+		layout.row("Final Demand And Wait Time Statistics")
+			.el(Plotly.class, (viz, data) -> {
+				viz.title = "Final Demand and Wait Stats over day time";
+				viz.description = "Nr Of Rides (customers) is displayed in bars, wait statistics in lines";
+
+				Plotly.DataSet dataset = viz.addDataset(data.output("*_waitStats_" + drtConfigGroup.mode + ".csv"));
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Time Bin").build())
+					.yAxis(Axis.builder().title("Wait Time [s]").build())
+					.yAxis2(Axis.builder().title("Nr Of Rides")
+						.side(Axis.Side.right)
+						.overlaying(ScatterTrace.YAxis.Y)
+						.build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+					.build();
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.mode(ScatterTrace.Mode.LINE)
+					.name("Average")
+					.build(),
+					dataset.mapping()
+						.x("timebin")
+						.y("average_wait")
+				);
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.name("P5")
+						.build(),
+					dataset.mapping()
+						.x("timebin")
+						.y("p_5")
+				);
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.name("P95")
+						.build(),
+					dataset.mapping()
+						.x("timebin")
+						.y("p_95")
+				);
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.opacity(0.3)
+						.yAxis(ScatterTrace.YAxis.Y2.toString())
+						.name("Rides")
+						.build(),
+					dataset.mapping()
+						.x("timebin")
+						.y("legs")
+						.color(Plotly.ColorScheme.Cividis)
+				);
+
+			});
+
+		//Demand stats over iterations
+		layout.row("'Evolution' of Demand And Wait Time Statistics Over Iterations")
+			.el(Plotly.class, (viz, data) -> {
+				viz.title = "'Evolution' of Demand And Wait Time Statistics Over Iterations\"";
+				viz.description = "Nr Of Rides (customers) is displayed in bars, wait statistics in lines";
+
+				Plotly.DataSet dataset = viz.addDataset(data.output("*_customer_stats_" + drtConfigGroup.mode + ".csv"));
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Iteration").build())
+					.yAxis(Axis.builder().title("Wait Time [s]").build())
+					.yAxis2(Axis.builder().title("Nr Of Rides")
+						.side(Axis.Side.right)
+						.overlaying(ScatterTrace.YAxis.Y)
+						.build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+					.build();
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.name("Average")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("wait_average")
+				);
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.name("Median")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("wait_median")
+				);
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.name("P95")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("wait_p95")
+				);
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.opacity(0.5)
+						.yAxis(ScatterTrace.YAxis.Y2.toString())
+						.name("Rejections")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("rejections")
+//						.color(Plotly.ColorScheme.RdBu)
+				);
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.opacity(0.5)
+						.yAxis(ScatterTrace.YAxis.Y2.toString())
+						.name("Rides")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("rides")
+//						.color(Plotly.ColorScheme.RdBu)
+				);
+
+			})
+			.el(Line.class, (viz, data) -> {
+				viz.title = "Travel Distance";
+				viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
+				viz.description = "traveled distance versus direct distance";
+				viz.x = "iteration";
+				viz.columns = List.of("directDistance_m_mean", "distance_m_mean");
+				viz.xAxisName = "Iteration";
+				viz.yAxisName = "distance [m]";
+			});
+
+		layout.row("'Evolution' of Demand And Travel Time Statistics Over Iterations")
+			.el(Plotly.class, (viz, data) -> {
+				viz.title = "'Evolution' of Demand And Travel Time Components\"";
+				viz.description = "Nr Of Rides (customers) is displayed in line, travel time components in bars";
+
+				Plotly.DataSet dataset = viz.addDataset(data.output("*_customer_stats_" + drtConfigGroup.mode + ".csv"));
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Iteration").build())
+					.yAxis(Axis.builder().title("Average Of Travel Time Component [s]")
+//					.overlaying(ScatterTrace.YAxis.Y2)
+					.build())
+					.yAxis2(Axis.builder().title("Nr Of Rides")
+						.side(Axis.Side.right)
+						.overlaying(ScatterTrace.YAxis.Y)
+						.build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+					.build();
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.opacity(0.5)
+						.name("In Vehicle")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("inVehicleTravelTime_mean")
+//						.color(Plotly.ColorScheme.RdBu)
+				);
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.opacity(0.5)
+						.name("Wait")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("wait_average")
+//						.color(Plotly.ColorScheme.RdBu)
+				);
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.yAxis(ScatterTrace.YAxis.Y2.toString())
+						.name("Rides")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("rides")
+				);
+
+		});
+
+
+		//Evolution of fleet stats
+		layout.row("'Evolution' of Fleet Stats Over Iterations")
+			.el(Plotly.class, (viz, data) -> {
+				viz.title = "'Evolution' of Fleet Stats";
+				viz.description = "Nr Of " + drtConfigGroup.mode + " vehicles (customers) is displayed as bars, distance stats as lines";
+
+				Plotly.DataSet dataset = viz.addDataset(data.output("*_vehicle_stats_" + drtConfigGroup.mode + ".csv"));
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Iteration").build())
+					.yAxis(Axis.builder().title("Total Distance [m]")
+//					.overlaying(ScatterTrace.YAxis.Y2)
+						.build())
+					.yAxis2(Axis.builder().title("Nr Of Vehicles")
+						.side(Axis.Side.right)
+						.overlaying(ScatterTrace.YAxis.Y)
+						.build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+					.build();
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.name("Passeng. Dist.")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("totalPassengerDistanceTraveled")
+				);
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.name("Vehicle mileage")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("totalDistance")
+				);
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.name("Empty mileage")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("totalEmptyDistance")
+				);
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.opacity(0.2)
+						.yAxis(ScatterTrace.YAxis.Y2.toString())
+						.name("Vehicles")
+						.build(),
+					dataset.mapping()
+						.x("iteration")
+						.y("vehicles")
+//						.color(Plotly.ColorScheme.RdBu)
+				);
+			})
+			.el(Line.class, (viz, data) -> {
+				viz.title = "Relative Statistics";
+				viz.dataset = data.output("*vehicle_stats_" + drtConfigGroup.mode + ".csv");
+				viz.description = "per Iteration";
+				viz.x = "iteration";
+				viz.columns = List.of("d_p/d_t", "l_det", "emptyRatio");
+				viz.xAxisName = "Iteration";
+				viz.yAxisName = "Value";
+			});
+
+
+
 
 	}
 }
