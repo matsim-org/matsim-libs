@@ -116,7 +116,7 @@ public class DrtDashboard implements Dashboard {
 				viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
 				viz.description = "per Iteration";
 				viz.x = "iteration";
-				viz.columns = List.of("totalTravelTime_mean", "inVehicleTravelTime_mean", "wait_mean");
+				viz.columns = List.of("totalTravelTime_mean", "inVehicleTravelTime_mean", "wait_average");
 				viz.xAxisName = "Iteration";
 				viz.yAxisName = "Time [s]";
 			});
