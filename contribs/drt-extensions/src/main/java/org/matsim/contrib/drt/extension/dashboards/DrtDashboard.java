@@ -9,7 +9,6 @@ import org.matsim.simwrapper.Data;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
-import org.w3c.dom.css.RGBColor;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
@@ -159,7 +158,7 @@ public class DrtDashboard implements Dashboard {
 						.side(Axis.Side.right)
 						.overlaying(ScatterTrace.YAxis.Y)
 						.build())
-					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -225,7 +224,7 @@ public class DrtDashboard implements Dashboard {
 						.side(Axis.Side.right)
 						.overlaying(ScatterTrace.YAxis.Y)
 						.build())
-					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
