@@ -44,6 +44,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -127,8 +130,9 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			//needs to be a DoubleColumn because transposing later forces us to have the same column type for all (new) value columns
 			tableSupplyKPI.addColumns(DoubleColumn.create("number of stops", new Integer[]{stops.size()}));
 
-			writeTripsPerStop(stops, legs, output.getPath("trips_per_stop.csv"));
-			writeOD(byLink, legs, output.getPath("od.csv"));
+			//TODO use and visualize this !?
+//			writeTripsPerStop(stops, legs, output.getPath("trips_per_stop.csv"));
+//			writeOD(byLink, legs, output.getPath("od.csv"));
 		}
 
 		if(areaFile != null){
@@ -141,7 +145,8 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		}
 
 		tableSupplyKPI.addColumns(prepareSupplyKPITable(vehicleStats).columnArray());
-		Table tableDemandKPI = prepareDemandKPITable(customerStats, tableSupplyKPI);
+
+		printDemandKPICSV(customerStats, tableSupplyKPI, output.getPath("demand_kpi.csv"));
 
 		//TODO format to 3 decimal points only
 
@@ -149,11 +154,6 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		tableSupplyKPI.column(0).setName("info");
 		tableSupplyKPI.column(1).setName("value");
 		tableSupplyKPI.write().csv(output.getPath("supply_kpi.csv").toFile());
-
-		tableDemandKPI = tableDemandKPI.transpose(true, false);
-		tableDemandKPI.column(0).setName("info");
-		tableDemandKPI.column(1).setName("value");
-		tableDemandKPI.write().csv(output.getPath("demand_kpi.csv").toFile());
 
 		return 0;
 	}
@@ -168,82 +168,58 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		tableSupplyKPI.replaceColumn("totalServiceDuration",  ((DoubleColumn)tableSupplyKPI
 			.column("totalServiceDuration"))
 			.divide(3600)
+			.round()
 			.setName("total service hours"));
 
 		tableSupplyKPI.replaceColumn("totalDistance", ((DoubleColumn)tableSupplyKPI
 			.column("totalDistance"))
 			.divide(1000)
+			.round()
 			.setName("total fleet mileage [km]"));
 
 		tableSupplyKPI.replaceColumn("totalPassengerDistanceTraveled",  ((DoubleColumn)tableSupplyKPI
 			.column("totalPassengerDistanceTraveled"))
 			.divide(1000)
-			.setName("total passenger km"));
+			.round()
+			.setName("total pax distance [km]"));
 
 		return tableSupplyKPI;
 	}
 
-	private static Table prepareDemandKPITable(Table customerStats, Table tableSupplyKPI) {
-		//only use last row (last iteration) and certain columns
-		Table tableDemandKPI = customerStats.dropRange(customerStats.rowCount() - 1)
-			.selectColumns("rides", "rejections", "rejectionRate", "totalTravelTime_mean", "inVehicleTravelTime_mean", "wait_average", "wait_p95",
-				"distance_m_mean", "directDistance_m_mean",  "fareAllReferences_mean");
+	private static void printDemandKPICSV(Table customerStats, Table tableSupplyKPI, Path output) throws IOException {
+		double rides = getLastDoubleValue(customerStats, "rides");
+		double rejections = getLastDoubleValue(customerStats, "rejections");
+		double requests = rides + rejections;
 
-		tableDemandKPI.replaceColumn("totalTravelTime_mean",  ((DoubleColumn)tableDemandKPI
-			.column("totalTravelTime_mean"))
-			.divide(60)
-			.setName("Avg. total travel time [min]"));
+		DecimalFormat df = new DecimalFormat("#,###.##", new DecimalFormatSymbols(Locale.US));
 
-		tableDemandKPI.replaceColumn("inVehicleTravelTime_mean",  ((DoubleColumn)tableDemandKPI
-			.column("inVehicleTravelTime_mean"))
-			.divide(60)
-			.setName("Avg. in-vehicle time [min]"));
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(output), CSVFormat.DEFAULT)) {
+			csv.printRecord("Info", "value");
 
-		tableDemandKPI.replaceColumn("wait_average",  ((DoubleColumn)tableDemandKPI
-			.column("wait_average"))
-			.divide(60)
-			.setName("Avg. wait time [min]"));
+			csv.printRecord("Requests", requests);
+			csv.printRecord("Rides", rides);
+			csv.printRecord("Rides per veh", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("vehicles")).get(0)));
+			csv.printRecord("Rides per veh-h", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total service hours")).get(0)));
+			csv.printRecord("Rides per veh-km", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total fleet mileage [km]")).get(0)));
+			csv.printRecord("Rejections", rejections);
+			csv.printRecord("Rejection rate", getLastDoubleValue(customerStats, "rejectionRate"));
+			csv.printRecord("Avg. total travel time", LocalTime.ofSecondOfDay( getLastDoubleValue(customerStats, "totalTravelTime_mean").longValue()));
+			csv.printRecord("Avg. in-vehicle time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "inVehicleTravelTime_mean").longValue()));
+			csv.printRecord("Avg. wait time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "wait_average").longValue()));
+			csv.printRecord("95th percentile wait time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "wait_p95").longValue()));
+			csv.printRecord("Avg. ride distance [km]", df.format((getLastDoubleValue(customerStats,"distance_m_mean"))/1000.));
+			csv.printRecord("Avg. direct distance [km]", df.format( (getLastDoubleValue(customerStats, "directDistance_m_mean")) / 1000.));
+			csv.printRecord("Avg. fare [MoneyUnit]", df.format(getLastDoubleValue(customerStats, "fareAllReferences_mean")));
+		}
+	}
 
-		tableDemandKPI.replaceColumn("wait_p95", ((DoubleColumn)tableDemandKPI
-			.column("wait_p95"))
-			.divide(60)
-			.setName("95th percentile wait time [min]"));
-
-		tableDemandKPI.replaceColumn("distance_m_mean", ((DoubleColumn)tableDemandKPI
-			.column("distance_m_mean"))
-			.divide(1000)
-			.setName("Avg. driven distance [km]"));
-
-		tableDemandKPI.replaceColumn("directDistance_m_mean", ((DoubleColumn)tableDemandKPI
-			.column("directDistance_m_mean"))
-			.divide(1000)
-			.setName("Avg. direct distance [km]"));
-
-		tableDemandKPI.column("fareAllReferences_mean")
-			.setName("Avg. fare [MoneyUnit]");
-
-		//compute rides per vehicle-hour
-		DoubleColumn ridesPerVeh = ((DoubleColumn) tableDemandKPI
-			.column("rides")
-			.copy())
-			.divide((DoubleColumn) tableSupplyKPI.column("vehicles"))
-			.setName("rides per veh");
-
-		DoubleColumn ridesPerVehH = ((DoubleColumn) tableDemandKPI
-			.column("rides")
-			.copy())
-			.divide((DoubleColumn) tableSupplyKPI.column("total service hours"))
-			.setName("rides per veh-h");
-
-		DoubleColumn ridesPerVehKm = ((DoubleColumn) tableDemandKPI
-			.column("rides")
-			.copy())
-			.divide((DoubleColumn) tableSupplyKPI.column("total fleet mileage [km]"))
-			.setName("rides per veh-km");
-
-		tableDemandKPI.addColumns(ridesPerVeh, ridesPerVehH, ridesPerVehKm);
-
-		return tableDemandKPI;
+	private static Double getLastDoubleValue(Table table, String columnName){
+		//the value ccan be null in case we are reading the value "NaN" within a DoubleColumn (this happens e.g. for 'wait_average' in customer stats when there is 0 rides)
+		if (table.column(columnName).get(table.rowCount() -1) == null){
+			return Double.NaN;
+		} else {
+			return ((DoubleColumn) table.column(columnName)).get(table.rowCount() -1);
+		}
 	}
 
 	private void writeStopsShp(Collection<TransitStopFacility> stops, Path path) throws IOException, SchemaException {
@@ -341,5 +317,13 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 
 	private record OD(String origin, String destination) {
 	}
+
+//	private LocalTime convertSeconds(double seconds){
+//
+//		double hours = TimeUnit.SECONDS. seconds % 3600;
+//		double minutes =  (seconds - hours * 3600) % 60;
+//		double remainingSeconds = (seconds - hours * 3600 - minutes * 60);
+//		return LocalTime.of(hours, minutes, seconds);
+//	}
 
 }
