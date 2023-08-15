@@ -242,7 +242,7 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 		GeotoolsTransformation ct = new GeotoolsTransformation(crs, "EPSG:4326");
 
 		ShpOptions.Index index = shp.isDefined() ? shp.createIndex(crs, "_") : null;
-		Predicate<Link> exclude = excludeRoads != null ? new Predicate<>() {
+		Predicate<Link> exclude = excludeRoads != null && !excludeRoads.isBlank() ? new Predicate<>() {
 			final Pattern p = Pattern.compile(excludeRoads, Pattern.CASE_INSENSITIVE);
 			@Override
 			public boolean test(Link link) {
