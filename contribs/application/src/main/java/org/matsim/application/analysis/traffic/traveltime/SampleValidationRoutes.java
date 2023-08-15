@@ -40,6 +40,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 @CommandLine.Command(
 	name = "sample-validation-routes",
@@ -76,6 +78,9 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--dist-range", description = "Range for the sampled distances.", split = ",", defaultValue = "3000,10000")
 	private List<Double> distRange;
+
+	@CommandLine.Option(names = "--exclude-roads", description = "Regexp pattern of road types to exclude as start- and endpoints.", defaultValue = ".+_link")
+	private String excludeRoads;
 
 	@CommandLine.Option(names = "--mode", description = "Mode to validate", defaultValue = TransportMode.car)
 	private String mode;
@@ -224,7 +229,7 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 	private List<Route> sampleRoutes(Network network, LeastCostPathCalculator router, SplittableRandom rnd) {
 
 		List<Route> result = new ArrayList<>();
-		List<? extends Link> links = new ArrayList<>(network.getLinks().values());
+		List<Link> links = new ArrayList<>(network.getLinks().values());
 		String crs = ProjectionUtils.getCRS(network);
 
 		if (this.crs.getInputCRS() != null)
@@ -237,9 +242,20 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 		GeotoolsTransformation ct = new GeotoolsTransformation(crs, "EPSG:4326");
 
 		ShpOptions.Index index = shp.isDefined() ? shp.createIndex(crs, "_") : null;
-
+		Predicate<Link> exclude = excludeRoads != null && !excludeRoads.isBlank() ? new Predicate<>() {
+			final Pattern p = Pattern.compile(excludeRoads, Pattern.CASE_INSENSITIVE);
+			@Override
+			public boolean test(Link link) {
+				return p.matcher(NetworkUtils.getHighwayType(link)).find();
+			}
+		} : link -> false;
 
 		for (int i = 0; i < numRoutes; i++) {
+			if (links.isEmpty()) {
+				log.warn("Not enough route samples could be generated");
+				break;
+			}
+
 			Link link = links.remove(rnd.nextInt(0, links.size()));
 
 			if (index != null && !index.contains(link.getCoord())) {
@@ -247,7 +263,7 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 				continue;
 			}
 
-			if (!link.getAllowedModes().contains(mode)) {
+			if (!link.getAllowedModes().contains(mode) || exclude.test(link)) {
 				i--;
 				continue;
 			}
@@ -255,7 +271,10 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 			Coord dest = rndCoord(rnd, rnd.nextDouble(distRange.get(0), distRange.get(1)), link);
 			Link to = NetworkUtils.getNearestLink(network, dest);
 
-			if (!to.getAllowedModes().contains(mode)) {
+			if (!to.getAllowedModes().contains(mode) || exclude.test(to)) {
+				// add the origin link back
+				links.add(link);
+
 				i--;
 				continue;
 			}
