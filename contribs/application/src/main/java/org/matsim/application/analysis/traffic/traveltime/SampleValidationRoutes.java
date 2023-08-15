@@ -79,7 +79,7 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 	@CommandLine.Option(names = "--dist-range", description = "Range for the sampled distances.", split = ",", defaultValue = "3000,10000")
 	private List<Double> distRange;
 
-	@CommandLine.Option(names = "--exclude-roads", description = "Regexp pattern of road types to exclude for selection.", defaultValue = ".+_link")
+	@CommandLine.Option(names = "--exclude-roads", description = "Regexp pattern of road types to exclude as start- and endpoints.", defaultValue = ".+_link")
 	private String excludeRoads;
 
 	@CommandLine.Option(names = "--mode", description = "Mode to validate", defaultValue = TransportMode.car)
