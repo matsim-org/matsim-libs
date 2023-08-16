@@ -6,8 +6,11 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class MultiModeCounts implements Attributable {
@@ -15,6 +18,8 @@ public class MultiModeCounts implements Attributable {
 	public static final String ELEMENT_NAME = "multiModeCounts";
 
 	public final Class<? extends Identifiable> identifiable;
+
+	private final Set<String> measurableTags = new HashSet<>();
 
 	private String name;
 	private String description;
@@ -24,8 +29,7 @@ public class MultiModeCounts implements Attributable {
 
 	private final TreeMap<Id<? extends Identifiable>, MultiModeCount> counts = new TreeMap<>();
 
-	@Inject
-	private Attributes attributes;
+	private final Attributes attributes = new AttributesImpl();
 
 	public MultiModeCounts(String name, int year){
 		this(name, year, Link.class);
@@ -47,7 +51,7 @@ public class MultiModeCounts implements Attributable {
 			throw new RuntimeException("There is already a counts object for location " + id.toString());
 		}
 
-		MultiModeCount count = year == null ? new MultiModeCount(id, stationName, this.year): new MultiModeCount(id, stationName, year);
+		MultiModeCount count = year == null ? new MultiModeCount(id, stationName, this.year, measurableTags): new MultiModeCount(id, stationName, year, measurableTags);
 		this.counts.put(id, count);
 
 		return count;
@@ -87,6 +91,10 @@ public class MultiModeCounts implements Attributable {
 
 	public TreeMap<Id<? extends Identifiable>, MultiModeCount> getCounts() {
 		return counts;
+	}
+
+	public Set<String> getMeasurableTags() {
+		return measurableTags;
 	}
 
 	@Override

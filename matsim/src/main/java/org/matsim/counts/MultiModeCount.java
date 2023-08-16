@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +16,6 @@ public class MultiModeCount implements Attributable {
 
 	public static final String ELEMENT_NAME = "multiModeCount";
 	private final Id<? extends Identifiable> id;
-	private final Map<String, Measurable> volumes = new HashMap<>();
 	private final Set<String> modes = new HashSet<>();
 
 	private final Map<String, Map<String, Measurable>> measurables = new HashMap<>();
@@ -25,14 +25,16 @@ public class MultiModeCount implements Attributable {
 	private String stationName;
 	private String description;
 	private int year;
+	private final Set<String> measurableTags;
 
 	@Inject
-	private Attributes attributes;
+	private Attributes attributes = new AttributesImpl();
 
-	MultiModeCount(final Id<? extends Identifiable> id, String stationName, int year){
+	MultiModeCount(final Id<? extends Identifiable> id, String stationName, int year, Set<String> measurableTags){
 		this.id = id;
 		this.stationName = stationName;
 		this.year = year;
+		this.measurableTags = measurableTags;
 	}
 
 	public Id<? extends Identifiable> getId() {
@@ -46,6 +48,7 @@ public class MultiModeCount implements Attributable {
 	}
 
 	public Measurable addMeasurable(String typeOfMeasurableData, String mode, boolean hasOnlyDailyValues){
+		this.measurableTags.add(typeOfMeasurableData);
 		Measurable measurable = new Measurable(mode, hasOnlyDailyValues, typeOfMeasurableData);
 
 		if(!this.measurables.containsKey(typeOfMeasurableData))
@@ -97,11 +100,11 @@ public class MultiModeCount implements Attributable {
 	}
 
 	public Measurable getVolumesForMode(String mode) {
-		return (Measurable) this.measurables.get(Measurable.VOLUMES).get(mode);
+		return this.measurables.get(Measurable.VOLUMES).get(mode);
 	}
 
-	Map<String, Measurable> getVolumes() {
-		return (Map<String, Measurable>) this.measurables.get(Measurable.VOLUMES);
+	Map<String, Map<String, Measurable>> getMeasurables() {
+		return this.measurables;
 	}
 
 	public Set<String> getDailyVolumeModes() {
@@ -116,12 +119,10 @@ public class MultiModeCount implements Attributable {
 	public String toString() {
 		return "MultiModeCount{" +
 				"id=" + id +
-				", volumes=" + volumes +
 				", modes=" + modes +
 				", stationName='" + stationName + '\'' +
-				", description='" + description + '\'' +
 				", year=" + year +
-				", attributes=" + attributes +
+				", measurableTags=" + measurableTags +
 				'}';
 	}
 }

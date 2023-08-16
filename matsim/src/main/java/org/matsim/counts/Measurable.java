@@ -12,8 +12,7 @@ import org.apache.logging.log4j.Logger;
  * */
 public class Measurable {
 
-	@Deprecated
-	public static final String ELEMENT_NAME = "volumes";
+	public static final String ELEMENT_NAME = "measurable";
 
 	public static String VOLUMES = "volumes";
 	public static String VELOCITIES = "velocities";
@@ -29,10 +28,6 @@ public class Measurable {
 
 	private final Logger logger = LogManager.getLogger(Measurable.class);
 
-	Measurable(String mode, boolean dailyValuesOnly){
-		this(mode, dailyValuesOnly, "volumes");
-	}
-
 	Measurable(String mode, boolean dailyValuesOnly, String type){
 		this.mode = mode;
 		this.dailyValuesOnly = dailyValuesOnly;
@@ -47,7 +42,7 @@ public class Measurable {
 	/**
 	 * Adds a value observed at a certain hour.
 	 * */
-	public void addAtHour(double value, int hour) {
+	public void addAtHour(int hour, double value) {
 		if(dailyValuesOnly)
 			throw new RuntimeException("Volume is supposed to contain daily values only!");
 
@@ -102,8 +97,8 @@ public class Measurable {
 	/**
 	 * Returns the name of the implementation. Information is needed for data writing.
 	 * */
-	public String getElementName() {
-		return "volumes";
+	public String getMeasurableType() {
+		return type;
 	}
 }
 
