@@ -109,11 +109,11 @@ public class RunPseudoRandomExperiment {
 		config.linkStats().setWriteLinkStatsInterval(0);
 
 		// ... for car ...
-		ModeRoutingParams carRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("car");
+		var carRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("car");
 		carRoutingParams.setTeleportedModeFreespeedFactor(1.0);
 
 		// ... and for public transport
-		ModeRoutingParams ptRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("pt");
+		var ptRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("pt");
 		ptRoutingParams.setTeleportedModeFreespeedFactor(1.0);
 
 		// Set configuration options
