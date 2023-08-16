@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.dashboards;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.MATSimApplication;
@@ -19,20 +20,21 @@ public class DashboardTests {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private void run() {
+	private void run(DrtConfigGroup.OperationalScheme operationalScheme) {
 
 		Config config = DrtTestScenario.loadConfig(utils);
 		config.controler().setLastIteration(4);
 		config.controler().setWritePlansInterval(4);
+		config.controler().setWriteEventsInterval(4);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		group.defaultParams().sampleSize = Double.valueOf("0.001");
-//		group.defaultParams().mapCenter = "11.891000, 48.911000";
+		group.defaultParams().mapCenter = "11.891000, 48.911000";
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		for (DrtConfigGroup drtCfg : multiModeDrtConfigGroup.getModalElements()) {
 			if (drtCfg.getMode().equals("drt")){
-				drtCfg.operationalScheme = DrtConfigGroup.OperationalScheme.serviceAreaBased;
+				drtCfg.operationalScheme = operationalScheme;
 				drtCfg.drtServiceAreaShapeFile = "drt-zones/drt-zonal-system.shp";
 			}
 		}
@@ -42,11 +44,27 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void drtDefaults() {
+	public void drtServiceBased() {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "drt");
 
-		run();
+		run(DrtConfigGroup.OperationalScheme.serviceAreaBased);
+
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**serviceArea.shp");
+
+		// TODO: add assertions
+	}
+
+	@Test
+	public void drtStopBased() {
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "drt");
+
+		run(DrtConfigGroup.OperationalScheme.stopbased);
+
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**stops.shp");
 
 		// TODO: add assertions
 	}

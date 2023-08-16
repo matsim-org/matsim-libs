@@ -59,6 +59,8 @@ public final class MapPlot extends Viz {
 
 		public DisplaySettings fillHeight = new DisplaySettings();
 
+		public DisplaySettings radius = new DisplaySettings();
+
 	}
 
 

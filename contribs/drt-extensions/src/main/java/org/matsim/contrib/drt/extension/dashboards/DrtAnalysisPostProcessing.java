@@ -37,7 +37,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import picocli.CommandLine;
-import tech.tablesaw.api.*;
+import tech.tablesaw.api.ColumnType;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.IOException;
@@ -83,6 +86,70 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		new DrtAnalysisPostProcessing().execute(args);
 	}
 
+	private static Table prepareSupplyKPITable(Table vehicleStats) {
+		//only use last row (last iteration) and certain columns
+		Table tableSupplyKPI = vehicleStats.dropRange(vehicleStats.rowCount() - 1)
+			.selectColumns("vehicles", "totalDistance", "emptyRatio", "totalPassengerDistanceTraveled", "d_p/d_t", "totalServiceDuration");
+
+		//important to know: divide function creates a copy of the column object, setName() does not!, so call divide first in order to avoid verbose code
+
+		tableSupplyKPI.replaceColumn("totalServiceDuration", ((DoubleColumn) tableSupplyKPI
+			.column("totalServiceDuration"))
+			.divide(3600)
+			.round()
+			.setName("Total service hours"));
+
+		tableSupplyKPI.replaceColumn("totalDistance", ((DoubleColumn) tableSupplyKPI
+			.column("totalDistance"))
+			.divide(1000)
+			.round()
+			.setName("Total fleet mileage [km]"));
+
+		tableSupplyKPI.replaceColumn("totalPassengerDistanceTraveled", ((DoubleColumn) tableSupplyKPI
+			.column("totalPassengerDistanceTraveled"))
+			.divide(1000)
+			.round()
+			.setName("Total pax distance [km]"));
+
+		return tableSupplyKPI;
+	}
+
+	private static void printDemandKPICSV(Table customerStats, Table tableSupplyKPI, Path output) throws IOException {
+		double rides = getLastDoubleValue(customerStats, "rides");
+		double rejections = getLastDoubleValue(customerStats, "rejections");
+		double requests = rides + rejections;
+
+		DecimalFormat df = new DecimalFormat("#,###.##", new DecimalFormatSymbols(Locale.US));
+
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(output), CSVFormat.DEFAULT)) {
+			csv.printRecord("Info", "value");
+
+			csv.printRecord("Requests", requests);
+			csv.printRecord("Rides", rides);
+			csv.printRecord("Rides per veh", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("vehicles")).get(0)));
+			csv.printRecord("Rides per veh-h", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total service hours")).get(0)));
+			csv.printRecord("Rides per veh-km", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total fleet mileage [km]")).get(0)));
+			csv.printRecord("Rejections", rejections);
+			csv.printRecord("Rejection rate", getLastDoubleValue(customerStats, "rejectionRate"));
+			csv.printRecord("Avg. total travel time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "totalTravelTime_mean").longValue()));
+			csv.printRecord("Avg. in-vehicle time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "inVehicleTravelTime_mean").longValue()));
+			csv.printRecord("Avg. wait time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "wait_average").longValue()));
+			csv.printRecord("95th percentile wait time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "wait_p95").longValue()));
+			csv.printRecord("Avg. ride distance [km]", df.format((getLastDoubleValue(customerStats, "distance_m_mean")) / 1000.));
+			csv.printRecord("Avg. direct distance [km]", df.format((getLastDoubleValue(customerStats, "directDistance_m_mean")) / 1000.));
+			csv.printRecord("Avg. fare [MoneyUnit]", df.format(getLastDoubleValue(customerStats, "fareAllReferences_mean")));
+		}
+	}
+
+	private static Double getLastDoubleValue(Table table, String columnName) {
+		//the value can be null in case we are reading the value "NaN" within a DoubleColumn (this happens e.g. for 'wait_average' in customer stats when there is 0 rides)
+		if (table.column(columnName).get(table.rowCount() - 1) == null) {
+			return Double.NaN;
+		} else {
+			return ((DoubleColumn) table.column(columnName)).get(table.rowCount() - 1);
+		}
+	}
+
 	@Override
 	public Integer call() throws Exception {
 
@@ -122,26 +189,25 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			.separator(';').build());
 
 		Table tableSupplyKPI = Table.create("supplyKPI");
-		if(stopsFile != null){
+		if (stopsFile != null) {
 			List<TransitStopFacility> stops = readTransitStops(stopsFile);
 			writeStopsShp(stops, output.getPath("stops.shp"));
 			Map<String, TransitStopFacility> byLink = stops.stream().collect(Collectors.toMap(s -> s.getLinkId().toString(), Function.identity()));
 
 			//needs to be a DoubleColumn because transposing later forces us to have the same column type for all (new) value columns
-			tableSupplyKPI.addColumns(DoubleColumn.create("number of stops", new Integer[]{stops.size()}));
+			tableSupplyKPI.addColumns(DoubleColumn.create("Number of stops", new Integer[]{stops.size()}));
 
-			//TODO use and visualize this !?
-//			writeTripsPerStop(stops, legs, output.getPath("trips_per_stop.csv"));
-//			writeOD(byLink, legs, output.getPath("od.csv"));
+			writeTripsPerStop(stops, legs, output.getPath("trips_per_stop.csv"));
+			writeOD(byLink, legs, output.getPath("od.csv"));
 		}
 
-		if(areaFile != null){
-			//TODO discuss whether this is our preferred practice, in general. (input file might not be accessible for simwrapper (web, different partition, ...)
+		if (areaFile != null) {
+			// create copy of shp file so that it is accessible for sim wrapper
 			Collection<SimpleFeature> allFeatures = ShapeFileReader.getAllFeatures(areaFile);
 			//do not convert coordinates! all MATSim output should be in the same CRS. if input was not in correct CRS, simulation would have crashed...
-			ShapeFileWriter.writeGeometries(allFeatures,output.getPath("serviceArea.shp").toString());
+			ShapeFileWriter.writeGeometries(allFeatures, output.getPath("serviceArea.shp").toString());
 			//needs to be a DoubleColumn because transposing later forces us to have the same column type for all (new) value columns
-			tableSupplyKPI.addColumns(DoubleColumn.create("number of areas", new Integer[]{allFeatures.size()}));
+			tableSupplyKPI.addColumns(DoubleColumn.create("Number of areas", new Integer[]{allFeatures.size()}));
 		}
 
 		tableSupplyKPI.addColumns(prepareSupplyKPITable(vehicleStats).columnArray());
@@ -153,73 +219,11 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		tableSupplyKPI = tableSupplyKPI.transpose(true, false);
 		tableSupplyKPI.column(0).setName("info");
 		tableSupplyKPI.column(1).setName("value");
+		tableSupplyKPI.replaceColumn(0, tableSupplyKPI.stringColumn(0).capitalize());
+
 		tableSupplyKPI.write().csv(output.getPath("supply_kpi.csv").toFile());
 
 		return 0;
-	}
-
-	private static Table prepareSupplyKPITable(Table vehicleStats) {
-		//only use last row (last iteration) and certain columns
-		Table tableSupplyKPI = vehicleStats.dropRange(vehicleStats.rowCount() - 1)
-			.selectColumns("vehicles", "totalDistance", "emptyRatio", "totalPassengerDistanceTraveled", "d_p/d_t", "totalServiceDuration" );
-
-		//important to know: divide function creates a copy of the column object, setName() does not!, so call divide first in order to avoid verbose code
-
-		tableSupplyKPI.replaceColumn("totalServiceDuration",  ((DoubleColumn)tableSupplyKPI
-			.column("totalServiceDuration"))
-			.divide(3600)
-			.round()
-			.setName("total service hours"));
-
-		tableSupplyKPI.replaceColumn("totalDistance", ((DoubleColumn)tableSupplyKPI
-			.column("totalDistance"))
-			.divide(1000)
-			.round()
-			.setName("total fleet mileage [km]"));
-
-		tableSupplyKPI.replaceColumn("totalPassengerDistanceTraveled",  ((DoubleColumn)tableSupplyKPI
-			.column("totalPassengerDistanceTraveled"))
-			.divide(1000)
-			.round()
-			.setName("total pax distance [km]"));
-
-		return tableSupplyKPI;
-	}
-
-	private static void printDemandKPICSV(Table customerStats, Table tableSupplyKPI, Path output) throws IOException {
-		double rides = getLastDoubleValue(customerStats, "rides");
-		double rejections = getLastDoubleValue(customerStats, "rejections");
-		double requests = rides + rejections;
-
-		DecimalFormat df = new DecimalFormat("#,###.##", new DecimalFormatSymbols(Locale.US));
-
-		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(output), CSVFormat.DEFAULT)) {
-			csv.printRecord("Info", "value");
-
-			csv.printRecord("Requests", requests);
-			csv.printRecord("Rides", rides);
-			csv.printRecord("Rides per veh", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("vehicles")).get(0)));
-			csv.printRecord("Rides per veh-h", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total service hours")).get(0)));
-			csv.printRecord("Rides per veh-km", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total fleet mileage [km]")).get(0)));
-			csv.printRecord("Rejections", rejections);
-			csv.printRecord("Rejection rate", getLastDoubleValue(customerStats, "rejectionRate"));
-			csv.printRecord("Avg. total travel time", LocalTime.ofSecondOfDay( getLastDoubleValue(customerStats, "totalTravelTime_mean").longValue()));
-			csv.printRecord("Avg. in-vehicle time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "inVehicleTravelTime_mean").longValue()));
-			csv.printRecord("Avg. wait time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "wait_average").longValue()));
-			csv.printRecord("95th percentile wait time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "wait_p95").longValue()));
-			csv.printRecord("Avg. ride distance [km]", df.format((getLastDoubleValue(customerStats,"distance_m_mean"))/1000.));
-			csv.printRecord("Avg. direct distance [km]", df.format( (getLastDoubleValue(customerStats, "directDistance_m_mean")) / 1000.));
-			csv.printRecord("Avg. fare [MoneyUnit]", df.format(getLastDoubleValue(customerStats, "fareAllReferences_mean")));
-		}
-	}
-
-	private static Double getLastDoubleValue(Table table, String columnName){
-		//the value ccan be null in case we are reading the value "NaN" within a DoubleColumn (this happens e.g. for 'wait_average' in customer stats when there is 0 rides)
-		if (table.column(columnName).get(table.rowCount() -1) == null){
-			return Double.NaN;
-		} else {
-			return ((DoubleColumn) table.column(columnName)).get(table.rowCount() -1);
-		}
 	}
 
 	private void writeStopsShp(Collection<TransitStopFacility> stops, Path path) throws IOException, SchemaException {
@@ -230,7 +234,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		FileDataStoreFactorySpi factory = new ShapefileDataStoreFactory();
 		ShapefileDataStore shp = (ShapefileDataStore) factory.createNewDataStore(map);
 
-		//TODO all the MATSim output should be in the same CRS! So, do not transform stop coordinates!! (Simwrapper automatically picks up the crs from the resulting .prj file and does conversion itself)
+		// re-project to default crs (lat/lon)
 		SimpleFeatureType featureType = DataUtilities.createType("stop", "the_geom:Point:srid=4326,id:String,linkId:String,name:String");
 		shp.createSchema(featureType);
 
@@ -292,11 +296,17 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			trips.mergeInt(new OD(leg.getString("fromLinkId"), leg.getString("toLinkId")), 1, Integer::sum);
 		}
 
+		Comparator<Object2IntMap.Entry<OD>> cmp = Comparator.comparingInt(Object2IntMap.Entry::getIntValue);
+
+		// Output only the top 200 relations, to avoid to large data
+		List<Object2IntMap.Entry<OD>> entries = trips.object2IntEntrySet().stream()
+			.sorted(cmp.reversed()).limit(200).toList();
+
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
 
 			csv.printRecord("from_stop", "to_stop", "trips");
 
-			for (Object2IntMap.Entry<OD> e : trips.object2IntEntrySet()) {
+			for (Object2IntMap.Entry<OD> e : entries) {
 				OD od = e.getKey();
 
 				if (e.getIntValue() > 0)
@@ -309,7 +319,6 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readURL(stopFile);
-
 
 
 		return new ArrayList<>(scenario.getTransitSchedule().getFacilities().values());
