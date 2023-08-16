@@ -16,7 +16,7 @@ public class XML extends Viz {
 	/**
 	 * Descriptive how many levels should be unfolded at the beginning.
 	 */
-	public int unfoldLevel;
+	public Integer unfoldLevel;
 
 	public XML() {
 		super("xml");

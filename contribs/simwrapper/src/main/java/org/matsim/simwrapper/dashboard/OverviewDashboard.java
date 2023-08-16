@@ -60,6 +60,7 @@ public class OverviewDashboard implements Dashboard {
 			viz.file = data.output("*.output_config.xml");
 			viz.height = 6d;
 			viz.width = 2d;
+			viz.unfoldLevel = 1;
 
 		}).el(PieChart.class, (viz, data) -> {
 			viz.title = "Mode Share";
