@@ -28,7 +28,7 @@ public class DashboardTests {
 		config.controler().setWriteEventsInterval(4);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.defaultParams().sampleSize = Double.valueOf("0.001");
+		group.defaultParams().sampleSize = 0.001;
 		group.defaultParams().mapCenter = "11.891000, 48.911000";
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
