@@ -11,12 +11,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MultiModeCount<T> implements Identifiable<T>, Attributable {
+public class MultiModeCount implements Attributable {
 
 	public static final String ELEMENT_NAME = "multiModeCount";
-	private final Id<T> id;
-	private final Map<String, Volumes> volumes = new HashMap<>();
+	private final Id<? extends Identifiable> id;
+	private final Map<String, Measurable> volumes = new HashMap<>();
 	private final Set<String> modes = new HashSet<>();
+
+	private final Map<String, Map<String, Measurable>> measurables = new HashMap<>();
 
 	private final Set<String> dailyVolumeModes = new HashSet<>();
 
@@ -27,14 +29,13 @@ public class MultiModeCount<T> implements Identifiable<T>, Attributable {
 	@Inject
 	private Attributes attributes;
 
-	MultiModeCount(final Id<T> id, String stationName, int year){
+	MultiModeCount(final Id<? extends Identifiable> id, String stationName, int year){
 		this.id = id;
 		this.stationName = stationName;
 		this.year = year;
 	}
 
-	@Override
-	public Id<T> getId() {
+	public Id<? extends Identifiable> getId() {
 
 		return id;
 	}
@@ -44,14 +45,27 @@ public class MultiModeCount<T> implements Identifiable<T>, Attributable {
 		return attributes;
 	}
 
-	public Volumes createVolume(String mode, boolean hasOnlyDailyVolumes){
-		Volumes volumes = new Volumes(mode, hasOnlyDailyVolumes);
-		this.volumes.put(mode, volumes);
+	public Measurable addMeasurable(String typeOfMeasurableData, String mode, boolean hasOnlyDailyValues){
+		Measurable measurable = new Measurable(mode, hasOnlyDailyValues, typeOfMeasurableData);
 
-		if(hasOnlyDailyVolumes)
-			dailyVolumeModes.add(mode);
+		if(!this.measurables.containsKey(typeOfMeasurableData))
+			this.measurables.put(typeOfMeasurableData, new HashMap<>());
 
-		return volumes;
+		this.measurables.get(typeOfMeasurableData).putIfAbsent(mode, measurable);
+
+		return measurable;
+	}
+
+	public Measurable createVolume(String mode, boolean hasOnlyDailyVolumes){
+		return addMeasurable(Measurable.VOLUMES, mode, hasOnlyDailyVolumes);
+	}
+
+	public Measurable createVelocity(String mode, boolean hasOnlyDailyVelocities){
+		return addMeasurable(Measurable.VELOCITIES, mode, hasOnlyDailyVelocities);
+	}
+
+	public Measurable createPassenger(String mode, boolean hasOnlyDailyPassengerCounts){
+		return addMeasurable(Measurable.PASSENGERS, mode, hasOnlyDailyPassengerCounts);
 	}
 
 	public void setStationName(String stationName) {
@@ -82,12 +96,20 @@ public class MultiModeCount<T> implements Identifiable<T>, Attributable {
 		return stationName;
 	}
 
-	public Volumes getVolumesForMode(String mode) {
-		return this.volumes.get(mode);
+	public Measurable getVolumesForMode(String mode) {
+		return (Measurable) this.measurables.get(Measurable.VOLUMES).get(mode);
+	}
+
+	Map<String, Measurable> getVolumes() {
+		return (Map<String, Measurable>) this.measurables.get(Measurable.VOLUMES);
 	}
 
 	public Set<String> getDailyVolumeModes() {
 		return dailyVolumeModes;
+	}
+
+	public Measurable getMeasurable(String measurableType, String mode){
+		return this.measurables.get(measurableType).get(mode);
 	}
 
 	@Override
