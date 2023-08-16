@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.CarrierConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.vehicles.Vehicle;
 
@@ -43,7 +43,7 @@ import java.util.TreeMap;
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
 		//temporarily store some information, because ActivityEndEvent does not have any information about the person's vehicle.
-		if((event instanceof ActivityEndEvent endEvent) && FreightConstants.START.equals(endEvent.getActType()) ) {
+		if((event instanceof ActivityEndEvent endEvent) && CarrierConstants.START.equals(endEvent.getActType()) ) {
 			final Id<Person> personId = endEvent.getPersonId();
 			endEventMap.put(personId, endEvent);
 
