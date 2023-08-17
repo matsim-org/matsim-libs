@@ -3,10 +3,6 @@ package org.matsim.counts;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.utils.objectattributes.attributable.Attributable;
@@ -50,14 +46,17 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 
 		super.writeXmlHead();
 
-		super.writeStartTag(MultiModeCounts.ELEMENT_NAME, attributesAsTupleList(counts), false, true);
-		super.writeElement("name", counts.getName());
-		super.writeElement("description", counts.getDescription());
-		super.writeElement("source", counts.getSource());
-		super.writeElement("year", String.valueOf(counts.getYear()));
-		super.writeElement("identifiable", counts.identifiable.getName());
+		List<Tuple<String, String>> variables = new ArrayList();
 
-		writeElement("measurableTags", counts.getMeasurableTags().stream().reduce((s, s2) -> s.concat(",").concat(s2)).orElse(""));
+		variables.add(new Tuple<>("measurableTags", counts.getMeasurableTags().stream().reduce((s, s2) -> s.concat(",").concat(s2)).orElse("")));
+		variables.add(new Tuple<>("identifiable", counts.identifiable.getName()));
+		variables.add(new Tuple<>("source", counts.getSource()));
+		variables.add(new Tuple<>("name", counts.getName()));
+		variables.add(new Tuple<>("year", String.valueOf(counts.getYear())));
+		variables.add(new Tuple<>("description", counts.getDescription()));
+
+		super.writeStartTag(MultiModeCounts.ELEMENT_NAME, variables, false, true);
+		super.writeStartTag("attributes", attributesAsTupleList(counts), true, false);
 
 		writeCounts();
 		super.writeEndTag(MultiModeCounts.ELEMENT_NAME);
@@ -79,15 +78,18 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 
 		for (MultiModeCount count : counts.getCounts().values()) {
 
-			writeStartTag(MultiModeCount.ELEMENT_NAME, attributesAsTupleList(count), false, false);
-
-			writeElement("id", count.getId().toString());
-			writeElement("stationName", count.getStationName());
-			writeElement("year", String.valueOf(count.getYear()));
+			List<Tuple<String, String>> variables = new ArrayList();
+			variables.add(new Tuple<>("id", count.getId().toString()));
+			variables.add(new Tuple<>("stationName", count.getStationName()));
+			variables.add(new Tuple<>("year", String.valueOf(count.getYear())));
 
 			String description = count.getDescription();
 			if (description != null)
-				writeElement("description", description);
+				variables.add(new Tuple<>("description", description));
+
+			writeStartTag(MultiModeCount.ELEMENT_NAME, variables, false, false);
+
+			writeStartTag("attributes", attributesAsTupleList(count), true, false);
 
 			//write volumes for each mode
 			writeMeasurables(count);
@@ -107,8 +109,6 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 		for (Map.Entry<String, Map<String, Measurable>> entry : measurables.entrySet()) {
 
 			//write type of measurable data
-			writeStartTag(Measurable.ELEMENT_NAME, null);
-
 			for (Measurable m : entry.getValue().values()) {
 				boolean onlyDailyValues = m.hasOnlyDailyValues();
 
@@ -117,7 +117,7 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 
 				//write either aggregated or disaggregated values
 				if (onlyDailyValues) {
-					writeElement("daily", String.valueOf(m.getDailyValue()));
+					writeStartTag("value", List.of(new Tuple<>("daily", String.valueOf(m.getDailyValue()))), true, false);
 				} else {
 					Int2DoubleMap hourlyValues = m.getHourlyValues();
 					try {
@@ -135,14 +135,13 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 							//end tag
 							super.writer.write("/>");
 						}
-					} catch (IOException e){
+					} catch (IOException e) {
 						logger.error("Error writing Measurables", e);
 					}
 				}
 
 				writeEndTag(m.getMeasurableType());
 			}
-			writeEndTag(Measurable.ELEMENT_NAME);
 		}
 
 	}

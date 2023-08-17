@@ -1,6 +1,5 @@
 package org.matsim.counts;
 
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
@@ -10,10 +9,16 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class MultiModeCounts implements Attributable {
+/**
+ * This class provides count object, that can assign any measurable values (traffic volumes, velocities e.g.) for any matsim transport mode
+ * to an identifiable object (links, nodes, transit stations e.g)
+ * Structure is simialar to regular counts, but more flexible to use.
+ * */
+public final class MultiModeCounts implements Attributable {
 
 	public static final String ELEMENT_NAME = "multiModeCounts";
 
@@ -27,17 +32,15 @@ public class MultiModeCounts implements Attributable {
 
 	private int year;
 
-	private final TreeMap<Id<? extends Identifiable>, MultiModeCount> counts = new TreeMap<>();
+	private final Map<Id<? extends Identifiable>, MultiModeCount> counts = new TreeMap<>();
 
 	private final Attributes attributes = new AttributesImpl();
 
-	public MultiModeCounts(String name, int year){
-		this(name, year, Link.class);
+	public MultiModeCounts(){
+		this(Link.class);
 	}
 
-	public MultiModeCounts(String name, int year, Class<? extends Identifiable> identifiable){
-		this.year = year;
-		this.name = name;
+	public MultiModeCounts(Class<? extends Identifiable> identifiable){
 		this.identifiable = identifiable;
 	}
 
@@ -89,7 +92,7 @@ public class MultiModeCounts implements Attributable {
 		return year;
 	}
 
-	public TreeMap<Id<? extends Identifiable>, MultiModeCount> getCounts() {
+	public Map<Id<? extends Identifiable>, MultiModeCount> getCounts() {
 		return counts;
 	}
 
@@ -103,7 +106,7 @@ public class MultiModeCounts implements Attributable {
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return "[name=" + this.name + "]" + "[nof_counts=" + this.counts.size() + "]";
 	}
 }

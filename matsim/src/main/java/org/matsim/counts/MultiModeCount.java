@@ -12,7 +12,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MultiModeCount implements Attributable {
+/**
+ * A MultiModeCount can hold measurable traffic stats (traffic volumes or velocities e.g.) for a single matsim infrastructure object.
+ * Measurable values are provided as Measurable instances for a certain mode. It is possible to assign the same kind of value to
+ * several transport modes.
+ * A single MultiModeCount instance for example can hold traffic volumes for the mode 'car' and average velocities for the mode 'freight'.
+ */
+public final class MultiModeCount implements Attributable {
 
 	public static final String ELEMENT_NAME = "multiModeCount";
 	private final Id<? extends Identifiable> id;
@@ -30,7 +36,7 @@ public class MultiModeCount implements Attributable {
 	@Inject
 	private Attributes attributes = new AttributesImpl();
 
-	MultiModeCount(final Id<? extends Identifiable> id, String stationName, int year, Set<String> measurableTags){
+	MultiModeCount(final Id<? extends Identifiable> id, String stationName, int year, Set<String> measurableTags) {
 		this.id = id;
 		this.stationName = stationName;
 		this.year = year;
@@ -47,11 +53,11 @@ public class MultiModeCount implements Attributable {
 		return attributes;
 	}
 
-	public Measurable addMeasurable(String typeOfMeasurableData, String mode, boolean hasOnlyDailyValues){
+	public Measurable addMeasurable(String typeOfMeasurableData, String mode, boolean hasOnlyDailyValues) {
 		this.measurableTags.add(typeOfMeasurableData);
 		Measurable measurable = new Measurable(mode, hasOnlyDailyValues, typeOfMeasurableData);
 
-		if(!this.measurables.containsKey(typeOfMeasurableData))
+		if (!this.measurables.containsKey(typeOfMeasurableData))
 			this.measurables.put(typeOfMeasurableData, new HashMap<>());
 
 		this.measurables.get(typeOfMeasurableData).putIfAbsent(mode, measurable);
@@ -59,15 +65,15 @@ public class MultiModeCount implements Attributable {
 		return measurable;
 	}
 
-	public Measurable createVolume(String mode, boolean hasOnlyDailyVolumes){
+	public Measurable createVolume(String mode, boolean hasOnlyDailyVolumes) {
 		return addMeasurable(Measurable.VOLUMES, mode, hasOnlyDailyVolumes);
 	}
 
-	public Measurable createVelocity(String mode, boolean hasOnlyDailyVelocities){
+	public Measurable createVelocity(String mode, boolean hasOnlyDailyVelocities) {
 		return addMeasurable(Measurable.VELOCITIES, mode, hasOnlyDailyVelocities);
 	}
 
-	public Measurable createPassenger(String mode, boolean hasOnlyDailyPassengerCounts){
+	public Measurable createPassenger(String mode, boolean hasOnlyDailyPassengerCounts) {
 		return addMeasurable(Measurable.PASSENGERS, mode, hasOnlyDailyPassengerCounts);
 	}
 
@@ -111,7 +117,7 @@ public class MultiModeCount implements Attributable {
 		return dailyVolumeModes;
 	}
 
-	public Measurable getMeasurable(String measurableType, String mode){
+	public Measurable getMeasurable(String measurableType, String mode) {
 		return this.measurables.get(measurableType).get(mode);
 	}
 
