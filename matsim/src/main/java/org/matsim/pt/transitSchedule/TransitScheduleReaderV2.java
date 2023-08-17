@@ -92,6 +92,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			String targetCRS,
 			TransitSchedule schedule,
 			RouteFactories routeFactory) {
+		super(ValidationType.DTD_ONLY);
 		this.externalInputCRS = externalInputCRS;
 		this.targetCRS = targetCRS;
 		this.schedule = schedule;

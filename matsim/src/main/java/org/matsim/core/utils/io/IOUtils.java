@@ -167,6 +167,16 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		COMPRESSION_EXTENSIONS.put("zst", CompressionType.ZSTD);
 	}
 
+	private static int zstdCompressionLevel = 6;
+
+	public static void setZstdCompressionLevel(int level) {
+		if (level >= 1) {
+			zstdCompressionLevel = level;
+		} else {
+			logger.error("Invalid ZSTD compression level.");
+		}
+	}
+
 	// Define a number of charsets that are / have been used.
 	public static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
 	public static final Charset CHARSET_WINDOWS_ISO88591 = StandardCharsets.ISO_8859_1;
@@ -356,7 +366,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 						outputStream = new CompressorStreamFactory().createCompressorOutputStream(CompressorStreamFactory.BZIP2, outputStream);
 						break;
 					case ZSTD:
-						outputStream = new ZstdOutputStream(outputStream, 6);
+						outputStream = new ZstdOutputStream(outputStream, zstdCompressionLevel);
 						break;
 				}
 			}

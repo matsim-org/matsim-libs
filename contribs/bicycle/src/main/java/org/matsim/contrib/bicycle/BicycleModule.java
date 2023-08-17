@@ -69,7 +69,7 @@ public final class BicycleModule extends AbstractModule {
 		}
 
 		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
-		// this is still needed because the bicycle travel time calculator needs to use the same bicycle speed as the mobsim.  kai, jun'23
+		// this is still needed because the bicycle travel time calculator for routing needs to use the same bicycle speed as the mobsim.  kai, jun'23
 
 		if (bicycleConfigGroup.isMotorizedInteraction()) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);

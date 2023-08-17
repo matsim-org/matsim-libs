@@ -31,6 +31,8 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchQSimModule;
+import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
@@ -157,6 +159,9 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 			case SelectiveInsertionSearchParams.SET_NAME:
 				return new SelectiveInsertionSearchQSimModule(drtCfg);
+
+			case RepeatedSelectiveInsertionSearchParams.SET_NAME:
+				return new RepeatedSelectiveInsertionSearchQSimModule(drtCfg);
 
 			default:
 				throw new RuntimeException(

@@ -47,6 +47,13 @@ import java.util.Set;
  *
  */
 public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
+	// yyyy TODOS:
+
+	// VSP now regularly uses marg utls of travelling != null to fit distance distributions.  There should be a switch to switch off the warnings.
+
+	// VSP says that people < 18J should not use car, and implements that via car availability.  How to handle that?
+
+	// 
 	private static final  Logger log = LogManager.getLogger(VspConfigConsistencyCheckerImpl.class);
 	
 	public VspConfigConsistencyCheckerImpl() {
