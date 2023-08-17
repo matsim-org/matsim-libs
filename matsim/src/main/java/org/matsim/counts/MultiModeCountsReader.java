@@ -34,8 +34,8 @@ public class MultiModeCountsReader extends MatsimXmlParser {
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 
 		switch (name) {
-			case MULTIMODECOUNTS -> startMultiModeCounts(atts, context);
-			case MULTIMODECOUNT -> startMultiModeCount(atts, context);
+			case MULTIMODECOUNTS -> startMultiModeCounts(atts);
+			case MULTIMODECOUNT -> startMultiModeCount(atts);
 			case ATTRIBUTES -> startAttributes(atts, context);
 			case VALUE -> addValuesToMeasurable(atts);
 
@@ -82,7 +82,7 @@ public class MultiModeCountsReader extends MatsimXmlParser {
 		this.currMeasurable = count.addMeasurable(tag, atts.getValue("mode"), atts.getValue("hasOnlyDailyValues").equals("t"));
 	}
 
-	private void startMultiModeCount(Attributes atts, Stack<String> context) {
+	private void startMultiModeCount(Attributes atts) {
 		String idString = atts.getValue("id");
 		Id<? extends Identifiable> id = Id.create(idString, counts.identifiable);
 		String stationName = atts.getValue("stationName");
@@ -92,7 +92,7 @@ public class MultiModeCountsReader extends MatsimXmlParser {
 		currCount = id;
 	}
 
-	private void startMultiModeCounts(Attributes atts, Stack<String> context) {
+	private void startMultiModeCounts(Attributes atts) {
 		org.matsim.utils.objectattributes.attributable.Attributes attributes = counts.getAttributes();
 
 		for (int i = 0; i < atts.getLength(); i++) {

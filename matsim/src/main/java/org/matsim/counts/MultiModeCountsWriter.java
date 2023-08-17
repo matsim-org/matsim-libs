@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Writer class for MultiModeCounts Object.
@@ -55,7 +56,9 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 		variables.add(new Tuple<>("year", String.valueOf(counts.getYear())));
 		variables.add(new Tuple<>("description", counts.getDescription()));
 
-		super.writeStartTag(MultiModeCounts.ELEMENT_NAME, variables, false, true);
+		List<Tuple<String, String>> filtered = variables.stream().filter(tuple -> tuple.getSecond() != null).collect(Collectors.toList());
+
+		super.writeStartTag(MultiModeCounts.ELEMENT_NAME, filtered, false, true);
 		super.writeStartTag("attributes", attributesAsTupleList(counts), true, false);
 
 		writeCounts();
@@ -82,12 +85,11 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 			variables.add(new Tuple<>("id", count.getId().toString()));
 			variables.add(new Tuple<>("stationName", count.getStationName()));
 			variables.add(new Tuple<>("year", String.valueOf(count.getYear())));
+			variables.add(new Tuple<>("description", counts.getDescription()));
 
-			String description = count.getDescription();
-			if (description != null)
-				variables.add(new Tuple<>("description", description));
+			List<Tuple<String, String>> filtered = variables.stream().filter(tuple -> tuple.getSecond() != null).toList();
 
-			writeStartTag(MultiModeCount.ELEMENT_NAME, variables, false, false);
+			writeStartTag(MultiModeCount.ELEMENT_NAME, filtered, false, false);
 
 			writeStartTag("attributes", attributesAsTupleList(count), true, false);
 

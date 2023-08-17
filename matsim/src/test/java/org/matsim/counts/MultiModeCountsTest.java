@@ -51,13 +51,13 @@ public class MultiModeCountsTest {
 		generateDummyCounts(dummyCounts);
 
 		MultiModeCountsWriter writer = new MultiModeCountsWriter(dummyCounts);
-		writer.write(utils.getOutputDirectory() + "test_counts.xml.gz");
+		writer.write("test_counts.xml.gz");
 
 		MultiModeCounts counts = new MultiModeCounts(Link.class);
 		MultiModeCountsReader reader = new MultiModeCountsReader(counts);
 
 		Assertions.assertThatNoException().isThrownBy(() -> {
-			reader.readFile(utils.getOutputDirectory() + "test_counts.xml.gz");
+			reader.readFile("test_counts.xml.gz");
 		});
 
 		Map<Id<? extends Identifiable>, MultiModeCount> countMap = counts.getCounts();
