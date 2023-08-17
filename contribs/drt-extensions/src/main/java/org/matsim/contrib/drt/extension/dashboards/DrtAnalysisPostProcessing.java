@@ -329,12 +329,4 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 	private record OD(String origin, String destination) {
 	}
 
-//	private LocalTime convertSeconds(double seconds){
-//
-//		double hours = TimeUnit.SECONDS. seconds % 3600;
-//		double minutes =  (seconds - hours * 3600) % 60;
-//		double remainingSeconds = (seconds - hours * 3600 - minutes * 60);
-//		return LocalTime.of(hours, minutes, seconds);
-//	}
-
 }
