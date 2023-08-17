@@ -50,9 +50,6 @@ public class DrtDashboard implements Dashboard {
 	private String postProcess(Data data, String file) {
 		List<String> args = new ArrayList<>(List.of("--drt-mode", drtConfigGroup.getMode(), "--input-crs", crs));
 
-		// TODO: Is there a name for d_p/d_t  ?
-
-
 		//it might be, that a serviceArea file is provided in the config, but the drt service is configured to be stopBased, nevertheless
 		switch (drtConfigGroup.operationalScheme) {
 			case stopbased ->
@@ -101,6 +98,7 @@ public class DrtDashboard implements Dashboard {
 
 						viz.addDataset("trips", postProcess(data, "trips_per_stop.csv"));
 
+						viz.display.radius.dataset = "trips";
 						viz.display.radius.columnName = "departures";
 						viz.display.radius.join = "stop_id";
 						viz.display.radius.scaleFactor = 10d;
@@ -130,6 +128,7 @@ public class DrtDashboard implements Dashboard {
 
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
+				viz.height = 7d;
 			})
 			.el(Hexagons.class, (viz, data) -> {
 				viz.title = "Spatial rejection distribution";
@@ -148,15 +147,15 @@ public class DrtDashboard implements Dashboard {
 //			})
 		;
 
-		// FIXME: check if this plot works
-		if (drtConfigGroup.operationalScheme == DrtConfigGroup.OperationalScheme.stopbased)
-			layout.row("od").el(AggregateOD.class, (viz, data) -> {
-
-				viz.shpFile = postProcess(data, "stops.shp");
-				viz.dbfFile = postProcess(data, "stops.shp").replace(".shp", ".dbf");
-				viz.csvFile = postProcess(data, "od.csv");
-
-			});
+//		This plot is not absolutely necesarry given the hex plots
+//		if (drtConfigGroup.operationalScheme == DrtConfigGroup.OperationalScheme.stopbased)
+//			layout.row("od").el(AggregateOD.class, (viz, data) -> {
+//
+//				viz.shpFile = postProcess(data, "stops.shp");
+//				viz.dbfFile = postProcess(data, "stops.shp").replace(".shp", ".dbf");
+//				viz.csvFile = postProcess(data, "od.csv");
+//
+//			});
 
 		//Final Demand stats
 		layout.row("Final Demand And Wait Time Statistics")
