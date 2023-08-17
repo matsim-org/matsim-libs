@@ -26,9 +26,9 @@ public final class RailLink implements HasLinkId {
 	private final boolean isExitLink;
 
 	/**
-	 * Reservations held for each track.
+	 * Drivers of each blocked track.
 	 */
-	private final MobsimDriverAgent[] reservations;
+	private final MobsimDriverAgent[] blocked;
 
 	final double length;
 	final double freeSpeed;
@@ -44,7 +44,7 @@ public final class RailLink implements HasLinkId {
 		id = link.getId();
 		state = new TrackState[RailsimUtils.getTrainCapacity(link)];
 		Arrays.fill(state, TrackState.FREE);
-		reservations = new MobsimDriverAgent[state.length];
+		blocked = new MobsimDriverAgent[state.length];
 		length = link.getLength();
 		freeSpeed = link.getFreespeed();
 		minimumHeadwayTime = RailsimUtils.getMinimumTrainHeadwayTime(link);
@@ -86,7 +86,7 @@ public final class RailLink implements HasLinkId {
 	 * Check if driver has already reserved this link.
 	 */
 	public boolean isBlockedBy(MobsimDriverAgent driver) {
-		for (MobsimDriverAgent reservation : reservations) {
+		for (MobsimDriverAgent reservation : blocked) {
 			if (reservation == driver)
 				return true;
 		}
@@ -110,7 +110,7 @@ public final class RailLink implements HasLinkId {
 	int blockTrack(MobsimDriverAgent driver) {
 		for (int i = 0; i < state.length; i++) {
 			if (state[i] == TrackState.FREE) {
-				reservations[i] = driver;
+				blocked[i] = driver;
 				state[i] = TrackState.BLOCKED;
 				return i;
 			}
@@ -123,9 +123,9 @@ public final class RailLink implements HasLinkId {
 	 */
 	int releaseTrack(MobsimDriverAgent driver) {
 		for (int i = 0; i < state.length; i++) {
-			if (reservations[i] == driver) {
+			if (blocked[i] == driver) {
 				state[i] = TrackState.FREE;
-				reservations[i] = null;
+				blocked[i] = null;
 				return i;
 			}
 		}
