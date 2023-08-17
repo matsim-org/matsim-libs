@@ -53,20 +53,18 @@ public class DrtDashboard implements Dashboard {
 		// TODO: Is there a name for d_p/d_t  ?
 
 
-		//it might be, that a serviceArea file is provided in the config, but the drt service is configured to be stopbased, nevertheless
+		//it might be, that a serviceArea file is provided in the config, but the drt service is configured to be stopBased, nevertheless
 		switch (drtConfigGroup.operationalScheme) {
-			case stopbased -> {
+			case stopbased ->
 //				drtConfigGroup.transitStopFile can not be null, otherwise simulation crashed, earlier
 				args.addAll(List.of("--stops-file", ConfigGroup.getInputFileURL(matsimConfigContext, drtConfigGroup.transitStopFile).toString()));
-			}
 			case door2door -> {
 				//TODO potentially show the entire drt network (all drt links have stops)
 			}
-			case serviceAreaBased -> {
+			case serviceAreaBased ->
 //				drtConfigGroup.drtServiceAreaShapeFile can not be null, otherwise simulation crashed, earlier
-				//this copies the input shape file into the output directoy. might not be ideal. but the input flle might be anywhere (web, different local partition, ...) and simwrapper might not have access....
+				//this copies the input shape file into the output directory. might not be ideal. but the input file might be anywhere (web, different local partition, ...) and simwrapper might not have access....
 				args.addAll(List.of("--area-file", ConfigGroup.getInputFileURL(matsimConfigContext, drtConfigGroup.drtServiceAreaShapeFile).toString()));
-			}
 		}
 
 		return data.compute(DrtAnalysisPostProcessing.class, file, args.toArray(new String[0]));
@@ -121,17 +119,6 @@ public class DrtDashboard implements Dashboard {
 				viz.width = 2.;
 			});
 
-		// FIXME: check if this plot works
-		if (drtConfigGroup.operationalScheme == DrtConfigGroup.OperationalScheme.stopbased)
-			layout.row("od").el(AggregateOD.class, (viz, data) -> {
-
-				viz.shpFile = postProcess(data, "stops.shp");
-				viz.dbfFile = postProcess(data, "stops.shp").replace(".shp", ".dbf");
-				viz.csvFile = postProcess(data, "od.csv");
-
-			});
-
-
 		//TODO: discuss: should we make XYTime plots out of those ??
 		layout.row("Spatial demand distribution")
 			.el(Hexagons.class, (viz, data) -> {
@@ -160,6 +147,16 @@ public class DrtDashboard implements Dashboard {
 //				viz.x = "time";
 //			})
 		;
+
+		// FIXME: check if this plot works
+		if (drtConfigGroup.operationalScheme == DrtConfigGroup.OperationalScheme.stopbased)
+			layout.row("od").el(AggregateOD.class, (viz, data) -> {
+
+				viz.shpFile = postProcess(data, "stops.shp");
+				viz.dbfFile = postProcess(data, "stops.shp").replace(".shp", ".dbf");
+				viz.csvFile = postProcess(data, "od.csv");
+
+			});
 
 		//Final Demand stats
 		layout.row("Final Demand And Wait Time Statistics")
@@ -384,7 +381,7 @@ public class DrtDashboard implements Dashboard {
 
 					viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
 							.mode(ScatterTrace.Mode.LINE)
-							.name("Passeng. Dist.")
+							.name("Pax Dist.")
 							.build(),
 						dataset.mapping()
 							.x("iteration")
@@ -421,11 +418,12 @@ public class DrtDashboard implements Dashboard {
 					);
 				})
 				.el(Line.class, (viz, data) -> {
-					viz.title = "Relative Statistics";
+					viz.title = "Relative Statistics per iteration";
 					viz.dataset = data.output("*vehicle_stats_" + drtConfigGroup.mode + ".csv");
-					viz.description = "per iteration";
+					viz.description = "Pooling ratio (Pax distance / Vehicle mileage), Detour ratio, and Empty Ratio";
 					viz.x = "iteration";
 					viz.columns = List.of("d_p/d_t", "l_det", "emptyRatio");
+					viz.legendName = List.of("Pooling ratio", "Detour ratio", "Empty Ratio");
 					viz.xAxisName = "Iteration";
 					viz.yAxisName = "Value";
 				});

@@ -20,7 +20,7 @@ public class DashboardTests {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private void run(DrtConfigGroup.OperationalScheme operationalScheme) {
+	private void run() {
 
 		Config config = DrtTestScenario.loadConfig(utils);
 		config.controler().setLastIteration(4);
@@ -31,10 +31,11 @@ public class DashboardTests {
 		group.defaultParams().sampleSize = 0.001;
 		group.defaultParams().mapCenter = "11.891000, 48.911000";
 
+		//we have 2 operators ('av' + 'drt'), configure one of them to be areaBased (the other remains stopBased)
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		for (DrtConfigGroup drtCfg : multiModeDrtConfigGroup.getModalElements()) {
-			if (drtCfg.getMode().equals("drt")){
-				drtCfg.operationalScheme = operationalScheme;
+			if (drtCfg.getMode().equals("av")){
+				drtCfg.operationalScheme = DrtConfigGroup.OperationalScheme.serviceAreaBased;
 				drtCfg.drtServiceAreaShapeFile = "drt-zones/drt-zonal-system.shp";
 			}
 		}
@@ -44,28 +45,43 @@ public class DashboardTests {
 	}
 
 	@Test
-	public void drtServiceBased() {
+	public void drtDefaults() {
+		run();
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "drt");
+		// TODO: add test headers!?
 
-		run(DrtConfigGroup.OperationalScheme.serviceAreaBased);
+		Path drtOutputPath = Path.of(utils.getOutputDirectory(), "analysis", "drt");
+		{
+			//test general output files
+			Assertions.assertThat(drtOutputPath)
+				.isDirectoryContaining("glob:**supply_kpi.csv");
+			Assertions.assertThat(drtOutputPath)
+				.isDirectoryContaining("glob:**demand_kpi.csv");
+		}
+		{
+			//test output files specific for stopBased services
+			Assertions.assertThat(drtOutputPath)
+				.isDirectoryContaining("glob:**stops.shp");
+			Assertions.assertThat(drtOutputPath)
+				.isDirectoryContaining("glob:**trips_per_stop.csv");
+			Assertions.assertThat(drtOutputPath)
+				.isDirectoryContaining("glob:**trips_per_stop.csv");
+		}
 
-		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**serviceArea.shp");
+		Path avOutputPath = Path.of(utils.getOutputDirectory(), "analysis", "drt-av");
+		{
+			//test general output files
+			Assertions.assertThat(avOutputPath)
+				.isDirectoryContaining("glob:**supply_kpi.csv");
+			Assertions.assertThat(avOutputPath)
+				.isDirectoryContaining("glob:**demand_kpi.csv");
+		}
 
-		// TODO: add assertions
+		{
+			//test output files specific for stopBased services
+			Assertions.assertThat(avOutputPath)
+				.isDirectoryContaining("glob:**serviceArea.shp");
+		}
 	}
 
-	@Test
-	public void drtStopBased() {
-
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "drt");
-
-		run(DrtConfigGroup.OperationalScheme.stopbased);
-
-		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**stops.shp");
-
-		// TODO: add assertions
-	}
 }

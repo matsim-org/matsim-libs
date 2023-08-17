@@ -89,7 +89,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 	private static Table prepareSupplyKPITable(Table vehicleStats) {
 		//only use last row (last iteration) and certain columns
 		Table tableSupplyKPI = vehicleStats.dropRange(vehicleStats.rowCount() - 1)
-			.selectColumns("vehicles", "totalDistance", "emptyRatio", "totalPassengerDistanceTraveled", "d_p/d_t", "totalServiceDuration");
+			.selectColumns("vehicles", "totalDistance", "emptyRatio", "totalPassengerDistanceTraveled", "d_p/d_t", "l_det", "totalServiceDuration");
 
 		//important to know: divide function creates a copy of the column object, setName() does not!, so call divide first in order to avoid verbose code
 
@@ -103,13 +103,17 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			.column("totalDistance"))
 			.divide(1000)
 			.round()
-			.setName("Total fleet mileage [km]"));
+			.setName("Total vehicle mileage [km]"));
 
 		tableSupplyKPI.replaceColumn("totalPassengerDistanceTraveled", ((DoubleColumn) tableSupplyKPI
 			.column("totalPassengerDistanceTraveled"))
 			.divide(1000)
 			.round()
 			.setName("Total pax distance [km]"));
+
+		tableSupplyKPI.column("d_p/d_t").setName("Pooling ratio");
+		tableSupplyKPI.column("l_det").setName("Detour ratio");
+		tableSupplyKPI.column("emptyRatio").setName("Empty ratio");
 
 		return tableSupplyKPI;
 	}
@@ -128,7 +132,7 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 			csv.printRecord("Rides", rides);
 			csv.printRecord("Rides per veh", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("vehicles")).get(0)));
 			csv.printRecord("Rides per veh-h", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total service hours")).get(0)));
-			csv.printRecord("Rides per veh-km", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total fleet mileage [km]")).get(0)));
+			csv.printRecord("Rides per veh-km", df.format(rides / ((DoubleColumn) tableSupplyKPI.column("total vehicle mileage [km]")).get(0)));
 			csv.printRecord("Rejections", rejections);
 			csv.printRecord("Rejection rate", getLastDoubleValue(customerStats, "rejectionRate"));
 			csv.printRecord("Avg. total travel time", LocalTime.ofSecondOfDay(getLastDoubleValue(customerStats, "totalTravelTime_mean").longValue()));
@@ -213,8 +217,6 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		tableSupplyKPI.addColumns(prepareSupplyKPITable(vehicleStats).columnArray());
 
 		printDemandKPICSV(customerStats, tableSupplyKPI, output.getPath("demand_kpi.csv"));
-
-		//TODO format to 3 decimal points only
 
 		tableSupplyKPI = tableSupplyKPI.transpose(true, false);
 		tableSupplyKPI.column(0).setName("info");
