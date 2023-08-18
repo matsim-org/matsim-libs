@@ -53,7 +53,7 @@ public class ChargerPowerTimeProfileCalculator implements ChargingStartEventHand
 		increment(averagePowerIn_kW, event.getChargerId(), chargingStartTime.get(event.getVehicleId()), event.getTime());
 	}
 	private void increment(double averagePower, Id<Charger> chargerId, double beginTime, double endTime) {
-		if (beginTime == endTime && beginTime >= qsimEndTime) {
+		if (beginTime == endTime && beginTime >= qsimEndTime || qsimEndTime == 0) {
 			return;
 		}
 		endTime = Math.min(endTime, qsimEndTime);

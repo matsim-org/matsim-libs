@@ -4,13 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.timeprofile.ProfileWriter;
-import org.matsim.contrib.ev.infrastructure.Charger;
 
 import java.awt.*;
-import java.util.Comparator;
 import java.util.Map;
-
-import one.util.streamex.EntryStream;
 
 public class ChargerPowerTimeProfileView implements ProfileWriter.ProfileView {
 	private final ChargerPowerTimeProfileCalculator calculator;
@@ -20,7 +16,7 @@ public class ChargerPowerTimeProfileView implements ProfileWriter.ProfileView {
 
 	}
 	@Override
-	public int[] times() {
+	public double[] times() {
 		return calculator.getTimeDiscretizer().getTimes();
 	}
 
