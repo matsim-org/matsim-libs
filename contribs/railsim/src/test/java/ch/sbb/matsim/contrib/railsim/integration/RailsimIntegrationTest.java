@@ -94,7 +94,7 @@ public class RailsimIntegrationTest {
 		Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
 
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setDumpDataAtEnd(false);
+		config.controler().setDumpDataAtEnd(true);
 		config.controler().setCreateGraphs(false);
 		config.controler().setLastIteration(0);
 
