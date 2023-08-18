@@ -191,12 +191,7 @@ TODO
 
 ## Fixed vs. Moving Block
 
-|               | Microscopic Scale                    | Mesoscopic Scale                     |
-|---------------|--------------------------------------|--------------------------------------|
-| Moving Block  | Model tracks consisting of short     | Model tracks consisting of short     |
-|               | links without resource id.           | links of capacity greater than 1     |
-|               |                                      | without resource id.                 |
-| ------------- | ------------------------------------ | ------------------------------------ |
-| Fixed Block   | Model blocks of links with capacity  | Not supported, as it adds no value;  |
-|               | 1 and identical resource id.         | simulation results will be nonsense  |
-| ------------- | ------------------------------------ | ------------------------------------ |
+|              | Microscopic Scale                                                | Mesoscopic Scale                                                                       |
+|--------------|------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| Moving Block | Model tracks consisting of short links without resource id.      | Model tracks consisting of short links of capacity greater than 1 without resource id. |
+| Fixed Block  | Model blocks of links with capacity 1 and identical resource id. | Not supported, as it adds no value; simulation results will be nonsense.               |
