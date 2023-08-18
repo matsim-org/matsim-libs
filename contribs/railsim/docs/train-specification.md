@@ -12,19 +12,19 @@ type in MATSim.
 
 TODO, e.g. length and acceleration of a train.
 
-#### maxAcceleration
+#### railsimAcceleration
 
 The vehicle-specific acceleration. Unit: meters per square-seconds \[m/s²]
 
-(ik, mu): Suggestion, maybe just `acceleration`? Do we always accelerate at maximum speed?
+#### railsimDeceleration
 
-#### maxDeceleration
-
-The vehicle-specific maximum deceleration for emergency braking ("bremsweg"). Unit: meters per square-seconds \[m/s²]
-
-#### deceleration
+TODO
 
 The typical vehicle-specific deceleration. Unit: meters per square-seconds \[m/s²]
+
+#### railsimMaxDeceleration
+
+The vehicle-specific maximum deceleration for emergency braking. Unit: meters per square-seconds \[m/s²]
 
 ## Examples
 
@@ -32,9 +32,9 @@ The typical vehicle-specific deceleration. Unit: meters per square-seconds \[m/s
 
 <vehicleType id="fvDosto">
     <attributes>
-        <attribute name="acceleration" class="java.lang.Double">0.5</attribute>
-        <attribute name="deceleration" class="java.lang.Double">0.5</attribute>
-        <attribute name="maxDeceleration" class="java.lang.Double">0.7</attribute>
+        <attribute name="railsimAcceleration" class="java.lang.Double">0.4</attribute>
+        <attribute name="railsimDeceleration" class="java.lang.Double">0.4</attribute>
+        <attribute name="railsimMaxDeceleration" class="java.lang.Double">0.5</attribute>
     </attributes>
     <capacity seats="606" standingRoomInPersons="0"/>
     <length meter="200.0"/>

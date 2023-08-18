@@ -13,7 +13,7 @@ that could include information about the new state of the link (or even the trac
 
 Attributes:
 
-- `state`: `free`, `reserved`, or `blocked`
+- `state`: `free` or `blocked`
 - `vehicleId`: if `state=reserved|blocked`, the id of the vehicle blocking or reserving this link
 - `track`: a number (0-based or 1-based?) if the link has multiple tracks
 

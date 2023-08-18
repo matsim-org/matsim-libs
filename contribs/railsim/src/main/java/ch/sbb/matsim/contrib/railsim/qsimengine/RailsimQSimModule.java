@@ -26,9 +26,7 @@ import com.google.inject.multibindings.OptionalBinder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
-import org.matsim.core.mobsim.qsim.pt.DefaultTransitDriverAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
 
 public class RailsimQSimModule extends AbstractQSimModule implements QSimComponentsConfigurator {
 

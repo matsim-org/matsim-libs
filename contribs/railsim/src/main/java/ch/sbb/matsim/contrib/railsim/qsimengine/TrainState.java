@@ -4,12 +4,10 @@ import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Stores the mutable current state of a train.

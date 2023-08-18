@@ -71,15 +71,10 @@ final class RailsimEngine implements Steppable {
 
 			update = updateQueue.peek();
 		}
-		
-		if (time % config.trainPositionMaximumUpdateInterval == 0.) {
-			// Update position events for all trains
-			for (TrainState train : activeTrains) {
-				if (train.timestamp < time)
-					updateState(time, new UpdateEvent(train, UpdateEvent.Type.POSITION));
-			}
-		}
 
+		if (time % config.trainPositionMaximumUpdateInterval == 0.) {
+			updateAllPositions(time);
+		}
 	}
 
 	/**
@@ -88,12 +83,10 @@ final class RailsimEngine implements Steppable {
 	public void updateAllStates(double time) {
 
 		// Process all waiting events first
+		// TODO: Consider potential duplication of position update events here, if time matches trainPositionMaximumUpdateInterval.
 		doSimStep(time);
 
-		for (TrainState train : activeTrains) {
-			if (train.timestamp < time)
-				updateState(time, new UpdateEvent(train, UpdateEvent.Type.POSITION));
-		}
+		updateAllPositions(time);
 	}
 
 	/**
@@ -125,10 +118,16 @@ final class RailsimEngine implements Steppable {
 		return true;
 	}
 
+	private void updateAllPositions(double time) {
+		for (TrainState train : activeTrains) {
+			if (train.timestamp < time)
+				updateState(time, new UpdateEvent(train, UpdateEvent.Type.POSITION));
+		}
+	}
+
 	private void createEvent(Event event) {
 		// Because of the 1s update interval, events need to be rounded to the current simulation step
 		event.setTime(Math.ceil(event.getTime()));
-//	 	System.out.println(event.getTime());
 		this.eventsManager.processEvent(event);
 	}
 
@@ -561,8 +560,6 @@ final class RailsimEngine implements Steppable {
 
 		TrainState state = event.state;
 		RailLink currentLink = resources.getLink(state.headLink);
-
-//		assert debug(state);
 
 		// (1) max speed reached
 		double accelDist = Double.POSITIVE_INFINITY;

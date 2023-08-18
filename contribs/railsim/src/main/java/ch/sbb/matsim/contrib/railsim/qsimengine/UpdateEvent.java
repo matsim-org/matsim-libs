@@ -22,7 +22,7 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	boolean waitingForLink;
 
 	/**
-	 * Stores a link that is should to be released.
+	 * Stores a link that is to be released.
 	 */
 	final RailLink unblockLink;
 
@@ -65,7 +65,7 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	}
 
 	/**
-	 * This train currently waits for an reservation for blocked tracks.
+	 * This train currently waits for a reservation for blocked tracks.
 	 */
 	boolean isAwaitingReservation() {
 		return checkReservation >= 0;

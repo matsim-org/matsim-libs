@@ -7,7 +7,6 @@
 			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
 			<attribute name="doorOperationMode" class="org.matsim.vehicles.VehicleType$DoorOperationMode">serial</attribute>
 			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
-			<attribute name="fahrwegFactor" class="java.lang.Double">1.0</attribute>
 		</attributes>
 		<capacity seats="40" standingRoomInPersons="0">
 
@@ -23,11 +22,11 @@
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
 
-	<vehicle id="train1" type="trainType1"/>	
-	<vehicle id="train2" type="trainType1"/>			
-	<vehicle id="train3" type="trainType1"/>	
-	<vehicle id="train4" type="trainType1"/>			
-	<vehicle id="train5" type="trainType1"/>			
-		
+	<vehicle id="train1" type="trainType1"/>
+	<vehicle id="train2" type="trainType1"/>
+	<vehicle id="train3" type="trainType1"/>
+	<vehicle id="train4" type="trainType1"/>
+	<vehicle id="train5" type="trainType1"/>
+
 
 </vehicleDefinitions>

@@ -4,7 +4,7 @@
 
 	<vehicleType id="Sprinter">
 		<attributes>
-			<attribute name="railsimMaxAcceleration" class="java.lang.Double">0.7</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.7</attribute>
 			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.7</attribute>
 		</attributes>
 		<capacity seats="450" standingRoomInPersons="0"/>
@@ -16,7 +16,7 @@
 
 	<vehicleType id="Express">
 		<attributes>
-			<attribute name="railsimMaxAcceleration" class="java.lang.Double">0.7</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.7</attribute>
 			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.7</attribute>
 		</attributes>
 		<capacity seats="500" standingRoomInPersons="0"/>
@@ -27,7 +27,7 @@
 
 	<vehicleType id="Regio">
 		<attributes>
-			<attribute name="railsimMaxAcceleration" class="java.lang.Double">0.5</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.5</attribute>
 			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.5</attribute>
 		</attributes>
 		<capacity seats="500" standingRoomInPersons="0"/>
@@ -38,7 +38,7 @@
 
 	<vehicleType id="Cargo">
 		<attributes>
-			<attribute name="railsimMaxAcceleration" class="java.lang.Double">0.2</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.2</attribute>
 			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.2</attribute>
 		</attributes>
 		<capacity seats="40" standingRoomInPersons="0"/>

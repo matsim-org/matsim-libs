@@ -25,8 +25,9 @@ public final class RailsimUtils {
 	public static final String LINK_ATTRIBUTE_MAX_SPEED = "railsimMaxSpeed";
 	public static final String LINK_ATTRIBUTE_MINIMUM_TIME = "railsimMinimumTime";
 	// vehicle
+	public static final String VEHICLE_ATTRIBUTE_ACCELERATION = "railsimAcceleration";
+	public static final String VEHICLE_ATTRIBUTE_DECELERATION = "railsimDeceleration";
 	public static final String VEHICLE_ATTRIBUTE_MAX_DECELERATION = "railsimMaxDeceleration";
-	public static final String VEHICLE_ATTRIBUTE_MAX_ACCELERATION = "railsimMaxAcceleration";
 
 	private RailsimUtils() {
 	}
@@ -77,7 +78,7 @@ public final class RailsimUtils {
 	 */
 	public static double getTrainAcceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
 		double acceleration = railsimConfigGroup.accelerationGlobalDefault;
-		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_MAX_ACCELERATION);
+		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_ACCELERATION);
 		return attr != null ? (double) attr : acceleration;
 	}
 
