@@ -1,13 +1,20 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
-import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -16,8 +23,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 
 /**
  * Engine to simulate train movement.
@@ -25,11 +34,6 @@ import java.util.stream.Collectors;
 final class RailsimEngine implements Steppable {
 
 	private static final Logger log = LogManager.getLogger(RailsimEngine.class);
-
-	/**
-	 * If trains need to wait, they will check every x seconds if they can proceed.
-	 */
-	private static final double POLL_INTERVAL = 10;
 
 	private final EventsManager eventsManager;
 	private final RailsimConfigGroup config;
@@ -67,6 +71,15 @@ final class RailsimEngine implements Steppable {
 
 			update = updateQueue.peek();
 		}
+		
+		if (time % config.trainPositionMaximumUpdateInterval == 0.) {
+			// Update position events for all trains
+			for (TrainState train : activeTrains) {
+				if (train.timestamp < time)
+					updateState(time, new UpdateEvent(train, UpdateEvent.Type.POSITION));
+			}
+		}
+
 	}
 
 	/**
@@ -165,7 +178,7 @@ final class RailsimEngine implements Steppable {
 
 			decideTargetSpeed(event, state);
 
-			event.checkReservation = time + POLL_INTERVAL;
+			event.checkReservation = time + config.pollInterval;
 			decideNextUpdate(event);
 
 		} else {
@@ -189,7 +202,7 @@ final class RailsimEngine implements Steppable {
 			if (allBlocked)
 				event.checkReservation = -1;
 			else {
-				event.checkReservation = time + POLL_INTERVAL;
+				event.checkReservation = time + config.pollInterval;
 			}
 
 			// Train already waits at the end of previous link
@@ -208,11 +221,11 @@ final class RailsimEngine implements Steppable {
 
 		} else {
 
-			event.checkReservation = time + POLL_INTERVAL;
+			event.checkReservation = time + config.pollInterval;
 
 			// If train is already standing still and waiting, there is no update needed.
 			if (event.waitingForLink) {
-				event.plannedTime = time + POLL_INTERVAL;
+				event.plannedTime = time + config.pollInterval;
 			} else {
 				decideNextUpdate(event);
 			}
@@ -260,7 +273,7 @@ final class RailsimEngine implements Steppable {
 
 		} else {
 			// vehicle will wait and call departure again
-			event.plannedTime += POLL_INTERVAL;
+			event.plannedTime += config.pollInterval;
 		}
 	}
 
@@ -388,7 +401,7 @@ final class RailsimEngine implements Steppable {
 			if (!currentLink.isBlockedBy(state.driver)) {
 				event.waitingForLink = true;
 				event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
-				event.plannedTime = time + POLL_INTERVAL;
+				event.plannedTime = time + config.pollInterval;
 				return;
 			}
 		}
@@ -718,19 +731,6 @@ final class RailsimEngine implements Steppable {
 		assert FuzzyUtils.equals(state.targetSpeed, state.speed) || state.acceleration != 0 : "Acceleration must be set if target speed is different than current";
 		assert FuzzyUtils.greaterThan(state.targetDecelDist, 0) : "Target decel must be greater than 0 after updating";
 
-	}
-
-	/**
-	 * Debug helper function to create breakpoints.
-	 */
-	private static boolean debug(TrainState state) {
-		if (state.driver.getId().toString().equals("pt_Expresszug_GE_BE_train_3_train_Expresszug_GE_BE") && state.routeIdx > 550)
-			log.info("debug");
-
-		if (state.driver.getVehicle().getId().toString().equals("regio5"))
-			log.info("debug");
-
-		return true;
 	}
 
 	/**
