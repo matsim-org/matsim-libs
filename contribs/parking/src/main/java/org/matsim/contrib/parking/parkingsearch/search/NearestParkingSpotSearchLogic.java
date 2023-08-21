@@ -31,13 +31,13 @@ import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
 
 /**
  * @author Ricardo Ewert
- *
  */
 
 public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
@@ -51,7 +51,7 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 	private final boolean canCheckParkingCapacitiesInAdvanced;
 	private boolean useRandomLinkChoice;
 	private int currentLinkIdx;
-	private final HashSet <Id<ActivityFacility>> triedParking;
+	private final HashSet<Id<ActivityFacility>> triedParking;
 	private Id<Link> nextLink;
 	private boolean skipParkingActivity = false;
 	private static final SplittableRandom random = new SplittableRandom(4711);
@@ -61,7 +61,8 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 	 *
 	 * @param parkingManager
 	 */
-	public NearestParkingSpotSearchLogic(Network network, ParkingRouter parkingRouter, ParkingSearchManager parkingManager, boolean canReserveParkingSlot, boolean canCheckParkingCapacitiesInAdvanced) {
+	public NearestParkingSpotSearchLogic(Network network, ParkingRouter parkingRouter, ParkingSearchManager parkingManager,
+										 boolean canReserveParkingSlot, boolean canCheckParkingCapacitiesInAdvanced) {
 		this.network = network;
 		this.parkingRouter = parkingRouter;
 		this.parkingManager = parkingManager;
@@ -77,12 +78,13 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 	/**
 	 * @param baseLinkId linkId of the origin destination where the parkingSearch starts
 	 */
-	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Link> baseLinkId, Id<Vehicle> vehicleId, String mode, double now, double maxParkingDuration, double nextPickupTime) {
+	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Link> baseLinkId, Id<Vehicle> vehicleId, String mode, double now,
+								double maxParkingDuration, double nextPickupTime) {
 
 		if (actualRoute == null) {
 			actualRoute = findRouteToNearestParkingFacility(baseLinkId, currentLinkId, canCheckParkingCapacitiesInAdvanced, now, maxParkingDuration);
 			checkIfDrivingToNextParkingLocationIsPossible(currentLinkId, baseLinkId, now, nextPickupTime);
-			if(actualRoute != null) {
+			if (actualRoute != null) {
 				actualRoute.setVehicleId(vehicleId);
 			}
 			triedParking.clear();
@@ -90,16 +92,16 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 			currentLinkIdx = 0;
 			actualRoute = findRouteToNearestParkingFacility(baseLinkId, currentLinkId, canCheckParkingCapacitiesInAdvanced, now, maxParkingDuration);
 			checkIfDrivingToNextParkingLocationIsPossible(currentLinkId, baseLinkId, now, nextPickupTime);
-			if(actualRoute != null) {
+			if (actualRoute != null) {
 				actualRoute.setVehicleId(vehicleId);
 			}
 		}
 		//if no possible parking was found. The vehicle takes a random next link. Background assumption: parking only at given parking slots
-		if (actualRoute == null){
+		if (actualRoute == null) {
 			List<Link> outGoingLinks = ParkingUtils.getOutgoingLinksForMode(network.getLinks().get(currentLinkId), mode);
 			return outGoingLinks.get(random.nextInt(outGoingLinks.size())).getId();
 		}
-		if (currentLinkIdx == actualRoute.getLinkIds().size() ) {
+		if (currentLinkIdx == actualRoute.getLinkIds().size()) {
 			return actualRoute.getEndLinkId();
 		}
 		nextLink = actualRoute.getLinkIds().get(currentLinkIdx);
@@ -109,8 +111,10 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 
 	}
 
-	/** Checks if it is possible to drive to the new parking facility and to drive back to the base without extending the startTime of the following activity.
-	 *  If the resulting parking time at the new facility is less then 5 minutes the vehicle will drive directly to the next activity location.
+	/**
+	 * Checks if it is possible to drive to the new parking facility and to drive back to the base without extending the startTime of the following activity.
+	 * If the resulting parking time at the new facility is less then 5 minutes the vehicle will drive directly to the next activity location.
+	 *
 	 * @param currentLinkId
 	 * @param baseLinkId
 	 * @param now
@@ -121,11 +125,11 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 
 		if (actualRoute == null)
 			expectedTravelTimeFromParkingToBase = this.parkingRouter.getRouteFromParkingToDestination(baseLinkId, now,
-					currentLinkId).getTravelTime().seconds(); //TODO better: use the nextLink for the check
+				currentLinkId).getTravelTime().seconds(); //TODO better: use the nextLink for the check
 		else
 			expectedTravelTimeFromParkingToBase = this.parkingRouter.getRouteFromParkingToDestination(baseLinkId, now,
 				actualRoute.getEndLinkId()).getTravelTime().seconds();
-		double minimumExpectedParkingDuration = 5*60;
+		double minimumExpectedParkingDuration = 5 * 60;
 		double travelTimeNextPart;
 		if (actualRoute == null)
 			travelTimeNextPart = 0.;
@@ -133,24 +137,27 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 
 		if ((nextPickupTime - now - travelTimeNextPart - expectedTravelTimeFromParkingToBase) < minimumExpectedParkingDuration) {
 			actualRoute = this.parkingRouter.getRouteFromParkingToDestination(baseLinkId, now,
-					currentLinkId);
+				currentLinkId);
 			skipParkingActivity = true;
 		}
 	}
 
-	public Id<Link> getNextParkingLocation(){
+	public Id<Link> getNextParkingLocation() {
 		if (actualRoute == null)
 			return null;
 		return actualRoute.getEndLinkId();
 	}
 
-	/** If the next parking activity is skipped because the given constraints are not fulfilled, it returns true.
+	/**
+	 * If the next parking activity is skipped because the given constraints are not fulfilled, it returns true.
+	 *
 	 * @return
 	 */
-	public boolean isNextParkingActivitySkipped(){
+	public boolean isNextParkingActivitySkipped() {
 		return skipParkingActivity;
 	}
-	public NetworkRoute getNextRoute(){
+
+	public NetworkRoute getNextRoute() {
 		return actualRoute;
 	}
 
@@ -158,14 +165,17 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 		return canReserveParkingSlot;
 	}
 
-	/** If no possible parking was found the vehicle selects a random outgoing link.
+	/**
+	 * If no possible parking was found the vehicle selects a random outgoing link.
+	 *
 	 * @return
 	 */
 	public boolean isUseRandomLinkChoice() {
 		return useRandomLinkChoice;
 	}
 
-	private NetworkRoute findRouteToNearestParkingFacility(Id<Link> baseLinkId, Id<Link> currentLinkId, boolean canCheckParkingCapacitiesInAdvanced, double now, double maxParkingDuration) {
+	private NetworkRoute findRouteToNearestParkingFacility(Id<Link> baseLinkId, Id<Link> currentLinkId, boolean canCheckParkingCapacitiesInAdvanced,
+														   double now, double maxParkingDuration) {
 		TreeMap<Double, ActivityFacility> euclideanDistanceToParkingFacilities = new TreeMap<>();
 		ActivityFacility nearstActivityFacility = null;
 		NetworkRoute selectedRoute = null;
@@ -180,16 +190,24 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 					continue;
 			}
 			double latestEndOfParking = now + maxParkingDuration;
-
-			// checks if parking slot is now open and still open when the parking will finish
-			if (!(activityFacility.getActivityOptions().get(
-					"parking").getOpeningTimes().first().getStartTime() == 0 && activityFacility.getActivityOptions().get(
-					"parking").getOpeningTimes().first().getEndTime() == 24*3600))
-				if (activityFacility.getActivityOptions().get(
-						"parking").getOpeningTimes().first().getStartTime() > now || activityFacility.getActivityOptions().get(
-						"parking").getOpeningTimes().first().getEndTime() < latestEndOfParking)
+			ActivityOption parkingOptions = activityFacility.getActivityOptions().get("parking");
+			// checks if parking slot is now open and still open when the parking will finish; if no openingTime is set, we assume that it is open the hole day
+			if (!parkingOptions.getOpeningTimes().isEmpty()) {
+				if (!(parkingOptions.getOpeningTimes().first().getStartTime() == 0 && parkingOptions.getOpeningTimes().first().getEndTime() == 24 * 3600))
+					if (parkingOptions.getOpeningTimes().first().getStartTime() > now || parkingOptions.getOpeningTimes().first().getEndTime() < latestEndOfParking)
+						continue;
+			}
+			//check if approx. the max parking time at facility will not exceed
+			if (activityFacility.getAttributes().getAsMap().containsKey("maxParkingDurationInHours")) { //TODO vielleicht etwas sparsamer machen
+				double maxParkingDurationAtFacility = 3600 * (double) activityFacility.getAttributes().getAsMap().get("maxParkingDurationInHours");
+				if (maxParkingDuration > maxParkingDurationAtFacility)
 					continue;
-
+				double expectedTravelTimeFromParkingToBase = getExpectedTravelTime(baseLinkId, now, activityFacility.getLinkId());
+				double expectedTravelTimeFromCurrentToParking = getExpectedTravelTime(activityFacility.getLinkId(), now, currentLinkId);
+				double expectedParkingTime = maxParkingDuration - expectedTravelTimeFromCurrentToParking - expectedTravelTimeFromParkingToBase;
+				if (expectedParkingTime > maxParkingDurationAtFacility)
+					continue;
+			}
 			// create Euclidean distances to the parking activities to find routes only to the nearest facilities in the next step
 			Coord coordBaseLink = network.getLinks().get(baseLinkId).getCoord();
 			Coord coordCurrentLink = network.getLinks().get(currentLinkId).getCoord();
@@ -207,12 +225,12 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 		for (ActivityFacility activityFacility : euclideanDistanceToParkingFacilities.values()) {
 			counter++;
 			NetworkRoute possibleRoute = this.parkingRouter.getRouteFromParkingToDestination(activityFacility.getLinkId(), now,
-					currentLinkId);
+				currentLinkId);
 			double travelTimeToParking = possibleRoute.getTravelTime().seconds();
 			double travelTimeFromParking = travelTimeToParking;
 			if (!baseLinkId.equals(currentLinkId)) {
 				NetworkRoute routeFromParkingToBase = this.parkingRouter.getRouteFromParkingToDestination(baseLinkId, now,
-						activityFacility.getLinkId());
+					activityFacility.getLinkId());
 				travelTimeFromParking = routeFromParkingToBase.getTravelTime().seconds();
 			}
 
@@ -234,12 +252,20 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 		actualRoute = selectedRoute;
 		return actualRoute;
 	}
-	public double getExpectedTravelDuration(Id<Link> destinationLinkId, double now,
-											Id<Link> currentLinkId){
+
+	/**
+	 * @param destinationLinkId
+	 * @param now
+	 * @param currentLinkId
+	 * @return
+	 */
+	public double getExpectedTravelTime(Id<Link> destinationLinkId, double now,
+										Id<Link> currentLinkId) {
 		NetworkRoute possibleRoute = this.parkingRouter.getRouteFromParkingToDestination(destinationLinkId, now,
-				currentLinkId);
+			currentLinkId);
 		return possibleRoute.getTravelTime().seconds();
 	}
+
 	@Override
 	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId, String mode) {
 		throw new RuntimeException("shouldn't happen - method not implemented");

@@ -3,8 +3,6 @@ package org.matsim.contrib.freight.mobsim;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -15,7 +13,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.CarrierConstants;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -140,7 +138,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 		@Override
 		public void startActivity(double time, Activity act) {
-			if(act.getType().equals(FreightConstants.END)){
+			if(act.getType().equals(CarrierConstants.END)){
 				startTimeOfEnd = time;
 			}
 		}

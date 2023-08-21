@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
 import org.matsim.contrib.parking.parkingsearch.events.RemoveParkingActivityEvent;
 import org.matsim.contrib.parking.parkingsearch.events.ReserveParkingLocationEvent;
 import org.matsim.contrib.parking.parkingsearch.events.SelectNewParkingLocationEvent;
@@ -24,7 +23,6 @@ import java.util.List;
 
 /**
  * @author Ricardo Ewert
- *
  */
 public class NearestParkingDynLeg extends ParkingDynLeg {
 	private boolean parkingAtEndOfLeg = true;
@@ -45,7 +43,8 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		this.currentPlannedLeg = currentPlannedLeg;
 		this.plan = plan;
 		this.planIndexNextActivity = planIndexNextActivity;
-		if (followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute("parking").equals("noParking"))
+		if (followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute("parking").equals(
+			"noParking"))
 			parkingAtEndOfLeg = false;
 	}
 
@@ -57,7 +56,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 			if (currentLinkId.equals(this.getDestinationLinkId())) {
 				if (!parkingAtEndOfLeg) {
 					reachedDestinationWithoutParking = true;
-				} else{
+				} else {
 					this.parkingMode = true;
 					this.events
 						.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
@@ -77,8 +76,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 				if (hasFoundParking) {
 					this.events.processEvent(new ReserveParkingLocationEvent(timer.getTimeOfDay(), vehicleId, currentLinkId, currentLinkId));
 					nextSelectedParkingLink = currentLinkId;
-				}
-				else
+				} else
 					((FacilityBasedParkingManager) parkingManager).registerRejectedReservation(timer.getTimeOfDay());
 			}
 		}
@@ -107,12 +105,11 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 					double expectedDrivingDurationToPickup;
 					double drivingDurationFromDropOff = timer.getTimeOfDay() - currentPlannedLeg.getDepartureTime().seconds();
 
-					if (nextSelectedParkingLink.equals(currentLinkId)){
-						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelDuration(
+					if (nextSelectedParkingLink.equals(currentLinkId)) {
+						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelTime(
 							followingActivity.getLinkId(), timer.getTimeOfDay(), currentLinkId);
-					}
-					else {
-						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelDuration(
+					} else {
+						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelTime(
 							currentPlannedLeg.getRoute().getStartLinkId(), timer.getTimeOfDay(), currentLinkId);
 					}
 					parkingDuration = followingActivity.getMaximumDuration().seconds() - drivingDurationFromDropOff - expectedDrivingDurationToPickup;
@@ -129,10 +126,10 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 				}
 				// need to find the next link
 				double nextPickupTime = followingActivity.getStartTime().seconds() + followingActivity.getMaximumDuration().seconds();
-				double maxParkingDuration = followingActivity.getMaximumDuration().seconds();
+				double maxParkingDuration = followingActivity.getMaximumDuration().seconds() - (followingActivity.getStartTime().seconds() - timer.getTimeOfDay());
 				Id<Link> nextLinkId = ((NearestParkingSpotSearchLogic) this.logic).getNextLink(currentLinkId, route.getEndLinkId(), vehicleId, mode,
 					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime);
-				if (((NearestParkingSpotSearchLogic) this.logic).isNextParkingActivitySkipped() && parkingAtEndOfLeg){
+				if (((NearestParkingSpotSearchLogic) this.logic).isNextParkingActivitySkipped() && parkingAtEndOfLeg) {
 					removeNextActivityAndFollowingLeg();
 					parkingAtEndOfLeg = false;
 					parkingMode = false;
@@ -170,6 +167,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		plan.getPlanElements().remove(planIndexNextActivity);
 		plan.getPlanElements().remove(planIndexNextActivity);
 	}
+
 	public boolean driveToBaseWithoutParking() {
 		return driveToBaseWithoutParking;
 	}

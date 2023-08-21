@@ -333,7 +333,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	private void writeIterationVehicleStats(String summarizeVehicles, String vehOcc, int it) {
 		try (var bw = getAppendingBufferedWriter("drt_vehicle_stats", ".csv")) {
 			if (!vheaderWritten) {
-				bw.write(line("runId", "iteration", "vehicles", "totalDistance", "totalEmptyDistance", "emptyRatio", "totalPassengerDistanceTraveled",
+				bw.write(line("runId", "iteration", "vehicles", "totalServiceDuration",  "totalDistance", "totalEmptyDistance", "emptyRatio", "totalPassengerDistanceTraveled",
 						"averageDrivenDistance", "averageEmptyDistance", "averagePassengerDistanceTraveled", "d_p/d_t", "l_det",
 						"minShareIdleVehicles", "minCountIdleVehicles"));
 			}
@@ -796,12 +796,15 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
 
+		DescriptiveStatistics totalServiceDuration = new DescriptiveStatistics();
 		DescriptiveStatistics driven = new DescriptiveStatistics();
 		DescriptiveStatistics passengerTraveledDistance = new DescriptiveStatistics();
 		DescriptiveStatistics occupied = new DescriptiveStatistics();
 		DescriptiveStatistics empty = new DescriptiveStatistics();
 
+
 		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
+			totalServiceDuration.addValue(state.serviceDuration);
 			driven.addValue(state.totalDistance);
 			passengerTraveledDistance.addValue(state.totalPassengerTraveledDistance);
 			occupied.addValue(state.totalOccupiedDistance);
@@ -809,6 +812,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		}
 		double d_p_d_t = passengerTraveledDistance.getSum() / driven.getSum();
 		return String.join(del, vehicleDistances.size() + "",//
+				format.format(totalServiceDuration.getSum()) + "",//
 				format.format(driven.getSum()) + "",//
 				format.format(empty.getSum()) + "",//
 				format.format(empty.getSum() / driven.getSum()) + "",//

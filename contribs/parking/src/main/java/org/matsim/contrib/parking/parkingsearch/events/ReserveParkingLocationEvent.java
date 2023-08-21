@@ -27,8 +27,7 @@ import org.matsim.vehicles.Vehicle;
 import java.util.Map;
 
 /**
- * @author  Ricardo Ewert
- *
+ * @author Ricardo Ewert
  */
 
 public class ReserveParkingLocationEvent extends Event {
@@ -55,12 +54,15 @@ public class ReserveParkingLocationEvent extends Event {
 	public Id<Link> getCurrentLinkId() {
 		return currentLinkId;
 	}
+
 	public Id<Link> getparkingLinkId() {
 		return parkingLinkId;
 	}
+
 	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
