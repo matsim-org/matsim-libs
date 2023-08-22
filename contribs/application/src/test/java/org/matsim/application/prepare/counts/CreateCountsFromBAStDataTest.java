@@ -4,12 +4,10 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.MatsimCountsReader;
+import org.matsim.counts.*;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -185,5 +183,37 @@ public class CreateCountsFromBAStDataTest {
 		};
 
 		Assert.assertThrows(RuntimeException.class, () -> new CreateCountsFromBAStData().execute(args));
+	}
+
+	@Test
+	public void testMultiModeCountsFile(){
+
+		String version = "normal-";
+		String car = utils.getOutputDirectory() + version + carOutput;
+		String freight = utils.getOutputDirectory() + version + freightOutput;
+
+		String[] args = new String[]{
+				"--station-data=" + utils.getPackageInputDirectory() + stationData,
+				"--network=" + network,
+				"--input-crs=" + networkCrs,
+				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+				"--shp=" + utils.getPackageInputDirectory() + shp,
+				"--shp-crs=" + shpCrs,
+				"--year=2021",
+				"--car-output=" + car,
+				"--freight-output=" + freight
+		};
+
+		new CreateCountsFromBAStData().execute(args);
+
+		MultiModeCounts multiModeCounts = new MultiModeCounts(Link.class);
+		new MultiModeCountsReader(multiModeCounts).readFile(car.replace("car-", ""));
+
+		Integer size = multiModeCounts.getCounts().size();
+
+		assertThat(size).isGreaterThan(0);
+
+		Assert.assertTrue(multiModeCounts.getMeasurableTags().contains("volumes"));
 	}
 }

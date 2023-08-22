@@ -21,9 +21,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsWriter;
+import org.matsim.counts.*;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -113,7 +111,14 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		log.info("+++++++ Map aggregated traffic volumes to count stations +++++++");
 		Counts<Link> miv = new Counts<>();
 		Counts<Link> freight = new Counts<>();
-		stations.values().forEach(station -> mapTrafficVolumeToCount(station, miv, freight));
+
+		MultiModeCounts mmCounts = new MultiModeCounts(Link.class);
+		mmCounts.setYear(year);
+		mmCounts.setName("BASt Counts");
+		mmCounts.setSource("Bundesanstalt für Straßenwesen");
+		mmCounts.setDescription("Aggregated daily traffic volumes for car and freight traffic.");
+
+		stations.values().forEach(station -> mapTrafficVolumeToCount(station, miv, freight, mmCounts));
 
 		miv.setYear(year);
 		freight.setYear(year);
@@ -122,10 +127,12 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		new CountsWriter(miv).write(carOutput.toString());
 		new CountsWriter(freight).write(freightOutput.toString());
 
+		new MultiModeCountsWriter(mmCounts).write(carOutput.toString().replace("car-", ""));
+
 		return 0;
 	}
 
-	private void mapTrafficVolumeToCount(BAStCountStation station, Counts<Link> miv, Counts<Link> freight) {
+	private void mapTrafficVolumeToCount(BAStCountStation station, Counts<Link> miv, Counts<Link> freight, MultiModeCounts multiModeCounts) {
 
 		if (!station.hasMatchedLink())
 			return;
@@ -138,6 +145,10 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		Count<Link> mivCount = miv.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
 		Count<Link> freightCount = freight.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
 
+		MultiModeCount multiModeCount = multiModeCounts.createAndAddCount(station.getMatchedLink().getId(), station.getName(), null);
+		Measurable carVolume = multiModeCount.createVolume(TransportMode.car, false);
+		Measurable freightVolume = multiModeCount.createVolume("freight", false);
+
 		var mivTrafficVolumes = station.getMivTrafficVolume();
 		var freightTrafficVolumes = station.getFreightTrafficVolume();
 
@@ -145,8 +156,13 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 			if (hour.startsWith("0")) hour.replace("0", "");
 			int h = Integer.parseInt(hour);
-			mivCount.createVolume(h, mivTrafficVolumes.get(hour));
-			freightCount.createVolume(h, freightTrafficVolumes.get(hour));
+			Double mivAtHour = mivTrafficVolumes.get(hour);
+			Double freightAtHour = freightTrafficVolumes.get(hour);
+			mivCount.createVolume(h, mivAtHour);
+			freightCount.createVolume(h, freightAtHour);
+
+			carVolume.addAtHour(h, mivAtHour);
+			freightVolume.addAtHour(h, freightAtHour);
 		}
 	}
 
