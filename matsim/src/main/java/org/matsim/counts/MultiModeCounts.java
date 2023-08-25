@@ -100,6 +100,10 @@ public final class MultiModeCounts implements Attributable {
 		return measurableTags;
 	}
 
+	public MultiModeCount getCount(Id<? extends Identifiable> id) {
+		return this.counts.get(id);
+	}
+
 	@Override
 	public Attributes getAttributes() {
 		return attributes;

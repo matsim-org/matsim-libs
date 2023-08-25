@@ -21,6 +21,7 @@ public class Measurable {
 	private final String type;
 
 	private final String mode;
+	//TODO find a better implementation for Int2DoubleMap
 	private final Int2DoubleMap hourlyVolume;
 	private final boolean dailyValuesOnly;
 

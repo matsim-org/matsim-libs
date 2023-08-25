@@ -207,6 +207,9 @@ public class CreateCountsFromBAStDataTest {
 
 		new CreateCountsFromBAStData().execute(args);
 
+		Counts<Link> carCounts = new Counts<>();
+		new CountsReaderMatsimV1(carCounts).readFile(car);
+
 		MultiModeCounts multiModeCounts = new MultiModeCounts(Link.class);
 		new MultiModeCountsReader(multiModeCounts).readFile(car.replace("car-", ""));
 
@@ -215,5 +218,13 @@ public class CreateCountsFromBAStDataTest {
 		assertThat(size).isGreaterThan(0);
 
 		Assert.assertTrue(multiModeCounts.getMeasurableTags().contains("volumes"));
+
+		Count<Link> carCount = carCounts.getCount(Id.createLinkId("7686"));
+		MultiModeCount mmCount = multiModeCounts.getCount(Id.createLinkId("7686"));
+
+		double carVolume = carCount.getVolume(10).getValue();
+		double mmCarVolume = mmCount.getVolumesForMode(TransportMode.car).getAtHour(10);
+
+		assertThat(carVolume).isEqualTo(mmCarVolume);
 	}
 }
