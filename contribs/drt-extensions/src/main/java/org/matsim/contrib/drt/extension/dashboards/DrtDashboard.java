@@ -231,130 +231,91 @@ public class DrtDashboard implements Dashboard {
 			//Demand stats over iterations
 			layout.row("Demand and Wait Time Statistics per iteration")
 				.el(Plotly.class, (viz, data) -> {
-					viz.title = "Demand and wait time statistics per iteration";
-					viz.description = "Number of rides (customers) is displayed in bars, wait statistics in lines";
+					viz.title = "Rides and rejections per iteration";
+					viz.description = "Number of rides (customers) and rejections over the course of the simulation";
 
 					Plotly.DataSet dataset = viz.addDataset(data.output("*_customer_stats_" + drtConfigGroup.mode + ".csv"));
 
 					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 						.xAxis(Axis.builder().title("Iteration").build())
 						.yAxis(Axis.builder().title("Wait Time [s]").build())
-						.yAxis2(Axis.builder().title("No. of Rides")
-							.side(Axis.Side.right)
-							.overlaying(ScatterTrace.YAxis.Y)
-							.build())
 						.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 						.build();
 
-					viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-							.mode(ScatterTrace.Mode.LINE)
-							.name("Average")
-							.build(),
-						dataset.mapping()
-							.x("iteration")
-							.y("wait_average")
-					);
-
-					viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-							.mode(ScatterTrace.Mode.LINE)
-							.name("Median")
-							.build(),
-						dataset.mapping()
-							.x("iteration")
-							.y("wait_median")
-					);
-
-					viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-							.mode(ScatterTrace.Mode.LINE)
-							.name("P95")
-							.build(),
-						dataset.mapping()
-							.x("iteration")
-							.y("wait_p95")
-					);
-
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-							.opacity(0.5)
-							.yAxis(ScatterTrace.YAxis.Y2.toString())
 							.name("Rejections")
 							.build(),
 						dataset.mapping()
 							.x("iteration")
 							.y("rejections")
-//						.color(Plotly.ColorScheme.RdBu)
+						.color(Plotly.ColorScheme.RdBu)
 					);
 
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-							.opacity(0.5)
-							.yAxis(ScatterTrace.YAxis.Y2.toString())
 							.name("Rides")
 							.build(),
 						dataset.mapping()
 							.x("iteration")
 							.y("rides")
-//						.color(Plotly.ColorScheme.RdBu)
+						.color(Plotly.ColorScheme.RdBu)
 					);
 
 				})
 				.el(Line.class, (viz, data) -> {
-					viz.title = "Travel Distance per iteration";
+					viz.title = "Waiting time statistics per iteration";
+					viz.description = "";
 					viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
-					viz.description = "traveled distance versus direct distance";
 					viz.x = "iteration";
-					viz.columns = List.of("directDistance_m_mean", "distance_m_mean");
+					viz.columns = List.of("wait_average","wait_median", "wait_p95");
+					viz.legendName = List.of("Average", "Median", "95th Percentile");
 					viz.xAxisName = "Iteration";
-					viz.yAxisName = "distance [m]";
-				});
+					viz.yAxisName = "Waiting Time [s]";
+				})
+				;
 
 			layout.row("Demand And Travel Time Statistics per iteration")
 				.el(Plotly.class, (viz, data) -> {
-					viz.title = "Demand and travel time components per iteration";
-					viz.description = "Number of rides (customers) is displayed as a line, travel time components as bars";
+					viz.title = "Travel time components per iteration";
+					viz.description = "Comparing mean wait vs. mean in-vehicle travel time per customer";
 
 					Plotly.DataSet dataset = viz.addDataset(data.output("*_customer_stats_" + drtConfigGroup.mode + ".csv"));
 
 					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 						.xAxis(Axis.builder().title("Iteration").build())
-						.yAxis(Axis.builder().title("Average value of travel time component [s]")
-//					.overlaying(ScatterTrace.YAxis.Y2)
-							.build())
-						.yAxis2(Axis.builder().title("Nr of rides")
-							.side(Axis.Side.right)
-							.overlaying(ScatterTrace.YAxis.Y)
+						.yAxis(Axis.builder().title("Time [s]")
 							.build())
 						.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 						.build();
 
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-							.opacity(0.5)
+//							.opacity(0.5)
 							.name("In Vehicle")
 							.build(),
 						dataset.mapping()
 							.x("iteration")
 							.y("inVehicleTravelTime_mean")
-//						.color(Plotly.ColorScheme.RdBu)
+						.color(Plotly.ColorScheme.RdBu)
 					);
 
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-							.opacity(0.5)
+//							.opacity(0.5)
 							.name("Wait")
 							.build(),
 						dataset.mapping()
 							.x("iteration")
 							.y("wait_average")
-//						.color(Plotly.ColorScheme.RdBu)
+						.color(Plotly.ColorScheme.RdBu)
 					);
-
-					viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-							.mode(ScatterTrace.Mode.LINE)
-							.yAxis(ScatterTrace.YAxis.Y2.toString())
-							.name("Rides")
-							.build(),
-						dataset.mapping()
-							.x("iteration")
-							.y("rides")
-					);
-
+				})
+				.el(Line.class, (viz, data) -> {
+					viz.title = "Customer travel distance per iteration";
+					viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
+					viz.description = "Customer traveled distance versus customer direct distance";
+					viz.x = "iteration";
+					viz.columns = List.of("directDistance_m_mean", "distance_m_mean");
+					viz.legendName = List.of("Mean direct distance", "Mean driven distance");
+					viz.xAxisName = "Iteration";
+					viz.yAxisName = "distance [m]";
 				});
 
 
