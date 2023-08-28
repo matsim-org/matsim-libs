@@ -486,37 +486,38 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		ValueSelectorUnderGivenProbability tourStartTimeSelector = createTourStartTimeDistribution();
 		ValueSelectorUnderGivenProbability tourDurationTimeSelector = createTourDurationTimeDistribution();
 
-		CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
-		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
-		additionalCarrierVehicleTypes.values().forEach(
-				vehicleType -> carrierVehicleTypes.getVehicleTypes().putIfAbsent(vehicleType.getId(), vehicleType));
+        CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
+        Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
+        additionalCarrierVehicleTypes.values().forEach(
+                vehicleType -> carrierVehicleTypes.getVehicleTypes().putIfAbsent(vehicleType.getId(), vehicleType));
 
-		for (VehicleType vehicleType : carrierVehicleTypes.getVehicleTypes().values()) {
-			CostInformation costInformation = vehicleType.getCostInformation();
-			VehicleUtils.setCostsPerSecondInService(costInformation, costInformation.getCostsPerSecond());
-			VehicleUtils.setCostsPerSecondWaiting(costInformation, costInformation.getCostsPerSecond());
-		}
+        for (VehicleType vehicleType : carrierVehicleTypes.getVehicleTypes().values()) {
+            CostInformation costInformation = vehicleType.getCostInformation();
+            VehicleUtils.setCostsPerSecondInService(costInformation, costInformation.getCostsPerSecond());
+            VehicleUtils.setCostsPerSecondWaiting(costInformation, costInformation.getCostsPerSecond());
+        }
 
-		for (Integer purpose : odMatrix.getListOfPurposes()) {
-			for (String startZone : odMatrix.getListOfZones()) {
-				for (String modeORvehType : odMatrix.getListOfModesOrVehTypes()) {
-					boolean isStartingLocation = false;
-					checkIfIsStartingPosition: {
-						for (String possibleStopZone : odMatrix.getListOfZones()) {
-							if (!modeORvehType.equals("pt") && !modeORvehType.equals("op"))
-								if (odMatrix.getTripDistributionValue(startZone, possibleStopZone, modeORvehType,
-										purpose, smallScaleCommercialTrafficType) != 0) {
-									isStartingLocation = true;
-									break checkIfIsStartingPosition;
-								}
-						}
-					}
-					if (isStartingLocation) {
-						double occupancyRate = 0;
-						String[] possibleVehicleTypes = null;
-						Integer serviceTimePerStop = null;
-						ArrayList<String> startCategory = new ArrayList<>();
-						ArrayList<String> stopCategory = new ArrayList<>();
+        for (Integer purpose : odMatrix.getListOfPurposes()) {
+            for (String startZone : odMatrix.getListOfZones()) {
+                for (String modeORvehType : odMatrix.getListOfModesOrVehTypes()) {
+                    boolean isStartingLocation = false;
+                    checkIfIsStartingPosition:
+                    {
+                        for (String possibleStopZone : odMatrix.getListOfZones()) {
+                            if (!modeORvehType.equals("pt") && !modeORvehType.equals("op"))
+                                if (odMatrix.getTripDistributionValue(startZone, possibleStopZone, modeORvehType,
+                                        purpose, smallScaleCommercialTrafficType) != 0) {
+                                    isStartingLocation = true;
+                                    break checkIfIsStartingPosition;
+                                }
+                        }
+                    }
+                    if (isStartingLocation) {
+                        double occupancyRate = 0;
+                        String[] possibleVehicleTypes = null;
+                        Integer serviceTimePerStop = null;
+                        ArrayList<String> startCategory = new ArrayList<>();
+                        ArrayList<String> stopCategory = new ArrayList<>();
 						if (purpose == 1) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
@@ -618,60 +619,60 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							}
 						}
 
-						// use only types of the possibleTypes which are in the given types file
-						List<String> vehicleTypes = new ArrayList<>();
+                        // use only types of the possibleTypes which are in the given types file
+                        List<String> vehicleTypes = new ArrayList<>();
 
-						assert possibleVehicleTypes != null;
-						for (String possibleVehicleType : possibleVehicleTypes) {
-							if (FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().containsKey(Id.create(possibleVehicleType, VehicleType.class)))
-									vehicleTypes.add(possibleVehicleType);
-						}
-						String selectedStartCategory = startCategory.get(rnd.nextInt(startCategory.size()));
-						while (resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0)
-							selectedStartCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
+                        assert possibleVehicleTypes != null;
+                        for (String possibleVehicleType : possibleVehicleTypes) {
+                            if (FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().containsKey(
+                                    Id.create(possibleVehicleType, VehicleType.class)))
+                                vehicleTypes.add(possibleVehicleType);
+                        }
+                        String selectedStartCategory = startCategory.get(rnd.nextInt(startCategory.size()));
+                        while (resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0)
+                            selectedStartCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
 
-						String carrierName = null;
-						if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
-							carrierName = "Carrier_Freight_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
-						} else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic"))
-							carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
-						int numberOfDepots = odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType, purpose,
-								smallScaleCommercialTrafficType);
-						FleetSize fleetSize = FleetSize.FINITE;
-						int fixedNumberOfVehiclePerTypeAndLocation = 1; //TODO possible improvement
-						ArrayList<String> vehicleDepots = new ArrayList<>();
-						createdCarrier++;
-						log.info("Create carrier number " + createdCarrier + " of a maximum Number of "
-								+ maxNumberOfCarrier + " carriers.");
-						log.info("Carrier: " + carrierName + "; depots: " + numberOfDepots + "; services: "
-								+ (int) Math.ceil(odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType,
-										purpose, smallScaleCommercialTrafficType) / occupancyRate));
+                        String carrierName = null;
+                        if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
+                            carrierName = "Carrier_Freight_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
+                        } else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic"))
+                            carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
+                        int numberOfDepots = odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType, purpose,
+                                smallScaleCommercialTrafficType);
+                        FleetSize fleetSize = FleetSize.FINITE;
+                        ArrayList<String> vehicleDepots = new ArrayList<>();
+                        createdCarrier++;
+                        log.info("Create carrier number " + createdCarrier + " of a maximum Number of "
+                                + maxNumberOfCarrier + " carriers.");
+                        log.info("Carrier: " + carrierName + "; depots: " + numberOfDepots + "; services: "
+                                + (int) Math.ceil(odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType,
+                                purpose, smallScaleCommercialTrafficType) / occupancyRate));
 						createNewCarrierAndAddVehicleTypes(scenario, purpose, startZone,
 							selectedStartCategory, carrierName, vehicleTypes, numberOfDepots, fleetSize,
 							fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, regionLinksMap, smallScaleCommercialTrafficType,
 							tourStartTimeSelector, tourDurationTimeSelector);
 						log.info("Create services for carrier: " + carrierName);
-						for (String stopZone : odMatrix.getListOfZones()) {
-							int trafficVolumeForOD = Math.round(odMatrix.getTripDistributionValue(startZone,
-									stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
-							int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / occupancyRate);
-							if (numberOfJobs == 0)
-								continue;
-							String selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
-							while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
-								selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
-							String[] serviceArea = new String[] { stopZone };
-							TimeWindow serviceTimeWindow = TimeWindow.newInstance(6 * 3600, 20 * 3600);
-							createServices(scenario, vehicleDepots, selectedStopCategory, carrierName,
-									numberOfJobs, serviceArea, serviceTimePerStop, serviceTimeWindow, regionLinksMap);
-						}
-					}
-				}
-			}
-		}
-		log.warn("The jspritIterations are now set to " + jspritIterations + " in this simulation!");
-		log.info("Finished creating " + createdCarrier + " carriers including related services.");
-	}
+                        for (String stopZone : odMatrix.getListOfZones()) {
+                            int trafficVolumeForOD = Math.round(odMatrix.getTripDistributionValue(startZone,
+                                    stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
+                            int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / occupancyRate);
+                            if (numberOfJobs == 0)
+                                continue;
+                            String selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
+                            while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
+                                selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
+                            String[] serviceArea = new String[]{stopZone};
+                            TimeWindow serviceTimeWindow = TimeWindow.newInstance(6 * 3600, 20 * 3600);
+                            createServices(scenario, vehicleDepots, selectedStopCategory, carrierName,
+                                    numberOfJobs, serviceArea, serviceTimePerStop, serviceTimeWindow, regionLinksMap);
+                        }
+                    }
+                }
+            }
+        }
+        log.warn("The jspritIterations are now set to " + jspritIterations + " in this simulation!");
+        log.info("Finished creating " + createdCarrier + " carriers including related services.");
+    }
 
 	/**
 	 * Creates the services for one carrier.
