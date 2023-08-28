@@ -479,9 +479,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private void createCarriers(Config config, Scenario scenario, TripDistributionMatrix odMatrix,
 			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, String smallScaleCommercialTrafficType,
 			Map<String, HashMap<Id<Link>, Link>> regionLinksMap) {
-		int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
-				* odMatrix.getListOfModesOrVehTypes().size();
-		int createdCarrier = 0;
+        int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
+                * odMatrix.getListOfModesOrVehTypes().size();
+        int createdCarrier = 0;
+        int fixedNumberOfVehiclePerTypeAndLocation = 1; //TODO possible improvement, perhaps check KiD
+		ValueSelectorUnderGivenProbability tourStartTimeSelector = createTourStartTimeDistribution();
+		ValueSelectorUnderGivenProbability tourDurationTimeSelector = createTourDurationTimeDistribution();
 
 		CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
 		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
@@ -644,8 +647,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								+ (int) Math.ceil(odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType,
 										purpose, smallScaleCommercialTrafficType) / occupancyRate));
 						createNewCarrierAndAddVehicleTypes(scenario, purpose, startZone,
-								selectedStartCategory, carrierName, vehicleTypes, numberOfDepots, fleetSize,
-								fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, regionLinksMap, smallScaleCommercialTrafficType);
+							selectedStartCategory, carrierName, vehicleTypes, numberOfDepots, fleetSize,
+							fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, regionLinksMap, smallScaleCommercialTrafficType,
+							tourStartTimeSelector, tourDurationTimeSelector);
 						log.info("Create services for carrier: " + carrierName);
 						for (String stopZone : odMatrix.getListOfZones()) {
 							int trafficVolumeForOD = Math.round(odMatrix.getTripDistributionValue(startZone,
@@ -699,7 +703,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private void createNewCarrierAndAddVehicleTypes(Scenario scenario, Integer purpose, String startZone,
 													String selectedStartCategory, String carrierName,
 													List<String> vehicleTypes, int numberOfDepots, FleetSize fleetSize, int fixedNumberOfVehiclePerTypeAndLocation,
-													ArrayList<String> vehicleDepots, Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType) {
+													ArrayList<String> vehicleDepots, Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
+													ValueSelectorUnderGivenProbability tourStartTimeSelector,
+													ValueSelectorUnderGivenProbability tourDurationTimeSelector) {
 
 		Carriers carriers = FreightUtils.addOrGetCarriers(scenario);
 		CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
@@ -725,9 +731,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 
 		for (String singleDepot : vehicleDepots) {
-			int vehicleStartTime = rnd.nextInt(6 * 3600, 14 * 3600); // TODO Verteilung über den Tag prüfen
-			int vehicleEndTime = vehicleStartTime + 8 * 3600;
-			for (String thisVehicleType : vehicleTypes) {
+			int vehicleStartTime = getVehicleStartTime(tourStartTimeSelector);
+			int tourDuration = getVehicleTourDuration(tourDurationTimeSelector);
+			int vehicleEndTime = vehicleStartTime + tourDuration;
+			for (String thisVehicleType : vehicleTypes) { //TODO Flottenzusammensetzung anpassen. Momentan pro Depot alle Fahrzeugtypen 1x erzeugen
 				VehicleType thisType = carrierVehicleTypes.getVehicleTypes()
 						.get(Id.create(thisVehicleType, VehicleType.class));
 				if (fixedNumberOfVehiclePerTypeAndLocation == 0)
@@ -749,6 +756,29 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 			thisCarrier.setCarrierCapabilities(carrierCapabilities);
 		}
+	}
+
+	/** Gives a duration for the created tour under the given probability.
+	 * @param tourDurationTimeSelector
+	 * @return
+	 */
+	private int getVehicleTourDuration(ValueSelectorUnderGivenProbability tourDurationTimeSelector) {
+		ValueSelectorUnderGivenProbability.ProbabilityForValue selectedValue = tourDurationTimeSelector.getNextValueUnderGivenProbability();
+		int tourDurationLowerBound = Integer.parseInt(selectedValue.getValue());
+		int tourDurationUpperBound = Integer.parseInt(selectedValue.getUpperBound());
+        return rnd.nextInt(tourDurationLowerBound * 3600, tourDurationUpperBound * 3600);
+	}
+
+	/** Gives a tour start time for the created tour under the given probability.
+	 * @param tourStartTimeSelector
+	 * @return
+	 */
+	private int getVehicleStartTime(ValueSelectorUnderGivenProbability tourStartTimeSelector) {
+		ValueSelectorUnderGivenProbability.ProbabilityForValue selectedValue = tourStartTimeSelector.getNextValueUnderGivenProbability();
+		int tourStartTimeLowerBound = Integer.parseInt(selectedValue.getValue());
+		int tourStartTimeUpperBound = Integer.parseInt(selectedValue.getUpperBound());
+        return rnd.nextInt(tourStartTimeLowerBound * 3600, tourStartTimeUpperBound * 3600);
+
 	}
 
 	/**
@@ -1089,5 +1119,72 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			return score;
 		}
 
+	}
+
+	/**
+	 * Creates the probability distribution for the tour start times for the day.
+	 * The values are given in [h] and have an upperBound.
+	 * Data source: KiD 2002
+	 *
+	 * @return
+	 */
+	private ValueSelectorUnderGivenProbability createTourStartTimeDistribution() {
+		List<ValueSelectorUnderGivenProbability.ProbabilityForValue> tourStartProbabilityDistribution = new ArrayList<>();
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "1",  0.005));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("1", "2",  0.002));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("2", "3",  0.004));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("3", "4",  0.006));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("4", "5",  0.016));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("5", "6",  0.042));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("6", "7",  0.143));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("7", "8",  0.309));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("8", "9",  0.192));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("9", "10",  0.116));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("10", "11", 0.057));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("11", "12", 0.027));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("12", "13", 0.016));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("13", "14", 0.015));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("14", "15", 0.01));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("15", "16", 0.008));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("16", "17", 0.006));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("17", "18", 0.004));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("18", "19", 0.003));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("19", "20", 0.001));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("20", "21", 0.001));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("21", "22", 0.001));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("22", "23", 0.001));
+		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("23", "24", 0.001));
+
+		return new ValueSelectorUnderGivenProbability(tourStartProbabilityDistribution,rnd);
+	}
+
+	/** Creates the probability distribution for the tour duration for the day.
+	 * The values are given in [h] and have an upperBound.
+	 *  Data source: KiD 2002
+	 * @return
+	 */
+	private ValueSelectorUnderGivenProbability createTourDurationTimeDistribution() {
+		List<ValueSelectorUnderGivenProbability.ProbabilityForValue> tourDurationProbabilityDistribution = new ArrayList<>();
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "1",  0.13));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("1", "2",  0.069));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("2", "3",  0.06));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("3", "4",  0.059));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("4", "5",  0.07));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("5", "6",  0.071));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("6", "7",  0.075));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("7", "8",  0.091));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("8", "9",  0.129));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("9", "10",  0.108));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("10", "11", 0.059));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("11", "12", 0.029));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("12", "13", 0.017));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("13", "14", 0.01));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("14", "15", 0.006));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("15", "16", 0.004));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("16", "17", 0.002));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("17", "18", 0.001));
+		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("18", "19", 0.001));
+
+		return new ValueSelectorUnderGivenProbability(tourDurationProbabilityDistribution,rnd);
 	}
 }
