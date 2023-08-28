@@ -430,7 +430,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private Config readAndCheckConfig(Path inputDataDirectory, String modelName, String sampleName, Path output) throws Exception {
 
 		Config config = ConfigUtils.loadConfig(inputDataDirectory.resolve("config_demand.xml").toString());
-		if (output == null)
+		if (output == null || output.toString().isEmpty())
 			config.controler().setOutputDirectory(Path.of(config.controler().getOutputDirectory()).resolve(modelName)
 				.resolve(usedSmallScaleCommercialTrafficType.toString() + "_" + sampleName + "pct" + "_"
 						+ java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay() + "_" + resistanceFactor)
