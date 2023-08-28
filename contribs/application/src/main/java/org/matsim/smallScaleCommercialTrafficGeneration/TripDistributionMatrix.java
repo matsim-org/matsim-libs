@@ -340,7 +340,7 @@ public class TripDistributionMatrix {
 	private Double getResistanceFunktionValue(String startZone, String stopZone, Network network, Map<String, HashMap<Id<Link>, Link>> regionLinksMap, double resistanceFactor) {
 
 		//if false the calculation is faster; e.g. for debugging
-		boolean useNetworkRoutsForResistanceFunction = true;
+		boolean useNetworkRoutesForResistanceFunction = true;
 		double resistanceFunktionResult;
 		if (netBasedCosts == null) {
 			VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("vwCaddy", VehicleType.class));
@@ -364,7 +364,7 @@ public class TripDistributionMatrix {
 						distance = 0;
 					} else {
 
-						if (useNetworkRoutsForResistanceFunction) {
+						if (useNetworkRoutesForResistanceFunction) {
 							Location startLocation = Location.newInstance(regionLinksMap.get(startZone).keySet().iterator().next().toString());
 							Location stopLocation = Location.newInstance(regionLinksMap.get(stopZone).keySet().iterator().next().toString());
 							Vehicle exampleVehicle = getExampleVehicle(startLocation);
@@ -379,7 +379,7 @@ public class TripDistributionMatrix {
 
 						}
 					}
-					if (useNetworkRoutsForResistanceFunction)
+					if (useNetworkRoutesForResistanceFunction)
 						resistanceFunktionResult = Math.exp(-resistanceFactor*travelCosts);
 					else
 						resistanceFunktionResult = Math.exp(-distance);
