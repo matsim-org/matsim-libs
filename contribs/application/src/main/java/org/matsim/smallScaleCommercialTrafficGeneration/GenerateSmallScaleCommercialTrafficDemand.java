@@ -225,13 +225,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic ->
-							createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, usedSmallScaleCommercialTrafficType.toString(),
+							createCarriersAndDemand(output, scenario, shpZones, resultingDataPerZone, regionLinksMap, usedSmallScaleCommercialTrafficType.toString(),
 									inputDataDirectory, includeExistingModels);
 					case completeSmallScaleCommercialTraffic -> {
-						createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "commercialPersonTraffic",
+						createCarriersAndDemand(output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "commercialPersonTraffic",
 								inputDataDirectory, includeExistingModels);
 						includeExistingModels = false; // because already included in the step before
-						createCarriersAndDemand(config, output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "goodsTraffic",
+						createCarriersAndDemand(output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "goodsTraffic",
 								inputDataDirectory, includeExistingModels);
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
@@ -394,10 +394,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		});
 	}
 
-	private void createCarriersAndDemand(Config config, Path output, Scenario scenario, ShpOptions shpZones,
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone,
-			Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType, Path inputDataDirectory,
-			boolean includeExistingModels) throws Exception {
+	private void createCarriersAndDemand(Path output, Scenario scenario, ShpOptions shpZones,
+										 HashMap<String, Object2DoubleMap<String>> resultingDataPerZone,
+										 Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType, Path inputDataDirectory,
+										 boolean includeExistingModels) throws Exception {
 
 		ArrayList<String> modesORvehTypes;
 		if (smallScaleCommercialTrafficType.equals("goodsTraffic"))
@@ -422,7 +422,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 		final TripDistributionMatrix odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
 				trafficVolumePerTypeAndZone_stop, shpZones, smallScaleCommercialTrafficType, scenario, output, regionLinksMap);
-		createCarriers(config, scenario, odMatrix, resultingDataPerZone, smallScaleCommercialTrafficType, regionLinksMap);
+		createCarriers(scenario, odMatrix, resultingDataPerZone, smallScaleCommercialTrafficType, regionLinksMap);
 	}
 
 	/** Reads and checks config if all necessary parameter are set.
@@ -476,9 +476,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Creates the carriers and the related demand, based on the generated
 	 * TripDistributionMatrix.
 	 */
-	private void createCarriers(Config config, Scenario scenario, TripDistributionMatrix odMatrix,
-			HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, String smallScaleCommercialTrafficType,
-			Map<String, HashMap<Id<Link>, Link>> regionLinksMap) {
+	private void createCarriers(Scenario scenario, TripDistributionMatrix odMatrix,
+								HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, String smallScaleCommercialTrafficType,
+								Map<String, HashMap<Id<Link>, Link>> regionLinksMap) {
         int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
                 * odMatrix.getListOfModesOrVehTypes().size();
         int createdCarrier = 0;
