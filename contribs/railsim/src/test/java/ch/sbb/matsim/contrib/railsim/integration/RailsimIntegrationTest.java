@@ -411,4 +411,9 @@ public class RailsimIntegrationTest {
 
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "station_rerouting"), filter);
 	}
+
+	@Test
+	public void test_micro_meso_combination() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "micro_meso_combination"));
+	}
 }

@@ -41,8 +41,8 @@
 				<link refId="l_e_F"/>
 			</route>
 			<departures>
-				<departure id="5" departureTime="08:10:00" vehicleRefId="v_IR_1"/>
-				<departure id="9" departureTime="08:20:00" vehicleRefId="v_IR_3"/>
+				<departure id="5" departureTime="11:10:00" vehicleRefId="v_IR_1"/>
+				<departure id="9" departureTime="11:30:00" vehicleRefId="v_IR_3"/>
 			</departures>
 		</transitRoute>
 		<transitRoute id="IR_R">
@@ -66,8 +66,8 @@
 				<link refId="l_a_R"/>
 			</route>
 			<departures>
-				<departure id="6" departureTime="08:10:00" vehicleRefId="v_IR_2"/>
-				<departure id="10" departureTime="08:20:00" vehicleRefId="v_IR_4"/>
+				<departure id="6" departureTime="10:10:00" vehicleRefId="v_IR_2"/>
+				<departure id="10" departureTime="10:30:00" vehicleRefId="v_IR_4"/>
 			</departures>
 		</transitRoute>
 	</transitLine>
@@ -92,7 +92,7 @@
 			</route>
 			<departures>
 				<departure id="3" departureTime="08:00:00" vehicleRefId="v_IC_1"/>
-				<departure id="7" departureTime="08:15:00" vehicleRefId="v_IC_3"/>
+				<departure id="7" departureTime="09:40:00" vehicleRefId="v_IC_3"/>
 			</departures>
 		</transitRoute>
 		<transitRoute id="IC_R">
@@ -115,7 +115,7 @@
 			</route>
 			<departures>
 				<departure id="4" departureTime="08:00:00" vehicleRefId="v_IC_2"/>
-				<departure id="8" departureTime="08:15:00" vehicleRefId="v_IC_4"/>
+				<departure id="8" departureTime="08:40:00" vehicleRefId="v_IC_4"/>
 			</departures>
 		</transitRoute>
 	</transitLine>
@@ -138,7 +138,7 @@
 				<link refId="l_d_F"/>
 			</route>
 			<departures>
-				<departure id="1" departureTime="07:55:00" vehicleRefId="v_CARGO_1"/>
+				<departure id="1" departureTime="07:50:00" vehicleRefId="v_CARGO_1"/>
 			</departures>
 		</transitRoute>
 		<transitRoute id="IC_R">
@@ -159,7 +159,7 @@
 				<link refId="l_a_R"/>
 			</route>
 			<departures>
-				<departure id="2" departureTime="07:55:00" vehicleRefId="v_CARGO_2"/>
+				<departure id="2" departureTime="07:50:00" vehicleRefId="v_CARGO_2"/>
 			</departures>
 		</transitRoute>
 	</transitLine>
