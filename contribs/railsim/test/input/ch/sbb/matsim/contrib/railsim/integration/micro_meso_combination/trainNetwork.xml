@@ -81,14 +81,14 @@
 		<link id="l_a_F" from="n_a1" to="n_a2" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">a</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">12</attribute>
 				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
 			</attributes>
 		</link>
 		<link id="l_a_R" from="n_a2" to="n_a1" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">a</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">12</attribute>
 				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
 			</attributes>
 		</link>
@@ -204,12 +204,12 @@
 			</attributes>
 		</link>
 
-		<link id="l_c1_c2_2_F" from="n_c2" to="n_c2_2" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+		<link id="l_c1_c2_2_F" from="n_c2_2" to="n_c2" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">c1_c2_2</attribute>
 			</attributes>
 		</link>
-		<link id="l_c1_c2_2_R" from="n_c2_2" to="n_c2" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+		<link id="l_c1_c2_2_R" from="n_c2" to="n_c2_2" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">c1_c2_2</attribute>
 			</attributes>
@@ -268,13 +268,13 @@
 		<link id="l_d_F" from="n_d1" to="n_d2" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">d</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">6</attribute>
 			</attributes>
 		</link>
 		<link id="l_d_R" from="n_d2" to="n_d1" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">d</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">6</attribute>
 			</attributes>
 		</link>
 
@@ -310,14 +310,14 @@
 		<link id="l_e_F" from="n_e1" to="n_e2" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">e</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">6</attribute>
 				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
 			</attributes>
 		</link>
 		<link id="l_e_R" from="n_e2" to="n_e1" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">e</attribute>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">6</attribute>
 				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
 			</attributes>
 		</link>
