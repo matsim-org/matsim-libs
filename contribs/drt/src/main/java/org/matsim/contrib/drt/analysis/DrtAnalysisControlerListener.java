@@ -19,31 +19,7 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import static java.util.stream.Collectors.toList;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
@@ -70,29 +46,40 @@ import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
-import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author jbischoff
  */
-public class DrtAnalysisControlerListener implements IterationEndsListener, ShutdownListener {
+public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 	private final DrtVehicleDistanceStats drtVehicleStats;
 	private final MatsimServices matsimServices;
@@ -259,6 +246,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 		analyzeBoardingsAndDeboardings(legs, delimiter, qSimCfg.getStartTime().orElse(0), endTime, 3600, filename(event, "drt_boardings", ".csv"),
 				filename(event, "drt_alightments", ".csv"), network);
+
+		if(event.getIteration() == matsimServices.getConfig().controler().getLastIteration()){
+			copyOutputFromLastIterToMainDir(event.getIteration());
+		}
+
 	}
 
 	private static double getTotalDistance(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances) {
@@ -393,34 +385,33 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		return IOUtils.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename(prefix + "_" + drtCfg.getMode() + extension));
 	}
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
+	public void copyOutputFromLastIterToMainDir(int iteration) {
 		// copy analysis output from last iteration to output directory
-		dumpOutput(event.getIteration(), "waitTimeComparison", ".png");
-		dumpOutput(event.getIteration(), "waitTimeComparison", ".csv");
-		dumpOutput(event.getIteration(), "drt_rejections", ".csv");
-		dumpOutput(event.getIteration(), "drt_legs", ".csv");
-		dumpOutput(event.getIteration(), "vehicleDistanceStats", ".csv");
-		dumpOutput(event.getIteration(), "drt_detours", ".csv");
-		dumpOutput(event.getIteration(), "drt_detours", "_distancePlot.png");
-		dumpOutput(event.getIteration(), "drt_detours", "_travelTimePlot.png");
-		dumpOutput(event.getIteration(), "drt_detours", "_rideTimePlot.png");
-		dumpOutput(event.getIteration(), "waitStats", ".csv");
-		dumpOutput(event.getIteration(), "waitStats", ".png");
-		dumpOutput(event.getIteration(), "waitStats", "_requests.png");
-		dumpOutput(event.getIteration(), "constraints", "_waiting_time.png");
-		dumpOutput(event.getIteration(), "constraints", "_travel_time.png");
-		dumpOutput(event.getIteration(), "drt_boardings", ".csv");
-		dumpOutput(event.getIteration(), "drt_alightments", ".csv");
-		dumpOutput(event.getIteration(), "occupancy_time_profiles", ".txt");
-		dumpOutput(event.getIteration(), "occupancy_time_profiles" + "_" + TimeProfileCharts.ChartType.Line, ".png");
-		dumpOutput(event.getIteration(), "occupancy_time_profiles" + "_" + TimeProfileCharts.ChartType.StackedArea, ".png");
-		dumpOutput(event.getIteration(), "task_time_profiles", ".txt");
-		dumpOutput(event.getIteration(), "task_time_profiles" + "_" + TimeProfileCharts.ChartType.Line, ".png");
-		dumpOutput(event.getIteration(), "task_time_profiles" + "_" + TimeProfileCharts.ChartType.StackedArea, ".png");
+		copyOutput(iteration, "waitTimeComparison", ".png");
+		copyOutput(iteration, "waitTimeComparison", ".csv");
+		copyOutput(iteration, "drt_rejections", ".csv");
+		copyOutput(iteration, "drt_legs", ".csv");
+		copyOutput(iteration, "vehicleDistanceStats", ".csv");
+		copyOutput(iteration, "drt_detours", ".csv");
+		copyOutput(iteration, "drt_detours", "_distancePlot.png");
+		copyOutput(iteration, "drt_detours", "_travelTimePlot.png");
+		copyOutput(iteration, "drt_detours", "_rideTimePlot.png");
+		copyOutput(iteration, "waitStats", ".csv");
+		copyOutput(iteration, "waitStats", ".png");
+		copyOutput(iteration, "waitStats", "_requests.png");
+		copyOutput(iteration, "constraints", "_waiting_time.png");
+		copyOutput(iteration, "constraints", "_travel_time.png");
+		copyOutput(iteration, "drt_boardings", ".csv");
+		copyOutput(iteration, "drt_alightments", ".csv");
+		copyOutput(iteration, "occupancy_time_profiles", ".txt");
+		copyOutput(iteration, "occupancy_time_profiles" + "_" + TimeProfileCharts.ChartType.Line, ".png");
+		copyOutput(iteration, "occupancy_time_profiles" + "_" + TimeProfileCharts.ChartType.StackedArea, ".png");
+		copyOutput(iteration, "task_time_profiles", ".txt");
+		copyOutput(iteration, "task_time_profiles" + "_" + TimeProfileCharts.ChartType.Line, ".png");
+		copyOutput(iteration, "task_time_profiles" + "_" + TimeProfileCharts.ChartType.StackedArea, ".png");
 	}
 
-	private void dumpOutput(int iteration, String prefix, String extension) {
+	private void copyOutput(int iteration, String prefix, String extension) {
 		try {
 			IOUtils.copyFile(filename(iteration, prefix, extension), outputFilename(prefix, extension));
 		} catch (Exception ee) {
