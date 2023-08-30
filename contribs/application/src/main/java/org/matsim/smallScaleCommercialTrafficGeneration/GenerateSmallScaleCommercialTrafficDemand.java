@@ -1164,32 +1164,57 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private ValueSelectorUnderGivenProbability createTourStartTimeDistribution() {
 		List<ValueSelectorUnderGivenProbability.ProbabilityForValue> tourStartProbabilityDistribution = new ArrayList<>();
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "1",  0.005));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("1", "2",  0.002));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("2", "3",  0.004));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("3", "4",  0.006));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("4", "5",  0.016));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("5", "6",  0.042));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("6", "7",  0.143));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("7", "8",  0.309));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("8", "9",  0.192));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("9", "10",  0.116));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("10", "11", 0.057));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("11", "12", 0.027));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("12", "13", 0.016));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("13", "14", 0.015));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("14", "15", 0.01));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("15", "16", 0.008));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("16", "17", 0.006));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("17", "18", 0.004));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("18", "19", 0.003));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("19", "20", 0.001));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("20", "21", 0.001));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("21", "22", 0.001));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("22", "23", 0.001));
-		tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("23", "24", 0.001));
+		if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic.toString())) {
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "1", 0.002));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("1", "2", 0.001));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("2", "3", 0.001));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("3", "4", 0.002));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("4", "5", 0.008));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("5", "6", 0.031));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("6", "7", 0.144));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("7", "8", 0.335));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("8", "9", 0.182));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("9", "10", 0.108));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("10", "11", 0.057));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("11", "12", 0.032));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("12", "13", 0.021));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("13", "14", 0.021));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("14", "15", 0.019));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("15", "16", 0.012));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("16", "17", 0.009));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("17", "18", 0.006));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("18", "19", 0.004));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("19", "20", 0.003));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("20", "21", 0.001));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("22", "23", 0.001));
+		} else if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "1", 0.008));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("1", "2", 0.003));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("2", "3", 0.008));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("3", "4", 0.012));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("4", "5", 0.028));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("5", "6", 0.052));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("6", "7", 0.115));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("7", "8", 0.222));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("8", "9", 0.197));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("9", "10", 0.14));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("10", "11", 0.076));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("11", "12", 0.035));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("12", "13", 0.022));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("13", "14", 0.022));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("14", "15", 0.021));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("15", "16", 0.014));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("16", "17", 0.008));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("17", "18", 0.005));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("18", "19", 0.004));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("19", "20", 0.002));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("20", "21", 0.001));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("21", "22", 0.001));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("22", "23", 0.002));
+			tourStartProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("23", "24", 0.001));
 
-		return new ValueSelectorUnderGivenProbability(tourStartProbabilityDistribution,rnd);
+		}
+		return new ValueSelectorUnderGivenProbability(tourStartProbabilityDistribution, rnd);
 	}
 
 	/** Creates the probability distribution for the tour duration for the day.
@@ -1197,27 +1222,48 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 *  Data source: KiD 2002
 	 * @return
 	 */
-	private ValueSelectorUnderGivenProbability createTourDurationTimeDistribution() {
+	private ValueSelectorUnderGivenProbability createTourDurationTimeDistribution(String smallScaleCommercialTrafficType) {
 		List<ValueSelectorUnderGivenProbability.ProbabilityForValue> tourDurationProbabilityDistribution = new ArrayList<>();
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "1",  0.13));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("1", "2",  0.069));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("2", "3",  0.06));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("3", "4",  0.059));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("4", "5",  0.07));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("5", "6",  0.071));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("6", "7",  0.075));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("7", "8",  0.091));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("8", "9",  0.129));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("9", "10",  0.108));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("10", "11", 0.059));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("11", "12", 0.029));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("12", "13", 0.017));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("13", "14", 0.01));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("14", "15", 0.006));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("15", "16", 0.004));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("16", "17", 0.002));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("17", "18", 0.001));
-		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("18", "19", 0.001));
+		if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic.toString())) {
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "1", 0.14));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("1", "2", 0.066));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("2", "3", 0.056));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("3", "4", 0.052));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("4", "5", 0.061));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("5", "6", 0.063));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("6", "7", 0.07));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("7", "8", 0.086));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("8", "9", 0.14));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("9", "10", 0.122));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("10", "11", 0.068));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("11", "12", 0.031));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("12", "13", 0.018));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("13", "14", 0.01));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("14", "15", 0.006));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("15", "16", 0.003));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("16", "17", 0.002));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("17", "18", 0.001));
+		} else if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "1", 0.096));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("1", "2", 0.074));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("2", "3", 0.065));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("3", "4", 0.071));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("4", "5", 0.086));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("5", "6", 0.084));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("6", "7", 0.084));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("7", "8", 0.101));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("8", "9", 0.118));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("9", "10", 0.092));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("10", "11", 0.048));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("11", "12", 0.027));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("12", "13", 0.015));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("13", "14", 0.011));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("14", "15", 0.006));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("15", "16", 0.004));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("16", "17", 0.002));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("17", "18", 0.001));
+			tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("18", "19", 0.001));
+		}
 
 		return new ValueSelectorUnderGivenProbability(tourDurationProbabilityDistribution,rnd);
 	}
