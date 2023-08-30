@@ -479,12 +479,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private void createCarriers(Scenario scenario, TripDistributionMatrix odMatrix,
 								HashMap<String, Object2DoubleMap<String>> resultingDataPerZone, String smallScaleCommercialTrafficType,
 								Map<String, HashMap<Id<Link>, Link>> regionLinksMap) {
-        int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
-                * odMatrix.getListOfModesOrVehTypes().size();
-        int createdCarrier = 0;
-        int fixedNumberOfVehiclePerTypeAndLocation = 1; //TODO possible improvement, perhaps check KiD
-		ValueSelectorUnderGivenProbability tourStartTimeSelector = createTourStartTimeDistribution();
-		ValueSelectorUnderGivenProbability tourDurationTimeSelector = createTourDurationTimeDistribution();
+		int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
+			* odMatrix.getListOfModesOrVehTypes().size();
+		int createdCarrier = 0;
+		int fixedNumberOfVehiclePerTypeAndLocation = 1; //TODO possible improvement, perhaps check KiD
+		ValueSelectorUnderGivenProbability tourStartTimeSelector = createTourStartTimeDistribution(smallScaleCommercialTrafficType);
+		ValueSelectorUnderGivenProbability tourDurationTimeSelector = createTourDurationTimeDistribution(smallScaleCommercialTrafficType);
+		Map<String, ValueSelectorUnderGivenProbability> stopDurationTimeSelector = createStopDurationTimeDistributionPerCategory(
+			smallScaleCommercialTrafficType);
 
         CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
         Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
@@ -521,7 +523,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						if (purpose == 1) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
-								serviceTimePerStop = (int) Math.round(71.7 * 60);
+//								serviceTimePerStop = (int) Math.round(71.7 * 60);
 								occupancyRate = 1.5;
 							}
 							startCategory.add("Employee Secondary Sector Rest");
@@ -529,7 +531,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						} else if (purpose == 2) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
-								serviceTimePerStop = (int) Math.round(70.4 * 60); // Durschnitt aus Handel,Transp.,Einw.
+//								serviceTimePerStop = (int) Math.round(70.4 * 60); // Durschnitt aus Handel,Transp.,Einw.
 								occupancyRate = 1.6;
 							}
 							startCategory.add("Employee Secondary Sector Rest");
@@ -543,7 +545,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						} else if (purpose == 3) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
-								serviceTimePerStop = (int) Math.round(70.4 * 60);
+//								serviceTimePerStop = (int) Math.round(70.4 * 60);
 								occupancyRate = 1.2;
 							}
 							startCategory.add("Employee Retail");
@@ -598,23 +600,23 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							switch (modeORvehType) {
 								case "vehTyp1" -> {
 									possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"}; // possible to add more types, see source
-									serviceTimePerStop = Math.round(120 * 60);
+//									serviceTimePerStop = (int) Math.round(120.0 * 60);
 								}
 								case "vehTyp2" -> {
 									possibleVehicleTypes = new String[]{"mercedes313", "e_SpaceTourer"};
-									serviceTimePerStop = Math.round(150 * 60);
+//									serviceTimePerStop = (int) Math.round(150.0 * 60);
 								}
 								case "vehTyp3" -> {
 									possibleVehicleTypes = new String[]{"light8t", "light8t_electro"};
-									serviceTimePerStop = Math.round(120 * 60);
+//									serviceTimePerStop = (int) Math.round(120.0 * 60);
 								}
 								case "vehTyp4" -> {
 									possibleVehicleTypes = new String[]{"light8t", "light8t_electro"};
-									serviceTimePerStop = Math.round(75 * 60);
+//									serviceTimePerStop = (int) Math.round(75.0 * 60);
 								}
 								case "vehTyp5" -> {
 									possibleVehicleTypes = new String[]{"medium18t", "medium18t_electro", "heavy40t", "heavy40t_electro"};
-									serviceTimePerStop = Math.round(65 * 60);
+//									serviceTimePerStop = (int) Math.round(65.0 * 60);
 								}
 							}
 						}
@@ -652,27 +654,47 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, regionLinksMap, smallScaleCommercialTrafficType,
 							tourStartTimeSelector, tourDurationTimeSelector);
 						log.info("Create services for carrier: " + carrierName);
-                        for (String stopZone : odMatrix.getListOfZones()) {
-                            int trafficVolumeForOD = Math.round(odMatrix.getTripDistributionValue(startZone,
-                                    stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
-                            int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / occupancyRate);
-                            if (numberOfJobs == 0)
-                                continue;
-                            String selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
-                            while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
-                                selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
-                            String[] serviceArea = new String[]{stopZone};
-                            TimeWindow serviceTimeWindow = TimeWindow.newInstance(6 * 3600, 20 * 3600);
-                            createServices(scenario, vehicleDepots, selectedStopCategory, carrierName,
-                                    numberOfJobs, serviceArea, serviceTimePerStop, serviceTimeWindow, regionLinksMap);
-                        }
-                    }
-                }
-            }
-        }
-        log.warn("The jspritIterations are now set to " + jspritIterations + " in this simulation!");
-        log.info("Finished creating " + createdCarrier + " carriers including related services.");
-    }
+						if (carrierName.equals("Carrier_Business_Euskirchen_Freilingen_purpose_3"))
+							log.info("Create services for carrier: " + carrierName);
+						for (String stopZone : odMatrix.getListOfZones()) {
+							int trafficVolumeForOD = Math.round(odMatrix.getTripDistributionValue(startZone,
+								stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
+							int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / occupancyRate);
+							if (numberOfJobs == 0)
+								continue;
+							// find a category for the tour stop with existing employees in this zone
+							String selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
+							while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
+								selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
+							String[] serviceArea = new String[]{stopZone};
+							if (selectedStartCategory.equals("Inhabitants"))
+								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector.get(startCategory.get(0)));
+							else
+								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector.get(selectedStartCategory));
+
+							TimeWindow serviceTimeWindow = TimeWindow.newInstance(0 * 3600,
+								24 * 3600); //TODO eventuell anpassen wegen veränderter Tourzeiten
+							createServices(scenario, vehicleDepots, selectedStopCategory, carrierName,
+								numberOfJobs, serviceArea, serviceTimePerStop, serviceTimeWindow, regionLinksMap);
+						}
+					}
+				}
+			}
+		}
+		System.out.println("Final results for the start time distribution");
+		tourStartTimeSelector.writeResults();
+
+		System.out.println("Final results for the tour duration distribution");
+		tourDurationTimeSelector.writeResults();
+
+		for (String sector : stopDurationTimeSelector.keySet()) {
+			System.out.println("Final results for the stop duration distribution in sector " + sector);
+			stopDurationTimeSelector.get(sector).writeResults();
+		}
+
+		log.warn("The jspritIterations are now set to " + jspritIterations + " in this simulation!");
+		log.info("Finished creating " + createdCarrier + " carriers including related services.");
+	}
 
 	/**
 	 * Creates the services for one carrier.
@@ -780,6 +802,17 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		int tourStartTimeUpperBound = Integer.parseInt(selectedValue.getUpperBound());
         return rnd.nextInt(tourStartTimeLowerBound * 3600, tourStartTimeUpperBound * 3600);
 
+	}
+
+	/** Give a service duration based on the purpose and the trafficType under a given probability
+	 * @param serviceDurationTimeSelector
+	 * @return
+	 */
+	private Integer getServiceTimePerStop(ValueSelectorUnderGivenProbability serviceDurationTimeSelector) {
+		ValueSelectorUnderGivenProbability.ProbabilityForValue selectedValue = serviceDurationTimeSelector.getNextValueUnderGivenProbability();
+		int serviceDurationLowerBound = Integer.parseInt(selectedValue.getValue());
+		int serviceDurationUpperBound = Integer.parseInt(selectedValue.getUpperBound());
+		return rnd.nextInt(serviceDurationLowerBound * 60, serviceDurationUpperBound * 60);
 	}
 
 	/**
@@ -1187,5 +1220,220 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		tourDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("18", "19", 0.001));
 
 		return new ValueSelectorUnderGivenProbability(tourDurationProbabilityDistribution,rnd);
+	}
+
+	private Map<String, ValueSelectorUnderGivenProbability> createStopDurationTimeDistributionPerCategory(String smallScaleCommercialTrafficType) {
+
+		Map<String, ValueSelectorUnderGivenProbability> stopDurationProbabilityDistribution = new HashMap<>();
+		if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic.toString())) {
+			List<ValueSelectorUnderGivenProbability.ProbabilityForValue> singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.098));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.17));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "90", 0.127));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("90", "120", 0.11));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.17));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.076));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.057));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.01));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.026));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.045));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.064));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.034));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "720", 0.012));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("720", "840", 0.002));
+			stopDurationProbabilityDistribution.put("Employee Primary Sector",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.054));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.164));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "90", 0.153));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("90", "120", 0.087));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.12));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.055));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.044));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.02));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.025));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.069));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.132));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.058));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "720", 0.016));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("720", "840", 0.002));
+			stopDurationProbabilityDistribution.put("Employee Construction",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.13));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.324));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "90", 0.178));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("90", "120", 0.108));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.097));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.034));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.02));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.018));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.02));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.027));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.029));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.008));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "720", 0.006));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("720", "840", 0.001));
+			stopDurationProbabilityDistribution.put("Employee Secondary Sector Rest",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.178));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.301));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "90", 0.192));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("90", "120", 0.104));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.092));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.043));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.013));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.017));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.011));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.016));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.016));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.007));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "720", 0.007));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("720", "840", 0.001));
+			stopDurationProbabilityDistribution.put("Employee Retail",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.144));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.372));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "90", 0.203));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("90", "120", 0.069));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.112));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.038));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.011));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.011));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.011));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.012));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.007));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.005));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "720", 0.005));
+			stopDurationProbabilityDistribution.put("Employee Traffic/Parcels",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.196));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.292));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "90", 0.19));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("90", "120", 0.101));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.105));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.034));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.017));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.009));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.013));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.019));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.014));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.006));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "720", 0.004));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("720", "840", 0.001));
+			stopDurationProbabilityDistribution.put("Employee Tertiary Sector Rest",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+		} else if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
+			List<ValueSelectorUnderGivenProbability.ProbabilityForValue> singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.118));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.431));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "120", 0.23));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.098));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.048));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.024));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.019));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.029));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.048));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.042));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.016));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "660", 0.013));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("660", "720", 0.0));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("720", "780", 0.003));
+			stopDurationProbabilityDistribution.put("Employee Primary Sector",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.118));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.33));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "120", 0.219));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.136));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.047));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.029));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.013));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.022));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.046));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.109));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.04));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "660", 0.007));
+			stopDurationProbabilityDistribution.put("Employee Construction",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.118));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.584));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "120", 0.217));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.065));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.036));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.026));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.021));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.009));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.02));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.017));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.002));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "660", 0.002));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("720", "780", 0.001));
+			stopDurationProbabilityDistribution.put("Employee Secondary Sector Rest",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.118));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.598));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "120", 0.236));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.074));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.029));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.02));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.01));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.008));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.011));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.004));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("540", "600", 0.006));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "660", 0.003));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("780", "840", 0.001));
+			stopDurationProbabilityDistribution.put("Employee Retail",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.118));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "60", 0.579));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("60", "120", 0.238));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.075));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.049));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.016));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.016));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.008));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.011));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.002));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("600", "660", 0.002));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("660", "720", 0.002));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("780", "840", 0.002));
+			stopDurationProbabilityDistribution.put("Employee Traffic/Parcels",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+
+			singleStopDurationProbabilityDistribution = new ArrayList<>();
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("0", "30", 0.564));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("30", "120", 0.261));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("120", "180", 0.076));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("180", "240", 0.032));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("240", "300", 0.023));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("300", "360", 0.005));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("360", "420", 0.012));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("420", "480", 0.017));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("480", "540", 0.007));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("660", "720", 0.001));
+			singleStopDurationProbabilityDistribution.add(new ValueSelectorUnderGivenProbability.ProbabilityForValue("720", "780", 0.003));
+			stopDurationProbabilityDistribution.put("Employee Tertiary Sector Rest",
+				new ValueSelectorUnderGivenProbability(singleStopDurationProbabilityDistribution, rnd));
+		}
+		return stopDurationProbabilityDistribution;
 	}
 }
