@@ -2,7 +2,7 @@ package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SplittableRandom;
+import java.util.Random;
 
 /** This class creates a distribution under given probabilities for the possible values.
  *
@@ -12,9 +12,9 @@ public class ValueSelectorUnderGivenProbability {
 
 	private int anIntAsSum;
 	private final List<ProbabilityForValue> ProbabilityDistribution;
-	private final SplittableRandom rnd;
+	private final Random rnd;
 
-	public ValueSelectorUnderGivenProbability(List<ProbabilityForValue> ProbabilityDistribution, SplittableRandom rnd) {
+	public ValueSelectorUnderGivenProbability(List<ProbabilityForValue> ProbabilityDistribution, Random rnd) {
 		this.anIntAsSum = 0;
 		this.ProbabilityDistribution = ProbabilityDistribution;
 		this.rnd = rnd;
