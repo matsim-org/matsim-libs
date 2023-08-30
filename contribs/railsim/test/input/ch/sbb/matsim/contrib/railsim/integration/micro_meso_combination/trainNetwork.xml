@@ -16,11 +16,11 @@
       n=5            n=3            n=3            n=5
 
 	Stations:
-    - A: Mesoscopic, 5
+    - A: Mesoscopic, 12
     - B: Mesoscopic, 3
     - C: Microscopic, 3
-    - D: Mesoscopic, 3
-    - E: Mesoscopic, 5
+    - D: Mesoscopic, 6
+    - E: Mesoscopic, 6
 
     Routes:
     - AB: Capacity 2, Microscopic
@@ -28,22 +28,21 @@
     - CD: Capacity 2, Mesoscopic
     - CE: Capacity 2, Mesoscopic
 
-	Transit Stop Facilities (and Areas, if set):
+	Transit stop facilities and areas:
 	- Stop A_F (A)
 	- Stop A_R (A)
-	- Stop B
-	- Stop C1 (C)
-	- Stop C2 (C)
-	- Stop C3 (C)
-	- Stop D
-	- Stop E
-
-	Trains:
-	- Train1: AB - CE - JK
-	- Train2: AB - CE - JK
-	- Train3: AB - CE - JK
-	- Train4: AB - CE - LM
-	- Train5: AB - CE - LM
+	- Stop B_F (B)
+	- Stop B_R (B)
+	- Stop C1_F (C)
+	- Stop C1_R (C)
+	- Stop C2_F (C)
+	- Stop C2_R (C)
+	- Stop C3_F (C)
+	- Stop C3_R (C)
+	- Stop D_F (D)
+	- Stop D_R (D)
+	- Stop E_F (E)
+	- Stop E_R (E)
 	-->
 
 	<nodes>

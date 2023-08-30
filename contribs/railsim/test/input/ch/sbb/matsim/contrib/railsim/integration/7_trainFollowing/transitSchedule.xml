@@ -40,7 +40,7 @@
 			</route>
 			<departures>
 				<departure id="0" departureTime="08:00:00" vehicleRefId="train1"/>
-				<departure id="1" departureTime="08:00:01" vehicleRefId="train2"/>
+				<departure id="1" departureTime="08:00:15" vehicleRefId="train2"/>
 			</departures>
 		</transitRoute>
 	</transitLine>

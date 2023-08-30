@@ -36,4 +36,8 @@
 		<param name="inputNetworkFile" value="trainNetwork.xml"/>
 	</module>
 
+	<module name="railsim" >
+		<param name="trainPositionMaximumUpdateInterval" value="1.0" />
+	</module>
+
 </config>
