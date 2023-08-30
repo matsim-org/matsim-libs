@@ -18,13 +18,7 @@ The vehicle-specific acceleration. Unit: meters per square-seconds \[m/s²]
 
 #### railsimDeceleration
 
-TODO
-
-The typical vehicle-specific deceleration. Unit: meters per square-seconds \[m/s²]
-
-#### railsimMaxDeceleration
-
-The vehicle-specific maximum deceleration for emergency braking. Unit: meters per square-seconds \[m/s²]
+The vehicle-specific acceleration. Unit: meters per square-seconds \[m/s²]
 
 ## Examples
 
@@ -33,8 +27,7 @@ The vehicle-specific maximum deceleration for emergency braking. Unit: meters pe
 <vehicleType id="fvDosto">
     <attributes>
         <attribute name="railsimAcceleration" class="java.lang.Double">0.4</attribute>
-        <attribute name="railsimDeceleration" class="java.lang.Double">0.4</attribute>
-        <attribute name="railsimMaxDeceleration" class="java.lang.Double">0.5</attribute>
+        <attribute name="railsimDeceleration" class="java.lang.Double">0.5</attribute>
     </attributes>
     <capacity seats="606" standingRoomInPersons="0"/>
     <length meter="200.0"/>

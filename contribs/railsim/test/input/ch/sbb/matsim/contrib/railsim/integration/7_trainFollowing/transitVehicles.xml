@@ -5,7 +5,7 @@
 	<vehicleType id="trainType1">
 		<attributes>
 			<attribute name="railsimAcceleration" class="java.lang.Double">0.4</attribute>
-			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.4</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.4</attribute>
 		</attributes>
 		<capacity seats="40" standingRoomInPersons="0">
 
@@ -24,7 +24,7 @@
 	<vehicleType id="trainType2">
 		<attributes>
 			<attribute name="railsimAcceleration" class="java.lang.Double">0.1</attribute>
-			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.1</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.1</attribute>
 		</attributes>
 		<capacity seats="40" standingRoomInPersons="0">
 

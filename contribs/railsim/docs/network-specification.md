@@ -104,9 +104,26 @@ Example:
 
 Currently none.
 
-## Microscopic Examples
+## Microscopic
 
-### Single track with contraflow
+### Moving Block
+
+Model tracks consisting of short links. Each link, except for the opposite link, has a unique resource ID and a capacity
+of 1.
+
+### Fixed block
+
+Model blocks of links with a capacity of 1 each and identical resource IDs.
+
+### Station
+
+Each platform link has a distinct resource ID, except for the opposite link, and a capacity of 1. Each platform link has
+a transit stop facility, which belongs to the same stop area id. Ingoing and outgoing links of the station have entry
+and exit attributes.
+
+### Examples
+
+#### Single track with contraflow
 
 Default value of `railsimCapacity` sets an own railsimResourceId for each track.
 
@@ -128,7 +145,7 @@ Default value of `railsimCapacity` sets an own railsimResourceId for each track.
 </links>
 ```
 
-### Two tracks, each with a single direction
+#### Two tracks, each with a single direction
 
 Default value of `railsimResourceId` sets an own railsimResourceId for each track.
 
@@ -144,7 +161,7 @@ Default value of `railsimResourceId` sets an own railsimResourceId for each trac
 </links>
 ```
 
-### Three tracks, with contraflow in the middle track
+#### Three tracks, with contraflow in the middle track
 
 ```xml
 
@@ -170,7 +187,7 @@ Default value of `railsimResourceId` sets an own railsimResourceId for each trac
 </links>
 ```
 
-### Two tracks that intersect each other
+#### Two tracks that intersect each other
 
 If two tracks cross each other, e.g. like in the form of the letter `X` or a plus `+`, a train driving in one direction
 effectively also blocks the intersecting tracks, even if they only share a common node, but not a common link.
@@ -179,19 +196,25 @@ There should be no additional link- or node-attributes necessary. The simulation
 `railsimCapacity = 1`, but not if the capacity is larger than 1. If the node is blocked, no other trains must be able
 to cross this node/intersection.
 
-## Mesoscopic Examples
+## Mesoscopic
 
-### Section with a capacity of 2
+### Track
+
+Model tracks consisting of links with capacities exceeding 1. Opposite links share the same resource ID. There is no
+differentiation between moving block and fixed block. A mesoscopic link can only initiate or terminate at points where a
+physical track change is feasible.
+
+### Station
+
+The station consists of one or several links, including the opposite links, with the same resource ID. The capacity is
+larger than 1 and corresponds to the number of tracks.
+
+### Examples
+
+#### Section with a capacity of 2
 
 TODO
 
-### Station with 5 platforms
+#### Station with 5 platforms
 
 TODO
-
-## Fixed vs. Moving Block
-
-|              | Microscopic Scale                                                | Mesoscopic Scale                                                                       |
-|--------------|------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| Moving Block | Model tracks consisting of short links without resource id.      | Model tracks consisting of short links of capacity greater than 1 without resource id. |
-| Fixed Block  | Model blocks of links with capacity 1 and identical resource id. | Not supported, as it adds no value; simulation results will be nonsense.               |

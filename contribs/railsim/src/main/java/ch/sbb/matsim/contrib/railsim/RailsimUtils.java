@@ -27,7 +27,6 @@ public final class RailsimUtils {
 	// vehicle
 	public static final String VEHICLE_ATTRIBUTE_ACCELERATION = "railsimAcceleration";
 	public static final String VEHICLE_ATTRIBUTE_DECELERATION = "railsimDeceleration";
-	public static final String VEHICLE_ATTRIBUTE_MAX_DECELERATION = "railsimMaxDeceleration";
 
 	private RailsimUtils() {
 	}
@@ -68,8 +67,8 @@ public final class RailsimUtils {
 	 * @return the default deceleration time or the vehicle-specific value
 	 */
 	public static double getTrainDeceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
-		double deceleration = railsimConfigGroup.maxDecelerationGlobalDefault;
-		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_MAX_DECELERATION);
+		double deceleration = railsimConfigGroup.decelerationGlobalDefault;
+		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_DECELERATION);
 		return attr != null ? (double) attr : deceleration;
 	}
 

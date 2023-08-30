@@ -41,8 +41,8 @@ public class RailsimConfigGroup extends ReflectiveConfigGroup {
 	public double accelerationGlobalDefault = 0.5;
 
 	@Parameter
-	@Comment("Maximum Global deceleration in meters per second^2 which is used if there is no value provided in the vehicle attributes (" + RailsimUtils.VEHICLE_ATTRIBUTE_MAX_DECELERATION + ");" + " used to compute the reserved train path and the train velocity per link.")
-	public double maxDecelerationGlobalDefault = 0.5;
+	@Comment("Global deceleration in meters per second^2 which is used if there is no value provided in the vehicle attributes (" + RailsimUtils.VEHICLE_ATTRIBUTE_DECELERATION + ");" + " used to compute the reserved train path and the train velocity per link.")
+	public double decelerationGlobalDefault = 0.5;
 
 	@Parameter
 	@Comment("Time interval in seconds a train has to wait until trying again to request a track reservation if the track was blocked by another train.")

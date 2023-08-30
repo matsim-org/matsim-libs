@@ -5,7 +5,7 @@
 	<vehicleType id="IC">
 		<attributes>
 			<attribute name="railsimAcceleration" class="java.lang.Double">0.3</attribute>
-			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.3</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.3</attribute>
 		</attributes>
 		<capacity seats="606" standingRoomInPersons="0"/>
 		<length meter="300.0"/>
@@ -17,7 +17,7 @@
 	<vehicleType id="IR">
 		<attributes>
 			<attribute name="railsimAcceleration" class="java.lang.Double">0.4</attribute>
-			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.4</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.4</attribute>
 		</attributes>
 		<capacity seats="400" standingRoomInPersons="0"/>
 		<length meter="200.0"/>
@@ -29,7 +29,7 @@
 	<vehicleType id="CARGO">
 		<attributes>
 			<attribute name="railsimAcceleration" class="java.lang.Double">0.1</attribute>
-			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.1</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.1</attribute>
 		</attributes>
 		<capacity seats="1" standingRoomInPersons="0"/>
 		<length meter="400.0"/>
