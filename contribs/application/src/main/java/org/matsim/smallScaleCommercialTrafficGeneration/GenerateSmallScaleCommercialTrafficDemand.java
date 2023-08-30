@@ -520,6 +520,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
                         Integer serviceTimePerStop = null;
                         ArrayList<String> startCategory = new ArrayList<>();
                         ArrayList<String> stopCategory = new ArrayList<>();
+						ArrayList<String> startCategory = new ArrayList<>();
+						ArrayList<String> stopCategory = new ArrayList<>();
+						stopCategory.add("Employee Primary Sector");
+						stopCategory.add("Employee Construction");
+						stopCategory.add("Employee Secondary Sector Rest");
+						stopCategory.add("Employee Retail");
+						stopCategory.add("Employee Traffic/Parcels");
+						stopCategory.add("Employee Tertiary Sector Rest");
+						stopCategory.add("Inhabitants");
 						if (purpose == 1) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
@@ -527,6 +536,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								occupancyRate = 1.5;
 							}
 							startCategory.add("Employee Secondary Sector Rest");
+							stopCategory.clear();
 							stopCategory.add("Employee Secondary Sector Rest");
 						} else if (purpose == 2) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
@@ -535,13 +545,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								occupancyRate = 1.6;
 							}
 							startCategory.add("Employee Secondary Sector Rest");
-							stopCategory.add("Employee Primary Sector");
-							stopCategory.add("Employee Construction");
-							stopCategory.add("Employee Secondary Sector Rest");
-							stopCategory.add("Employee Retail");
-							stopCategory.add("Employee Traffic/Parcels");
-							stopCategory.add("Employee Tertiary Sector Rest");
-							stopCategory.add("Inhabitants");
 						} else if (purpose == 3) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
@@ -550,13 +553,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							}
 							startCategory.add("Employee Retail");
 							startCategory.add("Employee Tertiary Sector Rest");
-							stopCategory.add("Employee Primary Sector");
-							stopCategory.add("Employee Construction");
-							stopCategory.add("Employee Secondary Sector Rest");
-							stopCategory.add("Employee Retail");
-							stopCategory.add("Employee Traffic/Parcels");
-							stopCategory.add("Employee Tertiary Sector Rest");
-							stopCategory.add("Inhabitants");
 						} else if (purpose == 4) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
@@ -564,13 +560,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								occupancyRate = 1.2;
 							}
 							startCategory.add("Employee Traffic/Parcels");
-							stopCategory.add("Employee Primary Sector");
-							stopCategory.add("Employee Construction");
-							stopCategory.add("Employee Secondary Sector Rest");
-							stopCategory.add("Employee Retail");
-							stopCategory.add("Employee Traffic/Parcels");
-							stopCategory.add("Employee Tertiary Sector Rest");
-							stopCategory.add("Inhabitants");
 						} else if (purpose == 5) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"mercedes313", "e_SpaceTourer"};
@@ -578,22 +567,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								occupancyRate = 1.7;
 							}
 							startCategory.add("Employee Construction");
-							stopCategory.add("Employee Primary Sector");
-							stopCategory.add("Employee Construction");
-							stopCategory.add("Employee Secondary Sector Rest");
-							stopCategory.add("Employee Retail");
-							stopCategory.add("Employee Traffic/Parcels");
-							stopCategory.add("Employee Tertiary Sector Rest");
-							stopCategory.add("Inhabitants");
 						} else if (purpose == 6) {
 							startCategory.add("Inhabitants");
-							stopCategory.add("Employee Primary Sector");
-							stopCategory.add("Employee Construction");
-							stopCategory.add("Employee Secondary Sector Rest");
-							stopCategory.add("Employee Retail");
-							stopCategory.add("Employee Traffic/Parcels");
-							stopCategory.add("Employee Tertiary Sector Rest");
-							stopCategory.add("Inhabitants");
 						}
 						if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 							occupancyRate = 1.;
