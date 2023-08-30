@@ -162,7 +162,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--pathOutput", description = "Path for the output")
 	private Path output;
 
-	private SplittableRandom rnd;
+	private Random rnd;
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new GenerateSmallScaleCommercialTrafficDemand()).execute(args));
@@ -444,7 +444,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
 			config.controler().getOverwriteFileSetting(), ControlerConfigGroup.CompressionType.gzip);
 		new File(Path.of(config.controler().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
-		rnd  = new SplittableRandom(config.global().getRandomSeed());
+		rnd = new Random(config.global().getRandomSeed());
 		if (config.network().getInputFile() == null)
 			throw new Exception("No network file in config");
 		if (config.network().getInputCRS() == null)
