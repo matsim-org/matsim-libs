@@ -32,7 +32,7 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 	private static int typicalTourDuration;
 	@CommandLine.Option(names = "--seed", description = "Set seed", defaultValue = "4411")
 	private static int seed;
-	private static final SplittableRandom rnd = new SplittableRandom(seed);
+	private static final Random rnd = new Random(seed);
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateDifferentPlansForFreightPopulation()).execute(args));
