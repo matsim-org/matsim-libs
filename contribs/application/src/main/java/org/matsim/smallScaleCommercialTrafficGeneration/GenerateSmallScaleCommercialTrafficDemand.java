@@ -521,7 +521,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					if (isStartingLocation) {
 						double occupancyRate = 0;
 						String[] possibleVehicleTypes = null;
-						Integer serviceTimePerStop = null;
 						ArrayList<String> startCategory = new ArrayList<>();
 						ArrayList<String> stopCategory = new ArrayList<>();
 						stopCategory.add("Employee Primary Sector");
@@ -534,7 +533,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						if (purpose == 1) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
-//								serviceTimePerStop = (int) Math.round(71.7 * 60);
 								occupancyRate = 1.5;
 							}
 							startCategory.add("Employee Secondary Sector Rest");
@@ -543,14 +541,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						} else if (purpose == 2) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
-//								serviceTimePerStop = (int) Math.round(70.4 * 60); // Durschnitt aus Handel,Transp.,Einw.
 								occupancyRate = 1.6;
 							}
 							startCategory.add("Employee Secondary Sector Rest");
 						} else if (purpose == 3) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
-//								serviceTimePerStop = (int) Math.round(70.4 * 60);
 								occupancyRate = 1.2;
 							}
 							startCategory.add("Employee Retail");
@@ -558,14 +554,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						} else if (purpose == 4) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
-//								serviceTimePerStop = (int) Math.round(100.6 * 60);
 								occupancyRate = 1.2;
 							}
 							startCategory.add("Employee Traffic/Parcels");
 						} else if (purpose == 5) {
 							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
 								possibleVehicleTypes = new String[]{"mercedes313", "e_SpaceTourer"};
-//								serviceTimePerStop = (int) Math.round(214.7 * 60);
 								occupancyRate = 1.7;
 							}
 							startCategory.add("Employee Construction");
@@ -575,26 +569,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
 							occupancyRate = 1.;
 							switch (modeORvehType) {
-								case "vehTyp1" -> {
+								case "vehTyp1" ->
 									possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"}; // possible to add more types, see source
-//									serviceTimePerStop = (int) Math.round(120.0 * 60);
-								}
-								case "vehTyp2" -> {
+								case "vehTyp2" ->
 									possibleVehicleTypes = new String[]{"mercedes313", "e_SpaceTourer"};
-//									serviceTimePerStop = (int) Math.round(150.0 * 60);
-								}
-								case "vehTyp3" -> {
+								case "vehTyp3", "vehTyp4" ->
 									possibleVehicleTypes = new String[]{"light8t", "light8t_electro"};
-//									serviceTimePerStop = (int) Math.round(120.0 * 60);
-								}
-								case "vehTyp4" -> {
-									possibleVehicleTypes = new String[]{"light8t", "light8t_electro"};
-//									serviceTimePerStop = (int) Math.round(75.0 * 60);
-								}
-								case "vehTyp5" -> {
+								case "vehTyp5" ->
 									possibleVehicleTypes = new String[]{"medium18t", "medium18t_electro", "heavy40t", "heavy40t_electro"};
-//									serviceTimePerStop = (int) Math.round(65.0 * 60);
-								}
 							}
 						}
 
@@ -647,12 +629,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
 								selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
 							String[] serviceArea = new String[]{stopZone};
+							int serviceTimePerStop;
 							if (selectedStartCategory.equals("Inhabitants"))
 								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, startCategory.get(0), modeORvehType, smallScaleCommercialTrafficType);
 							else
 								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, selectedStartCategory, modeORvehType, smallScaleCommercialTrafficType);
 
-							TimeWindow serviceTimeWindow = TimeWindow.newInstance(0 * 3600,
+							TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
 								24 * 3600); //TODO eventuell anpassen wegen veränderter Tourzeiten
 							createServices(scenario, vehicleDepots, selectedStopCategory, carrierName,
 								numberOfJobs, serviceArea, serviceTimePerStop, serviceTimeWindow, regionLinksMap);
@@ -1012,8 +995,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	static class DriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
-		// private static final Logger log =
-		// Logger.getLogger(DriversActivityScoring.class);
 
 		private double score;
 		private final double timeParameter = 0.008;
