@@ -1,18 +1,15 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PopulationUtils;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.SplittableRandom;
+import java.util.Random;
 
 @CommandLine.Command(name = "generate-plan-variants-for-freight", description = "Generates variants of plans for a population of freight agents", showDefaultValues = true)
 
@@ -21,6 +18,7 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 	private enum PlanVariantStrategy{changeStartingTimes}
 
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the population", defaultValue = "output/testOutput/testPopulation_new.xml.gz")
+	private enum PlanVariantStrategy {changeStartingTimes, locationChoice}
 	private Path populationPath;
 	@CommandLine.Option(names = "--outputPopulationPath", description = "Path to the outputPopulation", defaultValue = "output/testOutput/testPopulationVariant.xml.gz", required = true)
 	private Path outputPopulationPath;
@@ -51,21 +49,20 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 		return null;
 	}
 
-	public static void createPlanVariantsForPopulations(String planVariantStrategy, Population population, int selectedNumberOfPlanVariants,
+	public static void createMorePlansWithDifferentStartTimes(Population population, int selectedNumberOfPlanVariants,
 														int selectedEarliestTourStartTime, int selectedLatestTourStartTime,
 														int selectedTypicalTourDuration) {
-		PlanVariantStrategy selectedPlanVariantStrategy;
-		switch (planVariantStrategy) {
-			case ("changeStartingTimes") -> {
-				selectedPlanVariantStrategy = PlanVariantStrategy.changeStartingTimes;
-			}
-			default -> throw new RuntimeException(
-				"No possible PlanVariantStrategy selected. Possible strategies are: " + Arrays.toString(PlanVariantStrategy.values()));
-		}
+		PlanVariantStrategy selectedPlanVariantStrategy = PlanVariantStrategy.changeStartingTimes;
 		numberOfPlanVariants = selectedNumberOfPlanVariants;
 		earliestTourStartTime = selectedEarliestTourStartTime;
 		latestTourStartTime = selectedLatestTourStartTime;
 		typicalTourDuration = selectedTypicalTourDuration;
+		createPlanVariants(selectedPlanVariantStrategy, population);
+	}
+
+	public static void createMorePlansWithDifferentActivityOrder(Population population, int selectedNumberOfPlanVariants){
+		PlanVariantStrategy selectedPlanVariantStrategy = PlanVariantStrategy.locationChoice;
+		numberOfPlanVariants = selectedNumberOfPlanVariants;
 		createPlanVariants(selectedPlanVariantStrategy, population);
 	}
 
@@ -84,6 +81,36 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 						PopulationUtils.getFirstActivity(newPLan).setEndTime(variantStartTime);
 						PopulationUtils.getLastActivity(newPLan).setStartTime(variantEndTime);
 					}
+				}
+				case locationChoice -> {
+
+					List<Integer> activityIndexList = new ArrayList<>();
+					int count = 0;
+					for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
+						if (planElement instanceof Activity activity) {
+							if (activity.getType().equals("service")) {
+								activityIndexList.add(count);
+							}
+						}
+						count++;
+					}
+					for (int i = person.getPlans().size(); i < numberOfPlanVariants; i++) {
+						if (activityIndexList.size() < 2)
+							continue;
+						List<Integer> activityNewIndexList = new ArrayList<Integer>(activityIndexList);
+//						Collections.shuffle(activityIndexList, rnd);
+						Collections.shuffle(activityNewIndexList, rnd);
+						List<Integer> alreadySwapedActivity = new ArrayList<>();
+						Plan newPLan = person.createCopyOfSelectedPlanAndMakeSelected();
+						person.setSelectedPlan(person.getPlans().get(0));
+						for (int j = 0; j < activityIndexList.size(); j++) {
+							if (alreadySwapedActivity.contains(activityIndexList.get(j)))
+								continue;
+							Collections.swap(newPLan.getPlanElements(), activityIndexList.get(j), activityNewIndexList.get(j));
+							alreadySwapedActivity.add(activityNewIndexList.get(j));
+						}
+					}
+
 				}
 				default -> throw new RuntimeException("No possible PlanVariantStrategy selected");
 			}

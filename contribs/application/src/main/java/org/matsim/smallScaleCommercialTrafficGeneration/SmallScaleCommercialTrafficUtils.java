@@ -245,18 +245,20 @@ public class SmallScaleCommercialTrafficUtils {
 		String outputPopulationFile;
 		if (nameOutputPopulation == null)
 			if (smallScaleCommercialTrafficType.equals("completeSmallScaleCommercialTraffic"))
-				outputPopulationFile = output.toString() + "/"+modelName +"_" + "smallScaleCommercialTraffic" + "_" + sampleName + "pct_plans.xml.gz";
+				outputPopulationFile = output.toString() + "/" + modelName + "_" + "smallScaleCommercialTraffic" + "_" + sampleName + "pct_plans.xml.gz";
 			else
-				outputPopulationFile = output.toString() + "/"+modelName +"_" + smallScaleCommercialTrafficType + "_" + sampleName + "pct_plans.xml.gz";
-
-		else {
-			if (numberOfPlanVariantsPerAgent > 1)
-				CreateDifferentPlansForFreightPopulation.createPlanVariantsForPopulations("changeStartingTimes", population, numberOfPlanVariantsPerAgent, 6*3600, 14*3600, 8*3600);
-			else if (numberOfPlanVariantsPerAgent < 1)
-				log.warn("You selected " + numberOfPlanVariantsPerAgent + " of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.");
+				outputPopulationFile = output.toString() + "/" + modelName + "_" + smallScaleCommercialTrafficType + "_" + sampleName + "pct_plans.xml.gz";
+		else
 			outputPopulationFile = output.toString() + "/" + nameOutputPopulation;
-		}
-		PopulationUtils.writePopulation(population,outputPopulationFile);
+		if (numberOfPlanVariantsPerAgent > 1)
+//				CreateDifferentPlansForFreightPopulation.createMorePlansWithDifferentStartTimes(population, numberOfPlanVariantsPerAgent, 6*3600, 14*3600, 8*3600);
+			CreateDifferentPlansForFreightPopulation.createMorePlansWithDifferentActivityOrder(population, numberOfPlanVariantsPerAgent);
+		else if (numberOfPlanVariantsPerAgent < 1)
+			log.warn(
+				"You selected " + numberOfPlanVariantsPerAgent + " of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.");
+
+
+		PopulationUtils.writePopulation(population, outputPopulationFile);
 		scenario.getPopulation().getPersons().clear();
 	}
 	static String getSampleNameOfOutputFolder(double sample) {
