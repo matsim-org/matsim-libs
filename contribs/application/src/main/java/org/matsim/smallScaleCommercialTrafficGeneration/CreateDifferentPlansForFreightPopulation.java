@@ -34,7 +34,8 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 	private static int typicalTourDuration;
 	@CommandLine.Option(names = "--seed", description = "Set seed", defaultValue = "4411")
 	private static int seed;
-	private static final SplittableRandom rnd  = new SplittableRandom(seed);
+	private static final SplittableRandom rnd = new SplittableRandom(seed);
+
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateDifferentPlansForFreightPopulation()).execute(args));
 	}
@@ -49,13 +50,17 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 		PopulationUtils.writePopulation(population, outputPopulationPath.toString());
 		return null;
 	}
-	public static void createPlanVariantsForPopulations(String planVariantStrategy, Population population, int selectedNumberOfPlanVariants, int selectedEarliestTourStartTime, int selectedLatestTourStartTime, int selectedTypicalTourDuration){
+
+	public static void createPlanVariantsForPopulations(String planVariantStrategy, Population population, int selectedNumberOfPlanVariants,
+														int selectedEarliestTourStartTime, int selectedLatestTourStartTime,
+														int selectedTypicalTourDuration) {
 		PlanVariantStrategy selectedPlanVariantStrategy;
 		switch (planVariantStrategy) {
 			case ("changeStartingTimes") -> {
 				selectedPlanVariantStrategy = PlanVariantStrategy.changeStartingTimes;
 			}
-			default -> throw new RuntimeException("No possible PlanVariantStrategy selected. Possible strategies are: " + Arrays.toString(PlanVariantStrategy.values()));
+			default -> throw new RuntimeException(
+				"No possible PlanVariantStrategy selected. Possible strategies are: " + Arrays.toString(PlanVariantStrategy.values()));
 		}
 		numberOfPlanVariants = selectedNumberOfPlanVariants;
 		earliestTourStartTime = selectedEarliestTourStartTime;
@@ -63,9 +68,10 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 		typicalTourDuration = selectedTypicalTourDuration;
 		createPlanVariants(selectedPlanVariantStrategy, population);
 	}
+
 	private static void createPlanVariants(PlanVariantStrategy selectedPlanVariantStrategy, Population population) {
-		for (Person person: population.getPersons().values()) {
-			switch (selectedPlanVariantStrategy){
+		for (Person person : population.getPersons().values()) {
+			switch (selectedPlanVariantStrategy) {
 				case changeStartingTimes -> {
 
 					double initTourStart = PopulationUtils.getFirstActivity(person.getSelectedPlan()).getEndTime().seconds();
@@ -88,21 +94,23 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 		double vehicleStartTime = 0;
 		while (vehicleStartTime == 0) {
 			double possibleVehicleStartTime = rnd.nextInt(earliestTourStartTime, latestTourStartTime);
-			if(checkPossibleVehicleStartTime(possibleVehicleStartTime, timeVariants))
+			if (checkPossibleVehicleStartTime(possibleVehicleStartTime, timeVariants))
 				vehicleStartTime = possibleVehicleStartTime;
 		}
 		timeVariants.add(vehicleStartTime);
 		return vehicleStartTime;
 	}
 
-	/** Checks if the new starting time has always a minimum 30 minutes difference to all other possible startimes.
+	/**
+	 * Checks if the new starting time has always a minimum 30 minutes difference to all other possible startimes.
+	 *
 	 * @param possibleVehicleStartTime
 	 * @param timeVariants
 	 * @return
 	 */
 	private static boolean checkPossibleVehicleStartTime(double possibleVehicleStartTime, List<Double> timeVariants) {
-		for (double usedTimes: timeVariants) {
-			if (Math.abs((possibleVehicleStartTime-usedTimes)) > 1800)
+		for (double usedTimes : timeVariants) {
+			if (Math.abs((possibleVehicleStartTime - usedTimes)) > 1800)
 				return true;
 		}
 		return false;
