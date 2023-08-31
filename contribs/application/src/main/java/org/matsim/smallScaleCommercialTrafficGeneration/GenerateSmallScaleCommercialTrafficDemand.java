@@ -86,12 +86,6 @@ import java.util.stream.Collectors;
  */
 @CommandLine.Command(name = "generate-small-scale-commercial-traffic", description = "Generates plans for a small scale commercial traffic model", showDefaultValues = true)
 public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppCommand {
-	// goodsTraffic --> goodsTraffic -> Done: RE
-	// commercialPersonTraffic --> commercialPersonTraffic -> Done: RE
-
-	// small scale commercial person traffic ... "Krankenschwester" ... in "commercialPersonTraffic". -> Done: RE
-	// small scale commercial goods traffic ... "Essen auf Rädern" ... in "goodsTraffic'. -> Done: RE
-
 	// freight traffic from extern:
 
 	// Option 1: take "as is" from Chengqi code.
