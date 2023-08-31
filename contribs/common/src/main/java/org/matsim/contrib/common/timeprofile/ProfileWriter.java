@@ -77,7 +77,8 @@ public class ProfileWriter implements IterationEndsListener {
 		String file = filename(outputFile);
 		String timeFormat = Time.TIMEFORMAT_HHMMSS;
 
-		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
+		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"),
+			matsimServices.getConfig().global().getDefaultDelimiter().charAt(0))) {
 			String[] profileHeader = profiles.keySet().toArray(new String[0]);
 			writer.writeNext(new CSVLineBuilder().add("time").addAll(profileHeader));
 			for (int i = 0; i < times.length; i++) {

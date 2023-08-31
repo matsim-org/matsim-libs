@@ -289,7 +289,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.4.0</version>
+                <version>5.5.0</version>
                 <scope>test</scope>
             </dependency>
 
@@ -308,7 +308,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.14.5</version>
+				<version>1.14.7</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -325,7 +325,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <id>enforce</id>

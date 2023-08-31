@@ -76,7 +76,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * Mode how how default dashboards are loaded.
+	 * Mode how default dashboards are loaded.
 	 */
 	public enum Mode {
 		enabled,
