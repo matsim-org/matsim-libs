@@ -619,7 +619,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							tourStartTimeSelector, tourDurationTimeSelector);
 						log.info("Create services for carrier: " + carrierName);
 						for (String stopZone : odMatrix.getListOfZones()) {
-							int trafficVolumeForOD = Math.round(odMatrix.getTripDistributionValue(startZone,
+							int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(startZone,
 								stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
 							int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / occupancyRate);
 							if (numberOfJobs == 0)
@@ -880,7 +880,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					for (SimpleFeature building : buildingList) {
 						Link l = NetworkUtils.getNearestLink(networkToChange,
 							MGC.point2Coord(((Geometry) building.getDefaultGeometry()).getCentroid()));
-						regionLinksMap
+                        assert l != null;
+                        regionLinksMap
 							.computeIfAbsent(zoneID, (k) -> new HashMap<>())
 							.put(l.getId(), l);
 					}
@@ -997,8 +998,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 
 		private double score;
-		private final double timeParameter = 0.008;
-		private final double missedTimeWindowPenalty = 0.01;
 
 		public DriversActivityScoring() {
 			super();
@@ -1026,6 +1025,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				// log.info(act + " start: " + Time.writeTime(actStartTime));
 				TimeWindow tw = ((FreightActivity) act).getTimeWindow();
 				if (actStartTime > tw.getEnd()) {
+					double missedTimeWindowPenalty = 0.01;
 					double penalty_score = (-1) * (actStartTime - tw.getEnd()) * missedTimeWindowPenalty;
 					if (!(penalty_score <= 0.0))
 						throw new AssertionError("penalty score must be negative");
@@ -1033,6 +1033,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					score += penalty_score;
 
 				}
+				double timeParameter = 0.008;
 				double actTimeCosts = (act.getEndTime().seconds() - actStartTime) * timeParameter;
 				// log.info("actCosts " + actTimeCosts);
 				if (!(actTimeCosts >= 0.0))
