@@ -9,7 +9,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -368,6 +370,23 @@ public class RailsimIntegrationTest {
 	@Test
 	public void test14_mesoStations() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "14_mesoStations"));
+	}
+	
+	@Test
+	public void test15_simpleCorridor() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "15_simpleCorridor"));
+		
+		for (Event event : collector.getEvents()) {
+			if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
+				
+				VehicleArrivesAtFacilityEvent vehicleArrivesEvent = (VehicleArrivesAtFacilityEvent) event;
+				if (vehicleArrivesEvent.getVehicleId().toString().equals("train1") &&
+						vehicleArrivesEvent.getFacilityId().toString().equals("stop_3-4")) {
+					
+					Assert.assertEquals("The arrival time of train1 at stop_3-4 has changed.", 29594., event.getTime(), MatsimTestUtils.EPSILON);
+				}
+			}
+		}
 	}
 
 	@Test
