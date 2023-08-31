@@ -600,7 +600,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						}
 						String carrierName = null;
 						if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
-							carrierName = "Carrier_Freight_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
+							carrierName = "Carrier_Goods_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
 						} else if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic"))
 							carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
 						int numberOfDepots = odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType, purpose,
