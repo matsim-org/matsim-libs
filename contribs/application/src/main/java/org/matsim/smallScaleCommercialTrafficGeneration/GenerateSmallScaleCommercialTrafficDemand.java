@@ -150,7 +150,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--nameOutputPopulation", description = "Name of the output Population")
 	private String nameOutputPopulation;
 
-	@CommandLine.Option(names = "--numberOfPlanVariantsPerAgent", description = "If an agent should have variant plans, you should set this paramter.", defaultValue = "1")
+	@CommandLine.Option(names = "--numberOfPlanVariantsPerAgent", description = "If an agent should have variant plans, you should set this parameter.", defaultValue = "1")
 	private int numberOfPlanVariantsPerAgent;
 
 	@CommandLine.Option(names = "--pathOutput", description = "Path for the output")
