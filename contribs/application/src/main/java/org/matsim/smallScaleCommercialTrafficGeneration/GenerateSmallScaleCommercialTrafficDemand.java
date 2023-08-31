@@ -1258,7 +1258,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return new ValueSelectorUnderGivenProbability(tourDurationProbabilityDistribution, rnd);
 	}
 
-	private Map<String, ValueSelectorUnderGivenProbability> createStopDurationTimeDistributionPerCategory(String smallScaleCommercialTrafficType) {
+	/**
+	 * Creates the probability distribution for the duration of the services.
+	 * The values are given in [min] and have an upperBound.
+	 * Data source: KiD 2002
+	 *
+	 * @param smallScaleCommercialTrafficType
+	 * @return
+	 */
+	private Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> createStopDurationTimeDistributionPerCategory(String smallScaleCommercialTrafficType) {
 
 		Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> stopDurationProbabilityDistribution = new HashMap<>();
 		if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic.toString())) {
