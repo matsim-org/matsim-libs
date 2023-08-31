@@ -4,9 +4,8 @@
 
 	<vehicleType id="trainType1">
 		<attributes>
-			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
-			<attribute name="doorOperationMode" class="org.matsim.vehicles.VehicleType$DoorOperationMode">serial</attribute>
-			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.2</attribute>
+			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.2</attribute>
 		</attributes>
 		<capacity seats="40" standingRoomInPersons="0">
 

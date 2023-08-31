@@ -22,8 +22,8 @@
 			<transportMode>rail</transportMode>
 			<routeProfile>
 				<stop refId="-103251_0" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="-103245_1" arrivalOffset="00:05:00" departureOffset="00:10:00" awaitDeparture="true"/>
-				<stop refId="-103248_19" arrivalOffset="00:15:00" awaitDeparture="true"/>
+				<stop refId="-103245_1" arrivalOffset="00:03:00" departureOffset="00:7:00" awaitDeparture="true"/>
+				<stop refId="-103248_19" arrivalOffset="00:10:00" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
 				<link refId="-103251_0"/>

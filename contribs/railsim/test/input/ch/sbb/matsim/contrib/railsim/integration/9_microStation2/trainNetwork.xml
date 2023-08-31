@@ -127,291 +127,293 @@
 <!-- ====================================================================== -->
 
 	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
-		<link id="-103224_0" from="-137709" to="-137711" length="892.2810587242708" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_0" from="-137709" to="-137711" length="892.2810587242708" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 		</link>
-		<link id="-103224_1" from="-137711" to="-137712" length="183.22256933144394" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_1" from="-137711" to="-137712" length="183.22256933144394" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_10" from="-137720" to="-137721" length="131.2824202352696" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_10" from="-137720" to="-137721" length="131.2824202352696" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_11" from="-137721" to="-137722" length="152.42472148570005" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_11" from="-137721" to="-137722" length="152.42472148570005" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_12" from="-137722" to="-137723" length="150.36074709317688" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_12" from="-137722" to="-137723" length="150.36074709317688" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_13" from="-137723" to="-137724" length="147.83949249618183" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_13" from="-137723" to="-137724" length="147.83949249618183" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_14" from="-137724" to="-137725" length="148.33723569786326" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_14" from="-137724" to="-137725" length="148.33723569786326" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_15" from="-137725" to="-137726" length="214.19269130568566" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_15" from="-137725" to="-137726" length="214.19269130568566" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_16" from="-137726" to="-137727" length="186.6362643172662" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_16" from="-137726" to="-137727" length="186.6362643172662" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_17" from="-137727" to="-137728" length="145.33831835487157" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_17" from="-137727" to="-137728" length="145.33831835487157" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_18" from="-137728" to="-137729" length="162.61296205098157" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_18" from="-137728" to="-137729" length="162.61296205098157" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_19" from="-137729" to="-137730" length="1781.266839035054" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_19" from="-137729" to="-137730" length="1781.266839035054" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_2" from="-137712" to="-137713" length="138.70885840623956" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_2" from="-137712" to="-137713" length="138.70885840623956" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_3" from="-137713" to="-137714" length="148.36498655733217" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_3" from="-137713" to="-137714" length="148.36498655733217" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_4" from="-137714" to="-137715" length="133.41510660368903" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_4" from="-137714" to="-137715" length="133.41510660368903" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_5" from="-137715" to="-137716" length="141.83239843159026" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_5" from="-137715" to="-137716" length="141.83239843159026" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_6" from="-137716" to="-137717" length="87.40706855111716" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_6" from="-137716" to="-137717" length="87.40706855111716" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_7" from="-137717" to="-137718" length="122.44970959883202" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_7" from="-137717" to="-137718" length="122.44970959883202" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_8" from="-137718" to="-137719" length="105.90593227192393" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103224_8" from="-137718" to="-137719" length="105.90593227192393" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">r1</attribute>
+			</attributes>
+		</link>
+		<link id="-103224_9" from="-137719" to="-137720" length="308.3473345964248" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103224_9" from="-137719" to="-137720" length="308.3473345964248" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103245_0" from="-137719" to="-137731" length="93.50295729202739" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103245_0" from="-137719" to="-137731" length="93.50295729202739" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103245_1" from="-137731" to="-137732" length="500.0" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103245_1" from="-137731" to="-137732" length="500.0" freespeed="1.0" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103245_2" from="-137732" to="-137720" length="46.9420086221549" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103245_2" from="-137732" to="-137720" length="46.9420086221549" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103245_3" from="-137720" to="-137750" length="128.1132888248215" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103245_3" from="-137720" to="-137750" length="128.1132888248215" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_0" from="-137731" to="-137733" length="65.48232667572769" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_0" from="-137731" to="-137733" length="65.48232667572769" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_1" from="-137733" to="-137734" length="133.40482453954917" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_1" from="-137733" to="-137734" length="133.40482453954917" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_10" from="-137756" to="-137757" length="65.14467136657917" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_10" from="-137756" to="-137757" length="65.14467136657917" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_11" from="-137757" to="-137758" length="68.27321853655258" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_11" from="-137757" to="-137758" length="68.27321853655258" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_12" from="-137758" to="-137759" length="61.22608907246291" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_12" from="-137758" to="-137759" length="61.22608907246291" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_13" from="-137759" to="-137760" length="85.15483812495414" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_13" from="-137759" to="-137760" length="85.15483812495414" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_14" from="-137760" to="-137761" length="82.93609221608013" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_14" from="-137760" to="-137761" length="82.93609221608013" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_15" from="-137761" to="-137762" length="87.8467631991782" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_15" from="-137761" to="-137762" length="87.8467631991782" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_16" from="-137762" to="-137763" length="133.4333430409064" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_16" from="-137762" to="-137763" length="133.4333430409064" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_17" from="-137763" to="-137764" length="89.69423062189989" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_17" from="-137763" to="-137764" length="89.69423062189989" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_18" from="-137764" to="-137765" length="90.52915009461466" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_18" from="-137764" to="-137765" length="90.52915009461466" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_19" from="-137765" to="-137766" length="903.0" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_19" from="-137765" to="-137766" length="5000.0" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_2" from="-137734" to="-137732" length="36.548497538644625" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_2" from="-137734" to="-137732" length="36.548497538644625" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_3" from="-137732" to="-137750" length="131.7462852750681" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_3" from="-137732" to="-137750" length="131.7462852750681" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_4" from="-137750" to="-137751" length="119.62337169870379" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_4" from="-137750" to="-137751" length="119.62337169870379" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_5" from="-137751" to="-137752" length="115.51738173364578" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_5" from="-137751" to="-137752" length="115.51738173364578" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_6" from="-137752" to="-137753" length="104.61950235099744" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_6" from="-137752" to="-137753" length="104.61950235099744" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_7" from="-137753" to="-137754" length="157.42456435471556" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_7" from="-137753" to="-137754" length="157.42456435471556" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_8" from="-137754" to="-137755" length="130.92310163140831" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_8" from="-137754" to="-137755" length="130.92310163140831" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103248_9" from="-137755" to="-137756" length="99.51867023923363" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103248_9" from="-137755" to="-137756" length="99.51867023923363" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_0" from="-137735" to="-137736" length="1254.0" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		</link>
+		<link id="-103251_1" from="-137736" to="-137737" length="91.21692072206095" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_0" from="-137735" to="-137736" length="1000.0" freespeed="1.0" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
-		</link>
-		<link id="-103251_1" from="-137736" to="-137737" length="91.21692072206095" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_10" from="-137745" to="-137746" length="82.4522801747165" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_10" from="-137745" to="-137746" length="82.4522801747165" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_11" from="-137746" to="-137747" length="62.33735577416961" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_11" from="-137746" to="-137747" length="62.33735577416961" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_12" from="-137747" to="-137748" length="96.30400040200354" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_12" from="-137747" to="-137748" length="96.30400040200354" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_13" from="-137748" to="-137749" length="92.5784920894473" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_13" from="-137748" to="-137749" length="92.5784920894473" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_14" from="-137749" to="-137719" length="80.23986872232351" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">r1</attribute>
+			</attributes>
+		</link>
+		<link id="-103251_2" from="-137737" to="-137738" length="83.01184980092562" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_14" from="-137749" to="-137719" length="80.23986872232351" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_3" from="-137738" to="-137739" length="81.58202191064147" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_2" from="-137737" to="-137738" length="83.01184980092562" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_4" from="-137739" to="-137740" length="102.41476866053989" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_3" from="-137738" to="-137739" length="81.58202191064147" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_5" from="-137740" to="-137741" length="104.54937639359802" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_4" from="-137739" to="-137740" length="102.41476866053989" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_6" from="-137741" to="-137742" length="98.24884367584684" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_5" from="-137740" to="-137741" length="104.54937639359802" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_7" from="-137742" to="-137743" length="108.49737007762633" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_6" from="-137741" to="-137742" length="98.24884367584684" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_8" from="-137743" to="-137744" length="97.2739455374286" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
 		</link>
-		<link id="-103251_7" from="-137742" to="-137743" length="108.49737007762633" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
-			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="-103251_8" from="-137743" to="-137744" length="97.2739455374286" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
-			<attributes>
-				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-			</attributes>
-		</link>
-		<link id="-103251_9" from="-137744" to="-137745" length="71.85805854587338" freespeed="5.5556" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
+		<link id="-103251_9" from="-137744" to="-137745" length="71.85805854587338" freespeed="13.8889" capacity="3600.0" permlanes="2.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
 			</attributes>
