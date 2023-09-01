@@ -49,9 +49,18 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 		return null;
 	}
 
+	/**
+	 * Creates alternative plans (n = selectedNumberOfPlanVariants) by changing the start time (and end time) of the tour.
+	 *
+	 * @param population
+	 * @param selectedNumberOfPlanVariants
+	 * @param selectedEarliestTourStartTime
+	 * @param selectedLatestTourStartTime
+	 * @param selectedTypicalTourDuration
+	 */
 	public static void createMorePlansWithDifferentStartTimes(Population population, int selectedNumberOfPlanVariants,
-														int selectedEarliestTourStartTime, int selectedLatestTourStartTime,
-														int selectedTypicalTourDuration) {
+															  int selectedEarliestTourStartTime, int selectedLatestTourStartTime,
+															  int selectedTypicalTourDuration) {
 		PlanVariantStrategy selectedPlanVariantStrategy = PlanVariantStrategy.changeStartingTimes;
 		numberOfPlanVariants = selectedNumberOfPlanVariants;
 		earliestTourStartTime = selectedEarliestTourStartTime;
@@ -60,8 +69,14 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 		createPlanVariants(selectedPlanVariantStrategy, population);
 	}
 
-	public static void createMorePlansWithDifferentActivityOrder(Population population, int selectedNumberOfPlanVariants){
-		PlanVariantStrategy selectedPlanVariantStrategy = PlanVariantStrategy.locationChoice;
+	/**
+	 * Creates alternative plans (n = selectedNumberOfPlanVariants) by changing the order of the activities.
+	 *
+	 * @param population
+	 * @param selectedNumberOfPlanVariants
+	 */
+	public static void createMorePlansWithDifferentActivityOrder(Population population, int selectedNumberOfPlanVariants) {
+		PlanVariantStrategy selectedPlanVariantStrategy = PlanVariantStrategy.activityOrderVariation;
 		numberOfPlanVariants = selectedNumberOfPlanVariants;
 		createPlanVariants(selectedPlanVariantStrategy, population);
 	}
@@ -98,7 +113,6 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 						if (activityIndexList.size() < 2)
 							continue;
 						List<Integer> activityNewIndexList = new ArrayList<Integer>(activityIndexList);
-//						Collections.shuffle(activityIndexList, rnd);
 						Collections.shuffle(activityNewIndexList, rnd);
 						List<Integer> alreadySwapedActivity = new ArrayList<>();
 						Plan newPLan = person.createCopyOfSelectedPlanAndMakeSelected();
