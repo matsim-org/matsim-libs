@@ -26,6 +26,8 @@ import java.util.Optional;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
 /**
  * @author michalm
@@ -38,10 +40,10 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 
 	public ExtensiveInsertionSearch(ExtensiveInsertionProvider insertionProvider,
 			MultiInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
-			IncrementalStopDurationEstimator incrementalStopDurationEstimator) {
+			StopTimeCalculator stopTimeCalculator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
-		this.detourTimeCalculator = new InsertionDetourTimeCalculator(incrementalStopDurationEstimator, null);
+		this.detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, null);
 		this.bestInsertionFinder = new BestInsertionFinder(insertionCostCalculator);
 	}
 
