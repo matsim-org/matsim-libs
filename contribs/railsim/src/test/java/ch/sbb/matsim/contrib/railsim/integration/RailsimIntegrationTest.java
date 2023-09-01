@@ -336,6 +336,13 @@ public class RailsimIntegrationTest {
 	public void test7_trainFollowing() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "7_trainFollowing"));
 	}
+	
+	// This test is similar to test7_trainFollowing but with varying speed levels along the corridor.
+	// TODO: Right now, there are some runtime exceptions which I don't understand.
+	@Test
+	public void test7_trainFollowing2() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "7_trainFollowing2"));
+	}
 
 	@Test
 	public void test8_microStation() {
