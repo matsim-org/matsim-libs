@@ -15,10 +15,10 @@ import java.util.Random;
 
 public class CreateDifferentPlansForFreightPopulation implements MATSimAppCommand {
 
-	private enum PlanVariantStrategy{changeStartingTimes}
+	private enum PlanVariantStrategy {changeStartingTimes, activityOrderVariation}
 
-	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the population", defaultValue = "output/testOutput/testPopulation_new.xml.gz")
-	private enum PlanVariantStrategy {changeStartingTimes, locationChoice}
+	//output/testOutput/testPopulation_new.xml.gz
+	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the population", defaultValue = "../zerocuts/output/BusinessPassengerTraffic/vulkaneifel/completeSmallScaleCommercialTraffic_1pct_2023-08-31_52760_0.005/vulkaneifel_smallScaleCommercialTraffic_1pct_plans.xml.gz")
 	private Path populationPath;
 	@CommandLine.Option(names = "--outputPopulationPath", description = "Path to the outputPopulation", defaultValue = "output/testOutput/testPopulationVariant.xml.gz", required = true)
 	private Path outputPopulationPath;
@@ -41,7 +41,7 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 	@Override
 	public Integer call() throws Exception {
 
-		PlanVariantStrategy selectedPlanVariantStrategy = PlanVariantStrategy.changeStartingTimes;
+		PlanVariantStrategy selectedPlanVariantStrategy = PlanVariantStrategy.activityOrderVariation;
 
 		Population population = PopulationUtils.readPopulation(populationPath.toString());
 		createPlanVariants(selectedPlanVariantStrategy, population);
@@ -82,7 +82,7 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 						PopulationUtils.getLastActivity(newPLan).setStartTime(variantEndTime);
 					}
 				}
-				case locationChoice -> {
+				case activityOrderVariation -> {
 
 					List<Integer> activityIndexList = new ArrayList<>();
 					int count = 0;
