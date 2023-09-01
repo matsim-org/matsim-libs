@@ -60,9 +60,11 @@ public class DrtVehicleDistanceStats
 		double totalOccupiedDistance = 0;
 		double totalPassengerTraveledDistance = 0; //in (passenger x meters)
 		final double[] totalDistanceByOccupancy;
+		final double serviceDuration;
 
-		private VehicleState(int maxCapacity) {
-			totalDistanceByOccupancy = new double[maxCapacity + 1];
+		private VehicleState(int maxCapacity, double serviceTime) {
+			this.totalDistanceByOccupancy = new double[maxCapacity + 1];
+			this.serviceDuration = serviceTime;
 		}
 
 		private void linkEntered(Link link) {
@@ -101,10 +103,10 @@ public class DrtVehicleDistanceStats
 	private void initializeVehicles() {
 		int maxCapacity = DrtAnalysisControlerListener.findMaxVehicleCapacity(fleetSpecification);
 		fleetSpecification.getVehicleSpecifications()
-				.keySet()
+				.values()
 				.stream()
-				.map(Id::createVehicleId)
-				.forEach(id -> vehicleStates.put(id, new VehicleState(maxCapacity)));
+				.forEach(spec -> vehicleStates.put(Id.createVehicleId(spec.getId()),
+					new VehicleState(maxCapacity, spec.getServiceEndTime() - spec.getServiceBeginTime())));
 	}
 
 	@Override
