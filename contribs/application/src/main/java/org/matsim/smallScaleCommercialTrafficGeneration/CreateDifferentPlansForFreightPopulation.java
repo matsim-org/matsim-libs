@@ -17,10 +17,9 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 
 	private enum PlanVariantStrategy {changeStartingTimes, activityOrderVariation}
 
-	//output/testOutput/testPopulation_new.xml.gz
-	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the population", defaultValue = "../zerocuts/output/BusinessPassengerTraffic/vulkaneifel/completeSmallScaleCommercialTraffic_1pct_2023-08-31_52760_0.005/vulkaneifel_smallScaleCommercialTraffic_1pct_plans.xml.gz")
+	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the population")
 	private Path populationPath;
-	@CommandLine.Option(names = "--outputPopulationPath", description = "Path to the outputPopulation", defaultValue = "output/testOutput/testPopulationVariant.xml.gz", required = true)
+	@CommandLine.Option(names = "--outputPopulationPath", description = "Path to the outputPopulation", required = true)
 	private Path outputPopulationPath;
 	@CommandLine.Option(names = "--numberOfPlanVariants", description = "Set the number of plan variants", required = true, defaultValue = "5")
 	private static int numberOfPlanVariants;
