@@ -64,6 +64,10 @@ public class VehicleEntry {
 	}
 
 	public double getSlackTime(int index) {
-		return slackTimes[index];
+		return slackTimes[index + 1];
+	}
+	
+	public double getStartSlack() {
+		return slackTimes[0];
 	}
 }

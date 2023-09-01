@@ -42,7 +42,7 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	public void testCalculate() {
-		VehicleEntry entry = entry(new double[] { 20, 50 });
+		VehicleEntry entry = entry(new double[] { 20, 20, 50 });
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution

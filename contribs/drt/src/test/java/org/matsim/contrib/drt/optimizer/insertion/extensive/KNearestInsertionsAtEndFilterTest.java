@@ -114,7 +114,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	private Waypoint.Start start(double endTime) {
-		return new Waypoint.Start(null, null, endTime, 0);
+		return new Waypoint.Start(null, null, endTime, 0, 0);
 	}
 
 	private Waypoint.Stop stop(double endTime) {

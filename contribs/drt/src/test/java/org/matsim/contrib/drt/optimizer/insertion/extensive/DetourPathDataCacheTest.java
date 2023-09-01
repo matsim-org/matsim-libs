@@ -131,7 +131,7 @@ public class DetourPathDataCacheTest {
 	}
 
 	private VehicleEntry entry(Link startLink, Link... stopLinks) {
-		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, 0),
+		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, 0, 0),
 				Arrays.stream(stopLinks).map(this::stop).collect(ImmutableList.toImmutableList()), null);
 	}
 

@@ -264,7 +264,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private Waypoint.Start start(Task task, double time, Link link) {
-		return new Waypoint.Start(task, link, time, 0);
+		return new Waypoint.Start(task, link, time, 0, 0);
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link) {

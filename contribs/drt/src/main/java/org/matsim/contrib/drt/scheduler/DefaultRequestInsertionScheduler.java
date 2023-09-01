@@ -126,6 +126,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	private DrtStopTask insertPickup(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData) {
+		final double now = timer.getTimeOfDay();
 		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
@@ -164,7 +165,6 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 					stayTask.setEndTime(stayTask.getBeginTime());// could get later removed with ScheduleTimingUpdater
 				} else if (STAY.isBaseTypeOf(currentTask)) {
 					stayTask = (DrtStayTask)currentTask; // ongoing stay task
-					double now = timer.getTimeOfDay();
 					if (stayTask.getEndTime() > now) { // stop stay task; a new stop/drive task can be inserted now
 						stayTask.setEndTime(now);
 					}
@@ -179,15 +179,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				// add pickup request to stop task
 				stopTask.addPickupRequest(request);
 				
-				/*
-				 * TODO: insertionTime should be set to "now" here to avoid adding pickups to
-				 * ongoing tasks "for free" and generating requests with zero wait time. See 
-				 * InsertionDetourTimeCalculator.calculatePickupIfSameLink for more details.
-				 */
-				
-				double insertionTime = stopTask.getBeginTime();
+				// potentially extend task
 				stopTask.setEndTime(stopTimeCalculator.updateEndTimeForPickup(vehicleEntry.vehicle, stopTask,
-						insertionTime, request.getRequest()));
+						now, request.getRequest()));
 
 				/// ADDED
 				//// TODO this is copied, but has not been updated !!!!!!!!!!!!!!!
@@ -285,6 +279,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 	private DrtStopTask insertDropoff(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData,
 			DrtStopTask pickupTask) {
+		final double now = timer.getTimeOfDay();
 		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
@@ -303,15 +298,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				// add dropoff request to stop task, and extend the stop task (when incremental stop task duration is used)
 				stopTask.addDropoffRequest(request);
 
-				/*
-				 * TODO: insertionTime should be set to "now" here to avoid adding pickups to
-				 * ongoing tasks "for free" and generating requests with zero wait time. See 
-				 * InsertionDetourTimeCalculator.calculatePickupIfSameLink for more details.
-				 */
-				
-				double insertionTime = stopTask.getBeginTime();
+				// potentially extend task
 				stopTask.setEndTime(stopTimeCalculator.updateEndTimeForDropoff(vehicleEntry.vehicle, stopTask,
-						insertionTime, request.getRequest()));
+						now, request.getRequest()));
 				scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
 						stopTask.getTaskIdx() + 1, stopTask.getEndTime());
 
