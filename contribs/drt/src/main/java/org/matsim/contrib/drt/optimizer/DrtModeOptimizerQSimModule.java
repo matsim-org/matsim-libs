@@ -45,7 +45,7 @@ import org.matsim.contrib.drt.scheduler.DefaultRequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
-import org.matsim.contrib.drt.stops.StopDurationProvider;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;

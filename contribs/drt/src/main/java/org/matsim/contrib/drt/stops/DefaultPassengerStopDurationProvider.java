@@ -3,10 +3,10 @@ package org.matsim.contrib.drt.stops;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
-public class DefaultStopDurationProvider implements StopDurationProvider {
+public class DefaultPassengerStopDurationProvider implements PassengerStopDurationProvider {
 	private final double stopDuration;
 
-	public DefaultStopDurationProvider(double stopDuration) {
+	public DefaultPassengerStopDurationProvider(double stopDuration) {
 		this.stopDuration = stopDuration;
 	}
 

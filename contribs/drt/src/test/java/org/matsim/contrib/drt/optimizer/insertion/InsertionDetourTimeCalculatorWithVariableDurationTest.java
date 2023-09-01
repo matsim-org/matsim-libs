@@ -34,7 +34,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.stops.CumulativeStopTimeCalculator;
-import org.matsim.contrib.drt.stops.StopDurationProvider;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
@@ -61,7 +61,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	private static final int STOP_DURATION_INITIAL = 10;
 	private static final int STOP_DURATION_ADDED = 5;
 	
-	public static final StopDurationProvider STOP_DURATION_PROVIDER = new StopDurationProvider() {
+	public static final PassengerStopDurationProvider STOP_DURATION_PROVIDER = new PassengerStopDurationProvider() {
 		@Override
 		public double calcPickupDuration(DvrpVehicle vehicle, DrtRequest request) {
 			if (request.equals(drtRequestInitial)) {

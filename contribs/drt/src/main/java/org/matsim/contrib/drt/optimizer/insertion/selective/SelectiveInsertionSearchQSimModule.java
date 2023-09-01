@@ -25,7 +25,7 @@ import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.stops.StopDurationProvider;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;

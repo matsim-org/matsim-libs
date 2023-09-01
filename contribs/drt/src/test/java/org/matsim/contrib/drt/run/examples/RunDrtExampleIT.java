@@ -40,8 +40,8 @@ import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.stops.CumulativeStopTimeCalculator;
 import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
-import org.matsim.contrib.drt.stops.StaticStopDurationProvider;
-import org.matsim.contrib.drt.stops.StopDurationProvider;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -251,7 +251,7 @@ public class RunDrtExampleIT {
 		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
 			@Override
 			public void install() {
-				StopDurationProvider stopDurationProvider = StaticStopDurationProvider.of(60.0, 5.0);
+				PassengerStopDurationProvider stopDurationProvider = StaticPassengerStopDurationProvider.of(60.0, 5.0);
 				StopTimeCalculator stopTimeCalculator = new CumulativeStopTimeCalculator(stopDurationProvider);
 				stopTimeCalculator = new MinimumStopDurationAdapter(stopTimeCalculator, 60.0);
 				bindModal(StopTimeCalculator.class).toInstance(stopTimeCalculator);

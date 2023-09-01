@@ -12,9 +12,9 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * the vehicle than others or induce a longer time after dropoff.
  */
 public class ParallelStopTimeCalculator implements StopTimeCalculator {
-	private final StopDurationProvider stopDurationProvider;
+	private final PassengerStopDurationProvider stopDurationProvider;
 
-	public ParallelStopTimeCalculator(StopDurationProvider stopDurationProvider) {
+	public ParallelStopTimeCalculator(PassengerStopDurationProvider stopDurationProvider) {
 		this.stopDurationProvider = stopDurationProvider;
 	}
 

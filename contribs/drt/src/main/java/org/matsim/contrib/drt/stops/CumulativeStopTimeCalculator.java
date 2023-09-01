@@ -5,9 +5,9 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 public class CumulativeStopTimeCalculator implements StopTimeCalculator {
-	private final StopDurationProvider provider;
+	private final PassengerStopDurationProvider provider;
 
-	public CumulativeStopTimeCalculator(StopDurationProvider provider) {
+	public CumulativeStopTimeCalculator(PassengerStopDurationProvider provider) {
 		this.provider = provider;
 	}
 

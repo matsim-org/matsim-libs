@@ -5,9 +5,9 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 public class PrebookingStopTimeCalculator implements StopTimeCalculator {
-	private final StopDurationProvider provider;
+	private final PassengerStopDurationProvider provider;
 
-	public PrebookingStopTimeCalculator(StopDurationProvider provider) {
+	public PrebookingStopTimeCalculator(PassengerStopDurationProvider provider) {
 		this.provider = provider;
 	}
 

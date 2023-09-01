@@ -36,7 +36,7 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
-import org.matsim.contrib.drt.stops.StopDurationProvider;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;

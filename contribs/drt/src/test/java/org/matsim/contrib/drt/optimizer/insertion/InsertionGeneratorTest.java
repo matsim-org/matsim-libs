@@ -37,7 +37,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
-import org.matsim.contrib.drt.stops.DefaultStopDurationProvider;
+import org.matsim.contrib.drt.stops.DefaultPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;

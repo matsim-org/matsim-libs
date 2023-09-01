@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * also become a simple attribute of a DrtRequest to simplify the code
  * complexity.
  */
-public interface StopDurationProvider {
+public interface PassengerStopDurationProvider {
 	double calcPickupDuration(DvrpVehicle vehicle, DrtRequest request);
 
 	double calcDropoffDuration(DvrpVehicle vehicle, DrtRequest request);

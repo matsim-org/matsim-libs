@@ -26,7 +26,7 @@ import java.util.Optional;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.stops.StopDurationProvider;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
 /**

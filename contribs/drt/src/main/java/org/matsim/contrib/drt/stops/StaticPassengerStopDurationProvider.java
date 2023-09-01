@@ -3,11 +3,11 @@ package org.matsim.contrib.drt.stops;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
-public class StaticStopDurationProvider implements StopDurationProvider {
+public class StaticPassengerStopDurationProvider implements PassengerStopDurationProvider {
 	private final double pickupDuration;
 	private final double dropoffDuration;
 
-	public StaticStopDurationProvider(double pickupDuration, double dropoffDuration) {
+	public StaticPassengerStopDurationProvider(double pickupDuration, double dropoffDuration) {
 		this.pickupDuration = pickupDuration;
 		this.dropoffDuration = dropoffDuration;
 	}
@@ -22,7 +22,7 @@ public class StaticStopDurationProvider implements StopDurationProvider {
 		return dropoffDuration;
 	}
 
-	public static StaticStopDurationProvider of(double pickupDuration, double dropoffDuration) {
-		return new StaticStopDurationProvider(pickupDuration, dropoffDuration);
+	public static StaticPassengerStopDurationProvider of(double pickupDuration, double dropoffDuration) {
+		return new StaticPassengerStopDurationProvider(pickupDuration, dropoffDuration);
 	}
 }

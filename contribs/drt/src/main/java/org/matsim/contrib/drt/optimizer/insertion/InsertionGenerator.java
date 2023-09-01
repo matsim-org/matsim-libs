@@ -27,7 +27,7 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.stops.StopDurationProvider;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
 import com.google.common.base.MoreObjects;

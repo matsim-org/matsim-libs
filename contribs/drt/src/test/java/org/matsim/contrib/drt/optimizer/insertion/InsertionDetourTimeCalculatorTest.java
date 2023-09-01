@@ -36,7 +36,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
-import org.matsim.contrib.drt.stops.DefaultStopDurationProvider;
+import org.matsim.contrib.drt.stops.DefaultPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.schedule.Task;
