@@ -418,15 +418,15 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		super.addParameterSet( set );
 	}
 
-	public void addTeleportedModeParams( final ModeRoutingParams pars ) {
-		this.addModeRoutingParams( pars );
-	}
-	/**
-	 * @deprecated -- use {@link #addTeleportedModeParams(ModeRoutingParams)} instead.
-	 */
-	public void addModeRoutingParams(final TeleportedModeParams pars ) {
+	public void addTeleportedModeParams( final TeleportedModeParams pars ) {
 		testForLocked() ;
 		addParameterSet( pars );
+	}
+	/**
+	 * @deprecated -- use {@link #addTeleportedModeParams(TeleportedModeParams)} instead.
+	 */
+	public void addModeRoutingParams(final TeleportedModeParams pars ) {
+		this.addTeleportedModeParams( pars );
 	}
 	public void removeTeleportedModeParams( String key ){
 		this.removeModeRoutingParams( key );
