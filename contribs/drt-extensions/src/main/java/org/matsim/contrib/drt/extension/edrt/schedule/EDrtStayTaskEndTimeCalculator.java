@@ -19,13 +19,13 @@
 package org.matsim.contrib.drt.extension.edrt.schedule;
 
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
-import org.matsim.contrib.drt.schedule.StopDurationEstimator;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
 public class EDrtStayTaskEndTimeCalculator extends DrtStayTaskEndTimeCalculator {
-	public EDrtStayTaskEndTimeCalculator(StopDurationEstimator stopDurationEstimator) {
-		super(stopDurationEstimator);
+	public EDrtStayTaskEndTimeCalculator(StopTimeCalculator stopTimeCalculator) {
+		super(stopTimeCalculator);
 	}
 
 	@Override

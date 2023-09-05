@@ -43,7 +43,7 @@ import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.CarrierConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
@@ -155,7 +155,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 				Activity currentActivity = (Activity) planElement;
 
 				// Handle all regular services
-				if(!currentActivity.getType().equals(FreightConstants.START))
+				if(!currentActivity.getType().equals(CarrierConstants.START))
 				{
 
 					// ExpectedArrivalTime from jsprit needs to be recalculated
@@ -165,7 +165,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 					Activity prevAct = (Activity) planElements.get(i - 2);
 
-					if (!prevAct.getType().equals(FreightConstants.START)) {
+					if (!prevAct.getType().equals(CarrierConstants.START)) {
 
 						//End of plan is reached
 						if (nextLeg == null) {
@@ -187,7 +187,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 					}
 
-				} else if (currentActivity.getType().equals(FreightConstants.START))
+				} else if (currentActivity.getType().equals(CarrierConstants.START))
 				{
 
 					double travelTimeToFirstJob = ((Leg) planElements.get(i+1)).getTravelTime().seconds();
@@ -218,7 +218,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 		// Create start activity
 
-		Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START,
+		Activity startActivity = PopulationUtils.createActivityFromLinkId(CarrierConstants.START,
 				scheduledTour.getVehicle().getLinkId() );
 		plan.addActivity(startActivity);
 
@@ -273,7 +273,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		}
 
 		// Create end activity
-		Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END,
+		Activity endActivity = PopulationUtils.createActivityFromLinkId(CarrierConstants.END,
 				scheduledTour.getVehicle().getLinkId() );
 		plan.addActivity(endActivity);
 

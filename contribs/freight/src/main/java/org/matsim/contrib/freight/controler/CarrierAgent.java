@@ -110,7 +110,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
 			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour, scoringFunction, carrier, events, carrierEventCreators);
 			Plan plan = PopulationUtils.createPlan();
-			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLinkId() );
+			Activity startActivity = PopulationUtils.createActivityFromLinkId(CarrierConstants.START, scheduledTour.getVehicle().getLinkId() );
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
@@ -141,7 +141,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 					plan.addActivity(tourElementActivity);
 				}
 			}
-			Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END, scheduledTour.getVehicle().getLinkId() );
+			Activity endActivity = PopulationUtils.createActivityFromLinkId(CarrierConstants.END, scheduledTour.getVehicle().getLinkId() );
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);

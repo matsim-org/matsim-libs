@@ -28,6 +28,7 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.*;
@@ -35,6 +36,8 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -44,6 +47,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -53,6 +57,7 @@ import com.google.common.base.Verify;
 
 /**
  * @author michalm
+ * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 public class DefaultRequestInsertionScheduler implements RequestInsertionScheduler {
 
@@ -60,16 +65,16 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	private final TravelTime travelTime;
 	private final ScheduleTimingUpdater scheduleTimingUpdater;
 	private final DrtTaskFactory taskFactory;
-	private StopDurationEstimator stopDurationEstimator;
+	private StopTimeCalculator stopTimeCalculator;
 
 	public DefaultRequestInsertionScheduler(Fleet fleet, MobsimTimer timer,
 			TravelTime travelTime, ScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory,
-											StopDurationEstimator stopDurationEstimator) {
+			StopTimeCalculator stopTimeCalculator) {
 		this.timer = timer;
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.taskFactory = taskFactory;
-		this.stopDurationEstimator = stopDurationEstimator;
+		this.stopTimeCalculator = stopTimeCalculator;
 		initSchedules(fleet);
 	}
 
@@ -90,8 +95,24 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		var dropoffTask = insertDropoff(request, insertion, pickupTask);
 		verifyTimes("Inconsistent dropoff arrival time", insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime,
 				dropoffTask.getBeginTime());
-
+		
+		verifyTaskContinuity(insertion);
 		return new PickupDropoffTaskPair(pickupTask, dropoffTask);
+	}
+	
+	private void verifyTaskContinuity(InsertionWithDetourData insertion) {
+		/*
+		 * During insertion of tasks the common sanity checks that happen when appending
+		 * to the schedule (next start time = previous end time) are not evaluated. This
+		 * method verifies that the timing remains intact after insertion.
+		 */
+		
+		Schedule schedule = insertion.insertion.vehicleEntry.vehicle.getSchedule();
+		for (int i = 1; i < schedule.getTaskCount(); i++) {
+			Task first = schedule.getTasks().get(i - 1);
+			Task second = schedule.getTasks().get(i);
+			Verify.verify(first.getEndTime() == second.getBeginTime());
+		}
 	}
 
 	private void verifyTimes(String messageStart, double timeFromInsertionData, double timeFromScheduler) {
@@ -157,8 +178,16 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			if (stopTask != null && request.getFromLink() == stopTask.getLink()) { // no detour; no new stop task
 				// add pickup request to stop task
 				stopTask.addPickupRequest(request);
-				double stopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle, stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
-				stopTask.setEndTime(Math.max(stopTask.getBeginTime() + stopDuration, request.getEarliestStartTime()));
+				
+				/*
+				 * TODO: insertionTime should be set to "now" here to avoid adding pickups to
+				 * ongoing tasks "for free" and generating requests with zero wait time. See 
+				 * InsertionDetourTimeCalculator.calculatePickupIfSameLink for more details.
+				 */
+				
+				double insertionTime = stopTask.getBeginTime();
+				stopTask.setEndTime(stopTimeCalculator.updateEndTimeForPickup(vehicleEntry.vehicle, stopTask,
+						insertionTime, request.getRequest()));
 
 				/// ADDED
 				//// TODO this is copied, but has not been updated !!!!!!!!!!!!!!!
@@ -191,6 +220,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 					scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
 							stopTask.getTaskIdx() + 2, driveFromPickupTask.getEndTime());
 					///////
+				} else {
+					scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
+							stopTask.getTaskIdx() + 1, stopTask.getEndTime());
 				}
 
 				return stopTask;
@@ -229,9 +261,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		// insert pickup stop task
 		double startTime = beforePickupTask.getEndTime();
 		int taskIdx = beforePickupTask.getTaskIdx() + 1;
-		double stopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle, Collections.emptySet(), Collections.singleton(request));
+		double stopEndTime = stopTimeCalculator.initEndTimeForPickup(vehicleEntry.vehicle, startTime, request.getRequest());
 		DrtStopTask pickupStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
-				Math.max(startTime + stopDuration, request.getEarliestStartTime()), request.getFromLink());
+				stopEndTime, request.getFromLink());
 		schedule.addTask(taskIdx, pickupStopTask);
 		pickupStopTask.addPickupRequest(request);
 
@@ -270,8 +302,19 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			if (request.getToLink() == stopTask.getLink()) { // no detour; no new stop task
 				// add dropoff request to stop task, and extend the stop task (when incremental stop task duration is used)
 				stopTask.addDropoffRequest(request);
-				double updatedStopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle, stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
-				stopTask.setEndTime(stopTask.getBeginTime() + updatedStopDuration);
+
+				/*
+				 * TODO: insertionTime should be set to "now" here to avoid adding pickups to
+				 * ongoing tasks "for free" and generating requests with zero wait time. See 
+				 * InsertionDetourTimeCalculator.calculatePickupIfSameLink for more details.
+				 */
+				
+				double insertionTime = stopTask.getBeginTime();
+				stopTask.setEndTime(stopTimeCalculator.updateEndTimeForDropoff(vehicleEntry.vehicle, stopTask,
+						insertionTime, request.getRequest()));
+				scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
+						stopTask.getTaskIdx() + 1, stopTask.getEndTime());
+
 				return stopTask;
 			} else { // add drive task to dropoff location
 
@@ -296,9 +339,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		// insert dropoff stop task
 		double startTime = driveToDropoffTask.getEndTime();
 		int taskIdx = driveToDropoffTask.getTaskIdx() + 1;
-		double stopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle, Collections.singleton(request), Collections.emptySet());
+		double stopEndTime = stopTimeCalculator.initEndTimeForDropoff(vehicleEntry.vehicle, startTime, request.getRequest());
 		DrtStopTask dropoffStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
-				startTime + stopDuration, request.getToLink());
+				stopEndTime, request.getToLink());
 		schedule.addTask(taskIdx, dropoffStopTask);
 		dropoffStopTask.addDropoffRequest(request);
 
@@ -319,7 +362,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		} else {
 			Link toLink = stops.get(dropoffIdx).task.getLink(); // dropoff->j+1
 
-			VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getToLink(), toLink, startTime + stopDuration,
+			VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getToLink(), toLink, dropoffStopTask.getEndTime(),
 					detourData.detourFromDropoff, travelTime);
 			Task driveFromDropoffTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath, DrtDriveTask.TYPE);
 			schedule.addTask(taskIdx + 1, driveFromDropoffTask);

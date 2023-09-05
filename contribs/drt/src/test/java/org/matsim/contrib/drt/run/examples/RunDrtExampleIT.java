@@ -34,11 +34,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.stops.CumulativeStopTimeCalculator;
+import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -49,6 +58,7 @@ import com.google.common.base.MoreObjects;
 
 /**
  * @author jbischoff
+ * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 public class RunDrtExampleIT {
 
@@ -112,6 +122,41 @@ public class RunDrtExampleIT {
 				.inVehicleTravelTimeMean(388.85)
 				.totalTravelTimeMean(682.48)
 				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+	@Test
+	public void testRunDrtExampleWithNoRejections_RepeatedSelectiveSearch() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+			new OTFVisConfigGroup());
+
+		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			//replace extensive with repeated selective search
+			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
+			var repeatedSelectiveInsertionSearchParams = new RepeatedSelectiveInsertionSearchParams();
+			// using adaptive travel time matrix
+			repeatedSelectiveInsertionSearchParams.retryInsertion = 5;
+			drtCfg.addParameterSet(repeatedSelectiveInsertionSearchParams);
+
+			//disable rejections
+			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+		}
+
+		config.controler().setLastIteration(3);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+
+		var expectedStats = Stats.newBuilder()
+			.rejectionRate(0.0)
+			.rejections(0)
+			.waitAverage(261.57)
+			.inVehicleTravelTimeMean(382.74)
+			.totalTravelTimeMean(644.32)
+			.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
@@ -186,6 +231,41 @@ public class RunDrtExampleIT {
 				.waitAverage(223.86)
 				.inVehicleTravelTimeMean(389.57)
 				.totalTravelTimeMean(613.44)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+	@Test
+	public void testRunDrtExampleWithIncrementalStopDuration() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
+		Controler controller = DrtControlerCreator.createControler(config, false);
+
+		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
+			@Override
+			public void install() {
+				PassengerStopDurationProvider stopDurationProvider = StaticPassengerStopDurationProvider.of(60.0, 5.0);
+				StopTimeCalculator stopTimeCalculator = new CumulativeStopTimeCalculator(stopDurationProvider);
+				stopTimeCalculator = new MinimumStopDurationAdapter(stopTimeCalculator, 60.0);
+				bindModal(StopTimeCalculator.class).toInstance(stopTimeCalculator);
+			}
+		});
+
+		controller.run();
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.04)
+				.rejections(16)
+				.waitAverage(278.11)
+				.inVehicleTravelTimeMean(384.6)
+				.totalTravelTimeMean(662.71)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);

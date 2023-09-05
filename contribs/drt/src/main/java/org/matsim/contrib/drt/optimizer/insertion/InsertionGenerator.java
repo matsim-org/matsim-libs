@@ -27,6 +27,8 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
 import com.google.common.base.MoreObjects;
 
@@ -140,9 +142,9 @@ public class InsertionGenerator {
 	private final DetourTimeEstimator detourTimeEstimator;
 	private final InsertionDetourTimeCalculator detourTimeCalculator;
 
-	public InsertionGenerator(IncrementalStopDurationEstimator stopDurationEstimator, DetourTimeEstimator detourTimeEstimator) {
+	public InsertionGenerator(StopTimeCalculator stopTimeCalculator, DetourTimeEstimator detourTimeEstimator) {
 		this.detourTimeEstimator = detourTimeEstimator;
-		detourTimeCalculator = new InsertionDetourTimeCalculator(stopDurationEstimator, detourTimeEstimator);
+		detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, detourTimeEstimator);
 	}
 
 	public List<InsertionWithDetourData> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
