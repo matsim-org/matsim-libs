@@ -111,8 +111,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		commercialPersonTraffic, goodsTraffic, completeSmallScaleCommercialTraffic
 	}
 
-	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the freight data directory")
-	private Path inputDataDirectory;
+	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to the config for small scale commercial generation")
+	private Path configPath;
 
 	@CommandLine.Option(names = "--sample", description = "Scaling factor of the small scale commercial traffic (0, 1)", required = true)
 	private double sample;
@@ -166,11 +166,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	public Integer call() throws Exception {
 		Configurator.setLevel("org.matsim.core.utils.geometry.geotools.MGC", Level.ERROR);
 
-		String modelName = inputDataDirectory.getFileName().toString();
+		String modelName = configPath.getParent().getFileName().toString();
 
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 
-		Config config = readAndCheckConfig(inputDataDirectory, modelName, sampleName, output);
+		Config config = readAndCheckConfig(configPath, modelName, sampleName, output);
 
 		output = Path.of(config.controler().getOutputDirectory());
 
@@ -209,6 +209,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (!Files.exists(shapeFileZonePath)) {
 					throw new Exception("Required districts shape file {} not found" + shapeFileZonePath.toString());
 				}
+				Path inputDataDirectory = Path.of(config.getContext().toURI()).getParent();
 				HashMap<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 					.createInputDataDistribution(output, landuseCategoriesAndDataConnection, inputDataDirectory,
 						usedLanduseConfiguration.toString(), shapeFileLandusePath, shapeFileZonePath,
@@ -221,13 +222,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					case commercialPersonTraffic, goodsTraffic ->
 						createCarriersAndDemand(output, scenario, shpZones, resultingDataPerZone, regionLinksMap,
 							usedSmallScaleCommercialTrafficType.toString(),
-							inputDataDirectory, includeExistingModels);
+							includeExistingModels);
 					case completeSmallScaleCommercialTraffic -> {
 						createCarriersAndDemand(output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "commercialPersonTraffic",
-							inputDataDirectory, includeExistingModels);
+							includeExistingModels);
 						includeExistingModels = false; // because already included in the step before
 						createCarriersAndDemand(output, scenario, shpZones, resultingDataPerZone, regionLinksMap, "goodsTraffic",
-							inputDataDirectory, includeExistingModels);
+							includeExistingModels);
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
@@ -393,7 +394,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private void createCarriersAndDemand(Path output, Scenario scenario, ShpOptions shpZones,
 										 HashMap<String, Object2DoubleMap<String>> resultingDataPerZone,
 										 Map<String, HashMap<Id<Link>, Link>> regionLinksMap, String smallScaleCommercialTrafficType,
-										 Path inputDataDirectory,
 										 boolean includeExistingModels) throws Exception {
 
 		ArrayList<String> modesORvehTypes;
@@ -413,7 +413,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType);
 
 		if (includeExistingModels) {
-			SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
+			SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 			TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, smallScaleCommercialTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
@@ -425,9 +425,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Reads and checks config if all necessary parameter are set.
 	 */
-	private Config readAndCheckConfig(Path inputDataDirectory, String modelName, String sampleName, Path output) throws Exception {
+	private Config readAndCheckConfig(Path configPath, String modelName, String sampleName, Path output) throws Exception {
 
-		Config config = ConfigUtils.loadConfig(inputDataDirectory.resolve("config_demand.xml").toString());
+		Config config = ConfigUtils.loadConfig(configPath.toString());
 		if (output == null || output.toString().isEmpty())
 			config.controler().setOutputDirectory(Path.of(config.controler().getOutputDirectory()).resolve(modelName)
 				.resolve(usedSmallScaleCommercialTrafficType.toString() + "_" + sampleName + "pct" + "_"
