@@ -104,7 +104,7 @@ public class LanduseBuildingAnalysis {
 					}
 				}
 			}
-			log.info("Data distribution for " + resultingDataPerZone.size() + " zones was imported from ",
+			log.info("Data distribution for " + resultingDataPerZone.size() + " zones was imported from " +
 					existingDataDistribution);
 			Files.copy(existingDataDistribution, outputFileInOutputFolder, StandardCopyOption.COPY_ATTRIBUTES);
 		}
@@ -211,7 +211,7 @@ public class LanduseBuildingAnalysis {
 							resultingNumberPerCategory, Double::sum);
 			}
 			if (totalEmployeesInCategoriesPerZone.get(investigationArea).getDouble(zoneId) != 0)
-			resultingDataPerZone.get(zoneId).mergeDouble("Employee",
+				resultingDataPerZone.get(zoneId).mergeDouble("Employee",
 					totalEmployeesInCategoriesPerZone.get(investigationArea).getDouble(zoneId), Double::sum);
 		}
 	}
@@ -337,7 +337,7 @@ public class LanduseBuildingAnalysis {
 					.point2Coord(((Geometry) singleBuildingFeature.getDefaultGeometry()).getCentroid());
 			String singleZone = indexZones.query(centroidPointOfBuildingPolygon);
 			String buildingType = String.valueOf(singleBuildingFeature.getAttribute("type"));
-			if (buildingType.equals("") || buildingType.equals("null") || buildingType.equals("yes")) {
+			if (buildingType.isEmpty() || buildingType.equals("null") || buildingType.equals("yes")) {
 				buildingType = indexLanduse.query(centroidPointOfBuildingPolygon);
 				buildingTypes = new String[] { buildingType };
 			} else {

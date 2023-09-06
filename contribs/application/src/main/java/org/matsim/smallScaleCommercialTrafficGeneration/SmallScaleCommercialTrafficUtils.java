@@ -281,11 +281,11 @@ public class SmallScaleCommercialTrafficUtils {
 	 * scenario reduces the demand of the small scale commercial traffic. The
 	 * dispersedTraffic will be added additionally.
 	 */
-	static void readExistingModels(Scenario scenario, double sampleScenario, Path inputDataDirectory,
+	static void readExistingModels(Scenario scenario, double sampleScenario,
 								   Map<String, HashMap<Id<Link>, Link>> regionLinksMap) throws Exception {
 
-		String locationOfExistingModels = inputDataDirectory.resolve("existingModels")
-			.resolve("existingModels.csv").toString();
+		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
+		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
 		CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
 			.setSkipHeaderRecord(true).build().parse(IOUtils.getBufferedReader(locationOfExistingModels));
 		for (CSVRecord record : parse) {
@@ -304,8 +304,7 @@ public class SmallScaleCommercialTrafficUtils {
 				vehicleType = null;
 			final String modelMode = record.get("networkMode");
 
-			Path scenarioLocation = inputDataDirectory.resolve("existingModels")
-				.resolve(modelName);
+			Path scenarioLocation = existingModelsFolder.resolve(modelName);
 			if (!Files.exists(scenarioLocation.resolve("output_carriers.xml.gz")))
 				throw new Exception("For the existing model " + modelName
 					+ " no carrierFile exists. The carrierFile should have the name 'output_carriers.xml.gz'");
