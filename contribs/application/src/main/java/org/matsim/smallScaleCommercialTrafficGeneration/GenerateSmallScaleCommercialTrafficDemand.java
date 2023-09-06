@@ -185,6 +185,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					throw new Exception(
 						"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
 				freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+				if (config.vehicles() != null && freightConfigGroup.getCarriersVehicleTypesFile() == null)
+					freightConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
 				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
 				FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 			}
@@ -194,6 +196,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					throw new Exception(
 						"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
 				freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+				if (config.vehicles() != null && freightConfigGroup.getCarriersVehicleTypesFile() == null)
+					freightConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
 				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
 				FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 				solveSeparatedVRPs(scenario, null);
