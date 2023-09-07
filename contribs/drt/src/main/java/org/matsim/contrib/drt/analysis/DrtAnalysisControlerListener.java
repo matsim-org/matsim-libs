@@ -241,7 +241,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		}
 		writeVehicleDistances(drtVehicleStats.getVehicleStates(), filename(event, "vehicleDistanceStats", ".csv"), delimiter);
 		analyseDetours(network, legs, drtVehicleStats.getTravelDistances(), drtCfg, filename(event, "drt_detours"), createGraphs, delimiter);
-		analyseWaitTimes(filename(event, "waitStats"), legs, drtEventSequenceCollector, 1800, createGraphs, delimiter);
+		analyseWaitTimes(filename(event, "waitStats"), legs, 1800, createGraphs, delimiter);
+		analyseRejections(filename(event,"drt_numOfRejection"), drtEventSequenceCollector,1800, createGraphs, delimiter);
 		analyseConstraints(filename(event, "constraints"), legs, createGraphs);
 
 		double endTime = qSimCfg.getEndTime()
@@ -389,6 +390,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		dumpOutput(event.getIteration(), "waitTimeComparison", ".png");
 		dumpOutput(event.getIteration(), "waitTimeComparison", ".csv");
 		dumpOutput(event.getIteration(), "drt_rejections", ".csv");
+		dumpOutput(event.getIteration(), "drt_numOfRejection", ".csv");
 		dumpOutput(event.getIteration(), "drt_legs", ".csv");
 		dumpOutput(event.getIteration(), "vehicleDistanceStats", ".csv");
 		dumpOutput(event.getIteration(), "drt_detours", ".csv");
@@ -444,10 +446,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private static Map<Double, List<EventSequence>> splitEventsIntoBins(DrtEventSequenceCollector drtEventSequenceCollector, int startTime, int endTime, int binSize_s) {
-		// get all events
-		Map<Id<Request>, EventSequence> rejectionSeq = drtEventSequenceCollector.getRejectedRequestSequences();
 		// get all rejection events
-		Collection<EventSequence> rejectionEvents = rejectionSeq.values();
+		Collection<EventSequence> rejectionEvents = drtEventSequenceCollector.getRejectedRequestSequences().values();
 
 		Map<Double, List<EventSequence>> rejections = new TreeMap<>();
 
@@ -455,7 +455,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 			// rejection list in this timebin
 			List<EventSequence> rejectionList = new ArrayList<>();
-			rejections.put((double)time, rejectionList);
 
 			//Iterate through each rejection
 			for (EventSequence seq : rejectionEvents){
@@ -466,10 +465,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					LogManager.getLogger(DrtAnalysisControlerListener.class).error("wrong end / start Times for analysis");
 				}
 
-				if (rejectionTime < time + binSize_s) {
+				if (rejectionTime > time && rejectionTime < time + binSize_s) {
 					rejectionList.add(seq);
 				}
 			}
+			rejections.put((double)time, rejectionList);
 		}
 		return rejections;
 	}
@@ -636,13 +636,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		}
 	}
 
-	private static void analyseWaitTimes(String fileName, List<DrtLeg> legs, DrtEventSequenceCollector drtEventSequenceCollector, int binsize_s, boolean createGraphs, String delimiter) {
+	private static void analyseWaitTimes(String fileName, List<DrtLeg> legs, int binsize_s, boolean createGraphs, String delimiter) {
 		if (legs.size() == 0)
 			return;
 		int startTime = ((int)(legs.get(0).departureTime / binsize_s)) * binsize_s;
 		int endTime = ((int)(legs.get(legs.size() - 1).departureTime / binsize_s) + binsize_s) * binsize_s;
 		Map<Double, List<DrtLeg>> splitLegs = splitLegsIntoBins(legs, startTime, endTime, binsize_s);
-		Map<Double, List<EventSequence>> splitEvents = splitEventsIntoBins(drtEventSequenceCollector,startTime, endTime, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -655,7 +654,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName + ".csv");
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 		TimeSeriesCollection datasetrequ = new TimeSeriesCollection();
-		TimeSeries rejections = new TimeSeries("number of rejections");
 		TimeSeries averageWaitC = new TimeSeries("average");
 		TimeSeries medianWait = new TimeSeries("median");
 		TimeSeries p_5Wait = new TimeSeries("5th percentile");
@@ -663,7 +661,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		TimeSeries requests = new TimeSeries("Ride requests");
 
 		try {
-			bw.write(String.join(delimiter, "timebin", "legs", "rejections", "average_wait", "min", "p_5", "p_25", "median", "p_75", "p_95", "max"));
+			bw.write(String.join(delimiter, "timebin", "legs", "average_wait", "min", "p_5", "p_25", "median", "p_75", "p_95", "max"));
 			for (Map.Entry<Double, List<DrtLeg>> e : splitLegs.entrySet()) {
 				long rides = 0;
 				double averageWait = 0;
@@ -710,18 +708,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 						format.format(max) + ""));
 
 			}
-			for(Map.Entry<Double, List<EventSequence>> e : splitEvents.entrySet()){
-				int rejectionNum = 0;
-				if (!e.getValue().isEmpty()) {
-					rejectionNum = e.getValue().size();
-				}
-
-				Minute h = new Minute(sdf2.parse(Time.writeTime(e.getKey())));
-
-				rejections.addOrUpdate(h, Double.valueOf(rejectionNum));
-				bw.newLine();
-				bw.write(String.join(delimiter, "" + format.format(rejectionNum)));
-			}
 
 			bw.flush();
 			bw.close();
@@ -742,6 +728,55 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			e.printStackTrace();
 		}
 
+	}
+
+	private static void analyseRejections(String fileName, DrtEventSequenceCollector drtEventSequenceCollector, int binsize_s, boolean createGraphs, String delimiter) {
+
+		int startTime = 0;
+		int endTime = 86400;
+		Map<Double, List<EventSequence>> splitEvents = splitEventsIntoBins(drtEventSequenceCollector,startTime, endTime, binsize_s);
+
+		DecimalFormat format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+
+		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss");
+
+		BufferedWriter bw = IOUtils.getBufferedWriter(fileName + ".csv");
+		TimeSeriesCollection dataset = new TimeSeriesCollection();
+		TimeSeries rejections = new TimeSeries("number of rejections");
+
+		try {
+			bw.write(String.join(delimiter, "timebin", "rejections"));
+
+			for(Map.Entry<Double, List<EventSequence>> e : splitEvents.entrySet()){
+				int drt_numOfRejection = 0;
+				if (!e.getValue().isEmpty()) {
+					drt_numOfRejection = e.getValue().size();
+				}
+
+				Minute h = new Minute(sdf2.parse(Time.writeTime(e.getKey())));
+
+				rejections.addOrUpdate(h, Double.valueOf(drt_numOfRejection));
+				bw.newLine();
+				bw.write(String.join(delimiter, Time.writeTime(e.getKey()) + "",//
+						 format.format(drt_numOfRejection) +""));
+			}
+
+			bw.flush();
+			bw.close();
+			if (createGraphs) {
+				dataset.addSeries(rejections);
+				JFreeChart chart = chartProfile(splitEvents.size(), dataset, "Number of rejections", "Number");
+				ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
+			}
+
+		} catch (IOException | ParseException e) {
+
+			e.printStackTrace();
+		}
 	}
 
 	private static JFreeChart chartProfile(int length, TimeSeriesCollection dataset, String descriptor, String yax) {
