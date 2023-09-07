@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.events.RemoveParkingActivityEvent;
 import org.matsim.contrib.parking.parkingsearch.events.ReserveParkingLocationEvent;
 import org.matsim.contrib.parking.parkingsearch.events.SelectNewParkingLocationEvent;
@@ -43,8 +44,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		this.currentPlannedLeg = currentPlannedLeg;
 		this.plan = plan;
 		this.planIndexNextActivity = planIndexNextActivity;
-		if (followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute("parking").equals(
-			"noParking"))
+		if (!ParkingUtils.checkIfActivityHasParking(followingActivity))
 			parkingAtEndOfLeg = false;
 	}
 

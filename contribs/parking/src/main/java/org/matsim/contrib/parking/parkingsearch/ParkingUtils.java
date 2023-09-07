@@ -21,13 +21,14 @@ package org.matsim.contrib.parking.parkingsearch;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 /**
- * @author  jbischoff, tschlenther
+ * @author  jbischoff, tschlenther, Ricardo Ewert
  *
  */
 public class ParkingUtils {
@@ -143,4 +144,24 @@ public class ParkingUtils {
 		return outGoingModeLinks;
 	}
 
+	/**
+	 * Checks if the activity has parking while the activity.
+	 *
+	 * @param followingActivity
+	 * @return
+	 */
+	public static boolean checkIfActivityHasParking(Activity followingActivity) {
+		return !(followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute(
+			"parking").equals(
+			"noParking"));
+	}
+
+	/**
+	 * Sets that while this activity we simulate no parking activities.
+	 *
+	 * @param activity
+	 */
+	public static void setNoParkingForActivity(Activity activity) {
+		activity.getAttributes().putAttribute("parking", "noParking");
+	}
 }
