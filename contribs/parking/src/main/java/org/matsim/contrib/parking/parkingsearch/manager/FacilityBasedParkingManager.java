@@ -55,6 +55,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	protected Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
 	protected Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
 	protected Network network;
+	protected ParkingSearchConfigGroup psConfigGroup;
 	protected boolean canParkOnlyAtFacilities;
 	private final int maxSlotIndex;
 	private final int maxTime;
@@ -63,7 +64,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	@Inject
 	public FacilityBasedParkingManager(Scenario scenario) {
-		ParkingSearchConfigGroup psConfigGroup = (ParkingSearchConfigGroup) scenario.getConfig().getModules().get(
+		psConfigGroup = (ParkingSearchConfigGroup) scenario.getConfig().getModules().get(
 			ParkingSearchConfigGroup.GROUP_NAME);
 		canParkOnlyAtFacilities = psConfigGroup.getCanParkOnlyAtFacilities();
 		this.network = scenario.getNetwork();
