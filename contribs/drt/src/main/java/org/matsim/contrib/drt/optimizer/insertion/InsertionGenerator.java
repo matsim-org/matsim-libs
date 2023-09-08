@@ -27,8 +27,10 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 import com.google.common.base.MoreObjects;
 
@@ -180,6 +182,11 @@ public class InsertionGenerator {
 				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
 		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
 				fromPickupTT, true, request);
+		
+		if (i == 0 && !checkStartSlack(vEntry, request, pickupDetourInfo)) {
+			// Inserting at schedule start and extending an ongoing stop task further than allowed
+			return;
+		}
 
 		int stopCount = vEntry.stops.size();
 		// i == j
@@ -251,6 +258,26 @@ public class InsertionGenerator {
 
 	private Waypoint.Stop nextStop(VehicleEntry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx);
+	}
+	
+	private boolean checkStartSlack(VehicleEntry vEntry, DrtRequest request, PickupDetourInfo pickupDetourInfo) {
+		if (vEntry.start.task.isEmpty()) {
+			return true;
+		}
+		
+		Task startTask = vEntry.start.task.get();
+		
+		if (!DrtTaskBaseType.STOP.isBaseTypeOf(startTask)) {
+			return true;
+		}
+		
+		DrtStopTask stopTask = (DrtStopTask) startTask;
+		
+		if (stopTask.getLink() != request.getFromLink()) {
+			return true;
+		}
+		
+		return vEntry.getStartSlackTime() >= pickupDetourInfo.departureTime - stopTask.getEndTime();
 	}
 
 	private InsertionWithDetourData createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,

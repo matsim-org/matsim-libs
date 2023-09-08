@@ -274,7 +274,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
-		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null);
+		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null, 0);
 	}
 
 	private InsertionWithDetourData insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx,

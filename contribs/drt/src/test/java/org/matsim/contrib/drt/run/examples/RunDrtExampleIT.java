@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSele
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.stops.CorrectedStopTimeCalculator;
 import org.matsim.contrib.drt.stops.CumulativeStopTimeCalculator;
 import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
@@ -212,6 +213,41 @@ public class RunDrtExampleIT {
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
+	
+	@Test
+	public void testRunDrtStopbasedExampleWithFlexibleStopDuration() {		
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+				"mielec_stop_based_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		
+		Controler controller = DrtControlerCreator.createControler(config, false);		
+
+		// This snippet adds the correction against wait times smaller than the defined stopDuration
+		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
+			@Override
+			public void install() {
+				StopTimeCalculator stopTimeCalculator = new CorrectedStopTimeCalculator(60.0);
+				bindModal(StopTimeCalculator.class).toInstance(stopTimeCalculator);
+			}
+		});
+			
+		controller.run();
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.05)
+				.rejections(17)
+				.waitAverage(261.88)
+				.inVehicleTravelTimeMean(376.04)
+				.totalTravelTimeMean(637.93)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
 
 	@Test
 	public void testRunServiceAreabasedExampleWithSpeedUp() {
@@ -263,9 +299,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.04)
 				.rejections(16)
-				.waitAverage(278.11)
+				.waitAverage(278.92)
 				.inVehicleTravelTimeMean(384.6)
-				.totalTravelTimeMean(662.71)
+				.totalTravelTimeMean(663.52)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
