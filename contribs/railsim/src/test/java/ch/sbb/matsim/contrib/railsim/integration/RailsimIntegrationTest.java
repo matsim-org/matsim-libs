@@ -336,7 +336,7 @@ public class RailsimIntegrationTest {
 	public void test7_trainFollowing() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "7_trainFollowing"));
 	}
-	
+
 	// This test is similar to test7_trainFollowing but with varying speed levels along the corridor.
 	// TODO: Right now, there are some runtime exceptions which I don't understand.
 	@Test
@@ -355,8 +355,8 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
-	public void test10_cross() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "10_cross"));
+	public void test10_junctionCross() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "10_junctionCross"));
 	}
 
 	@Test
@@ -370,26 +370,26 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
-	public void test13_Y() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "13_Y"));
+	public void test13_junctionY() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "13_junctionY"));
 	}
 
 	@Test
 	public void test14_mesoStations() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "14_mesoStations"));
 	}
-	
+
 	@Test
 	public void test15_simpleCorridor() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "15_simpleCorridor"));
-		
+
 		for (Event event : collector.getEvents()) {
 			if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
-				
+
 				VehicleArrivesAtFacilityEvent vehicleArrivesEvent = (VehicleArrivesAtFacilityEvent) event;
 				if (vehicleArrivesEvent.getVehicleId().toString().equals("train1") &&
 						vehicleArrivesEvent.getFacilityId().toString().equals("stop_3-4")) {
-					
+
 					Assert.assertEquals("The arrival time of train1 at stop_3-4 has changed.", 29594., event.getTime(), MatsimTestUtils.EPSILON);
 				}
 			}
