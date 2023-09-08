@@ -277,7 +277,7 @@ public class InsertionGenerator {
 			return true;
 		}
 		
-		return vEntry.getStartSlack() >= pickupDetourInfo.departureTime - stopTask.getEndTime();
+		return vEntry.getStartSlackTime() >= pickupDetourInfo.departureTime - stopTask.getEndTime();
 	}
 
 	private InsertionWithDetourData createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,
