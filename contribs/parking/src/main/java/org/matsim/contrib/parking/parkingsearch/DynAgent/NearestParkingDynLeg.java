@@ -29,6 +29,7 @@ import java.util.List;
  */
 public class NearestParkingDynLeg extends ParkingDynLeg {
 	private boolean parkingAtEndOfLeg = true;
+	private boolean passangerInteractionAtEndOfLeg = false;
 	private boolean reachedDestinationWithoutParking = false;
 	private boolean alreadyReservedParking = false;
 	private boolean driveToBaseWithoutParking = false;
@@ -47,8 +48,10 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		this.currentPlannedLeg = currentPlannedLeg;
 		this.plan = plan;
 		this.planIndexNextActivity = planIndexNextActivity;
-		if (!ParkingUtils.checkIfActivityHasParking(followingActivity))
+		if (ParkingUtils.checkIfActivityHasNoParking(followingActivity))
 			parkingAtEndOfLeg = false;
+		if (ParkingUtils.checkIfActivityHasPassengerInteraction(followingActivity))
+			passangerInteractionAtEndOfLeg = true;
 	}
 
 	@Override
@@ -88,7 +91,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 	@Override
 	public Id<Link> getNextLinkId() {
 
-		if (!parkingMode && parkingAtEndOfLeg) {
+		if (!passangerInteractionAtEndOfLeg && (!parkingMode && parkingAtEndOfLeg)) {
 			parkingMode = true;
 			this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
 		}
@@ -103,7 +106,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		} else {
 			if (hasFoundParking || reachedDestinationWithoutParking) {
 				// easy, we can just park where at our destination link
-				if (hasFoundParking) {
+				if (hasFoundParking && !passangerInteractionAtEndOfLeg) {
 					double parkingDuration;
 					double expectedDrivingDurationToPickup;
 					double drivingDurationFromDropOff = timer.getTimeOfDay() - currentPlannedLeg.getDepartureTime().seconds();
@@ -118,6 +121,21 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 					parkingDuration = followingActivity.getMaximumDuration().seconds() - drivingDurationFromDropOff - expectedDrivingDurationToPickup;
 					followingActivity.setMaximumDuration(parkingDuration);
 				}
+				if (plan.getPlanElements().size() > planIndexNextActivity + 2) {
+					Activity activityAfterFollowing = (Activity) plan.getPlanElements().get(planIndexNextActivity + 2);
+					if (activityAfterFollowing.getType().equals("parking_activity")) {
+						boolean canParkAtGetOffFacility = ((FacilityBasedParkingManager) parkingManager).canParkAtThisFacilityUntilEnd(currentLinkId,
+							activityAfterFollowing.getMaximumDuration().seconds(), followingActivity.getMaximumDuration().seconds(),
+							((Activity) plan.getPlanElements().get(planIndexNextActivity + 4)).getMaximumDuration().seconds(), timer.getTimeOfDay());
+						if (canParkAtGetOffFacility) {
+							plan.getPlanElements().remove(planIndexNextActivity + 3);
+							plan.getPlanElements().remove(planIndexNextActivity + 1);
+//							log.info(
+//								plan.getPerson().getId().toString() + ": Parking activity can take place at getOff point. " + followingActivity.getType() + "The legs between getOff and parking are removed!");
+						}
+					}
+				}
+
 				this.logic.reset();
 				return null;
 			} else {
@@ -131,7 +149,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 				double nextPickupTime = followingActivity.getStartTime().seconds() + followingActivity.getMaximumDuration().seconds();
 				double maxParkingDuration = followingActivity.getMaximumDuration().seconds() - (followingActivity.getStartTime().seconds() - timer.getTimeOfDay());
 				Id<Link> nextLinkId = ((NearestParkingSpotSearchLogic) this.logic).getNextLink(currentLinkId, route.getEndLinkId(), vehicleId, mode,
-					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime);
+					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime, passangerInteractionAtEndOfLeg);
 				if (((NearestParkingSpotSearchLogic) this.logic).isNextParkingActivitySkipped() && parkingAtEndOfLeg) {
 					removeNextActivityAndFollowingLeg();
 					parkingAtEndOfLeg = false;
@@ -169,6 +187,8 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 	private void removeNextActivityAndFollowingLeg() {
 		plan.getPlanElements().remove(planIndexNextActivity);
 		plan.getPlanElements().remove(planIndexNextActivity);
+//		log.info(
+//			plan.getPerson().getId().toString() + ": Parking activity after getOff point '" + ((Activity)plan.getPlanElements().get(planIndexNextActivity - 2)).getType() + "' is removed, because no parking facility was found.");
 	}
 
 	public boolean driveToBaseWithoutParking() {

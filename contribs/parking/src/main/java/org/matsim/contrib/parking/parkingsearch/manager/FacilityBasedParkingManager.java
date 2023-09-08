@@ -30,6 +30,7 @@ import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -107,6 +108,39 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		}
 
 		return canPark;
+	}
+
+	/**
+	 * Checks if it is possible if you can park at this link for the complete time.
+	 *
+	 * @param linkId
+	 * @param stopDuration
+	 * @param getOffDuration
+	 * @param pickUpDuration
+	 * @param now
+	 * @return
+	 */
+	public boolean canParkAtThisFacilityUntilEnd(Id<Link> linkId, double stopDuration, double getOffDuration, double pickUpDuration, double now) {
+		Set<Id<ActivityFacility>> facilities = this.facilitiesPerLink.get(linkId);
+		if (facilities != null) {
+			double totalNeededParkingDuration = getOffDuration + stopDuration + pickUpDuration;
+			for (Id<ActivityFacility> facility : facilities) {
+				double maxParkingDurationAtFacilityInHours = Double.MAX_VALUE;
+				if (this.parkingFacilities.get(facility).getAttributes().getAsMap().containsKey("maxParkingDurationInHours"))
+					maxParkingDurationAtFacilityInHours = (double) this.parkingFacilities.get(facility).getAttributes().getAsMap().get(
+						"maxParkingDurationInHours");
+				if (maxParkingDurationAtFacilityInHours > totalNeededParkingDuration) {
+					ActivityOption parkingOptions = this.parkingFacilities.get(facility).getActivityOptions().get("parking");
+					if (!parkingOptions.getOpeningTimes().isEmpty()) {
+						if ((parkingOptions.getOpeningTimes().first().getStartTime() == 0 && parkingOptions.getOpeningTimes().first().getEndTime() == 24 * 3600))
+							if (parkingOptions.getOpeningTimes().first().getStartTime() <= now && parkingOptions.getOpeningTimes().first().getEndTime() >= now + totalNeededParkingDuration)
+								return true;
+					} else
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean linkIdHasAvailableParkingForVehicle(Id<Link> linkId, Id<Vehicle> vid) {

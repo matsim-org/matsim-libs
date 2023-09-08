@@ -81,8 +81,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 //			Leg currentLeg = (Leg) this.currentPlanElement;
 			int planIndexNextActivity = planIndex + 1;
 			Activity nextPlanElement = (Activity) plan.getPlanElements().get(planIndexNextActivity);
-			if (nextPlanElement.getAttributes().getAsMap().containsKey("parking") && nextPlanElement.getAttributes().getAttribute("parking").equals(
-				"noParking"))
+			if (ParkingUtils.checkIfActivityHasNoParking(nextPlanElement))
 				this.lastParkActionState = LastParkActionState.WALKFROMPARK;
 			//this could be Car, Carsharing, Motorcylce, or whatever else mode we have, so we want our leg to reflect this.
 			return new NearestParkingDynLeg(currentPlannedLeg, actualRoute, plan, planIndexNextActivity, parkingLogic, parkingManager,
@@ -118,6 +117,8 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		// we could either depart by car or not next
 
 		if (plan.getPlanElements().size() >= planIndex + 1) {
+			if (plan.getPlanElements().get(planIndex +1) instanceof Activity)
+				return nextStateAfterNonCarTrip(oldAction, now);
 			planIndex++;
 			this.currentPlanElement = plan.getPlanElements().get(planIndex);
 			Leg currentLeg = (Leg) currentPlanElement;
@@ -172,10 +173,9 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 	protected DynAction nextStateAfterWalkToPark(DynAction oldAction, double now) {
 		//walk2park is complete, we can unpark.
 		this.lastParkActionState = LastParkActionState.UNPARKACTIVITY;
-		PlanElement beforePlanElement = plan.getPlanElements().get(planIndex - 1);
-		if (beforePlanElement.getAttributes().getAsMap().containsKey("parking") && beforePlanElement.getAttributes().getAttribute("parking").equals(
-			"noParking"))
-			return nextStateAfterUnParkActivity(oldAction, now);
+		Activity beforePlanElement = (Activity) plan.getPlanElements().get(planIndex - 1);
+		if (ParkingUtils.checkIfActivityHasNoParking(beforePlanElement))
+			return nextStateAfterUnParkActivity(oldAction, now); // wenn kein Parken dann einfach weiter
 		return new IdleDynActivity(this.stageInteractionType, now + configGroup.getUnparkduration());
 	}
 }
