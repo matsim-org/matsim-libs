@@ -52,14 +52,12 @@ public interface Waypoint {
 		public final Link link;
 		public final double time;
 		public final int occupancy;
-		public final double now;
 
-		public Start(@Nullable Task task, Link link, double time, int occupancy, double now) {
+		public Start(@Nullable Task task, Link link, double time, int occupancy) {
 			this.task = Optional.ofNullable(task);
 			this.link = link;
 			this.time = time;
 			this.occupancy = occupancy;
-			this.now = now;
 		}
 
 		@Override

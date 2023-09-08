@@ -108,8 +108,8 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop);
 
-		return new VehicleEntry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy, currentTime),
-				ImmutableList.copyOf(stops), slackTimes);
+		return new VehicleEntry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
+				ImmutableList.copyOf(stops), slackTimes, currentTime);
 	}
 
 	public boolean isNotEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {

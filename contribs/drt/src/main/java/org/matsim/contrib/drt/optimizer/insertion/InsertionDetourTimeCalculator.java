@@ -153,7 +153,7 @@ public class InsertionDetourTimeCalculator {
 		} else {
 			// case 3: previous waypoint is an ongoing (started) stop
 			// insertion is a soon as possible (now)
-			double departureTime = stopTimeCalculator.updateEndTimeForPickup(vEntry.vehicle, stopTask, vEntry.start.now, request);
+			double departureTime = stopTimeCalculator.updateEndTimeForPickup(vEntry.vehicle, stopTask, vEntry.createTime, request);
 			double additionalStopDuration = departureTime - stopTask.getEndTime();
 			return new PickupTimeInfo(departureTime, additionalStopDuration);
 		}

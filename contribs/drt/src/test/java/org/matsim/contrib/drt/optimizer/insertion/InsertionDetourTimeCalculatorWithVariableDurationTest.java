@@ -264,7 +264,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private Waypoint.Start start(Task task, double time, Link link) {
-		return new Waypoint.Start(task, link, time, 0, 0);
+		return new Waypoint.Start(task, link, time, 0);
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link) {
@@ -274,7 +274,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
-		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null);
+		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null, 0);
 	}
 
 	private InsertionWithDetourData insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx,

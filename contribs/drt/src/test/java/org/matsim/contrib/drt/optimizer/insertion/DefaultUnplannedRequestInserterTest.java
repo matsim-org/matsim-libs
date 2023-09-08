@@ -197,7 +197,7 @@ public class DefaultUnplannedRequestInserterTest {
 		var unplannedRequests = requests(request1);
 		double now = 15;
 
-		var vehicle1Entry = new VehicleEntry(vehicle1, null, null, null);
+		var vehicle1Entry = new VehicleEntry(vehicle1, null, null, null, 0);
 		var createEntryCounter = new MutableInt();
 		VehicleEntry.EntryFactory entryFactory = (vehicle, currentTime) -> {
 			//make sure the right arguments are passed
