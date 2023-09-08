@@ -166,6 +166,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				.sorted(Comparator.comparing(leg -> leg.departureTime))
 				.collect(toList());
 
+		List<EventSequence> rejectionEvents = drtEventSequenceCollector.getRejectedRequestSequences()
+				.values()
+				.stream()
+				.sorted(Comparator.comparing(rejectionEvent -> rejectionEvent.getSubmitted().getTime()))
+				.collect(Collectors.toList());
+
 		collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(), filename(event, "drt_rejections", ".csv"),
 				String.join(delimiter, "time", "personId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
 					DrtRequestSubmittedEvent submission = seq.getSubmitted();
@@ -242,7 +248,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		writeVehicleDistances(drtVehicleStats.getVehicleStates(), filename(event, "vehicleDistanceStats", ".csv"), delimiter);
 		analyseDetours(network, legs, drtVehicleStats.getTravelDistances(), drtCfg, filename(event, "drt_detours"), createGraphs, delimiter);
 		analyseWaitTimes(filename(event, "waitStats"), legs, 1800, createGraphs, delimiter);
-		analyseRejections(filename(event,"drt_numOfRejection"), drtEventSequenceCollector,1800, createGraphs, delimiter);
+		analyseRejections(filename(event,"drt_rejections_perTimeBin"), rejectionEvents,1800, createGraphs, delimiter);
 		analyseConstraints(filename(event, "constraints"), legs, createGraphs);
 
 		double endTime = qSimCfg.getEndTime()
@@ -390,7 +396,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		dumpOutput(event.getIteration(), "waitTimeComparison", ".png");
 		dumpOutput(event.getIteration(), "waitTimeComparison", ".csv");
 		dumpOutput(event.getIteration(), "drt_rejections", ".csv");
-		dumpOutput(event.getIteration(), "drt_numOfRejection", ".csv");
+		dumpOutput(event.getIteration(), "drt_rejections_perTimeBin", ".csv");
 		dumpOutput(event.getIteration(), "drt_legs", ".csv");
 		dumpOutput(event.getIteration(), "vehicleDistanceStats", ".csv");
 		dumpOutput(event.getIteration(), "drt_detours", ".csv");
@@ -445,10 +451,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		return splitLegs;
 	}
 
-	private static Map<Double, List<EventSequence>> splitEventsIntoBins(DrtEventSequenceCollector drtEventSequenceCollector, int startTime, int endTime, int binSize_s) {
-		// get all rejection events
-		Collection<EventSequence> rejectionEvents = drtEventSequenceCollector.getRejectedRequestSequences().values();
-
+	private static Map<Double, List<EventSequence>> splitEventsIntoBins(Collection<EventSequence> rejectionEvents, int startTime, int endTime, int binSize_s) {
 		Map<Double, List<EventSequence>> rejections = new TreeMap<>();
 
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
@@ -730,11 +733,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 	}
 
-	private static void analyseRejections(String fileName, DrtEventSequenceCollector drtEventSequenceCollector, int binsize_s, boolean createGraphs, String delimiter) {
-
-		int startTime = 0;
-		int endTime = 86400;
-		Map<Double, List<EventSequence>> splitEvents = splitEventsIntoBins(drtEventSequenceCollector,startTime, endTime, binsize_s);
+	private static void analyseRejections(String fileName, List<EventSequence> rejectionEvents, int binsize_s, boolean createGraphs, String delimiter) {
+		int startTime = ((int)(rejectionEvents.get(0).getSubmitted().getTime() / binsize_s)) * binsize_s;
+		int endTime = ((int)(rejectionEvents.get(rejectionEvents.size() - 1).getSubmitted().getTime() / binsize_s) + 1) * binsize_s;
+		Map<Double, List<EventSequence>> splitEvents = splitEventsIntoBins(rejectionEvents,startTime, endTime, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
