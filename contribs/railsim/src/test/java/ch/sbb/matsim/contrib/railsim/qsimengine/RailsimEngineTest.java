@@ -101,7 +101,7 @@ public class RailsimEngineTest {
 	@Test
 	public void congested_with_headway() {
 
-		RailsimTestUtils.Holder test = getTestEngine("network0.xml", l -> RailsimUtils.setMinimumTrainHeadwayTime(l, 60));
+		RailsimTestUtils.Holder test = getTestEngine("network0.xml", l -> RailsimUtils.setMinimumHeadwayTime(l, 60));
 
 		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 0, "l1-2", "l5-6");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 60, "l1-2", "l5-6");

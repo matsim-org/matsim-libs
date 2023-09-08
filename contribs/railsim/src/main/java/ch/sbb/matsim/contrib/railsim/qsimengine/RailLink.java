@@ -47,7 +47,7 @@ public final class RailLink implements HasLinkId {
 		blocked = new MobsimDriverAgent[state.length];
 		length = link.getLength();
 		freeSpeed = link.getFreespeed();
-		minimumHeadwayTime = RailsimUtils.getMinimumTrainHeadwayTime(link);
+		minimumHeadwayTime = RailsimUtils.getMinimumHeadwayTime(link);
 		String resourceId = RailsimUtils.getResourceId(link);
 		resource = resourceId != null ? Id.create(resourceId, RailResource.class) : null;
 		isEntryLink = RailsimUtils.isEntryLink(link);
