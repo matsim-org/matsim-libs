@@ -128,7 +128,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			for (Id<ActivityFacility> facility : facilities) {
 				double maxParkingDurationAtFacilityInHours = Double.MAX_VALUE;
 				if (this.parkingFacilities.get(facility).getAttributes().getAsMap().containsKey("maxParkingDurationInHours"))
-					maxParkingDurationAtFacilityInHours = (double) this.parkingFacilities.get(facility).getAttributes().getAsMap().get(
+					maxParkingDurationAtFacilityInHours = 3600 * (double) this.parkingFacilities.get(facility).getAttributes().getAsMap().get(
 						"maxParkingDurationInHours");
 				if (maxParkingDurationAtFacilityInHours > totalNeededParkingDuration) {
 					ActivityOption parkingOptions = this.parkingFacilities.get(facility).getActivityOptions().get("parking");
