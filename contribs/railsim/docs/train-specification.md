@@ -10,7 +10,8 @@ type in MATSim.
 
 ### TransitVehicle Attributes
 
-TODO, e.g. length and acceleration of a train.
+Default vehicle type attributes for length, maximum velocity and capacity.
+Set network mode to rail.
 
 #### railsimAcceleration
 
@@ -18,21 +19,21 @@ The vehicle-specific acceleration. Unit: meters per square-seconds \[m/s²]
 
 #### railsimDeceleration
 
-The vehicle-specific acceleration. Unit: meters per square-seconds \[m/s²]
+The vehicle-specific deceleration. Unit: meters per square-seconds \[m/s²]
 
 ## Examples
 
 ```xml
 
 <vehicleType id="fvDosto">
-    <attributes>
-        <attribute name="railsimAcceleration" class="java.lang.Double">0.4</attribute>
-        <attribute name="railsimDeceleration" class="java.lang.Double">0.5</attribute>
-    </attributes>
-    <capacity seats="606" standingRoomInPersons="0"/>
-    <length meter="200.0"/>
-    <width meter="1.435"/>
-    <maximumVelocity meterPerSecond="55.556"/>
-    <networkMode networkMode="rail/pt/railsim?"/>
+	<attributes>
+		<attribute name="railsimAcceleration" class="java.lang.Double">0.4</attribute>
+		<attribute name="railsimDeceleration" class="java.lang.Double">0.5</attribute>
+	</attributes>
+	<capacity seats="606" standingRoomInPersons="0"/>
+	<length meter="200.0"/>
+	<width meter="1.435"/>
+	<maximumVelocity meterPerSecond="55.556"/>
+	<networkMode networkMode="rail"/>
 </vehicleType>
 ```

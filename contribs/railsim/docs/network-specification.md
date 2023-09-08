@@ -14,10 +14,6 @@ We use the prefix `railsim` where it is appropriate.
 
 ### Link Attributes
 
-#### railsimGrade
-
-TODO
-
 #### railsimTrainCapacity
 
 The number of trains that can be on this link at the same time. If the attribute is not provided, a default of 1 is
@@ -30,9 +26,9 @@ Example:
 ```xml
 
 <link id="A" from="A" to="A0" length="500" freespeed="2.77" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-    <attributes>
-        <attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
-    </attributes>
+	<attributes>
+		<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+	</attributes>
 </link>
 
 ```
@@ -69,16 +65,12 @@ Example:
 ```xml
 
 <link id="hl" from="H" to="L" length="3000" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
-    <attributes>
-        <attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
-    </attributes>
+	<attributes>
+		<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+	</attributes>
 </link>
 
 ```
-
-#### railsimMaxSpeed
-
-TODO
 
 #### railsimSpeed_ + vehicle type
 
@@ -92,10 +84,10 @@ Example:
 ```xml
 
 <link id="A_B" from="A" to="B" length="200.0" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
-    <attributes>
-        <attribute name="railsimSpeed_ic2000" class="java.lang.Integer">44.444</attribute>
-        <attribute name="railsimSpeed_fvdosto" class="java.lang.Integer">50.0</attribute>
-    </attributes>
+	<attributes>
+		<attribute name="railsimSpeed_ic2000" class="java.lang.Integer">44.444</attribute>
+		<attribute name="railsimSpeed_fvdosto" class="java.lang.Integer">50.0</attribute>
+	</attributes>
 </link>
 
 ```
@@ -130,18 +122,18 @@ Default value of `railsimCapacity` sets an own railsimResourceId for each track.
 ```xml
 
 <links>
-    <link id="A_B" from="A" to="B" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
-          modes="rail">
-        <attributes>
-            <attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
-        </attributes>
-    </link>
-    <link id="B_A" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
-          modes="rail">
-        <attributes>
-            <attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
-        </attributes>
-    </link>
+	<link id="A_B" from="A" to="B" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
+		  modes="rail">
+		<attributes>
+			<attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
+		</attributes>
+	</link>
+	<link id="B_A" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
+		  modes="rail">
+		<attributes>
+			<attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
+		</attributes>
+	</link>
 </links>
 ```
 
@@ -152,12 +144,12 @@ Default value of `railsimResourceId` sets an own railsimResourceId for each trac
 ```xml
 
 <links>
-    <link id="A_B" from="A" to="B" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
-          modes="rail">
-    </link>
-    <link id="B_A" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
-          modes="rail">
-    </link>
+	<link id="A_B" from="A" to="B" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
+		  modes="rail">
+	</link>
+	<link id="B_A" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
+		  modes="rail">
+	</link>
 </links>
 ```
 
@@ -166,24 +158,24 @@ Default value of `railsimResourceId` sets an own railsimResourceId for each trac
 ```xml
 
 <links>
-    <link id="A_B" from="A" to="B" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
-          modes="rail">
-    </link>
-    <link id="A_B_contra" from="A" to="B" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
-          modes="rail">
-        <attributes>
-            <attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
-        </attributes>
-    </link>
-    <link id="B_A_contra" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
-          modes="rail">
-        <attributes>
-            <attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
-        </attributes>
-    </link>
-    <link id="B_A" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
-          modes="rail">
-    </link>
+	<link id="A_B" from="A" to="B" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
+		  modes="rail">
+	</link>
+	<link id="A_B_contra" from="A" to="B" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
+		  modes="rail">
+		<attributes>
+			<attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
+		</attributes>
+	</link>
+	<link id="B_A_contra" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
+		  modes="rail">
+		<attributes>
+			<attribute name="railsimResourceId" class="java.lang.String">AB</attribute>
+		</attributes>
+	</link>
+	<link id="B_A" from="B" to="A" length="200.0" freespeed="50" capacity="3600.0" permlanes="1" oneway="1"
+		  modes="rail">
+	</link>
 </links>
 ```
 
@@ -198,7 +190,7 @@ to cross this node/intersection.
 
 ## Mesoscopic
 
-### Track
+### Route
 
 Model tracks consisting of links with capacities exceeding 1. Opposite links share the same resource ID. There is no
 differentiation between moving block and fixed block. A mesoscopic link can only initiate or terminate at points where a
@@ -213,8 +205,18 @@ larger than 1 and corresponds to the number of tracks.
 
 #### Section with a capacity of 2
 
-TODO
+```xml
 
-#### Station with 5 platforms
-
-TODO
+<links>
+	<link id="l_bc_F" from="n_b2" to="n_c1" length="4000" freespeed="27.777" capacity="3600.0" permlanes="1" modes="rail">
+		<attributes>
+			<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+		</attributes>
+	</link>
+	<link id="l_bc_R" from="n_c1" to="n_b2" length="4000" freespeed="27.777" capacity="3600.0" permlanes="1" modes="rail">
+		<attributes>
+			<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+		</attributes>
+	</link>
+</links>
+```

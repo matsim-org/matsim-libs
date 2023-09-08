@@ -6,10 +6,10 @@ All the additional events use the prefix `railsim`.
 
 ## Event Types
 
-### railsimLinkStateChangeEvent
+### RailsimLinkStateChangeEvent
 
-Instead of `trainPathEntersLinkEvent`, we could have a generic `railsimLinkStateChangeEvent`
-that could include information about the new state of the link (or even the track of a multi-track link).
+Instead of `TrainPathEntersLinkEvent`, we have a generic `RailsimLinkStateChangeEvent` that includes information about
+the new state of the link (or even the track of a multi-track link).
 
 Attributes:
 
@@ -17,21 +17,21 @@ Attributes:
 - `vehicleId`: if `state=reserved|blocked`, the id of the vehicle blocking or reserving this link
 - `track`: a number (0-based or 1-based?) if the link has multiple tracks
 
-### railsimTrainLeavesLinkEvent
+### RailsimTrainLeavesLinkEvent
 
-Similar to the existing `trainLeavesLinkEvent`.
+Similar to the existing `TrainLeavesLinkEvent`.
 One could argue that setting the link state to `free` would imply the same. I (mr) would still
 say it makes sense to have it separate, because depending on the implementation, a link could
 remain blocked for a longer time even if the train has already passed (e.g. minimum headway time).
 
-There is **no** railsimTrainEntersLinkEvent. The regular `LinkEnterEvent` is used to provide the highest
+There is **no** `RailsimTrainEntersLinkEvent`. The regular `LinkEnterEvent` is used to provide the highest
 compatibility with existing analysis and visualization tools.
 
-### railsimTrainStateEvent
+### RailsimTrainStateEvent
 
-This event is emitted every time there is a position update for a train. 
+This event is emitted every time there is a position update for a train.
 This event contains detailed information about the trains position on a single link.
 
-### railsimDetourEvent
+### RailsimDetourEvent
 
 This event is emitted when a train is re-routed and contains parts of the routes that have changed.
