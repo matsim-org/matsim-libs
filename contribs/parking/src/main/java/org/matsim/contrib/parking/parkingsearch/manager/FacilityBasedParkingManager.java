@@ -302,6 +302,24 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		return ((int) time / this.timeBinSize);
 	}
 
+	/**
+	 * Gives the duration of the staging activity of parking
+	 *
+	 * @return
+	 */
+	public double getParkStageActivityDuration() {
+		return psConfigGroup.getParkduration();
+	}
+
+	/**
+	 * Gives the duration of the staging activity of unparking
+	 *
+	 * @return
+	 */
+	public double getUnParkStageActivityDuration() {
+		return psConfigGroup.getUnparkduration();
+	}
+
 	@Override
 	public void reset(int iteration) {
 		for (Id<ActivityFacility> fac : this.rejectedReservations.keySet()) {
