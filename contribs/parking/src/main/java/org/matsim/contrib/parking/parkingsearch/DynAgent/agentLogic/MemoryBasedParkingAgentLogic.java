@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic;
 
@@ -31,22 +31,22 @@ public class MemoryBasedParkingAgentLogic extends ParkingAgentLogic {
 		super(plan, parkingManager, walkRouter, network, parkingRouter, events, parkingLogic, timer, teleportationLogic, configGroup);
 	}
 
-	
+
 	@Override
 	protected DynAction nextStateAfterUnParkActivity(DynAction oldAction, double now) {
 		// we have unparked, now we need to get going by car again.
-		
+
 		Leg currentPlannedLeg = (Leg) currentPlanElement;
 		Route plannedRoute = currentPlannedLeg.getRoute();
 		NetworkRoute actualRoute = this.parkingRouter.getRouteFromParkingToDestination(plannedRoute.getEndLinkId(), now, agent.getCurrentLinkId());
-		if ((this.parkingManager.unParkVehicleHere(currentlyAssignedVehicleId, agent.getCurrentLinkId(), now))||(isinitialLocation)){
+		if ((this.parkingManager.unParkVehicleHere(currentlyAssignedVehicleId, agent.getCurrentLinkId(), now))||(isInitialLocation)){
 			this.lastParkActionState = LastParkActionState.CARTRIP;
-			isinitialLocation = false;
+			isInitialLocation = false;
 			Leg currentLeg = (Leg) this.currentPlanElement;
 			//this could be Car, Carsharing, Motorcylce, or whatever else mode we have, so we want our leg to reflect this.
 			return new DistanceMemoryDynLeg(currentLeg.getMode(), actualRoute, parkingLogic, parkingManager, currentlyAssignedVehicleId, timer, events);
 		}
 		else throw new RuntimeException("parking location mismatch");
-		
+
 	}
 }
