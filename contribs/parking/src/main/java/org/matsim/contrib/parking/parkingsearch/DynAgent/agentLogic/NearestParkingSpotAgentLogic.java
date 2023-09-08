@@ -70,6 +70,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		// we have unparked, now we need to get going by car again.
 
 		Leg currentPlannedLeg = (Leg) currentPlanElement;
+		currentPlannedLeg.setDepartureTime(timer.getTimeOfDay());
 		Route plannedRoute = currentPlannedLeg.getRoute();
 		NetworkRoute actualRoute = this.parkingRouter.getRouteFromParkingToDestination(plannedRoute.getEndLinkId(), now, agent.getCurrentLinkId());
 		actualRoute.setVehicleId(currentlyAssignedVehicleId);
