@@ -139,32 +139,17 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		// ordinary activity: get next Leg, if car: go to car, otherwise add ordinary leg by other mode
 		// walk-leg to car: add unpark activity
 		// unpark activity: find the way to the next route & start leg
-		switch (lastParkActionState) {
-			case ACTIVITY:
-				return nextStateAfterActivity(oldAction, now);
+        return switch (lastParkActionState) {
+            case ACTIVITY -> nextStateAfterActivity(oldAction, now);
+            case CARTRIP -> nextStateAfterCarTrip(oldAction, now);
+            case NONCARTRIP -> nextStateAfterNonCarTrip(oldAction, now);
+            case PARKACTIVITY -> nextStateAfterParkActivity(oldAction, now);
+            case UNPARKACTIVITY -> nextStateAfterUnParkActivity(oldAction, now);
+            case WALKFROMPARK -> nextStateAfterWalkFromPark(oldAction, now);
+            case WALKTOPARK -> nextStateAfterWalkToPark(oldAction, now);
+        };
 
-			case CARTRIP:
-				return nextStateAfterCarTrip(oldAction, now);
-
-			case NONCARTRIP:
-				return nextStateAfterNonCarTrip(oldAction, now);
-
-			case PARKACTIVITY:
-				return nextStateAfterParkActivity(oldAction, now);
-
-			case UNPARKACTIVITY:
-				return nextStateAfterUnParkActivity(oldAction, now);
-
-			case WALKFROMPARK:
-				return nextStateAfterWalkFromPark(oldAction, now);
-
-			case WALKTOPARK:
-				return nextStateAfterWalkToPark(oldAction, now);
-
-		}
-		throw new RuntimeException("unreachable code");
-
-	}
+    }
 
 	protected DynAction nextStateAfterUnParkActivity(DynAction oldAction, double now) {
 		// we have unparked, now we need to get going by car again.
@@ -201,12 +186,11 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		Facility toFacility = new LinkWrapperFacility(network.getLinks().get(currentPlannedLeg.getRoute().getEndLinkId()));
 		List<? extends PlanElement> walkTrip = walkRouter.calcRoute(
 			DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, now, plan.getPerson()));
-		if (walkTrip.size() != 1 || !(walkTrip.get(0) instanceof Leg)) {
+		if (walkTrip.size() != 1 || !(walkTrip.get(0) instanceof Leg walkLeg)) {
 			String message = "walkRouter returned something else than a single Leg, e.g. it routes walk on the network with non_network_walk to access the network. Not implemented in parking yet!";
 			log.error(message);
 			throw new RuntimeException(message);
 		}
-		Leg walkLeg = (Leg) walkTrip.get(0);
 		this.lastParkActionState = LastParkActionState.WALKFROMPARK;
 		this.stageInteractionType = null;
 		return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
@@ -264,12 +248,11 @@ public class ParkingAgentLogic implements DynAgentLogic {
 				Facility toFacility = new LinkWrapperFacility(network.getLinks().get(teleportedParkLink));
 				List<? extends PlanElement> walkTrip = walkRouter.calcRoute(
 					DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, now, plan.getPerson()));
-				if (walkTrip.size() != 1 || !(walkTrip.get(0) instanceof Leg)) {
+				if (walkTrip.size() != 1 || !(walkTrip.get(0) instanceof Leg walkLeg)) {
 					String message = "walkRouter returned something else than a single Leg, e.g. it routes walk on the network with non_network_walk to access the network. Not implemented in parking yet!";
 					log.error(message);
 					throw new RuntimeException(message);
 				}
-				Leg walkLeg = (Leg) walkTrip.get(0);
 				this.lastParkActionState = LastParkActionState.WALKTOPARK;
 				this.currentlyAssignedVehicleId = vehicleId;
 				this.stageInteractionType = ParkingUtils.PARKACTIVITYTYPE;

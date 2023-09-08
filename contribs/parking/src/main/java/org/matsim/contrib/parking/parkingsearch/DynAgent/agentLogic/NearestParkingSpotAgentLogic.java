@@ -54,31 +54,16 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		if (lastParkActionState.equals(LastParkActionState.CARTRIP) && ((NearestParkingDynLeg) oldAction).driveToBaseWithoutParking())
 			this.lastParkActionState = LastParkActionState.WALKFROMPARK;
 
-		switch (lastParkActionState) {
-			case ACTIVITY:
-				return nextStateAfterActivity(oldAction, now);
-
-			case CARTRIP:
-				return nextStateAfterCarTrip(oldAction, now);
-
-			case NONCARTRIP:
-				return nextStateAfterNonCarTrip(oldAction, now);
-
-			case PARKACTIVITY:
-				return nextStateAfterParkActivity(oldAction, now);
-
-			case UNPARKACTIVITY:
-				return nextStateAfterUnParkActivity(oldAction, now);
-
-			case WALKFROMPARK:
-				return nextStateAfterWalkFromPark(oldAction, now);
-
-			case WALKTOPARK:
-				return nextStateAfterWalkToPark(oldAction, now);
-
-		}
-		throw new RuntimeException("unreachable code");
-	}
+        return switch (lastParkActionState) {
+            case ACTIVITY -> nextStateAfterActivity(oldAction, now);
+            case CARTRIP -> nextStateAfterCarTrip(oldAction, now);
+            case NONCARTRIP -> nextStateAfterNonCarTrip(oldAction, now);
+            case PARKACTIVITY -> nextStateAfterParkActivity(oldAction, now);
+            case UNPARKACTIVITY -> nextStateAfterUnParkActivity(oldAction, now);
+            case WALKFROMPARK -> nextStateAfterWalkFromPark(oldAction, now);
+            case WALKTOPARK -> nextStateAfterWalkToPark(oldAction, now);
+        };
+    }
 
 	@Override
 	protected DynAction nextStateAfterUnParkActivity(DynAction oldAction, double now) {
@@ -90,9 +75,9 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		actualRoute.setVehicleId(currentlyAssignedVehicleId);
 		if (!plannedRoute.getStartLinkId().equals(actualRoute.getStartLinkId()))
 			currentPlannedLeg.setRoute(actualRoute);
-		if ((this.parkingManager.unParkVehicleHere(currentlyAssignedVehicleId, agent.getCurrentLinkId(), now)) || (isinitialLocation)) {
+		if ((this.parkingManager.unParkVehicleHere(currentlyAssignedVehicleId, agent.getCurrentLinkId(), now)) || (isInitialLocation)) {
 			this.lastParkActionState = LastParkActionState.CARTRIP;
-			isinitialLocation = false;
+			isInitialLocation = false;
 //			Leg currentLeg = (Leg) this.currentPlanElement;
 			int planIndexNextActivity = planIndex + 1;
 			Activity nextPlanElement = (Activity) plan.getPlanElements().get(planIndexNextActivity);
@@ -151,12 +136,11 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 				Facility toFacility = new LinkWrapperFacility(network.getLinks().get(teleportedParkLink));
 				List<? extends PlanElement> walkTrip = walkRouter.calcRoute(
 					DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, now, plan.getPerson()));
-				if (walkTrip.size() != 1 || !(walkTrip.get(0) instanceof Leg)) {
+				if (walkTrip.size() != 1 || !(walkTrip.get(0) instanceof Leg walkLeg)) {
 					String message = "walkRouter returned something else than a single Leg, e.g. it routes walk on the network with non_network_walk to access the network. Not implemented in parking yet!";
 					log.error(message);
 					throw new RuntimeException(message);
 				}
-				Leg walkLeg = (Leg) walkTrip.get(0);
 				this.currentlyAssignedVehicleId = vehicleId;
 				this.stageInteractionType = ParkingUtils.PARKACTIVITYTYPE;
 				if (!walkLeg.getTravelTime().equals(OptionalTime.defined(0.))) {
