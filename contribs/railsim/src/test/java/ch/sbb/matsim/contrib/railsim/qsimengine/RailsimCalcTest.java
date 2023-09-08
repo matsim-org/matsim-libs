@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RailsimCalcTest {
 
 	@Test
-	public void calc() {
+	public void testCalcAndSolveTraveledDist() {
 
 		assertThat(RailsimCalc.calcTraveledDist(5, 2, 0))
 			.isEqualTo(10);
@@ -28,7 +28,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void negative() {
+	public void testCalcAndSolveTraveledDistNegative() {
 
 		double d = RailsimCalc.calcTraveledDist(5, 5, -1);
 
@@ -45,7 +45,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void maxSpeed() {
+	public void testMaxSpeed() {
 
 		double dist = 1000;
 
@@ -55,7 +55,7 @@ public class RailsimCalcTest {
 		RailsimCalc.SpeedTarget res = RailsimCalc.calcTargetSpeed(dist, 0.5, 0.5,
 			5, 30, 0);
 
-		System.out.println(res);
+		// System.out.println(res);
 
 		double timeDecel = (res.targetSpeed() - f) / 0.5;
 		double distDecel = RailsimCalc.calcTraveledDist(res.targetSpeed(), timeDecel, -0.5);
@@ -69,7 +69,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void decel() {
+	public void testCalcTargetDecel() {
 
 		double d = RailsimCalc.calcTargetDecel(1000,  0,10);
 
@@ -84,7 +84,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void targetSpeed() {
+	public void testCalcTargetSpeed() {
 
 		RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(100, 0.5, 0.5, 0, 23, 0);
 
@@ -100,7 +100,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void speedForStop() {
+	public void testCalcTargetSpeedForStop() {
 
 		double v = RailsimCalc.calcTargetSpeedForStop(1000, 0.5, 0.5, 0);
 
