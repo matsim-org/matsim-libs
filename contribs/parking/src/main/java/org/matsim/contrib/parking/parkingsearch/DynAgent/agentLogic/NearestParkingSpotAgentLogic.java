@@ -127,7 +127,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 				Id<Link> parkLink = this.parkingManager.getVehicleParkingLocation(vehicleId);
 
 				if (parkLink == null) {
-					//this is the first activity of a day and our parking manager does not provide informations about initial stages. We suppose the car is parked where we are
+					//this is the first activity of a day and our parking manager does not provide information about initial stages. We suppose the car is parked where we are
 					parkLink = agent.getCurrentLinkId();
 				}
 
