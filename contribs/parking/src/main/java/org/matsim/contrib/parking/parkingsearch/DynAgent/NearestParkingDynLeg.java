@@ -118,7 +118,9 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelTime(
 							currentPlannedLeg.getRoute().getStartLinkId(), timer.getTimeOfDay(), currentLinkId);
 					}
-					parkingDuration = followingActivity.getMaximumDuration().seconds() - drivingDurationFromGetOff - expectedDrivingDurationToPickup;
+					parkingDuration = followingActivity.getMaximumDuration().seconds()
+						- drivingDurationFromGetOff - expectedDrivingDurationToPickup
+						- ((FacilityBasedParkingManager) parkingManager).getParkStageActivityDuration();
 					followingActivity.setMaximumDuration(parkingDuration);
 				}
 				if (plan.getPlanElements().size() > planIndexNextActivity + 2 || followingActivity.getType().equals("parking_activity")) {
