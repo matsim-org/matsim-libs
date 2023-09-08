@@ -1,5 +1,7 @@
 package org.matsim.contrib.parking.parkingsearch.DynAgent;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -35,6 +37,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 	private final int planIndexNextActivity;
 	private Plan plan;
 	private Id<Link> nextSelectedParkingLink = null;
+	protected static final Logger log = LogManager.getLogger(NearestParkingDynLeg.class);
 
 	public NearestParkingDynLeg(Leg currentPlannedLeg, NetworkRoute route, Plan plan, int planIndexNextActivity, ParkingSearchLogic logic,
 								ParkingSearchManager parkingManager, Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
