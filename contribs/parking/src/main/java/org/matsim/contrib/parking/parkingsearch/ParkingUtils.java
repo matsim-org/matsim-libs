@@ -150,10 +150,10 @@ public class ParkingUtils {
 	 * @param followingActivity
 	 * @return
 	 */
-	public static boolean checkIfActivityHasParking(Activity followingActivity) {
-		return !(followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute(
-			"parking").equals(
-			"noParking"));
+	public static boolean checkIfActivityHasNoParking(Activity followingActivity) {
+        return followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute(
+			"parking").equals("noParking");
+
 	}
 
 	/**
@@ -163,5 +163,18 @@ public class ParkingUtils {
 	 */
 	public static void setNoParkingForActivity(Activity activity) {
 		activity.getAttributes().putAttribute("parking", "noParking");
+	}
+
+	/** TODO
+	 * @param getOffActivity
+	 */
+	public static void setPassangerInteractionForActivity(Activity getOffActivity) {
+		getOffActivity.getAttributes().putAttribute("parking", "PassangerInteraction");
+	}
+
+	public static boolean checkIfActivityHasPassengerInteraction(Activity followingActivity) {
+		return followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute(
+			"parking").equals(
+			"PassangerInteraction");
 	}
 }
