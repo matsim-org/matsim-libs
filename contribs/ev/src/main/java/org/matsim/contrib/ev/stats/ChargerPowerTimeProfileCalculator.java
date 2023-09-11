@@ -22,12 +22,18 @@ import com.google.inject.Inject;
 public class ChargerPowerTimeProfileCalculator implements ChargingStartEventHandler, ChargingEndEventHandler {
 
 	private final Map<Id<Charger>, double[]> chargerProfiles = new HashMap<>();
-	private final Map<Id<Vehicle>, Double> chargingStartTime = new HashMap<>();
-	private final Map<Id<Vehicle>, Double> chargingStartEnergy = new HashMap<>();
+	private final Map<Id<Vehicle>, Double> chargingStartTimeMap = new HashMap<>();
+	private final Map<Id<Vehicle>, Double> chargingStartEnergyMap = new HashMap<>();
 
 	private final TimeDiscretizer timeDiscretizer;
 	private final double qsimEndTime;
 
+	/**
+	 * Calculation of average power output for each charging station for each charging event. Charging stations without any charging events will not
+	 * be present in the output file. Implementation does only work when the Qsim end time is defined in the config, i.e., will not work for
+	 * extensions drt and taxi or others depending on the ev contrib without a defined Qsim end time.
+	 * @author mattiasingelstrom
+	 */
 	@Inject
 	public ChargerPowerTimeProfileCalculator(Config config) {
 		int chargeTimeStep = ConfigUtils.addOrGetModule(config, EvConfigGroup.class).chargeTimeStep;
@@ -42,24 +48,27 @@ public class ChargerPowerTimeProfileCalculator implements ChargingStartEventHand
 
 	@Override
 	public void handleEvent(ChargingStartEvent event) {
-		chargingStartTime.put(event.getVehicleId(), event.getTime());
-		chargingStartEnergy.put(event.getVehicleId(), EvUnits.J_to_kWh(event.getCharge()));
+		chargingStartTimeMap.put(event.getVehicleId(), event.getTime());
+		chargingStartEnergyMap.put(event.getVehicleId(), EvUnits.J_to_kWh(event.getCharge()));
 	}
 
 	@Override
+
 	public void handleEvent(ChargingEndEvent event) {
-		double chargingTimeIn_h = (event.getTime() - chargingStartTime.get(event.getVehicleId())) / 3600.0;
-		double averagePowerIn_kW = (EvUnits.J_to_kWh(event.getCharge()) - chargingStartEnergy.get(event.getVehicleId())) / chargingTimeIn_h;
-		increment(averagePowerIn_kW, event.getChargerId(), chargingStartTime.get(event.getVehicleId()), event.getTime());
+		double chargingTimeIn_h = (event.getTime() - chargingStartTimeMap.get(event.getVehicleId())) / 3600.0;
+		double averagePowerIn_kW = (EvUnits.J_to_kWh(event.getCharge()) - chargingStartEnergyMap.get(event.getVehicleId())) / chargingTimeIn_h;
+		increment(averagePowerIn_kW, event.getChargerId(), chargingStartTimeMap.get(event.getVehicleId()), event.getTime());
 	}
-	private void increment(double averagePower, Id<Charger> chargerId, double beginTime, double endTime) {
-		if (beginTime == endTime && beginTime >= qsimEndTime || qsimEndTime == 0) {
+	private void increment(double averagePower, Id<Charger> chargerId, double chargingStartTime, double chargingEndTime) {
+
+		 //If Qsim end time is undefined in config, qsimEndTime will be 0.0 and will therefore not proceed in calculating the power curves.
+		if (chargingStartTime == chargingEndTime || chargingStartTime >= qsimEndTime || qsimEndTime == 0.0) {
 			return;
 		}
-		endTime = Math.min(endTime, qsimEndTime);
+		chargingEndTime = Math.min(chargingEndTime, qsimEndTime);
 
-		int fromIdx = timeDiscretizer.getIdx(beginTime);
-		int toIdx = timeDiscretizer.getIdx(endTime);
+		int fromIdx = timeDiscretizer.getIdx(chargingStartTime);
+		int toIdx = timeDiscretizer.getIdx(chargingEndTime);
 
 		for (int i = fromIdx; i < toIdx; i++) {
 			double[] chargingVector = chargerProfiles.computeIfAbsent(chargerId, c -> new double[timeDiscretizer.getIntervalCount()]);
