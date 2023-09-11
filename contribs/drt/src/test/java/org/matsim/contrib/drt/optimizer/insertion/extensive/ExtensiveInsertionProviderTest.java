@@ -37,6 +37,7 @@ import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -47,7 +48,7 @@ public class ExtensiveInsertionProviderTest {
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
-		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(new DefaultIncrementalStopDurationEstimator(120), null),
+		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(new DefaultStopTimeCalculator(120), null),
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
 	}

@@ -35,6 +35,8 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
@@ -55,11 +57,11 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 
 	public SelectiveInsertionSearch(SelectiveInsertionProvider insertionProvider,
 			SingleInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
-			DrtConfigGroup drtCfg, MatsimServices matsimServices, IncrementalStopDurationEstimator incrementalStopDurationEstimator) {
+			DrtConfigGroup drtCfg, MatsimServices matsimServices, StopTimeCalculator stopTimeCalculator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
 		this.insertionCostCalculator = insertionCostCalculator;
-		this.detourTimeCalculator = new InsertionDetourTimeCalculator(incrementalStopDurationEstimator, null);
+		this.detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, null);
 		this.matsimServices = matsimServices;
 		this.mode = drtCfg.getMode();
 	}

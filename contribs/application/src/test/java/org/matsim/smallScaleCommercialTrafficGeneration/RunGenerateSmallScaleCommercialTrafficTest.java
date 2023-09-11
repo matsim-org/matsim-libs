@@ -48,14 +48,13 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 
 	@Test
 	public void testMainRunAndResults() {
-		String inputDataDirectory = utils.getPackageInputDirectory();
+		String inputDataDirectory = utils.getPackageInputDirectory() + "config_demand.xml";
 		String output = utils.getOutputDirectory();
 		String sample = "0.1";
 		String jspritIterations = "2";
 		String creationOption = "createNewCarrierFile";
 		String landuseConfiguration = "useExistingDataDistribution";
 		String smallScaleCommercialTrafficType = "commercialPersonTraffic";
-		String includeExistingModels = "true";
 		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
 		String buildingsShapeFileName = utils.getPackageInputDirectory() + "/shp/testBuildings.shp";
 		String landuseShapeFileName = utils.getPackageInputDirectory() + "/shp/testLanduse.shp";

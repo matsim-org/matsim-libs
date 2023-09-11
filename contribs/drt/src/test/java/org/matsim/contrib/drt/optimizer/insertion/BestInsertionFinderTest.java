@@ -132,7 +132,7 @@ public class BestInsertionFinderTest {
 	private InsertionWithDetourData insertion(String vehicleId, int pickupIdx, int dropoffIdx) {
 		var vehicle = mock(DvrpVehicle.class);
 		when(vehicle.getId()).thenReturn(Id.create(vehicleId, DvrpVehicle.class));
-		var vehicleEntry = new VehicleEntry(vehicle, null, null, null);
+		var vehicleEntry = new VehicleEntry(vehicle, null, null, null, 0);
 
 		var pickupInsertion = new InsertionGenerator.InsertionPoint(pickupIdx, null, null, null);
 		var dropoffInsertion = new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null);

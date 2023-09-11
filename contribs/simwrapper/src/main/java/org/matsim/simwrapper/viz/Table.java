@@ -16,6 +16,11 @@ public class Table extends Viz {
 	public String dataset;
 
 	/**
+	 * This option could be used to define the style. Predefined styles are e.g. default, topsheet
+	 */
+	public String style;
+
+	/**
 	 * This option could be used to filter columns. This option adds a filter mask to each column. The default setting is false.
 	 */
 	public Boolean enableFilter;
