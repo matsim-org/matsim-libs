@@ -55,8 +55,6 @@ public class RailsimCalcTest {
 		RailsimCalc.SpeedTarget res = RailsimCalc.calcTargetSpeed(dist, 0.5, 0.5,
 			5, 30, 0);
 
-		// System.out.println(res);
-
 		double timeDecel = (res.targetSpeed() - f) / 0.5;
 		double distDecel = RailsimCalc.calcTraveledDist(res.targetSpeed(), timeDecel, -0.5);
 
@@ -94,6 +92,7 @@ public class RailsimCalcTest {
 
 		target = RailsimCalc.calcTargetSpeed(200, 0.5, 0.5, 13, 13, 0);
 
+		// TODO: Failing test, fix or set correct value?
 		assertThat(target.decelDist())
 			.isCloseTo(169, Offset.offset(0.0001));
 

@@ -17,17 +17,23 @@ import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.MatsimVehicleReader;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class for test cases.
  */
 public class RailsimTestUtils {
-
 
 	static Map<TestVehicle, VehicleType> vehicles = new EnumMap<>(TestVehicle.class);
 
@@ -47,10 +53,11 @@ public class RailsimTestUtils {
 	/**
 	 * Create a departure within the engine. Route will be determined automatically.
 	 */
-	public static void createDeparture(Holder test, TestVehicle type,  String veh, double time, String from, String to) {
+	public static void createDeparture(Holder test, TestVehicle type, String veh, double time, String from, String to) {
 
 		DijkstraFactory f = new DijkstraFactory();
-		LeastCostPathCalculator lcp = f.createPathCalculator(test.network(), new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()), new FreeSpeedTravelTime());
+		LeastCostPathCalculator lcp = f.createPathCalculator(test.network(), new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()),
+			new FreeSpeedTravelTime());
 
 		Link fromLink = test.network.getLinks().get(Id.createLinkId(from));
 		Link toLink = test.network.getLinks().get(Id.createLinkId(to));
@@ -71,7 +78,6 @@ public class RailsimTestUtils {
 		Mockito.when(mobVeh.getVehicle()).thenReturn(vehicle);
 		Mockito.when(mobVeh.getId()).thenReturn(vehicleId);
 		Mockito.when(driver.getVehicle()).thenReturn(mobVeh);
-
 
 		test.engine.handleDeparture(time, driver, route.getStartLinkId(), route);
 	}
@@ -143,7 +149,7 @@ public class RailsimTestUtils {
 	/**
 	 * Helper method for event assertions.
 	 */
-	public static EventsAssert assertThat(EventCollector events) {
+	static EventsAssert assertThat(EventCollector events) {
 		return new EventsAssert(events.events, EventsAssert.class);
 	}
 

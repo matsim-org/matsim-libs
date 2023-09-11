@@ -34,14 +34,10 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 final class RailsimEngine implements Steppable {
 
 	private static final Logger log = LogManager.getLogger(RailsimEngine.class);
-
 	private final EventsManager eventsManager;
 	private final RailsimConfigGroup config;
-
 	private final List<TrainState> activeTrains = new ArrayList<>();
-
 	private final Queue<UpdateEvent> updateQueue = new PriorityQueue<>();
-
 	private final RailResourceManager resources;
 	private final TrainDisposition disposition;
 
@@ -72,7 +68,7 @@ final class RailsimEngine implements Steppable {
 			update = updateQueue.peek();
 		}
 
-		if (time % config.trainPositionMaximumUpdateInterval == 0.) {
+		if (time % config.updateInterval == 0.) {
 			updateAllPositions(time);
 		}
 	}
@@ -83,7 +79,7 @@ final class RailsimEngine implements Steppable {
 	public void updateAllStates(double time) {
 
 		// Process all waiting events first
-		// TODO: Consider potential duplication of position update events here, if time matches trainPositionMaximumUpdateInterval.
+		// TODO: Consider potential duplication of position update events here, if time matches updateInterval.
 		doSimStep(time);
 
 		updateAllPositions(time);
@@ -405,7 +401,6 @@ final class RailsimEngine implements Steppable {
 			}
 		}
 
-
 		// On route departure the head link is null
 		createEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
 
@@ -458,7 +453,6 @@ final class RailsimEngine implements Steppable {
 			unblockTrack(time, state, tailLink);
 		else
 			updateQueue.add(new UpdateEvent(state, tailLink, time));
-
 	}
 
 	/**
@@ -520,7 +514,6 @@ final class RailsimEngine implements Steppable {
 		if (Double.isFinite(state.targetDecelDist)) {
 			state.targetDecelDist -= dist;
 		}
-
 
 		// When trains are put into the network their tail may be longer than the current link
 		// this assertion may not hold depending on the network, should possibly be removed
@@ -743,7 +736,6 @@ final class RailsimEngine implements Steppable {
 			if (link.getLinkId().equals(state.tailLink)) {
 				break;
 			}
-
 		}
 
 		return maxSpeed;

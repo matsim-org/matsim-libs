@@ -4,15 +4,15 @@
 <transitSchedule>
 
 	<transitStops>
-		<stopFacility id="Depot1"  x="0" y="0" linkRefId="depot1_link" isBlocking="false">
+		<stopFacility id="Depot1" x="0" y="0" linkRefId="depot1_link" isBlocking="false">
 		</stopFacility>
 		<stopFacility id="Bhf1" x="0" y="100" linkRefId="bhf1_link" isBlocking="false">
 		</stopFacility>
-		<stopFacility id="Bhf2" x="0" y="1100"  linkRefId="bhf2_link" isBlocking="false">
+		<stopFacility id="Bhf2" x="0" y="1100" linkRefId="bhf2_link" isBlocking="false">
 		</stopFacility>
-		<stopFacility id="Bhf3"  x="-600" y="1600" linkRefId="bhf3_link" isBlocking="false">
+		<stopFacility id="Bhf3" x="-600" y="1600" linkRefId="bhf3_link" isBlocking="false">
 		</stopFacility>
-		<stopFacility id="Depot3"  x="-600" y="1700" linkRefId="depot3_link" isBlocking="false">
+		<stopFacility id="Depot3" x="-600" y="1700" linkRefId="depot3_link" isBlocking="false">
 		</stopFacility>
 	</transitStops>
 

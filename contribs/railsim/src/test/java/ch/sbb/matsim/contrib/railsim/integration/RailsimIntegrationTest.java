@@ -93,7 +93,6 @@ public class RailsimIntegrationTest {
 		assertTrainState(currentTime, linkSpeed, linkSpeed, 0, accDistance1 + cruiseDistance2 + accDistance3, train1events);
 
 		// train can cruise with link speed until it needs to decelerate for next station
-
 		double decTime5 = timeToAccelerate(linkSpeed, stationSpeed, -acceleration);
 		double decDistance5 = distanceTravelled(linkSpeed, -acceleration, decTime5);
 

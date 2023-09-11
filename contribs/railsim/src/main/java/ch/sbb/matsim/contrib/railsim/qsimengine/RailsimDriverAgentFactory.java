@@ -27,12 +27,11 @@ import java.util.stream.Collectors;
 public class RailsimDriverAgentFactory implements TransitDriverAgentFactory {
 
 	private final Set<String> modes;
-
 	private final Map<Id<TransitStopArea>, List<TransitStopFacility>> stopAreas;
 
 	@Inject
 	public RailsimDriverAgentFactory(Config config, Scenario scenario) {
-		this.modes = ConfigUtils.addOrGetModule(config, RailsimConfigGroup.class).getRailNetworkModes();
+		this.modes = ConfigUtils.addOrGetModule(config, RailsimConfigGroup.class).getNetworkModes();
 
 		this.stopAreas = scenario.getTransitSchedule().getFacilities().values().stream()
 			.filter(t -> t.getStopAreaId() != null)

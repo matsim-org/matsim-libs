@@ -27,13 +27,12 @@ public class RailsimEngineTest {
 	private RailsimTestUtils.EventCollector collector;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		eventsManager = EventsUtils.createEventsManager();
 		collector = new RailsimTestUtils.EventCollector();
 
 		eventsManager.addHandler(collector);
 		eventsManager.initProcessing();
-
 	}
 
 	private RailsimTestUtils.Holder getTestEngine(String network, @Nullable Consumer<Link> f) {
@@ -125,8 +124,6 @@ public class RailsimEngineTest {
 
 		test.doSimStepUntil(600);
 
-//		test.debug(collector, "opposite");
-
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 293, 600, 0)
 			.hasTrainState("regio2", 358, 1000, 0);
@@ -138,8 +135,6 @@ public class RailsimEngineTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l8-7", "l2-1");
 
 		test.doStateUpdatesUntil(600, 1);
-
-//		test.debug(collector, "opposite_detailed");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 293, 600, 0)
@@ -156,8 +151,6 @@ public class RailsimEngineTest {
 
 		test.doSimStepUntil(10000);
 
-//		test.debug(collector, "varyingSpeed");
-
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio", 7599, 0, 2.7777777)
 			.hasTrainState("regio", 7674, 200, 0);
@@ -171,8 +164,6 @@ public class RailsimEngineTest {
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio", 7599, 0, 2.7777777)
 			.hasTrainState("regio", 7674, 200, 0);
-
-//		test.debug(collector, "varyingSpeed_detailed");
 
 	}
 
@@ -192,8 +183,6 @@ public class RailsimEngineTest {
 			.hasTrainState("regio0", 7674, 200, 0)
 			.hasTrainState("regio1", 7734, 200, 0)
 			.hasTrainState("regio9", 23107, 200, 0);
-
-//		test.debug(collector, "varyingSpeed_many");
 
 		test = getTestEngine("networkMesoUni.xml");
 
@@ -220,8 +209,6 @@ public class RailsimEngineTest {
 
 		test.doSimStepUntil(5000);
 
-//		test.debugFiles(collector, "trainFollowing");
-
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 1138, 1000, 0)
 			.hasTrainState("regio2", 1517, 1000, 0);
@@ -232,13 +219,9 @@ public class RailsimEngineTest {
 
 		test.doStateUpdatesUntil(5000, 1);
 
-//		test.debugFiles(collector, "trainFollowing_detailed");
-
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 1138, 1000, 0)
 			.hasTrainState("regio2", 1517, 1000, 0);
-
-
 	}
 
 }

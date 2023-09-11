@@ -6,10 +6,10 @@
 	<transitStops>
 		<stopFacility id="X" x="250" y="0" linkRefId="X" isBlocking="false">
 		</stopFacility>
-		
-		<stopFacility id="A" x="-2100" y="1100"  linkRefId="A" isBlocking="false">
+
+		<stopFacility id="A" x="-2100" y="1100" linkRefId="A" isBlocking="false">
 		</stopFacility>
-		<stopFacility id="B"  x="-2000" y="-1000" linkRefId="B" isBlocking="false">
+		<stopFacility id="B" x="-2000" y="-1000" linkRefId="B" isBlocking="false">
 		</stopFacility>
 		<stopFacility id="C" x="2100" y="1100" linkRefId="C" isBlocking="false">
 		</stopFacility>

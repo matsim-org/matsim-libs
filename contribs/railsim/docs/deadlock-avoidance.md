@@ -1,4 +1,4 @@
-# Deadlock avoidance
+# Deadlock-Avoidance
 
 Deadlocks can occur on two scales in the mesoscopic approach of railsim:
 

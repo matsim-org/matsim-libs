@@ -108,7 +108,7 @@ public final class RailsimUtils {
 	 * @return the default deceleration time or the vehicle-specific value.
 	 */
 	public static double getTrainDeceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
-		double deceleration = railsimConfigGroup.decelerationGlobalDefault;
+		double deceleration = railsimConfigGroup.decelerationDefault;
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_DECELERATION);
 		return attr != null ? (double) attr : deceleration;
 	}
@@ -124,7 +124,7 @@ public final class RailsimUtils {
 	 * @return the default acceleration time or the vehicle-specific value.
 	 */
 	public static double getTrainAcceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
-		double acceleration = railsimConfigGroup.accelerationGlobalDefault;
+		double acceleration = railsimConfigGroup.accelerationDefault;
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_ACCELERATION);
 		return attr != null ? (double) attr : acceleration;
 	}

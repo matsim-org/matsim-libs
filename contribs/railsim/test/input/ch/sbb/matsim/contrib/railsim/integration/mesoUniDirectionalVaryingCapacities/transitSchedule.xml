@@ -33,12 +33,12 @@
 				<departure id="3" departureTime="08:03:00" vehicleRefId="train4"/>
 				<departure id="4" departureTime="08:04:00" vehicleRefId="train5"/>
 				<departure id="5" departureTime="08:05:00" vehicleRefId="train6"/>
-				<departure id="6" departureTime="08:06:00" vehicleRefId="train7"/>			
-				<departure id="7" departureTime="08:07:00" vehicleRefId="train8"/>			
+				<departure id="6" departureTime="08:06:00" vehicleRefId="train7"/>
+				<departure id="7" departureTime="08:07:00" vehicleRefId="train8"/>
 				<departure id="8" departureTime="08:08:00" vehicleRefId="train9"/>
-				<departure id="9" departureTime="08:09:00" vehicleRefId="train10"/>			
-	
-						
+				<departure id="9" departureTime="08:09:00" vehicleRefId="train10"/>
+
+
 			</departures>
 		</transitRoute>
 	</transitLine>

@@ -1,6 +1,5 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import org.matsim.api.core.v01.Id;
@@ -19,7 +18,6 @@ record TrainInfo(
 ) {
 
 	public TrainInfo(VehicleType vehicle, RailsimConfigGroup config) {
-		// TODO:
 		this(
 			vehicle.getId(),
 			vehicle.getLength(),
@@ -39,6 +37,5 @@ record TrainInfo(
 
 		if (!Double.isFinite(deceleration) || deceleration <= 0)
 			throw new IllegalArgumentException("Train of type " + id + " does not have a finite and positive deceleration.");
-
 	}
 }

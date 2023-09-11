@@ -8,10 +8,10 @@
 		</stopFacility>
 		<stopFacility id="3-4" x="0.0" y="-8000.0" linkRefId="3-4" isBlocking="false">
 		</stopFacility>
-		
+
 		<stopFacility id="7-8" x="120000.0" y="0" linkRefId="7-8" isBlocking="false">
 		</stopFacility>
-		
+
 	</transitStops>
 	<transitLine id="line1">
 		<transitRoute id="line1_route1">

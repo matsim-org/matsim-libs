@@ -10,10 +10,11 @@ the *railsim* contrib provides a custom QSim-Engine to simulate trains:
 
 - Trains are spatially expanded along several links. Additional events indicate when the end of the train leaves a link.
 - Trains accelerate and decelerate based on predefined vehicle attributes (along a single link or along several links).
-- The infrastructure ahead of each train is blocked (reserved train path) depending on the braking distance which is computed based on the
-  vehicle-specific deceleration and the current speed.
+- The infrastructure ahead of each train is blocked (reserved train path) depending on the braking distance which is
+  computed based on the vehicle-specific deceleration and the current speed.
 - Capacity effects are modeled at the level of resources. A resource consists of one link or several links.
-- Trains may deviate from the network route given in the schedule, e.g. to avoid a blocked track (dispatching, disposition).
+- Trains may deviate from the network route given in the schedule, e.g. to avoid a blocked track (dispatching,
+  disposition).
 
 ## Configuration
 

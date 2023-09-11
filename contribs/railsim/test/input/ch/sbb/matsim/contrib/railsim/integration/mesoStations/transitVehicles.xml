@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+<vehicleDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
 
 	<vehicleType id="trainType1">
 		<attributes>
@@ -23,6 +23,6 @@
 	</vehicleType>
 
 	<vehicle id="train1" type="trainType1"/>
-	<vehicle id="train2" type="trainType1"/>	
+	<vehicle id="train2" type="trainType1"/>
 
 </vehicleDefinitions>

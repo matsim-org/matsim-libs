@@ -8,8 +8,8 @@ All the additional events use the prefix `railsim`.
 
 ### RailsimLinkStateChangeEvent
 
-Instead of `TrainPathEntersLinkEvent`, we have a generic `RailsimLinkStateChangeEvent` that includes information about
-the new state of the link (or even the track of a multi-track link).
+The generic `RailsimLinkStateChangeEvent` includes information about the new state of a link (or even the track of a
+multi-track link).
 
 Attributes:
 
@@ -19,7 +19,6 @@ Attributes:
 
 ### RailsimTrainLeavesLinkEvent
 
-Similar to the existing `TrainLeavesLinkEvent`.
 One could argue that setting the link state to `free` would imply the same. I (mr) would still
 say it makes sense to have it separate, because depending on the implementation, a link could
 remain blocked for a longer time even if the train has already passed (e.g. minimum headway time).
@@ -29,8 +28,8 @@ compatibility with existing analysis and visualization tools.
 
 ### RailsimTrainStateEvent
 
-This event is emitted every time there is a position update for a train.
-This event contains detailed information about the trains position on a single link.
+This event is emitted every time there is a position update for a train and contains detailed information about the
+trains position on a single link.
 
 ### RailsimDetourEvent
 

@@ -10,10 +10,10 @@
 		</stopFacility>
 		<stopFacility id="-103248_19" x="931991.9061782291" y="5955567.174656826" linkRefId="-103248_19" isBlocking="false">
 		</stopFacility>
-		
+
 		<stopFacility id="-103224_0" x="927735.3167769414" y="5955175.437275518" linkRefId="-103224_0" isBlocking="false">
 		</stopFacility>
-		<stopFacility id="-103224_19" x="932837.4836376626" y="5959527.575350824"  linkRefId="-103224_19" isBlocking="false">
+		<stopFacility id="-103224_19" x="932837.4836376626" y="5959527.575350824" linkRefId="-103224_19" isBlocking="false">
 		</stopFacility>
 
 	</transitStops>
@@ -41,7 +41,7 @@
 				<link refId="-103251_12"/>
 				<link refId="-103251_13"/>
 				<link refId="-103251_14"/>
-				
+
 				<link refId="-103224_9"/>
 				<link refId="-103245_3"/>
 
@@ -67,7 +67,7 @@
 			</departures>
 		</transitRoute>
 	</transitLine>
-	
+
 	<transitLine id="line2">
 		<transitRoute id="line2_route1">
 			<transportMode>rail</transportMode>
