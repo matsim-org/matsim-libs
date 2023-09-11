@@ -206,7 +206,7 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 
 	private void writeResult(CSVPrinter csv, Path params, Result r) throws IOException {
 		String pName = paramsName != null ? paramsName : params.getFileName().toString();
-		String p = params != null ? pName : "non_optimized";
+		String p = params != null ? pName : "non_optimized_" + pName;
 		String network = FilenameUtils.getName(input.getNetworkPath());
 
 		csv.printRecord(network, modelClazz.getPackageName(), modelClazz.getSimpleName(), p, r.mae(), r.rmse());
