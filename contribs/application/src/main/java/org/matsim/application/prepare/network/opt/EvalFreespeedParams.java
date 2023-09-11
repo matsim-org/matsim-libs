@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -24,6 +25,7 @@ import picocli.CommandLine;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,7 @@ import static org.matsim.application.prepare.network.opt.NetworkParamsOpt.*;
 @CommandSpec(
 	requireNetwork = true,
 	requires = "features.csv",
-	produces = "eval_speed_factors.csv"
+	produces = {"eval_speed_factors.csv", "eval.csv"}
 )
 public class EvalFreespeedParams implements MATSimAppCommand {
 
@@ -57,11 +59,17 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 	@CommandLine.Option(names = "--params", description = "Apply params to model")
 	private Path params;
 
+	@CommandLine.Option(names = "--params-name", description = "Use specified name instead of filename")
+	private String paramsName;
+
 	@CommandLine.Option(names = "--ref-hours", description = "Reference hours", defaultValue = "3,21", split = ",")
 	private List<Integer> refHours;
 
-	@CommandLine.Option(names = "--min-speed-factor", description = "Minimum speed factor", defaultValue = DEFAULT_MIN_SPEED)
-	private double minSpeedFactor;
+	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower,upper bound)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
+	private double[] speedFactorBounds;
+
+	@CommandLine.Option(names = "--eval-factors", description = "Eval freespeed factors", defaultValue = "false")
+	private boolean evalFactors;
 
 	private Network network;
 	private NetworkModel model;
@@ -74,7 +82,7 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 
 	static Result applyAndEvaluateParams(
 		Network network, NetworkModel model, Object2DoubleMap<SampleValidationRoutes.FromToNodes> validationSet, Map<Id<Link>, Feature> features,
-		double minFactor, Request request, String save) throws IOException {
+		double[] speedFactorBounds, Request request, String save) throws IOException {
 
 		Map<Id<Link>, double[]> attributes = new HashMap<>();
 
@@ -104,9 +112,13 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 
 					if (request.hasParams()) {
 						double[] p = request.getParams(ft.junctionType());
-						speedFactor = Math.max(minFactor, speedModel.predict(ft.features(), p));
+						speedFactor = speedModel.predict(ft.features(), p);
 					} else
-						speedFactor = Math.max(minFactor, speedModel.predict(ft.features()));
+						speedFactor = speedModel.predict(ft.features());
+
+					// apply lower and upper bound
+					speedFactor = Math.max(speedFactorBounds[0], speedFactor);
+					speedFactor = Math.min(speedFactorBounds[1], speedFactor);
 
 					attributes.put(link.getId(), speedModel.getData(ft.features()));
 
@@ -138,34 +150,66 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 		validationSet = readValidation(validationFiles, refHours);
 		features = readFeatures(input.getPath("features.csv"), network.getLinks().size());
 
+		CSVPrinter csv;
+		Path out = output.getPath("eval.csv");
+		if (Files.exists(out)) {
+			csv = new CSVPrinter(Files.newBufferedWriter(out, StandardOpenOption.APPEND), CSVFormat.DEFAULT);
+		} else {
+			csv = new CSVPrinter(Files.newBufferedWriter(out, StandardOpenOption.CREATE_NEW), CSVFormat.DEFAULT);
+			csv.printRecord("network", "package", "name", "params", "mae", "rmse");
+			csv.flush();
+		}
+
 		log.info("Model score:");
-		applyAndEvaluateParams(network, model, validationSet, features, minSpeedFactor, new Request(0), null);
+		Result r = applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds, new Request(0), null);
+		writeResult(csv, null, r);
 
 		if (params != null) {
 			log.info("Model with parameter score:");
-			applyAndEvaluateParams(network, model, validationSet, features, minSpeedFactor,
+			r = applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds,
 				mapper.readValue(params.toFile(), Request.class), null);
+			writeResult(csv, params, r);
 		}
 
+		csv.close();
 
-		log.info("Evaluating free-speed factors");
-		evalSpeedFactors(output.getPath());
+		if (evalFactors) {
+			log.info("Evaluating free-speed factors");
+			evalSpeedFactors(output.getPath());
+		}
 
 		return 0;
 	}
 
 	private void evalSpeedFactors(Path eval) throws IOException {
 
-		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(eval), CSVFormat.DEFAULT)) {
-			csv.printRecord("urban_speed_factor", "mae", "rmse");
-
-			for (int i = 25; i <= 100; i ++) {
-				Result res = applyAndEvaluateParams(network, model, validationSet, features, 0,
-					new Request(i / 100d), null);
-				csv.printRecord(i / 100d, res.mae(), res.rmse());
-			}
-
+		CSVPrinter csv;
+		if (Files.exists(eval)) {
+			csv = new CSVPrinter(Files.newBufferedWriter(eval, StandardOpenOption.APPEND), CSVFormat.DEFAULT);
+		} else {
+			csv = new CSVPrinter(Files.newBufferedWriter(eval, StandardOpenOption.CREATE_NEW), CSVFormat.DEFAULT);
+			csv.printRecord("network", "urban_speed_factor", "mae", "rmse");
+			csv.flush();
 		}
+
+		String networkName = FilenameUtils.getName(input.getNetworkPath());
+
+		for (int i = 25; i <= 100; i++) {
+			Result res = applyAndEvaluateParams(network, model, validationSet, features, new double[]{0, 1},
+				new Request(i / 100d), null);
+			csv.printRecord(networkName, i / 100d, res.mae(), res.rmse());
+		}
+
+
+		csv.close();
+	}
+
+	private void writeResult(CSVPrinter csv, Path params, Result r) throws IOException {
+		String pName = paramsName != null ? paramsName : params.getFileName().toString();
+		String p = params != null ? pName : "non_optimized";
+		String network = FilenameUtils.getName(input.getNetworkPath());
+
+		csv.printRecord(network, modelClazz.getPackageName(), modelClazz.getSimpleName(), p, r.mae(), r.rmse());
 	}
 
 

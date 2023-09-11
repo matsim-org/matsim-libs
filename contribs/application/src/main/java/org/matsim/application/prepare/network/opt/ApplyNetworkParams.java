@@ -39,8 +39,8 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	@CommandLine.Option(names = "--model", description = "Reference to the network model class", required = true)
 	private Class<? extends NetworkModel> modelClazz;
 
-	@CommandLine.Option(names = "--min-speed-factor", description = "Minimum speed factor", defaultValue = NetworkParamsOpt.DEFAULT_MIN_SPEED)
-	private double minSpeedFactor;
+	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower,upper bound)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
+	private double[] speedFactorBounds;
 
 	private NetworkModel model;
 
@@ -66,7 +66,6 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 		return 3600 * Qc;
 	}
-
 
 
 	@Override
@@ -135,16 +134,16 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 			speedFactor = speedModel.predict(features);
 
-			if (speedFactor > 1) {
-				log.warn("Reducing speed factor on {} from {} to 1", link.getId(), speedFactor);
-				speedFactor = 1;
+			if (speedFactor > speedFactorBounds[1]) {
+				log.warn("Reducing speed factor on {} from {} to {}", link.getId(), speedFactor, speedFactorBounds[1]);
+				speedFactor = speedFactorBounds[1];
 				modified = true;
 			}
 
 			// Threshold for very low speed factors
-			if (speedFactor < minSpeedFactor) {
-				log.warn("Increasing speed factor on {} from {} to {}", link, speedFactor, minSpeedFactor);
-				speedFactor = minSpeedFactor;
+			if (speedFactor < speedFactorBounds[0]) {
+				log.warn("Increasing speed factor on {} from {} to {}", link, speedFactor, speedFactorBounds[0]);
+				speedFactor = speedFactorBounds[0];
 				modified = true;
 			}
 		}

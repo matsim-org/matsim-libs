@@ -52,8 +52,8 @@ public class FreespeedOptServer implements MATSimAppCommand {
 	@CommandLine.Parameters(arity = "1..*", description = "Input validation files loaded from APIs")
 	private List<String> validationFiles;
 
-	@CommandLine.Option(names = "--min-speed-factor", description = "Minimum speed factor", defaultValue = NetworkParamsOpt.DEFAULT_MIN_SPEED)
-	private double minSpeedFactor;
+	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower,upper bound)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
+	private double[] speedFactorBounds;
 
 	@CommandLine.Option(names = "--ref-hours", description = "Reference hours", defaultValue = "3,21", split = ",")
 	private List<Integer> refHours;
@@ -120,7 +120,7 @@ public class FreespeedOptServer implements MATSimAppCommand {
 	}
 
 	private Result applyAndEvaluateParams(Request request, String save) throws IOException {
-		return EvalFreespeedParams.applyAndEvaluateParams(network, model, validationSet, features, minSpeedFactor,
+		return EvalFreespeedParams.applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds,
 			request, save);
 	}
 

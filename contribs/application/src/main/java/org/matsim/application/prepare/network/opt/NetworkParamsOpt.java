@@ -41,9 +41,9 @@ import java.util.stream.Collectors;
 class NetworkParamsOpt {
 
 	/**
-	 * Default min speed factor.
+	 * Factor limits. Deviation of 3% above max is allowed.
 	 */
-	static final String DEFAULT_MIN_SPEED = "0.25";
+	static final String DEFAULT_FACTOR_BOUNDS = "0.25,1.03";
 
 	private NetworkParamsOpt() {
 	}

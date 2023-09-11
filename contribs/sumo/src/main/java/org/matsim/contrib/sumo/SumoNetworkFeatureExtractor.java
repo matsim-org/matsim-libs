@@ -1,12 +1,12 @@
 package org.matsim.contrib.sumo;
 
 import org.apache.commons.csv.CSVPrinter;
+import org.matsim.contrib.osm.networkReader.LinkProperties;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Generates edge features from a network. These features might not be the same as in the network because they
@@ -15,10 +15,23 @@ import java.util.stream.IntStream;
 class SumoNetworkFeatureExtractor {
 	private final SumoNetworkHandler handler;
 
+	/**
+	 * Maps junction id to incoming edges.
+	 */
+	private final Map<String, List<SumoNetworkHandler.Edge>> incomingEdges;
+
+	private final Map<String, LinkProperties> osm = LinkProperties.createLinkProperties();
+
 	SumoNetworkFeatureExtractor(SumoNetworkHandler handler) {
 		this.handler = handler;
-	}
 
+		incomingEdges = new HashMap<>();
+
+		for (SumoNetworkHandler.Edge edge : this.handler.edges.values()) {
+			incomingEdges.computeIfAbsent(edge.to, (k) -> new ArrayList<>())
+				.add(edge);
+		}
+	}
 
 	private static String getHighwayType(String type) {
 		if (type != null)
@@ -64,10 +77,17 @@ class SumoNetworkFeatureExtractor {
 		return set;
 	}
 
+	/**
+	 * Get priority. Higher is more important.
+	 */
+	private int getPrio(SumoNetworkHandler.Edge edge) {
+		return -osm.getOrDefault(getHighwayType(edge.type), new LinkProperties(LinkProperties.LEVEL_UNCLASSIFIED, 1, 1, 1, true)).getHierarchyLevel();
+	}
+
 	public List<String> getHeader() {
 		return List.of("linkId", "highway_type", "speed", "length", "num_lanes", "change_num_lanes", "change_speed", "num_to_links", "num_conns",
 			"num_response", "num_foes", "dir_multiple_s", "dir_l", "dir_r", "dir_s", "dir_exclusive",
-			"junction_type", "junction_inc_lanes", "priority_equal", "priority_higher", "priority_lower",
+			"junction_type", "junction_inc_lanes", "priority_higher", "priority_equal", "priority_lower",
 			"is_secondary_or_higher", "is_primary_or_higher", "is_motorway", "is_link");
 	}
 
@@ -123,10 +143,14 @@ class SumoNetworkFeatureExtractor {
 			dirs.addAll(d);
 		}
 
-		List<Integer> prios = IntStream.concat(IntStream.of(edge.priority), toEdges.stream().mapToInt(e -> e.priority))
-			.distinct().sorted().boxed().toList();
+		List<Integer> prios = incomingEdges.get(junction.id).stream()
+			.map(this::getPrio).distinct().sorted()
+			.toList();
+		String prio = calcPrio(getPrio(edge), prios);
 
-		String prio = calcPrio(edge.priority, prios);
+		int incomingLanes = incomingEdges.get(junction.id).stream()
+			.mapToInt(e -> e.lanes.size())
+			.sum();
 
 		boolean geq_secondary = switch (highwayType) {
 			case "secondary", "primary", "trunk", "motorway" -> true;
@@ -155,9 +179,9 @@ class SumoNetworkFeatureExtractor {
 		out.print(bool(dirs.contains('s')));
 		out.print(bool(exclusiveDirs));
 		out.print(junction.type);
-		out.print(Math.min(12, junction.incLanes.size()));
-		out.print(bool("equal".equals(prio)));
+		out.print(Math.min(12, incomingLanes));
 		out.print(bool("higher".equals(prio)));
+		out.print(bool("equal".equals(prio)));
 		out.print(bool("lower".equals(prio)));
 		out.print(bool(geq_secondary));
 		out.print(bool(geq_primary));

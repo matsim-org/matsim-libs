@@ -279,11 +279,14 @@ public class SumoNetworkHandler extends DefaultHandler {
 				// aggregate edges split by sumo again
 				String from = attributes.getValue("from");
 				Junction j = junctions.get(edges.get(from).to);
+
 				Connection conn = new Connection(from, attributes.getValue("to"),
 					Integer.parseInt(attributes.getValue("fromLane")),
 					Integer.parseInt(attributes.getValue("toLane")),
 					attributes.getValue("dir"), j != null ? j.connIdx++ : -1);
 
+				if (j != null)
+					j.connections.add(conn);
 
 				connections.computeIfAbsent(from, k -> new ArrayList<>()).add(conn);
 
@@ -404,6 +407,7 @@ public class SumoNetworkHandler extends DefaultHandler {
 		final double[] coord;
 
 		final List<Req> requests = new ArrayList<>();
+		final List<Connection> connections = new ArrayList<>();
 
 		/**
 		 * Mutable connection index.
