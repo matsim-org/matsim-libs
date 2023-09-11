@@ -26,6 +26,7 @@ import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionW
 import static org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.INSERTION_WITH_COST_COMPARATOR;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.zone.skims.AdaptiveTravelTimeMatrix;
 import org.matsim.core.router.util.TravelTime;
 
@@ -55,11 +56,11 @@ class RepeatedSelectiveInsertionProvider {
 
     public static RepeatedSelectiveInsertionProvider create( InsertionCostCalculator insertionCostCalculator, AdaptiveTravelTimeMatrix updatableTravelTimeMatrix,
 															TravelTime travelTime,
-															ForkJoinPool forkJoinPool, IncrementalStopDurationEstimator incrementalStopDurationEstimator) {
+															ForkJoinPool forkJoinPool, StopTimeCalculator stopTimeCalculator) {
         var detourTimeEstimatorWithUpdatedTravelTimes = DetourTimeEstimatorWithAdaptiveTravelTimes.create(
                 SPEED_FACTOR, updatableTravelTimeMatrix, travelTime);
         return new RepeatedSelectiveInsertionProvider(insertionCostCalculator,
-                new InsertionGenerator(incrementalStopDurationEstimator, detourTimeEstimatorWithUpdatedTravelTimes), forkJoinPool);
+                new InsertionGenerator(stopTimeCalculator, detourTimeEstimatorWithUpdatedTravelTimes), forkJoinPool);
     }
 
     public List<InsertionWithDetourData> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {

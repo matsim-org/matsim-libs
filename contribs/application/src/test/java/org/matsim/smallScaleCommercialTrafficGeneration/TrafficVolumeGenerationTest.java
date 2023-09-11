@@ -398,13 +398,14 @@ public class TrafficVolumeGenerationTest {
 		config.global().setCoordinateSystem("EPSG:4326");
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
+		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
+		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
 		Assert.assertEquals(3, FreightUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -463,13 +464,14 @@ public class TrafficVolumeGenerationTest {
 		config.global().setCoordinateSystem("EPSG:4326");
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
+		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
+		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
 		Assert.assertEquals(2, FreightUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -523,6 +525,7 @@ public class TrafficVolumeGenerationTest {
 		config.global().setCoordinateSystem("EPSG:4326");
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
+		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
@@ -540,7 +543,7 @@ public class TrafficVolumeGenerationTest {
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
+		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
 		TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
@@ -682,6 +685,7 @@ public class TrafficVolumeGenerationTest {
 		config.global().setCoordinateSystem("EPSG:4326");
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
+		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
@@ -699,7 +703,7 @@ public class TrafficVolumeGenerationTest {
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
+		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
 		TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);

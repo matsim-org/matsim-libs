@@ -23,10 +23,10 @@ package org.matsim.contrib.drt.optimizer.insertion.repeatedselective;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.IncrementalStopDurationEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SingleInsertionDetourPathCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.zone.skims.AdaptiveTravelTimeMatrix;
@@ -54,12 +54,12 @@ public class RepeatedSelectiveInsertionSearchQSimModule extends AbstractDvrpMode
             RepeatedSelectiveInsertionProvider provider = RepeatedSelectiveInsertionProvider.create(
                     getter.getModal(InsertionCostCalculator.class), getter.getModal(AdaptiveTravelTimeMatrix.class),
                     getter.getModal(TravelTime.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
-                    getter.getModal(IncrementalStopDurationEstimator.class));
+                    getter.getModal(StopTimeCalculator.class));
             var insertionCostCalculator = getter.getModal(InsertionCostCalculator.class);
             return new RepeatedSelectiveInsertionSearch(provider,
                     getter.getModal(SingleInsertionDetourPathCalculator.class),
                     insertionCostCalculator, drtCfg, getter.get(MatsimServices.class),
-                    getter.getModal(IncrementalStopDurationEstimator.class), getter.getModal(TravelTimeMatrix.class),
+                    getter.getModal(StopTimeCalculator.class), getter.getModal(TravelTimeMatrix.class),
                     getter.getModal(AdaptiveTravelTimeMatrix.class));
         }));
         bindModal(DrtInsertionSearch.class).to(modalKey(RepeatedSelectiveInsertionSearch.class));

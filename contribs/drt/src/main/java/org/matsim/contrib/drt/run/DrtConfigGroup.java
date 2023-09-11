@@ -81,7 +81,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public boolean useModeFilteredSubnetwork = false;
 
 	@Parameter
-	@Comment("Bus stop duration. Must be positive.")
+	@Comment("Minimum vehicle stop duration. Must be positive.")
 	@Positive
 	public double stopDuration = Double.NaN;// seconds
 

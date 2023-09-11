@@ -32,6 +32,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -234,10 +237,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 
 	private static final Set<Class<?>> ALLOWED_PARAMETER_TYPES = Set.of(String.class, Float.class, Double.class,
 			Integer.class, Long.class, Boolean.class, Character.class, Byte.class, Short.class, Float.TYPE, Double.TYPE,
-			Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE);
+			Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE, LocalTime.class,
+			LocalDate.class, LocalDateTime.class);
 
 	private static final String HINT = " Valid types are String, primitive types and their wrapper classes,"
-			+ " enumerations, List<String> and Set<String>."
+			+ " enumerations, List<String> and Set<String>, LocalTime, LocalDate, LocalDateTime"
 			+ " Other types are fine as parameters, but you will need to implement conversion strategies"
 			+ " in corresponding StringGetters andStringSetters.";
 
@@ -342,6 +346,12 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			return null;
 		} else if (type.equals(String.class)) {
 			return value;
+		} else if (type.equals(LocalTime.class)) {
+			return LocalTime.parse(value);
+		} else if (type.equals(LocalDate.class)) {
+			return LocalDate.parse(value);
+		} else if (type.equals(LocalDateTime.class)) {
+			return LocalDateTime.parse(value);
 		} else if (type.equals(Float.class) || type.equals(Float.TYPE)) {
 			return Float.parseFloat(value);
 		} else if (type.equals(Double.class) || type.equals(Double.TYPE)) {
