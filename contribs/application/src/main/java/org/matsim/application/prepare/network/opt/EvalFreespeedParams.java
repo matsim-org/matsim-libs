@@ -194,7 +194,7 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 			return null;
 
 		Path base = Path.of("freespeed_detailed");
-		return base.resolve(FilenameUtils.getBaseName(input.getNetworkPath() + "_" + modelClazz.getSimpleName() + "_" + postfix)).toString();
+		return base.resolve(FilenameUtils.getBaseName(input.getNetworkPath()) + "_" + modelClazz.getSimpleName() + "_" + postfix).toString();
 	}
 
 	private void evalSpeedFactors(Path eval, String save) throws IOException {
@@ -234,8 +234,8 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 	}
 
 	private String getParamsName(Path params) {
-		String pName = paramsName != null ? paramsName : (params != null ? params.getFileName().toString() : "");
-		return params != null ? pName : ("non_optimized_" + pName);
+		String pName = paramsName != null ? paramsName : (params != null ? params.getFileName().toString() : "null");
+		return params != null ? pName : ("non-optimized_" + pName);
 	}
 
 	private void writeResult(CSVPrinter csv, Path params, Result r) throws IOException {
