@@ -71,6 +71,9 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 	@CommandLine.Option(names = "--eval-factors", description = "Eval freespeed factors", defaultValue = "false")
 	private boolean evalFactors;
 
+	@CommandLine.Option(names = "--eval-detailed", description = "Write detailed csv for each request.")
+	private boolean evalDetailed;
+
 	private Network network;
 	private NetworkModel model;
 	private Object2DoubleMap<SampleValidationRoutes.FromToNodes> validationSet;
@@ -160,14 +163,19 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 			csv.flush();
 		}
 
+
+		if (evalDetailed)
+			Files.createDirectories(Path.of("freespeed_detailed"));
+
+
 		log.info("Model score:");
-		Result r = applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds, new Request(0), null);
+		Result r = applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds, new Request(0), save(getParamsName(null)));
 		writeResult(csv, null, r);
 
 		if (params != null) {
 			log.info("Model with parameter score:");
 			r = applyAndEvaluateParams(network, model, validationSet, features, speedFactorBounds,
-				mapper.readValue(params.toFile(), Request.class), null);
+				mapper.readValue(params.toFile(), Request.class), save(getParamsName(params)));
 			writeResult(csv, params, r);
 		}
 
@@ -175,13 +183,21 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 
 		if (evalFactors) {
 			log.info("Evaluating free-speed factors");
-			evalSpeedFactors(output.getPath());
+			evalSpeedFactors(output.getPath(), save("best_urban_factor"));
 		}
 
 		return 0;
 	}
 
-	private void evalSpeedFactors(Path eval) throws IOException {
+	private String save(String postfix) {
+		if (!evalDetailed)
+			return null;
+
+		Path base = Path.of("freespeed_detailed");
+		return base.resolve(FilenameUtils.getBaseName(input.getNetworkPath() + "_" + modelClazz.getSimpleName() + "_" + postfix)).toString();
+	}
+
+	private void evalSpeedFactors(Path eval, String save) throws IOException {
 
 		CSVPrinter csv;
 		if (Files.exists(eval)) {
@@ -194,23 +210,38 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 
 		String networkName = FilenameUtils.getName(input.getNetworkPath());
 
+		Request best = null;
+		double bestScore = Double.POSITIVE_INFINITY;
+		double[] bounds = {0, 1};
+
 		for (int i = 25; i <= 100; i++) {
-			Result res = applyAndEvaluateParams(network, model, validationSet, features, new double[]{0, 1},
-				new Request(i / 100d), null);
+			Request req = new Request(i / 100d);
+			Result res = applyAndEvaluateParams(network, model, validationSet, features, bounds, req, null);
 			csv.printRecord(networkName, i / 100d, res.mae(), res.rmse());
+			if (best == null || res.mae() < bestScore) {
+				best = req;
+				bestScore = res.mae();
+			}
 		}
 
+		log.info("Best factor {} with mae {}", best.f, bestScore);
+
+		if (save != null) {
+			applyAndEvaluateParams(network, model, validationSet, features, bounds, best, save);
+		}
 
 		csv.close();
 	}
 
-	private void writeResult(CSVPrinter csv, Path params, Result r) throws IOException {
-		String pName = paramsName != null ? paramsName : params.getFileName().toString();
-		String p = params != null ? pName : "non_optimized_" + pName;
-		String network = FilenameUtils.getName(input.getNetworkPath());
-
-		csv.printRecord(network, modelClazz.getPackageName(), modelClazz.getSimpleName(), p, r.mae(), r.rmse());
+	private String getParamsName(Path params) {
+		String pName = paramsName != null ? paramsName : (params != null ? params.getFileName().toString() : "");
+		return params != null ? pName : ("non_optimized_" + pName);
 	}
 
+	private void writeResult(CSVPrinter csv, Path params, Result r) throws IOException {
+		String network = FilenameUtils.getBaseName(input.getNetworkPath());
+
+		csv.printRecord(network, modelClazz.getPackageName(), modelClazz.getSimpleName(), getParamsName(params), r.mae(), r.rmse());
+	}
 
 }

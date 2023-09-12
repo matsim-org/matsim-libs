@@ -128,7 +128,7 @@ class NetworkParamsOpt {
 		CSVPrinter csv = save != null ? new CSVPrinter(Files.newBufferedWriter(Path.of(save + "-eval.csv")), CSVFormat.DEFAULT) : null;
 
 		if (csv != null)
-			csv.printRecord("from_node", "to_node", "beeline_dist", "dist", "travel_time");
+			csv.printRecord("from_node", "to_node", "beeline_dist", "sim_speed", "ref_speed");
 
 		Map<String, List<Data>> data = new HashMap<>();
 
@@ -165,7 +165,7 @@ class NetworkParamsOpt {
 
 			if (csv != null)
 				csv.printRecord(r.fromNode(), r.toNode(), (int) CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()),
-					(int) distance, (int) path.travelTime);
+					speed, e.getDoubleValue());
 		}
 
 		if (csv != null)
