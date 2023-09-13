@@ -169,7 +169,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		List<EventSequence> rejectionEvents = drtEventSequenceCollector.getRejectedRequestSequences()
 				.values()
 				.stream()
-				.sorted(Comparator.comparing(rejectionEvent -> rejectionEvent.getSubmitted().getTime()))
+				.sorted(Comparator.comparing(rejectionEvent -> rejectionEvent.getRejected().get().getTime()))
 				.collect(Collectors.toList());
 
 		collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(), filename(event, "drt_rejections", ".csv"),
@@ -461,15 +461,15 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 			//Iterate through each rejection
 			for (EventSequence seq : rejectionEvents){
-				//get rejection time
-				DrtRequestSubmittedEvent submission = seq.getSubmitted();
-				double rejectionTime = submission.getTime();
-				if (rejectionTime > endTime || rejectionTime <startTime) {
-					LogManager.getLogger(DrtAnalysisControlerListener.class).error("wrong end / start Times for analysis");
-				}
+				if (seq.getRejected().isPresent()) {
+					double rejectionTime = seq.getRejected().get().getTime();
+					if (rejectionTime > endTime || rejectionTime < startTime) {
+						LogManager.getLogger(DrtAnalysisControlerListener.class).error("wrong end / start Times for analysis");
+					}
 
-				if (rejectionTime > time && rejectionTime < time + binSize_s) {
-					rejectionList.add(seq);
+					if (rejectionTime > time && rejectionTime < time + binSize_s) {
+						rejectionList.add(seq);
+					}
 				}
 			}
 			rejections.put((double)time, rejectionList);
@@ -734,6 +734,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private static void analyseRejections(String fileName, List<EventSequence> rejectionEvents, int binsize_s, boolean createGraphs, String delimiter) {
+		if (rejectionEvents.size() == 0)
+			return;
 		int startTime = ((int)(rejectionEvents.get(0).getSubmitted().getTime() / binsize_s)) * binsize_s;
 		int endTime = ((int)(rejectionEvents.get(rejectionEvents.size() - 1).getSubmitted().getTime() / binsize_s) + 1) * binsize_s;
 		Map<Double, List<EventSequence>> splitEvents = splitEventsIntoBins(rejectionEvents,startTime, endTime, binsize_s);
