@@ -37,14 +37,16 @@ public class VehicleEntry {
 	public final ImmutableList<Waypoint.Stop> stops;
 	public final Waypoint.End end;
 	private final double[] slackTimes;// for all insertion points
+	public final double createTime;
 
 	public VehicleEntry(DvrpVehicle vehicle, Waypoint.Start start, ImmutableList<Waypoint.Stop> stops,
-			double[] slackTimes) {
+			double[] slackTimes, double createTime) {
 		this.vehicle = vehicle;
 		this.start = start;
 		this.stops = stops;
 		this.end = Waypoint.End.OPEN_END;
 		this.slackTimes = slackTimes;
+		this.createTime = createTime;
 	}
 
 	protected VehicleEntry(VehicleEntry that) {
@@ -53,6 +55,7 @@ public class VehicleEntry {
 		this.stops = that.stops;
 		this.end = that.end;
 		this.slackTimes = that.slackTimes;
+		this.createTime = that.createTime;
 	}
 
 	public Waypoint getWaypoint(int index) {
@@ -64,6 +67,10 @@ public class VehicleEntry {
 	}
 
 	public double getSlackTime(int index) {
-		return slackTimes[index];
+		return slackTimes[index + 1];
+	}
+	
+	public double getStartSlackTime() {
+		return slackTimes[0];
 	}
 }

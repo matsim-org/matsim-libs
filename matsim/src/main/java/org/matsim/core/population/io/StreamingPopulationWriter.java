@@ -63,8 +63,8 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 		}
 	}
 	private DummyMatsimWriter matsimWriter = new DummyMatsimWriter() ;
-	
-	
+
+
 	public StreamingPopulationWriter() {
 		this(1.0);
 	}
@@ -83,7 +83,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			final CoordinateTransformation coordinateTransformation,
 			final double fraction) {
 		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
+		this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
 	}
 
 	/**
@@ -207,5 +207,5 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 	public final void setWriterHandler(final PopulationWriterHandler handler) {
 		this.handler = handler;
 	}
-	
+
 }

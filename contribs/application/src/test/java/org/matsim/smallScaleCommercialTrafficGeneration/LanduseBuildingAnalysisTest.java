@@ -84,12 +84,12 @@ public class LanduseBuildingAnalysisTest {
 			Assert.assertTrue(categories.containsKey("Employee Traffic/Parcels"));
 			Assert.assertTrue(categories.containsKey("Employee Tertiary Sector Rest"));
 
-			employeeSum += categories.getDouble("Employee Primary Sector");
-			employeeSum += categories.getDouble("Employee Construction");
-			employeeSum += categories.getDouble("Employee Secondary Sector Rest");
-			employeeSum += categories.getDouble("Employee Retail");
-			employeeSum += categories.getDouble("Employee Traffic/Parcels");
-			employeeSum += categories.getDouble("Employee Tertiary Sector Rest");
+			employeeSum += (int) categories.getDouble("Employee Primary Sector");
+			employeeSum += (int) categories.getDouble("Employee Construction");
+			employeeSum += (int) categories.getDouble("Employee Secondary Sector Rest");
+			employeeSum += (int) categories.getDouble("Employee Retail");
+			employeeSum += (int) categories.getDouble("Employee Traffic/Parcels");
+			employeeSum += (int) categories.getDouble("Employee Tertiary Sector Rest");
 
 			Assert.assertEquals(categories.getDouble("Employee"), employeeSum, MatsimTestUtils.EPSILON);
 
@@ -276,12 +276,12 @@ public class LanduseBuildingAnalysisTest {
 			Assert.assertTrue(categories.containsKey("Employee Traffic/Parcels"));
 			Assert.assertTrue(categories.containsKey("Employee Tertiary Sector Rest"));
 
-			employeeSum += categories.getDouble("Employee Primary Sector");
-			employeeSum += categories.getDouble("Employee Construction");
-			employeeSum += categories.getDouble("Employee Secondary Sector Rest");
-			employeeSum += categories.getDouble("Employee Retail");
-			employeeSum += categories.getDouble("Employee Traffic/Parcels");
-			employeeSum += categories.getDouble("Employee Tertiary Sector Rest");
+			employeeSum += (int) categories.getDouble("Employee Primary Sector");
+			employeeSum += (int) categories.getDouble("Employee Construction");
+			employeeSum += (int) categories.getDouble("Employee Secondary Sector Rest");
+			employeeSum += (int) categories.getDouble("Employee Retail");
+			employeeSum += (int) categories.getDouble("Employee Traffic/Parcels");
+			employeeSum += (int) categories.getDouble("Employee Tertiary Sector Rest");
 
 			Assert.assertEquals(categories.getDouble("Employee"), employeeSum, MatsimTestUtils.EPSILON);
 

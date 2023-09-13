@@ -151,12 +151,24 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 
 		final VehicleType vehicleType = qVehicle.getVehicle().getType();
 
-		if ( qSimConfigGroup.getVehiclesSource()== QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData ) {
-			if ( !vehicleType.getId().toString().equals( vehicleType.getNetworkMode() ) ) {
+		// the below consistentcy check is to broad; need a version that is more narrow ...
+		
+//		if ( qSimConfigGroup.getVehiclesSource()== QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData ) {
+//			if ( !vehicleType.getId().toString().equals( vehicleType.getNetworkMode() ) ) {
+//				throw new RuntimeException( "You are using mode vehicles but the network mode of the vehicle type is wrong: vehType.id=" + vehicleType.getId()
+//									    + "; vehType.mode=" + vehicleType.getNetworkMode() );
+//			}
+//		}
+
+		// ... more narrow version coming here ...
+		if (
+				qVehicle.getVehicle().getType().getId().toString().equals( bicycleConfigGroup.getBicycleMode() )
+									      && !vehicleType.getNetworkMode().equals( bicycleConfigGroup.getBicycleMode() )
+		) {
 				throw new RuntimeException( "You are using mode vehicles but the network mode of the vehicle type is wrong: vehType.id=" + vehicleType.getId()
 									    + "; vehType.mode=" + vehicleType.getNetworkMode() );
-			}
 		}
+
 
 		return vehicleType.getNetworkMode().equals(bicycleConfigGroup.getBicycleMode() );
 	}

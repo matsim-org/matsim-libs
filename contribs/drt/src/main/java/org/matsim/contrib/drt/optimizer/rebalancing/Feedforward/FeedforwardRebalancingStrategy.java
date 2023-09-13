@@ -46,7 +46,6 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final RebalancingParams generalParams;
 
 	private final int timeBinSize;
-	private final double rebalanceInterval;
 	private final double scaling;
 	private final Random rnd = new Random(1234);
 	private final int feedforwardSignalLead;
@@ -57,7 +56,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final DrtZoneTargetLinkSelector drtZoneTargetLinkSelector;
 	private final FastHeuristicZonalRelocationCalculator fastHeuristicRelocationCalculator;
 
-	private final Map<Double, List<Flow<DrtZone, DrtZone>>> feedforwardSignal;
+	private final Map<Integer, List<Flow<DrtZone, DrtZone>>> feedforwardSignal;
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, RebalancingParams generalParams,
 			FeedforwardRebalancingStrategyParams strategySpecificParams,
@@ -70,11 +69,9 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		this.fleet = fleet;
 		timeBinSize = strategySpecificParams.timeBinSize;
 
-		rebalanceInterval = generalParams.interval;
-
-		scaling = strategySpecificParams.feedforwardSignalStrength * rebalanceInterval / timeBinSize;
+		scaling = strategySpecificParams.feedforwardSignalStrength * (double)generalParams.interval / timeBinSize;
 		log.info("The feedforward signal strength is: "
-				+ Double.toString(strategySpecificParams.feedforwardSignalStrength));
+				+ strategySpecificParams.feedforwardSignalStrength);
 
 		feedforwardSignal = feedforwardSignalHandler.getFeedforwardSignal();
 		feedforwardSignalLead = strategySpecificParams.feedforwardSignalLead;
@@ -92,7 +89,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		List<Relocation> relocationList = new ArrayList<>();
-		double timeBin = Math.floor((time + feedforwardSignalLead) / timeBinSize);
+		int timeBin = (int)Math.floor((time + feedforwardSignalLead) / timeBinSize);
 		Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = RebalancingUtils
 				.groupRebalancableVehicles(zonalSystem, generalParams, rebalancableVehicles, time);
 		Map<DrtZone, List<DvrpVehicle>> actualRebalancableVehiclesPerZone = new HashMap<>();
@@ -129,9 +126,9 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		if (feedforwardSignal.containsKey(timeBin)) {
 			// Generate relocations based on the "rebalancePlanCore"
 			for (Flow<DrtZone, DrtZone> rebalanceInfo : feedforwardSignal.get(timeBin)) {
-				DrtZone departureZone = rebalanceInfo.origin;
-				DrtZone arrivalZone = rebalanceInfo.destination;
-				int vehicleToSend = (int) Math.floor(scaling * rebalanceInfo.amount + rnd.nextDouble());
+				DrtZone departureZone = rebalanceInfo.origin();
+				DrtZone arrivalZone = rebalanceInfo.destination();
+				int vehicleToSend = (int) Math.floor(scaling * rebalanceInfo.amount() + rnd.nextDouble());
 				// Note: we use probability to solve the problem of non-integer value of
 				// vehileToSend after scaling.
 

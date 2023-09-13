@@ -54,7 +54,7 @@ public class TrafficVolumeGenerationTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTrafficVolumeGenerationBusinessTraffic() throws IOException {
+	public void testTrafficVolumeGenerationCommercialPersonTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
@@ -74,7 +74,7 @@ public class TrafficVolumeGenerationTest {
 						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
 
 
-		String usedTrafficType = "businessTraffic";
+		String usedTrafficType = "commercialPersonTraffic";
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				List.of("total"));
@@ -184,7 +184,7 @@ public class TrafficVolumeGenerationTest {
 	}
 
 	@Test
-	public void testTrafficVolumeGenerationFreightTraffic() throws IOException {
+	public void testTrafficVolumeGenerationGoodsTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
@@ -204,7 +204,7 @@ public class TrafficVolumeGenerationTest {
 						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
 
 
-		String usedTrafficType = "freightTraffic";
+		String usedTrafficType = "goodsTraffic";
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
@@ -398,13 +398,14 @@ public class TrafficVolumeGenerationTest {
 		config.global().setCoordinateSystem("EPSG:4326");
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
+		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
+		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
+		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
 		Assert.assertEquals(3, FreightUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -420,7 +421,7 @@ public class TrafficVolumeGenerationTest {
 		Assert.assertEquals(3, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(30, addedCarrier1.getServices().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(6, addedCarrier1.getAttributes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("businessTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
+		Assert.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
 		Assert.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute("purpose"));
 		Assert.assertEquals("exampleServiceCarrier", addedCarrier1.getAttributes().getAttribute("existingModel"));
 		Assert.assertEquals("car", addedCarrier1.getAttributes().getAttribute("networkMode"));
@@ -434,7 +435,7 @@ public class TrafficVolumeGenerationTest {
 		Assert.assertEquals(1, addedCarrier2.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(2, addedCarrier2.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(20, addedCarrier2.getServices().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("businessTraffic", addedCarrier2.getAttributes().getAttribute("subpopulation"));
+		Assert.assertEquals("commercialPersonTraffic", addedCarrier2.getAttributes().getAttribute("subpopulation"));
 		Assert.assertEquals(2, (int) addedCarrier2.getAttributes().getAttribute("purpose"));
 		Assert.assertEquals("exampleServiceCarrier", addedCarrier2.getAttributes().getAttribute("existingModel"));
 		Assert.assertEquals("car", addedCarrier2.getAttributes().getAttribute("networkMode"));
@@ -463,13 +464,14 @@ public class TrafficVolumeGenerationTest {
 		config.global().setCoordinateSystem("EPSG:4326");
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
+		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
+		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
+		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
 		Assert.assertEquals(2, FreightUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -484,7 +486,7 @@ public class TrafficVolumeGenerationTest {
 		Assert.assertEquals(1, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(10, addedCarrier1.getServices().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(6, addedCarrier1.getAttributes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("businessTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
+		Assert.assertEquals("commercialPersonTraffic", addedCarrier1.getAttributes().getAttribute("subpopulation"));
 		Assert.assertEquals(2, (int) addedCarrier1.getAttributes().getAttribute("purpose"));
 		Assert.assertEquals("exampleServiceCarrier", addedCarrier1.getAttributes().getAttribute("existingModel"));
 		Assert.assertEquals("car", addedCarrier1.getAttributes().getAttribute("networkMode"));
@@ -502,7 +504,7 @@ public class TrafficVolumeGenerationTest {
 	}
 
 	@Test
-	public void testReducingDemandAfterAddingExistingScenarios_freight() throws Exception {
+	public void testReducingDemandAfterAddingExistingScenarios_goods() throws Exception {
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
@@ -515,7 +517,7 @@ public class TrafficVolumeGenerationTest {
 		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
 		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, null, StandardCharsets.UTF_8);
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		String usedTrafficType = "freightTraffic";
+		String usedTrafficType = "goodsTraffic";
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
@@ -523,6 +525,7 @@ public class TrafficVolumeGenerationTest {
 		config.global().setCoordinateSystem("EPSG:4326");
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
+		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
@@ -536,11 +539,11 @@ public class TrafficVolumeGenerationTest {
 		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
+		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
+		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
 		TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
@@ -661,7 +664,7 @@ public class TrafficVolumeGenerationTest {
 	}
 
 	@Test
-	public void testReducingDemandAfterAddingExistingScenarios_business() throws Exception {
+	public void testReducingDemandAfterAddingExistingScenarios_commercialPersonTraffic() throws Exception {
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
@@ -674,7 +677,7 @@ public class TrafficVolumeGenerationTest {
 		Path shapeFileBuildingsPath = inputDataDirectory.resolve("shp/testBuildings.shp");
 		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, null, StandardCharsets.UTF_8);
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		String usedTrafficType = "businessTraffic";
+		String usedTrafficType = "commercialPersonTraffic";
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				List.of("total"));
@@ -682,6 +685,7 @@ public class TrafficVolumeGenerationTest {
 		config.global().setCoordinateSystem("EPSG:4326");
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
+		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
@@ -695,11 +699,11 @@ public class TrafficVolumeGenerationTest {
 		HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, usedTrafficType);
 
-		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = CreateSmallScaleCommercialTrafficDemand
+		Map<String, HashMap<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
 				.filterLinksForZones(scenario, shpZones, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem()),
                         buildingsPerZone);
 
-		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, inputDataDirectory, regionLinksMap);
+		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
 		TrafficVolumeGeneration.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);

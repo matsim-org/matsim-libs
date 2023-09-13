@@ -47,7 +47,7 @@ public class TripDistributionMatrixTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testTripDistributionBusinessTraffic() throws IOException {
+	public void testTripDistributionCommercialPersonTrafficTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
@@ -67,7 +67,7 @@ public class TripDistributionMatrixTest {
 						inputDataDirectory, usedLanduseConfiguration,
 						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
 
-		String usedTrafficType = "businessTraffic";
+		String usedTrafficType = "commercialPersonTraffic";
 		double sample = 1.;
 		double resistanceFactor = 0.005;
 
@@ -137,7 +137,7 @@ public class TripDistributionMatrixTest {
 	}
 
 	@Test
-	public void testTripDistributionFreightTraffic() throws IOException {
+	public void testTripDistributionGoodsTraffic() throws IOException {
 
 		HashMap<String, ArrayList<String>> landuseCategoriesAndDataConnection = new HashMap<String, ArrayList<String>>();
 		HashMap<String, HashMap<String, ArrayList<SimpleFeature>>> buildingsPerZone = new HashMap<>();
@@ -157,7 +157,7 @@ public class TripDistributionMatrixTest {
 						inputDataDirectory, usedLanduseConfiguration,
 						shapeFileLandusePath, shapeFileZonePath, shapeFileBuildingsPath, null, buildingsPerZone);
 
-		String usedTrafficType = "freightTraffic";
+		String usedTrafficType = "goodsTraffic";
 		double sample = 1.;
 		double resistanceFactor = 0.005;
 

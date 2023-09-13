@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.CarrierConstants;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import java.util.*;
@@ -93,7 +93,7 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
 
 
     private void handleFreightActivityStart(ActivityStartEvent event) {
-        if (event.getActType().equals(FreightConstants.END)) {
+        if (event.getActType().equals(CarrierConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
         } else if (event.getActType().startsWith(CommercialJobGenerator.COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) {
 
@@ -126,7 +126,7 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        if (event.getActType().equals(FreightConstants.START)) {
+        if (event.getActType().equals(CarrierConstants.START)) {
             activeDeliveryAgents.add(event.getPersonId());
         }
     }

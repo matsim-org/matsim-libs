@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package org.matsim.households;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
 
 
@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class PersonHouseholdMapping {
 
-	private Map<Id<Person>, Household> phMap = new HashMap<Id<Person>, Household>();
+	private final Map<Id<Person>, Household> phMap = new IdMap<>(Person.class);
 	
 	public PersonHouseholdMapping(Households hhs) {
 		this.reinitialize(hhs);

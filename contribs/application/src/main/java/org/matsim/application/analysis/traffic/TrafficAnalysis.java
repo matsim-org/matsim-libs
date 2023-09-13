@@ -1,6 +1,5 @@
 package org.matsim.application.analysis.traffic;
 
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -15,8 +14,8 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
 import tech.tablesaw.columns.Column;
@@ -50,7 +49,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private ShpOptions shp;
 
-	@CommandLine.Option(names = "--transport-modes", description = "transport modes to analyze", split = ",")
+	@CommandLine.Option(names = "--transport-modes", description = "transport modes to analyze", defaultValue = "", split = ",")
 	private Set<String> modes;
 
 	public static void main(String[] args) {
@@ -76,7 +75,11 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		Network network = filterNetwork();
 
 		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
-		builder.setAnalyzedModes(modes);
+		if (modes != null && !modes.isEmpty()) {
+			builder.setFilterModes(true);
+			builder.setAnalyzedModes(modes);
+		}
+
 		builder.setCalculateLinkTravelTimes(true);
 		builder.setMaxTime(86400);
 		builder.setTimeslice(900);
@@ -276,8 +279,9 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		manager.addLinkFilter(l -> l.getAllowedModes().stream().anyMatch(s -> modes.contains(s)));
 
 		if (shp.isDefined()) {
-			Geometry geometry = shp.getGeometry();
-			manager.addLinkFilter(l -> geometry.covers(MGC.coord2Point(l.getCoord())));
+			String crs = ProjectionUtils.getCRS(unfiltered);
+			ShpOptions.Index index = shp.createIndex(crs != null ? crs : shp.getShapeCrs(), "_");
+			manager.addLinkFilter(l -> index.contains(l.getCoord()));
 		}
 
 		return manager.applyFilters();
