@@ -677,7 +677,8 @@ final class RailsimEngine implements Steppable {
 
 			// Only need to consider if speed is lower than the allowed speed
 			if (!FuzzyUtils.equals(dist, 0) && allowed <= minAllowed) {
-				RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(dist, state.train.acceleration(), state.train.deceleration(), state.speed, state.allowedMaxSpeed, allowed);
+				RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(dist, state.train.acceleration(), state.train.deceleration(),
+					state.speed, state.allowedMaxSpeed, Math.min(state.allowedMaxSpeed, allowed));
 
 				assert FuzzyUtils.greaterEqualThan(target.decelDist(), 0) : "Decel dist must be greater than 0, or stopping is not possible";
 

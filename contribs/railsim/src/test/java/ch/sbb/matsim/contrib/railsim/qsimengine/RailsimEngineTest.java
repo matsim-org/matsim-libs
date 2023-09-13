@@ -224,4 +224,32 @@ public class RailsimEngineTest {
 			.hasTrainState("regio2", 1517, 1000, 0);
 	}
 
+	@Test
+	public void testMicroTrainFollowingVaryingSpeed() {
+
+		RailsimTestUtils.Holder test = getTestEngine("networkMicroVaryingSpeed.xml");
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo1", 0, "1-2", "20-21");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo2", 15, "1-2", "20-21");
+
+		test.doSimStepUntil(3000);
+//		test.debugFiles(collector, "microVarying");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("cargo1", 1278, 1000, 0)
+			.hasTrainState("cargo2", 2033, 1000, 0);
+
+		// Same test with state updates
+		test = getTestEngine("networkMicroVaryingSpeed.xml");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo1", 0, "1-2", "20-21");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo2", 15, "1-2", "20-21");
+		test.doStateUpdatesUntil(3000, 1);
+//		test.debugFiles(collector, "microVarying_detailed");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("cargo1", 1278, 1000, 0)
+			.hasTrainState("cargo2", 2033, 1000, 0);
+
+
+	}
 }
