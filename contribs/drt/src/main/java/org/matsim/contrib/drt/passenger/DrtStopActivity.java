@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.passenger;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -42,11 +43,11 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 	private final DynAgent driver;
 	private final Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests;
 	private final Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests;
-	private final double expectedEndTime;
+	private final Supplier<Double> endTime;
 
 	private int passengersPickedUp = 0;
 
-	public DrtStopActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask task,
+	public DrtStopActivity(PassengerHandler passengerHandler, DynAgent driver, Supplier<Double> endTime,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests, String activityType) {
 		super(activityType);
@@ -54,12 +55,12 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 		this.driver = driver;
 		this.dropoffRequests = dropoffRequests;
 		this.pickupRequests = pickupRequests;
-		this.expectedEndTime = task.getEndTime();
+		this.endTime = endTime;
 	}
 
 	@Override
 	protected boolean isLastStep(double now) {
-		return passengersPickedUp == pickupRequests.size() && now >= expectedEndTime;
+		return passengersPickedUp == pickupRequests.size() && now >= endTime.get();
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 
 	@Override
 	protected void simStep(double now) {
-		if (now == expectedEndTime) {
+		if (now == endTime.get()) {
 			for (var request : pickupRequests.values()) {
 				if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
 					passengersPickedUp++;
@@ -83,7 +84,7 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		if (now < expectedEndTime) {
+		if (now < endTime.get()) {
 			return;// pick up only at the end of stop activity
 		}
 

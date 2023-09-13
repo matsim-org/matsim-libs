@@ -70,7 +70,7 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Detect changes against master
         # we only want to build matsim (module) if changes are not limited to contribs
