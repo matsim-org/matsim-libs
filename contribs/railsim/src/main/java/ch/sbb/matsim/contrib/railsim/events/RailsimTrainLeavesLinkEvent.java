@@ -19,7 +19,7 @@ public class RailsimTrainLeavesLinkEvent extends Event implements HasLinkId, Has
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 
-	public RailsimTrainLeavesLinkEvent(double time,Id<Vehicle> vehicleId, Id<Link> linkId) {
+	public RailsimTrainLeavesLinkEvent(double time, Id<Vehicle> vehicleId, Id<Link> linkId) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.linkId = linkId;

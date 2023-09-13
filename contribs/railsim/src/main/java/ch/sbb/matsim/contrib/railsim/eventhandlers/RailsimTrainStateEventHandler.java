@@ -22,6 +22,13 @@ package ch.sbb.matsim.contrib.railsim.eventhandlers;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import org.matsim.core.events.handler.EventHandler;
 
+/**
+ * Event handler for {@link RailsimTrainStateEvent}.
+ */
 public interface RailsimTrainStateEventHandler extends EventHandler {
+
+	/**
+	 * Handle given event.
+	 */
 	void handleEvent(RailsimTrainStateEvent event);
 }

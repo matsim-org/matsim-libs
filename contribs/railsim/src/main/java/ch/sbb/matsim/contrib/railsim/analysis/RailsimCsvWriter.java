@@ -14,8 +14,17 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 
-public class RailsimCsvWriter {
+/**
+ * Helper class to write railsim related csv files.
+ */
+public final class RailsimCsvWriter {
 
+	private RailsimCsvWriter() {
+	}
+
+	/**
+	 * Write {@link RailsimLinkStateChangeEvent} to a csv file.
+	 */
 	public static void writeLinkStatesCsv(List<RailsimLinkStateChangeEvent> events, String filename) throws UncheckedIOException {
 		String[] header = {"link", "time", "state", "vehicle", "track"};
 
@@ -34,6 +43,9 @@ public class RailsimCsvWriter {
 
 	}
 
+	/**
+	 * Write {@link RailsimTrainStateEvent} to a csv file.
+	 */
 	public static void writeTrainStatesCsv(List<RailsimTrainStateEvent> events, Network network, String filename) throws UncheckedIOException {
 		String[] header = {"vehicle", "time", "acceleration", "speed", "targetSpeed", "headLink", "headPosition", "headX", "headY", "tailLink", "tailPosition", "tailX", "tailY"};
 

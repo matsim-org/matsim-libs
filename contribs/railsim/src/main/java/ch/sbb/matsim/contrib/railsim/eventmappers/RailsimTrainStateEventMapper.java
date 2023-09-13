@@ -26,6 +26,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * Convert for {@link RailsimTrainStateEvent}.
+ */
 public class RailsimTrainStateEventMapper implements MatsimEventsReader.CustomEventMapper {
 	@Override
 	public RailsimTrainStateEvent apply(GenericEvent event) {

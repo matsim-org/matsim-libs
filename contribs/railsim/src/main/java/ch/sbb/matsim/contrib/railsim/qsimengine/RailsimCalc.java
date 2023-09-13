@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Utility class holding static calculation methods related to state (updates).
  */
-class RailsimCalc {
+final class RailsimCalc {
 
 	private RailsimCalc() {
 	}

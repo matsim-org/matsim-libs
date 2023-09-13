@@ -33,7 +33,7 @@ public final class RailsimUtils {
 	}
 
 	/**
-	 * @return the train capacity for this link, if no link attribute is provided the default is 1.
+	 * Return the train capacity for this link, if no link attribute is provided the default is 1.
 	 */
 	public static int getTrainCapacity(Link link) {
 		Object attr = link.getAttributes().getAttribute(LINK_ATTRIBUTE_CAPACITY);
@@ -48,7 +48,7 @@ public final class RailsimUtils {
 	}
 
 	/**
-	 * @return the minimum time for the switch at the end of the link (toNode); if no link attribute is provided the default is 0.
+	 * Return the minimum time for the switch at the end of the link (toNode); if no link attribute is provided the default is 0.
 	 */
 	public static double getMinimumHeadwayTime(Link link) {
 		Object attr = link.getAttributes().getAttribute(LINK_ATTRIBUTE_MINIMUM_TIME);
@@ -105,7 +105,7 @@ public final class RailsimUtils {
 	}
 
 	/**
-	 * @return the default deceleration time or the vehicle-specific value.
+	 * Return the default deceleration time or the vehicle-specific value.
 	 */
 	public static double getTrainDeceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
 		double deceleration = railsimConfigGroup.decelerationDefault;
@@ -121,7 +121,7 @@ public final class RailsimUtils {
 	}
 
 	/**
-	 * @return the default acceleration time or the vehicle-specific value.
+	 * Return the default acceleration time or the vehicle-specific value.
 	 */
 	public static double getTrainAcceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
 		double acceleration = railsimConfigGroup.accelerationDefault;

@@ -26,7 +26,7 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 	 */
 	final RailLink unblockLink;
 
-	public UpdateEvent(TrainState state, Type type) {
+	UpdateEvent(TrainState state, Type type) {
 		this.state = state;
 		this.plannedTime = state.timestamp;
 		this.type = type;
@@ -34,7 +34,7 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		this.unblockLink = null;
 	}
 
-	public UpdateEvent(TrainState state, RailLink unblockLink, double time) {
+	UpdateEvent(TrainState state, RailLink unblockLink, double time) {
 		this.state = state;
 		this.unblockLink = unblockLink;
 		this.plannedTime = time + unblockLink.minimumHeadwayTime;

@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Event thrown when the {@link ch.sbb.matsim.contrib.railsim.qsimengine.TrackState} of a {@link Link} changes.
  */
-public class RailsimLinkStateChangeEvent extends Event implements HasLinkId, HasVehicleId {
+public final class RailsimLinkStateChangeEvent extends Event implements HasLinkId, HasVehicleId {
 
 	public static final String EVENT_TYPE = "railsimLinkStateChangeEvent";
 

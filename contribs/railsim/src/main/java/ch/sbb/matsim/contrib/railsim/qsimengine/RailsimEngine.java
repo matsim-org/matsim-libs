@@ -41,7 +41,7 @@ final class RailsimEngine implements Steppable {
 	private final RailResourceManager resources;
 	private final TrainDisposition disposition;
 
-	public RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, RailResourceManager resources, TrainDisposition disposition) {
+	RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, RailResourceManager resources, TrainDisposition disposition) {
 		this.eventsManager = eventsManager;
 		this.config = config;
 		this.resources = resources;
@@ -142,7 +142,7 @@ final class RailsimEngine implements Steppable {
 			case BLOCK_TRACK -> blockTrack(time, event);
 			case WAIT_FOR_RESERVATION -> checkTrackReservation(time, event);
 			case UNBLOCK_LINK -> {
-				unblockTrack(time, event.state,  event.unblockLink);
+				unblockTrack(time, event.state, event.unblockLink);
 				// event will be removed
 				event.type = UpdateEvent.Type.IDLE;
 			}

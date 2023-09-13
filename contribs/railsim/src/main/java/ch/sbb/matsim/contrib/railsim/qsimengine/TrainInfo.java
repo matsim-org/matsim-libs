@@ -17,7 +17,7 @@ record TrainInfo(
 	double maxDeceleration
 ) {
 
-	public TrainInfo(VehicleType vehicle, RailsimConfigGroup config) {
+	TrainInfo(VehicleType vehicle, RailsimConfigGroup config) {
 		this(
 			vehicle.getId(),
 			vehicle.getLength(),

@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Event for currents train position.
  */
-public class RailsimTrainStateEvent extends Event implements HasVehicleId {
+public final class RailsimTrainStateEvent extends Event implements HasVehicleId {
 
 	public static final String EVENT_TYPE = "railsimTrainStateEvent";
 

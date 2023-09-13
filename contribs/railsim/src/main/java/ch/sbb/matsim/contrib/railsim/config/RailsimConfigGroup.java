@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * Config of the Railsim contrib.
  */
-public class RailsimConfigGroup extends ReflectiveConfigGroup {
+public final class RailsimConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "railsim";
 

@@ -30,7 +30,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * Example script that shows how to use railsim included in this contrib.
  */
-public class RunRailsimExample {
+public final class RunRailsimExample {
+
+	private RunRailsimExample() {
+	}
 
 	public static void main(String[] args) {
 

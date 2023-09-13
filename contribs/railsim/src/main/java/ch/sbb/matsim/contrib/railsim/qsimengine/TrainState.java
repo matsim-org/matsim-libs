@@ -94,7 +94,7 @@ final class TrainState {
 	double speed;
 
 	/**
-	 * Current Acceleration, (or deceleration if negative)
+	 * Current Acceleration, (or deceleration if negative).
 	 */
 	double acceleration;
 

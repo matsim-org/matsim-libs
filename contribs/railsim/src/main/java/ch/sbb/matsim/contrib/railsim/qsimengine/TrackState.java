@@ -9,5 +9,5 @@ public enum TrackState {
 	/**
 	 * Blocked tracks that are exclusively available for trains.
 	 */
-	BLOCKED,
+	BLOCKED
 }

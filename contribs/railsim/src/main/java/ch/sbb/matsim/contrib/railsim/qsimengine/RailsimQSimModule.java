@@ -28,6 +28,9 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentFactory;
 
+/**
+ * Module to install railsim functionality.
+ */
 public class RailsimQSimModule extends AbstractQSimModule implements QSimComponentsConfigurator {
 
 	public static final String COMPONENT_NAME = "Railsim";
