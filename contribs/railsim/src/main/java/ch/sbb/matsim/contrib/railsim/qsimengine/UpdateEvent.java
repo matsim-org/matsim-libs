@@ -81,8 +81,6 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		POSITION,
 		ENTER_LINK,
 		LEAVE_LINK,
-		// TODO: Never used, should we delete this event type?
-		RELEASE_TRACK,
 		BLOCK_TRACK,
 		WAIT_FOR_RESERVATION,
 		SPEED_CHANGE,
