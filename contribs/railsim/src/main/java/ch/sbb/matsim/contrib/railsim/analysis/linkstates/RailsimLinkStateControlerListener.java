@@ -29,7 +29,9 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-
+/**
+ * Controler to automatically write rail sim analysis files.
+ */
 public final class RailsimLinkStateControlerListener implements IterationEndsListener, IterationStartsListener {
 
 	private RailLinkStateAnalysis analysis;

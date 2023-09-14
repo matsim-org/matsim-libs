@@ -7,25 +7,23 @@ import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Map;
 
 /**
  * Event for currents train position.
  */
-public class RailsimTrainStateEvent extends Event implements HasVehicleId {
+public final class RailsimTrainStateEvent extends Event implements HasVehicleId {
 
 	public static final String EVENT_TYPE = "railsimTrainStateEvent";
 
 	public static final String ATTRIBUTE_EXACT_TIME = "exactTime";
-	public static final String ATTRIBUTE_HEADLINK = "headLink";
-	public static final String ATTRIBUTE_HEADPOSITION = "headPosition";
-	public static final String ATTRIBUTE_TAILLINK = "tailLink";
-	public static final String ATTRIBUTE_TAILPOSITION = "tailPosition";
+	public static final String ATTRIBUTE_HEAD_LINK = "headLink";
+	public static final String ATTRIBUTE_HEAD_POSITION = "headPosition";
+	public static final String ATTRIBUTE_TAIL_LINK = "tailLink";
+	public static final String ATTRIBUTE_TAIL_POSITION = "tailPosition";
 	public static final String ATTRIBUTE_SPEED = "speed";
 	public static final String ATTRIBUTE_ACCELERATION = "acceleration";
-	public static final String ATTRIBUTE_TARGETSPEED = "targetSpeed";
+	public static final String ATTRIBUTE_TARGET_SPEED = "targetSpeed";
 
 	/**
 	 * Exact time with resolution of 0.001s.
@@ -103,13 +101,13 @@ public class RailsimTrainStateEvent extends Event implements HasVehicleId {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_EXACT_TIME, String.valueOf(exactTime));
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put(ATTRIBUTE_HEADLINK, String.valueOf(headLink));
-		attr.put(ATTRIBUTE_HEADPOSITION, Double.toString(headPosition));
-		attr.put(ATTRIBUTE_TAILLINK, String.valueOf(tailLink));
-		attr.put(ATTRIBUTE_TAILPOSITION, Double.toString(tailPosition));
+		attr.put(ATTRIBUTE_HEAD_LINK, String.valueOf(headLink));
+		attr.put(ATTRIBUTE_HEAD_POSITION, Double.toString(headPosition));
+		attr.put(ATTRIBUTE_TAIL_LINK, String.valueOf(tailLink));
+		attr.put(ATTRIBUTE_TAIL_POSITION, Double.toString(tailPosition));
 		attr.put(ATTRIBUTE_SPEED, Double.toString(speed));
 		attr.put(ATTRIBUTE_ACCELERATION, Double.toString(acceleration));
-		attr.put(ATTRIBUTE_TARGETSPEED, Double.toString(targetSpeed));
+		attr.put(ATTRIBUTE_TARGET_SPEED, Double.toString(targetSpeed));
 		return attr;
 	}
 }

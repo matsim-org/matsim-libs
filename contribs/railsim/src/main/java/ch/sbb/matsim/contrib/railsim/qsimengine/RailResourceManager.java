@@ -29,7 +29,6 @@ public final class RailResourceManager {
 	 */
 	private final Map<Id<Link>, RailLink> links;
 
-
 	private final Map<Id<RailResource>, RailResource> resources;
 
 	@Inject
@@ -44,7 +43,7 @@ public final class RailResourceManager {
 		this.eventsManager = eventsManager;
 		this.links = new IdMap<>(Link.class, network.getLinks().size());
 
-		Set<String> modes = config.getRailNetworkModes();
+		Set<String> modes = config.getNetworkModes();
 		for (Map.Entry<Id<Link>, ? extends Link> e : network.getLinks().entrySet()) {
 			if (e.getValue().getAllowedModes().stream().anyMatch(modes::contains))
 				this.links.put(e.getKey(), new RailLink(e.getValue()));

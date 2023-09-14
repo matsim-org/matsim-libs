@@ -30,6 +30,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
 
+/**
+ * Controler to write {@link ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent} csv files.
+ */
 public final class RailsimTrainStateControlerListener implements IterationEndsListener, IterationStartsListener {
 
 	private TrainStateAnalysis analysis;

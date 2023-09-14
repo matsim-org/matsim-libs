@@ -25,7 +25,10 @@ import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrainStateAnalysis implements RailsimTrainStateEventHandler {
+/**
+ * Handler collecting all {@link RailsimTrainStateEvent}s.
+ */
+public final class TrainStateAnalysis implements RailsimTrainStateEventHandler {
 
 	final List<RailsimTrainStateEvent> events = new ArrayList<>(1000);
 

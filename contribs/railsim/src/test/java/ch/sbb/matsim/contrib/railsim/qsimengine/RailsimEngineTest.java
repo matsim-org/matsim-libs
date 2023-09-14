@@ -27,13 +27,12 @@ public class RailsimEngineTest {
 	private RailsimTestUtils.EventCollector collector;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		eventsManager = EventsUtils.createEventsManager();
 		collector = new RailsimTestUtils.EventCollector();
 
 		eventsManager.addHandler(collector);
 		eventsManager.initProcessing();
-
 	}
 
 	private RailsimTestUtils.Holder getTestEngine(String network, @Nullable Consumer<Link> f) {
@@ -58,9 +57,9 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void simple() {
+	public void testSimple() {
 
-		RailsimTestUtils.Holder test = getTestEngine("network0.xml");
+		RailsimTestUtils.Holder test = getTestEngine("networkMicroBi.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l5-6");
 
 		test.doSimStepUntil(400);
@@ -70,7 +69,7 @@ public class RailsimEngineTest {
 			.hasTrainState("train", 144, 0, 44)
 			.hasTrainState("train", 234, 2000, 0);
 
-		test = getTestEngine("network0.xml");
+		test = getTestEngine("networkMicroBi.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l5-6");
 
 		test.doStateUpdatesUntil(400, 1);
@@ -83,9 +82,9 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void congested() {
+	public void testCongested() {
 
-		RailsimTestUtils.Holder test = getTestEngine("network0.xml");
+		RailsimTestUtils.Holder test = getTestEngine("networkMicroBi.xml");
 
 		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 0, "l1-2", "l5-6");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 60, "l1-2", "l5-6");
@@ -99,9 +98,9 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void congested_with_headway() {
+	public void testCongestedWithHeadway() {
 
-		RailsimTestUtils.Holder test = getTestEngine("network0.xml", l -> RailsimUtils.setMinimumTrainHeadwayTime(l, 60));
+		RailsimTestUtils.Holder test = getTestEngine("networkMicroBi.xml", l -> RailsimUtils.setMinimumHeadwayTime(l, 60));
 
 		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 0, "l1-2", "l5-6");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 60, "l1-2", "l5-6");
@@ -116,30 +115,26 @@ public class RailsimEngineTest {
 
 
 	@Test
-	public void opposite() {
+	public void testOpposite() {
 
-		RailsimTestUtils.Holder test = getTestEngine("network0.xml");
+		RailsimTestUtils.Holder test = getTestEngine("networkMicroBi.xml");
 
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "l1-2", "l7-8");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l8-7", "l2-1");
 
 		test.doSimStepUntil(600);
 
-//		test.debug(collector, "opposite");
-
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 293, 600, 0)
 			.hasTrainState("regio2", 358, 1000, 0);
 
 
-		test = getTestEngine("network0.xml");
+		test = getTestEngine("networkMicroBi.xml");
 
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "l1-2", "l7-8");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "l8-7", "l2-1");
 
 		test.doStateUpdatesUntil(600, 1);
-
-//		test.debug(collector, "opposite_detailed");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 293, 600, 0)
@@ -148,21 +143,19 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void varyingSpeed_one() {
+	public void testVaryingSpeedOne() {
 
-		RailsimTestUtils.Holder test = getTestEngine("network1.xml");
+		RailsimTestUtils.Holder test = getTestEngine("networkMesoUni.xml");
 
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "t1_IN-t1_OUT", "t3_IN-t3_OUT");
 
 		test.doSimStepUntil(10000);
 
-//		test.debug(collector, "varyingSpeed");
-
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio", 7599, 0, 2.7777777)
 			.hasTrainState("regio", 7674, 200, 0);
 
-		test = getTestEngine("network1.xml");
+		test = getTestEngine("networkMesoUni.xml");
 
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "t1_IN-t1_OUT", "t3_IN-t3_OUT");
 
@@ -172,14 +165,12 @@ public class RailsimEngineTest {
 			.hasTrainState("regio", 7599, 0, 2.7777777)
 			.hasTrainState("regio", 7674, 200, 0);
 
-//		test.debug(collector, "varyingSpeed_detailed");
-
 	}
 
 	@Test
-	public void varyingSpeed_many() {
+	public void testVaryingSpeedMany() {
 
-		RailsimTestUtils.Holder test = getTestEngine("network1.xml");
+		RailsimTestUtils.Holder test = getTestEngine("networkMesoUni.xml");
 
 		for (int i = 0; i < 10; i++) {
 			RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio" + i, 60 * i, "t1_IN-t1_OUT", "t3_IN-t3_OUT");
@@ -193,9 +184,7 @@ public class RailsimEngineTest {
 			.hasTrainState("regio1", 7734, 200, 0)
 			.hasTrainState("regio9", 23107, 200, 0);
 
-//		test.debug(collector, "varyingSpeed_many");
-
-		test = getTestEngine("network1.xml");
+		test = getTestEngine("networkMesoUni.xml");
 
 		for (int i = 0; i < 10; i++) {
 			RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio" + i, 60 * i, "t1_IN-t1_OUT", "t3_IN-t3_OUT");
@@ -212,33 +201,55 @@ public class RailsimEngineTest {
 	}
 
 	@Test
-	public void trainFollowing() {
+	public void testTrainFollowing() {
 
-		RailsimTestUtils.Holder test = getTestEngine("../integration/7_trainFollowing/trainNetwork.xml");
+		RailsimTestUtils.Holder test = getTestEngine("networkMicroUni.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "1-2", "20-21");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "1-2", "20-21");
 
 		test.doSimStepUntil(5000);
 
-//		test.debugFiles(collector, "trainFollowing");
-
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 1138, 1000, 0)
 			.hasTrainState("regio2", 1517, 1000, 0);
 
-		test = getTestEngine("../integration/7_trainFollowing/trainNetwork.xml");
+		test = getTestEngine("networkMicroUni.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1", 0, "1-2", "20-21");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "1-2", "20-21");
 
 		test.doStateUpdatesUntil(5000, 1);
 
-//		test.debugFiles(collector, "trainFollowing_detailed");
-
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1", 1138, 1000, 0)
 			.hasTrainState("regio2", 1517, 1000, 0);
+	}
+
+	@Test
+	public void testMicroTrainFollowingVaryingSpeed() {
+
+		RailsimTestUtils.Holder test = getTestEngine("networkMicroVaryingSpeed.xml");
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo1", 0, "1-2", "20-21");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo2", 15, "1-2", "20-21");
+
+		test.doSimStepUntil(3000);
+//		test.debugFiles(collector, "microVarying");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("cargo1", 1278, 1000, 0)
+			.hasTrainState("cargo2", 2033, 1000, 0);
+
+		// Same test with state updates
+		test = getTestEngine("networkMicroVaryingSpeed.xml");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo1", 0, "1-2", "20-21");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo2", 15, "1-2", "20-21");
+		test.doStateUpdatesUntil(3000, 1);
+//		test.debugFiles(collector, "microVarying_detailed");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("cargo1", 1278, 1000, 0)
+			.hasTrainState("cargo2", 2033, 1000, 0);
 
 
 	}
-
 }

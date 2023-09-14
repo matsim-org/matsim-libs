@@ -58,13 +58,12 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private RailsimEngine engine;
 
 	@Inject
-	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition,
-							 TransitStopAgentTracker agentTracker) {
+	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker) {
 		this.qsim = qsim;
 		this.config = ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
 		this.res = res;
 		this.disposition = disposition;
-		this.modes = config.getRailNetworkModes();
+		this.modes = config.getNetworkModes();
 		this.agentTracker = agentTracker;
 	}
 
@@ -91,8 +90,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 
-		if (!modes.contains(agent.getMode()))
-			return false;
+		if (!modes.contains(agent.getMode())) return false;
 
 		NetsimLink link = qsim.getNetsimNetwork().getNetsimLink(linkId);
 
@@ -122,27 +120,4 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 		return engine.handleDeparture(now, driver, linkId, networkRoute);
 	}
 
-
-	/*
-	   For visualization purposes, the following output should be produced:
-	   - CSV containing time-dependent link-attributes depicting the track-state (needs discussion what we output when a link contains multiple tracks)
-	     - optionally include information which trains (vehicleId) blocked or reserved a track?
-	   - CSV containing time-dependent vehicle-attributes: e.g. current acceleration
-	   - CSV containing XYT data to show head and tail of train, maybe even multiple points (e.g. every 25m) to show length of train?
-	     - how often? every 1min, every 5min? --> config?
-	     - additional attributes? e.g. current speed and acceleration?
-	   - linkEnter/linkLeave-Events for the front of the train
-	     instead of XYT (see above), we could think about if we could create linkEnter/linkLeave-Events for each wagon (estimated every 25m of the train),
-	     but this might not look good as Via still interpolates the position independently.
-
-	   We will have to think about deadlock prevention at some stage.
-	   Maybe design some test networks for that, e.g. a single track with a loop on one end; if too many trains try to get into the loop, they can't get out.
-	   This is where the `reserved` track-state might come into play.
-
-
-	  TODO:
-	  	9. Re routing
-	   10. Deadlock Prevention
-
-	 */
 }

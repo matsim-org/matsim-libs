@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Utility class holding static calculation methods related to state (updates).
  */
-public class RailsimCalc {
+final class RailsimCalc {
 
 	private RailsimCalc() {
 	}
@@ -150,7 +150,7 @@ public class RailsimCalc {
 	 * @param currentLink the link where the train head is on
 	 * @return travel distance after which reservations should be updated.
 	 */
-	public static double nextLinkReservation(TrainState state, RailLink currentLink) {
+	 static double nextLinkReservation(TrainState state, RailLink currentLink) {
 
 		// on way to pt stop, no need to reserve anymore
 		if (state.isStop(currentLink.getLinkId()) && FuzzyUtils.lessThan(state.headPosition, currentLink.length))
@@ -194,7 +194,7 @@ public class RailsimCalc {
 	/**
 	 * Links that need to be blocked or otherwise stop needs to be initiated.
 	 */
-	public static List<RailLink> calcLinksToBlock(TrainState state, RailLink currentLink) {
+	static List<RailLink> calcLinksToBlock(TrainState state, RailLink currentLink) {
 
 		List<RailLink> result = new ArrayList<>();
 
@@ -231,7 +231,7 @@ public class RailsimCalc {
 	 *
 	 * @param upcoming the upcoming links the train tried to block.
 	 */
-	public static boolean considerReRouting(List<RailLink> upcoming, RailLink currentLink) {
+	static boolean considerReRouting(List<RailLink> upcoming, RailLink currentLink) {
 		return currentLink.isEntryLink() || upcoming.stream().anyMatch(RailLink::isEntryLink);
 	}
 

@@ -18,21 +18,19 @@ public class RailResource {
 	final List<RailLink> links;
 
 	/**
+	 * Agents holding this resource exclusively.
+	 */
+	final Set<MobsimDriverAgent> reservations;
+
+	/**
 	 * Maximum number of reservations.
 	 */
 	int capacity;
 
-	/**
-	 * Agents holding this resource exclusively.
-	 */
-	Set<MobsimDriverAgent> reservations;
-
 	public RailResource(List<RailLink> links) {
-		capacity = links.stream().mapToInt(RailLink::getNumberOfTracks).min().orElseThrow();
 		this.links = links;
-
-		// TODO: this is not necessarily needed and can be computed implicitly
-		reservations = new HashSet<>();
+		this.reservations = new HashSet<>();
+		this.capacity = links.stream().mapToInt(RailLink::getNumberOfTracks).min().orElseThrow();
 	}
 
 	/**

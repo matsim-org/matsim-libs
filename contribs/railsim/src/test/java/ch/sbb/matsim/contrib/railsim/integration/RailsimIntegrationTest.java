@@ -9,8 +9,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.vsp.scenario.SnzActivities;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -42,130 +43,13 @@ public class RailsimIntegrationTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void scenario_kelheim() {
-
-		URL base = ExamplesUtils.getTestScenarioURL("kelheim");
-
-		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(base, "config.xml"));
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		// Convert all pt to rail
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			if (link.getAllowedModes().contains(TransportMode.car))
-				link.setAllowedModes(Set.of(TransportMode.car, "ride", "freight"));
-
-			if (link.getAllowedModes().contains(TransportMode.pt)) {
-				link.setFreespeed(50);
-				link.setAllowedModes(Set.of("rail"));
-			}
-		}
-
-		// Maximum velocity must be configured
-		for (VehicleType type : scenario.getTransitVehicles().getVehicleTypes().values()) {
-			type.setMaximumVelocity(30);
-			type.setLength(100);
-		}
-
-		SnzActivities.addScoringParams(config);
-
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new RailsimModule());
-		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
-
-		controler.run();
+	public void testMicroSimpleBiDirectionalTrack() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack"));
 	}
 
 	@Test
-	public void test0_simple() {
-
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "0_simple"));
-
-	}
-
-	private EventsCollector runSimulation(File scenarioDir) {
-		return runSimulation(scenarioDir, null);
-	}
-
-	private EventsCollector runSimulation(File scenarioDir, Consumer<Scenario> f) {
-		Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
-
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setDumpDataAtEnd(false);
-		config.controler().setCreateGraphs(false);
-		config.controler().setLastIteration(0);
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		if (f != null)
-			f.accept(scenario);
-
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new RailsimModule());
-		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
-
-		EventsCollector collector = new EventsCollector();
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.addEventHandlerBinding().toInstance(collector);
-			}
-		});
-
-		controler.run();
-
-		return collector;
-	}
-
-	private double timeToAccelerate(double v0, double v, double a) {
-		return (v - v0) / a;
-	}
-
-	private double distanceTravelled(double v0, double a, double t) {
-		return 0.5 * a * t * t + v0 * t;
-	}
-
-	private double timeForDistance(double d, double v) {
-		return d / v;
-	}
-
-	private void assertTrainState(double time, double speed, double targetSpeed, double acceleration, double headPosition,
-								  List<RailsimTrainStateEvent> events) {
-
-		RailsimTrainStateEvent prev = null;
-		for (RailsimTrainStateEvent event : events) {
-
-			if (event.getTime() > Math.ceil(time)) {
-				Assert.fail(String.format("No matching event found for time %f, speed %f pos %f, Closest event is%s", time, speed, headPosition, prev));
-			}
-
-			// If all assertions are true, returns successfully
-			try {
-				Assert.assertEquals(Math.ceil(time), event.getTime(), 1e-7);
-				Assert.assertEquals(speed, event.getSpeed(), 1e-5);
-				Assert.assertEquals(targetSpeed, event.getTargetSpeed(), 1e-7);
-				Assert.assertEquals(acceleration, event.getAcceleration(), 1e-5);
-				Assert.assertEquals(headPosition, event.getHeadPosition(), 1e-5);
-				return;
-			} catch (AssertionError e) {
-				// Check further events in loop
-			}
-
-			prev = event;
-		}
-	}
-
-	private List<RailsimTrainStateEvent> filterTrainEvents(EventsCollector collector, String train) {
-		return collector.getEvents().stream().filter(event -> event instanceof RailsimTrainStateEvent).map(event -> (RailsimTrainStateEvent) event).filter(event -> event.getVehicleId().toString().equals(train)).toList();
-	}
-
-	@Test
-	public void test0_varyingCapacities() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "0_varyingCapacities"));
+	public void testMesoUniDirectionalVaryingCapacities() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoUniDirectionalVaryingCapacities"));
 
 		// print events of train1 for debugging
 		List<RailsimTrainStateEvent> train1events = filterTrainEvents(collector, "train1");
@@ -209,7 +93,6 @@ public class RailsimIntegrationTest {
 		assertTrainState(currentTime, linkSpeed, linkSpeed, 0, accDistance1 + cruiseDistance2 + accDistance3, train1events);
 
 		// train can cruise with link speed until it needs to decelerate for next station
-
 		double decTime5 = timeToAccelerate(linkSpeed, stationSpeed, -acceleration);
 		double decDistance5 = distanceTravelled(linkSpeed, -acceleration, decTime5);
 
@@ -272,34 +155,39 @@ public class RailsimIntegrationTest {
 	}
 
 	@Test
-	public void test1_oppositeTraffic() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "1_oppositeTraffic"));
+	public void testMicroTrackOppositeTraffic() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic"));
 	}
 
 	@Test
-	public void test2_oppositeTraffic_multipleTrains_oneSlowTrain() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "2_multipleOppositeTraffic"));
+	public void testMicroTrackOppositeTrafficMany() {
+		// multiple trains, one slow train
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTrafficMany"));
 	}
 
 	@Test
-	public void test3_twoSources() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "3_twoSources"));
+	public void testMesoTwoSources() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSources"));
 	}
 
 	@Test
-	public void test4_genf_bern() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "4_genf_bern"));
+	public void testMesoTwoSourcesComplex() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSourcesComplex"));
 	}
 
 	@Test
-	public void test4_1_genf_bern() {
+	public void testScenarioMesoGenfBernAllTrains() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"));
+	}
+
+	@Test
+	public void testScenarioMesoGenfBernOneTrain() {
 
 		// Remove vehicles except the first one
 		Consumer<Scenario> filter = scenario -> {
 
-			Set<Id<Vehicle>> remove = scenario.getTransitVehicles().getVehicles().values().stream().filter(
-				v -> !v.getId().toString().equals("Bummelzug_GE_BE_train_0")
-			).map(Vehicle::getId).collect(Collectors.toSet());
+			Set<Id<Vehicle>> remove = scenario.getTransitVehicles().getVehicles().values().stream()
+				.filter(v -> !v.getId().toString().equals("Bummelzug_GE_BE_train_0")).map(Vehicle::getId).collect(Collectors.toSet());
 
 			for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
 
@@ -308,8 +196,7 @@ public class RailsimIntegrationTest {
 					Collection<Departure> values = new ArrayList<>(route.getDepartures().values());
 					for (Departure departure : values) {
 
-						if (remove.contains(departure.getVehicleId()))
-							route.removeDeparture(departure);
+						if (remove.contains(departure.getVehicleId())) route.removeDeparture(departure);
 					}
 				}
 			}
@@ -317,79 +204,95 @@ public class RailsimIntegrationTest {
 			remove.forEach(v -> scenario.getTransitVehicles().removeVehicle(v));
 		};
 
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "4_genf_bern"), filter);
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"), filter);
 
 	}
 
 	@Test
-	public void test5_complexTwoSources() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "5_complexTwoSources"));
+	public void testMicroThreeUniDirectionalTracks() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microThreeUniDirectionalTracks"));
 	}
 
 	@Test
-	public void test6_threeTracksMicroscopic() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "6_threeTracksMicroscopic"));
+	public void testMicroTrainFollowingConstantSpeed() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingConstantSpeed"));
+	}
+
+	// This test is similar to testMicroTrainFollowingConstantSpeed but with varying speed levels along the corridor.
+	// TODO: Right now, there are some runtime exceptions which I don't understand.
+	@Test
+	public void testMicroTrainFollowingVaryingSpeed() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
 	}
 
 	@Test
-	public void test7_trainFollowing() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "7_trainFollowing"));
+	public void testMicroStationSameLink() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationSameLink"));
 	}
 
 	@Test
-	public void test8_microStation() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "8_microStation"));
+	public void testMicroStationDifferentLink() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationDifferentLink"));
 	}
 
 	@Test
-	public void test9_microStation2() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "9_microStation2"));
+	public void testMicroJunctionCross() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCross"));
 	}
 
 	@Test
-	public void test10_cross() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "10_cross"));
+	public void testMicroJunctionY() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionY"));
 	}
 
 	@Test
-	public void test11_mesoStation() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "11_mesoStation"));
+	public void testMesoStationCapacityOne() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityOne"));
 	}
 
 	@Test
-	public void test12_mesoStation2() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "12_mesoStation2"));
+	public void testMesoStationCapacityTwo() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityTwo"));
 	}
 
 	@Test
-	public void test13_Y() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "13_Y"));
+	public void testMesoStations() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStations"));
 	}
 
 	@Test
-	public void test14_mesoStations() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "14_mesoStations"));
+	public void testMicroSimpleUniDirectionalTrack() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleUniDirectionalTrack"));
+
+		for (Event event : collector.getEvents()) {
+			if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
+
+				VehicleArrivesAtFacilityEvent vehicleArrivesEvent = (VehicleArrivesAtFacilityEvent) event;
+				if (vehicleArrivesEvent.getVehicleId().toString().equals("train1") && vehicleArrivesEvent.getFacilityId().toString()
+					.equals("stop_3-4")) {
+
+					Assert.assertEquals("The arrival time of train1 at stop_3-4 has changed.", 29594., event.getTime(), MatsimTestUtils.EPSILON);
+				}
+			}
+		}
 	}
 
 	@Test
-	public void test_station_rerouting() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "station_rerouting"));
-
+	public void testMicroStationRerouting() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"));
 		collector.getEvents().forEach(System.out::println);
-
 		// Checks end times
 		assertTrainState(30854, 0, 0, 0, 400, filterTrainEvents(collector, "train1"));
 		// 1min later
 		assertTrainState(30914, 0, 0, 0, 400, filterTrainEvents(collector, "train2"));
-
 		// These arrive closer together, because both waited
 		assertTrainState(30974, 0, 0, 0, 400, filterTrainEvents(collector, "train3"));
 		assertTrainState(30982, 0, 0, 0, 400, filterTrainEvents(collector, "train4"));
 	}
 
 	@Test
-	public void test_station_rerouting_concurrent() {
-		Consumer<Scenario> filter = scenario ->  {
+	public void testMicroStationReroutingConcurrent() {
+		Consumer<Scenario> filter = scenario -> {
 
 			TransitScheduleFactory f = scenario.getTransitSchedule().getFactory();
 
@@ -410,6 +313,125 @@ public class RailsimIntegrationTest {
 			}
 		};
 
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "station_rerouting"), filter);
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"), filter);
+	}
+
+	@Test
+	public void testScenarioKelheim() {
+
+		URL base = ExamplesUtils.getTestScenarioURL("kelheim");
+
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(base, "config.xml"));
+		config.controler().setLastIteration(0);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setCreateGraphs(false);
+		config.controler().setDumpDataAtEnd(false);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// Convert all pt to rail
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			if (link.getAllowedModes().contains(TransportMode.car)) link.setAllowedModes(Set.of(TransportMode.car, "ride", "freight"));
+
+			if (link.getAllowedModes().contains(TransportMode.pt)) {
+				link.setFreespeed(50);
+				link.setAllowedModes(Set.of("rail"));
+			}
+		}
+
+		// Maximum velocity must be configured
+		for (VehicleType type : scenario.getTransitVehicles().getVehicleTypes().values()) {
+			type.setMaximumVelocity(30);
+			type.setLength(100);
+		}
+
+		SnzActivities.addScoringParams(config);
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new RailsimModule());
+		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
+
+		controler.run();
+	}
+
+	@Test
+	public void testScenarioMicroMesoCombination() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoCombination"));
+	}
+
+	private EventsCollector runSimulation(File scenarioDir) {
+		return runSimulation(scenarioDir, null);
+	}
+
+	private EventsCollector runSimulation(File scenarioDir, Consumer<Scenario> f) {
+		Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
+
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setDumpDataAtEnd(true);
+		config.controler().setCreateGraphs(false);
+		config.controler().setLastIteration(0);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		if (f != null) f.accept(scenario);
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new RailsimModule());
+		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
+
+		EventsCollector collector = new EventsCollector();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(collector);
+			}
+		});
+
+		controler.run();
+
+		return collector;
+	}
+
+	private double timeToAccelerate(double v0, double v, double a) {
+		return (v - v0) / a;
+	}
+
+	private double distanceTravelled(double v0, double a, double t) {
+		return 0.5 * a * t * t + v0 * t;
+	}
+
+	private double timeForDistance(double d, double v) {
+		return d / v;
+	}
+
+	private void assertTrainState(double time, double speed, double targetSpeed, double acceleration, double headPosition, List<RailsimTrainStateEvent> events) {
+
+		RailsimTrainStateEvent prev = null;
+		for (RailsimTrainStateEvent event : events) {
+
+			if (event.getTime() > Math.ceil(time)) {
+				Assert.fail(
+					String.format("No matching event found for time %f, speed %f pos %f, Closest event is%s", time, speed, headPosition, prev));
+			}
+
+			// If all assertions are true, returns successfully
+			try {
+				Assert.assertEquals(Math.ceil(time), event.getTime(), 1e-7);
+				Assert.assertEquals(speed, event.getSpeed(), 1e-5);
+				Assert.assertEquals(targetSpeed, event.getTargetSpeed(), 1e-7);
+				Assert.assertEquals(acceleration, event.getAcceleration(), 1e-5);
+				Assert.assertEquals(headPosition, event.getHeadPosition(), 1e-5);
+				return;
+			} catch (AssertionError e) {
+				// Check further events in loop
+			}
+
+			prev = event;
+		}
+	}
+
+	private List<RailsimTrainStateEvent> filterTrainEvents(EventsCollector collector, String train) {
+		return collector.getEvents().stream().filter(event -> event instanceof RailsimTrainStateEvent).map(event -> (RailsimTrainStateEvent) event)
+			.filter(event -> event.getVehicleId().toString().equals(train)).toList();
 	}
 }

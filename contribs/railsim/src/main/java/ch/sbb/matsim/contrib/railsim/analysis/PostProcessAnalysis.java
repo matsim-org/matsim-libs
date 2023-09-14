@@ -33,7 +33,13 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class PostProcessAnalysis {
+/**
+ * Class to generate rail sim csv files from event file.
+ */
+public final class PostProcessAnalysis {
+
+	private PostProcessAnalysis() {
+	}
 
 	public static void main(String[] args) {
 		String eventsFilename;

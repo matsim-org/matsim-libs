@@ -20,7 +20,6 @@
 package ch.sbb.matsim.contrib.railsim;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -31,7 +30,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * Example script that shows how to use railsim included in this contrib.
  */
-public class RunRailsimExample {
+public final class RunRailsimExample {
+
+	private RunRailsimExample() {
+	}
 
 	public static void main(String[] args) {
 

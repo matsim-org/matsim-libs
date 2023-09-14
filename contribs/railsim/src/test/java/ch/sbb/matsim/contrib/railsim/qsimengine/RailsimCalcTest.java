@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RailsimCalcTest {
 
 	@Test
-	public void calc() {
+	public void testCalcAndSolveTraveledDist() {
 
 		assertThat(RailsimCalc.calcTraveledDist(5, 2, 0))
 			.isEqualTo(10);
@@ -28,7 +28,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void negative() {
+	public void testCalcAndSolveTraveledDistNegative() {
 
 		double d = RailsimCalc.calcTraveledDist(5, 5, -1);
 
@@ -45,7 +45,7 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void maxSpeed() {
+	public void testMaxSpeed() {
 
 		double dist = 1000;
 
@@ -54,8 +54,6 @@ public class RailsimCalcTest {
 
 		RailsimCalc.SpeedTarget res = RailsimCalc.calcTargetSpeed(dist, 0.5, 0.5,
 			5, 30, 0);
-
-		System.out.println(res);
 
 		double timeDecel = (res.targetSpeed() - f) / 0.5;
 		double distDecel = RailsimCalc.calcTraveledDist(res.targetSpeed(), timeDecel, -0.5);
@@ -69,14 +67,14 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void decel() {
+	public void testCalcTargetDecel() {
 
-		double d = RailsimCalc.calcTargetDecel(1000,  0,10);
+		double d = RailsimCalc.calcTargetDecel(1000, 0, 10);
 
 		assertThat(RailsimCalc.calcTraveledDist(10, -10 / d, d))
 			.isCloseTo(1000, Offset.offset(0.001));
 
-		d = RailsimCalc.calcTargetDecel(1000,  5,10);
+		d = RailsimCalc.calcTargetDecel(1000, 5, 10);
 
 		assertThat(RailsimCalc.calcTraveledDist(10, -5 / d, d))
 			.isCloseTo(1000, Offset.offset(0.001));
@@ -84,23 +82,40 @@ public class RailsimCalcTest {
 	}
 
 	@Test
-	public void targetSpeed() {
+	public void testCalcTargetSpeed() {
 
 		RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(100, 0.5, 0.5, 0, 23, 0);
 
+
+		double t = RailsimCalc.solveTraveledDist(0, 50, 0.5);
+
+		// Train can not reach target speed and accelerates until 50m
 		assertThat(target.decelDist())
+			.isCloseTo(50, Offset.offset(0.0001));
+
+		assertThat(RailsimCalc.calcTraveledDist(target.targetSpeed(), t, -0.5))
 			.isCloseTo(50, Offset.offset(0.0001));
 
 
 		target = RailsimCalc.calcTargetSpeed(200, 0.5, 0.5, 13, 13, 0);
 
+		assertThat(target.targetSpeed())
+			.isCloseTo(13, Offset.offset(0.0001));
+
+		// assume travelling at max speed for 31m
 		assertThat(target.decelDist())
-			.isCloseTo(169, Offset.offset(0.0001));
+			.isCloseTo(31, Offset.offset(0.0001));
+
+		t = RailsimCalc.solveTraveledDist(13, 200 - 31, -0.5);
+
+		// speed is 0 after decelerating rest of the distance
+		assertThat(13 + t * -0.5)
+			.isCloseTo(0, Offset.offset(0.001));
 
 	}
 
 	@Test
-	public void speedForStop() {
+	public void testCalcTargetSpeedForStop() {
 
 		double v = RailsimCalc.calcTargetSpeedForStop(1000, 0.5, 0.5, 0);
 

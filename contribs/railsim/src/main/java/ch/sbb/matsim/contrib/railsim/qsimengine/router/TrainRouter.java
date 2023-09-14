@@ -34,8 +34,7 @@ public final class TrainRouter {
 		this.network = network;
 		this.resources = resources;
 
-		// TODO: filter rail network
-
+		// uses the full network, which should not be slower than filtered network as long as dijkstra is used
 		this.lpc = new FastDijkstraFactory(false).createPathCalculator(network, new DisUtility(), new FreeSpeedTravelTime());
 	}
 

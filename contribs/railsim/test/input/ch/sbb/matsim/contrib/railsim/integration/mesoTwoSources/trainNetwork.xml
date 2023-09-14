@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+	<!--
+
+	t1_A  <===> t1a_B  <================>
+										t2_A <===> t2_B <====================> t3_A <===> t3_B
+	t1a_A <===> t1_B <================>
+
+	 -->
+
+
+	<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="t1_A" x="-1000.0" y="0">
+		</node>
+		<node id="t1_B" x="0.0" y="0">
+		</node>
+		<node id="t1a_A" x="-1000.0" y="8000.0">
+		</node>
+		<node id="t1a_B" x="0.0" y="8000.0">
+		</node>
+		<node id="t2_A" x="49500.0" y="0">
+		</node>
+		<node id="t2_B" x="50500.0" y="0">
+		</node>
+		<node id="t3_A" x="100000" y="0">
+		</node>
+		<node id="t3_B" x="101000.0" y="0">
+		</node>
+	</nodes>
+
+	<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="t1_B-t2_A" from="t1_B" to="t2_A" length="5000" freespeed="13.8889" capacity="3600" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="t2_A-t1_B" from="t2_A" to="t1_B" length="5000" freespeed="13.8889" capacity="3600" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+
+		<link id="t1a_B-t2_A" from="t1a_B" to="t2_A" length="5000" freespeed="13.8889" capacity="3600" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="t2_A-t1a_B" from="t2_A" to="t1a_B" length="5000" freespeed="13.8889" capacity="3600" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+
+		<link id="t2_B-t3_A" from="t2_B" to="t3_A" length="5000" freespeed="13.8889" capacity="3600" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="t3_A-t2_B" from="t3_A" to="t2_B" length="5000" freespeed="13.8889" capacity="3600" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+
+		<link id="t1_A-t1_B" from="t1_A" to="t1_B" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="t1_B-t1_A" from="t1_B" to="t1_A" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+
+		<link id="t1a_A-t1a_B" from="t1a_A" to="t1a_B" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="t1a_B-t1a_A" from="t1a_B" to="t1a_A" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+
+		<link id="t2_A-t2_B" from="t2_A" to="t2_B" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">bottleneck</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="t2_B-t2_A" from="t2_B" to="t2_A" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">bottleneck</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+
+		<link id="t3_A-t3_B" from="t3_A" to="t3_B" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="t3_B-t3_A" from="t3_B" to="t3_A" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+	</links>
+
+	<!-- ====================================================================== -->
+
+</network>

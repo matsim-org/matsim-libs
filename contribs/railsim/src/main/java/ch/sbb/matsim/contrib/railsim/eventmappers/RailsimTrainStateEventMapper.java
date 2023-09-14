@@ -26,6 +26,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * Convert for {@link RailsimTrainStateEvent}.
+ */
 public class RailsimTrainStateEventMapper implements MatsimEventsReader.CustomEventMapper {
 	@Override
 	public RailsimTrainStateEvent apply(GenericEvent event) {
@@ -34,13 +37,13 @@ public class RailsimTrainStateEventMapper implements MatsimEventsReader.CustomEv
 			event.getTime(),
 			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_EXACT_TIME)),
 			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
-			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEADLINK), Link.class),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEADPOSITION)),
-			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TAILLINK), Link.class),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TAILPOSITION)),
+			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEAD_LINK), Link.class),
+			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEAD_POSITION)),
+			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TAIL_LINK), Link.class),
+			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TAIL_POSITION)),
 			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_SPEED)),
 			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_ACCELERATION)),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TARGETSPEED))
+			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TARGET_SPEED))
 		);
 	}
 

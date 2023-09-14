@@ -12,7 +12,6 @@ import java.util.List;
  */
 public interface TrainDisposition {
 
-
 	/**
 	 * Method invoked when a train is departing.
 	 */
@@ -42,6 +41,5 @@ public interface TrainDisposition {
 	 * This needs to be called after track states have been updated already.
 	 */
 	void unblockRailLink(double time, MobsimDriverAgent driver, RailLink link);
-
 
 }

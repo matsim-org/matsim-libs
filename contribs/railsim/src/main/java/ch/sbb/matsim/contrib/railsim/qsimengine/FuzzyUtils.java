@@ -10,14 +10,12 @@ final class FuzzyUtils {
 	private FuzzyUtils() {
 	}
 
-
 	/**
 	 * Returns true if two doubles are approximately equal.
 	 */
 	public static boolean equals(double a, double b) {
 		return a == b || Math.abs(a - b) < EPSILON;
 	}
-
 
 	/**
 	 * Returns true if the first double is approximately greater than the second.
@@ -32,7 +30,6 @@ final class FuzzyUtils {
 	public static boolean greaterThan(double a, double b) {
 		return a - b > EPSILON;
 	}
-
 
 	/**
 	 * Returns true if the first double is approximately less than the second.
