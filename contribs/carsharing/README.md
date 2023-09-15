@@ -1,5 +1,5 @@
 
-### Main features of the contrib
+### IntersectionTest features of the contrib
 
 Allows to simulate carsharing modes: station based (one-way, round-trip) and freefloating.  
 
@@ -24,7 +24,7 @@ The main features of the current state are:
 
 
 ### Usage
-Main method of the `RunCarsharing` class takes only the config file as an input in order to run the carsharing module.
+IntersectionTest method of the `RunCarsharing` class takes only the config file as an input in order to run the carsharing module.
 
 
 ### Models
@@ -39,7 +39,7 @@ In `CarsharingUtils` class in the runExample package one can see an example of d
 ### Output
 Output files are located in each iteration folder and contain all the necessary information about all the carsharing rentals during the iteration.
 
-## Main reference
+## IntersectionTest reference
 
 The main research reference for the station based carsharing services:
 > Balac, M., F. Ciari, and K. W. Axhausen (2015) Carsharing demand estimation: Zurich, Switzerland, area case study. Transportation Research Record, 2536, 10-18.

@@ -4,7 +4,7 @@ The Discrete Mode Choice extension defines two model types: trip-based and tour-
 
 ```xml
 <module name="DiscreteModeChoice">
-	<!-- Main model type: Trip, Tour -->
+	<!-- IntersectionTest model type: Trip, Tour -->
 	<param name="modelType" value="Tour" />
 </module>
 ```

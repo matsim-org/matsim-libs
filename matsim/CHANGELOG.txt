@@ -68,7 +68,7 @@ Changes:
 Release Spring 2012 (version 0.4.0)
 -------------------------------------------------------------------------------
 
-Main focus of this release:
+IntersectionTest focus of this release:
 Maintenance Release
 
 
@@ -118,7 +118,7 @@ Changes:
 Release Spring 2011 (version 0.3.0)
 -------------------------------------------------------------------------------
 
-Main focus of this release:
+IntersectionTest focus of this release:
 Speed and memory improvements
 
 Changes:
@@ -172,7 +172,7 @@ looking at old mvi-files.
 Release Fall 2010 (version 0.2.0)
 -------------------------------------------------------------------------------
 
-Main focus of this release:
+IntersectionTest focus of this release:
 Simulation of public transport, Improvements to OTFVis, Code cleanup
 
 
@@ -224,7 +224,7 @@ Bugfixes:
 Release Spring 2010 (version 0.1.0)
 -------------------------------------------------------------------------------
 
-Main focus of this release:
+IntersectionTest focus of this release:
 Code stability and performance improvements, not so much about new features for users.
 
 

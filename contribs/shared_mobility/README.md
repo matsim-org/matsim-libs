@@ -9,9 +9,9 @@ More documentation is underway, on:
 
 For the time being, there are a couple of examples. For instance, `RunCarsharing` sets up a simple (network-based) car-sharing service for standard scenarios such as Sioux Falls. `RunTeleportationBikesharing` is a similar example for a teleportation-based bikesharing service.
 
-Main developers:
+IntersectionTest developers:
 - Milos Balac (ETH Zurich)
 - Sebastian Hörl (IRT SystemX)
 
-Main reference:
+IntersectionTest reference:
 - Balac, M. and S. Hörl (2021) [Simulation of intermodal shared mobility in the San Francisco Bay Area using MATSim](https://www.researchgate.net/publication/355612958_Simulation_of_intermodal_shared_mobility_in_the_San_Francisco_Bay_Area_using_MATSim), paper presented at the 2021 IEEE Intelligent Transportation Systems Conference (ITSC).
