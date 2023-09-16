@@ -1,5 +1,9 @@
 package org.matsim.application.prepare.network.opt;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,9 +16,12 @@ import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.prepare.network.opt.NetworkParamsOpt.Feature;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
+import java.io.BufferedReader;
 import java.util.Map;
+import java.util.Set;
 
 @CommandLine.Command(
 	name = "apply-network-params", description = "Apply network parameters for capacity and speed."
@@ -33,6 +40,9 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(ApplyNetworkParams.class);
 
+	@CommandLine.Parameters(arity = "1..*", description = "Type of parameters to apply. Available: ${COMPLETION-CANDIDATES}")
+	private Set<Parameter> params;
+
 	@CommandLine.Option(names = "--input-params", description = "Path to parameter json")
 	private String inputParams;
 
@@ -43,7 +53,7 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	private double[] speedFactorBounds;
 
 	private NetworkModel model;
-
+	private NetworkParamsOpt.Request paramsOpt;
 
 	private int warn = 0;
 
@@ -74,10 +84,13 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 		model = NetworkParamsOpt.load(modelClazz);
 
 		Network network = input.getNetwork();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+		mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
 
-		// TODO: read parameters, reuse code from free speed optimizer
-		// TODO: might need validation files which are not available -> eval should be separete class
-		// TODO put eval into this class?
+		try (BufferedReader in = IOUtils.getBufferedReader(inputParams)) {
+			paramsOpt = mapper.readValue(in, NetworkParamsOpt.Request.class);
+		}
 
 		Map<Id<Link>, Feature> features = NetworkParamsOpt.readFeatures(input.getPath("features.csv"), network.getLinks().size());
 
@@ -100,39 +113,45 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 
 		String type = NetworkUtils.getHighwayType(link);
 
-		FeatureRegressor capacity = model.capacity(junctionType);
-
-		double perLane = capacity.predict(features);
-
-		double cap = capacityEstimate(features.getDouble("speed"));
-
 		boolean modified = false;
 
-		// Minimum thresholds
-		double threshold = switch (junctionType) {
-			// traffic light can reduce capacity at least to 50% (with equal green split)
-			case "traffic_light" -> 0.4;
-			case "right_before_left" -> 0.6;
-			// Motorways are kept at their max theoretical capacity
-			case "priority" -> type.startsWith("motorway") ? 1 : 0.8;
-			default -> throw new IllegalArgumentException("Unknown type: " + junctionType);
-		};
+		if (params.contains(Parameter.capacity)) {
 
-		if (perLane < cap * threshold) {
-			log.warn("Increasing capacity per lane on {} ({}, {}) from {} to {}", link.getId(), type, junctionType, perLane, cap * threshold);
-			perLane = cap * threshold;
-			modified = true;
+			FeatureRegressor capacity = model.capacity(junctionType);
+
+			double perLane = capacity.predict(features);
+
+			double cap = capacityEstimate(features.getDouble("speed"));
+
+			// Minimum thresholds
+			double threshold = switch (junctionType) {
+				// traffic light can reduce capacity at least to 50% (with equal green split)
+				case "traffic_light" -> 0.4;
+				case "right_before_left" -> 0.6;
+				// Motorways are kept at their max theoretical capacity
+				case "priority" -> type.startsWith("motorway") ? 1 : 0.8;
+				default -> throw new IllegalArgumentException("Unknown type: " + junctionType);
+			};
+
+			if (perLane < cap * threshold) {
+				log.warn("Increasing capacity per lane on {} ({}, {}) from {} to {}", link.getId(), type, junctionType, perLane, cap * threshold);
+				perLane = cap * threshold;
+				modified = true;
+			}
+
+			link.setCapacity(link.getNumberOfLanes() * perLane);
+
 		}
 
-		link.setCapacity(link.getNumberOfLanes() * perLane);
 
-		double speedFactor = 1.0;
+		if (params.contains(Parameter.freespeed)) {
 
-		if (!type.startsWith("motorway")) {
-
+			double speedFactor = 1.0;
 			FeatureRegressor speedModel = model.speedFactor(junctionType);
 
-			speedFactor = speedModel.predict(features);
+			speedFactor =  paramsOpt != null ?
+				speedModel.predict(features, paramsOpt.getParams(junctionType)) :
+				speedModel.predict(features);
 
 			if (speedFactor > speedFactorBounds[1]) {
 				log.warn("Reducing speed factor on {} from {} to {}", link.getId(), speedFactor, speedFactorBounds[1]);
@@ -146,14 +165,12 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 				speedFactor = speedFactorBounds[0];
 				modified = true;
 			}
+
+			link.setFreespeed((double) link.getAttributes().getAttribute("allowed_speed") * speedFactor);
+			link.getAttributes().putAttribute("speed_factor", speedFactor);
 		}
 
 		if (modified)
 			warn++;
-
-		link.setFreespeed((double) link.getAttributes().getAttribute("allowed_speed") * speedFactor);
-		link.getAttributes().putAttribute("speed_factor", speedFactor);
 	}
-
-
 }
