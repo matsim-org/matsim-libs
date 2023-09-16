@@ -26,6 +26,7 @@ import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SingleInsertionDetourPathCalculator;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.zone.skims.AdaptiveTravelTimeMatrix;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
@@ -62,12 +63,12 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 
 	public RepeatedSelectiveInsertionSearch(RepeatedSelectiveInsertionProvider insertionProvider,
 											SingleInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
-											DrtConfigGroup drtCfg, MatsimServices matsimServices, IncrementalStopDurationEstimator incrementalStopDurationEstimator, TravelTimeMatrix travelTimeMatrix, AdaptiveTravelTimeMatrix adaptiveTravelTimeMatrix) {
+											DrtConfigGroup drtCfg, MatsimServices matsimServices, StopTimeCalculator stopTimeCalculator, TravelTimeMatrix travelTimeMatrix, AdaptiveTravelTimeMatrix adaptiveTravelTimeMatrix) {
 		this.insertionSearchParams = (RepeatedSelectiveInsertionSearchParams) drtCfg.getDrtInsertionSearchParams();
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
 		this.insertionCostCalculator = insertionCostCalculator;
-		this.detourTimeCalculator = new InsertionDetourTimeCalculator(incrementalStopDurationEstimator, null);
+		this.detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, null);
 		this.matsimServices = matsimServices;
 		this.mode = drtCfg.getMode();
 		this.travelTimeMatrix = travelTimeMatrix;
