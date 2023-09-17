@@ -1,3 +1,5 @@
+package NetworkCreator;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +26,7 @@ public class MultiSquareCoordinateCalculator extends IntersectionCoordinateCalcu
 				for (int j = 0; j <= slices; j++) {
 					double x = currentXOrigin + (i * increment);
 					double y = j * increment;
-					String nodeId = String.format("%d0%02d%02d",(int)((x / 1000)+1), (int)(x/ increment), (int)(y / increment));
+					String nodeId = String.format("%d0%02d%02d",(int)(x / 1000 +1), (int)(i), (int)(j));
 					nodes.add(String.format("<node id=\"%s\" x=\"%.2f\" y=\"%.2f\" />", nodeId, x, y));
 				}
 			}
@@ -37,7 +39,7 @@ public class MultiSquareCoordinateCalculator extends IntersectionCoordinateCalcu
 	}
 
 	public static void main(String[] args) {
-		List<Integer> slicesList = List.of(3, 4);  // Example list
+		List<Integer> slicesList = List.of(3, 6);  // Example list
 		MultiSquareCoordinateCalculator calculator = new MultiSquareCoordinateCalculator(slicesList);
 		List<String> intersections = calculator.getIntersections();
 		for (String intersection : intersections) {

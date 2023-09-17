@@ -1,7 +1,10 @@
+package NetworkCreator;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class LinksCalculator {
 	private static final Pattern NODE_PATTERN = Pattern.compile("<node id=\"(\\d{2})(\\d{2})(\\d{2})\" x=\"([0-9\\.]+)\" y=\"([0-9\\.]+)\" />");
@@ -31,8 +34,8 @@ class LinksCalculator {
 				}
 			}
 
-			if (closestRight != null) links.add(createLink(fromNode, closestRight));
-			if (closestBelow != null) links.add(createLink(fromNode, closestBelow));
+			if (closestRight != null) links.addAll(createLink(fromNode, closestRight));
+			if (closestBelow != null) links.addAll(createLink(fromNode, closestBelow));
 		}
 
 		return links;
@@ -50,10 +53,16 @@ class LinksCalculator {
 		}
 	}
 
-	private String createLink(Node from, Node to) {
+	private List<String> createLink(Node from, Node to) {
 		double distance = Math.sqrt(Math.pow(from.x - to.x, 2) + Math.pow(from.y - to.y, 2));
-		return String.format("\t<link id=\"%s%s\" from=\"%s\" to=\"%s\" length=\"%.2f\" capacity=\"2000\" freespeed=\"12\" modes=\"car\" permlanes=\"1\" />",
+
+		String forwardLink = String.format("\t<link id=\"%s%s\" from=\"%s\" to=\"%s\" length=\"%.2f\" capacity=\"2000\" freespeed=\"12\" modes=\"car\" permlanes=\"1\" />",
 			from.id, to.id, from.id, to.id, distance);
+
+		String reverseLink = String.format("\t<link id=\"%s%s-r\" from=\"%s\" to=\"%s\" length=\"%.2f\" capacity=\"2000\" freespeed=\"12\" modes=\"car\" permlanes=\"1\" />",
+			to.id, from.id, to.id, from.id, distance);
+
+		return Arrays.asList(forwardLink, reverseLink);
 	}
 
 	static class Node {

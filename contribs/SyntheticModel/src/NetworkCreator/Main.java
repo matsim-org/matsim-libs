@@ -1,3 +1,5 @@
+package NetworkCreator;
+
 import java.io.PrintWriter;
 import java.util.List;
 // Only works when the
@@ -6,7 +8,7 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		// Example list of slices for each square
 		// Only works when the no. of slices increases
-		List<Integer> slicesList = List.of(7, 19, 26);
+		List<Integer> slicesList = List.of(27,26, 21, 20, 19, 9, 8 ,7);
 		MultiSquareCoordinateCalculator calculator = new MultiSquareCoordinateCalculator(slicesList);
 		LinksCalculator linkCalculator = new LinksCalculator();
 
