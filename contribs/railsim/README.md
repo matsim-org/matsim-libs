@@ -29,3 +29,7 @@ See `RunRailsimExample.java`
 - [network-specification](docs/network-specification.md)
 - [train-specification](docs/train-specification.md)
 - [events-specification](docs/events-specification.md)
+
+## Acknowledgments
+
+This contrib was initiated and initially funded by the [Swiss Federal Railways](https://www.sbb.ch) (SBB).

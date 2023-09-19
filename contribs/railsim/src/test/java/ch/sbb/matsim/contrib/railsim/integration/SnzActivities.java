@@ -1,4 +1,4 @@
-/**
+/*
  * Avoid dependency on vsp contrib, copy from:
  * https://github.com/matsim-org/matsim-libs/blob/b2305e5e0f744b357486c8bbab253bb7c38aaad4/contribs/vsp/src/main/java/org/matsim/contrib/vsp/scenario/SnzActivities.java
  */

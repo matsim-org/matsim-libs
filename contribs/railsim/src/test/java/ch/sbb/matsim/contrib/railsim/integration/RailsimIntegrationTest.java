@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package ch.sbb.matsim.contrib.railsim.integration;
 
 import ch.sbb.matsim.contrib.railsim.RailsimModule;
@@ -219,7 +238,6 @@ public class RailsimIntegrationTest {
 	}
 
 	// This test is similar to testMicroTrainFollowingConstantSpeed but with varying speed levels along the corridor.
-	// TODO: Right now, there are some runtime exceptions which I don't understand.
 	@Test
 	public void testMicroTrainFollowingVaryingSpeed() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
