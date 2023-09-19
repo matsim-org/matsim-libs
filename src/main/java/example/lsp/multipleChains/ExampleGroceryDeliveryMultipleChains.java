@@ -73,6 +73,9 @@ public class ExampleGroceryDeliveryMultipleChains {
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+//					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 2);
+//					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
+//					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
 					return strategyManager;
 				});
 			}
@@ -97,7 +100,7 @@ public class ExampleGroceryDeliveryMultipleChains {
 			ConfigUtils.applyCommandline(config,args);
 		} else {
 			config.controler().setOutputDirectory("output/groceryDelivery");
-			config.controler().setLastIteration(0);
+			config.controler().setLastIteration(5);
 		}
 
 		config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
@@ -215,7 +218,7 @@ public class ExampleGroceryDeliveryMultipleChains {
 			multipleMixedEchelonChainsPlan = LSPUtils.createLSPPlan()
 					.addLogisticChain(directChain)
 					.addLogisticChain(hubChain)
-					.setAssigner(MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner());
+					.setAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
