@@ -14,6 +14,7 @@ import org.matsim.application.options.LanduseOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import picocli.CommandLine;
 
@@ -93,7 +94,7 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 
 						Coord newCoord = mapping.getOrDefault(coord, null);
 						if (newCoord == null) {
-							newCoord = landuse.select(crs.getInputCRS(),
+							newCoord = CoordUtils.round(landuse.select(crs.getInputCRS(),
 									() -> {
 										double x = rnd.nextDouble(-gridResolution / 2, gridResolution / 2);
 										double y = rnd.nextDouble(-gridResolution / 2, gridResolution / 2);
@@ -103,7 +104,7 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 										else
 											return new Coord(coord.getX() + x, coord.getY() + y);
 									}
-							);
+							));
 							mapping.put(coord, newCoord);
 						}
 
