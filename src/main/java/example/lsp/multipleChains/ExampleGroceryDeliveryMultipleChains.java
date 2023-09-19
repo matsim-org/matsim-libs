@@ -123,8 +123,8 @@ public class ExampleGroceryDeliveryMultipleChains {
 	}
 
 	private static LSP createLSP(Scenario scenario) {
-		String carrierPlanFile = "/Users/niclasrichter/Documents/Studium/Master/Thesis/groceryDeliveryScenario/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEV.xml";
-		String vehicleTypeFile = "/Users/niclasrichter/Documents/Studium/Master/Thesis/groceryDeliveryScenario/vehicleTypesBVWP100_DC_noTax.xml";
+		String carrierPlanFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
+		String vehicleTypeFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
 
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
 		CarrierVehicleTypeReader vehicleTypeReader = new CarrierVehicleTypeReader(vehicleTypes);
