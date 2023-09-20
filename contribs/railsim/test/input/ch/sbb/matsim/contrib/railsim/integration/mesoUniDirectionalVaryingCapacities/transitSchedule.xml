@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="t1" x="0.0" y="-10000" linkRefId="t1_IN-t1_OUT" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="t2" x="50000.0" y="-10000" linkRefId="t2_IN-t2_OUT" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="t3" x="120000.0" y="-10000" linkRefId="t3_IN-t3_OUT" isBlocking="false">
+		</stopFacility>
+	</transitStops>
+	<transitLine id="line1">
+		<transitRoute id="line1_route1_0">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="t1" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="t2" arrivalOffset="02:00:00" departureOffset="02:30:00" awaitDeparture="false"/>
+				<stop refId="t3" arrivalOffset="04:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="t1_IN-t1_OUT"/>
+				<link refId="t1_OUT-t2_IN"/>
+				<link refId="t2_IN-t2_OUT"/>
+				<link refId="t2_OUT-t3_IN"/>
+				<link refId="t3_IN-t3_OUT"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train1"/>
+				<departure id="1" departureTime="08:01:00" vehicleRefId="train2"/>
+				<departure id="2" departureTime="08:02:00" vehicleRefId="train3"/>
+				<departure id="3" departureTime="08:03:00" vehicleRefId="train4"/>
+				<departure id="4" departureTime="08:04:00" vehicleRefId="train5"/>
+				<departure id="5" departureTime="08:05:00" vehicleRefId="train6"/>
+				<departure id="6" departureTime="08:06:00" vehicleRefId="train7"/>
+				<departure id="7" departureTime="08:07:00" vehicleRefId="train8"/>
+				<departure id="8" departureTime="08:08:00" vehicleRefId="train9"/>
+				<departure id="9" departureTime="08:09:00" vehicleRefId="train10"/>
+
+
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

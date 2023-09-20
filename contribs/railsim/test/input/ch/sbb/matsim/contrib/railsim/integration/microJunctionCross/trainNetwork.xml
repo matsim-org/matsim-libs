@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+	<!--
+
+							  8
+							  | B0
+							  V
+							  9
+							  | B1
+							  V
+							  10
+							  | B2
+	   A0	  A1		  A2  V A3    A4           A5
+	1  ==>  2 ========> 3 ==> 4 ==> 5 =========> 6 ==> 7
+							  | B3
+							  V
+							  11
+							  | B4
+							  V
+							  12
+							  | B5
+							  V
+							  13
+	-->
+
+	<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="1" x="-1500.0" y="0.0">
+		</node>
+		<node id="10" x="0.0" y="100.0">
+		</node>
+		<node id="11" x="0.0" y="-100.0">
+		</node>
+		<node id="12" x="0.0" y="-1000.0">
+		</node>
+		<node id="13" x="0.0" y="-1500.0">
+		</node>
+		<node id="2" x="-1000.0" y="0.0">
+		</node>
+		<node id="3" x="-100.0" y="0.0">
+		</node>
+		<node id="4" x="0.0" y="0.0">
+		</node>
+		<node id="5" x="100.0" y="0.0">
+		</node>
+		<node id="6" x="1000.0" y="0.0">
+		</node>
+		<node id="7" x="1500.0" y="0.0">
+		</node>
+		<node id="8" x="0.0" y="1500.0">
+		</node>
+		<node id="9" x="0.0" y="1000.0">
+		</node>
+	</nodes>
+
+	<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="A0" from="1" to="2" length="500.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="A1" from="2" to="3" length="900.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="A2" from="3" to="4" length="100.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1</attribute>
+			</attributes>
+		</link>
+		<link id="A3" from="4" to="5" length="100.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1</attribute>
+			</attributes>
+		</link>
+		<link id="A4" from="5" to="6" length="900.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="A5" from="6" to="7" length="500.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="B0" from="8" to="9" length="500.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="B1" from="9" to="10" length="900.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="B2" from="10" to="4" length="100.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1</attribute>
+			</attributes>
+		</link>
+		<link id="B3" from="4" to="11" length="100.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1</attribute>
+			</attributes>
+		</link>
+		<link id="B4" from="11" to="12" length="900.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+		<link id="B5" from="12" to="13" length="500.0" freespeed="15.0" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+		</link>
+	</links>
+
+	<!-- ====================================================================== -->
+
+</network>

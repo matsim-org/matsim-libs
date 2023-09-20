@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+	<!--
+										  ce (n=2)
+								       //=========>(E)
+								      //           n=5
+		                             //
+		   ab (n=2)       bc (n=2)   V   cd (n=2)
+	  (A)<==========>(B)<==========>(C)<==========>(D)
+      n=5            n=3            n=3            n=5
+
+	Stations:
+    - A: Mesoscopic, 12
+    - B: Mesoscopic, 3
+    - C: Microscopic, 3
+    - D: Mesoscopic, 6
+    - E: Mesoscopic, 6
+
+    Routes:
+    - AB: Capacity 2, Microscopic
+    - BC: Capacity 2, Mesoscopic
+    - CD: Capacity 2, Mesoscopic
+    - CE: Capacity 2, Mesoscopic
+
+	Transit stop facilities and areas:
+	- Stop A_F (A)
+	- Stop A_R (A)
+	- Stop B_F (B)
+	- Stop B_R (B)
+	- Stop C1_F (C)
+	- Stop C1_R (C)
+	- Stop C2_F (C)
+	- Stop C2_R (C)
+	- Stop C3_F (C)
+	- Stop C3_R (C)
+	- Stop D_F (D)
+	- Stop D_R (D)
+	- Stop E_F (E)
+	- Stop E_R (E)
+	-->
+
+	<nodes>
+		<!-- stations -->
+		<node id="n_a1" x="0" y="0"/>
+		<node id="n_a2" x="500" y="0"/>
+		<node id="n_b1" x="5500" y="0"/>
+		<node id="n_b2" x="6000" y="0"/>
+		<node id="n_c1" x="10000" y="0"/>
+		<node id="n_c2" x="10600" y="0"/>
+		<node id="n_d1" x="14500" y="0"/>
+		<node id="n_d2" x="15000" y="0"/>
+		<node id="n_e1" x="14500" y="2000"/>
+		<node id="n_e2" x="15000" y="2000"/>
+
+		<!-- route A-B -->
+		<node id="n_ab1" x="550" y="50"/>
+		<node id="n_ab2" x="5450" y="50"/>
+
+		<!-- station C: detail -->
+		<node id="n_c1_2" x="10050" y="50"/>
+		<node id="n_c2_2" x="10550" y="50"/>
+		<node id="n_c1_3" x="10100" y="100"/>
+		<node id="n_c2_3" x="10600" y="100"/>
+
+		<!-- route C-E -->
+		<node id="n_ce_1" x="12500" y="2000"/>
+
+	</nodes>
+
+
+	<links>
+
+		<!-- station A -->
+		<link id="l_a_F" from="n_a1" to="n_a2" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">a</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">12</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="l_a_R" from="n_a2" to="n_a1" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">a</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">12</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+
+		<!-- route A-B -->
+		<link id="l_ab1_F" from="n_a2" to="n_b1" length="5000" freespeed="41.667" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ab1</attribute>
+			</attributes>
+		</link>
+		<link id="l_ab1_R" from="n_b1" to="n_a2" length="5000" freespeed="41.667" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ab1</attribute>
+			</attributes>
+		</link>
+
+		<link id="l_ab2_F_1" from="n_a2" to="n_ab1" length="70.71" freespeed="41.667" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ab2_1</attribute>
+			</attributes>
+		</link>
+		<link id="l_ab2_R_1" from="n_ab1" to="n_a2" length="70.71" freespeed="41.667" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ab2_1</attribute>
+			</attributes>
+		</link>
+
+		<link id="l_ab2_F_2" from="n_ab1" to="n_ab2" length="4950" freespeed="41.667" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ab2_2</attribute>
+			</attributes>
+		</link>
+		<link id="l_ab2_R_2" from="n_ab2" to="n_ab1" length="4950" freespeed="41.667" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ab2_2</attribute>
+			</attributes>
+		</link>
+
+		<link id="l_ab2_F_3" from="n_ab2" to="n_b1" length="70.71" freespeed="41.667" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ab2_3</attribute>
+			</attributes>
+		</link>
+		<link id="l_ab2_R_3" from="n_b1" to="n_ab2" length="70.71" freespeed="41.667" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ab2_3</attribute>
+			</attributes>
+		</link>
+
+		<!-- station B -->
+		<link id="l_b_F" from="n_b1" to="n_b2" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">b</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="l_b_R" from="n_b2" to="n_b1" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">b</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+
+		<!-- route B-C -->
+		<link id="l_bc_F" from="n_b2" to="n_c1" length="4000" freespeed="27.777" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">bc</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="l_bc_R" from="n_c1" to="n_b2" length="4000" freespeed="27.777" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">bc</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+
+		<!-- station C -->
+		<link id="l_c1_F" from="n_c1" to="n_c2" length="600" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1</attribute>
+			</attributes>
+		</link>
+		<link id="l_c1_R" from="n_c2" to="n_c1" length="600" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1</attribute>
+			</attributes>
+		</link>
+
+		<link id="l_c1_c2_1_F" from="n_c1" to="n_c1_2" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1_c2_1</attribute>
+			</attributes>
+		</link>
+		<link id="l_c1_c2_1_R" from="n_c1_2" to="n_c1" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1_c2_1</attribute>
+			</attributes>
+		</link>
+
+		<link id="l_c2_F" from="n_c1_2" to="n_c2_2" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c2</attribute>
+			</attributes>
+		</link>
+		<link id="l_c2_R" from="n_c2_2" to="n_c1_2" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c2</attribute>
+			</attributes>
+		</link>
+
+		<link id="l_c1_c2_2_F" from="n_c2_2" to="n_c2" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1_c2_2</attribute>
+			</attributes>
+		</link>
+		<link id="l_c1_c2_2_R" from="n_c2" to="n_c2_2" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c1_c2_2</attribute>
+			</attributes>
+		</link>
+
+		<link id="l_c2_c3_1_F" from="n_c1_2" to="n_c1_3" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c2_c3_1</attribute>
+			</attributes>
+		</link>
+		<link id="l_c2_c3_1_R" from="n_c1_3" to="n_c1_2" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c2_c3_1</attribute>
+			</attributes>
+		</link>
+
+		<link id="l_c3_F" from="n_c1_3" to="n_c2_3" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c3</attribute>
+			</attributes>
+		</link>
+		<link id="l_c3_R" from="n_c2_3" to="n_c1_3" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c3</attribute>
+			</attributes>
+		</link>
+
+		<link id="l_c2_c3_2_F" from="n_c2_2" to="n_c2_3" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c2_c3_2</attribute>
+			</attributes>
+		</link>
+		<link id="l_c2_c3_2_R" from="n_c2_3" to="n_c2_2" length="70.71" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">c2_c3_2</attribute>
+			</attributes>
+		</link>
+
+		<!-- route C-D -->
+		<link id="l_cd_F" from="n_c2" to="n_d1" length="3900" freespeed="33.333" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">cd</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="l_cd_R" from="n_d1" to="n_c2" length="3900" freespeed="33.333" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">cd</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+
+		<!-- station D -->
+		<link id="l_d_F" from="n_d1" to="n_d2" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">d</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">6</attribute>
+			</attributes>
+		</link>
+		<link id="l_d_R" from="n_d2" to="n_d1" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">d</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">6</attribute>
+			</attributes>
+		</link>
+
+		<!-- route C-E -->
+		<link id="l_ce_F_1" from="n_c2_3" to="n_ce_1" length="2687.01" freespeed="27.777" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ce_1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="l_ce_R_1" from="n_ce_1" to="n_c2_3" length="2687.01" freespeed="27.777" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ce_1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="l_ce_F_2" from="n_ce_1" to="n_e1" length="2000" freespeed="27.777" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ce_2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="l_ce_R_2" from="n_e1" to="n_ce_1" length="2000" freespeed="27.777" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ce_2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+
+		<!-- station E -->
+		<link id="l_e_F" from="n_e1" to="n_e2" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">e</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">6</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="l_e_R" from="n_e2" to="n_e1" length="500" freespeed="25" capacity="3600.0" permlanes="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">e</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">6</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+
+
+	</links>
+
+</network>
