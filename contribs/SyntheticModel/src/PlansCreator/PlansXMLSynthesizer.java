@@ -28,9 +28,9 @@ public class PlansXMLSynthesizer {
 				writer.write("\t<person id=\"" + i + "\">\n");
 				writer.write("\t\t<plan>\n");
 				writer.write(String.format("\t\t\t<act type=\"h\" x=\"%.2f\" y=\"%.2f\" end_time=\"%s\" />\n", home.x, home.y, generateEndTime(7, 30, 15)));
-				writer.write("\t\t\t<leg mode=\"car\"> </leg>\n");
+				writer.write("\t\t\t<leg mode=\"drt\"> </leg>\n");
 				writer.write(String.format("\t\t\t<act type=\"w\" x=\"%.2f\" y=\"%.2f\" end_time=\"%s\" />\n", work.x, work.y, generateEndTime(17, 15, 60)));
-				writer.write("\t\t\t<leg mode=\"car\"> </leg>\n");
+				writer.write("\t\t\t<leg mode=\"drt\"> </leg>\n");
 				writer.write(String.format("\t\t\t<act type=\"h\" x=\"%.2f\" y=\"%.2f\" />\n", home.x, home.y));
 				writer.write("\t\t</plan>\n");
 				writer.write("\t</person>\n");
