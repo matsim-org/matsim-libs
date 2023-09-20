@@ -41,6 +41,7 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [parking](parking/README.md)                                             | Parking infrastructure and supply constraints
 | [protobuf](protobuf/README.md)                                           | Protocol buffer implementation and converter for the MATSim event infrastructure
 | [pseudosimulation](pseudosimulation/README.md)                           | Pseudo-simulation to speed-up simulation times
+| [railsim](railsim/README.md)                                             | A large-scale hybrid micro- and mesoscopic simulation approach for railway operation
 | [roadpricing](roadpricing/README.md)                                     | Functionality to simulate different road-pricing scenarios in MATSim
 | [shared_mobility](shared_mobility/README.md)                             | Simulate human-driven shared mobility (i.e., micromobility)
 | [signals](signals/README.md)                                             | Simulate traffic lights microscopically
