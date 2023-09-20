@@ -141,7 +141,7 @@
 			<!-- Bus stop duration. Must be positive. -->
 			<param name="stopDuration" value="30.0" />
 			<!-- An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd -->
-			<param name="vehiclesFile" value="UrbanLinedrts3082S4.xml" />
+			<param name="vehiclesFile" value="UrbanLinedrts0S4.xml" />
 		</parameterset>
 	</module>
 
