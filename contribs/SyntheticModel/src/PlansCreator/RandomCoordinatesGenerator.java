@@ -88,14 +88,24 @@ public class RandomCoordinatesGenerator {
 			this.y = y;
 		}
 	}
+	/*
+<!-- Input parameters for households.xml Sept 19:
+	Densities: [8000, 10000, 4500, 4500, 4500, 700, 500, 700]
+	Decay rates: [0.6, 0.8, 0.7, 0.4, 0.3, 0.4, 0.1, 0.9]
+		-->
+		<!-- Input parameters for commercial Sept 19:
+	Densities: [1500, 1000, 250, 250, 220, 70, 50, 70]
+	Decay rates: [0.6, 0.8, 0.7, 0.4, 0.5, 0.4, 0.3, 0.9]
+-->
+	 */
 
 	public static void main(String[] args) {
-		List<Integer> densities = List.of(8000, 10000, 4500, 4500, 4500, 700, 500, 700);
-		List<Double> decayRates = List.of(0.6, 0.8, 0.7, 0.4, 0.3, 0.4, 0.1, 0.9 );  // Example decay rates for each square
+		List<Integer> densities = List.of(1500, 1000, 250, 250, 220, 70, 50, 70);
+		List<Double> decayRates = List.of(0.6, 0.8, 0.7, 0.4, 0.5, 0.4, 0.3, 0.9 );  // Example decay rates for each square
 		RandomCoordinatesGenerator generator = new RandomCoordinatesGenerator(densities, decayRates);
 
 		try {
-			generator.writeToXML("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine","households.xml");
+			generator.writeToXML("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine","commercial.xml");
 			System.out.println("XML file has been written successfully!");
 		} catch (IOException e) {
 			e.printStackTrace();
