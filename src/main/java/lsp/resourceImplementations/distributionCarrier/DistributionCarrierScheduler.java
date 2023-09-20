@@ -25,6 +25,7 @@ import lsp.resourceImplementations.CarrierSchedulerUtils;
 import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
+import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
@@ -256,7 +257,9 @@ import java.util.List;
 
 		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLinkId(), vehicleType);
 		vBuilder.setEarliestStart(startTime);
-		vBuilder.setLatestEnd(24 * 60 * 60);
+		final int latestEnd = 72 * 60 * 60;
+		Assert.isTrue(latestEnd > startTime, "latest End must be later than earliest start. start: " + startTime + " ; end: " +latestEnd);
+		vBuilder.setLatestEnd(latestEnd);
 		CarrierVehicle cv = vBuilder.build();
 		auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().put(cv.getId(), cv);
 		auxiliaryCarrier.getCarrierCapabilities().setFleetSize(FleetSize.FINITE);
