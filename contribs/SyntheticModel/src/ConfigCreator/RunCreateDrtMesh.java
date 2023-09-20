@@ -79,7 +79,7 @@ public class RunCreateDrtMesh {
 
 		// Shuffle the records randomly and get only the first 10% of the nodes
 		Collections.shuffle(records, new Random());
-		int tenPercentSize = (int) (0.1 * records.size());
+		int tenPercentSize = (int) (0.025 * records.size());
 		records = records.subList(0, tenPercentSize);
 
 		System.out.println(records);

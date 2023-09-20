@@ -12,7 +12,7 @@ public class PlansXMLSynthesizer {
 	private static final String DIRECTORY_PATH = "C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine"; // Replace with your directory path
 
 
-	public void synthesize(int numPlans) throws ParserConfigurationException, SAXException, IOException {
+	public void synthesize(int numPlans, double drtRatio) throws ParserConfigurationException, SAXException, IOException {
 		List<Coordinate> householdNodes = extractCoordinates(DIRECTORY_PATH + "\\households.xml");
 		List<Coordinate> commercialNodes = extractCoordinates(DIRECTORY_PATH + "\\commercial.xml");
 
@@ -25,12 +25,15 @@ public class PlansXMLSynthesizer {
 				Coordinate home = householdNodes.get(random.nextInt(householdNodes.size()));
 				Coordinate work = commercialNodes.get(random.nextInt(commercialNodes.size()));
 
+				String legModeToWork = getLegMode(drtRatio);
+				String legModeToHome = getLegMode(drtRatio);
+
 				writer.write("\t<person id=\"" + i + "\">\n");
 				writer.write("\t\t<plan>\n");
 				writer.write(String.format("\t\t\t<act type=\"h\" x=\"%.2f\" y=\"%.2f\" end_time=\"%s\" />\n", home.x, home.y, generateEndTime(7, 30, 15)));
-				writer.write("\t\t\t<leg mode=\"drt\"> </leg>\n");
+				writer.write("\t\t\t<leg mode=\"" + legModeToWork + "\"> </leg>\n");
 				writer.write(String.format("\t\t\t<act type=\"w\" x=\"%.2f\" y=\"%.2f\" end_time=\"%s\" />\n", work.x, work.y, generateEndTime(17, 15, 60)));
-				writer.write("\t\t\t<leg mode=\"drt\"> </leg>\n");
+				writer.write("\t\t\t<leg mode=\"" + legModeToHome + "\"> </leg>\n");
 				writer.write(String.format("\t\t\t<act type=\"h\" x=\"%.2f\" y=\"%.2f\" />\n", home.x, home.y));
 				writer.write("\t\t</plan>\n");
 				writer.write("\t</person>\n");
@@ -72,11 +75,16 @@ public class PlansXMLSynthesizer {
 		return String.format("%02d:%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
 	}
 
+	private String getLegMode(double drtRatio) {
+		return random.nextDouble() < drtRatio ? "drt" : "car";
+	}
+
 	public static void main(String[] args) {
 		PlansXMLSynthesizer synthesizer = new PlansXMLSynthesizer();
-		int numberOfPlansToGenerate = 10000; // specify the desired number of plans here
+		int numberOfPlansToGenerate = 500; // specify the desired number of plans here
+		double drtratio = 0.0; // specify the desired number of plans with initial mode drt here
 		try {
-			synthesizer.synthesize(numberOfPlansToGenerate);
+			synthesizer.synthesize(numberOfPlansToGenerate, drtratio);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

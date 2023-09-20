@@ -20,7 +20,7 @@
 		<param name="outputDirectory" value="./output" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="2" />
+		<param name="lastIteration" value="10" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="qsim" />
 	</module>
@@ -46,9 +46,6 @@
 			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
 		</parameterset>
 
-		<parameterset type="modeParams">
-			<param name="mode" value="pt"/>
-		</parameterset>
 
 		<parameterset type="modeParams">
 			<param name="mode" value="walk"/>
@@ -62,7 +59,7 @@
 		<param name="dailyMonetaryConstant" value="0.0" />
 		<param name="dailyUtilityConstant" value="0.0" />
 		<param name="marginalUtilityOfDistance_util_m" value="0.0" />
-		<param name="marginalUtilityOfTraveling_util_hr" value="-60" />
+		<param name="marginalUtilityOfTraveling_util_hr" value="+6" />
 		<param name="mode" value="drt" />
 		<param name="monetaryDistanceRate" value="-0.0" />
 		</parameterset>
@@ -102,7 +99,7 @@
 
 		<parameterset type="strategysettings">
 			<param name="strategyName" value="BestScore"/>
-			<param name="weight" value="0.7"/>
+			<param name="weight" value="0.1"/>
 		</parameterset>
 
 		<parameterset type="strategysettings">
@@ -116,9 +113,14 @@
 		</parameterset>
 		<parameterset type="strategysettings">
 			<param name="strategyName" value="ChangeTripMode"/>
-			<param name="weight" value="0.1"/>
+			<param name="weight" value="0.3"/>
 		</parameterset>
 
+	</module>
+
+	<module name="changeMode">
+		<!-- provide a comma-separated list of leg modes -->
+		<param name="modes" value="car,walk,bike,drt" />
 	</module>
 
 	<module name="multiModeDrt" >
