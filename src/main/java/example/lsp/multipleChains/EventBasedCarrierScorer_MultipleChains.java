@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
+class EventBasedCarrierScorer_MultipleChains implements CarrierScoringFunctionFactory {
 
 	@Inject
 	private Network network;

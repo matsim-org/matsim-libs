@@ -61,7 +61,7 @@ public class ExampleGroceryDeliveryMultipleChains {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				final MyEventBasedCarrierScorer carrierScorer = new MyEventBasedCarrierScorer();
+				final EventBasedCarrierScorer_MultipleChains carrierScorer = new EventBasedCarrierScorer_MultipleChains();
 				carrierScorer.setToll(TOLL_VALUE);
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
 				bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);

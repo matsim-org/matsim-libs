@@ -86,7 +86,7 @@ public class ExampleMultipleMixedEchelonChains {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				final MyEventBasedCarrierScorer carrierScorer = new MyEventBasedCarrierScorer();
+				final EventBasedCarrierScorer_MultipleChains carrierScorer = new EventBasedCarrierScorer_MultipleChains();
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
 				carrierScorer.setToll(TOLL_VALUE);
 				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
