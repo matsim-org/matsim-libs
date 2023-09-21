@@ -81,7 +81,7 @@ public class RunFreightAnalysisEventBased {
 		//freight settings
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
 		freightConfigGroup.setCarriersFile( SIM_OUTPUT_PATH + "output_carriers.xml.gz");
-		freightConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_carriersVehicleTypes.xml.gz");
+		freightConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_allVehicles.xml.gz");
 
 		//Were to store the analysis output?
 		String analysisOutputDirectory = ANALYSIS_OUTPUT_PATH;
