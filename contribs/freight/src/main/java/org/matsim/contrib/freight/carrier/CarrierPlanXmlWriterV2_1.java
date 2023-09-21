@@ -40,6 +40,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
 import org.matsim.vehicles.VehicleType;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -102,6 +103,20 @@ import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 			e.printStackTrace();
 			logger.error(e);
 			System.exit(1);
+		}
+	}
+
+	public void write(String filename, boolean createDirectory, String directoryPath) {
+		if (createDirectory) {
+			File dir = new File(directoryPath);
+			if (!dir.mkdir()) {
+				if (dir.exists()) {
+					logger.info("directory " + directoryPath + " exist already.");
+				} else {
+					logger.warn("Failed to create directory: " + directoryPath);
+				}
+			}
+			write(filename);
 		}
 	}
 
