@@ -168,6 +168,13 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
+		//clear ShipmentPlans
+		var lsps = LSPUtils.getLSPs(scenario);
+		for (LSP lsp : lsps.getLSPs().values()) {
+			for (LSPPlan lspPlan : lsp.getPlans()) {
+				lspPlan.getShipmentPlans().clear();
+			}
+		}
 	}
 
 	@Override
