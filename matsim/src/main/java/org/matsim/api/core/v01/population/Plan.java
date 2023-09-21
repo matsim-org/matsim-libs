@@ -49,6 +49,18 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, A
 	public abstract String getType();
 
 	public abstract void setType(final String type);
+	
+	public abstract void setPlanId(final String planId);
+	
+	public abstract String getPlanId();
+	
+	public abstract int getIterationCreated();
+	
+	public abstract void setIterationCreated(int iteration);
+	
+	public abstract String getPlanMutator();
+	
+	public abstract void setPlanMutator(String planMutator);
 
 	public abstract Person getPerson();
 

@@ -158,6 +158,36 @@ public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {
 		public void setType(String type) {
 			throw new UnsupportedOperationException();
 		}
+		
+		@Override
+		public int getIterationCreated() {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void setIterationCreated(int iteration) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public String getPlanId() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setPlanId(String planId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getPlanMutator() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setPlanMutator(String planMutator) {
+			throw new UnsupportedOperationException();
+		}
 
 		@Override
 		public void setScore(Double score) {

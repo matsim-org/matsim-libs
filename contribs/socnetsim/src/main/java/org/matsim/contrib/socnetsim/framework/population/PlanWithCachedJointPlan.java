@@ -172,6 +172,24 @@ public final class PlanWithCachedJointPlan implements Plan {
 	public void setType(String type) {
 		this.delegate.setType(type);
 	}
+	
+	@Override
+	public String getPlanId() { return null; }
+
+	@Override
+	public void setPlanId(String planId) { /* nothing to do here */ }
+	
+	@Override
+	public int getIterationCreated() { return -1; }
+
+	@Override
+	public void setIterationCreated(int iteration) { /* nothing to do here */ }
+
+	@Override
+	public String getPlanMutator() { return null; }
+
+	@Override
+	public void setPlanMutator(String planMutator) { /* nothing to do here */ }
 
 	@Override
 	public Person getPerson() {

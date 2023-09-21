@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.replanning.inheritance.PlanInheritanceModule;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
@@ -120,6 +121,36 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
     @Override
 	public void setType(final String type) {
 		this.type = type;
+	}
+    
+	@Override
+	public String getPlanId() {
+		return (String) this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID);
+	}
+
+	@Override
+	public void setPlanId(String planId) {
+		this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_ID, planId);
+	}
+	
+	@Override
+	public int getIterationCreated() {
+		return (int) this.getAttributes().getAttribute(PlanInheritanceModule.ITERATION_CREATED);
+	}
+
+	@Override
+	public void setIterationCreated(int iteration) {
+		this.getAttributes().putAttribute(PlanInheritanceModule.ITERATION_CREATED, iteration);
+	}
+
+	@Override
+	public String getPlanMutator() {
+		return (String) this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_MUTATOR);
+	}
+
+	@Override
+	public void setPlanMutator(String planMutator) {
+		this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_MUTATOR, planMutator);
 	}
 
 	@Override
