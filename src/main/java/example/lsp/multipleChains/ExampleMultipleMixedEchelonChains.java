@@ -38,7 +38,7 @@ public class ExampleMultipleMixedEchelonChains {
 
 	private static final Logger log = LogManager.getLogger(ExampleMultipleMixedEchelonChains.class);
 
-	private static final AssignerSetting assignerSetting = AssignerSetting.roundRobin;
+	private static final AssignerSetting assignerSetting = AssignerSetting.primary;
 	enum AssignerSetting {primary, roundRobin}
 
 	private static final double TOLL_VALUE = 1000;
