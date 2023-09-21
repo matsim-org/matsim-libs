@@ -171,9 +171,11 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		//clear ShipmentPlans
 		var lsps = LSPUtils.getLSPs(scenario);
 		for (LSP lsp : lsps.getLSPs().values()) {
-			for (LSPPlan lspPlan : lsp.getPlans()) {
-				lspPlan.getShipmentPlans().clear();
-			}
+			lsp.getSelectedPlan().getShipmentPlans().clear();
+//			//clearing all seems to be wrong, because we want to keep them.
+//			for (LSPPlan lspPlan : lsp.getPlans()) {
+//				lspPlan.getShipmentPlans().clear();
+//			}
 		}
 	}
 
