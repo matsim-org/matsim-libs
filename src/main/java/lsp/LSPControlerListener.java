@@ -120,6 +120,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		strategyManager.run(lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext());
 
 		for (LSP lsp : lsps.getLSPs().values()) {
+			lsp.getSelectedPlan().getShipmentPlans().clear(); //clear ShipmentPlans to start with clear(n) state. Otherwise, some times were accumulating over the time. :(
 			lsp.scheduleLogisticChains();
 		}
 
@@ -168,15 +169,6 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		//clear ShipmentPlans
-		var lsps = LSPUtils.getLSPs(scenario);
-		for (LSP lsp : lsps.getLSPs().values()) {
-			lsp.getSelectedPlan().getShipmentPlans().clear();
-//			//clearing all seems to be wrong, because we want to keep them.
-//			for (LSPPlan lspPlan : lsp.getPlans()) {
-//				lspPlan.getShipmentPlans().clear();
-//			}
-		}
 	}
 
 	@Override
