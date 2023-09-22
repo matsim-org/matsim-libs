@@ -18,12 +18,14 @@ import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -72,10 +74,12 @@ public class ExampleGroceryDeliveryMultipleChains {
 				});
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new PlanCalcScoreConfigGroup())), null, 1);
 //					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 2);
 //					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
 //					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
+//					strategyManager.setMaxPlansPerAgent(5);
+					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
 					return strategyManager;
 				});
 			}
