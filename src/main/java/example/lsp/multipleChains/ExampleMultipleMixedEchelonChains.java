@@ -120,8 +120,8 @@ public class ExampleMultipleMixedEchelonChains {
 			}
 			ConfigUtils.applyCommandline(config,args);
 		} else {
-			config.controler().setOutputDirectory("output/multipleMixedEchelonChains_" + "_" + assignerSetting);
-			config.controler().setLastIteration(2);
+			config.controler().setOutputDirectory("output/multipleMixedEchelonChains_" + assignerSetting);
+			config.controler().setLastIteration(0);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
