@@ -21,6 +21,7 @@
 package example.lsp.lspReplanning;
 
 import lsp.LSP;
+import lsp.LSPPlan;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 import org.matsim.core.gbl.Gbl;
@@ -37,11 +38,11 @@ import java.util.Random;
 	}
 
 	@Override
-	public void assignToLogisticChain(LSPShipment shipment) {
+	public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
 		boolean assignToday = random.nextBoolean();
 		if (assignToday) {
-			Gbl.assertIf(lsp.getSelectedPlan().getLogisticChains().size() == 1);
-			lsp.getSelectedPlan().getLogisticChains().iterator().next().addShipmentToChain(shipment);
+			Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
+			lspPlan.getLogisticChains().iterator().next().addShipmentToChain(shipment);
 		}
 	}
 

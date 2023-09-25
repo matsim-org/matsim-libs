@@ -20,10 +20,9 @@
 
 package example.lsp.lspReplanning;
 
-import lsp.LSP;
-import lsp.LSPPlan;
-import lsp.ShipmentAssigner;
+import lsp.*;
 import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -32,6 +31,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 
 import java.util.Collection;
 
+@Deprecated
 /*package-private*/ class TomorrowShipmentAssignerStrategyFactory {
 
 	private final ShipmentAssigner assigner;
@@ -53,12 +53,27 @@ import java.util.Collection;
 
 			@Override
 			public void handlePlan(LSPPlan plan) {
+				plan.getLogisticChains().iterator().next().getShipmentIds().clear();
 				plan.setAssigner(assigner);
 //				LSP lsp = assigner.getLSP();
 				LSP lsp = plan.getLSP();
 				Collection<LSPShipment> shipments = lsp.getShipments();
 				for (LSPShipment shipment : shipments) {
-					assigner.assignToLogisticChain(shipment);
+					assigner.assignToPlan(plan ,shipment);
+				}
+
+				for (LogisticChain solution : plan.getLogisticChains()) {
+					solution.getShipmentIds().clear();
+					for (LogisticChainElement element : solution.getLogisticChainElements()) {
+						element.getIncomingShipments().clear();
+						element.getOutgoingShipments().clear();
+					}
+				}
+
+				for (LSPShipment shipment : plan.getLSP().getShipments()) {
+					ShipmentUtils.getOrCreateShipmentPlan(plan, shipment.getId()).clear();
+					shipment.getShipmentLog().clear();
+					plan.getAssigner().assignToPlan(plan, shipment);
 				}
 			}
 

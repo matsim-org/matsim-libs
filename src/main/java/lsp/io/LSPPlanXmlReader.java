@@ -18,8 +18,10 @@
  *  * ***********************************************************************
  */
 
-package lsp;
+package lsp.io;
 
+import lsp.LSPConstants;
+import lsp.LSPs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.freight.carrier.Carriers;

@@ -18,17 +18,19 @@
  *  * ***********************************************************************
  */
 
-package lsp;
+package lsp.io;
 
-import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.LSP;
+import lsp.*;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -45,7 +47,6 @@ import org.xml.sax.Attributes;
 
 import java.util.*;
 
-import static lsp.LSPConstants.LSP;
 import static lsp.LSPConstants.*;
 
 /**
@@ -57,7 +58,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
 	public static final Logger logger = LogManager.getLogger( LSPPlanXmlParserV1.class );
 
-	private LSP currentLsp = null;
+	private lsp.LSP currentLsp = null;
 	private Carrier currentCarrier = null;
 	private LSPShipment currentShipment = null;
 	private LSPPlan currentLspPlan = null;

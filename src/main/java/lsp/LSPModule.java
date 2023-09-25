@@ -20,9 +20,9 @@
 
 package lsp;
 
+import com.google.inject.Provides;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import com.google.inject.Provides;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;

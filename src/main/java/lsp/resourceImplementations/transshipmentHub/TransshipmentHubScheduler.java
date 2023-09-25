@@ -20,7 +20,10 @@
 
 package lsp.resourceImplementations.transshipmentHub;
 
-import lsp.*;
+import lsp.LSPResource;
+import lsp.LSPResourceScheduler;
+import lsp.LogisticChainElement;
+import lsp.LspShipmentWithTime;
 import lsp.shipment.ShipmentPlan;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;

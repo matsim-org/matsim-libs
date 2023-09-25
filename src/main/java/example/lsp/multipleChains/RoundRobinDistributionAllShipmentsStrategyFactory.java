@@ -24,13 +24,16 @@ import lsp.LSP;
 import lsp.LSPPlan;
 import lsp.LogisticChain;
 import lsp.shipment.LSPShipment;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /*package-private*/ class RoundRobinDistributionAllShipmentsStrategyFactory {
 
@@ -38,8 +41,7 @@ import java.util.*;
 	}
 
 	/*package-private*/ GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
-		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
-
+		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new PlanCalcScoreConfigGroup()));
 		GenericPlanStrategyModule<LSPPlan> roundRobinModule = new GenericPlanStrategyModule<>() {
 
 			@Override
@@ -48,6 +50,14 @@ import java.util.*;
 
 			@Override
 			public void handlePlan(LSPPlan lspPlan) {
+
+				// Shifting shipments only makes sense for multiple chains
+				if (lspPlan.getLogisticChains().size() < 2) return;
+
+				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+					logisticChain.getShipmentIds().clear();
+				}
+
 				LSP lsp = lspPlan.getLSP();
 				Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
 

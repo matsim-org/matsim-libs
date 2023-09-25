@@ -36,6 +36,6 @@ import lsp.shipment.LSPShipment;
  */
 public interface ShipmentAssigner extends KnowsLSP {
 
-	void assignToLogisticChain(LSPShipment shipment);
+	void assignToPlan(LSPPlan lspPlan, LSPShipment shipment);
 
 }

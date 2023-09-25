@@ -20,13 +20,14 @@
 
 package example.lsp.initialPlans;
 
+import example.lsp.lspReplanning.AssignmentStrategyFactory;
 import lsp.*;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -146,7 +147,7 @@ import java.util.*;
 				// The above means there will be no replanning.  The below needs at least one strategy to be happy.  kai, jul'22
 				bind( LSPStrategyManager.class ).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1. );
+					strategyManager.addStrategy(new AssignmentStrategyFactory().createStrategy(), null, 1);
 					return strategyManager;
 				});
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
