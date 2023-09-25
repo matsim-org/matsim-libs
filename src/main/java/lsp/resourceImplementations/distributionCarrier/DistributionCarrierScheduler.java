@@ -25,6 +25,7 @@ import lsp.resourceImplementations.CarrierSchedulerUtils;
 import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
+import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
@@ -209,12 +210,15 @@ import java.util.List;
 			}
 		}
 		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-		Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
-		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
+		final Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
+		final int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
+		final Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);
+		final double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
+		final double latestEnd = legBeforeService.getExpectedTransportTime() + legBeforeService.getExpectedDepartureTime();
+		Assert.isTrue(latestEnd > startTimeOfTransport, "latest End must be later than earliest start. start: " + startTimeOfTransport + " ; end: " +latestEnd);
+
 		builder.setStartTime(startTimeOfTransport);
-		int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
-		Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);
-		builder.setEndTime(legBeforeService.getExpectedTransportTime() + legBeforeService.getExpectedDepartureTime());
+		builder.setEndTime(latestEnd);
 		builder.setCarrierId(carrier.getId());
 		builder.setFromLinkId(tour.getStartLinkId());
 		builder.setToLinkId(serviceActivity.getLocation());
@@ -241,7 +245,7 @@ import java.util.List;
 		builder.setLinkId(serviceActivity.getLocation());
 		builder.setCarrierService(serviceActivity.getService());
 		ShipmentPlanElement unload = builder.build();
-		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
+		String idString = unload.getResourceId() + String.valueOf(unload.getLogisticChainElement().getId()) + unload.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, unload);
 	}
