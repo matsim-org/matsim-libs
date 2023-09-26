@@ -23,6 +23,7 @@ package lsp.resourceImplementations.transshipmentHub;
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
 import lsp.LogisticChainElement;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -98,29 +99,31 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 	public void handleEvent(CarrierTourEndEvent event) {
 		Tour tour = null;
 		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
-		Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
-		for (ScheduledTour scheduledTour : scheduledTours) {
-			if (scheduledTour.getTour().getId() == event.getTourId()) {
-				tour = scheduledTour.getTour();
-				break;
+//		if (ResourceImplementationUtils.getCarrierType(carrier).equals(ResourceImplementationUtils.CARRIER_TYPE.mainRunCarrier)) { //Todo müsste auch für Collection Carrier gehen, aber da muss hub funktionalität eh geprüft werden, KMT 21.09.23
+			Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
+			for (ScheduledTour scheduledTour : scheduledTours) {
+				if (scheduledTour.getTour().getId() == event.getTourId()) {
+					tour = scheduledTour.getTour();
+					break;
+				}
 			}
-		}
-		if ((event.getLinkId() == this.linkId)) {
-			assert tour != null;
-			if (allShipmentsOfTourEndInOnePoint(tour)) {
-				for (TourElement tourElement : tour.getTourElements()) {
-					if (tourElement instanceof ServiceActivity serviceActivity) {
-						if (serviceActivity.getLocation() == transshipmentHubResource.getStartLinkId()
-								&& allServicesAreInOnePoint(tour)
-								&& (tour.getStartLinkId() != transshipmentHubResource.getStartLinkId())) {
-							logHandlingInHub(serviceActivity.getService(), event.getTime());
-						} else {
-							logHandlingInHub(serviceActivity.getService(), event.getTime() + getUnloadEndTime(tour));
+			if ((event.getLinkId() == this.linkId)) {
+				assert tour != null;
+				if (allShipmentsOfTourEndInOnePoint(tour)) {
+					for (TourElement tourElement : tour.getTourElements()) {
+						if (tourElement instanceof ServiceActivity serviceActivity) {
+							if (serviceActivity.getLocation() == transshipmentHubResource.getStartLinkId()
+									&& allServicesAreInOnePoint(tour)
+									&& (tour.getStartLinkId() != transshipmentHubResource.getStartLinkId())) {
+								logHandlingInHub(serviceActivity.getService(), event.getTime());
+							} else {
+								logHandlingInHub(serviceActivity.getService(), event.getTime() + getUnloadEndTime(tour));
+							}
 						}
 					}
 				}
 			}
-		}
+//		}
 	}
 
 	private boolean allShipmentsOfTourEndInOnePoint(Tour tour) {
