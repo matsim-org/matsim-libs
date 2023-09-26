@@ -2,9 +2,9 @@ package org.matsim.counts;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -23,12 +23,13 @@ public class MultiModeCountsTest {
 
 	SplittableRandom random = new SplittableRandom(1234);
 
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void test_general_handling() {
 
-		MatsimTestUtils utils = new MatsimTestUtils();
-
-		MultiModeCounts multiModeCounts = new MultiModeCounts();
+		MultiModeCounts<Link> multiModeCounts = new MultiModeCounts<>();
 		multiModeCounts.setName("test");
 		multiModeCounts.setYear(2100);
 		multiModeCounts.setDescription("Test counts for several transport modes.");
@@ -44,30 +45,29 @@ public class MultiModeCountsTest {
 	}
 
 	@Test
-	public void test_reader(){
-		MatsimTestUtils utils = new MatsimTestUtils();
+	public void test_reader() {
 
-		MultiModeCounts dummyCounts = new MultiModeCounts(Link.class);
+		MultiModeCounts<Link> dummyCounts = new MultiModeCounts<>();
 		generateDummyCounts(dummyCounts);
 
 		MultiModeCountsWriter writer = new MultiModeCountsWriter(dummyCounts);
-		writer.write("test_counts.xml.gz");
+		writer.write("test_counts.xml");
 
-		MultiModeCounts counts = new MultiModeCounts(Link.class);
-		MultiModeCountsReader reader = new MultiModeCountsReader(counts);
+		MultiModeCounts<Link> counts = new MultiModeCounts<>();
+		MultiModeCountsReader reader = new MultiModeCountsReader(counts, Link.class);
 
 		Assertions.assertThatNoException().isThrownBy(() -> {
-			reader.readFile("test_counts.xml.gz");
+			reader.readFile("test_counts.xml");
 		});
 
-		Map<Id<? extends Identifiable>, MultiModeCount> countMap = counts.getCounts();
+		Map<Id<Link>, MultiModeCount<Link>> countMap = counts.getCounts();
 		Assert.assertEquals(21, countMap.size());
 
-		boolean onlyDailyValues = countMap.get(Id.create("12", Link.class)).getMeasurable(Measurable.VOLUMES, TransportMode.car).hasOnlyDailyValues();
+		boolean onlyDailyValues = countMap.get(Id.create("12", Link.class)).getMeasurable(Measurable.VOLUMES, TransportMode.car).getInterval() == 24 * 60;
 		Assert.assertFalse(onlyDailyValues);
 	}
 
-	public void generateDummyCounts(MultiModeCounts multiModeCounts){
+	public void generateDummyCounts(MultiModeCounts<Link> multiModeCounts) {
 		Set<String> modes = Set.of(TransportMode.car, TransportMode.bike, TransportMode.drt);
 
 		URL berlin = ExamplesUtils.getTestScenarioURL("berlin");
@@ -77,34 +77,35 @@ public class MultiModeCountsTest {
 		int counter = 0;
 
 		for (Id<Link> id : network.getLinks().keySet()) {
-			if(counter++ > 20)
+			if (counter++ > 20)
 				break;
 
-			if(id.toString().equals("12")){
-				MultiModeCount count = multiModeCounts.createAndAddCount(id, id + "_test", 2100);
-				Measurable volume = count.createVolume(TransportMode.car, false);
+			if (id.toString().equals("12")) {
+				MultiModeCount<Link> count = multiModeCounts.createAndAddCount(id, id + "_test", 2100);
+				Measurable volume = count.createVolume(TransportMode.car);
 
 				for (int i = 0; i < 24; i++) {
-					volume.addAtHour(i, random.nextInt(0, 800));
+					volume.setAtHour(i, random.nextInt(0, 800));
 				}
 				continue;
 			}
 
-			MultiModeCount count = multiModeCounts.createAndAddCount(id, id + "_test", 2100);
+			MultiModeCount<Link> count = multiModeCounts.createAndAddCount(id, id + "_test", 2100);
 			for (String mode : modes) {
-				boolean b = random.nextBoolean();
-				Measurable volume = count.createVolume(mode, b);
-				if (b) {
+				boolean dailyValuesOnly = random.nextBoolean();
+				Measurable volume;
+				if (dailyValuesOnly) {
+					volume = count.addMeasurable(Measurable.VOLUMES, mode, 24 * 60);
 					volume.setDailyValue(random.nextInt(0, 10000));
 				} else {
+					volume = count.createVolume(mode);
+					for (int i = 0; i < 24; i++)
+						volume.setAtHour(i, random.nextInt(0, 800));
 
-					for (int i = 0; i < 24; i++) {
-						volume.addAtHour(i, random.nextInt(0, 800));
-					}
 				}
 
-				if(random.nextBoolean()){
-					Measurable velocity = count.createVelocity(mode, true);
+				if (random.nextBoolean()) {
+					Measurable velocity = count.createVelocity(mode);
 					velocity.setDailyValue(random.nextDouble(27.78));
 				}
 			}

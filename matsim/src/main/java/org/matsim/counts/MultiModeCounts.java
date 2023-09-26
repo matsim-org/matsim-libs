@@ -18,11 +18,9 @@ import java.util.TreeMap;
  * to an identifiable object (links, nodes, transit stations e.g)
  * Structure is simialar to regular counts, but more flexible to use.
  * */
-public final class MultiModeCounts implements Attributable {
+public final class MultiModeCounts<T extends Identifiable<T>> implements Attributable {
 
 	public static final String ELEMENT_NAME = "multiModeCounts";
-
-	public final Class<? extends Identifiable> identifiable;
 
 	private final Set<String> measurableTags = new HashSet<>();
 
@@ -32,29 +30,23 @@ public final class MultiModeCounts implements Attributable {
 
 	private int year;
 
-	private final Map<Id<? extends Identifiable>, MultiModeCount> counts = new TreeMap<>();
+	private final Map<Id<T>, MultiModeCount<T>> counts = new TreeMap<>();
 
 	private final Attributes attributes = new AttributesImpl();
 
-	public MultiModeCounts(){
-		this(Link.class);
-	}
-
-	public MultiModeCounts(Class<? extends Identifiable> identifiable){
-		this.identifiable = identifiable;
-	}
+	public MultiModeCounts(){}
 
 	/**
 	 * Creates a MultiModeCount object and adds to count tree map. Argument has to be an id for an matsim Identifiable object (link, node, pt station e.g).
 	 * A year can be passed as argument if count sources from different years are used, if not the year of the counts collection will be handed over.
 	 * */
-	public MultiModeCount createAndAddCount(final Id<? extends Identifiable> id, String stationName, @Nullable Integer year){
+	public MultiModeCount<T> createAndAddCount(final Id<T> id, String stationName, @Nullable Integer year){
 
 		if (this.counts.containsKey(id)) {
 			throw new RuntimeException("There is already a counts object for location " + id.toString());
 		}
 
-		MultiModeCount count = year == null ? new MultiModeCount(id, stationName, this.year, measurableTags): new MultiModeCount(id, stationName, year, measurableTags);
+		MultiModeCount<T> count = year == null ? new MultiModeCount<T>(id, stationName, this.year, measurableTags): new MultiModeCount<T>(id, stationName, year, measurableTags);
 		this.counts.put(id, count);
 
 		return count;
@@ -92,7 +84,7 @@ public final class MultiModeCounts implements Attributable {
 		return year;
 	}
 
-	public Map<Id<? extends Identifiable>, MultiModeCount> getCounts() {
+	public Map<Id<T>, MultiModeCount<T>> getCounts() {
 		return counts;
 	}
 
@@ -100,7 +92,7 @@ public final class MultiModeCounts implements Attributable {
 		return measurableTags;
 	}
 
-	public MultiModeCount getCount(Id<? extends Identifiable> id) {
+	public MultiModeCount<T> getCount(Id<T> id) {
 		return this.counts.get(id);
 	}
 

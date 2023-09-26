@@ -11,23 +11,26 @@ import java.util.Stack;
 
 /**
  * Reader class to parse MulitModeCounts from file.
- * */
+ */
 public class MultiModeCountsReader extends MatsimXmlParser {
 
-	private final String MULTIMODECOUNTS = "multiModeCounts";
-	private final String MULTIMODECOUNT = "multiModeCount";
-	private final String ATTRIBUTES = "attributes";
-	private final String VALUE = "value";
+	private final static String MULTIMODECOUNTS = "multiModeCounts";
+	private final static String MULTIMODECOUNT = "multiModeCount";
+	private final static String ATTRIBUTES = "attributes";
+	private final static String VALUE = "value";
 
-	private final MultiModeCounts counts;
-	private final Map<Id<? extends Identifiable>, MultiModeCount> countMap;
-	private Id<? extends Identifiable> currCount;
+	private final Class<? extends Identifiable<?>> identifiableClass;
+	private final MultiModeCounts<?> counts;
+	private final Map<? extends Id<?>, ? extends MultiModeCount<?>> countMap;
+	private Id<?> currCount;
 	private Measurable currMeasurable;
 
-	public MultiModeCountsReader(MultiModeCounts counts) {
+	public MultiModeCountsReader(MultiModeCounts<?> counts, Class<? extends Identifiable<?>> identifiableClass) {
 		super(ValidationType.NO_VALIDATION);
 		this.counts = counts;
 		this.countMap = counts.getCounts();
+
+		this.identifiableClass = identifiableClass;
 	}
 
 	@Override
@@ -47,12 +50,12 @@ public class MultiModeCountsReader extends MatsimXmlParser {
 	}
 
 	private void addValuesToMeasurable(Attributes atts) {
-		if (this.currMeasurable.hasOnlyDailyValues()) {
+		if (this.currMeasurable.getInterval() == 1440) {
 			this.currMeasurable.setDailyValue(Double.parseDouble(atts.getValue(0)));
 		} else {
 			int h = Integer.parseInt(atts.getValue("h"));
 			double v = Double.parseDouble(atts.getValue("v"));
-			this.currMeasurable.addAtHour(h, v);
+			this.currMeasurable.setAtMinute(h, v);
 		}
 	}
 
@@ -78,13 +81,15 @@ public class MultiModeCountsReader extends MatsimXmlParser {
 	}
 
 	private void startMeasurable(String tag, Attributes atts) {
-		MultiModeCount count = countMap.get(currCount);
-		this.currMeasurable = count.addMeasurable(tag, atts.getValue("mode"), atts.getValue("hasOnlyDailyValues").equals("t"));
+		MultiModeCount<?> count = countMap.get(currCount);
+		int interval = Integer.parseInt(atts.getValue("interval"));
+		this.currMeasurable = count.addMeasurable(tag, atts.getValue("mode"), interval);
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void startMultiModeCount(Attributes atts) {
 		String idString = atts.getValue("id");
-		Id<? extends Identifiable> id = Id.create(idString, counts.identifiable);
+		Id id = Id.create(idString, this.identifiableClass);
 		String stationName = atts.getValue("stationName");
 		int year = Integer.parseInt(atts.getValue("year"));
 
@@ -105,10 +110,6 @@ public class MultiModeCountsReader extends MatsimXmlParser {
 				case "source" -> counts.setSource(value);
 				case "year" -> counts.setYear(Integer.parseInt(value));
 				case "description" -> counts.setDescription(value);
-				case "identifiable" -> {
-					if (!counts.identifiable.getName().equals(value))
-						throw new RuntimeException("Counts from file are matched onto " + value + " objects, but + " + counts.identifiable.getName() + " were specified before!");
-				}
 				case "measurableTags" -> Arrays.stream(value.split(",")).forEach(s -> counts.getMeasurableTags().add(s));
 
 				default -> attributes.putAttribute(name, value);

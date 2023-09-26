@@ -112,7 +112,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		Counts<Link> miv = new Counts<>();
 		Counts<Link> freight = new Counts<>();
 
-		MultiModeCounts mmCounts = new MultiModeCounts(Link.class);
+		MultiModeCounts<Link> mmCounts = new MultiModeCounts<>();
 		mmCounts.setYear(year);
 		mmCounts.setName("BASt Counts");
 		mmCounts.setSource("Bundesanstalt für Straßenwesen");
@@ -132,7 +132,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		return 0;
 	}
 
-	private void mapTrafficVolumeToCount(BAStCountStation station, Counts<Link> miv, Counts<Link> freight, MultiModeCounts multiModeCounts) {
+	private void mapTrafficVolumeToCount(BAStCountStation station, Counts<Link> miv, Counts<Link> freight, MultiModeCounts<Link> multiModeCounts) {
 
 		if (!station.hasMatchedLink())
 			return;
@@ -145,9 +145,9 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		Count<Link> mivCount = miv.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
 		Count<Link> freightCount = freight.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
 
-		MultiModeCount multiModeCount = multiModeCounts.createAndAddCount(station.getMatchedLink().getId(), station.getName(), null);
-		Measurable carVolume = multiModeCount.createVolume(TransportMode.car, false);
-		Measurable freightVolume = multiModeCount.createVolume("freight", false);
+		MultiModeCount<Link> multiModeCount = multiModeCounts.createAndAddCount(station.getMatchedLink().getId(), station.getName(), null);
+		Measurable carVolume = multiModeCount.createVolume(TransportMode.car);
+		Measurable freightVolume = multiModeCount.createVolume("freight");
 
 		var mivTrafficVolumes = station.getMivTrafficVolume();
 		var freightTrafficVolumes = station.getFreightTrafficVolume();
@@ -161,8 +161,8 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			mivCount.createVolume(h, mivAtHour);
 			freightCount.createVolume(h, freightAtHour);
 
-			carVolume.addAtHour(h, mivAtHour);
-			freightVolume.addAtHour(h, freightAtHour);
+			carVolume.setAtHour(h, mivAtHour);
+			freightVolume.setAtHour(h, freightAtHour);
 		}
 	}
 

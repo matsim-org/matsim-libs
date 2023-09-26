@@ -1,15 +1,15 @@
 package org.matsim.counts;
 
-import it.unimi.dsi.fastutil.ints.Int2DoubleArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import java.util.OptionalDouble;
 
 /**
  * A MultiModeCount station can hold any kind of measurable data to calibrate a scenario provided as an implementation of this interface.
  * A single instance holds values for only one transport mode.
  * Average velocities and traffic volumes are already implemented.
- * */
+ */
 public class Measurable {
 
 	public static final String ELEMENT_NAME = "measurable";
@@ -19,87 +19,90 @@ public class Measurable {
 	public static String PASSENGERS = "passengers";
 
 	private final String type;
-
 	private final String mode;
-	//TODO find a better implementation for Int2DoubleMap
-	private final Int2DoubleMap hourlyVolume;
-	private final boolean dailyValuesOnly;
 
-	private double dailyValue;
+	private final Int2DoubleMap values;
 
-	private final Logger logger = LogManager.getLogger(Measurable.class);
+	/**
+	 * Measurement interval in minutes.
+	 */
+	private final int interval;
 
-	Measurable(String mode, boolean dailyValuesOnly, String type){
+	Measurable(String mode, String type, int interval) {
 		this.mode = mode;
-		this.dailyValuesOnly = dailyValuesOnly;
-		this.hourlyVolume = new Int2DoubleArrayMap();
 		this.type = type;
+		this.values = new Int2DoubleAVLTreeMap();
+		this.interval = interval;
 	}
 
-	public Int2DoubleMap getHourlyValues() {
-		return hourlyVolume;
+	Int2DoubleMap getValues() {
+		return values;
+	}
+
+	public void setDailyValue(double value){
+		setAtMinute(24 * 60, value);
 	}
 
 	/**
 	 * Adds a value observed at a certain hour.
-	 * */
-	public void addAtHour(int hour, double value) {
-		if(dailyValuesOnly)
-			throw new RuntimeException("Volume is supposed to contain daily values only!");
-
-		this.hourlyVolume.put(hour, value);
+	 */
+	public void setAtHour(int hour, double value) {
+		setAtMinute(hour * 60, value);
 	}
 
 	/**
-	 * Sets an aggregated daily value, daily traffic volume e.g.
-	 * */
-	public void setDailyValue(double value) {
-		if(!dailyValuesOnly)
-			logger.warn("Daily volume is set but hourly volumes are allowed too! Might produces trash data!");
+	 * Adds a value observed at a certain minute. Note that the minute must match the given interval, for example if the intervall is set to 15 minutes
+	 * the minute must be something like 15, 30, 45, 300 etc.
+	 */
+	public void setAtMinute(int minute, double value) {
+		if (minute % this.interval != 0)
+			throw new RuntimeException("Time value doesn't match the interval!");
 
-		this.dailyValue = value;
+
+
+		this.values.put(minute, value);
 	}
 
 	/**
-	 * Returns the daily aggregated value.
-	 * */
-	public double getDailyValue() {
-
-		if(dailyValuesOnly){
-			return dailyValue;
-		} else {
-			if(this.hourlyVolume.size() < 24)
-				logger.warn("Less than 24 hourly traffic volumes were provided. Daily traffic volume might be incorrect.");
-			return this.hourlyVolume.values().doubleStream().sum();
-		}
+	 * Returns the observed daily value.
+	 */
+	public OptionalDouble getDailyValue() {
+		return getAtHour(60 * 24);
 	}
 
 	/**
 	 * Returns the observed value at a certain hour.
-	 * */
-	public double getAtHour(int hour) {
-		return hourlyVolume.get(hour);
+	 */
+	public OptionalDouble getAtHour(int hour) {
+		return getAtMinute(hour * 60);
 	}
 
 	/**
-	 * Returns if instance holds only aggregated daily values.
-	 * */
-	public boolean hasOnlyDailyValues() {
-		return dailyValuesOnly;
+	 * Returns the observed value at a certain minute.
+	 */
+	public OptionalDouble getAtMinute(int minutes) {
+		if (values.containsKey(minutes))
+			return OptionalDouble.of(values.get(minutes));
+
+		return OptionalDouble.empty();
 	}
 
 	/**
 	 * Returns the transport mode of the observed data.
-	 * */
+	 */
 	public String getMode() {
 		return mode;
 	}
 
 	/**
 	 * Returns the name of the implementation. Information is needed for data writing.
-	 * */
+	 */
 	public String getMeasurableType() {
 		return type;
+	}
+
+	public int getInterval() {
+		return interval;
 	}
 }
 

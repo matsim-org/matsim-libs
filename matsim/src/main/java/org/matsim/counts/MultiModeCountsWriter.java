@@ -21,12 +21,12 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 
 	Logger logger = LogManager.getLogger(MultiModeCountsWriter.class);
 
-	private final MultiModeCounts counts;
+	private final MultiModeCounts<?> counts;
 
 	/**
 	 * Default Constructor, takes the MultiModeCounts object as argument.
 	 */
-	public MultiModeCountsWriter(MultiModeCounts counts) {
+	public MultiModeCountsWriter(MultiModeCounts<?> counts) {
 		this.counts = counts;
 	}
 
@@ -50,7 +50,6 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 		List<Tuple<String, String>> variables = new ArrayList();
 
 		variables.add(new Tuple<>("measurableTags", counts.getMeasurableTags().stream().reduce((s, s2) -> s.concat(",").concat(s2)).orElse("")));
-		variables.add(new Tuple<>("identifiable", counts.identifiable.getName()));
 		variables.add(new Tuple<>("source", counts.getSource()));
 		variables.add(new Tuple<>("name", counts.getName()));
 		variables.add(new Tuple<>("year", String.valueOf(counts.getYear())));
@@ -79,7 +78,7 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 
 		writeStartTag("counts", null, false, false);
 
-		for (MultiModeCount count : counts.getCounts().values()) {
+		for (MultiModeCount<?> count : counts.getCounts().values()) {
 
 			List<Tuple<String, String>> variables = new ArrayList();
 			variables.add(new Tuple<>("id", count.getId().toString()));
@@ -104,7 +103,7 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 
 	}
 
-	private void writeMeasurables(MultiModeCount count) {
+	private void writeMeasurables(MultiModeCount<?> count) {
 
 		Map<String, Map<String, Measurable>> measurables = count.getMeasurables();
 
@@ -112,40 +111,35 @@ public class MultiModeCountsWriter extends MatsimXmlWriter {
 
 			//write type of measurable data
 			for (Measurable m : entry.getValue().values()) {
-				boolean onlyDailyValues = m.hasOnlyDailyValues();
+				int interval = m.getInterval();
 
-				writeStartTag(m.getMeasurableType(), List.of(new Tuple<>("mode", m.getMode()), new Tuple<>("hasOnlyDailyValues",
-						String.valueOf(String.valueOf(onlyDailyValues).charAt(0)))));
+				writeStartTag(m.getMeasurableType(), List.of(new Tuple<>("mode", m.getMode()), new Tuple<>("interval",
+						String.valueOf(interval))));
 
-				//write either aggregated or disaggregated values
-				if (onlyDailyValues) {
-					writeStartTag("value", List.of(new Tuple<>("daily", String.valueOf(m.getDailyValue()))), true, false);
-				} else {
-					Int2DoubleMap hourlyValues = m.getHourlyValues();
-					try {
-						for (Integer hour : hourlyValues.keySet()) {
-							double v = hourlyValues.get(hour.intValue());
-							writeEmptyLine();
+				//write values
+				Int2DoubleMap hourlyValues = m.getValues();
+				try {
+					for (Integer hour : hourlyValues.keySet()) {
+						double v = hourlyValues.get(hour.intValue());
+						writeEmptyLine();
 
-							//start tag
-							super.writer.write("\t\t\t\t\t<value ");
+						//start tag
+						super.writer.write("\t\t\t\t\t<value ");
 
-							super.writer.write("h=\"" + hour + "\" ");
+						super.writer.write("t=\"" + hour + "\" ");
 
-							super.writer.write("v=\"" + v + "\" ");
+						super.writer.write("v=\"" + v + "\" ");
 
-							//end tag
-							super.writer.write("/>");
-						}
-					} catch (IOException e) {
-						logger.error("Error writing Measurables", e);
+						//end tag
+						super.writer.write("/>");
 					}
+				} catch (IOException e) {
+					logger.error("Error writing Measurables", e);
 				}
 
 				writeEndTag(m.getMeasurableType());
 			}
 		}
-
 	}
 
 	private void writeEmptyLine() {
