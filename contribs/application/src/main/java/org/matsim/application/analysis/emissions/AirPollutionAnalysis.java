@@ -113,7 +113,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		String eventsFile = ApplicationUtils.matchInput("events", input.getRunDirectory()).toString();
 
-		EmissionsOnLinkEventHandler emissionsEventHandler = new EmissionsOnLinkEventHandler(3600);
+		EmissionsOnLinkEventHandler emissionsEventHandler = new EmissionsOnLinkEventHandler(3600, 86400);
 		eventsManager.addHandler(emissionsEventHandler);
 		eventsManager.initProcessing();
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
@@ -129,7 +129,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		writeRaster(filteredNetwork, config, emissionsEventHandler);
 
-		// writeTimeDependentRaster(filteredNetwork, config, emissionsEventHandler);
+		writeTimeDependentRaster(filteredNetwork, config, emissionsEventHandler);
 
 		return 0;
 	}
@@ -278,12 +278,15 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 				for (int yi = 0; yi < yLength.get(0); yi++) {
 
 					Coord coord = raster.getCoordForIndex(xi, yi);
+					double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
+
+					if (value == 0)
+						continue;
 
 					printer.print(0.0);
 					printer.print(coord.getX());
 					printer.print(coord.getY());
 
-					double value = rasterMap.get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
 					printer.print(value);
 
 					printer.println();
@@ -332,12 +335,15 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 					for (TimeBinMap.TimeBin<Map<Pollutant, Raster>> timeBin : timeBinMap.getTimeBins()) {
 
 						Coord coord = raster.getCoordForIndex(xi, yi);
+						double value = timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
+
+						if (value == 0)
+							continue;
 
 						printer.print(timeBin.getStartTime());
 						printer.print(coord.getX());
 						printer.print(coord.getY());
 
-						double value = timeBin.getValue().get(Pollutant.CO2_TOTAL).getValueByIndex(xi, yi);
 						printer.print(value);
 
 						printer.println();
