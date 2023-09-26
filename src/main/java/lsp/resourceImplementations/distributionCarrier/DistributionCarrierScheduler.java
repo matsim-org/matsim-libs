@@ -214,11 +214,11 @@ import java.util.List;
 		final int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
 		final Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);
 		final double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
-		final double latestEnd = legBeforeService.getExpectedTransportTime() + legBeforeService.getExpectedDepartureTime();
-		Assert.isTrue(latestEnd > startTimeOfTransport, "latest End must be later than earliest start. start: " + startTimeOfTransport + " ; end: " +latestEnd);
+		final double endTimeOfTransport = legBeforeService.getExpectedTransportTime() + legBeforeService.getExpectedDepartureTime();
+		Assert.isTrue(endTimeOfTransport >= startTimeOfTransport, "latest End must be later than earliest start. start: " + startTimeOfTransport + " ; end: " +endTimeOfTransport);
 
 		builder.setStartTime(startTimeOfTransport);
-		builder.setEndTime(latestEnd);
+		builder.setEndTime(endTimeOfTransport);
 		builder.setCarrierId(carrier.getId());
 		builder.setFromLinkId(tour.getStartLinkId());
 		builder.setToLinkId(serviceActivity.getLocation());
@@ -239,8 +239,13 @@ import java.util.List;
 		}
 		int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
 		ServiceActivity service = (ServiceActivity) tour.getTourElements().get(serviceIndex);
-		builder.setStartTime(service.getExpectedArrival());
-		builder.setEndTime(service.getDuration() + service.getExpectedArrival());
+
+		final double startTime = service.getExpectedArrival();
+		final double endTime = startTime + service.getDuration();
+		Assert.isTrue(endTime >= startTime, "latest End must be later than earliest start. start: " + startTime + " ; end: " + endTime);
+
+		builder.setStartTime(startTime);
+		builder.setEndTime(endTime);
 		builder.setCarrierId(carrier.getId());
 		builder.setLinkId(serviceActivity.getLocation());
 		builder.setCarrierService(serviceActivity.getService());
