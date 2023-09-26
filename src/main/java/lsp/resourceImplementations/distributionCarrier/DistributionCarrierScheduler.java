@@ -25,6 +25,7 @@ import lsp.resourceImplementations.CarrierSchedulerUtils;
 import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
+import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
@@ -209,12 +210,15 @@ import java.util.List;
 			}
 		}
 		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-		Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
-		double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
+		final Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
+		final int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
+		final Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);
+		final double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
+		final double endTimeOfTransport = legBeforeService.getExpectedTransportTime() + legBeforeService.getExpectedDepartureTime();
+		Assert.isTrue(endTimeOfTransport >= startTimeOfTransport, "latest End must be later than earliest start. start: " + startTimeOfTransport + " ; end: " +endTimeOfTransport);
+
 		builder.setStartTime(startTimeOfTransport);
-		int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
-		Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);
-		builder.setEndTime(legBeforeService.getExpectedTransportTime() + legBeforeService.getExpectedDepartureTime());
+		builder.setEndTime(endTimeOfTransport);
 		builder.setCarrierId(carrier.getId());
 		builder.setFromLinkId(tour.getStartLinkId());
 		builder.setToLinkId(serviceActivity.getLocation());
@@ -235,13 +239,18 @@ import java.util.List;
 		}
 		int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
 		ServiceActivity service = (ServiceActivity) tour.getTourElements().get(serviceIndex);
-		builder.setStartTime(service.getExpectedArrival());
-		builder.setEndTime(service.getDuration() + service.getExpectedArrival());
+
+		final double startTime = service.getExpectedArrival();
+		final double endTime = startTime + service.getDuration();
+		Assert.isTrue(endTime >= startTime, "latest End must be later than earliest start. start: " + startTime + " ; end: " + endTime);
+
+		builder.setStartTime(startTime);
+		builder.setEndTime(endTime);
 		builder.setCarrierId(carrier.getId());
 		builder.setLinkId(serviceActivity.getLocation());
 		builder.setCarrierService(serviceActivity.getService());
 		ShipmentPlanElement unload = builder.build();
-		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
+		String idString = unload.getResourceId() + String.valueOf(unload.getLogisticChainElement().getId()) + unload.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, unload);
 	}

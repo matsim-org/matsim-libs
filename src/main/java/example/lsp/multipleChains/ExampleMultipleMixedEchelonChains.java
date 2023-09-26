@@ -38,7 +38,7 @@ public class ExampleMultipleMixedEchelonChains {
 
 	private static final Logger log = LogManager.getLogger(ExampleMultipleMixedEchelonChains.class);
 
-	private static final AssignerSetting assignerSetting = AssignerSetting.roundRobin;
+	private static final AssignerSetting assignerSetting = AssignerSetting.primary;
 	enum AssignerSetting {primary, roundRobin}
 
 	private static final double TOLL_VALUE = 1000;
@@ -86,7 +86,7 @@ public class ExampleMultipleMixedEchelonChains {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				final MyEventBasedCarrierScorer carrierScorer = new MyEventBasedCarrierScorer();
+				final EventBasedCarrierScorer_MultipleChains carrierScorer = new EventBasedCarrierScorer_MultipleChains();
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
 				carrierScorer.setToll(TOLL_VALUE);
 				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
@@ -120,8 +120,8 @@ public class ExampleMultipleMixedEchelonChains {
 			}
 			ConfigUtils.applyCommandline(config,args);
 		} else {
-			config.controler().setOutputDirectory("output/multipleMixedEchelonChains_" + "_" + assignerSetting);
-			config.controler().setLastIteration(2);
+			config.controler().setOutputDirectory("output/multipleMixedEchelonChains_" + assignerSetting);
+			config.controler().setLastIteration(0);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

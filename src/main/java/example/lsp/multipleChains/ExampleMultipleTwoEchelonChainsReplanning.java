@@ -3,6 +3,8 @@ package example.lsp.multipleChains;
 import lsp.*;
 import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import lsp.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
@@ -36,11 +38,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ExampleMultipleOneEchelonChainsReplanning {
+public class ExampleMultipleTwoEchelonChainsReplanning {
 
-	private static final Logger log = LogManager.getLogger(ExampleMultipleOneEchelonChainsReplanning.class);
+	private static final Logger log = LogManager.getLogger(ExampleMultipleTwoEchelonChainsReplanning.class);
+
+	static final double HUBCOSTS_FIX = 100;
 
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
+	private static final Id<Link> HUB_LEFT_LINK_ID = Id.createLinkId("i(1,5)R");
+	private static final Id<Link> HUB_RIGHT_LINK_ID = Id.createLinkId("j(9,5)");
 
 	private static final VehicleType VEH_TYPE_SMALL_05 = CarrierVehicleType.Builder.newInstance(Id.create("small05", VehicleType.class))
 			.setCapacity(5)
@@ -58,7 +64,7 @@ public class ExampleMultipleOneEchelonChainsReplanning {
 			.setCostPerTimeUnit(0.01)
 			.build();
 
-	private ExampleMultipleOneEchelonChainsReplanning() {
+	private ExampleMultipleTwoEchelonChainsReplanning() {
 	}
 
 	public static void main(String[] args) {
@@ -91,20 +97,13 @@ public class ExampleMultipleOneEchelonChainsReplanning {
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new PlanCalcScoreConfigGroup())), null, 1);
-//					strategyManager.addStrategy(new RoundRobinDistributionAllShipmentsStrategyFactory().createStrategy(), null, 1);
-//					strategyManager.addStrategy(new RandomDistributionAllShipmentsStrategyFactory().createStrategy(), null, 1);
-//					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 1);
-//					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
-//					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
+					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(5);
 					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
 					return strategyManager;
 				});
 			}
 		});
-
-		//TODO: Innovation switch not working
-		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
 		log.info("Run MATSim");
 
@@ -123,8 +122,8 @@ public class ExampleMultipleOneEchelonChainsReplanning {
 			}
 			ConfigUtils.applyCommandline(config,args);
 		} else {
-			config.controler().setOutputDirectory("output/multipleOneEchelonChainsReplanning");
-			config.controler().setLastIteration(10);
+			config.controler().setOutputDirectory("output/multipleTwoEchelonChainsReplanning");
+			config.controler().setLastIteration(8);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -154,92 +153,128 @@ public class ExampleMultipleOneEchelonChainsReplanning {
 		log.info("create LSP");
 		Network network = scenario.getNetwork();
 
-		// A plan with one logistic chain, containing a single carrier is created
-		LSPPlan singleOneEchelonChainPlan;
+		// A plan with a two hub chains is created
+		LSPPlan multipleTwoEchelonChainsPlan;
 		{
-			Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
-			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-
-			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("veh_large"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-			LSPResource singleCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
-					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
-					.build();
-
-			LogisticChainElement singleCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("singleCarrierElement", LogisticChainElement.class))
-					.setResource(singleCarrierResource)
-					.build();
-
-			LogisticChain singleChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("singleChain", LogisticChain.class))
-					.addLogisticChainElement(singleCarrierElement)
-					.build();
-
-			final ShipmentAssigner singleSolutionShipmentAssigner = MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner();
-			singleOneEchelonChainPlan = LSPUtils.createLSPPlan()
-					.addLogisticChain(singleChain)
-					.setAssigner(singleSolutionShipmentAssigner);
-
-			singleOneEchelonChainPlan.setType(MultipleChainsUtils.LspPlanTypes.SINGLE_ONE_ECHELON_CHAIN.toString());
-		}
-
-		// A plan with two different logistic chains on the left and right, with respective carriers is created
-		LSPPlan multipleOneEchelonChainsPlan;
-		{
-			LogisticChainElement leftCarrierElement;
+			LogisticChain hubChainLeft;
 			{
-				Carrier carrierLeft = CarrierUtils.createCarrier(Id.create("carrierLeft", Carrier.class));
-				carrierLeft.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+				Carrier mainCarrierLeft = CarrierUtils.createCarrier(Id.create("mainCarrierLeft", Carrier.class));
+				mainCarrierLeft.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
-				LSPResource carrierLeftResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierLeft, network)
+				CarrierUtils.addCarrierVehicle(mainCarrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+				LSPResource mainCarrierResourceLeft = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrierLeft, network)
+						.setFromLinkId(DEPOT_LINK_ID)
+						.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
+						.setToLinkId(HUB_LEFT_LINK_ID)
+						.setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
+						.build();
+
+				LogisticChainElement mainCarrierElementLeft = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("mainCarrierElementLeft", LogisticChainElement.class))
+						.setResource(mainCarrierResourceLeft)
+						.build();
+
+				LSPResourceScheduler hubSchedulerLeft = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+						.setCapacityNeedFixed(10)
+						.setCapacityNeedLinear(1)
+						.build();
+
+				LSPResource hubResourceLeft = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(Id.create("HubLeft", LSPResource.class), HUB_LEFT_LINK_ID, scenario)
+						.setTransshipmentHubScheduler(hubSchedulerLeft)
+						.build();
+				LSPUtils.setFixedCost(hubResourceLeft, HUBCOSTS_FIX);
+
+				LogisticChainElement hubElementLeft = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("HubElement", LogisticChainElement.class))
+						.setResource(hubResourceLeft)
+						.build();
+
+				Carrier distributionCarrierLeft = CarrierUtils.createCarrier(Id.create("distributionCarrierLeft", Carrier.class));
+				distributionCarrierLeft.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+
+				CarrierUtils.addCarrierVehicle(distributionCarrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LEFT_LINK_ID, VEH_TYPE_SMALL_05));
+				LSPResource distributionCarrierResourceLeft = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrierLeft, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();
 
-				leftCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("leftCarrierElement", LogisticChainElement.class))
-						.setResource(carrierLeftResource)
+				LogisticChainElement distributionCarrierElementLeft = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("distributionCarrierElementLeft", LogisticChainElement.class))
+						.setResource(distributionCarrierResourceLeft)
+						.build();
+
+				mainCarrierElementLeft.connectWithNextElement(hubElementLeft);
+				hubElementLeft.connectWithNextElement(distributionCarrierElementLeft);
+
+				hubChainLeft = LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChainLeft", LogisticChain.class))
+						.addLogisticChainElement(mainCarrierElementLeft)
+						.addLogisticChainElement(hubElementLeft)
+						.addLogisticChainElement(distributionCarrierElementLeft)
 						.build();
 			}
 
-			LogisticChainElement rightCarrierElement;
+			LogisticChain hubChainRight;
 			{
-				Carrier carrierRight = CarrierUtils.createCarrier(Id.create("carrierRight", Carrier.class));
-				carrierRight.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+				Carrier mainCarrier = CarrierUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
+				mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierRight, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
-				LSPResource carrierRightResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierRight, network)
+				CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+				LSPResource mainCarrierResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
+						.setFromLinkId(DEPOT_LINK_ID)
+						.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
+						.setToLinkId(HUB_RIGHT_LINK_ID)
+						.setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
+						.build();
+
+				LogisticChainElement mainCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("mainCarrierElement", LogisticChainElement.class))
+						.setResource(mainCarrierResource)
+						.build();
+
+				LSPResourceScheduler hubScheduler = TranshipmentHubUtils.TranshipmentHubSchedulerBuilder.newInstance()
+						.setCapacityNeedFixed(10)
+						.setCapacityNeedLinear(1)
+						.build();
+
+				LSPResource hubResourceRight = TranshipmentHubUtils.TransshipmentHubBuilder.newInstance(Id.create("HubRight", LSPResource.class), HUB_RIGHT_LINK_ID, scenario)
+						.setTransshipmentHubScheduler(hubScheduler)
+						.build();
+				LSPUtils.setFixedCost(hubResourceRight, HUBCOSTS_FIX);
+
+				LogisticChainElement hubElementRight = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("HubElement", LogisticChainElement.class))
+						.setResource(hubResourceRight)
+						.build();
+
+				Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
+				distributionCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+
+				CarrierUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_RIGHT_LINK_ID, VEH_TYPE_SMALL_05));
+				LSPResource distributionCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();
 
-				rightCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("rightCarrierElement", LogisticChainElement.class))
-						.setResource(carrierRightResource)
+				LogisticChainElement distributionCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("distributionCarrierElement", LogisticChainElement.class))
+						.setResource(distributionCarrierResource)
+						.build();
+
+				mainCarrierElement.connectWithNextElement(hubElementRight);
+				hubElementRight.connectWithNextElement(distributionCarrierElement);
+
+				hubChainRight = LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubChainRight", LogisticChain.class))
+						.addLogisticChainElement(mainCarrierElement)
+						.addLogisticChainElement(hubElementRight)
+						.addLogisticChainElement(distributionCarrierElement)
 						.build();
 			}
 
-			LogisticChain leftChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("leftChain", LogisticChain.class))
-					.addLogisticChainElement(leftCarrierElement)
-					.build();
-
-			LogisticChain rightChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("rightChain", LogisticChain.class))
-					.addLogisticChainElement(rightCarrierElement)
-					.build();
-
-			final ShipmentAssigner shipmentAssigner = MultipleChainsUtils.createRandomLogisticChainShipmentAssigner();
-			multipleOneEchelonChainsPlan = LSPUtils.createLSPPlan()
-					.addLogisticChain(leftChain)
-					.addLogisticChain(rightChain)
-					.setAssigner(shipmentAssigner);
-
-			multipleOneEchelonChainsPlan.setType(MultipleChainsUtils.LspPlanTypes.MULTIPLE_ONE_ECHELON_CHAINS.toString());
+			multipleTwoEchelonChainsPlan = LSPUtils.createLSPPlan()
+					.addLogisticChain(hubChainLeft)
+					.addLogisticChain(hubChainRight)
+					.setAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
-		lspPlans.add(singleOneEchelonChainPlan);
-		lspPlans.add(multipleOneEchelonChainsPlan);
+		lspPlans.add(multipleTwoEchelonChainsPlan);
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(singleOneEchelonChainPlan)
+				.setInitialPlan(multipleTwoEchelonChainsPlan)
 				.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
-		lsp.addPlan(multipleOneEchelonChainsPlan);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
