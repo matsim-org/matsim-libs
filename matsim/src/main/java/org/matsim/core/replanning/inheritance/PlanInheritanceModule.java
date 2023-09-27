@@ -1,5 +1,25 @@
 package org.matsim.core.replanning.inheritance;
 
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ParallelPopulationReaderMatsimV6.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,9 +51,16 @@ import org.matsim.core.utils.io.IOUtils;
 
 import com.google.inject.Singleton;
 
+/**
+ * The core plan inheritance module responsible for
+ *  <li> Initialization of initially read plans and default writers
+ *  <li> Book-keeping, i.e. setting additional plan attributes not stored in the plan itself
+ *  <li> Calculation default stats like the distribution of mutators among (selected) plans
+ * 
+ * @author neuma
+ */
 @Singleton
 public class PlanInheritanceModule extends AbstractModule implements StartupListener, BeforeMobsimListener, ShutdownListener  {
-	
 
 	public static final String PLAN_ID = "planId";
 	public static final String ITERATION_CREATED = "iterationCreated";
@@ -55,11 +82,21 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		// initialize all default writers
 		CompressionType compressionType = event.getServices().getConfig().controler().getCompressionType();
 		this.planInheritanceRecordWriter = new PlanInheritanceRecordWriter(event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + ".csv", compressionType));
 		this.strategies = this.getActiveStrategies(event.getServices().getConfig().strategy().getStrategySettings(), event.getServices().getStrategyManager());
 		this.selectedPlanStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares_selected.csv"));
 		this.planStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares.csv"));
+
+		// reset all plan attributes that might be present from a previously performed matsim run
+		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				plan.setPlanId(null);
+				plan.setPlanMutator(null);
+				plan.setIterationCreated(0);
+			}
+		}
 	}
 
 	/**
@@ -114,6 +151,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		// check the plans of the population and all currently stored plan records - do the actual book-keeping
 		
 		Set<String> activePlanIds = new HashSet<>();
 		Set<String> selectedPlanIds = new HashSet<>();
@@ -169,6 +207,9 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		this.calculateAndWriteDistribution(event.getIteration(), this.strategies, this.planId2planInheritanceRecords, this.planId2planInheritanceRecords.keySet(), this.planStrategyShareWriter);
 	}
 
+	/**
+	 * Updates the default plan stats - namely the distribution of plan mutators based on the given plan ids.
+	 */
 	private void calculateAndWriteDistribution(int currentIteration, ArrayList<String> strategies, Map<String, PlanInheritanceRecord> planId2planInheritanceRecords, Set<String> planIds, BufferedWriter writer) {
 		Map<String, AtomicLong> strategy2count = new HashMap<>();
 		for (String strategyName : strategies) {
@@ -198,6 +239,8 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
+		// flush all pending plan inheritance records and close the readers
+		
 		for (PlanInheritanceRecord planInheritanceRecord : this.planId2planInheritanceRecords.values()) {
 			this.planInheritanceRecordWriter.write(planInheritanceRecord);
 		}
