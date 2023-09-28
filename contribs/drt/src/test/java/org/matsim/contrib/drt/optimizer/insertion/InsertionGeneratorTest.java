@@ -207,10 +207,10 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 1);//pick up 1 pax
 		Waypoint.Stop stop1 = stop(stop0.getDepartureTime() + TIME_REPLACED_DRIVE, link("stop1"), 0);//drop off 1 pax
 
-		double[] slackTimes = { 0, // impossible insertions: 00, 01, 02 (pickup at 0 is not possible)
+		double[] slackTimes = { 0, 0, // impossible insertions: 00, 01, 02 (pickup at 0 is not possible)
 				500, // additional impossible insertions: 11 (too long total detour); however 12 is possible
 				1000 }; // 22 is possible
-		VehicleEntry entry = new VehicleEntry(vehicle, start, ImmutableList.of(stop0, stop1), slackTimes);
+		VehicleEntry entry = new VehicleEntry(vehicle, start, ImmutableList.of(stop0, stop1), slackTimes, 0);
 
 		var insertions = new ArrayList<InsertionWithDetourData>();
 		{//12
@@ -399,8 +399,8 @@ public class InsertionGeneratorTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
-		var slackTimes = new double[stops.length + 1];
+		var slackTimes = new double[stops.length + 2];
 		Arrays.fill(slackTimes, Double.POSITIVE_INFINITY);
-		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes);
+		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes, 0);
 	}
 }

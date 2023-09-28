@@ -25,9 +25,9 @@ public class ChargingChangeoverActivity implements DynActivity {
                                       DynAgent driver, StayTask task,
                                       Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
                                       Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests) {
-        chargingDelegate = new FixedTimeChargingActivity(chargingTask, task.getEndTime());
-        busStopDelegate = new DrtStopActivity(passengerHandler, driver, task, dropoffRequests, pickupRequests, "");
 		endTime = task.getEndTime();
+        chargingDelegate = new FixedTimeChargingActivity(chargingTask, endTime);
+        busStopDelegate = new DrtStopActivity(passengerHandler, driver, () -> endTime, dropoffRequests, pickupRequests, "");
 	}
 
     @Override

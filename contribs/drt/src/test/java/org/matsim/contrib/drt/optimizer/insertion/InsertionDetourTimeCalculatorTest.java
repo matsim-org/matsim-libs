@@ -234,7 +234,7 @@ public class InsertionDetourTimeCalculatorTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
-		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null);
+		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null, 0);
 	}
 
 	private InsertionDetourData detourData(double toPickupTT, double fromPickupTT, double toDropoffTT,
