@@ -19,31 +19,7 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import static java.util.stream.Collectors.toList;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
@@ -70,12 +46,13 @@ import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
-import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -87,7 +64,20 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author jbischoff
@@ -176,6 +166,13 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				.sorted(Comparator.comparing(leg -> leg.departureTime))
 				.collect(toList());
 
+		List<PassengerRequestRejectedEvent> rejectionEvents = drtEventSequenceCollector.getRejectedRequestSequences()
+			.values()
+			.stream()
+			.map(eventSequence -> eventSequence.getRejected().get())
+			.sorted(Comparator.comparing(rejectionEvent -> rejectionEvent.getTime()))
+			.collect(toList());
+
 		collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(), filename(event, "drt_rejections", ".csv"),
 				String.join(delimiter, "time", "personId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
 					DrtRequestSubmittedEvent submission = seq.getSubmitted();
@@ -252,6 +249,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		writeVehicleDistances(drtVehicleStats.getVehicleStates(), filename(event, "vehicleDistanceStats", ".csv"), delimiter);
 		analyseDetours(network, legs, drtVehicleStats.getTravelDistances(), drtCfg, filename(event, "drt_detours"), createGraphs, delimiter);
 		analyseWaitTimes(filename(event, "waitStats"), legs, 1800, createGraphs, delimiter);
+		analyseRejections(filename(event,"drt_rejections_perTimeBin"), rejectionEvents,1800, createGraphs, delimiter);
 		analyseConstraints(filename(event, "constraints"), legs, createGraphs);
 
 		double endTime = qSimCfg.getEndTime()
@@ -399,6 +397,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		dumpOutput(event.getIteration(), "waitTimeComparison", ".png");
 		dumpOutput(event.getIteration(), "waitTimeComparison", ".csv");
 		dumpOutput(event.getIteration(), "drt_rejections", ".csv");
+		dumpOutput(event.getIteration(), "drt_rejections_perTimeBin", ".csv");
 		dumpOutput(event.getIteration(), "drt_legs", ".csv");
 		dumpOutput(event.getIteration(), "vehicleDistanceStats", ".csv");
 		dumpOutput(event.getIteration(), "drt_detours", ".csv");
@@ -451,6 +450,33 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		}
 
 		return splitLegs;
+	}
+
+	private static Map<Double, List<PassengerRequestRejectedEvent>> splitEventsIntoBins(List<PassengerRequestRejectedEvent> rejectionEvents, int binSize_s) {
+		Map<Double, List<PassengerRequestRejectedEvent>> rejections = new TreeMap<>();
+
+		int startTime = ((int)(rejectionEvents.get(0).getTime() / binSize_s)) * binSize_s;
+		int endTime = ((int)(rejectionEvents.get(rejectionEvents.size() - 1).getTime() / binSize_s) + 1) * binSize_s;
+
+		for (int time = startTime; time < endTime; time = time + binSize_s) {
+
+			// rejection list in this timebin
+			List<PassengerRequestRejectedEvent> rejectionList = new ArrayList<>();
+
+			//Iterate through each rejection
+			for (PassengerRequestRejectedEvent rejectedEvent : rejectionEvents){
+				double rejectionTime = rejectedEvent.getTime();
+				if (rejectionTime > endTime || rejectionTime < startTime) {
+					LogManager.getLogger(DrtAnalysisControlerListener.class).error("wrong end / start Times for analysis");
+				}
+
+				if (rejectionTime > time && rejectionTime < time + binSize_s) {
+					rejectionList.add(rejectedEvent);
+				}
+			}
+			rejections.put((double)time, rejectionList);
+		}
+		return rejections;
 	}
 
 	private static void analyzeBoardingsAndDeboardings(List<DrtLeg> legs, String delimiter, double startTime, double endTime, double timeBinSize,
@@ -706,6 +732,55 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			e.printStackTrace();
 		}
 
+	}
+
+	private static void analyseRejections(String fileName, List<PassengerRequestRejectedEvent> rejectionEvents, int binsize_s, boolean createGraphs, String delimiter) {
+		if (rejectionEvents.size() == 0)
+			return;
+
+		Map<Double, List<PassengerRequestRejectedEvent>> splitEvents = splitEventsIntoBins(rejectionEvents, binsize_s);
+
+		DecimalFormat format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+
+		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss");
+
+		BufferedWriter bw = IOUtils.getBufferedWriter(fileName + ".csv");
+		TimeSeriesCollection dataset = new TimeSeriesCollection();
+		TimeSeries rejections = new TimeSeries("number of rejections");
+
+		try {
+			bw.write(String.join(delimiter, "timebin", "rejections"));
+
+			for(Map.Entry<Double, List<PassengerRequestRejectedEvent>> e : splitEvents.entrySet()){
+				int drt_numOfRejection = 0;
+				if (!e.getValue().isEmpty()) {
+					drt_numOfRejection = e.getValue().size();
+				}
+
+				Minute h = new Minute(sdf2.parse(Time.writeTime(e.getKey())));
+
+				rejections.addOrUpdate(h, Double.valueOf(drt_numOfRejection));
+				bw.newLine();
+				bw.write(String.join(delimiter, Time.writeTime(e.getKey()) + "",//
+					format.format(drt_numOfRejection) +""));
+			}
+
+			bw.flush();
+			bw.close();
+			if (createGraphs) {
+				dataset.addSeries(rejections);
+				JFreeChart chart = chartProfile(splitEvents.size(), dataset, "Number of rejections", "Number");
+				ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
+			}
+
+		} catch (IOException | ParseException e) {
+
+			e.printStackTrace();
+		}
 	}
 
 	private static JFreeChart chartProfile(int length, TimeSeriesCollection dataset, String descriptor, String yax) {
