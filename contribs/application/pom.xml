@@ -77,7 +77,7 @@
 		<dependency>
 			<groupId>com.github.matsim-org</groupId>
 			<artifactId>gtfs2matsim</artifactId>
-			<version>master-33809c4f0f-1</version>
+			<version>14.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.geotools</groupId>
