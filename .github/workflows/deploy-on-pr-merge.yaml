@@ -10,8 +10,8 @@ on:
 jobs:
   deploy-snapshot:
     name: deploy PR-labelled version
-    # for PR-labelled deployment -- only if closed by merging
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    # only if PR closed by merging
+    if: github.event.pull_request.merged == true
 
     runs-on: ubuntu-latest
 
