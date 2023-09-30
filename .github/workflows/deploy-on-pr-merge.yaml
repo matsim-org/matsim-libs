@@ -43,5 +43,10 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
 
+      - name: Submit Dependency Graph
+        # Generate a complete dependency graph and submit the graph to the GitHub repository.
+        # The goal is to improve security alerts from dependabot, because dependabot is not able to compute the complete dependency graph.
+        uses: advanced-security/maven-dependency-submission-action@v3
+
     env:
       MAVEN_OPTS: -Xmx2g
