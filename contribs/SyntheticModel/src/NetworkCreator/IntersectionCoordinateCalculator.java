@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class IntersectionCoordinateCalculator {
+public class  IntersectionCoordinateCalculator {
 
 	private final int Meshsize = 1000; // square Meshsize
 	private final int slices;

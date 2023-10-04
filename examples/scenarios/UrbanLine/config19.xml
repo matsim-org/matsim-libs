@@ -123,6 +123,17 @@
 		<param name="modes" value="car,walk,bike,drt" />
 	</module>
 
+	<module name="subtourModeChoice" >
+		<!-- Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: fromAllModesToSpecifiedModes fromSpecifiedModesToSpecifiedModes  -->
+		<param name="behavior" value="fromSpecifiedModesToSpecifiedModes" />
+		<!-- Defines the chain-based modes, seperated by commas -->
+		<param name="chainBasedModes" value="car,bike" />
+		<!-- Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car -->
+		<param name="considerCarAvailability" value="true" />
+		<!-- Defines all the modes available, including chain-based modes, seperated by commas -->
+		<param name="modes" value="walk,bike,car,drt" />
+	</module>
+
 	<module name="multiModeDrt" >
 		<parameterset type="drt" >
 			<parameterset type="ExtensiveInsertionSearch"/>
