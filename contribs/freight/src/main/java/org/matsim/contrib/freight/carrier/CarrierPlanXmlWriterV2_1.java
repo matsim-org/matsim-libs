@@ -131,9 +131,9 @@ import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 						logger.warn("Failed to create directory: " + directoryPath);
 					}
 				}
-				writeCarrierPlan(filename);
 			}
 		}
+		writeCarrierPlan(filename);
 	}
 
 	private void writeRootElement() throws UncheckedIOException, IOException {
