@@ -48,9 +48,9 @@ import java.io.IOException;
  *
  * @author kturner (Kai Martins-Turner)
  */
-public class RunFreightAnalysisEventbased {
+public class RunFreightAnalysisEventBased {
 
-	private static final Logger log = LogManager.getLogger(RunFreightAnalysisEventbased.class);
+	private static final Logger log = LogManager.getLogger(RunFreightAnalysisEventBased.class);
 
 	//Were is your simulation output, that should be analysed?
 	private final String SIM_OUTPUT_PATH ;
@@ -62,7 +62,7 @@ public class RunFreightAnalysisEventbased {
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 * @param globalCrs
 	 */
-	public RunFreightAnalysisEventbased(String simOutputPath, String analysisOutputPath, String globalCrs) {
+	public RunFreightAnalysisEventBased(String simOutputPath, String analysisOutputPath, String globalCrs) {
 		this.SIM_OUTPUT_PATH = simOutputPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 		this.GLOBAL_CRS = globalCrs;
@@ -81,7 +81,7 @@ public class RunFreightAnalysisEventbased {
 		//freight settings
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
 		freightConfigGroup.setCarriersFile( SIM_OUTPUT_PATH + "output_carriers.xml.gz");
-		freightConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_carriersVehicleTypes.xml.gz");
+		freightConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_allVehicles.xml.gz");
 
 		//Were to store the analysis output?
 		String analysisOutputDirectory = ANALYSIS_OUTPUT_PATH;
