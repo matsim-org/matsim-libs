@@ -41,7 +41,7 @@ public class NoiseEventsReader extends MatsimXmlParser{
 	private final EventsManager eventsManager;
 
 	public NoiseEventsReader(EventsManager events) {
-		super();
+		super(ValidationType.NO_VALIDATION);
 		this.eventsManager = events;
 		setValidating(false); // events-files have no DTD, thus they cannot validate
 	}
@@ -73,7 +73,7 @@ public class NoiseEventsReader extends MatsimXmlParser{
 			Id<Vehicle> causingVehicleId = null;
 			Double amount = 0.0;
 			Id<Link> linkId = null;
-			
+
 			for (int i = 0; i < attributes.getLength(); i++){
 				if (attributes.getQName(i).equals("time")){
 					time = Double.parseDouble(attributes.getValue(i));
@@ -101,7 +101,7 @@ public class NoiseEventsReader extends MatsimXmlParser{
 				}
 			}
 			this.eventsManager.processEvent(new NoiseEventCaused(time, timeBinEndTime, linkEnteringTime, causingAgentId, causingVehicleId, amount, linkId));
-		
+
 		} else if (NoiseEventAffected.EVENT_TYPE.equals(eventType)){
 			Double time = 0.0;
 			Double timeBinEndTime = 0.0;
@@ -109,7 +109,7 @@ public class NoiseEventsReader extends MatsimXmlParser{
 			Double amount = 0.0;
 			Id<ReceiverPoint> receiverPointId = null;
 			String activityType = null;
-			
+
 			for (int i = 0; i < attributes.getLength(); i++){
 				if (attributes.getQName(i).equals("time")){
 					time = Double.parseDouble(attributes.getValue(i));
@@ -119,7 +119,7 @@ public class NoiseEventsReader extends MatsimXmlParser{
 				}
 				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_TIME_BIN)){
 					timeBinEndTime = Double.parseDouble(attributes.getValue(i));
-				}	
+				}
 				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_AGENT_ID)){
 					affectedAgentId = Id.create((attributes.getValue(i)), Person.class);
 				}

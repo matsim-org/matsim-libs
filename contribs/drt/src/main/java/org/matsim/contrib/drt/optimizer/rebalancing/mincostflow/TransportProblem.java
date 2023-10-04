@@ -25,8 +25,8 @@ import java.util.function.ToIntBiFunction;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.common.util.DistanceUtils;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 
 import graphs.flows.MinCostFlow;
 import graphs.flows.MinCostFlow.Edge;
@@ -53,16 +53,7 @@ public class TransportProblem<P, C> {
 		return (int)DistanceUtils.calculateDistance(zone1.getCentroid(), zone2.getCentroid());
 	}
 
-	public static class Flow<P, C> {
-		public final P origin;
-		public final C destination;
-		public final int amount;
-
-		private Flow(P origin, C destination, int amount) {
-			this.origin = origin;
-			this.destination = destination;
-			this.amount = amount;
-		}
+	public record Flow<P, C>(P origin, C destination, int amount) {
 	}
 
 	private final ToIntBiFunction<P, C> costFunction;

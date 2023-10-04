@@ -37,7 +37,7 @@ import org.xml.sax.Attributes;
 public class MatsimMatricesReader extends MatsimXmlParser {
 
 	private final static Logger log = LogManager.getLogger(MatsimMatricesReader.class);
-	
+
 	private final static String MATRICES_V1 = "matrices_v1.dtd";
 
 	private final Matrices matrices;
@@ -51,6 +51,7 @@ public class MatsimMatricesReader extends MatsimXmlParser {
 	 * @param scenario The scenario containing the world/layers the matrices reference to.
 	 */
 	public MatsimMatricesReader(final Matrices matrices, final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.matrices = matrices;
 		this.scenario = scenario;
 	}

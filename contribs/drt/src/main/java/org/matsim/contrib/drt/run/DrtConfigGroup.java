@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -80,7 +81,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public boolean useModeFilteredSubnetwork = false;
 
 	@Parameter
-	@Comment("Bus stop duration. Must be positive.")
+	@Comment("Minimum vehicle stop duration. Must be positive.")
 	@Positive
 	public double stopDuration = Double.NaN;// seconds
 
@@ -216,13 +217,16 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtZonalSystemParams.SET_NAME, DrtZonalSystemParams::new, () -> zonalSystemParams,
 				params -> zonalSystemParams = (DrtZonalSystemParams)params);
 
-		//insertion search params (one of: extensive, selective)
+		//insertion search params (one of: extensive, selective, repeated selective)
 		addDefinition(ExtensiveInsertionSearchParams.SET_NAME, ExtensiveInsertionSearchParams::new,
 				() -> drtInsertionSearchParams,
 				params -> drtInsertionSearchParams = (ExtensiveInsertionSearchParams)params);
 		addDefinition(SelectiveInsertionSearchParams.SET_NAME, SelectiveInsertionSearchParams::new,
 				() -> drtInsertionSearchParams,
 				params -> drtInsertionSearchParams = (SelectiveInsertionSearchParams)params);
+		addDefinition(RepeatedSelectiveInsertionSearchParams.SET_NAME, RepeatedSelectiveInsertionSearchParams::new,
+				() -> drtInsertionSearchParams,
+				params -> drtInsertionSearchParams = (RepeatedSelectiveInsertionSearchParams)params);
 
 		//drt fare (optional)
 		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,

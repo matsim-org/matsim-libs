@@ -104,7 +104,7 @@ public class LanduseBuildingAnalysis {
 					}
 				}
 			}
-			log.info("Data distribution for " + resultingDataPerZone.size() + " zones was imported from ",
+			log.info("Data distribution for " + resultingDataPerZone.size() + " zones was imported from " +
 					existingDataDistribution);
 			Files.copy(existingDataDistribution, outputFileInOutputFolder, StandardCopyOption.COPY_ATTRIBUTES);
 		}
@@ -210,7 +210,8 @@ public class LanduseBuildingAnalysis {
 					totalEmployeesInCategoriesPerZone.get(investigationArea).mergeDouble(zoneId,
 							resultingNumberPerCategory, Double::sum);
 			}
-			resultingDataPerZone.get(zoneId).mergeDouble("Employee",
+			if (totalEmployeesInCategoriesPerZone.get(investigationArea).getDouble(zoneId) != 0)
+				resultingDataPerZone.get(zoneId).mergeDouble("Employee",
 					totalEmployeesInCategoriesPerZone.get(investigationArea).getDouble(zoneId), Double::sum);
 		}
 	}
@@ -327,13 +328,16 @@ public class LanduseBuildingAnalysis {
 				log.info("Investigate Building " + countOSMObjects + " of " + buildingsFeatures.size() + " buildings: "
 						+ Math.round((double) countOSMObjects / buildingsFeatures.size() * 100) + " %");
 
+			if (singleBuildingFeature.getFeatureType().indexOf("levels") == -1)
+				throw new RuntimeException("The buildings object should contain the attribute 'levels'.");
+
 			List<String> categoriesOfBuilding = new ArrayList<String>();
 			String[] buildingTypes;
 			Coord centroidPointOfBuildingPolygon = MGC
 					.point2Coord(((Geometry) singleBuildingFeature.getDefaultGeometry()).getCentroid());
 			String singleZone = indexZones.query(centroidPointOfBuildingPolygon);
 			String buildingType = String.valueOf(singleBuildingFeature.getAttribute("type"));
-			if (buildingType.equals("") || buildingType.equals("null") || buildingType.equals("yes")) {
+			if (buildingType.isEmpty() || buildingType.equals("null") || buildingType.equals("yes")) {
 				buildingType = indexLanduse.query(centroidPointOfBuildingPolygon);
 				buildingTypes = new String[] { buildingType };
 			} else {

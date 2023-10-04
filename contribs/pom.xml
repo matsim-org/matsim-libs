@@ -90,11 +90,13 @@
 		<module>parking</module>
 		<module>protobuf</module>
 		<module>pseudosimulation</module>
+		<module>railsim</module>
 		<module>roadpricing</module>
 		<module>sbb-extensions</module>
 		<module>shared_mobility</module>
 		<module>signals</module>
 		<module>simulatedannealing</module>
+		<module>simwrapper</module>
 		<module>socnetsim</module>
 		<module>sumo</module>
 		<module>taxi</module>

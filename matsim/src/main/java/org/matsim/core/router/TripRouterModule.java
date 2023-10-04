@@ -40,7 +40,7 @@ public class TripRouterModule extends AbstractModule {
 
         bind(TripRouter.class); // not thread-safe, not a singleton
         bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
-        bind(AnalysisMainModeIdentifier.class).to(RoutingModeMainModeIdentifier.class);
+        bind(AnalysisMainModeIdentifier.class).to(DefaultAnalysisMainModeIdentifier.class);
 
         bind(MultimodalLinkChooser.class).to(MultimodalLinkChooserDefaultImpl.class);
 
@@ -59,7 +59,7 @@ public class TripRouterModule extends AbstractModule {
         for (String mode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
             addRoutingModuleBinding(mode).toProvider(new BeelineTeleportationRouting(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
         }
-        
+
         boolean linkToLinkRouting = getConfig().controler().isLinkToLinkRoutingEnabled();
         if (linkToLinkRouting) {
             bind(NetworkTurnInfoBuilderI.class).to(NetworkTurnInfoBuilder.class) ;

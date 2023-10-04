@@ -19,7 +19,7 @@
 
 package org.matsim.core.router;
 
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -321,9 +321,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	private static void routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
 			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, Config config) {
-		final ModeRoutingParams params;
-		ModeRoutingParams tmp;
-		final Map<String, ModeRoutingParams> paramsMap = config.plansCalcRoute().getModeRoutingParams();
+		final PlansCalcRouteConfigGroup.TeleportedModeParams params;
+		PlansCalcRouteConfigGroup.TeleportedModeParams tmp;
+		final Map<String, PlansCalcRouteConfigGroup.TeleportedModeParams> paramsMap = config.plansCalcRoute().getModeRoutingParams();
 		if ((tmp = paramsMap.get(TransportMode.non_network_walk)) != null) {
 			params = tmp;
 		} else if ((tmp = paramsMap.get(TransportMode.walk)) != null) {
@@ -354,7 +354,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 	static void routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
-			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, ModeRoutingParams params) {
+			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, TeleportedModeParams params ) {
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
 		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
 		// complication which I certainly don't want here.  kai, dec'15

@@ -22,6 +22,8 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.GenericEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.vehicles.Vehicle;
@@ -73,6 +75,20 @@ public class CarrierShipmentDeliveryStartEvent extends AbstractCarrierEvent {
 		attr.put(ATTRIBUTE_DROPOFF_DURATION, String.valueOf(this.deliveryDuration));
 		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;
+	}
+
+	public static CarrierShipmentDeliveryStartEvent convert(GenericEvent event) {
+		var attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
+		Id<Carrier> carrierId = Id.create(attributes.get(ATTRIBUTE_CARRIER_ID), Carrier.class);
+		Id<CarrierShipment> shipmentId = Id.create(attributes.get(ATTRIBUTE_SHIPMENT_ID), CarrierShipment.class);
+		Id<Link> shipmentTo = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
+		int size = Integer.parseInt(attributes.get(ATTRIBUTE_CAPACITYDEMAND));
+		CarrierShipment shipment = CarrierShipment.Builder.newInstance(shipmentId, null, shipmentTo, size)
+				.setDeliveryServiceTime(Double.parseDouble(attributes.get(ATTRIBUTE_SERVICE_DURATION)))
+				.build();
+		Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(ATTRIBUTE_VEHICLE));
+		return new CarrierShipmentDeliveryStartEvent(time, carrierId, shipment, vehicleId);
 	}
 
 }

@@ -52,7 +52,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -277,7 +277,7 @@ public class AgentNotificationTest {
 				@Override
 				protected void configureQSim() {
 					bind(PopulationAgentSource.class).asEagerSingleton();
-					addNamedComponent(PopulationAgentSource.class, PopulationModule.COMPONENT_NAME);
+					addQSimComponentBinding( PopulationModule.COMPONENT_NAME ).to( PopulationAgentSource.class );
 					bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
 					bind( QVehicleFactory.class ).toProvider( () -> QVehicleImpl::new ) ;
 				}
@@ -306,7 +306,7 @@ public class AgentNotificationTest {
 	private static Scenario createSimpleScenario() {
 		final Config config = ConfigUtils.createConfig();
 
-		ModeRoutingParams params = new ModeRoutingParams( TransportMode.walk ) ;
+		PlansCalcRouteConfigGroup.TeleportedModeParams params = new PlansCalcRouteConfigGroup.TeleportedModeParams( TransportMode.walk ) ;
 		params.setBeelineDistanceFactor(1.3);
 		params.setTeleportedModeSpeed(1.);
 		config.plansCalcRoute().addModeRoutingParams( params );

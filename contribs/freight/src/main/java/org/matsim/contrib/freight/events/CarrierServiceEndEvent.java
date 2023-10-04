@@ -24,6 +24,8 @@ package org.matsim.contrib.freight.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.GenericEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.vehicles.Vehicle;
@@ -66,5 +68,18 @@ public final class CarrierServiceEndEvent extends AbstractCarrierEvent {
 		attr.put(ATTRIBUTE_SERVICE_ID, serviceId.toString());
 		attr.put(ATTRIBUTE_SERVICE_DURATION, String.valueOf(serviceDuration));
 		return attr;
+	}
+
+	public static CarrierServiceEndEvent convert(GenericEvent event) {
+		Map<String, String> attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
+		Id<Carrier> carrierId = Id.create(attributes.get(ATTRIBUTE_CARRIER_ID), Carrier.class);
+		Id<CarrierService> carrierServiceId = Id.create(attributes.get(ATTRIBUTE_SERVICE_ID), CarrierService.class);
+		Id<Link> locationLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
+		CarrierService service = CarrierService.Builder.newInstance(carrierServiceId, locationLinkId)
+				.setServiceDuration(Double.parseDouble(attributes.get(ATTRIBUTE_SERVICE_DURATION)))
+				.build();
+		Id<Vehicle> vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), Vehicle.class);
+		return new CarrierServiceEndEvent(time, carrierId, service, vehicleId);
 	}
 }

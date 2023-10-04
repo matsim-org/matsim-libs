@@ -124,7 +124,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	private VehicleEntry vehicleEntry(String id, Waypoint.Start start, Waypoint.Stop... stops) {
 		var vehicle = mock(DvrpVehicle.class);
 		when(vehicle.getId()).thenReturn(Id.create(id, DvrpVehicle.class));
-		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null);
+		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, 0);
 	}
 
 	private List<Insertion> filterOneInsertionAtEnd(InsertionWithDetourData... insertions) {

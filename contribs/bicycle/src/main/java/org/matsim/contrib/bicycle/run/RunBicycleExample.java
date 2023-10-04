@@ -18,20 +18,24 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.bicycle.AdditionalBicycleLinkScore;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.AllowsConfiguration;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -70,7 +74,7 @@ public class RunBicycleExample {
 		config.controler().setLastIteration(100); // Modify if motorized interaction is used
 		boolean considerMotorizedInteraction = false;
 
-		new RunBicycleExample().run(config, considerMotorizedInteraction);
+		new RunBicycleExample().run(config );
 	}
 
 	static void fillConfigWithBicycleStandardValues(Config config) {
@@ -86,8 +90,9 @@ public class RunBicycleExample {
 
 		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
 
+
 		List<String> mainModeList = new ArrayList<>();
-		mainModeList.add("bicycle");
+		mainModeList.add( bicycleConfigGroup.getBicycleMode() );
 		mainModeList.add(TransportMode.car);
 
 		config.qsim().setMainModes(mainModeList);
@@ -104,7 +109,33 @@ public class RunBicycleExample {
 		config.plansCalcRoute().setNetworkModes(mainModeList);
 	}
 
-	public void run(Config config, boolean considerMotorizedInteraction) {
+	public void run(Config config ) {
+		config.global().setNumberOfThreads(1);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+
+		config.plansCalcRoute().setRoutingRandomness(3.);
+
+		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
+
+		final String bicycle = bicycleConfigGroup.getBicycleMode();
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// set config such that the mode vehicles come from vehicles data:
+		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+
+		// now put hte mode vehicles into the vehicles data:
+		final VehiclesFactory vf = VehicleUtils.getFactory();
+		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) ) );
+		scenario.getVehicles().addVehicleType( vf.createVehicleType(Id.create( bicycle, VehicleType.class ) )
+							 .setNetworkMode( bicycle ).setMaximumVelocity(4.16666666 ).setPcuEquivalents(0.25 ) );
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new BicycleModule() );
+
+		controler.run();
+	}
+	public void runWithOwnScoring(Config config, boolean considerMotorizedInteraction) {
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -127,7 +158,30 @@ public class RunBicycleExample {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new BicycleModule() );
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				this.bind( AdditionalBicycleLinkScore.class ).to( MyAdditionalBicycleLinkScore.class );
+			}
+		} );
 
 		controler.run();
 	}
+
+	private static class MyAdditionalBicycleLinkScore implements AdditionalBicycleLinkScore {
+
+		private final AdditionalBicycleLinkScore delegate;
+		@Inject MyAdditionalBicycleLinkScore( Scenario scenario ) {
+			this.delegate = BicycleUtils.createDefaultBicycleLinkScore( scenario );
+		}
+		@Override public double computeLinkBasedScore( Link link ){
+			double result = (double) link.getAttributes().getAttribute( "carFreeStatus" );  // from zero to one
+
+			double amount = delegate.computeLinkBasedScore( link );
+
+			return amount + result ;  // or some other way to augment the score
+
+		}
+	}
+
+
 }

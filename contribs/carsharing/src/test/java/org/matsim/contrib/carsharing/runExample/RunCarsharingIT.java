@@ -20,7 +20,7 @@
 package org.matsim.contrib.carsharing.runExample;
 
 import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -99,7 +99,7 @@ public class RunCarsharingIT {
 		//		config.qsim().setNumberOfThreads(1);
 
 		{
-			ModeRoutingParams params = new ModeRoutingParams(TransportMode.non_network_walk);
+			TeleportedModeParams params = new TeleportedModeParams(TransportMode.non_network_walk);
 			params.setTeleportedModeSpeed(0.83333333333);
 			//			params.setTeleportedModeSpeed( 2.0 );
 			params.setBeelineDistanceFactor(1.3);
@@ -107,7 +107,7 @@ public class RunCarsharingIT {
 		}
 		{
 			config.plansCalcRoute().removeModeRoutingParams(TransportMode.walk);
-			ModeRoutingParams params = new ModeRoutingParams(TransportMode.walk);
+			TeleportedModeParams params = new TeleportedModeParams(TransportMode.walk);
 			params.setTeleportedModeSpeed(0.83333333333);
 			//			params.setTeleportedModeSpeed( 2.0 );
 			params.setBeelineDistanceFactor(1.3);

@@ -181,7 +181,7 @@ public class MATSimApplicationTest {
 	@MATSimApplication.Prepare({
 			TrajectoryToPlans.class, GenerateShortDistanceTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
 	})
-	private static final class TestScenario extends MATSimApplication {
+	public static final class TestScenario extends MATSimApplication {
 
 		@CommandLine.Mixin
 		private SampleOptions sample = new SampleOptions(1, 10, 25);
