@@ -28,6 +28,7 @@ public class FreefloatingAreasReader extends MatsimXmlParser {
 	private ArrayList<Coord> coords;
 
 	public FreefloatingAreasReader() {
+		super(ValidationType.DTD_ONLY);
 		this.polygonFeatureFactory = new PolygonFeatureFactory.Builder()
 				.setName("freefloating_area")
 				.setCrs(DefaultGeographicCRS.WGS84)

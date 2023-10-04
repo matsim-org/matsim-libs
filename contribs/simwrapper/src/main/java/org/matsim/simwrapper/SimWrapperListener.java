@@ -26,7 +26,10 @@ import java.util.stream.StreamSupport;
 public class SimWrapperListener implements StartupListener, ShutdownListener {
 
 	private static final Logger log = LogManager.getLogger(SimWrapper.class);
-
+	/**
+	 * Run priority of SimWrapper. Generally, it should run after alls other listeners.
+	 */
+	public static double PRIORITY = -1000;
 	private final SimWrapper simWrapper;
 	private final Config config;
 
@@ -34,6 +37,11 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	public SimWrapperListener(SimWrapper simWrapper, Config config) {
 		this.simWrapper = simWrapper;
 		this.config = config;
+	}
+
+	@Override
+	public double priority() {
+		return PRIORITY;
 	}
 
 	@Override
@@ -126,7 +134,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	 * Run dashboard creation and execution. This method is useful when used outside MATSim.
 	 */
 	public void run(Path output) throws IOException {
-		simWrapper.generate(output);
+		generate(output);
 		simWrapper.run(output);
 	}
 

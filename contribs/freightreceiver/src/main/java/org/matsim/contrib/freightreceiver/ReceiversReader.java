@@ -39,6 +39,7 @@ public final class ReceiversReader extends MatsimXmlParser{
 	private final Receivers receivers;
 
 	public ReceiversReader(Receivers receivers) {
+		super(ValidationType.DTD_ONLY);
 		this.receivers = receivers;
 	}
 

@@ -34,6 +34,7 @@ public class ChargerReader extends MatsimXmlParser {
 	private final ChargingInfrastructureSpecification chargingInfrastructure;
 
 	public ChargerReader(ChargingInfrastructureSpecification chargingInfrastructure) {
+		super(ValidationType.DTD_ONLY);
 		this.chargingInfrastructure = chargingInfrastructure;
 	}
 

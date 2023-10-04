@@ -550,7 +550,7 @@ public class Tour {
 
 		@Override
 		public String getActivityType() {
-			return FreightConstants.PICKUP;
+			return CarrierConstants.PICKUP;
 		}
 
 		@Override
@@ -613,7 +613,7 @@ public class Tour {
 
 		@Override
 		public String getActivityType() {
-			return FreightConstants.DELIVERY;
+			return CarrierConstants.DELIVERY;
 		}
 
 		@Override

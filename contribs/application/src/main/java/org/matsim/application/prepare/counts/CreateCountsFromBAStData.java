@@ -292,7 +292,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		}
 	}
 
-	private void match(Network network, NetworkIndex index, BAStCountStation station, CountsOption counts) {
+	private void match(Network network, NetworkIndex<BAStCountStation> index, BAStCountStation station, CountsOption counts) {
 
 		Id<Link> manuallyMatched = counts.isManuallyMatched(station.getId());
 		Link matched;
@@ -357,15 +357,14 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		}
 
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:25832", crs.getInputCRS());
-		NetworkIndex<BAStCountStation> index = new NetworkIndex(filteredNetwork, searchRange, station -> {
-			BAStCountStation countStation = (BAStCountStation) station;
-			Coord coord = countStation.getCoord();
+		NetworkIndex<BAStCountStation> index = new NetworkIndex<>(filteredNetwork, searchRange, station -> {
+			Coord coord = station.getCoord();
 			Coord transform = coordinateTransformation.transform(coord);
 			return MGC.coord2Point(transform);
 		});
 
 		index.addLinkFilter((link, station) -> {
-			String linkDir = BAStCountStation.getLinkDirection(link);
+			String linkDir = BAStCountStation.getLinkDirection(link.link());
 			String stationDir = station.getDirection();
 			return linkDir.contains(stationDir);
 		});

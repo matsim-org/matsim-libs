@@ -84,6 +84,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			CoordinateTransformation coordinateTransformation,
 			TransitSchedule schedule,
 			RouteFactories routeFactory) {
+		super(ValidationType.DTD_ONLY);
 		this.coordinateTransformation = coordinateTransformation;
 		this.schedule = schedule;
 		this.routeFactory = routeFactory;

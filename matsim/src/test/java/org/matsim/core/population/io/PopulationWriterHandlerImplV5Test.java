@@ -57,7 +57,7 @@ public class PopulationWriterHandlerImplV5Test {
 	@Test
 	public void test_writeNetworkRoute_sameStartEndLink() {
 		doTestWriteNetworkRoute("1", "", "1", "1");
-		
+
 		// round trip
 		doTestWriteNetworkRoute("1", "2 3", "1", "1 2 3 1");
 	}
@@ -115,7 +115,7 @@ public class PopulationWriterHandlerImplV5Test {
 		}
 		return nr;
 	}
-	
+
 	@Test
 	public void testWriteGenericRouteRoute() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.util.loadConfig((String) null));
@@ -133,9 +133,9 @@ public class PopulationWriterHandlerImplV5Test {
 		Leg leg = pb.createLeg(TransportMode.walk);
 		Route route = RouteUtils.createGenericRouteImpl(idFrom, idTo);
 		final double travTime = 60.0 * 60.0;
-		route.setTravelTime(travTime); 
+		route.setTravelTime(travTime);
 		final double dist = 100.0;
-		route.setDistance(dist); 
+		route.setDistance(dist);
 		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(pb.createActivityFromLinkId("h", Id.create("2", Link.class)));
@@ -163,6 +163,7 @@ public class PopulationWriterHandlerImplV5Test {
 		/*package*/ String interceptedRouteContent = null;
 
 		public RouteInterceptingPopulationReader(final MatsimXmlParser delegate) {
+			super(ValidationType.DTD_ONLY);
 			this.delegate = delegate;
 		}
 

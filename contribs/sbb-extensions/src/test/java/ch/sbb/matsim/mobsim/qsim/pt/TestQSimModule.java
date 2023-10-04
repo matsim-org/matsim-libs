@@ -4,10 +4,13 @@
 
 package ch.sbb.matsim.mobsim.qsim.pt;
 
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import org.matsim.core.config.Config;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.pt.*;
 import org.matsim.core.replanning.ReplanningContext;
 
 /**
@@ -29,7 +32,14 @@ public class TestQSimModule extends AbstractQSimModule {
     protected void configureQSim() {
         bind(ReplanningContext.class).toInstance(context);
         bind(TransitStopHandlerFactory.class).to(ComplexTransitStopHandlerFactory.class);
+		bind(TransitDriverAgentFactory.class).to(DefaultTransitDriverAgentFactory.class);
     }
+
+	@Provides
+	@Singleton
+	public TransitStopAgentTracker transitStopAgentTracker(QSim qSim) {
+		return new TransitStopAgentTracker(qSim.getEventsManager());
+	}
 
     public static final class DummyReplanningContext implements ReplanningContext {
 
