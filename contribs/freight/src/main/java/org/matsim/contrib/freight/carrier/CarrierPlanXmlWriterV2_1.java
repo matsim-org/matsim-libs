@@ -78,11 +78,11 @@ import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 	}
 
 	/**
-	 * Writes carriers and their plans into a xml-file.
+	 * This now writes out the carriers file.
 	 *
-	 * @param filename should be the target xml-file
+	 * @param filename should be the target xml-file including the path to it.
 	 */
-	public void write(String filename) {
+	private void writeCarrierPlan(String filename) {
 		logger.info("write carrier plans");
 		try {
 			openFile(filename);
@@ -106,17 +106,33 @@ import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 		}
 	}
 
+	/**
+	 * Writes carriers and their plans into a xml-file.
+	 * When using this, the directory, where the file goes to must be present.
+	 *
+	 * @deprecated Please use the method write(String filename, boolean createDirectory, String directoryPath) instead. KMT oct'23
+	 * @param filename should be the target xml-file
+	 */
+	@Deprecated(since = "oct'23")
+	public void write(String filename) {
+		write(filename, false, null);
+	}
+
 	public void write(String filename, boolean createDirectory, String directoryPath) {
+		//TODO: In my point of view the directoyPath in not needed, because it should be possible to get extracted from the filename.
 		if (createDirectory) {
-			File dir = new File(directoryPath);
-			if (!dir.mkdir()) {
-				if (dir.exists()) {
-					logger.info("directory " + directoryPath + " exist already.");
-				} else {
-					logger.warn("Failed to create directory: " + directoryPath);
+			Objects.requireNonNull(createDirectory);
+			if (!directoryPath.isEmpty()) {
+				File dir = new File(directoryPath);
+				if (!dir.mkdir()) {
+					if (dir.exists()) {
+						logger.info("directory " + directoryPath + " exist already.");
+					} else {
+						logger.warn("Failed to create directory: " + directoryPath);
+					}
 				}
+				writeCarrierPlan(filename);
 			}
-			write(filename);
 		}
 	}
 
