@@ -69,7 +69,7 @@ public class EmptyVehicleRelocator {
 		}
 	}
 
-	private void relocateVehicleImpl(DvrpVehicle vehicle, VrpPathWithTravelData vrpPath, DrtTaskType taskType) {
+	private void relocateVehicleImpl(DvrpVehicle vehicle, VrpPathWithTravelData vrpPath, DrtTaskType relocationTaskType) {
 		Schedule schedule = vehicle.getSchedule();
 		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
 		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
@@ -77,7 +77,7 @@ public class EmptyVehicleRelocator {
 		}
 
 		stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
-		schedule.addTask(taskFactory.createDriveTask(vehicle, vrpPath, RELOCATE_VEHICLE_TASK_TYPE)); // add RELOCATE
+		schedule.addTask(taskFactory.createDriveTask(vehicle, vrpPath, relocationTaskType)); // add RELOCATE
 		// append STAY
 		schedule.addTask(taskFactory.createStayTask(vehicle, vrpPath.getArrivalTime(), vehicle.getServiceEndTime(),
 				vrpPath.getToLink()));
