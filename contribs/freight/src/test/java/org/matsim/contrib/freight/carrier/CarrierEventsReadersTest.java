@@ -24,12 +24,14 @@ public class CarrierEventsReadersTest {
 
 		eventsManager.addHandler(collector);
 		eventsManager.initProcessing();
-		carrierEventsReaders.readFile(utils.getClassInputDirectory() + "serviceBasedEventsFile.xml");
+		carrierEventsReaders.readFile(utils.getClassInputDirectory() + "serviceBasedEvents.xml");
 		eventsManager.finishProcessing();
 
+		//Hier müsste dann wohl "serviceBasedEventsWritten.xml" geschrieben werden und dann auch nochmal der eventsManager für die ausgeschriebene Datei durchlaufen werden
+
 		assertEquals("number of events should be same", collector.getEvents().size(), collector.getEvents().size());
-		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "serviceBasedEventsFile.xml", utils.getClassInputDirectory() + "serviceBasedEventsFileWritten.xml");
-		MatsimTestUtils.assertEqualFilesLineByLine(utils.getClassInputDirectory() + "serviceBasedEventsFile.xml", utils.getClassInputDirectory() + "serviceBasedEventsFileWritten.xml");
+		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "serviceBasedEvents.xml", utils.getClassInputDirectory() + "serviceBasedEventsWritten.xml");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getClassInputDirectory() + "serviceBasedEvents.xml", utils.getClassInputDirectory() + "serviceBasedEventsWritten.xml");
 	}
 
 	@Test
@@ -40,12 +42,12 @@ public class CarrierEventsReadersTest {
 
 		eventsManager.addHandler(collector);
 		eventsManager.initProcessing();
-		carrierEventsReaders.readFile(utils.getClassInputDirectory() + "shipmentBasedEventsFile.xml");
+		carrierEventsReaders.readFile(utils.getClassInputDirectory() + "shipmentBasedEvents.xml");
 		eventsManager.finishProcessing();
 
 		assertEquals("number of events should be same", collector.getEvents().size(), collector.getEvents().size());
-		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "shipmentBasedEventsFile.xml", utils.getClassInputDirectory() + "shipmentBasedEventsFileWritten.xml");
-		MatsimTestUtils.assertEqualFilesLineByLine(utils.getClassInputDirectory() + "shipmentBasedEventsFile.xml", utils.getClassInputDirectory() + "shipmentBasedEventsFileWritten.xml");
+		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "shipmentBasedEvents.xml", utils.getClassInputDirectory() + "shipmentBasedEventsWritten.xml");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getClassInputDirectory() + "shipmentBasedEvents.xml", utils.getClassInputDirectory() + "shipmentBasedEventsWritten.xml");
 	}
 
 
