@@ -138,15 +138,15 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	private void returnToDepot(double evaluationInterval, double timeout) {
 		if (drtCfg.idleVehiclesReturnToDepots && mobsimTimer.getTimeOfDay() % evaluationInterval == 0) {
-			Stream<? extends DvrpVehicle> backToDepot = fleet.getVehicles().values().stream()
-					.filter(scheduleInquiry::isIdle).filter(v -> stayTimeoutExceeded(v, timeout));
-
-			backToDepot.forEach(v -> {
-				Link depotLink = depotFinder.findDepot(v);
-				if (depotLink != null) {
-					relocator.relocateVehicle(v, depotLink, EmptyVehicleRelocator.RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE);
-				}
-			});
+			fleet.getVehicles().values().stream()
+				.filter(scheduleInquiry::isIdle)
+				.filter(v -> stayTimeoutExceeded(v, timeout))
+				.forEach(v -> {
+					Link depotLink = depotFinder.findDepot(v);
+					if (depotLink != null) {
+						relocator.relocateVehicle(v, depotLink, EmptyVehicleRelocator.RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE);
+					}
+				});
 		}
 	}
 
