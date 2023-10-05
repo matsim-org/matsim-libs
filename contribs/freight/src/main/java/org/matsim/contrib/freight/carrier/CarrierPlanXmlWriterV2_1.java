@@ -115,13 +115,14 @@ import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 	 */
 	@Deprecated(since = "oct'23")
 	public void write(String filename) {
-		write(filename, false, null);
+		write(filename, false);
 	}
 
-	public void write(String filename, boolean createDirectory, String directoryPath) {
-		//TODO: In my point of view the directoyPath in not needed, because it should be possible to get extracted from the filename.
+	public void write(String filename, boolean createDirectory) {
+		File file = new File(filename);
+		String directoryPath = file.getParent();
+
 		if (createDirectory) {
-			Objects.requireNonNull(createDirectory);
 			if (!directoryPath.isEmpty()) {
 				File dir = new File(directoryPath);
 				if (!dir.mkdir()) {
