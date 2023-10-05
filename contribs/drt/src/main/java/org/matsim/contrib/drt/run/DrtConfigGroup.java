@@ -131,11 +131,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public boolean idleVehiclesReturnToDepots = false;
 
 	@Parameter
-	@Comment("Specifies the time that needs to be exceeded in order to return a vehicle back into depot.")
+	@Comment("Specifies the duration a vehicle needs to be idle in order to get send back to the depot.")
 	public double returnToDepotTimeout = 1800;
 
 	@Parameter
-	@Comment("Specifies the time interval a vehicle gets evaluated to be send back to depot")
+	@Comment("Specifies the time interval a vehicle gets evaluated to be send back to depot.")
 	public double returnToDepotEvaluationInterval = 300;
 
 	public enum OperationalScheme {
