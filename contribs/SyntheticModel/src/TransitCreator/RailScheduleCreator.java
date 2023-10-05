@@ -61,8 +61,8 @@ public class RailScheduleCreator {
 		List<TransitStopFacility> stopFacilities_r = new ArrayList<>(scenario.getTransitSchedule().getFacilities().values());
 		List<TransitRouteStop> transitRouteStops_r = createTransitRouteStopsForFacilities(scheduleFactory, stopFacilities_r);
 
-		TransitRoute transitRoute = scheduleFactory.createTransitRoute(Id.create("Suburbs", TransitRoute.class), null, transitRouteStops, "train");
-		TransitRoute transitRoute_r = scheduleFactory.createTransitRoute(Id.create("Centre", TransitRoute.class), null, transitRouteStops_r, "train");
+		TransitRoute transitRoute = scheduleFactory.createTransitRoute(Id.create("Suburbs", TransitRoute.class), networkRoute, transitRouteStops, "pt");
+		TransitRoute transitRoute_r = scheduleFactory.createTransitRoute(Id.create("Centre", TransitRoute.class), networkRoute_r, transitRouteStops_r, "pt");
 
 
 
@@ -94,7 +94,7 @@ public class RailScheduleCreator {
 
 	private void DepartureCreator(TransitScheduleFactory scheduleFactory, TransitRoute transitRoute_r, String[] times, String[] vehicleRefIds) {
 		for (int i = 0; i < times.length; i++) {
-			Id<Departure> departureId = Id.create("departure_" + (i+1), Departure.class);
+			Id<Departure> departureId = Id.create("d_" + (i+1), Departure.class);
 			double departureTime = Time.parseTime(times[i]);
 			Id<Vehicle> vehicleId = Id.create(vehicleRefIds[i], Vehicle.class);
 			Departure departure = scheduleFactory.createDeparture(departureId, departureTime);
@@ -104,7 +104,7 @@ public class RailScheduleCreator {
 	}
 
 	public static void main(String[] args) {
-		String configFilePath = "C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\config19.xml";
+		String configFilePath = "C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\config05.xml";
 		Config config = ConfigUtils.loadConfig(configFilePath);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -134,6 +134,7 @@ public class RailScheduleCreator {
 			Id.createLinkId("link-id_400.0_733.0_r"),     // length = 333
 			Id.createLinkId("link-id_100.0_400.0_r")      // length = 300
 		);
+
 
 		String[] times = {
 			"06:00:00", "06:15:00", "06:30:00", "06:40:00", "06:50:00", "07:00:00",

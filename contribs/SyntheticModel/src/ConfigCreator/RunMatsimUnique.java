@@ -18,7 +18,7 @@ public class RunMatsimUnique {
 
 		Config config;
 		if ( args==null || args.length==0 || args[0]==null ){
-			config = ConfigUtils.loadConfig( "C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\config19.xml", new MultiModeDrtConfigGroup(),
+			config = ConfigUtils.loadConfig( "C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\config05.xml", new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup() );
 		} else {
 			config = ConfigUtils.loadConfig( args );
