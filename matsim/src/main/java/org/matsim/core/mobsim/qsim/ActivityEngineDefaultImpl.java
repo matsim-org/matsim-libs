@@ -85,7 +85,7 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 			// It is unclear why this convention is supposed to be helpful.
 			// kai & dominik, jul'12
 			//
-			return e1.agent.getId().compareTo(e0.agent.getId());
+			return e0.agent.getId().compareTo(e1.agent.getId());
 		}
 		return cmp;
 	});
