@@ -165,15 +165,23 @@ public class ParkingUtils {
 		activity.getAttributes().putAttribute("parking", "noParking");
 	}
 
-	/** TODO
-	 * @param getOffActivity
+	/**
+	 * This activity has a passenger interaction. This would mean that the location is fixed, and can not be changed.
+	 *
+	 * @param activity
 	 */
-	public static void setPassangerInteractionForActivity(Activity getOffActivity) {
-		getOffActivity.getAttributes().putAttribute("parking", "PassangerInteraction");
+	public static void setPassangerInteractionForActivity(Activity activity) {
+		activity.getAttributes().putAttribute("parking", "PassangerInteraction");
 	}
 
-	public static boolean checkIfActivityHasPassengerInteraction(Activity followingActivity) {
-		return followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute(
+	/**
+	 * Checks if the activity has a passanger interaction. This would mean that the location is fixed, and can not be changed.
+	 *
+	 * @param activity
+	 * @return
+	 */
+	public static boolean checkIfActivityHasPassengerInteraction(Activity activity) {
+		return activity.getAttributes().getAsMap().containsKey("parking") && activity.getAttributes().getAttribute(
 			"parking").equals(
 			"PassangerInteraction");
 	}
