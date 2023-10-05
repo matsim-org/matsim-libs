@@ -43,6 +43,8 @@ import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
+
 /**
  * @author michalm
  */
@@ -95,6 +97,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
 		}
 
+		returnToDepot(drtCfg.returnToDepotEvaluationInterval, drtCfg.returnToDepotTimeout);
 		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
 			if (!scheduleTimingUpdated) {
 				for (DvrpVehicle v : fleet.getVehicles().values()) {
@@ -116,7 +119,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			for (Relocation r : relocations) {
 				Link currentLink = ((DrtStayTask)r.vehicle.getSchedule().getCurrentTask()).getLink();
 				if (currentLink != r.link) {
-					relocator.relocateVehicle(r.vehicle, r.link);
+					relocator.relocateVehicle(r.vehicle, r.link, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE);
 				}
 			}
 		}
@@ -130,15 +133,29 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void nextTask(DvrpVehicle vehicle) {
 		scheduleTimingUpdater.updateBeforeNextTask(vehicle);
-
 		vehicle.getSchedule().nextTask();
+	}
 
-		// if STOP->STAY then choose the best depot
-		if (drtCfg.idleVehiclesReturnToDepots && Depots.isSwitchingFromStopToStay(vehicle)) {
-			Link depotLink = depotFinder.findDepot(vehicle);
-			if (depotLink != null) {
-				relocator.relocateVehicle(vehicle, depotLink);
-			}
+	private void returnToDepot(double evaluationInterval, double timeout) {
+		if (drtCfg.idleVehiclesReturnToDepots && mobsimTimer.getTimeOfDay() % evaluationInterval == 0) {
+			Stream<? extends DvrpVehicle> backToDepot = fleet.getVehicles().values().stream()
+					.filter(scheduleInquiry::isIdle).filter(v -> stayTimeoutExceeded(v, timeout));
+
+			backToDepot.forEach(v -> {
+				Link depotLink = depotFinder.findDepot(v);
+				if (depotLink != null) {
+					relocator.relocateVehicle(v, depotLink, EmptyVehicleRelocator.RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE);
+				}
+			});
 		}
+	}
+
+	boolean stayTimeoutExceeded(DvrpVehicle vehicle, double timeout) {
+		if (STAY.isBaseTypeOf(vehicle.getSchedule().getCurrentTask())) {
+			double now = mobsimTimer.getTimeOfDay();
+			double taskStart = vehicle.getSchedule().getCurrentTask().getBeginTime();
+			return (now - taskStart) > timeout;
+		}
+		return false;
 	}
 }

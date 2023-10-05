@@ -130,6 +130,14 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()")
 	public boolean idleVehiclesReturnToDepots = false;
 
+	@Parameter
+	@Comment("Specifies the time that needs to be exceeded in order to return a vehicle back into depot.")
+	public double returnToDepotTimeout = 1800;
+
+	@Parameter
+	@Comment("Specifies the time interval a vehicle gets evaluated to be send back to depot")
+	public double returnToDepotEvaluationInterval = 300;
+
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
 	}

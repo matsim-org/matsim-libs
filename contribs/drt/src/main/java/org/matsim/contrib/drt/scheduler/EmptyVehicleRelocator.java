@@ -41,6 +41,7 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class EmptyVehicleRelocator {
 	public static final DrtTaskType RELOCATE_VEHICLE_TASK_TYPE = new DrtTaskType("RELOCATE", DRIVE);
+	public static final DrtTaskType RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE = new DrtTaskType("RELOCATE_DEPOT", DRIVE);
 
 	private final TravelTime travelTime;
 	private final MobsimTimer timer;
@@ -55,7 +56,7 @@ public class EmptyVehicleRelocator {
 		router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
-	public void relocateVehicle(DvrpVehicle vehicle, Link link) {
+	public void relocateVehicle(DvrpVehicle vehicle, Link link, DrtTaskType relocationTaskType) {
 		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
 
@@ -63,12 +64,12 @@ public class EmptyVehicleRelocator {
 			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, link, timer.getTimeOfDay(), router,
 					travelTime);
 			if (path.getArrivalTime() < vehicle.getServiceEndTime()) {
-				relocateVehicleImpl(vehicle, path);
+				relocateVehicleImpl(vehicle, path, relocationTaskType);
 			}
 		}
 	}
 
-	private void relocateVehicleImpl(DvrpVehicle vehicle, VrpPathWithTravelData vrpPath) {
+	private void relocateVehicleImpl(DvrpVehicle vehicle, VrpPathWithTravelData vrpPath, DrtTaskType taskType) {
 		Schedule schedule = vehicle.getSchedule();
 		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
 		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
