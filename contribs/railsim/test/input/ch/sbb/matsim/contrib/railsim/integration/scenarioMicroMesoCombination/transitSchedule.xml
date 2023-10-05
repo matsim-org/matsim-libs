@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "https://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="A_F" x="500" y="0" linkRefId="l_a_F" stopAreaId="A"/>
+		<stopFacility id="A_R" x="0" y="0" linkRefId="l_a_R" stopAreaId="A"/>
+		<stopFacility id="B_F" x="6000" y="0" linkRefId="l_b_F" stopAreaId="B"/>
+		<stopFacility id="B_R" x="5500" y="0" linkRefId="l_b_R" stopAreaId="B"/>
+		<stopFacility id="C1_F" x="10600" y="0" linkRefId="l_c1_F" stopAreaId="C"/>
+		<stopFacility id="C1_R" x="10000" y="0" linkRefId="l_c1_R" stopAreaId="C"/>
+		<stopFacility id="C2_F" x="10550" y="50" linkRefId="l_c2_F" stopAreaId="C"/>
+		<stopFacility id="C2_R" x="10050" y="50" linkRefId="l_c2_R" stopAreaId="C"/>
+		<stopFacility id="C3_F" x="10600" y="100" linkRefId="l_c3_F" stopAreaId="C"/>
+		<stopFacility id="C3_R" x="10100" y="100" linkRefId="l_c3_R" stopAreaId="C"/>
+		<stopFacility id="D_F" x="15000" y="0" linkRefId="l_d_F" stopAreaId="D"/>
+		<stopFacility id="D_R" x="14500" y="0" linkRefId="l_d_R" stopAreaId="D"/>
+		<stopFacility id="E_F" x="15000" y="2000" linkRefId="l_e_F" stopAreaId="E"/>
+		<stopFacility id="E_R" x="14500" y="2000" linkRefId="l_e_R" stopAreaId="E"/>
+	</transitStops>
+	<transitLine id="IR">
+		<transitRoute id="IR_F">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="A_F" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="B_F" arrivalOffset="00:03:00" departureOffset="00:05:00" awaitDeparture="true"/>
+				<stop refId="C2_F" arrivalOffset="00:09:00" departureOffset="00:11:00" awaitDeparture="true"/>
+				<stop refId="E_F" arrivalOffset="00:15:00"/>
+			</routeProfile>
+			<route>
+				<link refId="l_a_F"/>
+				<link refId="l_ab1_F"/>
+				<link refId="l_b_F"/>
+				<link refId="l_bc_F"/>
+				<link refId="l_c1_c2_1_F"/>
+				<link refId="l_c2_F"/>
+				<link refId="l_c2_c3_2_F"/>
+				<link refId="l_ce_F_1"/>
+				<link refId="l_ce_F_2"/>
+				<link refId="l_e_F"/>
+			</route>
+			<departures>
+				<departure id="5" departureTime="08:10:00" vehicleRefId="v_IR_1"/>
+				<departure id="9" departureTime="08:40:00" vehicleRefId="v_IR_3"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="IR_R">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="E_R" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="C2_R" arrivalOffset="00:04:00" departureOffset="00:06:00" awaitDeparture="true"/>
+				<stop refId="B_R" arrivalOffset="00:10:00" departureOffset="00:12:00" awaitDeparture="true"/>
+				<stop refId="A_R" arrivalOffset="00:15:00"/>
+			</routeProfile>
+			<route>
+				<link refId="l_e_R"/>
+				<link refId="l_ce_R_2"/>
+				<link refId="l_ce_R_1"/>
+				<link refId="l_c2_c3_2_R"/>
+				<link refId="l_c2_R"/>
+				<link refId="l_c1_c2_1_R"/>
+				<link refId="l_bc_R"/>
+				<link refId="l_b_R"/>
+				<link refId="l_ab1_R"/>
+				<link refId="l_a_R"/>
+			</route>
+			<departures>
+				<departure id="6" departureTime="08:14:00" vehicleRefId="v_IR_2"/>
+				<departure id="10" departureTime="08:44:00" vehicleRefId="v_IR_4"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="IC">
+		<transitRoute id="IC_F">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="A_F" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="C2_F" arrivalOffset="00:07:00" departureOffset="00:09:00" awaitDeparture="true"/>
+				<stop refId="D_F" arrivalOffset="00:12:00"/>
+			</routeProfile>
+			<route>
+				<link refId="l_a_F"/>
+				<link refId="l_ab1_F"/>
+				<link refId="l_b_F"/>
+				<link refId="l_bc_F"/>
+				<link refId="l_c1_c2_1_F"/>
+				<link refId="l_c2_F"/>
+				<link refId="l_c1_c2_2_F"/>
+				<link refId="l_cd_F"/>
+				<link refId="l_d_F"/>
+			</route>
+			<departures>
+				<departure id="3" departureTime="08:00:00" vehicleRefId="v_IC_1"/>
+				<departure id="7" departureTime="08:30:00" vehicleRefId="v_IC_3"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="IC_R">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="D_R" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="C2_R" arrivalOffset="00:03:00" departureOffset="00:05:00" awaitDeparture="true"/>
+				<stop refId="A_R" arrivalOffset="00:12:00"/>
+			</routeProfile>
+			<route>
+				<link refId="l_d_R"/>
+				<link refId="l_cd_R"/>
+				<link refId="l_c1_c2_2_R"/>
+				<link refId="l_c2_R"/>
+				<link refId="l_c1_c2_1_R"/>
+				<link refId="l_bc_R"/>
+				<link refId="l_b_R"/>
+				<link refId="l_ab1_R"/>
+				<link refId="l_a_R"/>
+			</route>
+			<departures>
+				<departure id="4" departureTime="08:02:00" vehicleRefId="v_IC_2"/>
+				<departure id="8" departureTime="08:32:00" vehicleRefId="v_IC_4"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="CARGO">
+		<transitRoute id="CARGO_F">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="A_F" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="D_F" arrivalOffset="00:12:00"/>
+			</routeProfile>
+			<route>
+				<link refId="l_a_F"/>
+				<link refId="l_ab1_F"/>
+				<link refId="l_b_F"/>
+				<link refId="l_bc_F"/>
+				<link refId="l_c1_c2_1_F"/>
+				<link refId="l_c2_F"/>
+				<link refId="l_c1_c2_2_F"/>
+				<link refId="l_cd_F"/>
+				<link refId="l_d_F"/>
+			</route>
+			<departures>
+				<departure id="1" departureTime="07:50:00" vehicleRefId="v_CARGO_1"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="CARGO_R">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="D_R" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="A_R" arrivalOffset="00:12:00"/>
+			</routeProfile>
+			<route>
+				<link refId="l_d_R"/>
+				<link refId="l_cd_R"/>
+				<link refId="l_c1_c2_2_R"/>
+				<link refId="l_c2_R"/>
+				<link refId="l_c1_c2_1_R"/>
+				<link refId="l_bc_R"/>
+				<link refId="l_b_R"/>
+				<link refId="l_ab1_R"/>
+				<link refId="l_a_R"/>
+			</route>
+			<departures>
+				<departure id="2" departureTime="07:50:00" vehicleRefId="v_CARGO_2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

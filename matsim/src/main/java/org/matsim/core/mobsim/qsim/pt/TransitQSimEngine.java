@@ -54,7 +54,7 @@ import jakarta.inject.Inject;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, AgentSource, HasAgentTracker {
+public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentSource, HasAgentTracker {
 
 
 	private Collection<MobsimAgent> ptDrivers;
@@ -80,27 +80,32 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
-	private TransitDriverAgentFactory transitDriverFactory;
+	private final TransitDriverAgentFactory transitDriverFactory;
 
 	private InternalInterface internalInterface = null ;
 
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
-		transitDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, agentTracker);
 	}
 
 	TransitQSimEngine(QSim queueSimulation) {
-		this(queueSimulation, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(queueSimulation.getScenario()) );
+		this(queueSimulation, new SimpleTransitStopHandlerFactory(),
+			new ReconstructingUmlaufBuilder(queueSimulation.getScenario()),
+			new TransitStopAgentTracker(queueSimulation.getEventsManager()),
+			new DefaultTransitDriverAgentFactory());
 	}
 
 	@Inject
-	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory, UmlaufBuilder umlaufBuilder) {
+	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory,
+							 UmlaufBuilder umlaufBuilder, TransitStopAgentTracker tracker,
+							 TransitDriverAgentFactory transitDriverFactory) {
 		this.qSim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();
 		this.umlaufBuilder = umlaufBuilder;
-		this.agentTracker = new TransitStopAgentTracker(this.qSim.getEventsManager());
+		this.agentTracker = tracker;
 		this.stopHandlerFactory = stopHandlerFactory;
+		this.transitDriverFactory = transitDriverFactory;
 	}
 
 	// For tests (which create an Engine, and externally create Agents as well).
@@ -154,7 +159,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(Umlauf umlauf, Vehicle vehicle) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle);
-		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf);
+		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);
@@ -203,10 +208,6 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
 		this.stopHandlerFactory = stopHandlerFactory;
-	}
-
-	public void setAbstractTransitDriverFactory(final TransitDriverAgentFactory abstractTransitDriverFactory) {
-		this.transitDriverFactory = abstractTransitDriverFactory;
 	}
 
 	@Override

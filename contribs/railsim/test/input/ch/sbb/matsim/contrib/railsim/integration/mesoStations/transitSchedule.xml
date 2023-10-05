@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="Depot1" x="0" y="0" linkRefId="depot1_link" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="Bhf1" x="0" y="100" linkRefId="bhf1_link" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="Bhf2" x="0" y="1100" linkRefId="bhf2_link" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="Bhf3" x="-600" y="1600" linkRefId="bhf3_link" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="Depot3" x="-600" y="1700" linkRefId="depot3_link" isBlocking="false">
+		</stopFacility>
+	</transitStops>
+
+	<transitLine id="line1">
+		<transitRoute id="line1_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="Depot1" departureOffset="00:10:00" awaitDeparture="true"/>
+				<stop refId="Bhf1" departureOffset="00:15:00" awaitDeparture="true"/>
+				<stop refId="Bhf2" departureOffset="00:48:00" awaitDeparture="true"/>
+				<stop refId="Bhf3" departureOffset="01:21:00" awaitDeparture="true"/>
+				<stop refId="Depot3" arrivalOffset="01:22:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="depot1_link"/>
+				<link refId="out_depot1_in_bhf1"/>
+				<link refId="bhf1_link"/>
+				<link refId="out_bhf1_in_bhf2"/>
+				<link refId="bhf2_link"/>
+				<link refId="out_bhf2_in_bhf3"/>
+				<link refId="bhf3_link"/>
+				<link refId="in_depot3_out_bhf3"/>
+				<link refId="depot3_link"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train1"/>
+				<departure id="1" departureTime="09:00:00" vehicleRefId="train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

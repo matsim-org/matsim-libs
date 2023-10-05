@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="-103251_0" x="927152.4796589524" y="5956259.892391633" linkRefId="-103251_0" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="-103245_1" x="929237.7845028288" y="5956412.759282229" linkRefId="-103245_1" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="-103248_19" x="931991.9061782291" y="5955567.174656826" linkRefId="-103248_19" isBlocking="false">
+		</stopFacility>
+
+		<stopFacility id="-103224_0" x="927735.3167769414" y="5955175.437275518" linkRefId="-103224_0" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="-103224_19" x="932837.4836376626" y="5959527.575350824" linkRefId="-103224_19" isBlocking="false">
+		</stopFacility>
+
+	</transitStops>
+	<transitLine id="line1">
+		<transitRoute id="line1_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="-103251_0" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="-103245_1" arrivalOffset="00:03:00" departureOffset="00:7:00" awaitDeparture="true"/>
+				<stop refId="-103248_19" arrivalOffset="00:10:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="-103251_0"/>
+				<link refId="-103251_1"/>
+				<link refId="-103251_2"/>
+				<link refId="-103251_3"/>
+				<link refId="-103251_4"/>
+				<link refId="-103251_5"/>
+				<link refId="-103251_6"/>
+				<link refId="-103251_7"/>
+				<link refId="-103251_8"/>
+				<link refId="-103251_9"/>
+				<link refId="-103251_10"/>
+				<link refId="-103251_11"/>
+				<link refId="-103251_12"/>
+				<link refId="-103251_13"/>
+				<link refId="-103251_14"/>
+				<link refId="-103245_0"/>
+				<link refId="-103245_1"/>
+				<link refId="-103248_3"/>
+				<link refId="-103248_4"/>
+				<link refId="-103248_5"/>
+				<link refId="-103248_6"/>
+				<link refId="-103248_7"/>
+				<link refId="-103248_8"/>
+				<link refId="-103248_9"/>
+				<link refId="-103248_10"/>
+				<link refId="-103248_11"/>
+				<link refId="-103248_12"/>
+				<link refId="-103248_13"/>
+				<link refId="-103248_14"/>
+				<link refId="-103248_15"/>
+				<link refId="-103248_16"/>
+				<link refId="-103248_17"/>
+				<link refId="-103248_18"/>
+				<link refId="-103248_19"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train1"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+	<transitLine id="line2">
+		<transitRoute id="line2_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="-103224_0" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="-103224_19" arrivalOffset="00:15:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="-103224_0"/>
+				<link refId="-103224_1"/>
+				<link refId="-103224_2"/>
+				<link refId="-103224_3"/>
+				<link refId="-103224_4"/>
+				<link refId="-103224_5"/>
+				<link refId="-103224_6"/>
+				<link refId="-103224_7"/>
+				<link refId="-103224_8"/>
+				<link refId="-103224_9"/>
+				<link refId="-103224_10"/>
+				<link refId="-103224_11"/>
+				<link refId="-103224_12"/>
+				<link refId="-103224_13"/>
+				<link refId="-103224_14"/>
+				<link refId="-103224_15"/>
+				<link refId="-103224_16"/>
+				<link refId="-103224_17"/>
+				<link refId="-103224_18"/>
+				<link refId="-103224_19"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>
