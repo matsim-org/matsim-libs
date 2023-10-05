@@ -18,7 +18,7 @@ public class RailLinkCreator {
 		Network network = NetworkUtils.readNetwork("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\network22.xml");
 
 		Coord coordStart = new Coord(100, 500);
-		double[] distances = {300, 333, 333, 400, 400, 450,  1000, 1000, 1500, 2000};
+		double[] distances = {300, 333, 350, 400, 410, 450, 1000, 1100, 1500, 2000};
 		int numOfLinks = 10;
 
 		if (distances.length != numOfLinks) {
@@ -44,6 +44,8 @@ public class RailLinkCreator {
 		Set<String> allowedModes = new HashSet<>();
 		allowedModes.add("train");
 		link.setAllowedModes(allowedModes);
+		link.setCapacity(100);
+		link.setFreespeed(12);
 
 		network.addNode(fromNode);
 		network.addNode(toNode);
@@ -52,6 +54,8 @@ public class RailLinkCreator {
 		// Create the reverse link
 		Link reverseLink = network.getFactory().createLink(Id.createLinkId("link-id_" + coordStart.getX() + "_" + coordEnd.getX() + "_r"), toNode, fromNode);
 		reverseLink.setAllowedModes(allowedModes);
+		reverseLink.setCapacity(100);
+		reverseLink.setFreespeed(12);
 		network.addLink(reverseLink);
 
 		// Create Station Link

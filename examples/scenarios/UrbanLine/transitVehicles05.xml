@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+
+	<vehicleType id="1">
+	   <description>train</description>
+	   <capacity>
+		  <seats persons="333"/>
+		  <standingRoom persons="667"/>
+	   </capacity>
+	   <length meter="36"/>
+	</vehicleType>
+	<vehicle id="tr_1" type="1"/>
+	<vehicle id="tr_2" type="1"/>
+	<vehicle id="tr_3" type="1"/>
+	<vehicle id="tr_4" type="1"/>
+
+</vehicleDefinitions>
