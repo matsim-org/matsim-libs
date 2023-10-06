@@ -47,7 +47,7 @@ public class RailLinkCreator {
 		Link link = network.getFactory().createLink(Id.createLinkId("link-id_" + fromNode.getId() + "_" + toNode.getId()), fromNode, toNode);
 
 		Set<String> allowedModes = new HashSet<>();
-		allowedModes.add("train");
+		allowedModes.add("pt");
 		link.setAllowedModes(allowedModes);
 		link.setCapacity(100);
 		link.setFreespeed(12);

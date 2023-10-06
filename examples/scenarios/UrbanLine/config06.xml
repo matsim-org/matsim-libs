@@ -58,7 +58,7 @@
 		<parameterset type="modeParams">
 			<param name="mode" value="pt"/>
 			<param name="constant" value="-130.0" />
-			<param name="marginalUtilityOfTraveling_util_hr" value="-1200.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-1.0" />
 			<param name="monetaryDistanceRate" value="-0.01" />
 			<!-- [utils] daily utility constant. default=0 to be backwards compatible -->
 			<param name="dailyUtilityConstant" value="0.0" />
@@ -135,51 +135,51 @@
 
 	<module name="changeMode">
 		<!-- provide a comma-separated list of leg modes -->
-		<param name="modes" value="car,walk,bike,drt,pt" />
+		<param name="modes" value="car,walk,bike,pt" />
 	</module>
 
-	<module name="subtourModeChoice" >
-		<!-- Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: fromAllModesToSpecifiedModes fromSpecifiedModesToSpecifiedModes  -->
-		<param name="behavior" value="fromSpecifiedModesToSpecifiedModes" />
-		<!-- Defines the chain-based modes, seperated by commas -->
-		<param name="chainBasedModes" value="car,bike,drt,pt" />
-		<!-- Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car -->
-		<param name="considerCarAvailability" value="true" />
-		<!-- Defines all the modes available, including chain-based modes, seperated by commas -->
-		<param name="modes" value="walk,bike,car,drt,pt" />
-	</module>
-
-	<module name="multiModeDrt" >
-		<parameterset type="drt" >
-			<parameterset type="ExtensiveInsertionSearch"/>
-			<!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
-			<param name="maxTravelTimeAlpha" value="3.0" />
-			<!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
-			<param name="maxTravelTimeBeta" value="1200.0" />
-			<!-- Max wait time for the bus to come (optimisation constraint). -->
-			<param name="maxWaitTime" value="600.0" />
-			<!-- Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk -->
-			<param name="maxWalkDistance" value="500.0" />
-			<!-- Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective) -->
-			<param name="mode" value="drt" />
-			<!-- Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default -->
-			<param name="operationalScheme" value="door2door" />
-			<!-- If true, the max travel and wait times of a submitted request are considered hard constraints (the request gets rejected if one of the constraints is violated). If false, the max travel and wait times are considered soft constraints (insertion of a request that violates one of the constraints is allowed, but its cost is increased by additional penalty to make it relatively less attractive). Penalisation of insertions can be customised by injecting a customised InsertionCostCalculator.PenaltyCalculator -->
-			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />
-			<!-- Bus stop duration. Must be positive. -->
-			<param name="stopDuration" value="30.0" />
-			<!-- An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd -->
-			<param name="vehiclesFile" value="UrbanLinedrts0S4.xml" />
-		</parameterset>
-	</module>
-
-
-<!--	<module name="transit">-->
-<!--		<param name="useTransit" value="true" />-->
-<!--		<param name="transitScheduleFile" value="transitschedule.xml" />-->
-<!--		<param name="vehiclesFile" value="transitVehicles05.xml" />-->
-<!--		<param name="transitModes" value="pt" />-->
+<!--	<module name="subtourModeChoice" >-->
+<!--		&lt;!&ndash; Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: fromAllModesToSpecifiedModes fromSpecifiedModesToSpecifiedModes  &ndash;&gt;-->
+<!--		<param name="behavior" value="fromSpecifiedModesToSpecifiedModes" />-->
+<!--		&lt;!&ndash; Defines the chain-based modes, seperated by commas &ndash;&gt;-->
+<!--		<param name="chainBasedModes" value="car,bike,drt,pt" />-->
+<!--		&lt;!&ndash; Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car &ndash;&gt;-->
+<!--		<param name="considerCarAvailability" value="true" />-->
+<!--		&lt;!&ndash; Defines all the modes available, including chain-based modes, seperated by commas &ndash;&gt;-->
+<!--		<param name="modes" value="walk,bike,car,drt,pt" />-->
 <!--	</module>-->
+
+<!--	<module name="multiModeDrt" >-->
+<!--		<parameterset type="drt" >-->
+<!--			<parameterset type="ExtensiveInsertionSearch"/>-->
+<!--			&lt;!&ndash; Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. &ndash;&gt;-->
+<!--			<param name="maxTravelTimeAlpha" value="3.0" />-->
+<!--			&lt;!&ndash; Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. &ndash;&gt;-->
+<!--			<param name="maxTravelTimeBeta" value="1200.0" />-->
+<!--			&lt;!&ndash; Max wait time for the bus to come (optimisation constraint). &ndash;&gt;-->
+<!--			<param name="maxWaitTime" value="600.0" />-->
+<!--			&lt;!&ndash; Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk &ndash;&gt;-->
+<!--			<param name="maxWalkDistance" value="500.0" />-->
+<!--			&lt;!&ndash; Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective) &ndash;&gt;-->
+<!--			<param name="mode" value="drt" />-->
+<!--			&lt;!&ndash; Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default &ndash;&gt;-->
+<!--			<param name="operationalScheme" value="door2door" />-->
+<!--			&lt;!&ndash; If true, the max travel and wait times of a submitted request are considered hard constraints (the request gets rejected if one of the constraints is violated). If false, the max travel and wait times are considered soft constraints (insertion of a request that violates one of the constraints is allowed, but its cost is increased by additional penalty to make it relatively less attractive). Penalisation of insertions can be customised by injecting a customised InsertionCostCalculator.PenaltyCalculator &ndash;&gt;-->
+<!--			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />-->
+<!--			&lt;!&ndash; Bus stop duration. Must be positive. &ndash;&gt;-->
+<!--			<param name="stopDuration" value="30.0" />-->
+<!--			&lt;!&ndash; An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd &ndash;&gt;-->
+<!--			<param name="vehiclesFile" value="UrbanLinedrts0S4.xml" />-->
+<!--		</parameterset>-->
+<!--	</module>-->
+
+
+	<module name="transit">
+		<param name="useTransit" value="true" />
+		<param name="transitScheduleFile" value="transitschedule.xml" />
+		<param name="vehiclesFile" value="transitVehicles05.xml" />
+		<param name="transitModes" value="pt" />
+	</module>
 
 
 </config>
