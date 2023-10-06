@@ -9,7 +9,7 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="network05.xml" />
+		<param name="inputNetworkFile" value="network06.xml" />
 	</module>
 
 	<module name="plans">
@@ -20,7 +20,7 @@
 		<param name="outputDirectory" value="./output" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="2" />
+		<param name="lastIteration" value="25" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="qsim" />
 	</module>
@@ -41,40 +41,75 @@
 		<param name="performing" value="+6" />
 		<param name="waiting" value="-0" />
 
+			<!-- MODE PARAMETERS -->
+		<!-- asc_rail_w   -841.1623 -->
+		<!-- asc_rail_b   -5428.7875 -->
+		<!-- asc_rail_c   -7073.6735 -->
+		<!-- asc_walk     0.0000000 -->
+		<!-- asc_bike     -1834.7472 -->
+		<!-- asc_car      -1835.4811 -->
+		<!-- b_tt_w       -7381.3200 -->
+		<!-- b_tt_b       -6084.3600 -->
+		<!-- b_tt_c       -6063.1200 -->
+		<!-- b_tt_r       -377.6400 -->
+		<!-- b_rail_co    -1.1405 -->
+		<!-- b_car_co     -3.1216 -->
+
+		<!-- ALTERNATE MODE PARAMETERS -->
+		<!-- asc_walk       0.0000000 -->
+		<!-- asc_bike       -1472.1026 -->
+		<!-- asc_car        -1945.6262 -->
+		<!-- asc_pass1      -3860.9948 -->
+		<!-- asc_pass2      -3270.1045 -->
+		<!-- asc_rail_w     -703.1476 -->
+		<!-- asc_rail_b     -5420.1822 -->
+		<!-- asc_rail_c     -8622.1797 -->
+		<!-- asc_rail_p1    -7542.6445 -->
+		<!-- asc_rail_p2    -6973.4619 -->
+		<!-- b_tt_w         -7475.3759 -->
+		<!-- b_tt_b         -5823.9003 -->
+		<!-- b_tt_c         -5662.9789 -->
+		<!-- b_tt_p1        -6188.2158 -->
+		<!-- b_tt_p2        -7067.8152 -->
+		<!-- b_tt_r         -47.7792 -->
+		<!-- b_co           -1310.8 -->
+		<!-- pt cost         20 Y/km -->
+		<!-- drt cost        40 Y/km -->
+		<!-- car cost        10 Y/km -->
+
+
 		<parameterset type="modeParams">
 			<param name="mode" value="car"/>
-			<param name="constant" value="-1600.0" />
-			<param name="marginalUtilityOfDistance_util_m" value="-0.015" />
-			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
+			<param name="constant" value="-1.8" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-5.7" />
+			<param name="monetaryDistanceRate" value="-0.01" />
 		</parameterset>
 		<parameterset type="modeParams">
 			<param name="mode" value="drt"/>
-			<param name="constant" value="0.0" />
-			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
-			<param name="monetaryDistanceRate" value="-0.0" />
+			<param name="constant" value="-3.3" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.2" />
+			<param name="monetaryDistanceRate" value="-0.05" />
 			<!-- [utils] daily utility constant. default=0 to be backwards compatible -->
 			<param name="dailyUtilityConstant" value="-0.0" />
 		</parameterset>
 		<parameterset type="modeParams">
 			<param name="mode" value="pt"/>
-			<param name="constant" value="-130.0" />
-			<param name="marginalUtilityOfTraveling_util_hr" value="-1.0" />
-			<param name="monetaryDistanceRate" value="-0.01" />
+			<param name="constant" value="-0.7" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+			<param name="monetaryDistanceRate" value="-0.03" />
 			<!-- [utils] daily utility constant. default=0 to be backwards compatible -->
 			<param name="dailyUtilityConstant" value="0.0" />
 		</parameterset>
-		<parameterset type="modeParams" >
+		<parameterset type="modeParams">
 			<param name="constant" value="0.0" />
-			<param name="marginalUtilityOfDistance_util_m" value="-0.2" />
-			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-7.5" />
 			<param name="mode" value="walk" />
 			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
-		<parameterset type="modeParams" >
-			<param name="constant" value="-480.0" />
-			<param name="marginalUtilityOfDistance_util_m" value="-0.11" />
+		<parameterset type="modeParams">
+			<param name="constant" value="-1.5" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="-5.8" />
 			<param name="mode" value="bike" />
-			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
 			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 
@@ -135,43 +170,43 @@
 
 	<module name="changeMode">
 		<!-- provide a comma-separated list of leg modes -->
-		<param name="modes" value="car,walk,bike,pt" />
+		<param name="modes" value="car,walk,pt,drt" />
 	</module>
 
-<!--	<module name="subtourModeChoice" >-->
-<!--		&lt;!&ndash; Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: fromAllModesToSpecifiedModes fromSpecifiedModesToSpecifiedModes  &ndash;&gt;-->
-<!--		<param name="behavior" value="fromSpecifiedModesToSpecifiedModes" />-->
-<!--		&lt;!&ndash; Defines the chain-based modes, seperated by commas &ndash;&gt;-->
-<!--		<param name="chainBasedModes" value="car,bike,drt,pt" />-->
-<!--		&lt;!&ndash; Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car &ndash;&gt;-->
-<!--		<param name="considerCarAvailability" value="true" />-->
-<!--		&lt;!&ndash; Defines all the modes available, including chain-based modes, seperated by commas &ndash;&gt;-->
-<!--		<param name="modes" value="walk,bike,car,drt,pt" />-->
-<!--	</module>-->
+	<module name="subtourModeChoice" >
+		<!-- Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: fromAllModesToSpecifiedModes fromSpecifiedModesToSpecifiedModes  -->
+		<param name="behavior" value="fromSpecifiedModesToSpecifiedModes" />
+		<!-- Defines the chain-based modes, seperated by commas -->
+		<param name="chainBasedModes" value="car,bike" />
+		<!-- Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car -->
+		<param name="considerCarAvailability" value="true" />
+		<!-- Defines all the modes available, including chain-based modes, seperated by commas -->
+		<param name="modes" value="walk,bike,car,drt,pt" />
+	</module>
 
-<!--	<module name="multiModeDrt" >-->
-<!--		<parameterset type="drt" >-->
-<!--			<parameterset type="ExtensiveInsertionSearch"/>-->
-<!--			&lt;!&ndash; Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. &ndash;&gt;-->
-<!--			<param name="maxTravelTimeAlpha" value="3.0" />-->
-<!--			&lt;!&ndash; Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. &ndash;&gt;-->
-<!--			<param name="maxTravelTimeBeta" value="1200.0" />-->
-<!--			&lt;!&ndash; Max wait time for the bus to come (optimisation constraint). &ndash;&gt;-->
-<!--			<param name="maxWaitTime" value="600.0" />-->
-<!--			&lt;!&ndash; Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk &ndash;&gt;-->
-<!--			<param name="maxWalkDistance" value="500.0" />-->
-<!--			&lt;!&ndash; Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective) &ndash;&gt;-->
-<!--			<param name="mode" value="drt" />-->
-<!--			&lt;!&ndash; Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default &ndash;&gt;-->
-<!--			<param name="operationalScheme" value="door2door" />-->
-<!--			&lt;!&ndash; If true, the max travel and wait times of a submitted request are considered hard constraints (the request gets rejected if one of the constraints is violated). If false, the max travel and wait times are considered soft constraints (insertion of a request that violates one of the constraints is allowed, but its cost is increased by additional penalty to make it relatively less attractive). Penalisation of insertions can be customised by injecting a customised InsertionCostCalculator.PenaltyCalculator &ndash;&gt;-->
-<!--			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />-->
-<!--			&lt;!&ndash; Bus stop duration. Must be positive. &ndash;&gt;-->
-<!--			<param name="stopDuration" value="30.0" />-->
-<!--			&lt;!&ndash; An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd &ndash;&gt;-->
-<!--			<param name="vehiclesFile" value="UrbanLinedrts0S4.xml" />-->
-<!--		</parameterset>-->
-<!--	</module>-->
+	<module name="multiModeDrt" >
+		<parameterset type="drt" >
+			<parameterset type="ExtensiveInsertionSearch"/>
+			<!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
+			<param name="maxTravelTimeAlpha" value="3.0" />
+			<!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
+			<param name="maxTravelTimeBeta" value="1200.0" />
+			<!-- Max wait time for the bus to come (optimisation constraint). -->
+			<param name="maxWaitTime" value="600.0" />
+			<!-- Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk -->
+			<param name="maxWalkDistance" value="500.0" />
+			<!-- Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective) -->
+			<param name="mode" value="drt" />
+			<!-- Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default -->
+			<param name="operationalScheme" value="door2door" />
+			<!-- If true, the max travel and wait times of a submitted request are considered hard constraints (the request gets rejected if one of the constraints is violated). If false, the max travel and wait times are considered soft constraints (insertion of a request that violates one of the constraints is allowed, but its cost is increased by additional penalty to make it relatively less attractive). Penalisation of insertions can be customised by injecting a customised InsertionCostCalculator.PenaltyCalculator -->
+			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />
+			<!-- Bus stop duration. Must be positive. -->
+			<param name="stopDuration" value="30.0" />
+			<!-- An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd -->
+			<param name="vehiclesFile" value="UrbanLinedrts0S4.xml" />
+		</parameterset>
+	</module>
 
 
 	<module name="transit">

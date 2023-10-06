@@ -14,6 +14,7 @@ import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 import java.io.File;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -118,6 +119,7 @@ public class RailScheduleCreator {
 
 		// Import link network route
 		List<Id<Link>> linkIds = Arrays.asList(
+			Id.createLinkId("link-id_99.0_100.0"),    // length = 1
 			Id.createLinkId("link-id_100.0_400.0"),    // length = 300
 			Id.createLinkId("link-id_400.0_733.0"),    // length = 333
 			Id.createLinkId("link-id_733.0_1083.0"),   // length = 350
@@ -127,10 +129,13 @@ public class RailScheduleCreator {
 			Id.createLinkId("link-id_2343.0_3343.0"),  // length = 1000
 			Id.createLinkId("link-id_3343.0_4443.0"),  // length = 1100
 			Id.createLinkId("link-id_4443.0_5943.0"),  // length = 1500
-			Id.createLinkId("link-id_5943.0_7943.0")   // length = 2000
+			Id.createLinkId("link-id_5943.0_7943.0"),   // length = 2000
+			Id.createLinkId("link-id_7943.0_7944.0")   // length = 1
+
 		);
-// Reverse route LinkIds_r in descending order of length
+		// Reverse route LinkIds_r in descending order of length
 		List<Id<Link>> LinkIds_r = Arrays.asList(
+			Id.createLinkId("link-id_7943.0_7944.0_r"),   // length = 1
 			Id.createLinkId("link-id_5943.0_7943.0_r"),   // length = 2000
 			Id.createLinkId("link-id_4443.0_5943.0_r"),   // length = 1500
 			Id.createLinkId("link-id_3343.0_4443.0_r"),   // length = 1100
@@ -140,28 +145,47 @@ public class RailScheduleCreator {
 			Id.createLinkId("link-id_1083.0_1483.0_r"),   // length = 400
 			Id.createLinkId("link-id_733.0_1083.0_r"),    // length = 350
 			Id.createLinkId("link-id_400.0_733.0_r"),     // length = 333
-			Id.createLinkId("link-id_100.0_400.0_r")      // length = 300
+			Id.createLinkId("link-id_100.0_400.0_r"),      // length = 300
+			Id.createLinkId("link-id_99.0_100.0_r")   // length = 1
 		);
 
-
 		String[] times = {
-			"06:00:00", "06:15:00", "06:30:00", "06:45:00", "07:00:00", "07:15:00",
-			"07:30:00", "07:45:00", "08:00:00", "08:15:00", "08:30:00", "08:45:00",
-			"09:00:00", "09:15:00", "09:30:00", "09:45:00", "10:00:00", "10:15:00",
-			"10:30:00", "10:45:00", "11:00:00", "11:15:00", "11:30:00", "11:45:00",
-			"12:00:00", "12:15:00", "12:30:00", "12:45:00", "13:00:00", "13:15:00",
-			"13:30:00", "13:45:00", "14:00:00", "14:15:00", "14:30:00", "14:45:00",
-			"15:00:00", "15:15:00", "15:30:00", "15:45:00", "16:00:00", "16:15:00",
-			"16:30:00", "16:45:00", "17:00:00", "17:15:00", "17:30:00", "17:45:00",
-			"18:00:00", "18:15:00", "18:30:00", "18:45:00", "19:00:00", "19:15:00",
-			"19:30:00", "19:45:00", "20:00:00", "20:15:00", "20:30:00", "20:45:00",
-			"21:00:00", "21:15:00", "21:30:00", "21:45:00", "22:00:00", "22:15:00",
-			"22:30:00", "22:45:00", "23:00:00", "23:15:00", "23:30:00", "23:45:00"
+			// 6 AM to 6:45 AM: every 10 minutes
+			"06:00:00", "06:10:00", "06:20:00", "06:30:00", "06:40:00",
+
+			// 6:45 AM to 7:30 AM: every 7 minutes
+			"06:45:00", "06:52:00", "06:59:00", "07:06:00", "07:13:00", "07:20:00", "07:27:00",
+
+			// 7:30 AM to 8:15 AM: every 10 minutes
+			"07:30:00", "07:40:00", "07:50:00", "08:00:00", "08:10:00", "08:20:00",
+
+			// 8:15 AM to 4:15 PM: every 15 minutes
+			"08:30:00", "08:45:00", "09:00:00", "09:15:00", "09:30:00", "09:45:00", "10:00:00", "10:15:00", "10:30:00",
+			"10:45:00", "11:00:00", "11:15:00", "11:30:00", "11:45:00", "12:00:00", "12:15:00", "12:30:00", "12:45:00",
+			"13:00:00", "13:15:00", "13:30:00", "13:45:00", "14:00:00", "14:15:00", "14:30:00", "14:45:00", "15:00:00",
+			"15:15:00", "15:30:00", "15:45:00", "16:00:00",
+
+			// 4:15 PM to 5 PM: every 10 minutes
+			"16:10:00", "16:20:00", "16:30:00", "16:40:00", "16:50:00",
+
+			// 5 PM to 6 PM: every 7 minutes
+			"17:00:00", "17:07:00", "17:14:00", "17:21:00", "17:28:00", "17:35:00", "17:42:00", "17:49:00", "17:56:00",
+
+			// 6 PM to 7 PM: every 10 minutes
+			"18:00:00", "18:10:00", "18:20:00", "18:30:00", "18:40:00", "18:50:00",
+
+			// 7 PM to 12 AM: every 15 minutes
+			"19:00:00", "19:15:00", "19:30:00", "19:45:00", "20:00:00", "20:15:00", "20:30:00", "20:45:00", "21:00:00",
+			"21:15:00", "21:30:00", "21:45:00", "22:00:00", "22:15:00", "22:30:00", "22:45:00", "23:00:00", "23:15:00"
 		};
 
 		String[] vehicleRefIds = new String[times.length];
 		for (int i = 0; i < times.length; i++) {
-			vehicleRefIds[i] = (i % 2 == 0) ? "tr_2" : "tr_1";
+			if (LocalTime.parse(times[i]).isAfter(LocalTime.of(8, 15)) && LocalTime.parse(times[i]).isBefore(LocalTime.of(17, 0))) {
+				vehicleRefIds[i] = "tr_" + ((i % 4) + 1); // rotates between tr_1, tr_2, tr_3, tr_4
+			} else {
+				vehicleRefIds[i] = (i % 2 == 0) ? "tr_1" : "tr_2"; // alternates between tr_1 and tr_2
+			}
 		}
 
 			RailScheduleCreator creator = new RailScheduleCreator(scenario);

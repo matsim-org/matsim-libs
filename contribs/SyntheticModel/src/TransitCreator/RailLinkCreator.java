@@ -13,32 +13,49 @@ import java.util.Set;
 public class RailLinkCreator {
 
 	public static void main(String[] args) {
+		// Instantiate the RailLinkCreator
 		RailLinkCreator creator = new RailLinkCreator();
+
+		// Read the network from the XML file
 		Network network = NetworkUtils.readNetwork("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\network22.xml");
 
+		// Define the initial coordinate and distances for the rail links
 		Coord coordStart = new Coord(100, 500);
 		double[] distances = {300, 333, 350, 400, 410, 450, 1000, 1100, 1500, 2000};
 		int numOfLinks = 10;
 
-		if (distances.length != numOfLinks) {
-			System.out.println("The number of distances provided does not match the number of links specified.");
-			return;
-		}
+		// Create an initial extra node to the left of the coordStart
+		Coord initialExtraCoord = new Coord(coordStart.getX() - 1, coordStart.getY());
+		Node InitialStation = network.getFactory().createNode(Id.createNodeId(String.valueOf(initialExtraCoord.getX())), initialExtraCoord);
+		network.addNode(InitialStation);  // Add this node to the network
 
-		Node previousNode = network.getFactory().createNode(Id.createNodeId("" + coordStart.getX()), coordStart);
+		// Create the starting node to act as a station for turn around
+		Node previousNode = network.getFactory().createNode(Id.createNodeId(String.valueOf(coordStart.getX())), coordStart);
 		network.addNode(previousNode);
+		creator.createRailLink(network, InitialStation, previousNode);
 
+		// Iterate to create the main nodes and links
 		for (int i = 0; i < numOfLinks; i++) {
+			// Calculate the end coordinate for the current link
 			Coord coordEnd = new Coord(coordStart.getX() + distances[i], coordStart.getY());
-			Node currentNode = network.getFactory().createNode(Id.createNodeId("" + coordEnd.getX()), coordEnd);
-			network.addNode(currentNode);
+			Node currentNode = network.getFactory().createNode(Id.createNodeId(String.valueOf(coordEnd.getX())), coordEnd);
+			network.addNode(currentNode);  // Add this node to the network
 
+			// Connect the previous node to the current node
 			creator.createRailLink(network, previousNode, currentNode);
 
+			// Update the previous node and start coordinate for the next iteration
 			previousNode = currentNode;
 			coordStart = coordEnd;
 		}
 
+		// Create a final extra node to the right of the last coordEnd
+		Coord finalExtraCoord = new Coord(coordStart.getX() + 1, coordStart.getY());
+		Node finalExtraNode = network.getFactory().createNode(Id.createNodeId("" + finalExtraCoord.getX()), finalExtraCoord);
+		network.addNode(finalExtraNode);
+		creator.createRailLink(network, previousNode, finalExtraNode);
+
+		// Write the modified network back to the XML file
 		new NetworkWriter(network).write("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\pathToSave.xml");
 	}
 
