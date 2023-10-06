@@ -20,7 +20,7 @@
 		<param name="outputDirectory" value="./output" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="25" />
+		<param name="lastIteration" value="20" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="qsim" />
 	</module>
@@ -114,6 +114,7 @@
 		</parameterset>
 
 
+
 		<parameterset type="activityParams">
 			<param name="activityType"    value="h" /> <!-- home -->
 			<param name="priority"        value="1" />
@@ -144,6 +145,25 @@
 		</parameterset>
 	</module>
 
+	<module name="planscalcroute" >
+		<param name="networkModes" value="car" />
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.0" />
+			<param name="mode" value="dummy" />
+			<param name="teleportedModeSpeed" value="10000.0" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.3" />
+			<param name="mode" value="bike" />
+			<param name="teleportedModeSpeed" value="3.055" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.3" />
+			<param name="mode" value="walk" />
+			<param name="teleportedModeSpeed" value="1.25" />
+		</parameterset>
+	</module>
+
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
@@ -170,7 +190,7 @@
 
 	<module name="changeMode">
 		<!-- provide a comma-separated list of leg modes -->
-		<param name="modes" value="car,walk,pt,drt" />
+		<param name="modes" value="car,bike,walk,pt,drt" />
 	</module>
 
 	<module name="subtourModeChoice" >
@@ -184,29 +204,118 @@
 		<param name="modes" value="walk,bike,car,drt,pt" />
 	</module>
 
-	<module name="multiModeDrt" >
-		<parameterset type="drt" >
+
+	<!-- This module is dedicated to configuring the multi-modal DRT (Demand Responsive Transport). -->
+	<module name="multiModeDrt">
+		<parameterset type="drt">
+			<!-- The search strategy for finding a vehicle for a DRT request. -->
 			<parameterset type="ExtensiveInsertionSearch"/>
-			<!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
-			<param name="maxTravelTimeAlpha" value="3.0" />
-			<!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
-			<param name="maxTravelTimeBeta" value="1200.0" />
-			<!-- Max wait time for the bus to come (optimisation constraint). -->
-			<param name="maxWaitTime" value="600.0" />
-			<!-- Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk -->
-			<param name="maxWalkDistance" value="500.0" />
-			<!-- Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective) -->
-			<param name="mode" value="drt" />
+			<!-- The duration of a stop in seconds. This is the time a vehicle waits at a stop. -->
+			<param name="stopDuration" value="60"/>
 			<!-- Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default -->
-			<param name="operationalScheme" value="door2door" />
-			<!-- If true, the max travel and wait times of a submitted request are considered hard constraints (the request gets rejected if one of the constraints is violated). If false, the max travel and wait times are considered soft constraints (insertion of a request that violates one of the constraints is allowed, but its cost is increased by additional penalty to make it relatively less attractive). Penalisation of insertions can be customised by injecting a customised InsertionCostCalculator.PenaltyCalculator -->
-			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />
-			<!-- Bus stop duration. Must be positive. -->
-			<param name="stopDuration" value="30.0" />
-			<!-- An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd -->
-			<param name="vehiclesFile" value="UrbanLinedrts0S4.xml" />
+			<param name="operationalScheme" value="door2door"/>
+			<!-- Maximum wait time in seconds before being picked up by a DRT vehicle. -->
+			<param name="maxWaitTime" value="3600"/>
+			<!-- Alpha parameter for max travel time estimation. Used to increase the travel time estimation based on direct travel time. -->
+			<param name="maxTravelTimeAlpha" value="3.0"/>
+			<!-- Beta parameter for max travel time estimation. This value in seconds will be added to the estimated travel time. -->
+			<param name="maxTravelTimeBeta" value="1200"/>
+
+			<param name="vehiclesFile" value="UrbanLinedrts0S4.xml"/>
+
+			<parameterset type="zonalSystem">
+				<!-- Specifies how the zones are generated. Here, it's based on a grid derived from the network. -->
+				<param name="zonesGeneration" value="GridFromNetwork"/>
+				<!-- The cell size of the grid in meters. This defines the size of each zone in the zonal system. -->
+				<param name="cellSize" value="10"/>
+			</parameterset>
+
+			<parameterset type="rebalancing">
+				<!-- Uses the min-cost flow rebalancing strategy. -->
+				<parameterset type="minCostFlowRebalancingStrategy">
+					<!-- Target alpha value for the rebalancing strategy. -->
+					<param name="targetAlpha" value="0.5"/>
+					<!-- Target beta value for the rebalancing strategy. -->
+					<param name="targetBeta" value="0.5"/>
+				</parameterset>
+			</parameterset>
+
+			<parameterset type="drtfare">
+				<!-- Base fare for a DRT trip. -->
+				<param name="basefare" value="100.0"/>
+				<!-- Daily subscription fee for using the DRT service. -->
+				<param name="dailySubscriptionFee" value="0.0"/>
+				<!-- Fare per meter of travel. -->
+				<param name="distanceFare_m" value="0.08"/>
+				<!-- Fare per hour of travel. -->
+				<param name="timeFare_h" value="0"/>
+				<!-- Minimum fare charged per DRT trip. -->
+				<param name="minFarePerTrip" value="150"/>
+			</parameterset>
 		</parameterset>
 	</module>
+
+	<module name="swissRailRaptor" >
+		<!-- Sets whether intermodal access and egress modes are selected by least cost (default) or randomly chosen out of the available access / egress modes. -->
+		<param name="intermodalAccessEgressModeSelection" value="RandomSelectOneModePerRoutingRequestAndDirection" />
+		<param name="useIntermodalAccessEgress" value="true" />
+		<param name="useRangeQuery" value="true" />
+		<param name="scoringParameters" value="Individual" />
+		<param name="transferPenaltyBaseCost" value="100" />
+		<param name="transferPenaltyCostPerTravelTimeHour" value="200" />
+		<param name="transferPenaltyMaxCost" value="300" />
+		<param name="transferPenaltyMinCost" value="130" />
+
+		<!-- The configuration for walking as access/egress mode. -->
+		<parameterset type="intermodalAccessEgress" >
+			<!-- Initial distance around a person's origin or destination within which transit stops are looked for. -->
+			<param name="initialSearchRadius" value="1500.0" />
+			<!-- Maximum distance a person is willing to walk to/from a transit stop. -->
+			<param name="maxRadius" value="2500.0" />
+			<!-- If less than 2 transit stops are found within the initial search radius,
+                 this value is added to the initial radius iteratively until transit stops are found or maxRadius is reached. -->
+			<param name="searchExtensionRadius" value="500.0" />
+			<!-- mode of transport for this parameterset is walking. -->
+			<param name="mode" value="walk" />
+		</parameterset>
+
+		<!-- The configuration for DRT as access/egress mode. -->
+		<parameterset type="intermodalAccessEgress" >
+			<!-- Initial distance around a person's origin or destination within which transit stops are looked for when using DRT. -->
+			<param name="initialSearchRadius" value="3000.0" />
+			<!-- If specific link IDs are to be used for DRT, they would be specified by an attribute.
+                 In this case, no such attribute is set (null). -->
+			<param name="linkIdAttribute" value="null" />
+			<!-- Maximum distance a person is willing to travel using DRT to/from a transit stop. -->
+			<param name="maxRadius" value="4000.0" />
+			<param name="mode" value="drt" />
+			<!-- Specific agent attributes  considered for DRT access/egress. -->
+			<param name="personFilterAttribute" value="null" />
+			<param name="personFilterValue" value="null" />
+			<!-- Similar to walking, if fewer transit stops are found,
+                 this value is added to the initial radius until stops are found or maxRadius is reached. -->
+			<param name="searchExtensionRadius" value="1000.0" />
+			<!-- If sharing of DRT vehicles is considered, this defines the maximum search radius for potential ride-sharing opportunities.
+                 Here, it's set to infinity, meaning there's no limit. -->
+			<param name="shareTripSearchRadius" value="Infinity" />
+			<!-- If transit stops are filtered based on specific attributes, those would be defined here.
+                 In this case, no such attributes are set. -->
+			<param name="stopFilterAttribute" value="null" />
+			<param name="stopFilterValue" value="null" />
+		</parameterset>
+
+		<parameterset type="rangeQuerySettings" >
+			<param name="maxEarlierDeparture_sec" value="900" />
+			<param name="maxLaterDeparture_sec" value="900" />
+		</parameterset>
+		<parameterset type="routeSelector" >
+			<param name="betaDepartureTime" value="0.0" />
+			<param name="betaTransferCount" value="300.0" />
+			<param name="betaTravelTime" value="1" />
+			<param name="subpopulations" value="" />
+		</parameterset>
+	</module>
+
 
 
 	<module name="transit">
