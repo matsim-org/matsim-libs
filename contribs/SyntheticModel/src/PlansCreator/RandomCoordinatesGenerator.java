@@ -100,12 +100,20 @@ public class RandomCoordinatesGenerator {
 	 */
 
 	public static void main(String[] args) {
-		List<Integer> densities = List.of(1500, 1000, 250, 250, 220, 70, 50, 70);
-		List<Double> decayRates = List.of(0.6, 0.8, 0.7, 0.4, 0.5, 0.4, 0.3, 0.9 );  // Example decay rates for each square
+		List<Integer> densities = List.of(8000, 10000, 10000, //main core
+			6000, 7000, 6000, 4000, 5000, 5000, 4600, 4000, 4700, 4000, 4000, 4000, 4000, 4200, 3000, //urban area
+			2000, 2200, 1800, 1500, 500, 1300, 1400, 1000, 800, 800, 500, 900, 1200, 800, 900, //suburban transition
+			900, 800, 700, 1000, 800, 800, 500, 800, 900, 1200, 700, 700, 800, 900, 1000, 700, 800, 500, 500, 700, 300 //suburb
+		);
+		List<Double> decayRates = List.of(0.1, 0.6, 0.7, // main core
+			0.1, 0.7, 0.6, 0.4, 0.3, 0.5, 0.6, 0.4, 0.4, 0.3, 0.2, 0.3, 0.2, 0.2, 0.2, // urban area
+			0.2, 0.2, 0.2, 0.2, 0.5, 0.1, 0.1, 0.8, 0.8, 0.5, 0.9, 0.1, 0.8, 0.9, // suburban transition
+			0.9, 0.8, 0.7, 0.5, 0.5, 0.4, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.3, 0.4, 0.4, 0.3, 0.3, 0.4, 0.4, 0.5, 0.8, 0.8, 0.5, 0.9 //suburb
+		);  // Example decay rates for each square
 		RandomCoordinatesGenerator generator = new RandomCoordinatesGenerator(densities, decayRates);
 
 		try {
-			generator.writeToXML("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine","commercial.xml");
+			generator.writeToXML("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\40kmx1km","households.xml");
 			System.out.println("XML file has been written successfully!");
 		} catch (IOException e) {
 			e.printStackTrace();

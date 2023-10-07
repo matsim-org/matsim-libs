@@ -20,7 +20,7 @@
 		<param name="outputDirectory" value="./output" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="20" />
+		<param name="lastIteration" value="2" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="qsim" />
 	</module>
@@ -246,11 +246,11 @@
 				<!-- Daily subscription fee for using the DRT service. -->
 				<param name="dailySubscriptionFee" value="0.0"/>
 				<!-- Fare per meter of travel. -->
-				<param name="distanceFare_m" value="0.08"/>
+				<param name="distanceFare_m" value="0.04"/>
 				<!-- Fare per hour of travel. -->
 				<param name="timeFare_h" value="0"/>
 				<!-- Minimum fare charged per DRT trip. -->
-				<param name="minFarePerTrip" value="150"/>
+				<param name="minFarePerTrip" value="100"/>
 			</parameterset>
 		</parameterset>
 	</module>

@@ -10,11 +10,22 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.analysis.VehicleTracker;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.analysis.TransitRouteAccessEgressAnalysis;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+
 
 public class RunMatsimUnique {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		Config config;
 		if ( args==null || args.length==0 || args[0]==null ){
@@ -26,25 +37,30 @@ public class RunMatsimUnique {
 
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setOutputDirectory("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\output");
-
 		// possibly modify config here
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation((QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime));
 
-		// ---
 		Controler controler = DrtControlerCreator.createControler(config, false);
 
-		// possibly modify scenario here
+		Scenario scenario = controler.getScenario();
+		TransitSchedule transitSchedule = scenario.getTransitSchedule();
+		TransitRoute transitRoute = transitSchedule.getTransitLines().get(Id.create("Shuttle", TransitRoute.class)).getRoutes().get(Id.create("Suburbs", TransitRoute.class));
+		VehicleTracker vehicleTracker = new VehicleTracker();
 
-		// ---
+		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(transitRoute, vehicleTracker);
 
-		// possibly modify controler here
+		// Add the analysis and vehicle tracker as event handlers
+		controler.getEvents().addHandler(analysis);
+		controler.getEvents().addHandler(vehicleTracker);
 
-//		controler.addOverridingModule( new OTFVisLiveModule() ) ;
-
-
-		// ---
-
+		// Run the simulation
 		controler.run();
+
+		// Print the statistics after the simulation
+		analysis.printStats();
+		Desktop.getDesktop().open(new File(config.controler().getOutputDirectory() + "/modestats_stackedbar.png"));
+
+
 	}
 }

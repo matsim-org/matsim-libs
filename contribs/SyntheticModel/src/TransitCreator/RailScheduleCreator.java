@@ -17,17 +17,18 @@ import java.io.File;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RailScheduleCreator {
 
-		private final Scenario scenario;
+	private final Scenario scenario;
 
 		// Constructor
-		public RailScheduleCreator(Scenario scenario) {
-			this.scenario = scenario;
+	public RailScheduleCreator(Scenario scenario) {
+		this.scenario = scenario;
 		}
-
 
 
 	public void createSchedule(List<Id<Link>> linkIds, List<Id<Link>> LinkIds_r, String[] times, String[] vehicleRefIds) {
@@ -113,84 +114,69 @@ public class RailScheduleCreator {
 	}
 
 	public static void main(String[] args) {
-		String configFilePath = "C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\config05.xml";
+		// Initialise scenario
+		String configFilePath = "C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\40kmx1km\\config07.xml";
 		Config config = ConfigUtils.loadConfig(configFilePath);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// Import link network route
-		List<Id<Link>> linkIds = Arrays.asList(
-			Id.createLinkId("link-id_99.0_100.0"),    // length = 1
-			Id.createLinkId("link-id_100.0_400.0"),    // length = 300
-			Id.createLinkId("link-id_400.0_733.0"),    // length = 333
-			Id.createLinkId("link-id_733.0_1083.0"),   // length = 350
-			Id.createLinkId("link-id_1083.0_1483.0"),  // length = 400
-			Id.createLinkId("link-id_1483.0_1893.0"),  // length = 410
-			Id.createLinkId("link-id_1893.0_2343.0"),  // length = 450
-			Id.createLinkId("link-id_2343.0_3343.0"),  // length = 1000
-			Id.createLinkId("link-id_3343.0_4443.0"),  // length = 1100
-			Id.createLinkId("link-id_4443.0_5943.0"),  // length = 1500
-			Id.createLinkId("link-id_5943.0_7943.0"),   // length = 2000
-			Id.createLinkId("link-id_7943.0_7944.0")   // length = 1
-
-		);
-		// Reverse route LinkIds_r in descending order of length
-		List<Id<Link>> LinkIds_r = Arrays.asList(
-			Id.createLinkId("link-id_7943.0_7944.0_r"),   // length = 1
-			Id.createLinkId("link-id_5943.0_7943.0_r"),   // length = 2000
-			Id.createLinkId("link-id_4443.0_5943.0_r"),   // length = 1500
-			Id.createLinkId("link-id_3343.0_4443.0_r"),   // length = 1100
-			Id.createLinkId("link-id_2343.0_3343.0_r"),   // length = 1000
-			Id.createLinkId("link-id_1893.0_2343.0_r"),   // length = 450
-			Id.createLinkId("link-id_1483.0_1893.0_r"),   // length = 410
-			Id.createLinkId("link-id_1083.0_1483.0_r"),   // length = 400
-			Id.createLinkId("link-id_733.0_1083.0_r"),    // length = 350
-			Id.createLinkId("link-id_400.0_733.0_r"),     // length = 333
-			Id.createLinkId("link-id_100.0_400.0_r"),      // length = 300
-			Id.createLinkId("link-id_99.0_100.0_r")   // length = 1
-		);
+		// Use RailLinkCreator to generate the link IDs
+		RailLinkCreator linkCreator = new RailLinkCreator();
+		linkCreator.generateLinks();
+		List<Id<Link>> linkIds = linkCreator.getGeneratedLinkIds();
+		List<Id<Link>> linkIds_r = new ArrayList<>(linkIds);
+		Collections.reverse(linkIds_r);
+		linkIds_r = linkIds_r.stream().map(id -> Id.createLinkId(id.toString() + "_r")).collect(Collectors.toList());
 
 		String[] times = {
-			// 6 AM to 6:45 AM: every 10 minutes
-			"06:00:00", "06:10:00", "06:20:00", "06:30:00", "06:40:00",
+			// 5 AM to 6 AM: Early morning, every 15 minutes
+			"05:00:00", "05:15:00", "05:30:00", "05:45:00",
 
-			// 6:45 AM to 7:30 AM: every 7 minutes
-			"06:45:00", "06:52:00", "06:59:00", "07:06:00", "07:13:00", "07:20:00", "07:27:00",
+			// 6 AM to 7:30 AM: Morning rush, every 5 minutes
+			"06:00:00", "06:05:00", "06:10:00", "06:15:00", "06:20:00", "06:25:00", "06:30:00",
+			"06:35:00", "06:40:00", "06:45:00", "06:50:00", "06:55:00", "07:00:00", "07:05:00",
+			"07:10:00", "07:15:00", "07:20:00", "07:25:00", "07:30:00",
 
-			// 7:30 AM to 8:15 AM: every 10 minutes
-			"07:30:00", "07:40:00", "07:50:00", "08:00:00", "08:10:00", "08:20:00",
+			// 7:30 AM to 9 AM: Peak rush, every 3-4 minutes
+			"07:33:00", "07:37:00", "07:40:00", "07:44:00", "07:48:00", "07:52:00", "07:56:00",
+			"08:00:00", "08:04:00", "08:08:00", "08:12:00", "08:16:00", "08:20:00", "08:24:00",
+			"08:28:00", "08:32:00", "08:36:00", "08:40:00", "08:44:00", "08:48:00", "08:52:00",
+			"08:56:00",
 
-			// 8:15 AM to 4:15 PM: every 15 minutes
-			"08:30:00", "08:45:00", "09:00:00", "09:15:00", "09:30:00", "09:45:00", "10:00:00", "10:15:00", "10:30:00",
-			"10:45:00", "11:00:00", "11:15:00", "11:30:00", "11:45:00", "12:00:00", "12:15:00", "12:30:00", "12:45:00",
-			"13:00:00", "13:15:00", "13:30:00", "13:45:00", "14:00:00", "14:15:00", "14:30:00", "14:45:00", "15:00:00",
-			"15:15:00", "15:30:00", "15:45:00", "16:00:00",
+			// 9 AM to 4 PM: Off-peak, every 10 minutes
+			"09:00:00", "09:10:00", "09:20:00", "09:30:00", "09:40:00", "09:50:00",
+			"10:00:00", "10:10:00", "10:20:00", "10:30:00", "10:40:00", "10:50:00",
+			"11:00:00", "11:10:00", "11:20:00", "11:30:00", "11:40:00", "11:50:00",
+			"12:00:00", "12:10:00", "12:20:00", "12:30:00", "12:40:00", "12:50:00",
+			"13:00:00", "13:10:00", "13:20:00", "13:30:00", "13:40:00", "13:50:00",
+			"14:00:00", "14:10:00", "14:20:00", "14:30:00", "14:40:00", "14:50:00",
+			"15:00:00", "15:10:00", "15:20:00", "15:30:00", "15:40:00", "15:50:00",
 
-			// 4:15 PM to 5 PM: every 10 minutes
-			"16:10:00", "16:20:00", "16:30:00", "16:40:00", "16:50:00",
+			// 4 PM to 7 PM: Evening rush, every 5 minutes
+			"16:00:00", "16:05:00", "16:10:00", "16:15:00", "16:20:00", "16:25:00",
+			"16:30:00", "16:35:00", "16:40:00", "16:45:00", "16:50:00", "16:55:00",
+			"17:00:00", "17:05:00", "17:10:00", "17:15:00", "17:20:00", "17:25:00",
+			"17:30:00", "17:35:00", "17:40:00", "17:45:00", "17:50:00", "17:55:00",
 
-			// 5 PM to 6 PM: every 7 minutes
-			"17:00:00", "17:07:00", "17:14:00", "17:21:00", "17:28:00", "17:35:00", "17:42:00", "17:49:00", "17:56:00",
-
-			// 6 PM to 7 PM: every 10 minutes
+			// 7 PM to 10 PM: Evening, every 10 minutes
 			"18:00:00", "18:10:00", "18:20:00", "18:30:00", "18:40:00", "18:50:00",
+			"19:00:00", "19:10:00", "19:20:00", "19:30:00", "19:40:00", "19:50:00",
+			"20:00:00", "20:10:00", "20:20:00", "20:30:00", "20:40:00", "20:50:00",
+			"21:00:00", "21:10:00", "21:20:00", "21:30:00", "21:40:00", "21:50:00",
 
-			// 7 PM to 12 AM: every 15 minutes
-			"19:00:00", "19:15:00", "19:30:00", "19:45:00", "20:00:00", "20:15:00", "20:30:00", "20:45:00", "21:00:00",
-			"21:15:00", "21:30:00", "21:45:00", "22:00:00", "22:15:00", "22:30:00", "22:45:00", "23:00:00", "23:15:00"
+			// 10 PM to 12 AM: Late evening, every 15 minutes
+			"22:00:00", "22:15:00", "22:30:00", "22:45:00", "23:00:00", "23:15:00", "23:30:00", "23:45:00",
 		};
+
 
 		String[] vehicleRefIds = new String[times.length];
 		for (int i = 0; i < times.length; i++) {
-			if (LocalTime.parse(times[i]).isAfter(LocalTime.of(8, 15)) && LocalTime.parse(times[i]).isBefore(LocalTime.of(17, 0))) {
-				vehicleRefIds[i] = "tr_" + ((i % 4) + 1); // rotates between tr_1, tr_2, tr_3, tr_4
-			} else {
-				vehicleRefIds[i] = (i % 2 == 0) ? "tr_1" : "tr_2"; // alternates between tr_1 and tr_2
-			}
+			vehicleRefIds[i] = "tr_" + ((i % 25) + 1);  // rotates between tr_1, tr_2, .... tr_25
 		}
 
+
 			RailScheduleCreator creator = new RailScheduleCreator(scenario);
-			creator.createSchedule(linkIds, LinkIds_r, times, vehicleRefIds);
-			new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\transitSchedule.xml");
+			creator.createSchedule(linkIds, linkIds_r, times, vehicleRefIds);
+			new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\40kmx1km\\transitSchedule.xml");
 
 	}
 	}

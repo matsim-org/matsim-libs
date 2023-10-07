@@ -1,21 +1,23 @@
 package NetworkCreator;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.api.core.v01.Coord;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiSquareCoordinateCalculator extends IntersectionCoordinateCalculator {
+public class MultiSquareCoordinateCalculator {
 
 	private List<Integer> slicesPerSquare;
 
 	public MultiSquareCoordinateCalculator(List<Integer> slicesPerSquare) {
-		// You can use any default value here since we'll be overriding the method completely.
-		super(1);
 		this.slicesPerSquare = slicesPerSquare;
 	}
 
-	@Override
-	public List<String> getIntersections() {
-		List<String> nodes = new ArrayList<>();
+	public List<Node> getIntersections() {
+		List<Node> nodes = new ArrayList<>();
 		int currentXOrigin = 0;
 
 		for (Integer slices : slicesPerSquare) {
@@ -26,8 +28,11 @@ public class MultiSquareCoordinateCalculator extends IntersectionCoordinateCalcu
 				for (int j = 0; j <= slices; j++) {
 					double x = currentXOrigin + (i * increment);
 					double y = j * increment;
-					String nodeId = String.format("%d0%02d%02d",(int)(x / 1000 +1), (int)(i), (int)(j));
-					nodes.add(String.format("<node id=\"%s\" x=\"%.2f\" y=\"%.2f\" />", nodeId, x, y));
+					String nodeIdStr = String.format("%d0%02d%02d",(int)(x / 1000 +1), (int)(i), (int)(j));
+					Id<Node> nodeId = Id.createNodeId(nodeIdStr);
+					Coord coord = new Coord(x, y);
+					Node node = NetworkUtils.createNode(nodeId, coord);
+					nodes.add(node);
 				}
 			}
 
@@ -41,10 +46,9 @@ public class MultiSquareCoordinateCalculator extends IntersectionCoordinateCalcu
 	public static void main(String[] args) {
 		List<Integer> slicesList = List.of(3, 6);  // Example list
 		MultiSquareCoordinateCalculator calculator = new MultiSquareCoordinateCalculator(slicesList);
-		List<String> intersections = calculator.getIntersections();
-		for (String intersection : intersections) {
-			System.out.println(intersection);
+		List<Node> intersections = calculator.getIntersections();
+		for (Node intersection : intersections) {
+			System.out.println("Node ID: " + intersection.getId() + ", Coord: (" + intersection.getCoord().getX() + ", " + intersection.getCoord().getY() + ")");
 		}
 	}
 }
-
