@@ -13,40 +13,39 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 public class RailLinkCreator {
-
+// This has been superseded by RailScheduleCreator
 
 	public static void main(String[] args) {
 		// Instantiate the RailLinkCreator
 		RailLinkCreator creator = new RailLinkCreator();
-		creator.generateLinks();
+		String scenarioPath = "examples/scenarios/UrbanLine/40kmx1km";
+		Coord coordStart = new Coord(100, 500);
+		double[] distances = {
+			// First half: links from 700 to 1500
+			700.0, 742.0, 868.0, 910.0, 952.0,
+			1036.0, 1246.0,
+			1414.0, 1456.0,
+			// Next quarter: links from 1500 to 3000
+			1666.0, 1998.0, 2330.0, 2994.0,
+			//  last bit: 10 links from 2500 to 3500
+			2765.0, 2895.0
+		};
+		creator.generateLinks(scenarioPath,coordStart,distances);
 	}
 
-	public void generateLinks() {
+	public void generateLinks(String scenarioPath, Coord coordStart, double[] distances) {
 
 		Network network = null;
 		try {
 			// Attempt to read the network from the XML file
-			network = NetworkUtils.readNetwork("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\40kmx1km\\network40x1km.xml");
+			network = NetworkUtils.readNetwork(scenarioPath + "/network.xml");
 		} catch (Exception e) {
 			System.err.println("Error reading the network file.");
 			e.printStackTrace();
 			return;  // Exit the program or handle the error accordingly
 		}
 
-		// Define the initial coordinate and distances for the rail links
-		Coord coordStart = new Coord(100, 500);
-		double[] distances = {
-			// First half: 20 links from 700 to 1500
-			700, 742, 784, 868, 910, 952,
-			1036, 1120, 1204, 1246, 1288,
-			1372, 1414, 1456,
-			// Next quarter: 10 links from 1500 to 3000
-			1666, 1832, 1998, 2330,
-			2496, 2994, 3000,
-			// Last quarter: 10 links from 2500 to 3500
-			2700, 2765,
-			2895, 2960, 3090, 3155
-		};
+
 		int numOfLinks = distances.length;
 
 		// Create an initial extra node to the left of the coordStart
@@ -86,7 +85,7 @@ public class RailLinkCreator {
 		createRailLink(network, previousNode, finalExtraNode);
 
 		// Write the modified network back to the XML file
-		new NetworkWriter(network).write("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\40kmx1km\\network_pt.xml");
+		new NetworkWriter(network).write(scenarioPath + "/network.xml");
 	}
 
 	public void createRailLink(Network network, Node fromNode, Node toNode) {

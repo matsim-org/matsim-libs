@@ -1,27 +1,22 @@
 package NetworkCreator;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 
-import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
-// Only works when the
+
 public class SyntheticNetworkCreator {
 
-	public static void main(String[] args) throws Exception {
-		// Example list of slices for each square
-		// Only works when the no. of slices increases
-		List<Integer> slicesList = List.of(
-			30, 27, 26, //main core
-			21, 20, 20, 20, 20, 19, 19, 19, 18, 18, 18, 18, 18, 17, 17, 17, 17, //urban area
-			16, 16, 15, 14, 14, 13, 13, 12, 12, 10, 9, 9, 9, 9, 9, //suburban transition
-			8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6 //suburb
-		);
+	private static final String NETWORK_FILENAME = "network.xml";
+
+	public void createNetwork(String scenarioPath, List<Integer> slicesList) throws Exception {
+		if (slicesList == null || slicesList.isEmpty()) {
+			throw new IllegalArgumentException("Provided slicesList is empty or null.");
+		}
 
 		MultiSquareCoordinateCalculator calculator = new MultiSquareCoordinateCalculator(slicesList);
 		LinksCalculator linkCalculator = new LinksCalculator();
@@ -42,7 +37,33 @@ public class SyntheticNetworkCreator {
 			network.addLink(link);
 		}
 
-		// Write the network to an XML file using NetworkWriter
-		new NetworkWriter(network).write("C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\40kmx1km\\network40x1km.xml");
+		// Create the output path for the network
+		String outputPath = scenarioPath + "/" + NETWORK_FILENAME;
+
+		// Write the network to the output path using NetworkWriter
+		new NetworkWriter(network).write(outputPath);
+	}
+
+	public static void main(String[] args, List<Integer> slicesList) throws Exception {
+		// Checking if there's at least one argument (the scenarioPath)
+		if(args.length < 1) {
+			System.err.println("Please provide the scenario path as the first argument.");
+			return;
+		}
+
+		String scenarioPath = args[0];
+
+		// Extracting slicesList from arguments (starting from the second argument)
+		for (int i = 1; i < args.length; i++) {
+			slicesList.add(Integer.parseInt(args[i]));
+		}
+
+		if (slicesList.isEmpty()) {
+			System.err.println("Please provide slices as additional arguments after the scenario path.");
+			return;
+		}
+
+		new SyntheticNetworkCreator().createNetwork(scenarioPath, slicesList);
 	}
 }
+

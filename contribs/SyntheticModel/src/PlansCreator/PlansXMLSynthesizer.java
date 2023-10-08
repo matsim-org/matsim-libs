@@ -11,14 +11,17 @@ import org.xml.sax.SAXException;
 public class PlansXMLSynthesizer {
 
 	private final Random random = new Random();
-	private static final String DIRECTORY_PATH = "C:\\Users\\snasi\\IdeaProjects\\matsim-libs\\examples\\scenarios\\UrbanLine\\40kmx1km"; // Replace with your directory path
+	private final String outputDirectory;
 
+	// Constructor that accepts the output directory as an argument
+	public PlansXMLSynthesizer(String outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
+	public void synthesize(int numPlans) throws ParserConfigurationException, SAXException, IOException {
+		List<Coord> householdNodes = extractCoordinates(outputDirectory + "\\households.xml");
+		List<Coord> commercialNodes = extractCoordinates(outputDirectory + "\\commercial.xml");
 
-	public void synthesize(int numPlans, double drtRatio) throws ParserConfigurationException, SAXException, IOException {
-		List<Coord> householdNodes = extractCoordinates(DIRECTORY_PATH + "\\households.xml");
-		List<Coord> commercialNodes = extractCoordinates(DIRECTORY_PATH + "\\commercial.xml");
-
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(DIRECTORY_PATH + "\\plans.xml"))) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputDirectory + "\\plans.xml"))) {
 			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 			writer.write("<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">\n");
 			writer.write("<plans>\n");
@@ -27,15 +30,13 @@ public class PlansXMLSynthesizer {
 				Coord home = householdNodes.get(random.nextInt(householdNodes.size()));
 				Coord work = commercialNodes.get(random.nextInt(commercialNodes.size()));
 
-				String legModeToWork = getLegMode(drtRatio);
-				String legModeToHome = getLegMode(drtRatio);
 
 				writer.write("\t<person id=\"" + i + "\">\n");
 				writer.write("\t\t<plan>\n");
 				writer.write(String.format("\t\t\t<act type=\"h\" x=\"%.2f\" y=\"%.2f\" end_time=\"%s\" />\n", home.getX(), home.getY(), generateEndTime(7, 30, 15)));
-				writer.write("\t\t\t<leg mode=\"" + legModeToWork + "\"> </leg>\n");
+				writer.write("\t\t\t<leg mode=\"car\"> </leg>\n");
 				writer.write(String.format("\t\t\t<act type=\"w\" x=\"%.2f\" y=\"%.2f\" start_time=\"%s\" end_time=\"%s\" />\n", work.getX(), work.getY(), generateEndTime(8, 30, 15), generateEndTime(17, 15, 60)));
-				writer.write("\t\t\t<leg mode=\"" + legModeToHome + "\"> </leg>\n");
+				writer.write("\t\t\t<leg mode=\"car\"> </leg>\n");
 				writer.write(String.format("\t\t\t<act type=\"h\" x=\"%.2f\" y=\"%.2f\" />\n", home.getX(), home.getY()));
 				writer.write("\t\t</plan>\n");
 				writer.write("\t</person>\n");
@@ -81,17 +82,12 @@ public class PlansXMLSynthesizer {
 		return random.nextDouble() < drtRatio ? "drt" : "car";
 	}
 
-	public static void main(String[] args) {
-		PlansXMLSynthesizer synthesizer = new PlansXMLSynthesizer();
+	public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
+		String outputDir = "examples/scenarios/UrbanLine/40kmx1km";  // Default directory for this main method
+		PlansXMLSynthesizer synthesizer = new PlansXMLSynthesizer(outputDir);
 		int numberOfPlansToGenerate = 5000; // specify the desired number of plans here
-		double drtratio = 0.0; // specify the desired number of plans with initial mode drt here
-		try {
-			synthesizer.synthesize(numberOfPlansToGenerate, drtratio);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		synthesizer.synthesize(numberOfPlansToGenerate);
 	}
-
 
 }
 
