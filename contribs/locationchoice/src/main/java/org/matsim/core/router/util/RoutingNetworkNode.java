@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FastRouterDelegateFactory.java
+ * RoutingNetworkNode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,13 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router;
+package org.matsim.core.router.util;
 
-import org.matsim.core.router.util.NodeDataFactory;
-import org.matsim.core.router.util.RoutingNetwork;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.PreProcessDijkstra.DeadEndData;
 
-public interface FastRouterDelegateFactory {
+public interface RoutingNetworkNode extends Node {
 
-	public FastRouterDelegate createFastRouterDelegate(Dijkstra dijkstra,
-			NodeDataFactory nodeDataFactory, RoutingNetwork routingNetwork);
+	public Node getNode();
+
+	public void setOutLinksArray(RoutingNetworkLink[] outLinks);
+
+	public RoutingNetworkLink[] getOutLinksArray();
+
+	public void setDeadEndData(DeadEndData deadEndData);
+
+	public DeadEndData getDeadEndData();
 }

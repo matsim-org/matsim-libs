@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FastRouterType.java
+ * FastRouterDelegateFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,13 +20,11 @@
 
 package org.matsim.core.router;
 
-/**
- * Type Pointer is no longer supported. For now we still keep it here so we
- * can throw an exception if somebody tries to us it. 
- * 
- * @author cdobler
- */
-public enum FastRouterType {
-	ARRAY, POINTER
-}
+import org.matsim.core.router.util.NodeDataFactory;
+import org.matsim.core.router.util.RoutingNetwork;
 
+public interface FastRouterDelegateFactory {
+
+	public FastRouterDelegate createFastRouterDelegate(Dijkstra dijkstra,
+																										 NodeDataFactory nodeDataFactory, RoutingNetwork routingNetwork);
+}
