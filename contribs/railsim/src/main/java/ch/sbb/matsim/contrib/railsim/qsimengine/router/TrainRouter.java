@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.FastDijkstraFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -54,7 +54,7 @@ public final class TrainRouter {
 		this.resources = resources;
 
 		// uses the full network, which should not be slower than filtered network as long as dijkstra is used
-		this.lpc = new FastDijkstraFactory(false).createPathCalculator(network, new DisUtility(), new FreeSpeedTravelTime());
+		this.lpc = new SpeedyALTFactory().createPathCalculator(network, new DisUtility(), new FreeSpeedTravelTime());
 	}
 
 	/**

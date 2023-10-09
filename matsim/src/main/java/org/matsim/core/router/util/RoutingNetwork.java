@@ -30,16 +30,13 @@ import org.matsim.api.core.v01.network.Node;
  * A network that is used by FastDijkstra, FastAStarEuclidean and FastAStarLandmarks.
  * Instead of storing the node data in a map, the data is attached directly to the nodes
  * which is faster but also consumes more memory.
- * 
- * @see org.matsim.core.router.FastDijkstra
- * @see org.matsim.core.router.FastAStarEuclidean
- * @see org.matsim.core.router.FastAStarLandmarks
+ *
  * @author cdobler
  */
 public interface RoutingNetwork extends Network {
-	
+
 	public void initialize();
-	
+
 	@Override
 	public Map<Id<Node>, RoutingNetworkNode> getNodes();
 }
