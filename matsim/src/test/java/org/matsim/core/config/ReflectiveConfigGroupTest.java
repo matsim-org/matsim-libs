@@ -26,8 +26,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,6 +71,9 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.localDateTimeField = LocalDateTime.of(2022, 12, 31, 23, 59, 59);
 		dumpedModule.enumListField = List.of(MyEnum.VALUE1, MyEnum.VALUE2);
 		dumpedModule.enumSetField = Set.of(MyEnum.VALUE2);
+		dumpedModule.integerMapField = Map.of("a\"b", 1, "b", 2);
+		dumpedModule.localDateMapField = Map.of('d', LocalDate.of(2023, 10, 9));
+		dumpedModule.booleanMapField = Map.of(0.1, true);
 		dumpedModule.setField = ImmutableSet.of("a", "b", "c");
 		dumpedModule.listField = List.of("1", "2", "3");
 		assertEqualAfterDumpAndRead(dumpedModule);
@@ -87,6 +92,9 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.setField = ImmutableSet.of();
 		dumpedModule.enumListField = List.of();
 		dumpedModule.enumSetField = ImmutableSet.of();
+		dumpedModule.integerMapField = Collections.emptyMap();
+		dumpedModule.localDateMapField = Collections.emptyMap();
+		dumpedModule.booleanMapField = Collections.emptyMap();
 		assertEqualAfterDumpAndRead(dumpedModule);
 	}
 
@@ -97,14 +105,23 @@ public class ReflectiveConfigGroupTest {
 		//fail on list
 		dumpedModule.listField = List.of("");
 		dumpedModule.setField = null;
+		dumpedModule.integerMapField = null;
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Collection [] contains blank elements. Only non-blank elements are supported.");
 
 		//fail on set
 		dumpedModule.listField = null;
 		dumpedModule.setField = ImmutableSet.of("");
+		dumpedModule.integerMapField = null;
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Collection [] contains blank elements. Only non-blank elements are supported.");
+
+		// fail on map
+		dumpedModule.listField = null;
+		dumpedModule.setField = null;
+		dumpedModule.integerMapField = Map.of("", 2);
+		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Map {=2} contains blank string keys. Only non-blank string keys are supported.");
 	}
 
 	@Test
@@ -114,14 +131,25 @@ public class ReflectiveConfigGroupTest {
 		//fail on list
 		dumpedModule.listField = List.of("non-empty", "");
 		dumpedModule.setField = ImmutableSet.of("non-empty");
+		dumpedModule.integerMapField = Map.of("a", 1, "b", 2);
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Collection [non-empty, ] contains blank elements. Only non-blank elements are supported.");
 
 		//fail on set
 		dumpedModule.listField = List.of("non-empty");
 		dumpedModule.setField = ImmutableSet.of("non-empty", "");
+		dumpedModule.integerMapField = Map.of("a", 1, "b", 2);
 		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Collection [non-empty, ] contains blank elements. Only non-blank elements are supported.");
+
+		// fail on map
+		dumpedModule.listField = List.of("non-empty");
+		dumpedModule.setField = ImmutableSet.of("non-empty");
+		dumpedModule.integerMapField = new LinkedHashMap<>();
+		dumpedModule.integerMapField.put("a", 1);
+		dumpedModule.integerMapField.put("", 2);
+		assertThatThrownBy(() -> assertEqualAfterDumpAndRead(dumpedModule)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Map {a=1, =2} contains blank string keys. Only non-blank string keys are supported.");
 	}
 
 	private void assertEqualAfterDumpAndRead(MyModule dumpedModule) {
@@ -167,6 +195,9 @@ public class ReflectiveConfigGroupTest {
 		expectedComments.put("enumListField", "list of enum");
 		expectedComments.put("enumSetField", "set of enum");
 		expectedComments.put("setField", "set");
+		expectedComments.put("integerMapField", "map of Integer");
+		expectedComments.put("localDateMapField", "map of LocalDate");
+		expectedComments.put("booleanMapField", "map of Boolean");
 
 		assertThat(new MyModule().getComments()).isEqualTo(expectedComments);
 	}
@@ -471,6 +502,18 @@ public class ReflectiveConfigGroupTest {
 		@Comment("set of enum")
 		@Parameter
 		private Set<MyEnum> enumSetField;
+
+		@Comment("map of Integer")
+		@Parameter
+		private Map<String, Integer> integerMapField;
+
+		@Comment("map of LocalDate")
+		@Parameter
+		private Map<Character, LocalDate> localDateMapField;
+
+		@Comment("map of Boolean")
+		@Parameter
+		private Map<Double, Boolean> booleanMapField;
 
 		// Object fields:
 		// Id: string representation is toString

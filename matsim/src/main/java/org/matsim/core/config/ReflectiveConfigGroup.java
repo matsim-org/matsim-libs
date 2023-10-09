@@ -39,7 +39,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,11 +50,17 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
@@ -104,6 +112,12 @@ import com.google.common.collect.Sets;
  */
 public abstract class ReflectiveConfigGroup extends ConfigGroup implements MatsimExtensionPoint {
 	private static final Logger log = LogManager.getLogger(ReflectiveConfigGroup.class);
+
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	static {
+		OBJECT_MAPPER.registerModule(new JavaTimeModule());
+	}
 
 	private final boolean storeUnknownParameters;
 
@@ -240,8 +254,10 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE, LocalTime.class,
 			LocalDate.class, LocalDateTime.class);
 
+	private static final Set<Class<?>> ALLOWED_MAP_PARAMETER_TYPES = ALLOWED_PARAMETER_TYPES; // currently identical
+
 	private static final String HINT = " Valid types are String, primitive types and their wrapper classes,"
-			+ " enumerations, List<String> and Set<String>, LocalTime, LocalDate, LocalDateTime"
+			+ " enumerations, List<String> and Set<String>, Maps<?,?>, LocalTime, LocalDate, LocalDateTime"
 			+ " Other types are fine as parameters, but you will need to implement conversion strategies"
 			+ " in corresponding StringGetters andStringSetters.";
 
@@ -255,6 +271,11 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			if (rawType.equals(List.class) || rawType.equals(Set.class)) {
 				var typeArgument = pType.getActualTypeArguments()[0];
 				return typeArgument.equals(String.class) || (typeArgument instanceof Class && ((Class<?>) typeArgument).isEnum());
+			} else if (rawType.equals(Map.class)) {
+				var keyType = pType.getActualTypeArguments()[0];
+				var valueType = pType.getActualTypeArguments()[1];
+				return (ALLOWED_MAP_PARAMETER_TYPES.contains(keyType) || (keyType instanceof Class && ((Class<?>) keyType).isEnum())) &&
+						(ALLOWED_MAP_PARAMETER_TYPES.contains(valueType) || (valueType instanceof Class && ((Class<?>) valueType).isEnum()));
 			}
 
 			if (rawType.equals(Class.class))
@@ -406,6 +427,21 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 				return stream.map(s -> stringToEnumValue(s, enumConstants)).toList();
 			}
 			return stream.toList();
+		} else if (type.equals(Map.class) && !type.equals(EnumMap.class)) {
+			if (value.isBlank()) {
+				return Collections.emptyMap();
+			} else if (paramField != null && paramField.getGenericType() instanceof ParameterizedType pType) {
+				Class<?> keyClass = TypeFactory.rawClass(pType.getActualTypeArguments()[0]);
+				Class<?> valueClass = TypeFactory.rawClass(pType.getActualTypeArguments()[1]);
+				JavaType mapType = OBJECT_MAPPER.getTypeFactory().constructMapType(
+						LinkedHashMap.class, keyClass, valueClass);
+				try {
+					return OBJECT_MAPPER.readValue(value, mapType);
+				} catch (JsonProcessingException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			throw new RuntimeException("Unsupported map field");
 		} else if (type.equals(Class.class)) {
 			try {
 				return ClassLoader.getSystemClassLoader().loadClass(value);
@@ -484,6 +520,17 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			Preconditions.checkArgument(collection.stream().noneMatch(String::isBlank),
 					"Collection %s contains blank elements. Only non-blank elements are supported.", collection);
 			return String.join(", ", collection);
+		} else if (result instanceof Map<?, ?> mapResult) {
+			Preconditions.checkArgument(mapResult.keySet().stream()
+					.filter(String.class::isInstance)
+					.map(String.class::cast)
+					.noneMatch(String::isBlank),
+					"Map %s contains blank string keys. Only non-blank string keys are supported.", mapResult);
+			try {
+				return new StringEscapeUtils().escapeXml11(OBJECT_MAPPER.writeValueAsString(result));
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			return result + "";
 		}
