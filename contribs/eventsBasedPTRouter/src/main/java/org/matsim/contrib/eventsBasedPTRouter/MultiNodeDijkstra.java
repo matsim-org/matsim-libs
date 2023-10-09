@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.router;
+package org.matsim.contrib.eventsBasedPTRouter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.pt.router.TransitLeastCostPathTree;
+import org.matsim.pt.router.TransitTravelDisutility;
 
 public class MultiNodeDijkstra /*extends Dijkstra*/ {
 
@@ -35,7 +37,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	 * The network on which we find routes.
 	 */
 	protected Network network;
-	
+
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
@@ -45,7 +47,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	 * The travel time calculator. Provides the travel time for each link and time step.
 	 */
 	private final TravelTime timeFunction;
-	
+
 	public MultiNodeDijkstra(final Network network, final TransitTravelDisutility costFunction, final TravelTime timeFunction) {
 		this.network = network;
 		this.costFunction = costFunction;

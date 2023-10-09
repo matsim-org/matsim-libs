@@ -35,12 +35,12 @@ public class MultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory 
 	private final boolean searchAllEndNodes;
 	private final boolean usePreProcessData;
 	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
-	
+
 	public MultiNodeDijkstraFactory() {
 		this.searchAllEndNodes = false;
 		this.usePreProcessData = false;
 	}
-	
+
 	public MultiNodeDijkstraFactory(final boolean searchAllEndNodes) {
 		this.searchAllEndNodes = searchAllEndNodes;
 		this.usePreProcessData = false;
@@ -52,7 +52,7 @@ public class MultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory 
 	}
 
 	@Override
-	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {		
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		if (this.usePreProcessData) {
 			PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
 			if (preProcessDijkstra == null) {
@@ -62,7 +62,7 @@ public class MultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory 
 			}
 			return new MultiNodeDijkstra(network, travelCosts, travelTimes, preProcessDijkstra, this.searchAllEndNodes);
 		}
-		
+
 		return new MultiNodeDijkstra(network, travelCosts, travelTimes, this.searchAllEndNodes);
 	}
 }

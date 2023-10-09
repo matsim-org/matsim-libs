@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RoutingNetworkFactory.java
+ * RoutingNetwork.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,16 +20,24 @@
 
 package org.matsim.core.router.util;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
+import java.util.Map;
 
-public interface RoutingNetworkFactory extends NetworkFactory {
-	
-	public RoutingNetwork createRoutingNetwork(final Network network);
-	
-	public RoutingNetworkNode createRoutingNetworkNode(final Node node, final int numOutLinks);
-	
-	public RoutingNetworkLink createRoutingNetworkLink(final Link link, final RoutingNetworkNode fromNode, final RoutingNetworkNode toNode);
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.RoutingNetworkNode;
+
+/**
+ * A network that is used by FastDijkstra, FastAStarEuclidean and FastAStarLandmarks.
+ * Instead of storing the node data in a map, the data is attached directly to the nodes
+ * which is faster but also consumes more memory.
+ *
+ * @author cdobler
+ */
+public interface RoutingNetwork extends Network {
+
+	public void initialize();
+
+	@Override
+	public Map<Id<Node>, RoutingNetworkNode> getNodes();
 }
