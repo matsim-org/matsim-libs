@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractRoutingNetworkFactory.java
+ * ArrayFastRouterDelegate.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.core.router;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.ArrayRoutingNetwork;
+import org.matsim.core.router.util.ArrayRoutingNetworkNode;
+import org.matsim.core.router.util.NodeData;
+import org.matsim.core.router.util.NodeDataFactory;
 
-public abstract class AbstractRoutingNetworkFactory implements RoutingNetworkFactory {
+/*package*/ class ArrayFastRouterDelegate extends AbstractFastRouterDelegate {
+
+	private final ArrayRoutingNetwork network;
+	private final NodeData[] nodeData;
+	private boolean isInitialized = false;
 	
-	@Override
-	public Link createLink(final Id<Link> id, final Node fromNode, final Node toNode) {
-		throw new RuntimeException("Not supported operation!");
+	/*package*/ ArrayFastRouterDelegate(final Dijkstra dijkstra, final NodeDataFactory nodeDataFactory,
+			final ArrayRoutingNetwork network) {
+		super(dijkstra, nodeDataFactory);
+		this.network = network;
+		this.nodeData = new NodeData[network.getNodes().size()];
 	}
 
 	@Override
-	public RoutingNetworkNode createNode(final Id<Node> id, final Coord coord) {
-		throw new RuntimeException("Not supported operation!");
+	public final void initialize() {
+		// lazy initialization
+		if (!isInitialized) {
+			for (Node node : this.network.getNodes().values()) {
+				int index = ((ArrayRoutingNetworkNode) node).getArrayIndex();
+				this.nodeData[index] = nodeDataFactory.createNodeData();
+			}
+			
+			this.isInitialized = true;
+		}
+	}
+	
+	/*
+	 * The NodeData is taken from the array.
+	 */
+	public NodeData getData(final Node n) {
+		ArrayRoutingNetworkNode routingNetworkNode = (ArrayRoutingNetworkNode) n;
+		return this.nodeData[routingNetworkNode.getArrayIndex()];
 	}
 }

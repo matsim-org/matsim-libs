@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RoutingNetworkNode.java
+ * RoutingNetworkFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,18 +20,16 @@
 
 package org.matsim.core.router.util;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.PreProcessDijkstra.DeadEndData;
 
-public interface RoutingNetworkNode extends Node {
-	
-	public Node getNode();
+public interface RoutingNetworkFactory extends NetworkFactory {
 
-	public void setOutLinksArray(RoutingNetworkLink[] outLinks);
-	
-	public RoutingNetworkLink[] getOutLinksArray();
+	public RoutingNetwork createRoutingNetwork(final Network network);
 
-	public void setDeadEndData(DeadEndData deadEndData);
-	
-	public DeadEndData getDeadEndData();
+	public RoutingNetworkNode createRoutingNetworkNode(final Node node, final int numOutLinks);
+
+	public RoutingNetworkLink createRoutingNetworkLink(final Link link, final RoutingNetworkNode fromNode, final RoutingNetworkNode toNode);
 }

@@ -11,15 +11,14 @@ import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
-import scala.util.parsing.combinator.testing.Str;
 import tech.tablesaw.api.ColumnType;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Row;
@@ -81,8 +80,8 @@ public class TravelTimeComparison implements MATSimAppCommand {
 
 		OnlyTimeDependentTravelDisutility util = new OnlyTimeDependentTravelDisutility(tt);
 
-		LeastCostPathCalculator congestedRouter = new FastDijkstraFactory(false).createPathCalculator(network, util, tt);
-		LeastCostPathCalculator freeflowRouter = new FastDijkstraFactory(false).createPathCalculator(network, new OnlyTimeDependentTravelDisutility(fs), fs);
+		LeastCostPathCalculator congestedRouter = new SpeedyALTFactory().createPathCalculator(network, util, tt);
+		LeastCostPathCalculator freeflowRouter = new SpeedyALTFactory().createPathCalculator(network, new OnlyTimeDependentTravelDisutility(fs), fs);
 
 		data.addColumns(
 			DoubleColumn.create("simulated", data.rowCount()),

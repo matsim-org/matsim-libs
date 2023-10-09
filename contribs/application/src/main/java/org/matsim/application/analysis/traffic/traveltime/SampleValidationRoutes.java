@@ -24,8 +24,8 @@ import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -156,7 +156,7 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 
 		FreeSpeedTravelTime tt = new FreeSpeedTravelTime();
 		OnlyTimeDependentTravelDisutility util = new OnlyTimeDependentTravelDisutility(tt);
-		LeastCostPathCalculator router = new FastDijkstraFactory(false).createPathCalculator(network, util, tt);
+		LeastCostPathCalculator router = new SpeedyALTFactory().createPathCalculator(network, util, tt);
 
 		List<Route> routes = sampleRoutes(network, router, rnd);
 
