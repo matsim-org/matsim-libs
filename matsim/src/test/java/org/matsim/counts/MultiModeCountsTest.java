@@ -12,6 +12,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,7 +28,7 @@ public class MultiModeCountsTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test_general_handling() {
+	public void test_general_handling() throws IOException {
 
 		MultiModeCounts<Link> multiModeCounts = new MultiModeCounts<>();
 		multiModeCounts.setName("test");
@@ -38,29 +39,29 @@ public class MultiModeCountsTest {
 
 		generateDummyCounts(multiModeCounts);
 
-		MultiModeCountsWriter writer = new MultiModeCountsWriter(multiModeCounts);
-		writer.write(utils.getOutputDirectory() + "test_counts.xml.gz");
+		CountsWriterHandlerImplV2 writer = new CountsWriterHandlerImplV2(multiModeCounts);
+		writer.write(utils.getOutputDirectory() + "test_counts.xml");
 
-		Assertions.assertThat(Files.exists(Path.of(utils.getOutputDirectory() + "test_counts.xml.gz"))).isTrue();
+		Assertions.assertThat(Files.exists(Path.of(utils.getOutputDirectory() + "test_counts.xml"))).isTrue();
 	}
 
 	@Test
-	public void test_reader() {
+	public void test_reader() throws IOException {
 
 		MultiModeCounts<Link> dummyCounts = new MultiModeCounts<>();
 		generateDummyCounts(dummyCounts);
 
-		MultiModeCountsWriter writer = new MultiModeCountsWriter(dummyCounts);
+		CountsWriterHandlerImplV2 writer = new CountsWriterHandlerImplV2(dummyCounts);
 		writer.write("test_counts.xml");
 
 		MultiModeCounts<Link> counts = new MultiModeCounts<>();
-		MultiModeCountsReader reader = new MultiModeCountsReader(counts, Link.class);
+		CountsReaderMatsimV2 reader = new CountsReaderMatsimV2(counts, Link.class);
 
 		Assertions.assertThatNoException().isThrownBy(() -> {
 			reader.readFile("test_counts.xml");
 		});
 
-		Map<Id<Link>, MultiModeCount<Link>> countMap = counts.getCounts();
+		Map<Id<Link>, MeasurementLocation<Link>> countMap = counts.getMeasureLocations();
 		Assert.assertEquals(21, countMap.size());
 
 		boolean onlyDailyValues = countMap.get(Id.create("12", Link.class)).getMeasurable(Measurable.VOLUMES, TransportMode.car).getInterval() == 24 * 60;
@@ -81,7 +82,7 @@ public class MultiModeCountsTest {
 				break;
 
 			if (id.toString().equals("12")) {
-				MultiModeCount<Link> count = multiModeCounts.createAndAddCount(id, id + "_test", 2100);
+				MeasurementLocation<Link> count = multiModeCounts.createAndAddCount(id, id + "_test");
 				Measurable volume = count.createVolume(TransportMode.car);
 
 				for (int i = 0; i < 24; i++) {
@@ -90,7 +91,7 @@ public class MultiModeCountsTest {
 				continue;
 			}
 
-			MultiModeCount<Link> count = multiModeCounts.createAndAddCount(id, id + "_test", 2100);
+			MeasurementLocation<Link> count = multiModeCounts.createAndAddCount(id, id + "_test");
 			for (String mode : modes) {
 				boolean dailyValuesOnly = random.nextBoolean();
 				Measurable volume;

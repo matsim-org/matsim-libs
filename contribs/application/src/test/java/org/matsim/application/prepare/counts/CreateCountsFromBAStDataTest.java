@@ -211,16 +211,19 @@ public class CreateCountsFromBAStDataTest {
 		new CountsReaderMatsimV1(carCounts).readFile(car);
 
 		MultiModeCounts<Link> multiModeCounts = new MultiModeCounts<>();
-		new MultiModeCountsReader(multiModeCounts, Link.class).readFile(car.replace("car-", ""));
 
-		Integer size = multiModeCounts.getCounts().size();
+		// TODO: use generalized reader
+
+		new CountsReaderMatsimV2(multiModeCounts, Link.class).readFile(car.replace("car-", ""));
+
+		Integer size = multiModeCounts.getMeasureLocations().size();
 
 		assertThat(size).isGreaterThan(0);
 
 		Assert.assertTrue(multiModeCounts.getMeasurableTags().contains("volumes"));
 
 		Count<Link> carCount = carCounts.getCount(Id.createLinkId("7686"));
-		MultiModeCount<Link> mmCount = multiModeCounts.getCount(Id.createLinkId("7686"));
+		MeasurementLocation<Link> mmCount = multiModeCounts.getMeasureLocation(Id.createLinkId("7686"));
 
 		double carVolume = carCount.getVolume(10).getValue();
 		double mmCarVolume = mmCount.getVolumesForMode(TransportMode.car).getAtHour(10).orElse(-99);

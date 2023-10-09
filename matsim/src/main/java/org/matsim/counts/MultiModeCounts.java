@@ -2,7 +2,6 @@ package org.matsim.counts;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
@@ -12,17 +11,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * This class provides count object, that can assign any measurable values (traffic volumes, velocities e.g.) for any matsim transport mode
  * to an identifiable object (links, nodes, transit stations e.g)
- * Structure is simialar to regular counts, but more flexible to use.
+ * Structure is similar to regular counts, but more flexible to use.
  * */
 public final class MultiModeCounts<T extends Identifiable<T>> implements Attributable {
 
-	public static final String ELEMENT_NAME = "multiModeCounts";
+	public static final String ELEMENT_NAME = "counts";
 
-	private final Set<String> measurableTags = new HashSet<>();
+	// TODO: merge into Counts class to have same API
 
 	private String name;
 	private String description;
@@ -30,24 +30,23 @@ public final class MultiModeCounts<T extends Identifiable<T>> implements Attribu
 
 	private int year;
 
-	private final Map<Id<T>, MultiModeCount<T>> counts = new TreeMap<>();
+	private final Map<Id<T>, MeasurementLocation<T>> locations = new TreeMap<>();
 
 	private final Attributes attributes = new AttributesImpl();
 
 	public MultiModeCounts(){}
 
 	/**
-	 * Creates a MultiModeCount object and adds to count tree map. Argument has to be an id for an matsim Identifiable object (link, node, pt station e.g).
-	 * A year can be passed as argument if count sources from different years are used, if not the year of the counts collection will be handed over.
+	 * Creates a MeasurementLocation object and adds to count tree map. Argument has to be an id for an matsim Identifiable object (link, node, pt station e.g).
 	 * */
-	public MultiModeCount<T> createAndAddCount(final Id<T> id, String stationName, @Nullable Integer year){
+	public MeasurementLocation<T> createAndAddCount(final Id<T> id, String stationName){
 
-		if (this.counts.containsKey(id)) {
-			throw new RuntimeException("There is already a counts object for location " + id.toString());
+		if (this.locations.containsKey(id)) {
+			throw new RuntimeException("There is already a measurement object for location " + id.toString());
 		}
 
-		MultiModeCount<T> count = year == null ? new MultiModeCount<T>(id, stationName, this.year, measurableTags): new MultiModeCount<T>(id, stationName, year, measurableTags);
-		this.counts.put(id, count);
+		MeasurementLocation<T> count = new MeasurementLocation<T>(id, stationName);
+		this.locations.put(id, count);
 
 		return count;
 	}
@@ -84,16 +83,19 @@ public final class MultiModeCounts<T extends Identifiable<T>> implements Attribu
 		return year;
 	}
 
-	public Map<Id<T>, MultiModeCount<T>> getCounts() {
-		return counts;
-	}
-
 	public Set<String> getMeasurableTags() {
-		return measurableTags;
+		return locations.values().stream()
+			.map(MeasurementLocation::getMeasurables)
+			.flatMap(m -> m.keySet().stream())
+			.collect(Collectors.toSet());
 	}
 
-	public MultiModeCount<T> getCount(Id<T> id) {
-		return this.counts.get(id);
+	public Map<Id<T>, MeasurementLocation<T>> getMeasureLocations() {
+		return locations;
+	}
+
+	public MeasurementLocation<T> getMeasureLocation(Id<T> id) {
+		return this.locations.get(id);
 	}
 
 	@Override
@@ -103,6 +105,6 @@ public final class MultiModeCounts<T extends Identifiable<T>> implements Attribu
 
 	@Override
 	public String toString() {
-		return "[name=" + this.name + "]" + "[nof_counts=" + this.counts.size() + "]";
+		return "[name=" + this.name + "]" + "[nof_locations=" + this.locations.size() + "]";
 	}
 }

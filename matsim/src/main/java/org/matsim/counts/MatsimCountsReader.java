@@ -24,6 +24,7 @@ import java.util.Stack;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -39,6 +40,7 @@ public class MatsimCountsReader extends MatsimXmlParser {
 
 	private final static Logger log = LogManager.getLogger(MatsimCountsReader.class);
 	private final static String COUNTS_V1 = "counts_v1.xsd";
+	private final static String COUNTS_V2 = "counts_v2.xsd";
 
 	private final Counts counts;
 	private MatsimXmlParser delegate = null;
@@ -68,6 +70,8 @@ public class MatsimCountsReader extends MatsimXmlParser {
 		this.counts = counts;
 	}
 
+	// TODO: constructor with specific ID class
+
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		this.delegate.startTag(name, atts, context);
@@ -83,8 +87,14 @@ public class MatsimCountsReader extends MatsimXmlParser {
 		super.setDoctype(doctype);
 		// Currently the only counts-type is v1
 		if (COUNTS_V1.equals(doctype)) {
-			this.delegate = new CountsReaderMatsimV1( coordinateTransformation , this.counts);
+			this.delegate = new CountsReaderMatsimV1( coordinateTransformation, this.counts);
 			log.info("using counts_v1-reader.");
+		} else if (COUNTS_V2.equals(doctype)) {
+			log.info("using counts_v2-reader.");
+
+			// TODO: not done
+			this.delegate = new CountsReaderMatsimV2(new MultiModeCounts<>(), Link.class);
+
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}

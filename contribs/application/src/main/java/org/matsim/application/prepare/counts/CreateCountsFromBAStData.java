@@ -127,7 +127,8 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		new CountsWriter(miv).write(carOutput.toString());
 		new CountsWriter(freight).write(freightOutput.toString());
 
-		new MultiModeCountsWriter(mmCounts).write(carOutput.toString().replace("car-", ""));
+		// FIXME: write new counts format
+		//new CountsWriter(mmCounts).write(carOutput.toString().replace("car-", ""));
 
 		return 0;
 	}
@@ -145,7 +146,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		Count<Link> mivCount = miv.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
 		Count<Link> freightCount = freight.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
 
-		MultiModeCount<Link> multiModeCount = multiModeCounts.createAndAddCount(station.getMatchedLink().getId(), station.getName(), null);
+		MeasurementLocation<Link> multiModeCount = multiModeCounts.createAndAddCount(station.getMatchedLink().getId(), station.getName());
 		Measurable carVolume = multiModeCount.createVolume(TransportMode.car);
 		Measurable freightVolume = multiModeCount.createVolume("freight");
 

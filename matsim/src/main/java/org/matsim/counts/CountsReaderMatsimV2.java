@@ -3,6 +3,7 @@ package org.matsim.counts;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
 import java.util.Arrays;
@@ -10,26 +11,27 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
- * Reader class to parse MulitModeCounts from file.
+ * A reader for counts-files of MATSim according to <code>counts_v2.xsd</code>.
  */
-public class MultiModeCountsReader extends MatsimXmlParser {
+public class CountsReaderMatsimV2 extends MatsimXmlParser {
 
-	private final static String MULTIMODECOUNTS = "multiModeCounts";
-	private final static String MULTIMODECOUNT = "multiModeCount";
+	private final static String VALUE = "val";
 	private final static String ATTRIBUTES = "attributes";
-	private final static String VALUE = "value";
 
 	private final Class<? extends Identifiable<?>> identifiableClass;
 	private final MultiModeCounts<?> counts;
-	private final Map<? extends Id<?>, ? extends MultiModeCount<?>> countMap;
+	private final Map<? extends Id<?>, ? extends MeasurementLocation<?>> locations;
 	private Id<?> currCount;
 	private Measurable currMeasurable;
+	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
 
-	public MultiModeCountsReader(MultiModeCounts<?> counts, Class<? extends Identifiable<?>> identifiableClass) {
+	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
+
+
+	public CountsReaderMatsimV2(MultiModeCounts<?> counts, Class<? extends Identifiable<?>> identifiableClass) {
 		super(ValidationType.NO_VALIDATION);
 		this.counts = counts;
-		this.countMap = counts.getCounts();
-
+		this.locations = counts.getMeasureLocations();
 		this.identifiableClass = identifiableClass;
 	}
 
@@ -37,19 +39,21 @@ public class MultiModeCountsReader extends MatsimXmlParser {
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 
 		switch (name) {
-			case MULTIMODECOUNTS -> startMultiModeCounts(atts);
-			case MULTIMODECOUNT -> startMultiModeCount(atts);
-			case ATTRIBUTES -> startAttributes(atts, context);
+			case MultiModeCounts.ELEMENT_NAME -> startMultiModeCounts(atts);
+			case MeasurementLocation.ELEMENT_NAME -> startMeasurementLocation(atts);
+			case Measurable.ELEMENT_NAME -> startMeasurable(name, atts);
+			case ATTRIBUTES -> attributesDelegate.startTag(name, atts, context, currAttributes);
 			case VALUE -> addValuesToMeasurable(atts);
-
-			default -> {
-				if (counts.getMeasurableTags().contains(name))
-					startMeasurable(name, atts);
-			}
 		}
 	}
 
+	@Override
+	public void endTag(String name, String content, Stack<String> context) {
+
+	}
+
 	private void addValuesToMeasurable(Attributes atts) {
+		// TODO interval should be irrelevant?
 		if (this.currMeasurable.getInterval() == 1440) {
 			this.currMeasurable.setDailyValue(Double.parseDouble(atts.getValue(0)));
 		} else {
@@ -59,46 +63,24 @@ public class MultiModeCountsReader extends MatsimXmlParser {
 		}
 	}
 
-	private void startAttributes(Attributes atts, Stack<String> context) {
-
-		String peek = context.peek();
-		org.matsim.utils.objectattributes.attributable.Attributes attributes;
-
-		if (peek.equals(MULTIMODECOUNTS)) {
-			attributes = counts.getAttributes();
-
-		} else {
-			attributes = countMap.get(this.currCount).getAttributes();
-		}
-
-		for (int i = 0; i < atts.getLength(); i++) {
-			String name = atts.getQName(i);
-			String value = atts.getValue(i);
-
-			attributes.putAttribute(name, value);
-		}
-
-	}
-
 	private void startMeasurable(String tag, Attributes atts) {
-		MultiModeCount<?> count = countMap.get(currCount);
+		MeasurementLocation<?> count = locations.get(currCount);
 		int interval = Integer.parseInt(atts.getValue("interval"));
 		this.currMeasurable = count.addMeasurable(tag, atts.getValue("mode"), interval);
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private void startMultiModeCount(Attributes atts) {
+	private void startMeasurementLocation(Attributes atts) {
 		String idString = atts.getValue("id");
 		Id id = Id.create(idString, this.identifiableClass);
 		String stationName = atts.getValue("stationName");
-		int year = Integer.parseInt(atts.getValue("year"));
 
-		counts.createAndAddCount(id, stationName, year);
+		counts.createAndAddCount(id, stationName);
 		currCount = id;
 	}
 
 	private void startMultiModeCounts(Attributes atts) {
-		org.matsim.utils.objectattributes.attributable.Attributes attributes = counts.getAttributes();
+		currAttributes = counts.getAttributes();
 
 		for (int i = 0; i < atts.getLength(); i++) {
 
@@ -110,15 +92,7 @@ public class MultiModeCountsReader extends MatsimXmlParser {
 				case "source" -> counts.setSource(value);
 				case "year" -> counts.setYear(Integer.parseInt(value));
 				case "description" -> counts.setDescription(value);
-				case "measurableTags" -> Arrays.stream(value.split(",")).forEach(s -> counts.getMeasurableTags().add(s));
-
-				default -> attributes.putAttribute(name, value);
 			}
 		}
-	}
-
-	@Override
-	public void endTag(String name, String content, Stack<String> context) {
-
 	}
 }

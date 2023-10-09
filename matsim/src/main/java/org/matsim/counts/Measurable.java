@@ -6,13 +6,13 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import java.util.OptionalDouble;
 
 /**
- * A MultiModeCount station can hold any kind of measurable data to calibrate a scenario provided as an implementation of this interface.
+ * A MeasurementLocation station can hold any kind of measurable data to calibrate a scenario provided as an implementation of this interface.
  * A single instance holds values for only one transport mode.
  * Average velocities and traffic volumes are already implemented.
  */
 public class Measurable {
 
-	public static final String ELEMENT_NAME = "measurable";
+	static final String ELEMENT_NAME = "measurable";
 
 	public static String VOLUMES = "volumes";
 	public static String VELOCITIES = "velocities";
