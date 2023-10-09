@@ -87,7 +87,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
-	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.AStarLandmarks;
+	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.SpeedyALT;
 	private EventTypeToCreateScoringFunctions eventTypeToCreateScoringFunctions = EventTypeToCreateScoringFunctions.IterationStarts;
 
 	private boolean linkToLinkRoutingEnabled = false;
