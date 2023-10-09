@@ -47,9 +47,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * This class is based on and similar to org.matsim.pt.router.MultiNodeDijkstra
+ * This class is based on and similar to org.matsim.contrib.eventsBasedPTRouter.MultiNodeDijkstra
  *
- * In contrast to org.matsim.pt.router.MultiNodeDijkstra, however, it stores the last
+ * In contrast to org.matsim.contrib.eventsBasedPTRouter.MultiNodeDijkstra, however, it stores the last
  * LeastCostPathTree. It is, therefore, much faster than it, in cases where many routes
  * starting with the same fromNode are calculated subsequently as every route from that
  * fromCoord can be retrieved now without having to compute the tree again.

@@ -158,7 +158,6 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -277,7 +276,6 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -356,7 +354,6 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

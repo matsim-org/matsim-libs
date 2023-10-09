@@ -47,13 +47,12 @@ public class RunPSimTest {
 	 */
 	@Test
 	public void testA() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		config.controler().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
 		pSimConfigGroup.setIterationsPerCycle(20);
-		
+
 		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		//identify selector strategies
@@ -95,12 +94,12 @@ public class RunPSimTest {
 
 		((Controler) runPSim.getMatsimControler()).addOverridingModule(new AbstractModule() {
 			@Override
-			public void install() {		
+			public void install() {
 				this.bind(TransitEmulator.class).to(NoTransitEmulator.class);
 			}
 		});
-		
-		
+
+
 		runPSim.run();
 		double psimScore = execScoreTracker.executedScore;
 		logger.info("RunPSim score was " + psimScore);
@@ -117,14 +116,13 @@ public class RunPSimTest {
 
 	/**
 	 * For comparison run 2 normal qsim iterations. Psim score should be slightly higher than default Controler score.
-	 * 
+	 *
 	 * Prior to implementing routing mode RunPSimTest tested only that psimScore outperformed default Controler on this
 	 * test for executed score by a margin > 1%. In the last commit in matsim master where the test ran, the psim score
 	 * in testA() was 134.52369453719413 and qsim score in testB was 131.84309487251033).
 	 */
 	@Test
 	public void testB() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(2);
 		config.controler().setCreateGraphs(false);
@@ -134,7 +132,7 @@ public class RunPSimTest {
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControlerListener(execScoreTracker);
 		controler.run();
-		
+
 		double qsimScore = execScoreTracker.executedScore;
 		logger.info("Default controler score was " + qsimScore );
 //		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);

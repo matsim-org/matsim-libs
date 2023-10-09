@@ -28,7 +28,6 @@ public class TestSiouxFalls {
 		URL scenarioURL = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioURL, "config_default.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement(config);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
