@@ -9,7 +9,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,12 +19,12 @@ import java.util.Map;
  * several transport modes.
  * A single MeasurementLocation instance for example can hold traffic volumes for the mode 'car' and average velocities for the mode 'freight'.
  */
-public final class MeasurementLocation<T> implements Identifiable<T>, Attributable {
+public final class MeasurementLocation<T> implements Identifiable<T>, Attributable, Iterable<MeasurementLocation.TypeAndMode> {
 
 	static final String ELEMENT_NAME = "location";
 
 	private final Id<T> id;
-	private final Map<String, Map<String, Measurable>> measurables = new HashMap<>();
+	private final Map<TypeAndMode, Measurable> measurables = new LinkedHashMap<>();
 	private final Attributes attributes = new AttributesImpl();
 	private String stationName;
 	private String description;
@@ -48,19 +48,15 @@ public final class MeasurementLocation<T> implements Identifiable<T>, Attributab
 	 * Create arbitrary measurable for certain mode and minute interval. If this measurable exists already, it is returned.
 	 */
 	public Measurable createMeasurable(String typeOfMeasurableData, String mode, int interval) {
-		Map<String, Measurable> map = this.measurables.computeIfAbsent(typeOfMeasurableData, k -> new LinkedHashMap<>());
-		return map.computeIfAbsent(mode, k -> new Measurable(mode, typeOfMeasurableData, interval));
+		return measurables.computeIfAbsent(new TypeAndMode(typeOfMeasurableData, mode),
+			k -> new Measurable(mode, typeOfMeasurableData, interval));
 	}
 
 	/**
 	 * Delete measurable for certain mode.
 	 */
 	public boolean deleteMeasurable(String typeOfMeasurableData, String mode) {
-		if (this.measurables.containsKey(typeOfMeasurableData)) {
-			return this.measurables.get(typeOfMeasurableData).remove(mode) != null;
-		}
-
-		return false;
+		return this.measurables.remove(new TypeAndMode(typeOfMeasurableData, mode)) != null;
 	}
 
 	/**
@@ -114,15 +110,22 @@ public final class MeasurementLocation<T> implements Identifiable<T>, Attributab
 	}
 
 	public Measurable getVolumesForMode(String mode) {
-		return this.measurables.get(Measurable.VOLUMES).get(mode);
+		return this.measurables.get(new TypeAndMode(Measurable.VOLUMES, mode));
+	}
+
+	/**
+	 * Return whether this location has measurable data for certain mode.
+	 */
+	public boolean hasMeasurableForMode(String measurableType, String mode) {
+		return this.measurables.containsKey(new TypeAndMode(measurableType, mode));
 	}
 
 	@Nullable
 	public Measurable getMeasurableForMode(String measurableType, String mode) {
-		return this.measurables.get(measurableType).get(mode);
+		return this.measurables.get(new TypeAndMode(measurableType, mode));
 	}
 
-	Map<String, Map<String, Measurable>> getMeasurables() {
+	Map<TypeAndMode, Measurable> getMeasurables() {
 		return this.measurables;
 	}
 
@@ -133,4 +136,16 @@ public final class MeasurementLocation<T> implements Identifiable<T>, Attributab
 			", stationName='" + stationName + '\'' +
 			'}';
 	}
+
+	@Override
+	public Iterator<TypeAndMode> iterator() {
+		return this.measurables.keySet().iterator();
+	}
+
+	/**
+	 * Stores the measurable type and mode of a {@link Measurable}.
+	 */
+	public final record TypeAndMode(String type, String mode) {
+	}
+
 }

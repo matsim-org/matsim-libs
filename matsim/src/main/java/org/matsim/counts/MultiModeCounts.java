@@ -15,29 +15,26 @@ import java.util.stream.Collectors;
  * This class provides count object, that can assign any measurable values (traffic volumes, velocities e.g.) for any matsim transport mode
  * to an identifiable object (links, nodes, transit stations e.g)
  * Structure is similar to regular counts, but more flexible to use.
- * */
+ */
 public final class MultiModeCounts<T extends Identifiable<T>> implements Attributable {
 
 	public static final String ELEMENT_NAME = "counts";
 
 	// TODO: merge into Counts class to have same API
-
+	private final Map<Id<T>, MeasurementLocation<T>> locations = new TreeMap<>();
+	private final Attributes attributes = new AttributesImpl();
 	private String name;
 	private String description;
 	private String source;
-
 	private int year;
 
-	private final Map<Id<T>, MeasurementLocation<T>> locations = new TreeMap<>();
-
-	private final Attributes attributes = new AttributesImpl();
-
-	public MultiModeCounts(){}
+	public MultiModeCounts() {
+	}
 
 	/**
 	 * Creates a MeasurementLocation object and adds to count tree map. Argument has to be an id for an matsim Identifiable object (link, node, pt station e.g).
-	 * */
-	public MeasurementLocation<T> createAndAddLocation(final Id<T> id, String stationName){
+	 */
+	public MeasurementLocation<T> createAndAddLocation(final Id<T> id, String stationName) {
 
 		if (this.locations.containsKey(id)) {
 			throw new RuntimeException("There is already a measurement object for location " + id.toString());
@@ -49,42 +46,46 @@ public final class MultiModeCounts<T extends Identifiable<T>> implements Attribu
 		return count;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	public void setYear(int year) {
-		this.year = year;
-	}
-
 	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public String getSource() {
 		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 
 	public int getYear() {
 		return year;
 	}
 
-	public Set<String> getMeasurableTags() {
+	public void setYear(int year) {
+		this.year = year;
+	}
+
+	/**
+	 * Returns all measured types of observations for all modes.
+	 */
+	public Set<String> getMeasurableTypes() {
 		return locations.values().stream()
 			.map(MeasurementLocation::getMeasurables)
-			.flatMap(m -> m.keySet().stream())
+			.flatMap(e -> e.keySet().stream())
+			.map(MeasurementLocation.TypeAndMode::type)
 			.collect(Collectors.toSet());
 	}
 

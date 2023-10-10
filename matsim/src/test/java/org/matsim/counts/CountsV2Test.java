@@ -20,12 +20,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SplittableRandom;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class CountsV2Test {
 
+	private final SplittableRandom random = new SplittableRandom(1234);
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	private final SplittableRandom random = new SplittableRandom(1234);
 
 	@Test
 	public void test_general_handling() throws IOException {
@@ -43,11 +44,11 @@ public class CountsV2Test {
 		String filename = utils.getOutputDirectory() + "test_counts.xml";
 
 		writer.write(filename);
-		Assertions.assertThat(Files.exists(Path.of(filename))).isTrue();
+		assertThat(Files.exists(Path.of(filename))).isTrue();
 	}
 
 	@Test
-	public void test_reader() throws IOException {
+	public void test_reader_writer() throws IOException {
 
 		String filename = utils.getOutputDirectory() + "test_counts.xml";
 
@@ -67,6 +68,22 @@ public class CountsV2Test {
 
 		boolean onlyDailyValues = countMap.get(Id.create("12", Link.class)).getMeasurableForMode(Measurable.VOLUMES, TransportMode.car).getInterval() == 24 * 60;
 		Assert.assertFalse(onlyDailyValues);
+
+		assertThat(dummyCounts.getMeasurableTypes())
+			.isEqualTo(counts.getMeasurableTypes());
+
+
+		// Compare if all content is equal
+		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> e : dummyCounts.getMeasureLocations().entrySet()) {
+			MeasurementLocation<Link> otherLocation = counts.getMeasureLocation(e.getKey());
+
+			for (MeasurementLocation.TypeAndMode typeAndMode : otherLocation) {
+
+				Measurable m = e.getValue().getMeasurableForMode(typeAndMode.type(), typeAndMode.mode());
+				assertThat(m)
+					.isEqualTo(otherLocation.getMeasurableForMode(typeAndMode.type(), typeAndMode.mode()));
+			}
+		}
 	}
 
 
@@ -106,7 +123,9 @@ public class CountsV2Test {
 			}
 
 			MeasurementLocation<Link> count = multiModeCounts.createAndAddLocation(id, id + "_test");
-			count.getAttributes().putAttribute("test", "test");
+
+			if (random.nextBoolean())
+				count.getAttributes().putAttribute("testAttribute", "test");
 
 			for (String mode : modes) {
 				boolean dailyValuesOnly = random.nextBoolean();

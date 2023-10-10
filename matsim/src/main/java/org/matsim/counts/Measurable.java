@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.OptionalDouble;
 
 /**
@@ -13,7 +14,7 @@ import java.util.OptionalDouble;
  */
 public class Measurable implements Iterable<Int2DoubleMap.Entry> {
 
-	static final String ELEMENT_NAME = "measurable";
+	static final String ELEMENT_NAME = "measurements";
 
 	public static String VOLUMES = "volumes";
 	public static String VELOCITIES = "velocities";
@@ -143,6 +144,19 @@ public class Measurable implements Iterable<Int2DoubleMap.Entry> {
 	@Override
 	public Iterator<Int2DoubleMap.Entry> iterator() {
 		return values.int2DoubleEntrySet().iterator();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Measurable entries = (Measurable) o;
+		return interval == entries.interval && Objects.equals(type, entries.type) && Objects.equals(mode, entries.mode) && Objects.equals(values, entries.values);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, mode, values, interval);
 	}
 }
 

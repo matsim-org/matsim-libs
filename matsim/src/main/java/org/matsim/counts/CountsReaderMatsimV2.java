@@ -6,7 +6,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
-import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -14,23 +13,20 @@ import java.util.Stack;
  */
 public class CountsReaderMatsimV2 extends MatsimXmlParser {
 
-	private final static String VALUE = "val";
+	private final static String VALUE = "value";
 	private final static String ATTRIBUTES = "attributes";
 
 	private final Class<? extends Identifiable<?>> identifiableClass;
 	private final MultiModeCounts<?> counts;
-	private final Map<? extends Id<?>, ? extends MeasurementLocation<?>> locations;
-	private Id<?> currCount;
+	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
+	private MeasurementLocation<?> currLocation;
 	private Measurable currMeasurable;
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
-
-	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
 
 
 	public CountsReaderMatsimV2(MultiModeCounts<?> counts, Class<? extends Identifiable<?>> identifiableClass) {
 		super(ValidationType.NO_VALIDATION);
 		this.counts = counts;
-		this.locations = counts.getMeasureLocations();
 		this.identifiableClass = identifiableClass;
 	}
 
@@ -52,37 +48,30 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 	}
 
 	private void addValuesToMeasurable(Attributes atts) {
-		// TODO interval should be irrelevant?
-		if (this.currMeasurable.getInterval() == 1440) {
-			this.currMeasurable.setDailyValue(Double.parseDouble(atts.getValue(0)));
-		} else {
-			int h = Integer.parseInt(atts.getValue("h"));
-			double v = Double.parseDouble(atts.getValue("v"));
-			this.currMeasurable.setAtMinute(h, v);
-		}
+		int t = Integer.parseInt(atts.getValue("t"));
+		double val = Double.parseDouble(atts.getValue("val"));
+		this.currMeasurable.setAtMinute(t, val);
 	}
 
 	private void startMeasurable(String tag, Attributes atts) {
-		MeasurementLocation<?> count = locations.get(currCount);
 		int interval = Integer.parseInt(atts.getValue("interval"));
-		this.currMeasurable = count.createMeasurable(tag, atts.getValue("mode"), interval);
+		currMeasurable = currLocation.createMeasurable(atts.getValue("type"), atts.getValue("mode"), interval);
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void startMeasurementLocation(Attributes atts) {
 		String idString = atts.getValue("id");
 		Id id = Id.create(idString, this.identifiableClass);
-		String stationName = atts.getValue("stationName");
+		String stationName = atts.getValue("name");
 
-		counts.createAndAddLocation(id, stationName);
-		currCount = id;
+		currLocation = counts.createAndAddLocation(id, stationName);
+		currAttributes = currLocation.getAttributes();
 	}
 
 	private void startMultiModeCounts(Attributes atts) {
 		currAttributes = counts.getAttributes();
 
 		for (int i = 0; i < atts.getLength(); i++) {
-
 			String name = atts.getQName(i);
 			String value = atts.getValue(i);
 

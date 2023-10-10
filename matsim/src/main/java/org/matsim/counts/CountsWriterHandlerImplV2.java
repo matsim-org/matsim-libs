@@ -57,18 +57,24 @@ class CountsWriterHandlerImplV2 extends MatsimXmlWriter {
 		write(filename.toString());
 	}
 
-	private void writeRootElement() throws UncheckedIOException, IOException {
+	private void writeRootElement() throws UncheckedIOException {
 
-		List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+		List<Tuple<String, String>> atts = new ArrayList<>();
 
 		atts.add(createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		atts.add(createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
 		atts.add(createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "counts_v2.xsd"));
 
-		atts.add(createTuple("source", counts.getSource()));
-		atts.add(createTuple("name", counts.getName()));
+		if (counts.getSource() != null)
+			atts.add(createTuple("source", counts.getSource()));
+
+		if (counts.getName() != null)
+			atts.add(createTuple("name", counts.getName()));
+
+		if (counts.getDescription() != null)
+			atts.add(createTuple("description", counts.getDescription()));
+
 		atts.add(createTuple("year", String.valueOf(counts.getYear())));
-		atts.add(createTuple("description", counts.getDescription()));
 
 		this.writeStartTag(MultiModeCounts.ELEMENT_NAME, atts, false, true);
 
@@ -85,9 +91,13 @@ class CountsWriterHandlerImplV2 extends MatsimXmlWriter {
 		for (MeasurementLocation<?> count : counts.getMeasureLocations().values()) {
 
 			List<Tuple<String, String>> attributes = new ArrayList<>();
-			attributes.add(new Tuple<>("id", count.getId().toString()));
-			attributes.add(new Tuple<>("name", count.getStationName()));
-			attributes.add(new Tuple<>("description", counts.getDescription()));
+			attributes.add(createTuple("id", count.getId().toString()));
+
+			if (count.getStationName() != null)
+				attributes.add(createTuple("name", count.getStationName()));
+
+			if (count.getDescription() != null)
+				attributes.add(createTuple("description", counts.getDescription()));
 
 			if (count.getCoordinates() != null) {
 				attributes.add(createTuple("x", count.getCoordinates().getX()));
@@ -109,43 +119,42 @@ class CountsWriterHandlerImplV2 extends MatsimXmlWriter {
 
 	private void writeMeasurables(MeasurementLocation<?> count) {
 
-		Map<String, Map<String, Measurable>> measurables = count.getMeasurables();
+		Map<MeasurementLocation.TypeAndMode, Measurable> measurables = count.getMeasurables();
 
-		for (Map.Entry<String, Map<String, Measurable>> entry : measurables.entrySet()) {
+		for (Map.Entry<MeasurementLocation.TypeAndMode, Measurable> entry : measurables.entrySet()) {
 
-			//write type of measurable data
-			for (Measurable m : entry.getValue().values()) {
-				int interval = m.getInterval();
+			Measurable m = entry.getValue();
 
-				writeStartTag("measurements", List.of(
-					new Tuple<>("type", m.getMeasurableType()),
-					new Tuple<>("mode", m.getMode()),
-					new Tuple<>("interval", String.valueOf(interval)))
-				);
+			int interval = m.getInterval();
 
-				//write values
-				Int2DoubleMap hourlyValues = m.getValues();
-				try {
-					for (Integer hour : hourlyValues.keySet()) {
-						double v = hourlyValues.get(hour.intValue());
-						writeEmptyLine();
+			writeStartTag(Measurable.ELEMENT_NAME, List.of(
+				new Tuple<>("type", m.getMeasurableType()),
+				new Tuple<>("mode", m.getMode()),
+				new Tuple<>("interval", String.valueOf(interval)))
+			);
 
-						//start tag
-						super.writer.write("\t\t\t\t\t<value ");
+			//write values
+			Int2DoubleMap hourlyValues = m.getValues();
+			try {
+				for (Integer hour : hourlyValues.keySet()) {
+					double v = hourlyValues.get(hour.intValue());
+					writeEmptyLine();
 
-						super.writer.write("t=\"" + hour + "\" ");
+					//start tag
+					super.writer.write("\t\t\t\t<value ");
 
-						super.writer.write("val=\"" + v + "\" ");
+					super.writer.write("t=\"" + hour + "\" ");
 
-						//end tag
-						super.writer.write("/>");
-					}
-				} catch (IOException e) {
-					logger.error("Error writing Measurables", e);
+					super.writer.write("val=\"" + v + "\" ");
+
+					//end tag
+					super.writer.write("/>");
 				}
-
-				writeEndTag("measurements");
+			} catch (IOException e) {
+				logger.error("Error writing Measurables", e);
 			}
+
+			writeEndTag(Measurable.ELEMENT_NAME);
 		}
 	}
 

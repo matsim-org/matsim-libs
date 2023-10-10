@@ -220,7 +220,7 @@ public class CreateCountsFromBAStDataTest {
 
 		assertThat(size).isGreaterThan(0);
 
-		Assert.assertTrue(multiModeCounts.getMeasurableTags().contains("volumes"));
+		Assert.assertTrue(multiModeCounts.getMeasurableTypes().contains("volumes"));
 
 		Count<Link> carCount = carCounts.getCount(Id.createLinkId("7686"));
 		MeasurementLocation<Link> mmCount = multiModeCounts.getMeasureLocation(Id.createLinkId("7686"));
