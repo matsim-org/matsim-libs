@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.charging;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -16,6 +17,8 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTas
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * based on {@link DrtStopActivity} and {@link ChargingActivity}
@@ -50,7 +53,7 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
     protected boolean isLastStep(double now) {
         if(chargingDelegate.getEndTime() < now && now >= endTime) {
             for (var request : pickupRequests.values()) {
-                if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
+                if (passengerHandler.tryPickUpPassengers(this, driver, request.getId(), now)) {
                     passengersPickedUp++;
                 }
             }
@@ -64,13 +67,13 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
     }
 
     @Override
-    public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
+    public void notifyPassengersAreReadyForDeparture(Set<MobsimPassengerAgent> passengers, double now) {
         if (!isLastStep(now)) {
             return;// pick up only at the end of stop activity
         }
 
-        var request = getRequestForPassenger(passenger.getId());
-        if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
+        var request = getRequestForPassengers(passengers.stream().map(Identifiable::getId).collect(Collectors.toSet()));
+        if (passengerHandler.tryPickUpPassengers(this, driver, request.getId(), now)) {
             passengersPickedUp++;
         } else {
             throw new IllegalStateException("The passenger is not on the link or not available for departure!");
@@ -81,7 +84,7 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
     protected void beforeFirstStep(double now) {
         // TODO probably we should simulate it more accurately (passenger by passenger, not all at once...)
         for (var request : dropoffRequests.values()) {
-            passengerHandler.dropOffPassenger(driver, request.getId(), now);
+            passengerHandler.dropOffPassengers(driver, request.getId(), now);
         }
     }
 
@@ -95,9 +98,9 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
         chargingDelegate.doSimStep(now);
     }
 
-    private AcceptedDrtRequest getRequestForPassenger(Id<Person> passengerId) {
+    private AcceptedDrtRequest getRequestForPassengers(Set<Id<Person>> passengerIds) {
         return pickupRequests.values().stream()
-                .filter(r -> passengerId.equals(r.getPassengerId()))
+                .filter(r -> r.getPassengerIds().containsAll(passengerIds))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
     }

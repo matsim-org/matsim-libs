@@ -25,10 +25,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter.NO_INSERTION_FOUND_CAUSE;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.Rule;
@@ -114,7 +111,7 @@ public class DefaultUnplannedRequestInserterTest {
 				PassengerRequestRejectedEvent.class);
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue()).isEqualToComparingFieldByField(
-				new PassengerRequestRejectedEvent(now, mode, request1.getId(), request1.getPassengerId(),
+				new PassengerRequestRejectedEvent(now, mode, request1.getId(), request1.getPassengerIds(),
 						NO_INSERTION_FOUND_CAUSE));
 	}
 
@@ -243,7 +240,7 @@ public class DefaultUnplannedRequestInserterTest {
 				PassengerRequestScheduledEvent.class);
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue()).isEqualToComparingFieldByField(
-				new PassengerRequestScheduledEvent(now, mode, request1.getId(), request1.getPassengerId(),
+				new PassengerRequestScheduledEvent(now, mode, request1.getId(), request1.getPassengerIds(),
 						vehicle1.getId(), pickupEndTime, dropoffBeginTime));
 
 		//vehicle entry was created twice:
@@ -271,7 +268,7 @@ public class DefaultUnplannedRequestInserterTest {
 	private DrtRequest request(String id, String fromLinkId, String toLinkId) {
 		return DrtRequest.newBuilder()
 				.id(Id.create(id, Request.class))
-				.passengerId(Id.createPersonId(id))
+				.passengerIds(Collections.singleton(Id.createPersonId(id)))
 				.fromLink(link(fromLinkId))
 				.toLink(link(toLinkId))
 				.mode(mode)

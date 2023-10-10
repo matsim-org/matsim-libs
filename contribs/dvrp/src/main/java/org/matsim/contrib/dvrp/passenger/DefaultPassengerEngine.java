@@ -19,9 +19,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import jakarta.inject.Inject;
@@ -65,7 +63,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	private InternalInterface internalInterface;
 
 	//accessed in doSimStep() and handleDeparture() (no need to sync)
-	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new HashMap<>();
+	private final Map<Id<Request>, Set<MobsimPassengerAgent>> activePassengers = new HashMap<>();
 
 	//accessed in doSimStep() and handleEvent() (potential data races)
 	private final Queue<PassengerRequestRejectedEvent> rejectedRequestsEvents = new ConcurrentLinkedQueue<>();
@@ -96,11 +94,13 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	@Override
 	public void doSimStep(double time) {
 		while (!rejectedRequestsEvents.isEmpty()) {
-			MobsimPassengerAgent passenger = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
+			Set<MobsimPassengerAgent> passengers = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
 			//not much else can be done for immediate requests
 			//set the passenger agent to abort - the event will be thrown by the QSim
-			passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
-			internalInterface.arrangeNextAgentState(passenger);
+			for (MobsimPassengerAgent passenger: passengers) {
+				passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
+				internalInterface.arrangeNextAgentState(passenger);
+			}
 		}
 	}
 
@@ -121,13 +121,13 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
-		validateAndSubmitRequest(passenger, request, now);
+				Collections.singleton(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
+		validateAndSubmitRequest(Collections.singleton(passenger), request, now);
 		return true;
 	}
 
-	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
-		activePassengers.put(request.getId(), passenger);
+	private void validateAndSubmitRequest(Set<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
+		activePassengers.put(request.getId(), passengers);
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			//need to synchronise to address cases where requestSubmitted() may:
 			// - be called from outside DepartureHandlers
@@ -148,17 +148,17 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	}
 
 	@Override
-	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			Id<Request> requestId, double now) {
-		boolean pickedUp = internalPassengerHandling.tryPickUpPassenger(driver, activePassengers.get(requestId),
+		boolean pickedUp = internalPassengerHandling.tryPickUpPassengers(driver, activePassengers.get(requestId),
 				requestId, now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
 	}
 
 	@Override
-	public void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now) {
-		internalPassengerHandling.dropOffPassenger(driver, activePassengers.remove(requestId), requestId, now);
+	public void dropOffPassengers(MobsimDriverAgent driver, Id<Request> requestId, double now) {
+		internalPassengerHandling.dropOffPassengers(driver, activePassengers.remove(requestId), requestId, now);
 	}
 
 	@Override

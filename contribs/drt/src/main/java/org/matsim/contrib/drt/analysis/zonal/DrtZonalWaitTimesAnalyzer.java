@@ -39,6 +39,8 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -138,11 +140,13 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		zoneStats.put(zoneIdForOutsideOfZonalSystem, new DescriptiveStatistics());
 
 		for (EventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
-			if (seq.getPickedUp().isPresent()) {
-				DrtZone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
-				final String zoneStr = zone != null ? zone.getId() : zoneIdForOutsideOfZonalSystem;
-				double waitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-				zoneStats.get(zoneStr).addValue(waitTime);
+			for (Id<Person> personId : seq.getSubmitted().getPersonIds()) {
+				if(seq.getPickedUp().containsKey(personId)) {
+					DrtZone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
+					final String zoneStr = zone != null ? zone.getId() : zoneIdForOutsideOfZonalSystem;
+					double waitTime = seq.getPickedUp().get(personId).getTime() - seq.getSubmitted().getTime();
+					zoneStats.get(zoneStr).addValue(waitTime);
+				}
 			}
 		}
 		return zoneStats;

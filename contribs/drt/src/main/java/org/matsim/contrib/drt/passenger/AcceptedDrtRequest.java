@@ -27,6 +27,8 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 
 import com.google.common.base.MoreObjects;
 
+import java.util.Set;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -98,8 +100,8 @@ public class AcceptedDrtRequest {
 		return request.getToLink();
 	}
 
-	public Id<Person> getPassengerId() {
-		return request.getPassengerId();
+	public Set<Id<Person>> getPassengerIds() {
+		return request.getPassengerIds();
 	}
 
 	public String getMode() {

@@ -54,7 +54,7 @@ public class MultiPassengerDropoffActivity extends FirstLastSimStepDynActivity {
 	protected void afterLastStep(double now) {
 		// dropoff at the end of stop activity
 		for (PassengerRequest request : requests.values()) {
-			passengerHandler.dropOffPassenger(driver, request.getId(), now);
+			passengerHandler.dropOffPassengers(driver, request.getId(), now);
 		}
 	}
 }

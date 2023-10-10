@@ -51,6 +51,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.core.config.Config;
@@ -101,8 +102,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	private final String delimiter;
 
 	DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet, DrtVehicleDistanceStats drtVehicleStats,
-			MatsimServices matsimServices, Network network, DrtEventSequenceCollector drtEventSequenceCollector,
-			VehicleOccupancyProfileCalculator vehicleOccupancyProfileCalculator) {
+								 MatsimServices matsimServices, Network network, DrtEventSequenceCollector drtEventSequenceCollector,
+								 VehicleOccupancyProfileCalculator vehicleOccupancyProfileCalculator) {
 		this.drtVehicleStats = drtVehicleStats;
 		this.matsimServices = matsimServices;
 		this.network = network;
@@ -126,29 +127,35 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 						  double arrivalTime, double fare, double latestDepartureTime, double latestArrivalTime) {
 	}
 
-	private static DrtLeg newDrtLeg(EventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
+	private static List<DrtLeg> newDrtLegs(EventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
 		Preconditions.checkArgument(sequence.isCompleted());
+		List<DrtLeg> legs = new ArrayList<>();
 		DrtRequestSubmittedEvent submittedEvent = sequence.getSubmitted();
-		PersonDepartureEvent departureEvent = sequence.getDeparture().get();
-		PassengerPickedUpEvent pickedUpEvent = sequence.getPickedUp().get();
+		Map<Id<Person>, PersonDepartureEvent> departureEvents = sequence.getDepartures();
+		Map<Id<Person>, PassengerPickedUpEvent> pickedUpEvents = sequence.getPickedUp();
+		Map<Id<Person>, PassengerDroppedOffEvent> droppedOffEvents = sequence.getDroppedOff();
+
 		var request = submittedEvent.getRequestId();
-		var departureTime = departureEvent.getTime();
-		var person = submittedEvent.getPersonId();
-		var vehicle = pickedUpEvent.getVehicleId();
 		var fromLinkId = submittedEvent.getFromLinkId();
 		var fromCoord = linkProvider.apply(fromLinkId).getToNode().getCoord();
 		var toLinkId = submittedEvent.getToLinkId();
 		var toCoord = linkProvider.apply(toLinkId).getToNode().getCoord();
-		var waitTime = pickedUpEvent.getTime() - departureEvent.getTime();
 		var unsharedDistanceEstimate_m = submittedEvent.getUnsharedRideDistance();
 		var unsharedTimeEstimate_m = submittedEvent.getUnsharedRideTime();
-		var arrivalTime = sequence.getDroppedOff().get().getTime();
 		// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
 		var fare = sequence.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
 		var latestDepartureTime = sequence.getSubmitted().getLatestPickupTime();
 		var latestArrivalTime = sequence.getSubmitted().getLatestDropoffTime();
-		return new DrtLeg(request, departureTime, person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
-				unsharedTimeEstimate_m, arrivalTime, fare, latestDepartureTime, latestArrivalTime);
+
+		for (Id<Person> person : submittedEvent.getPersonIds()) {
+			var departureTime = departureEvents.get(person).getTime();
+			var vehicle = pickedUpEvents.get(person).getVehicleId();
+			var waitTime = pickedUpEvents.get(person).getTime() - departureEvents.get(person).getTime();
+			var arrivalTime = droppedOffEvents.get(person).getTime();
+			legs.add(new DrtLeg(request, departureTime, person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
+					unsharedTimeEstimate_m, arrivalTime, fare, latestDepartureTime, latestArrivalTime));
+		}
+		return legs;
 	}
 
 	@Override
@@ -162,24 +169,25 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				.values()
 				.stream()
 				.filter(EventSequence::isCompleted)
-				.map(sequence -> newDrtLeg(sequence, network.getLinks()::get))
+				.map(sequence -> newDrtLegs(sequence, network.getLinks()::get))
+				.flatMap(Collection::stream)
 				.sorted(Comparator.comparing(leg -> leg.departureTime))
 				.collect(toList());
 
 		List<PassengerRequestRejectedEvent> rejectionEvents = drtEventSequenceCollector.getRejectedRequestSequences()
-			.values()
-			.stream()
-			.map(eventSequence -> eventSequence.getRejected().get())
-			.sorted(Comparator.comparing(rejectionEvent -> rejectionEvent.getTime()))
-			.collect(toList());
+				.values()
+				.stream()
+				.map(eventSequence -> eventSequence.getRejected().get())
+				.sorted(Comparator.comparing(rejectionEvent -> rejectionEvent.getTime()))
+				.collect(toList());
 
 		collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(), filename(event, "drt_rejections", ".csv"),
-				String.join(delimiter, "time", "personId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
+				String.join(delimiter, "time", "personIds", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
 					DrtRequestSubmittedEvent submission = seq.getSubmitted();
 					Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getToNode().getCoord();
 					Coord toCoord = network.getLinks().get(submission.getToLinkId()).getToNode().getCoord();
 					return String.join(delimiter, submission.getTime() + "",//
-							submission.getPersonId() + "",//
+							submission.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-")) + "",//
 							submission.getFromLinkId() + "",//
 							submission.getToLinkId() + "",//
 							fromCoord.getX() + "",//
@@ -188,7 +196,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 							toCoord.getY() + "");
 				});
 
-		double rejectionRate = (double)drtEventSequenceCollector.getRejectedRequestSequences().size()
+		double rejectionRate = (double) drtEventSequenceCollector.getRejectedRequestSequences().size()
 				/ drtEventSequenceCollector.getRequestSubmissions().size();
 		String legsSummarize = summarizeLegs(legs, drtVehicleStats.getTravelDistances(), drtEventSequenceCollector.getDrtFarePersonMoneyEvents(),
 				delimiter);
@@ -228,7 +236,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					"latestArrivalTime");
 
 			collection2Text(legs, filename(event, "drt_legs", ".csv"), header, leg -> String.join(delimiter,//
-					(Double)leg.departureTime + "",//
+					(Double) leg.departureTime + "",//
 					leg.person + "",//
 					leg.vehicle + "",//
 					leg.fromLinkId + "",//
@@ -249,7 +257,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		writeVehicleDistances(drtVehicleStats.getVehicleStates(), filename(event, "vehicleDistanceStats", ".csv"), delimiter);
 		analyseDetours(network, legs, drtVehicleStats.getTravelDistances(), drtCfg, filename(event, "drt_detours"), createGraphs, delimiter);
 		analyseWaitTimes(filename(event, "waitStats"), legs, 1800, createGraphs, delimiter);
-		analyseRejections(filename(event,"drt_rejections_perTimeBin"), rejectionEvents,1800, createGraphs, delimiter);
+		analyseRejections(filename(event, "drt_rejections_perTimeBin"), rejectionEvents, 1800, createGraphs, delimiter);
 		analyseConstraints(filename(event, "constraints"), legs, createGraphs);
 
 		double endTime = qSimCfg.getEndTime()
@@ -331,7 +339,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	private void writeIterationVehicleStats(String summarizeVehicles, String vehOcc, int it) {
 		try (var bw = getAppendingBufferedWriter("drt_vehicle_stats", ".csv")) {
 			if (!vheaderWritten) {
-				bw.write(line("runId", "iteration", "vehicles", "totalServiceDuration",  "totalDistance", "totalEmptyDistance", "emptyRatio", "totalPassengerDistanceTraveled",
+				bw.write(line("runId", "iteration", "vehicles", "totalServiceDuration", "totalDistance", "totalEmptyDistance", "emptyRatio", "totalPassengerDistanceTraveled",
 						"averageDrivenDistance", "averageEmptyDistance", "averagePassengerDistanceTraveled", "d_p/d_t", "l_det",
 						"minShareIdleVehicles", "minCountIdleVehicles"));
 			}
@@ -357,17 +365,20 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private void writeAndPlotWaitTimeEstimateComparison(Collection<EventSequence> performedRequestEventSequences, String plotFileName,
-			String textFileName, boolean createChart) {
+														String textFileName, boolean createChart) {
 		try (var bw = IOUtils.getBufferedWriter(textFileName)) {
 			XYSeries times = new XYSeries("waittimes", false, true);
 
 			bw.append(line("RequestId", "actualWaitTime", "estimatedWaitTime", "deviate"));
 			for (EventSequence seq : performedRequestEventSequences) {
-				if (seq.getPickedUp().isPresent()) {
-					double actualWaitTime = seq.getPickedUp().get().getTime() - seq.getDeparture().get().getTime();
-					double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getDeparture().get().getTime();
-					bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime, actualWaitTime - estimatedWaitTime));
-					times.add(actualWaitTime, estimatedWaitTime);
+				Set<Id<Person>> personIds = seq.getSubmitted().getPersonIds();
+				for (Id<Person> person : personIds) {
+					if(seq.getPickedUp().containsKey(person) && seq.getDepartures().containsKey(person)) {
+						double actualWaitTime = seq.getPickedUp().get(person).getTime() - seq.getDepartures().get(person).getTime();
+						double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getDepartures().get(person).getTime();
+						bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime, actualWaitTime - estimatedWaitTime));
+						times.add(actualWaitTime, estimatedWaitTime);
+					}
 				}
 			}
 
@@ -439,7 +450,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		Map<Double, List<DrtLeg>> splitLegs = new TreeMap<>();
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
 			List<DrtLeg> currentList = new ArrayList<>();
-			splitLegs.put((double)time, currentList);
+			splitLegs.put((double) time, currentList);
 			while (currentLeg.departureTime < time + binSize_s) {
 				currentList.add(currentLeg);
 				currentLeg = allLegs.pollFirst();
@@ -455,8 +466,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	private static Map<Double, List<PassengerRequestRejectedEvent>> splitEventsIntoBins(List<PassengerRequestRejectedEvent> rejectionEvents, int binSize_s) {
 		Map<Double, List<PassengerRequestRejectedEvent>> rejections = new TreeMap<>();
 
-		int startTime = ((int)(rejectionEvents.get(0).getTime() / binSize_s)) * binSize_s;
-		int endTime = ((int)(rejectionEvents.get(rejectionEvents.size() - 1).getTime() / binSize_s) + 1) * binSize_s;
+		int startTime = ((int) (rejectionEvents.get(0).getTime() / binSize_s)) * binSize_s;
+		int endTime = ((int) (rejectionEvents.get(rejectionEvents.size() - 1).getTime() / binSize_s) + 1) * binSize_s;
 
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
 
@@ -464,7 +475,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			List<PassengerRequestRejectedEvent> rejectionList = new ArrayList<>();
 
 			//Iterate through each rejection
-			for (PassengerRequestRejectedEvent rejectedEvent : rejectionEvents){
+			for (PassengerRequestRejectedEvent rejectedEvent : rejectionEvents) {
 				double rejectionTime = rejectedEvent.getTime();
 				if (rejectionTime > endTime || rejectionTime < startTime) {
 					LogManager.getLogger(DrtAnalysisControlerListener.class).error("wrong end / start Times for analysis");
@@ -474,29 +485,29 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					rejectionList.add(rejectedEvent);
 				}
 			}
-			rejections.put((double)time, rejectionList);
+			rejections.put((double) time, rejectionList);
 		}
 		return rejections;
 	}
 
 	private static void analyzeBoardingsAndDeboardings(List<DrtLeg> legs, String delimiter, double startTime, double endTime, double timeBinSize,
-			String boardingsFile, String deboardingsFile, Network network) {
+													   String boardingsFile, String deboardingsFile, Network network) {
 		if (endTime < startTime) {
 			throw new IllegalArgumentException("endTime < startTime");
 		}
 		Map<Id<Link>, int[]> boardings = new HashMap<>();
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
-		int bins = (int)Math.ceil((endTime - startTime) / timeBinSize);
+		int bins = (int) Math.ceil((endTime - startTime) / timeBinSize);
 
 		for (DrtLeg leg : legs) {
 			int[] board = boardings.getOrDefault(leg.fromLinkId, new int[bins]);
-			int startTimeBin = (int)((leg.departureTime + leg.waitTime - startTime) / timeBinSize);
+			int startTimeBin = (int) ((leg.departureTime + leg.waitTime - startTime) / timeBinSize);
 			if (startTimeBin < bins) {
 				board[startTimeBin]++;
 				boardings.put(leg.fromLinkId, board);
 			}
 			int[] deboard = deboardings.getOrDefault(leg.toLinkId, new int[bins]);
-			int arrivalTimeBin = (int)((leg.arrivalTime - startTime) / timeBinSize);
+			int arrivalTimeBin = (int) ((leg.arrivalTime - startTime) / timeBinSize);
 			if (arrivalTimeBin < bins) {
 				deboard[arrivalTimeBin]++;
 				deboardings.put(leg.toLinkId, deboard);
@@ -507,7 +518,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private static void writeBoardings(String filename, Network network, Map<Id<Link>, int[]> boardings, double startTime, double timeBinSize,
-			int bins, String delimiter) {
+									   int bins, String delimiter) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
 			bw.write("Link" + delimiter + "x" + delimiter + "y");
@@ -530,7 +541,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private static String summarizeLegs(List<DrtLeg> legs, Map<Id<Request>, Double> travelDistances, List<PersonMoneyEvent> drtFarePersonMoneyEvents,
-			String delimiter) {
+										String delimiter) {
 		DescriptiveStatistics waitStats = new DescriptiveStatistics();
 		DescriptiveStatistics rideStats = new DescriptiveStatistics();
 		DescriptiveStatistics distanceStats = new DescriptiveStatistics();
@@ -589,7 +600,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private static void analyseDetours(Network network, List<DrtLeg> legs, Map<Id<Request>, Double> travelDistances, DrtConfigGroup drtCfg,
-			String fileName, boolean createGraphs, String delimiter) {
+									   String fileName, boolean createGraphs, String delimiter) {
 		if (legs == null)
 			return;
 
@@ -644,8 +655,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	private static void analyseWaitTimes(String fileName, List<DrtLeg> legs, int binsize_s, boolean createGraphs, String delimiter) {
 		if (legs.size() == 0)
 			return;
-		int startTime = ((int)(legs.get(0).departureTime / binsize_s)) * binsize_s;
-		int endTime = ((int)(legs.get(legs.size() - 1).departureTime / binsize_s) + binsize_s) * binsize_s;
+		int startTime = ((int) (legs.get(0).departureTime / binsize_s)) * binsize_s;
+		int endTime = ((int) (legs.get(legs.size() - 1).departureTime / binsize_s) + binsize_s) * binsize_s;
 		Map<Double, List<DrtLeg>> splitLegs = splitLegsIntoBins(legs, startTime, endTime, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
@@ -755,7 +766,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		try {
 			bw.write(String.join(delimiter, "timebin", "rejections"));
 
-			for(Map.Entry<Double, List<PassengerRequestRejectedEvent>> e : splitEvents.entrySet()){
+			for (Map.Entry<Double, List<PassengerRequestRejectedEvent>> e : splitEvents.entrySet()) {
 				int drt_numOfRejection = 0;
 				if (!e.getValue().isEmpty()) {
 					drt_numOfRejection = e.getValue().size();
@@ -766,7 +777,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				rejections.addOrUpdate(h, Double.valueOf(drt_numOfRejection));
 				bw.newLine();
 				bw.write(String.join(delimiter, Time.writeTime(e.getKey()) + "",//
-					format.format(drt_numOfRejection) +""));
+						format.format(drt_numOfRejection) + ""));
 			}
 
 			bw.flush();
@@ -795,7 +806,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		plot.setDomainGridlinesVisible(false);
 		plot.setBackgroundPaint(Color.white);
 
-		NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
+		NumberAxis yAxis = (NumberAxis) plot.getRangeAxis();
 		yAxis.setAutoRange(true);
 
 		XYItemRenderer renderer = plot.getRenderer();
@@ -829,7 +840,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	 * @param iterationFilename
 	 */
 	private static void writeVehicleDistances(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances, String iterationFilename,
-			String delimiter) {
+											  String delimiter) {
 		String header = String.join(delimiter, "vehicleId", "drivenDistance_m", "occupiedDistance_m", "emptyDistance_m",
 				"passengerDistanceTraveled_pm");
 		BufferedWriter bw = IOUtils.getBufferedWriter(iterationFilename);
@@ -907,7 +918,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances, String del,
-			int maxcap) {
+														  int maxcap) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
@@ -936,7 +947,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			return Double.NaN; // to be consistent with DescriptiveStatistics
 		}
 
-		double count = (double)Arrays.stream(waitingTimes).filter(t -> t < timeCriteria).count();
+		double count = (double) Arrays.stream(waitingTimes).filter(t -> t < timeCriteria).count();
 		return count * 100 / waitingTimes.length;
 	}
 

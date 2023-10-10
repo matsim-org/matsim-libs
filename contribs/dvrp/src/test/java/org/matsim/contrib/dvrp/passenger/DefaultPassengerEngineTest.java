@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.junit.Test;
@@ -100,7 +101,7 @@ public class DefaultPassengerEngineTest {
 		fixture.assertPassengerEvents(
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, fixture.PERSON_ID, VEHICLE_ID, 0,
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, Collections.singleton(fixture.PERSON_ID), VEHICLE_ID, 0,
 						scheduledDropoffTime),
 				new PersonEntersVehicleEvent(pickupStartTime, fixture.PERSON_ID, Id.createVehicleId(VEHICLE_ID)),
 				new PassengerPickedUpEvent(pickupStartTime, MODE, requestId, fixture.PERSON_ID, VEHICLE_ID),
@@ -121,7 +122,7 @@ public class DefaultPassengerEngineTest {
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "invalid"),
+				new PassengerRequestRejectedEvent(0, MODE, requestId, Collections.singleton(fixture.PERSON_ID), "invalid"),
 				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
@@ -136,7 +137,7 @@ public class DefaultPassengerEngineTest {
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "rejecting_all_requests"),
+				new PassengerRequestRejectedEvent(0, MODE, requestId, Collections.singleton(fixture.PERSON_ID), "rejecting_all_requests"),
 				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
@@ -151,7 +152,7 @@ public class DefaultPassengerEngineTest {
 		public void requestSubmitted(Request request) {
 			PassengerRequest passengerRequest = (PassengerRequest)request;
 			eventsManager.processEvent(new PassengerRequestRejectedEvent(timer.getTimeOfDay(), MODE, request.getId(),
-					passengerRequest.getPassengerId(), "rejecting_all_requests"));
+					passengerRequest.getPassengerIds(), "rejecting_all_requests"));
 		}
 
 		@Override

@@ -20,17 +20,9 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
-
-import java.util.Set;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -44,6 +36,11 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.population.routes.GenericRouteImpl;
+
+import java.util.Collections;
+import java.util.Set;
+
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -72,7 +69,7 @@ public class TeleportingPassengerEngineTest {
 		fixture.assertPassengerEvents(
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, fixture.PERSON_ID, null, departureTime,
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, Collections.singleton(fixture.PERSON_ID), null, departureTime,
 						arrivalTime), new PassengerPickedUpEvent(departureTime, MODE, requestId, fixture.PERSON_ID, null),
 				new PassengerDroppedOffEvent(arrivalTime, MODE, requestId, fixture.PERSON_ID, null),
 				new TeleportationArrivalEvent(arrivalTime, fixture.PERSON_ID, travelDistance, MODE),
@@ -93,7 +90,7 @@ public class TeleportingPassengerEngineTest {
 		fixture.assertPassengerEvents(
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestRejectedEvent(departureTime, MODE, requestId, fixture.PERSON_ID, "invalid"),
+				new PassengerRequestRejectedEvent(departureTime, MODE, requestId, Collections.singleton(fixture.PERSON_ID), "invalid"),
 				new PersonStuckEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 

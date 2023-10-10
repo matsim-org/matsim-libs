@@ -124,12 +124,12 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		if (best.isEmpty()) {
 			if (!insertionRetryQueue.tryAddFailedRequest(req, now)) {
 				eventsManager.processEvent(
-						new PassengerRequestRejectedEvent(now, mode, req.getId(), req.getPassengerId(),
+						new PassengerRequestRejectedEvent(now, mode, req.getId(), req.getPassengerIds(),
 								NO_INSERTION_FOUND_CAUSE));
 				log.debug("No insertion found for drt request "
 						+ req
-						+ " from passenger id="
-						+ req.getPassengerId()
+						+ " with passenger ids="
+						+ req.getPassengerIds().stream().map(Object::toString).collect(Collectors.joining(","))
 						+ " fromLinkId="
 						+ req.getFromLink().getId());
 			}
@@ -152,7 +152,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			}
 
 			eventsManager.processEvent(
-					new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerId(), vehicle.getId(),
+					new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerIds(), vehicle.getId(),
 							pickupDropoffTaskPair.pickupTask.getEndTime(),
 							pickupDropoffTaskPair.dropoffTask.getBeginTime()));
 		}

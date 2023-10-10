@@ -28,6 +28,11 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  * @author michalm
  */
@@ -36,18 +41,18 @@ public final class OneTaxiRequest implements PassengerRequest {
 	private final double submissionTime;
 	private final double earliestStartTime;
 
-	private final Id<Person> passengerId;
+	private final Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 	private final String mode;
 
 	private final Link fromLink;
 	private final Link toLink;
 
-	public OneTaxiRequest(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink, Link toLink,
-			double departureTime, double submissionTime) {
+	public OneTaxiRequest(Id<Request> id, Collection<Id<Person>> passengerIds, String mode, Link fromLink, Link toLink,
+						  double departureTime, double submissionTime) {
 		this.id = id;
 		this.submissionTime = submissionTime;
 		this.earliestStartTime = departureTime;
-		this.passengerId = passengerId;
+		this.passengerIds.addAll(passengerIds);
 		this.mode = mode;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
@@ -79,8 +84,8 @@ public final class OneTaxiRequest implements PassengerRequest {
 	}
 
 	@Override
-	public Id<Person> getPassengerId() {
-		return passengerId;
+	public Set<Id<Person>> getPassengerIds() {
+		return Collections.unmodifiableSet(passengerIds);
 	}
 
 	@Override
@@ -90,9 +95,9 @@ public final class OneTaxiRequest implements PassengerRequest {
 
 	public static final class OneTaxiRequestCreator implements PassengerRequestCreator {
 		@Override
-		public OneTaxiRequest createRequest(Id<Request> id, Id<Person> passengerId, Route route, Link fromLink,
+		public OneTaxiRequest createRequest(Id<Request> id, Set<Id<Person>> passengerIds, Route route, Link fromLink,
 				Link toLink, double departureTime, double submissionTime) {
-			return new OneTaxiRequest(id, passengerId, TransportMode.taxi, fromLink, toLink, departureTime,
+			return new OneTaxiRequest(id, passengerIds, TransportMode.taxi, fromLink, toLink, departureTime,
 					submissionTime);
 		}
 	}

@@ -75,12 +75,9 @@ public class DrtEventSequenceCollector
 		@Nullable
 		private PassengerRequestRejectedEvent rejected;
 
-		@Nullable
-		private PersonDepartureEvent departure;
-		@Nullable
-		private PassengerPickedUpEvent pickedUp;
-		@Nullable
-		private PassengerDroppedOffEvent droppedOff;
+		private Map<Id<Person>, PersonDepartureEvent> departures = new HashMap<>();
+		private Map<Id<Person>, PassengerPickedUpEvent> pickedUp = new HashMap<>();
+		private Map<Id<Person>, PassengerDroppedOffEvent> droppedOff = new HashMap<>();
 		@Nullable
 		private List<PersonMoneyEvent> drtFares = new LinkedList<>();
 
@@ -88,14 +85,14 @@ public class DrtEventSequenceCollector
 			this.submitted = Objects.requireNonNull(submitted);
 		}
 
-		public EventSequence(PersonDepartureEvent departure, DrtRequestSubmittedEvent submitted,
-				PassengerRequestScheduledEvent scheduled, PassengerPickedUpEvent pickedUp,
-				PassengerDroppedOffEvent droppedOff, List<PersonMoneyEvent> drtFares) {
+		public EventSequence(Map<Id<Person>, PersonDepartureEvent> departures, DrtRequestSubmittedEvent submitted,
+				PassengerRequestScheduledEvent scheduled, Map<Id<Person> ,PassengerPickedUpEvent> pickedUp,
+							 Map<Id<Person>, PassengerDroppedOffEvent> droppedOff, List<PersonMoneyEvent> drtFares) {
 			this.submitted = Objects.requireNonNull(submitted);
 			this.scheduled = scheduled;
-			this.departure = departure;
-			this.pickedUp = pickedUp;
-			this.droppedOff = droppedOff;
+			this.departures.putAll(departures);
+			this.pickedUp.putAll(pickedUp);
+			this.droppedOff.putAll(droppedOff);
 			this.drtFares = new ArrayList<>(drtFares);
 		}
 
@@ -111,16 +108,16 @@ public class DrtEventSequenceCollector
 			return Optional.ofNullable(rejected);
 		}
 
-		public Optional<PersonDepartureEvent> getDeparture() {
-			return Optional.ofNullable(departure);
+		public Map<Id<Person>, PersonDepartureEvent> getDepartures() {
+			return Collections.unmodifiableMap(departures);
 		}
 
-		public Optional<PassengerPickedUpEvent> getPickedUp() {
-			return Optional.ofNullable(pickedUp);
+		public Map<Id<Person>, PassengerPickedUpEvent> getPickedUp() {
+			return Collections.unmodifiableMap(pickedUp);
 		}
 
-		public Optional<PassengerDroppedOffEvent> getDroppedOff() {
-			return Optional.ofNullable(droppedOff);
+		public Map<Id<Person>, PassengerDroppedOffEvent> getDroppedOff() {
+			return Collections.unmodifiableMap(droppedOff);
 		}
 
 		public List<PersonMoneyEvent> getDrtFares() {
@@ -137,7 +134,7 @@ public class DrtEventSequenceCollector
 	private final Map<Id<Request>, EventSequence> sequences = new HashMap<>();
 	private final List<PersonMoneyEvent> drtFarePersonMoneyEvents = new ArrayList<>();
 
-	private final Map<Id<Person>, List<EventSequence>> sequencesWithoutDeparture = new HashMap<>();
+	private final Map<Id<Person>, List<EventSequence>> sequencesWithoutDepartures = new HashMap<>();
 	private final Map<Id<Person>, List<PersonDepartureEvent>> departuresWithoutSequence = new HashMap<>();
 
 	public DrtEventSequenceCollector(String mode) {
@@ -169,7 +166,7 @@ public class DrtEventSequenceCollector
 	public void reset(int iteration) {
 		sequences.clear();
 		drtFarePersonMoneyEvents.clear();
-		sequencesWithoutDeparture.clear();
+		sequencesWithoutDepartures.clear();
 		departuresWithoutSequence.clear();
 	}
 
@@ -179,14 +176,23 @@ public class DrtEventSequenceCollector
 			EventSequence sequence = new EventSequence(event);
 			sequences.put(event.getRequestId(), sequence);
 
-			PersonDepartureEvent departureEvent = popDepartureForSubmission(event);
 
-			if (departureEvent == null) {
-				// We have a submitted request, but no departure event yet (i.e. a prebooking). We start the
-				// sequence and note down the person id to fill in the departure event later on.
-				sequencesWithoutDeparture.computeIfAbsent(event.getPersonId(), id -> new LinkedList<>()).add(sequence);
+			List<PersonDepartureEvent> departures = new ArrayList<>();
+			for (Id<Person> person : event.getPersonIds()) {
+				PersonDepartureEvent departureEvent = popDepartureForSubmission(event, person);
+				departures.add(departureEvent);
+			}
+
+			if (departures.isEmpty()) {
+				// We have a submitted request, but no departure events yet (i.e. a prebooking). We start the
+				// sequence and note down the person ids to fill in the departure event later on.
+				for (Id<Person> person : event.getPersonIds()) {
+					sequencesWithoutDepartures.computeIfAbsent(person, id -> new LinkedList<>()).add(sequence);
+				}
 			} else {
-				sequence.departure = departureEvent;
+				for (PersonDepartureEvent departure : departures) {
+					sequence.departures.put(departure.getPersonId(), departure);
+				}
 			}
 		}
 	}
@@ -202,7 +208,7 @@ public class DrtEventSequenceCollector
 				// is down (usually right after).
 				departuresWithoutSequence.computeIfAbsent(event.getPersonId(), id -> new LinkedList<>()).add(event);
 			} else {
-				sequence.departure = event;
+				sequence.departures.put(event.getPersonId(), event);
 			}
 		}
 	}
@@ -224,14 +230,14 @@ public class DrtEventSequenceCollector
 	@Override
 	public void handleEvent(PassengerPickedUpEvent event) {
 		if (event.getMode().equals(mode)) {
-			sequences.get(event.getRequestId()).pickedUp = event;
+			sequences.get(event.getRequestId()).pickedUp.put(event.getPersonId(), event);
 		}
 	}
 
 	@Override
 	public void handleEvent(PassengerDroppedOffEvent event) {
 		if (event.getMode().equals(mode)) {
-			sequences.get(event.getRequestId()).droppedOff = event;
+			sequences.get(event.getRequestId()).droppedOff.put(event.getPersonId(), event);
 		}
 	}
 
@@ -260,8 +266,8 @@ public class DrtEventSequenceCollector
 	 * DrtRequestSubmittedEvent. This means that the departure has happened before
 	 * submission, which is the usually case for instant requests.
 	 */
-	private PersonDepartureEvent popDepartureForSubmission(DrtRequestSubmittedEvent event) {
-		List<PersonDepartureEvent> potentialDepartures = departuresWithoutSequence.get(event.getPersonId());
+	private PersonDepartureEvent popDepartureForSubmission(DrtRequestSubmittedEvent event, Id<Person> person) {
+		List<PersonDepartureEvent> potentialDepartures = departuresWithoutSequence.get(person);
 		PersonDepartureEvent result = null;
 
 		if (potentialDepartures != null) {
@@ -282,7 +288,7 @@ public class DrtEventSequenceCollector
 			}
 
 			if (potentialDepartures.size() == 0) {
-				departuresWithoutSequence.remove(event.getPersonId());
+				departuresWithoutSequence.remove(person);
 			}
 		}
 
@@ -296,7 +302,7 @@ public class DrtEventSequenceCollector
 	 */
 	private EventSequence popSequenceForDeparture(PersonDepartureEvent event) {
 		EventSequence result = null;
-		List<EventSequence> potentialSequences = sequencesWithoutDeparture.get(event.getPersonId());
+		List<EventSequence> potentialSequences = sequencesWithoutDepartures.get(event.getPersonId());
 
 		if (potentialSequences != null) {
 			Iterator<EventSequence> iterator = potentialSequences.iterator();
@@ -316,7 +322,7 @@ public class DrtEventSequenceCollector
 			}
 
 			if (potentialSequences.size() == 0) {
-				sequencesWithoutDeparture.remove(event.getPersonId());
+				sequencesWithoutDepartures.remove(event.getPersonId());
 			}
 		}
 
