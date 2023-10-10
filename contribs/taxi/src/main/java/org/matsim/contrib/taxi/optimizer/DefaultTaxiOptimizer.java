@@ -27,6 +27,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.DefaultRequestQueue;
 import org.matsim.contrib.dvrp.passenger.RequestQueue;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -42,7 +43,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
-	private final RequestQueue<DrtRequest> unplannedRequests = RequestQueue.withNoAdvanceRequestPlanningHorizon();
+	private final RequestQueue<DrtRequest> unplannedRequests = DefaultRequestQueue.withNoAdvanceRequestPlanningHorizon();
 
 	private final UnplannedRequestInserter requestInserter;
 
