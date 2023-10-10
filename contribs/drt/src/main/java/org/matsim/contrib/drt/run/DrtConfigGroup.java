@@ -130,6 +130,15 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()")
 	public boolean idleVehiclesReturnToDepots = false;
 
+	@Parameter
+	@Comment("Specifies the duration (seconds) a vehicle needs to be idle in order to get send back to the depot." +
+		"Please be aware, that returnToDepotEvaluationInterval describes the minimal time a vehicle will be idle before it gets send back to depot.")
+	public double returnToDepotTimeout = 60;
+
+	@Parameter
+	@Comment("Specifies the time interval (seconds) a vehicle gets evaluated to be send back to depot.")
+	public double returnToDepotEvaluationInterval = 60;
+
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
 	}
@@ -271,6 +280,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		if (config.global().getNumberOfThreads() < numberOfThreads) {
 			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
 					+ " in order to speed up the DRT route update during the replanning phase.");
+		}
+
+		if (this.idleVehiclesReturnToDepots && this.returnToDepotTimeout < this.returnToDepotEvaluationInterval) {
+			log.warn("idleVehiclesReturnToDepots is active and returnToDepotTimeout < returnToDepotEvaluationInterval. " +
+				"Vehicles will be send back to depot after {} seconds",returnToDepotEvaluationInterval);
 		}
 
 		Verify.verify(getParameterSets(MinCostFlowRebalancingStrategyParams.SET_NAME).size() <= 1,
