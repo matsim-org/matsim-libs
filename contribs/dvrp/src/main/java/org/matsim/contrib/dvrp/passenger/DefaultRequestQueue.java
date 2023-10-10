@@ -21,33 +21,43 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.TreeSet;
+
+import org.matsim.contrib.dvrp.optimizer.Request;
 
 /**
  * @author Michal Maciejewski (michalm)
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public final class DefaultRequestQueue<R extends PassengerRequest> implements RequestQueue<R> {
-	public static <R extends PassengerRequest> DefaultRequestQueue<R> withLimitedAdvanceRequestPlanningHorizon(
+	public static <R extends PassengerRequest> RequestQueue<R> withLimitedAdvanceRequestPlanningHorizon(
 			double planningHorizon) {
 		//all immediate and selected advance (i.e. starting within the planning horizon) requests are scheduled
 		return new DefaultRequestQueue<>(planningHorizon);
 	}
 
-	public static <R extends PassengerRequest> DefaultRequestQueue<R> withInfiniteAdvanceRequestPlanningHorizon() {
+	public static <R extends PassengerRequest> RequestQueue<R> withInfiniteAdvanceRequestPlanningHorizon() {
 		return new DefaultRequestQueue<>(Double.POSITIVE_INFINITY);//all immediate and advance requests are scheduled
 	}
 
-	public static <R extends PassengerRequest> DefaultRequestQueue<R> withNoAdvanceRequestPlanningHorizon() {
+	public static <R extends PassengerRequest> RequestQueue<R> withNoAdvanceRequestPlanningHorizon() {
 		return new DefaultRequestQueue<>(0);//immediate requests only
 	}
 
+	private static final Comparator<PassengerRequest> ABSOLUTE_COMPARATOR = Comparator.comparing(
+					PassengerRequest::getEarliestStartTime)
+			.thenComparing(PassengerRequest::getLatestStartTime)
+			.thenComparing(Request::getSubmissionTime)
+			.thenComparing(Request::getId);
+
 	//all requests in the planning horizon (also includes old requests: never scheduled or unscheduled)
-	private final Collection<R> schedulableRequests = new LinkedList<>();
+	private final Collection<R> schedulableRequests = new TreeSet<>(ABSOLUTE_COMPARATOR);
 
 	//advance requests that are not in the planning horizon
-	private final List<R> postponedRequests = new LinkedList<>();
+	private final Queue<R> postponedRequests = new PriorityQueue<>(ABSOLUTE_COMPARATOR);
 
 	private final double planningHorizon;
 
@@ -59,16 +69,8 @@ public final class DefaultRequestQueue<R extends PassengerRequest> implements Re
 
 	public void updateQueuesOnNextTimeSteps(double currentTime) {
 		lastTimeStep = currentTime;
-		
-		var iterator = postponedRequests.iterator();
-		
-		while (iterator.hasNext()) {
-			R request = iterator.next();
-			
-			if (isSchedulable(request)) {
-				schedulableRequests.add(request);
-				iterator.remove();
-			}
+		while (!postponedRequests.isEmpty() && isSchedulable(postponedRequests.peek())) {
+			schedulableRequests.add(postponedRequests.poll());
 		}
 	}
 
