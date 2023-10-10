@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.PlanInheritanceConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -47,6 +48,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
 import com.google.inject.Singleton;
@@ -92,8 +94,8 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		// reset all plan attributes that might be present from a previously performed matsim run
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				plan.setPlanId(null);
-				plan.setPlanMutator(null);
+				plan.setPlanId(Long.toString(0, 36));
+				plan.setPlanMutator(INITIAL_PLAN);
 				plan.setIterationCreated(0);
 			}
 		}
@@ -262,6 +264,6 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 
 	@Override
 	public void install() {
-		addControlerListenerBinding().to(PlanInheritanceModule.class);
+		if (getConfig().planInheritance().getEnabled()) addControlerListenerBinding().to(PlanInheritanceModule.class);
 	}
 }

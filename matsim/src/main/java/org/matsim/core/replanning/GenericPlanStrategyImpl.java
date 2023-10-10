@@ -93,7 +93,8 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 			// set the working plan to a copy of the selected plan:
 			plan = person.createCopyOfSelectedPlanAndMakeSelected();
 			
-			if (plan instanceof Plan) {
+			//planId is only set inside planInheritance -> if null planInheritance is disabled
+			if (plan instanceof Plan && ((Plan) plan).getPlanId() != null) {
 				// add plan inheritance flags
 				((Plan) plan).setIterationCreated(this.replanningContext.getIteration());
 				((Plan) plan).setPlanMutator(this.toString());
