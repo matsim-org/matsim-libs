@@ -24,6 +24,7 @@ import java.util.Stack;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -46,6 +47,8 @@ public class MatsimCountsReader extends MatsimXmlParser {
 	private MatsimXmlParser delegate = null;
 
 	private final CoordinateTransformation coordinateTransformation;
+	private final Class<? extends Identifiable<?>> idClass;
+
 
 	/**
 	 * Creates a new reader for MATSim counts files.
@@ -53,7 +56,7 @@ public class MatsimCountsReader extends MatsimXmlParser {
 	 * @param counts The Counts-object to store the configuration settings in.
 	 */
 	public MatsimCountsReader(final Counts counts) {
-		this( new IdentityTransformation() , counts );
+		this( new IdentityTransformation() , counts, Link.class);
 	}
 
 	/**
@@ -65,12 +68,25 @@ public class MatsimCountsReader extends MatsimXmlParser {
 	public MatsimCountsReader(
 			final CoordinateTransformation coordinateTransformation,
 			final Counts counts) {
+		this(coordinateTransformation, counts, Link.class);
+	}
+
+	/**
+	 * Creates a new reader for MATSim counts files.
+	 *
+	 * @param coordinateTransformation transformation from the CRS of the file to the internal CRS for MATSim
+	 * @param counts the counts object to store the configuration settings in
+	 * @param idClass id class of locations
+	 */
+	public MatsimCountsReader(
+		final CoordinateTransformation coordinateTransformation,
+		final Counts counts,
+		Class<? extends Identifiable<?>> idClass) {
 		super(ValidationType.XSD_ONLY);
 		this.coordinateTransformation = coordinateTransformation;
 		this.counts = counts;
+		this.idClass = idClass;
 	}
-
-	// TODO: constructor with specific ID class
 
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
@@ -91,9 +107,7 @@ public class MatsimCountsReader extends MatsimXmlParser {
 			log.info("using counts_v1-reader.");
 		} else if (COUNTS_V2.equals(doctype)) {
 			log.info("using counts_v2-reader.");
-
-			// TODO: not done
-			this.delegate = new CountsReaderMatsimV2(new MultiModeCounts<>(), Link.class);
+			this.delegate = new CountsReaderMatsimV2(coordinateTransformation, new MultiModeCounts<>(), idClass);
 
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

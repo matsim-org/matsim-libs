@@ -1,7 +1,10 @@
 package org.matsim.counts;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
@@ -16,18 +19,23 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 	private final static String VALUE = "value";
 	private final static String ATTRIBUTES = "attributes";
 
-	private final Class<? extends Identifiable<?>> identifiableClass;
+	private final Class<? extends Identifiable<?>> idClass;
+	private final CoordinateTransformation coordinateTransformation;
 	private final MultiModeCounts<?> counts;
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
 	private MeasurementLocation<?> currLocation;
 	private Measurable currMeasurable;
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
 
+	public CountsReaderMatsimV2(MultiModeCounts<?> counts, Class<? extends Identifiable<?>> idClass) {
+		this(new IdentityTransformation(), counts, idClass);
+	}
 
-	public CountsReaderMatsimV2(MultiModeCounts<?> counts, Class<? extends Identifiable<?>> identifiableClass) {
+	public CountsReaderMatsimV2(CoordinateTransformation coordinateTransformation, MultiModeCounts<?> counts, Class<? extends Identifiable<?>> idClass) {
 		super(ValidationType.NO_VALIDATION);
+		this.coordinateTransformation = coordinateTransformation;
 		this.counts = counts;
-		this.identifiableClass = identifiableClass;
+		this.idClass = idClass;
 	}
 
 	@Override
@@ -61,10 +69,19 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void startMeasurementLocation(Attributes atts) {
 		String idString = atts.getValue("id");
-		Id id = Id.create(idString, this.identifiableClass);
+		Id id = Id.create(idString, this.idClass);
 		String stationName = atts.getValue("name");
 
 		currLocation = counts.createAndAddMeasureLocation(id, stationName);
+
+		String x = atts.getValue("x");
+		String y = atts.getValue("y");
+		if (x != null && y != null) {
+			currLocation.setCoordinates(coordinateTransformation.transform(
+				new Coord(Double.parseDouble(x), Double.parseDouble(y))
+			));
+		}
+
 		currAttributes = currLocation.getAttributes();
 	}
 
