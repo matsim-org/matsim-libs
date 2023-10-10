@@ -39,6 +39,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
@@ -59,22 +60,20 @@ public class RunBicycleExample {
 			config = ConfigUtils.loadConfig(args[0], new BicycleConfigGroup());
 			fillConfigWithBicycleStandardValues(config);
 		} else if (args.length == 0) {
-			LOG.info("No config.xml file was provided. Using 'standard' example files given in this contrib's resources folder.");
-			// Setting the context like this works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
-			config = ConfigUtils.createConfig("bicycle_example/");
-			config.addModule(new BicycleConfigGroup());
+			LOG.info("No config.xml file was provided. Using 'standard' example files given in examples module.");
+			config = ConfigUtils.createConfig(new BicycleConfigGroup());
 			fillConfigWithBicycleStandardValues(config);
 
-			config.network().setInputFile("network_lane.xml"); // Modify this
-			config.plans().setInputFile("population_1200.xml");
+			config.network().setInputFile(ExamplesUtils.getTestScenarioURL("bicycle_example") + "/network_lane.xml");
+			config.plans().setInputFile(ExamplesUtils.getTestScenarioURL("bicycle_example") + "population_1200.xml");
 		} else {
-			throw new RuntimeException("More than one argument was provided. There is no procedure for this situation. Thus aborting!"
-								     + " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
+			throw new RuntimeException("More than one argument was provided. This situation is not configured. Thus aborting!"
+								     + " Provide either (1) only a suitable config file or (2) no argument at all to run example of the examples module.");
 		}
 		config.controler().setLastIteration(100); // Modify if motorized interaction is used
 		boolean considerMotorizedInteraction = false;
 
-		new RunBicycleExample().run(config );
+		new RunBicycleExample().run(config);
 	}
 
 	static void fillConfigWithBicycleStandardValues(Config config) {
@@ -89,7 +88,6 @@ public class RunBicycleExample {
 		bicycleConfigGroup.setUserDefinedNetworkAttributeDefaultValue(0.1); // used for those links that do not have a value for the user-defined attribute
 
 		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
-
 
 		List<String> mainModeList = new ArrayList<>();
 		mainModeList.add( bicycleConfigGroup.getBicycleMode() );
@@ -135,6 +133,7 @@ public class RunBicycleExample {
 
 		controler.run();
 	}
+
 	public void runWithOwnScoring(Config config, boolean considerMotorizedInteraction) {
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -168,7 +167,6 @@ public class RunBicycleExample {
 	}
 
 	private static class MyAdditionalBicycleLinkScore implements AdditionalBicycleLinkScore {
-
 		private final AdditionalBicycleLinkScore delegate;
 		@Inject MyAdditionalBicycleLinkScore( Scenario scenario ) {
 			this.delegate = BicycleUtils.createDefaultBicycleLinkScore( scenario );
@@ -179,9 +177,6 @@ public class RunBicycleExample {
 			double amount = delegate.computeLinkBasedScore( link );
 
 			return amount + result ;  // or some other way to augment the score
-
 		}
 	}
-
-
 }
