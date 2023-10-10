@@ -26,7 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
-import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
@@ -97,7 +96,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
 		}
 
-		returnToDepot(drtCfg.returnToDepotEvaluationInterval, drtCfg.returnToDepotTimeout);
+		relocateVehiclesToDepot(drtCfg.returnToDepotEvaluationInterval, drtCfg.returnToDepotTimeout);
 		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
 			if (!scheduleTimingUpdated) {
 				for (DvrpVehicle v : fleet.getVehicles().values()) {
@@ -136,7 +135,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		vehicle.getSchedule().nextTask();
 	}
 
-	private void returnToDepot(double evaluationInterval, double timeout) {
+	private void relocateVehiclesToDepot(double evaluationInterval, double timeout) {
 		if (drtCfg.idleVehiclesReturnToDepots && mobsimTimer.getTimeOfDay() % evaluationInterval == 0) {
 			fleet.getVehicles().values().stream()
 				.filter(scheduleInquiry::isIdle)

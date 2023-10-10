@@ -41,7 +41,7 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class EmptyVehicleRelocator {
 	public static final DrtTaskType RELOCATE_VEHICLE_TASK_TYPE = new DrtTaskType("RELOCATE", DRIVE);
-	public static final DrtTaskType RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE = new DrtTaskType("RELOCATE_DEPOT", DRIVE);
+	public static final DrtTaskType RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE = new DrtTaskType("RELOCATE_TO_DEPOT", DRIVE);
 
 	private final TravelTime travelTime;
 	private final MobsimTimer timer;
