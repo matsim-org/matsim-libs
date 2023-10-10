@@ -92,7 +92,7 @@ public class CountsV2Test {
 
 		MultiModeCounts<Link> dummyCounts = new MultiModeCounts<>();
 
-		MeasurementLocation<Link> station = dummyCounts.createAndAddLocation(Id.create("12", Link.class), "12_test");
+		MeasurementLocation<Link> station = dummyCounts.createAndAddMeasureLocation(Id.create("12", Link.class), "12_test");
 		Measurable volume = station.createVolume(TransportMode.car, Measurable.HOURLY);
 
 		volume.setAtHour(0, 500);
@@ -113,7 +113,7 @@ public class CountsV2Test {
 				break;
 
 			if (id.toString().equals("12")) {
-				MeasurementLocation<Link> count = multiModeCounts.createAndAddLocation(id, id + "_test");
+				MeasurementLocation<Link> count = multiModeCounts.createAndAddMeasureLocation(id, id + "_test");
 				Measurable volume = count.createVolume(TransportMode.car, Measurable.HOURLY);
 
 				for (int i = 1; i <= 24; i++) {
@@ -122,7 +122,7 @@ public class CountsV2Test {
 				continue;
 			}
 
-			MeasurementLocation<Link> count = multiModeCounts.createAndAddLocation(id, id + "_test");
+			MeasurementLocation<Link> count = multiModeCounts.createAndAddMeasureLocation(id, id + "_test");
 
 			if (random.nextBoolean())
 				count.getAttributes().putAttribute("testAttribute", "test");

@@ -27,8 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
 public class Count<T> implements Identifiable<T> {
-
-	// TODO: keep this with one-based index
 	private final Id<T> linkId;
 	private String stationName;
 
@@ -39,6 +37,11 @@ public class Count<T> implements Identifiable<T> {
 	protected Count(final Id<T> linkId2, final String stationName) {
 		this.linkId = linkId2;
 		this.stationName = stationName;
+	}
+
+	protected Count(MeasurementLocation<T> v) {
+		this.linkId = v.getId();
+		// TODO: provide old API
 	}
 
 	/**

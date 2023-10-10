@@ -12,7 +12,7 @@ import java.util.OptionalDouble;
  * A single instance holds values for only one transport mode.
  * Average velocities and traffic volumes are already implemented.
  */
-public class Measurable implements Iterable<Int2DoubleMap.Entry> {
+public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 
 	static final String ELEMENT_NAME = "measurements";
 

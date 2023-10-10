@@ -34,16 +34,16 @@ public final class MultiModeCounts<T extends Identifiable<T>> implements Attribu
 	/**
 	 * Creates a MeasurementLocation object and adds to count tree map. Argument has to be an id for an matsim Identifiable object (link, node, pt station e.g).
 	 */
-	public MeasurementLocation<T> createAndAddLocation(final Id<T> id, String stationName) {
+	public MeasurementLocation<T> createAndAddMeasureLocation(final Id<T> id, String stationName) {
 
 		if (this.locations.containsKey(id)) {
 			throw new RuntimeException("There is already a measurement object for location " + id.toString());
 		}
 
-		MeasurementLocation<T> count = new MeasurementLocation<T>(id, stationName);
-		this.locations.put(id, count);
+		MeasurementLocation<T> loc = new MeasurementLocation<T>(id, stationName);
+		this.locations.put(id, loc);
 
-		return count;
+		return loc;
 	}
 
 	public String getName() {
@@ -96,6 +96,41 @@ public final class MultiModeCounts<T extends Identifiable<T>> implements Attribu
 	public MeasurementLocation<T> getMeasureLocation(Id<T> id) {
 		return this.locations.get(id);
 	}
+
+	/// Old API
+	// These functions belong to the older Counts API and are kept for compatibility
+	// Consider using the new API which provides more flexibility (createAndAddLocation, getMeasureLocations)
+
+	/**
+	 * @param linkId the link to which the counting station is assigned, must be unique
+	 * @param stationName some additional identifier for humans, e.g. the original name/id of the counting station
+	 * @return the created Count object, or {@linkplain RuntimeException} if it could not be created because it already exists
+	 */
+	public final Count<T> createAndAddCount(final Id<T> linkId, final String stationName) {
+		MeasurementLocation<T> location = createAndAddMeasureLocation(linkId, stationName);
+        return new Count<>(location);
+	}
+
+	/**
+	 * Retrieve map of all counts. This will be inefficient because all intermediate objects for the old API will be created.
+	 * @deprecated use {@link #getMeasureLocations()} instead
+	 */
+	@Deprecated
+	public final TreeMap<Id<T>, Count<T>> getCounts() {
+		TreeMap<Id<T>, Count<T>> result = new TreeMap<>();
+
+		for (Map.Entry<Id<T>, MeasurementLocation<T>> e : locations.entrySet()) {
+			result.put(e.getKey(), new Count<>(e.getValue()));
+		}
+
+		return result;
+	}
+
+	public final Count<T> getCount(final Id<T> locId) {
+		MeasurementLocation<T> loc = getMeasureLocation(locId);
+		return loc == null ? null : new Count<>(loc);
+	}
+
 
 	@Override
 	public Attributes getAttributes() {

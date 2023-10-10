@@ -64,7 +64,7 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 		Id id = Id.create(idString, this.identifiableClass);
 		String stationName = atts.getValue("name");
 
-		currLocation = counts.createAndAddLocation(id, stationName);
+		currLocation = counts.createAndAddMeasureLocation(id, stationName);
 		currAttributes = currLocation.getAttributes();
 	}
 
