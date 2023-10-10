@@ -6,8 +6,6 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import javax.annotation.Nullable;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -39,7 +37,7 @@ public final class MultiModeCounts<T extends Identifiable<T>> implements Attribu
 	/**
 	 * Creates a MeasurementLocation object and adds to count tree map. Argument has to be an id for an matsim Identifiable object (link, node, pt station e.g).
 	 * */
-	public MeasurementLocation<T> createAndAddCount(final Id<T> id, String stationName){
+	public MeasurementLocation<T> createAndAddLocation(final Id<T> id, String stationName){
 
 		if (this.locations.containsKey(id)) {
 			throw new RuntimeException("There is already a measurement object for location " + id.toString());

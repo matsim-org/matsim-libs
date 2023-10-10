@@ -7,9 +7,7 @@
 
     <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
-
     <xs:element name="counts" type="countsType"/>
-
 
     <xs:complexType name="countsType">
 
@@ -32,6 +30,14 @@
 
     <xs:complexType name="stationType">
         <xs:sequence>
+            <xs:element name="attributes" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
             <xs:element name="measurements" type="measureableType" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
 
@@ -52,10 +58,9 @@
     </xs:complexType>
 
     <xs:complexType name="measureType">
-        <xs:attribute name="t" type="xs:nonNegativeInteger" use="required"/>
+        <xs:attribute name="t" type="xs:positiveInteger" use="required"/>
         <xs:attribute name="val" type="xs:float" use="required"/>
     </xs:complexType>
-
 
 </xs:schema>
 

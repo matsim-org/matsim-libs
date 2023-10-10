@@ -146,7 +146,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		Count<Link> mivCount = miv.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
 		Count<Link> freightCount = freight.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
 
-		MeasurementLocation<Link> multiModeCount = multiModeCounts.createAndAddCount(station.getMatchedLink().getId(), station.getName());
+		MeasurementLocation<Link> multiModeCount = multiModeCounts.createAndAddLocation(station.getMatchedLink().getId(), station.getName());
 		Measurable carVolume = multiModeCount.createVolume(TransportMode.car);
 		Measurable freightVolume = multiModeCount.createVolume("freight");
 

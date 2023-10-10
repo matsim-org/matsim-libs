@@ -3,6 +3,7 @@ package org.matsim.counts;
 import it.unimi.dsi.fastutil.ints.Int2DoubleAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 
+import java.util.Iterator;
 import java.util.OptionalDouble;
 
 /**
@@ -10,13 +11,26 @@ import java.util.OptionalDouble;
  * A single instance holds values for only one transport mode.
  * Average velocities and traffic volumes are already implemented.
  */
-public class Measurable {
+public class Measurable implements Iterable<Int2DoubleMap.Entry> {
 
 	static final String ELEMENT_NAME = "measurable";
 
 	public static String VOLUMES = "volumes";
 	public static String VELOCITIES = "velocities";
 	public static String PASSENGERS = "passengers";
+
+	/**
+	 * Daily interval in minutes.
+	 */
+	public static int DAILY = 1440;
+	/**
+	 * Hourly interval in minutes.
+	 */
+	public static int HOURLY = 60;
+	/**
+	 * Quarter hourly interval in minutes.
+	 */
+	public static int QUARTER_HOURLY = 15;
 
 	private final String type;
 	private final String mode;
@@ -39,10 +53,6 @@ public class Measurable {
 		return values;
 	}
 
-	public void setDailyValue(double value){
-		setAtMinute(24 * 60, value);
-	}
-
 	/**
 	 * Adds a value observed at a certain hour.
 	 */
@@ -55,9 +65,11 @@ public class Measurable {
 	 * the minute must be something like 15, 30, 45, 300 etc.
 	 */
 	public void setAtMinute(int minute, double value) {
-		if (minute % this.interval != 0)
-			throw new RuntimeException("Time value doesn't match the interval!");
+		if (minute <= 0)
+			throw new IllegalArgumentException("Time value starts at 1 and *not* zero.");
 
+		if (minute % this.interval != 0)
+			throw new IllegalArgumentException("Time value doesn't match the interval!");
 
 
 		this.values.put(minute, value);
@@ -67,7 +79,27 @@ public class Measurable {
 	 * Returns the observed daily value.
 	 */
 	public OptionalDouble getDailyValue() {
-		return getAtHour(60 * 24);
+		if (interval == DAILY)
+			return getAtHour(24);
+
+		throw new IllegalArgumentException("Does not contain daily values!");
+	}
+
+	public void setDailyValue(double value) {
+		if (interval != DAILY)
+			throw new IllegalArgumentException("Does not contain daily values!");
+
+		setAtHour(24, value);
+	}
+
+	/**
+	 * Return sum of values or daily value.
+	 */
+	public double getDailySum() {
+		if (interval != DAILY)
+			return getAtHour(24).orElse(0);
+
+		return values.values().doubleStream().sum();
 	}
 
 	/**
@@ -103,6 +135,14 @@ public class Measurable {
 
 	public int getInterval() {
 		return interval;
+	}
+
+	/**
+	 * Iterate over all values as minute-value pairs.
+	 */
+	@Override
+	public Iterator<Int2DoubleMap.Entry> iterator() {
+		return values.int2DoubleEntrySet().iterator();
 	}
 }
 

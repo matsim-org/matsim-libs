@@ -6,7 +6,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Stack;
 
@@ -66,7 +65,7 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 	private void startMeasurable(String tag, Attributes atts) {
 		MeasurementLocation<?> count = locations.get(currCount);
 		int interval = Integer.parseInt(atts.getValue("interval"));
-		this.currMeasurable = count.addMeasurable(tag, atts.getValue("mode"), interval);
+		this.currMeasurable = count.createMeasurable(tag, atts.getValue("mode"), interval);
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -75,7 +74,7 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 		Id id = Id.create(idString, this.identifiableClass);
 		String stationName = atts.getValue("stationName");
 
-		counts.createAndAddCount(id, stationName);
+		counts.createAndAddLocation(id, stationName);
 		currCount = id;
 	}
 

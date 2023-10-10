@@ -20,12 +20,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SplittableRandom;
 
-public class MultiModeCountsTest {
-
-	SplittableRandom random = new SplittableRandom(1234);
+public class CountsV2Test {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	private final SplittableRandom random = new SplittableRandom(1234);
 
 	@Test
 	public void test_general_handling() throws IOException {
@@ -40,32 +40,46 @@ public class MultiModeCountsTest {
 		generateDummyCounts(multiModeCounts);
 
 		CountsWriterHandlerImplV2 writer = new CountsWriterHandlerImplV2(multiModeCounts);
-		writer.write(utils.getOutputDirectory() + "test_counts.xml");
+		String filename = utils.getOutputDirectory() + "test_counts.xml";
 
-		Assertions.assertThat(Files.exists(Path.of(utils.getOutputDirectory() + "test_counts.xml"))).isTrue();
+		writer.write(filename);
+		Assertions.assertThat(Files.exists(Path.of(filename))).isTrue();
 	}
 
 	@Test
 	public void test_reader() throws IOException {
 
+		String filename = utils.getOutputDirectory() + "test_counts.xml";
+
 		MultiModeCounts<Link> dummyCounts = new MultiModeCounts<>();
 		generateDummyCounts(dummyCounts);
 
 		CountsWriterHandlerImplV2 writer = new CountsWriterHandlerImplV2(dummyCounts);
-		writer.write("test_counts.xml");
+		writer.write(filename);
 
 		MultiModeCounts<Link> counts = new MultiModeCounts<>();
 		CountsReaderMatsimV2 reader = new CountsReaderMatsimV2(counts, Link.class);
 
-		Assertions.assertThatNoException().isThrownBy(() -> {
-			reader.readFile("test_counts.xml");
-		});
+		Assertions.assertThatNoException().isThrownBy(() -> reader.readFile(filename));
 
 		Map<Id<Link>, MeasurementLocation<Link>> countMap = counts.getMeasureLocations();
 		Assert.assertEquals(21, countMap.size());
 
-		boolean onlyDailyValues = countMap.get(Id.create("12", Link.class)).getMeasurable(Measurable.VOLUMES, TransportMode.car).getInterval() == 24 * 60;
+		boolean onlyDailyValues = countMap.get(Id.create("12", Link.class)).getMeasurableForMode(Measurable.VOLUMES, TransportMode.car).getInterval() == 24 * 60;
 		Assert.assertFalse(onlyDailyValues);
+	}
+
+
+	@Test(expected = IllegalArgumentException.class)
+	public void test_illegal() {
+
+		MultiModeCounts<Link> dummyCounts = new MultiModeCounts<>();
+
+		MeasurementLocation<Link> station = dummyCounts.createAndAddLocation(Id.create("12", Link.class), "12_test");
+		Measurable volume = station.createVolume(TransportMode.car, Measurable.HOURLY);
+
+		volume.setAtHour(0, 500);
+
 	}
 
 	public void generateDummyCounts(MultiModeCounts<Link> multiModeCounts) {
@@ -82,31 +96,33 @@ public class MultiModeCountsTest {
 				break;
 
 			if (id.toString().equals("12")) {
-				MeasurementLocation<Link> count = multiModeCounts.createAndAddCount(id, id + "_test");
-				Measurable volume = count.createVolume(TransportMode.car);
+				MeasurementLocation<Link> count = multiModeCounts.createAndAddLocation(id, id + "_test");
+				Measurable volume = count.createVolume(TransportMode.car, Measurable.HOURLY);
 
-				for (int i = 0; i < 24; i++) {
-					volume.setAtHour(i, random.nextInt(0, 800));
+				for (int i = 1; i <= 24; i++) {
+					volume.setAtHour(i, random.nextInt(300, 800));
 				}
 				continue;
 			}
 
-			MeasurementLocation<Link> count = multiModeCounts.createAndAddCount(id, id + "_test");
+			MeasurementLocation<Link> count = multiModeCounts.createAndAddLocation(id, id + "_test");
+			count.getAttributes().putAttribute("test", "test");
+
 			for (String mode : modes) {
 				boolean dailyValuesOnly = random.nextBoolean();
 				Measurable volume;
 				if (dailyValuesOnly) {
-					volume = count.addMeasurable(Measurable.VOLUMES, mode, 24 * 60);
-					volume.setDailyValue(random.nextInt(0, 10000));
+					volume = count.createMeasurable(Measurable.VOLUMES, mode, Measurable.DAILY);
+					volume.setDailyValue(random.nextInt(1000, 10000));
 				} else {
-					volume = count.createVolume(mode);
-					for (int i = 0; i < 24; i++)
-						volume.setAtHour(i, random.nextInt(0, 800));
+					volume = count.createVolume(mode, Measurable.HOURLY);
+					for (int i = 1; i <= 24; i++)
+						volume.setAtHour(i, random.nextInt(300, 800));
 
 				}
 
 				if (random.nextBoolean()) {
-					Measurable velocity = count.createVelocity(mode);
+					Measurable velocity = count.createVelocity(mode, Measurable.DAILY);
 					velocity.setDailyValue(random.nextDouble(27.78));
 				}
 			}
