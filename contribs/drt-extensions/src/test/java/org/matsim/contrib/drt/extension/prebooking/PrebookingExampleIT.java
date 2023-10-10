@@ -52,16 +52,14 @@ public class PrebookingExampleIT {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		
-		config.controler().setOutputDirectory("/home/shoerl/drt_examples_output");
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
 		controller.addOverridingModule(new PrebookingModule());
 		FixedSharePrebookingLogic.install("drt", 0.5, 4.0 * 3600.0, controller);
-		
+
 		controller.run();
 	}
-	
+
 	@Test
 	public void testElectricDrtWithPrebooking() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
