@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
+@Deprecated
 final class CountsWriterV1 extends MatsimXmlWriter implements MatsimWriter {
 
 	private final CountsWriterHandler handler;

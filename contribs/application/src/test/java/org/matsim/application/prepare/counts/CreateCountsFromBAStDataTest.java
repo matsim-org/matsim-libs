@@ -58,10 +58,11 @@ public class CreateCountsFromBAStDataTest {
 		Counts<Link> counts = new Counts<>();
 		new MatsimCountsReader(counts).readFile(out);
 
-		Integer size = counts.getMeasureLocations().size();
+		assertThat(counts.getMeasureLocations())
+			.hasSize(24);
 
-		assertThat(size)
-			.isEqualTo(24);
+		assertThat(counts.getCounts())
+			.hasSize(24);
 
 		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> e : counts.getMeasureLocations().entrySet()) {
 			assertThat(e.getValue().hasMeasurableForMode(Measurable.VOLUMES, TransportMode.car))
@@ -115,8 +116,8 @@ public class CreateCountsFromBAStDataTest {
 		new MatsimCountsReader(countsComplete).readFile(out1);
 		new MatsimCountsReader(countsWithoutIgnored).readFile(out2);
 
-		int completeSize = countsComplete.getCounts().size();
-		int ignoredSize = countsWithoutIgnored.getCounts().size();
+		int completeSize = countsComplete.getMeasureLocations().size();
+		int ignoredSize = countsWithoutIgnored.getMeasureLocations().size();
 
 		assertThat(completeSize).isGreaterThan(ignoredSize);
 	}
