@@ -156,7 +156,7 @@ public class InsertionGenerator {
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			Waypoint.Stop nextStop = nextStop(vEntry, i);
 
-			if (occupancy < vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
+			if (occupancy + drtRequest.getPassengerIds().size() <= vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
 				if (drtRequest.getFromLink() != nextStop.task.getLink()) {// next stop at different link
 					generateDropoffInsertions(drtRequest, vEntry, i, insertions);
 				}
@@ -222,7 +222,7 @@ public class InsertionGenerator {
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
 			// check the capacity constraints if i < j (already validated for `i == j`)
 			Waypoint.Stop currentStop = currentStop(vEntry, j);
-			if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
+			if (vEntry.vehicle.getCapacity() - currentStop.outgoingOccupancy < request.getPassengerIds().size()) {
 				if (request.getToLink() == currentStop.task.getLink()) {
 					//special case -- we can insert dropoff exactly at node j
 					addInsertion(insertions,
