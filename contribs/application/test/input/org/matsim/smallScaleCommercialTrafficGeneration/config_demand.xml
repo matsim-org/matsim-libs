@@ -47,7 +47,7 @@
 		<param name="outputDirectory" value="test/output/org/matsim/smallScaleCommercialTrafficGeneration/RunGenerateSmallScaleCommercialTrafficTest/testMainRunAndResults/" />
 		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
 		<param name="overwriteFiles" value="overwriteExistingFiles" />
-		<!-- The type of routing (least cost path) algorithm used, may have the values: [Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks, SpeedyALT] -->
+		<!-- The type of routing (least cost path) algorithm used, may have the values: [Dijkstra, AStarLandmarks, SpeedyALT] -->
 		<param name="routingAlgorithmType" value="SpeedyALT" />
 		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
 		<param name="runId" value="test" />

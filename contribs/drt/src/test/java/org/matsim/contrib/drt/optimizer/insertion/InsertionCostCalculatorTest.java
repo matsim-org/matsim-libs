@@ -42,7 +42,7 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	public void testCalculate() {
-		VehicleEntry entry = entry(new double[] { 20, 50 });
+		VehicleEntry entry = entry(new double[] { 20, 20, 50 });
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
@@ -71,7 +71,7 @@ public class InsertionCostCalculatorTest {
 	}
 
 	private VehicleEntry entry(double[] slackTimes) {
-		return new VehicleEntry(null, null, null, slackTimes);
+		return new VehicleEntry(null, null, null, slackTimes, 0);
 	}
 
 	private Link link(String id) {

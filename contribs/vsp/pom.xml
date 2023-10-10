@@ -140,7 +140,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.3</version>
+			<version>5.2.4</version>
 			<exclusions>
 				<!-- needed to compile in IntelliJ with Eclipse compiler -->
 				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
@@ -174,12 +174,12 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
-			<version>20.0.2</version>
+			<version>21</version>
 		</dependency>
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>graphhopper-core</artifactId>
-			<version>6.2</version>
+			<version>7.0</version>
 		</dependency>
 		<!-- Enforce version -->
 		<dependency>

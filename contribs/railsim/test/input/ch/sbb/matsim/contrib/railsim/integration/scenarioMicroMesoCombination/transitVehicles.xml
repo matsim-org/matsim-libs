@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="IC">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.3</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.3</attribute>
+		</attributes>
+		<capacity seats="606" standingRoomInPersons="0"/>
+		<length meter="300.0"/>
+		<width meter="1.435"/>
+		<maximumVelocity meterPerSecond="55.556"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+
+	<vehicleType id="IR">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.4</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.4</attribute>
+		</attributes>
+		<capacity seats="400" standingRoomInPersons="0"/>
+		<length meter="200.0"/>
+		<width meter="1.435"/>
+		<maximumVelocity meterPerSecond="33.333"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+
+	<vehicleType id="CARGO">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.1</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.1</attribute>
+		</attributes>
+		<capacity seats="1" standingRoomInPersons="0"/>
+		<length meter="400.0"/>
+		<width meter="1.435"/>
+		<maximumVelocity meterPerSecond="25"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+
+	<vehicle id="v_IC_1" type="IC"/>
+	<vehicle id="v_IC_2" type="IC"/>
+	<vehicle id="v_IC_3" type="IC"/>
+	<vehicle id="v_IC_4" type="IC"/>
+
+	<vehicle id="v_IR_1" type="IR"/>
+	<vehicle id="v_IR_2" type="IR"/>
+	<vehicle id="v_IR_3" type="IR"/>
+	<vehicle id="v_IR_4" type="IR"/>
+
+	<vehicle id="v_CARGO_1" type="CARGO"/>
+	<vehicle id="v_CARGO_2" type="CARGO"/>
+
+</vehicleDefinitions>

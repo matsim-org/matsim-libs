@@ -34,10 +34,10 @@ import java.util.*;
 public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = LogManager.getLogger( ControlerConfigGroup.class );
 
-	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks, SpeedyALT}
-	
+	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, SpeedyALT}
+
 	public enum EventTypeToCreateScoringFunctions {IterationStarts, BeforeMobsim}
-	
+
 	public enum EventsFileFormat {xml, pb, json}
 
 	public enum CompressionType {
@@ -77,7 +77,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String CLEAN_ITERS_AT_END = "cleanItersAtEnd";
 	private static final String COMPRESSION_TYPE = "compressionType";
 	private static final String EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS = "createScoringFunctionType";
-	
+
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim, hermes}
 
@@ -87,9 +87,9 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
-	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.AStarLandmarks;
+	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.SpeedyALT;
 	private EventTypeToCreateScoringFunctions eventTypeToCreateScoringFunctions = EventTypeToCreateScoringFunctions.IterationStarts;
-	
+
 	private boolean linkToLinkRoutingEnabled = false;
 
 	private String runId = null;
@@ -127,7 +127,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
                 "written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
 		map.put(LINKTOLINK_ROUTING_ENABLED, "Default=false. If enabled, the router takes travel times needed for turning moves into account."
-		        + " Cannot be used if the (Fast)AStarLandmarks routing or TravelTimeCalculator.separateModes is enabled.");
+		        + " Can only be used with Dijkstra routing. Cannot be used when TravelTimeCalculator.separateModes is enabled.");
 		map.put(FIRST_ITERATION, "Default=0. First Iteration of a simulation.");
 		map.put(LAST_ITERATION, "Default=1000. Last Iteration of a simulation.");
 
@@ -136,16 +136,11 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 				" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );
 		map.put(COMPRESSION_TYPE, "Compression algorithm to use when writing out data to files. Possible values: " + Arrays.toString(CompressionType.values()));
 		map.put(EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS, "Defines when the scoring functions for the population are created. Default=IterationStarts. Possible values: " + Arrays.toString(EventTypeToCreateScoringFunctions.values()));
-		
-		StringBuilder mobsimTypes = new StringBuilder();
-		for ( MobsimType mtype : MobsimType.values() ) {
-			mobsimTypes.append(mtype.toString());
-			mobsimTypes.append(' ');
-		}
-		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + mobsimTypes + IOUtils.NATIVE_NEWLINE + "\t\t" +
+
+		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + Arrays.toString(MobsimType.values()) + IOUtils.NATIVE_NEWLINE + "\t\t" +
 				"Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim." + IOUtils.NATIVE_NEWLINE + "\t\t" +
 				"For 'qsim', add a module 'qsim' to the config.");
-		
+
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims' and `otfvis'.");
 		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
 				"to a file. `0' disables snapshots writing completely");
@@ -347,12 +342,12 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	public void setWritePlansInterval(final int writePlansInterval) {
 		this.writePlansInterval = writePlansInterval;
 	}
-	
+
 	@StringGetter( WRITE_SNAPSHOTS_INTERVAL )
 	public int getWriteSnapshotsInterval() {
 		return writeSnapshotsInterval;
 	}
-	
+
 	@StringSetter( WRITE_SNAPSHOTS_INTERVAL )
 	public void setWriteSnapshotsInterval(int writeSnapshotsInterval) {
 		this.writeSnapshotsInterval = writeSnapshotsInterval;
@@ -433,7 +428,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	public void setWriteEventsUntilIteration(int val) {
 		this.writeEventsUntilIteration = val ;
 	}
-	@Override 
+	@Override
 	protected void checkConsistency(Config config) {
 		if ( config.controler().getOverwriteFileSetting() == OverwriteFileSetting.overwriteExistingFiles ) {
 			log.warn( "setting overwriting behavior to "+overwriteFileSetting );
