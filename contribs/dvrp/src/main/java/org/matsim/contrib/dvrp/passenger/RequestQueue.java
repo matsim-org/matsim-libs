@@ -21,72 +21,21 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.TreeSet;
-
-import org.matsim.contrib.dvrp.optimizer.Request;
 
 /**
  * @author Michal Maciejewski (michalm)
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public final class RequestQueue<R extends PassengerRequest> {
-	public static <R extends PassengerRequest> RequestQueue<R> withLimitedAdvanceRequestPlanningHorizon(
-			double planningHorizon) {
-		//all immediate and selected advance (i.e. starting within the planning horizon) requests are scheduled
-		return new RequestQueue<>(planningHorizon);
-	}
+public interface RequestQueue<R extends PassengerRequest> {
+	void updateQueuesOnNextTimeSteps(double currentTime);
 
-	public static <R extends PassengerRequest> RequestQueue<R> withInfiniteAdvanceRequestPlanningHorizon() {
-		return new RequestQueue<>(Double.POSITIVE_INFINITY);//all immediate and advance requests are scheduled
-	}
-
-	public static <R extends PassengerRequest> RequestQueue<R> withNoAdvanceRequestPlanningHorizon() {
-		return new RequestQueue<>(0);//immediate requests only
-	}
-
-	private static final Comparator<PassengerRequest> ABSOLUTE_COMPARATOR = Comparator.comparing(
-					PassengerRequest::getEarliestStartTime)
-			.thenComparing(PassengerRequest::getLatestStartTime)
-			.thenComparing(Request::getSubmissionTime)
-			.thenComparing(Request::getId);
-
-	//all requests in the planning horizon (also includes old requests: never scheduled or unscheduled)
-	private final Collection<R> schedulableRequests = new TreeSet<>(ABSOLUTE_COMPARATOR);
-
-	//advance requests that are not in the planning horizon
-	private final Queue<R> postponedRequests = new PriorityQueue<>(ABSOLUTE_COMPARATOR);
-
-	private final double planningHorizon;
-
-	private double lastTimeStep = -Double.MAX_VALUE;
-
-	private RequestQueue(double planningHorizon) {
-		this.planningHorizon = planningHorizon;
-	}
-
-	public void updateQueuesOnNextTimeSteps(double currentTime) {
-		lastTimeStep = currentTime;
-		while (!postponedRequests.isEmpty() && isSchedulable(postponedRequests.peek())) {
-			schedulableRequests.add(postponedRequests.poll());
-		}
-	}
-
-	public void addRequest(R request) {
-		(isSchedulable(request) ? schedulableRequests : postponedRequests).add(request);
-	}
-
-	private boolean isSchedulable(R request) {
-		return request.getEarliestStartTime() <= lastTimeStep + planningHorizon;
-	}
+	void addRequest(R request);
 
 	/**
-	 * Assumes external code can modify schedulableRequests (e.g. remove scheduled requests and add unscheduled ones)
+	 * Assumes external code can modify schedulableRequests (e.g. remove scheduled
+	 * requests and add unscheduled ones)
 	 *
 	 * @return requests to be inserted into vehicle schedules
 	 */
-	public Collection<R> getSchedulableRequests() {
-		return schedulableRequests;
-	}
+	public Collection<R> getSchedulableRequests();
 }

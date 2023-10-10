@@ -6,6 +6,7 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
+import org.matsim.contrib.drt.schedule.DrtWaitTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
@@ -84,4 +85,9 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
         ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
         return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, shift, totalEnergy, chargingTask, facility);
     }
+
+	@Override
+	public DrtWaitTask createWaitTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
+		return delegate.createWaitTask(vehicle, beginTime, endTime, link);
+	}
 }

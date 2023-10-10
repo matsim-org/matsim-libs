@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.extension.edrt.schedule;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
+import org.matsim.contrib.drt.schedule.DrtWaitTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
@@ -56,5 +57,13 @@ public class EDrtTaskFactoryImpl implements DrtTaskFactory {
 			double totalEnergy) {
 		return new EDrtChargingTask(beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(),
 				totalEnergy);
+	}
+
+	@Override
+	public DrtWaitTask createWaitTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
+		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
+		double auxEnergy = ev.getAuxEnergyConsumption()
+				.calcEnergyConsumption(beginTime, endTime - beginTime, link.getId());
+		return new EDrtWaitTask(beginTime, endTime, link, auxEnergy);
 	}
 }

@@ -41,7 +41,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 /**
  * @author Michal Maciejewski (michalm)
  */
-class InternalPassengerHandling {
+public class InternalPassengerHandling {
 	private static final Logger LOGGER = LogManager.getLogger(InternalPassengerHandling.class);
 
 	private final String mode;
@@ -50,20 +50,20 @@ class InternalPassengerHandling {
 
 	private InternalInterface internalInterface;
 
-	InternalPassengerHandling(String mode, EventsManager eventsManager) {
+	public InternalPassengerHandling(String mode, EventsManager eventsManager) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 	}
 
-	void setInternalInterface(InternalInterface internalInterface) {
+	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 	}
 
-	Id<Request> createRequestId() {
+	public Id<Request> createRequestId() {
 		return Id.create(mode + "_" + currentRequestId.incrementAndGet(), Request.class);
 	}
 
-	boolean validateRequest(PassengerRequest request, PassengerRequestValidator requestValidator, double now) {
+	public boolean validateRequest(PassengerRequest request, PassengerRequestValidator requestValidator, double now) {
 		Set<String> violations = requestValidator.validateRequest(request);
 		if (!violations.isEmpty()) {
 			String cause = String.join(", ", violations);
@@ -75,7 +75,7 @@ class InternalPassengerHandling {
 		return violations.isEmpty();
 	}
 
-	boolean tryPickUpPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, Id<Request> requestId,
+	public boolean tryPickUpPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, Id<Request> requestId,
 			double now) {
 		if (internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(), driver.getCurrentLinkId()) == null) {
 			//only possible with prebooking
@@ -92,7 +92,7 @@ class InternalPassengerHandling {
 		return true;
 	}
 
-	void dropOffPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, Id<Request> requestId, double now) {
+	public void dropOffPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, Id<Request> requestId, double now) {
 		MobsimVehicle mobVehicle = driver.getVehicle();
 		mobVehicle.removePassenger(passenger);
 		passenger.setVehicle(null);

@@ -185,6 +185,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@PositiveOrZero
 	public double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
 
+	@Parameter
+	@Comment("When working with prebooked requests, defines whether vehicles drive immediately to the next"
+			+ "(prebooked) future task and wait for the planned stop to begin, or wait at the current"
+			+ "position and depart to arrive on time at the following stop. The latter behavior (not"
+			+ "the default) may lead to larger ucnertainty in highly congested scenarios.")
+	public boolean scheduleWaitBeforeDrive = false;
+
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 

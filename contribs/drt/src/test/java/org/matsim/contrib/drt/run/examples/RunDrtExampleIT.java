@@ -296,12 +296,16 @@ public class RunDrtExampleIT {
 
 		controller.run();
 
+		// sh, 11/08/2023: updated after introducing prebookg, basically we generate a
+		// new feasible insertion (see InsertionGenerator) that previously did not
+		// exist, but has the same cost (pickup loss + drop-off loss) as the original
+		// one
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.04)
 				.rejections(16)
-				.waitAverage(278.92)
-				.inVehicleTravelTimeMean(384.6)
-				.totalTravelTimeMean(663.52)
+				.waitAverage(278.76)
+				.inVehicleTravelTimeMean(384.93)
+				.totalTravelTimeMean(663.68)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);

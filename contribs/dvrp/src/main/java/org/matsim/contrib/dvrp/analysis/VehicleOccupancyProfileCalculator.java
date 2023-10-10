@@ -164,6 +164,7 @@ public class VehicleOccupancyProfileCalculator
 	private void increment(VehicleState state, double endTime) {
 		Verify.verify(state.taskType != null);
 		Verify.verify(state.occupancy >= 0);
+		Verify.verify(state.occupancy <= maxCapacity);
 
 		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType);
 		Verify.verify(servingPassengers || state.occupancy == 0,

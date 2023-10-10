@@ -65,7 +65,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
 			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry, ScheduleTimingUpdater scheduleTimingUpdater,
-			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
+			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue,
+			RequestQueue<DrtRequest> requestQueue) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -76,9 +77,9 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
 		this.insertionRetryQueue = insertionRetryQueue;
+		this.unplannedRequests = requestQueue;
 
 		rebalancingInterval = drtCfg.getRebalancingParams().map(rebalancingParams -> rebalancingParams.interval).orElse(null);
-		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(drtCfg.advanceRequestPlanningHorizon);
 	}
 
 	@Override
