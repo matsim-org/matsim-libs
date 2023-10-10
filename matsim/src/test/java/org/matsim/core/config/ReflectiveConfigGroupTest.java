@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -74,6 +75,8 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.integerMapField = Map.of("a\"b", 1, "b", 2);
 		dumpedModule.localDateMapField = Map.of('d', LocalDate.of(2023, 10, 9));
 		dumpedModule.booleanMapField = Map.of(0.1, true);
+		dumpedModule.enumMapField = new EnumMap<>(MyEnum.class);
+		dumpedModule.enumMapField.put(MyEnum.VALUE1, "abc");
 		dumpedModule.setField = ImmutableSet.of("a", "b", "c");
 		dumpedModule.listField = List.of("1", "2", "3");
 		assertEqualAfterDumpAndRead(dumpedModule);
@@ -198,6 +201,7 @@ public class ReflectiveConfigGroupTest {
 		expectedComments.put("integerMapField", "map of Integer");
 		expectedComments.put("localDateMapField", "map of LocalDate");
 		expectedComments.put("booleanMapField", "map of Boolean");
+		expectedComments.put("enumMapField", "map of Enum");
 
 		assertThat(new MyModule().getComments()).isEqualTo(expectedComments);
 	}
@@ -514,6 +518,10 @@ public class ReflectiveConfigGroupTest {
 		@Comment("map of Boolean")
 		@Parameter
 		private Map<Double, Boolean> booleanMapField;
+
+		@Comment("map of Enum")
+		@Parameter
+		private Map<MyEnum, String> enumMapField;
 
 		// Object fields:
 		// Id: string representation is toString

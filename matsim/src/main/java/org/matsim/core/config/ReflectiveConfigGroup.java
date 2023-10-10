@@ -433,8 +433,9 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			} else if (paramField != null && paramField.getGenericType() instanceof ParameterizedType pType) {
 				Class<?> keyClass = TypeFactory.rawClass(pType.getActualTypeArguments()[0]);
 				Class<?> valueClass = TypeFactory.rawClass(pType.getActualTypeArguments()[1]);
-				JavaType mapType = OBJECT_MAPPER.getTypeFactory().constructMapType(
-						LinkedHashMap.class, keyClass, valueClass);
+				Class<? extends Map> mapClass = keyClass.isEnum() ? EnumMap.class : LinkedHashMap.class;
+				JavaType mapType = OBJECT_MAPPER.getTypeFactory().constructMapType(mapClass, keyClass,
+						valueClass);
 				try {
 					return OBJECT_MAPPER.readValue(value, mapType);
 				} catch (JsonProcessingException e) {
