@@ -107,7 +107,7 @@ public class MatsimCountsReader extends MatsimXmlParser {
 			log.info("using counts_v1-reader.");
 		} else if (COUNTS_V2.equals(doctype)) {
 			log.info("using counts_v2-reader.");
-			this.delegate = new CountsReaderMatsimV2(coordinateTransformation, new MultiModeCounts<>(), idClass);
+			this.delegate = new CountsReaderMatsimV2(coordinateTransformation, new Counts<>(), idClass);
 
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

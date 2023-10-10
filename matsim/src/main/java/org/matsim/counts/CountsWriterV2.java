@@ -3,7 +3,9 @@ package org.matsim.counts;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
@@ -17,18 +19,22 @@ import java.util.Map;
 /**
  * Writer class for <code>counts_v2.xsd</code>.
  */
-class CountsWriterHandlerImplV2 extends MatsimXmlWriter {
+final class CountsWriterV2 extends MatsimXmlWriter {
 
-	private static final Logger logger = LogManager.getLogger(CountsWriterHandlerImplV2.class);
+	private static final Logger logger = LogManager.getLogger(CountsWriterV2.class);
 
-	private final MultiModeCounts<?> counts;
+
+	private final Counts<?> counts;
 
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
+	private final CoordinateTransformation coordinateTransformation;
+
 
 	/**
-	 * Default Constructor, takes the MultiModeCounts object as argument.
+	 * Default Constructor, takes the Counts object as argument.
 	 */
-	public CountsWriterHandlerImplV2(MultiModeCounts<?> counts) {
+	public CountsWriterV2(CoordinateTransformation coordinateTransformation, Counts<?> counts) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.counts = counts;
 	}
 
@@ -38,7 +44,7 @@ class CountsWriterHandlerImplV2 extends MatsimXmlWriter {
 	 * @param filename output file path
 	 */
 	public void write(String filename) throws IOException {
-		logger.info("Write MultiModeCounts to {}", filename);
+		logger.info("Write Counts to {}", filename);
 
 		this.openFile(filename);
 
@@ -76,14 +82,14 @@ class CountsWriterHandlerImplV2 extends MatsimXmlWriter {
 
 		atts.add(createTuple("year", String.valueOf(counts.getYear())));
 
-		this.writeStartTag(MultiModeCounts.ELEMENT_NAME, atts, false, true);
+		this.writeStartTag(Counts.ELEMENT_NAME, atts, false, true);
 
 		attributesWriter.writeAttributes("\t", this.writer, counts.getAttributes());
 
 		writeCounts();
 
 		this.writeContent("\n", true);
-		this.writeEndTag(MultiModeCounts.ELEMENT_NAME);
+		this.writeEndTag(Counts.ELEMENT_NAME);
 	}
 
 	private void writeCounts() {
@@ -100,8 +106,9 @@ class CountsWriterHandlerImplV2 extends MatsimXmlWriter {
 				attributes.add(createTuple("description", counts.getDescription()));
 
 			if (count.getCoordinates() != null) {
-				attributes.add(createTuple("x", count.getCoordinates().getX()));
-				attributes.add(createTuple("y", count.getCoordinates().getY()));
+				Coord c = coordinateTransformation.transform(count.getCoordinates());
+				attributes.add(createTuple("x", c.getX()));
+				attributes.add(createTuple("y", c.getY()));
 			}
 
 			writeStartTag(MeasurementLocation.ELEMENT_NAME, attributes, false, true);

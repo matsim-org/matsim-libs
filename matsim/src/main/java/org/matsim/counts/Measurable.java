@@ -146,6 +146,13 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 		return values.int2DoubleEntrySet().iterator();
 	}
 
+	/**
+	 * Number of entries.
+	 */
+	public int size() {
+		return values.size();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

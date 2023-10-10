@@ -11,17 +11,16 @@ import org.matsim.counts.*;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateCountsFromBAStDataTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	String carOutput = "car-test-counts.xml.gz";
-	String freightOutput = "freight-test-counts.xml.gz";
+	String countsOutput = "test-counts.xml.gz";
 
 	String ignoredCounts = "ignored.csv";
 	String manualMatchedCounts = "manual.csv";
@@ -37,72 +36,75 @@ public class CreateCountsFromBAStDataTest {
 	String shpCrs = "EPSG:3857";
 
 	@Test
-	public void testCreateCountsFromBAStData(){
+	public void testCreateCountsFromBAStData() {
 
 		String version = "normal-";
-		String car = utils.getOutputDirectory() + version + carOutput;
-		String freight = utils.getOutputDirectory() + version + freightOutput;
+		String out = utils.getOutputDirectory() + version + countsOutput;
 
 		String[] args = new String[]{
-				"--station-data=" + utils.getPackageInputDirectory() + stationData,
-				"--network=" + network,
-				"--input-crs=" + networkCrs,
-				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
-				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
-				"--shp=" + utils.getPackageInputDirectory() + shp,
-				"--shp-crs=" + shpCrs,
-				"--year=2021",
-				"--car-output=" + car,
-				"--freight-output=" + freight
+			"--station-data=" + utils.getPackageInputDirectory() + stationData,
+			"--network=" + network,
+			"--input-crs=" + networkCrs,
+			"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+			"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+			"--shp=" + utils.getPackageInputDirectory() + shp,
+			"--shp-crs=" + shpCrs,
+			"--year=2021",
+			"--output=" + out,
 		};
 
 		new CreateCountsFromBAStData().execute(args);
 
 		Counts<Link> counts = new Counts<>();
-		new MatsimCountsReader(counts).readFile(car);
+		new MatsimCountsReader(counts).readFile(out);
 
-		Integer size = counts.getCounts().size();
+		Integer size = counts.getMeasureLocations().size();
 
-		assertThat(size).isGreaterThan(0);
+		assertThat(size)
+			.isEqualTo(24);
+
+		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> e : counts.getMeasureLocations().entrySet()) {
+			assertThat(e.getValue().hasMeasurableForMode(Measurable.VOLUMES, TransportMode.car))
+				.isTrue();
+
+			assertThat(e.getValue().hasMeasurableForMode(Measurable.VOLUMES, TransportMode.truck))
+				.isTrue();
+		}
 	}
 
 	@Test
-	public void testWithIgnoredStations(){
+	public void testWithIgnoredStations() {
 
 		String version = "with-ignored-";
-		String car1 = utils.getOutputDirectory() + version + carOutput;
-		String freight1 = utils.getOutputDirectory() + version + freightOutput;
+		String out1 = utils.getOutputDirectory() + version + countsOutput;
 
 		String[] args1 = new String[]{
-				"--station-data=" + utils.getPackageInputDirectory() + stationData,
-				"--network=" + network,
-				"--input-crs=" + networkCrs,
-				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
-				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
-				"--shp=" + utils.getPackageInputDirectory() + shp,
-				"--shp-crs=" + shpCrs,
-				"--year=2021",
-				"--car-output=" + car1,
-				"--freight-output=" + freight1
+			"--station-data=" + utils.getPackageInputDirectory() + stationData,
+			"--network=" + network,
+			"--input-crs=" + networkCrs,
+			"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+			"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+			"--shp=" + utils.getPackageInputDirectory() + shp,
+			"--shp-crs=" + shpCrs,
+			"--year=2021",
+			"--output=" + out1,
 		};
 
 		new CreateCountsFromBAStData().execute(args1);
 
-		String car2 = utils.getOutputDirectory() + "without-ignored-" + carOutput;
-		String freight2 = utils.getOutputDirectory() + "without-ignored-" + freightOutput;
+		String out2 = utils.getOutputDirectory() + "without-ignored-" + countsOutput;
 
 		String[] args2 = new String[]{
-				"--station-data=" + utils.getPackageInputDirectory() + stationData,
-				"--network=" + network,
-				"--input-crs=" + networkCrs,
-				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
-				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
-				"--shp=" + utils.getPackageInputDirectory() + shp,
-				"--shp-crs=" + shpCrs,
-				"--year=2021",
-				"--car-output=" + car2,
-				"--freight-output=" + freight2,
-				"--ignored-counts=" + utils.getPackageInputDirectory() + ignoredCounts,
+			"--station-data=" + utils.getPackageInputDirectory() + stationData,
+			"--network=" + network,
+			"--input-crs=" + networkCrs,
+			"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+			"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+			"--shp=" + utils.getPackageInputDirectory() + shp,
+			"--shp-crs=" + shpCrs,
+			"--year=2021",
+			"--output=" + out2,
+			"--ignored-counts=" + utils.getPackageInputDirectory() + ignoredCounts,
 		};
 
 		new CreateCountsFromBAStData().execute(args2);
@@ -110,8 +112,8 @@ public class CreateCountsFromBAStDataTest {
 		Counts<Link> countsComplete = new Counts<>();
 		Counts<Link> countsWithoutIgnored = new Counts<>();
 
-		new MatsimCountsReader(countsComplete).readFile(car1);
-		new MatsimCountsReader(countsWithoutIgnored).readFile(car2);
+		new MatsimCountsReader(countsComplete).readFile(out1);
+		new MatsimCountsReader(countsWithoutIgnored).readFile(out2);
 
 		int completeSize = countsComplete.getCounts().size();
 		int ignoredSize = countsWithoutIgnored.getCounts().size();
@@ -120,114 +122,64 @@ public class CreateCountsFromBAStDataTest {
 	}
 
 	@Test
-	public void testManualMatchedCounts(){
+	public void testManualMatchedCounts() {
 
-		String car = utils.getOutputDirectory() + "manual-matched-" + carOutput;
-		String freight = utils.getOutputDirectory() + "manual-matched-" + freightOutput;
+		String out = utils.getOutputDirectory() + "manual-matched-" + countsOutput;
 
 		//Map contains supposed matching from manual.csv
 		Map<Id<Link>, String> manual = Map.of(Id.createLinkId("4205"), "Neukölln_N", Id.createLinkId("4219"), "Neukölln_S");
 
 		String[] args = new String[]{
-				"--station-data=" + utils.getPackageInputDirectory() + stationData,
-				"--network=" + network,
-				"--input-crs=" + networkCrs,
-				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
-				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
-				"--shp=" + utils.getPackageInputDirectory() + shp,
-				"--shp-crs=" + shpCrs,
-				"--year=2021",
-				"--car-output=" + car,
-				"--freight-output=" + freight,
-				"--manual-matched-counts=" + utils.getPackageInputDirectory() + manualMatchedCounts,
+			"--station-data=" + utils.getPackageInputDirectory() + stationData,
+			"--network=" + network,
+			"--input-crs=" + networkCrs,
+			"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+			"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+			"--shp=" + utils.getPackageInputDirectory() + shp,
+			"--shp-crs=" + shpCrs,
+			"--year=2021",
+			"--output=" + out,
+			"--manual-matched-counts=" + utils.getPackageInputDirectory() + manualMatchedCounts,
 		};
 
 		new CreateCountsFromBAStData().execute(args);
 
 		Counts<Link> countsWithManualMatched = new Counts<>();
 
-		new CountsReaderMatsimV1(countsWithManualMatched).readFile(car);
+		new MatsimCountsReader(countsWithManualMatched).readFile(out);
 
-		var map = countsWithManualMatched.getCounts();
+		var map = countsWithManualMatched.getMeasureLocations();
 
-		for(var entry: manual.entrySet()){
+		for (var entry : manual.entrySet()) {
 
 			Id<Link> supposed = entry.getKey();
 			String station = entry.getValue();
 
-			Count<Link> actual = map.get(supposed);
-			String actualStation = actual.getCsLabel();
+			MeasurementLocation<Link> actual = map.get(supposed);
+			String actualStation = actual.getStationName();
 
 			Assert.assertEquals(station, actualStation);
 		}
 	}
 
 	@Test
-	public void testManualMatchingWithWrongInput(){
+	public void testManualMatchingWithWrongInput() {
 
-		String car = utils.getOutputDirectory() + "manual-matched-" + carOutput;
-		String freight = utils.getOutputDirectory() + "manual-matched-" + freightOutput;
+		String out = utils.getOutputDirectory() + "manual-matched-" + countsOutput;
 
 		String[] args = new String[]{
-				"--station-data=" + utils.getPackageInputDirectory() + stationData,
-				"--network=" + network,
-				"--input-crs=" + networkCrs,
-				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
-				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
-				"--shp=" + utils.getPackageInputDirectory() + shp,
-				"--shp-crs=" + shpCrs,
-				"--year=2021",
-				"--car-output=" + car,
-				"--freight-output=" + freight,
-				"--manual-matched-counts=" + utils.getPackageInputDirectory() + wrongManualMatchedCounts,
+			"--station-data=" + utils.getPackageInputDirectory() + stationData,
+			"--network=" + network,
+			"--input-crs=" + networkCrs,
+			"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
+			"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
+			"--shp=" + utils.getPackageInputDirectory() + shp,
+			"--shp-crs=" + shpCrs,
+			"--year=2021",
+			"--output=" + out,
+			"--manual-matched-counts=" + utils.getPackageInputDirectory() + wrongManualMatchedCounts,
 		};
 
 		Assert.assertThrows(RuntimeException.class, () -> new CreateCountsFromBAStData().execute(args));
-	}
-
-	@Test
-	public void testMultiModeCountsFile(){
-
-		String version = "normal-";
-		String car = utils.getOutputDirectory() + version + carOutput;
-		String freight = utils.getOutputDirectory() + version + freightOutput;
-
-		String[] args = new String[]{
-				"--station-data=" + utils.getPackageInputDirectory() + stationData,
-				"--network=" + network,
-				"--input-crs=" + networkCrs,
-				"--motorway-data=" + utils.getPackageInputDirectory() + motorwayData,
-				"--primary-data=" + utils.getPackageInputDirectory() + primaryData,
-				"--shp=" + utils.getPackageInputDirectory() + shp,
-				"--shp-crs=" + shpCrs,
-				"--year=2021",
-				"--car-output=" + car,
-				"--freight-output=" + freight
-		};
-
-		new CreateCountsFromBAStData().execute(args);
-
-		Counts<Link> carCounts = new Counts<>();
-		new CountsReaderMatsimV1(carCounts).readFile(car);
-
-		MultiModeCounts<Link> multiModeCounts = new MultiModeCounts<>();
-
-		// TODO: use generalized reader
-
-		new CountsReaderMatsimV2(multiModeCounts, Link.class).readFile(car.replace("car-", ""));
-
-		Integer size = multiModeCounts.getMeasureLocations().size();
-
-		assertThat(size).isGreaterThan(0);
-
-		Assert.assertTrue(multiModeCounts.getMeasurableTypes().contains("volumes"));
-
-		Count<Link> carCount = carCounts.getCount(Id.createLinkId("7686"));
-		MeasurementLocation<Link> mmCount = multiModeCounts.getMeasureLocation(Id.createLinkId("7686"));
-
-		double carVolume = carCount.getVolume(10).getValue();
-		double mmCarVolume = mmCount.getVolumesForMode(TransportMode.car).getAtHour(10).orElse(-99);
-
-		assertThat(carVolume).isEqualTo(mmCarVolume);
 	}
 }

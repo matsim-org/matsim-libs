@@ -21,17 +21,17 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 
 	private final Class<? extends Identifiable<?>> idClass;
 	private final CoordinateTransformation coordinateTransformation;
-	private final MultiModeCounts<?> counts;
+	private final Counts<?> counts;
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
 	private MeasurementLocation<?> currLocation;
 	private Measurable currMeasurable;
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
 
-	public CountsReaderMatsimV2(MultiModeCounts<?> counts, Class<? extends Identifiable<?>> idClass) {
+	public CountsReaderMatsimV2(Counts<?> counts, Class<? extends Identifiable<?>> idClass) {
 		this(new IdentityTransformation(), counts, idClass);
 	}
 
-	public CountsReaderMatsimV2(CoordinateTransformation coordinateTransformation, MultiModeCounts<?> counts, Class<? extends Identifiable<?>> idClass) {
+	public CountsReaderMatsimV2(CoordinateTransformation coordinateTransformation, Counts<?> counts, Class<? extends Identifiable<?>> idClass) {
 		super(ValidationType.NO_VALIDATION);
 		this.coordinateTransformation = coordinateTransformation;
 		this.counts = counts;
@@ -42,7 +42,7 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 
 		switch (name) {
-			case MultiModeCounts.ELEMENT_NAME -> startMultiModeCounts(atts);
+			case Counts.ELEMENT_NAME -> startMultiModeCounts(atts);
 			case MeasurementLocation.ELEMENT_NAME -> startMeasurementLocation(atts);
 			case Measurable.ELEMENT_NAME -> startMeasurable(name, atts);
 			case ATTRIBUTES -> attributesDelegate.startTag(name, atts, context, currAttributes);

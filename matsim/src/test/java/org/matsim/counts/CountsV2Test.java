@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -31,16 +32,16 @@ public class CountsV2Test {
 	@Test
 	public void test_general_handling() throws IOException {
 
-		MultiModeCounts<Link> multiModeCounts = new MultiModeCounts<>();
-		multiModeCounts.setName("test");
-		multiModeCounts.setYear(2100);
-		multiModeCounts.setDescription("Test counts for several transport modes.");
-		multiModeCounts.setSource("unit4");
-		multiModeCounts.getAttributes().putAttribute("generationType", "random");
+		Counts<Link> counts = new Counts<>();
+		counts.setName("test");
+		counts.setYear(2100);
+		counts.setDescription("Test counts for several transport modes.");
+		counts.setSource("unit4");
+		counts.getAttributes().putAttribute("generationType", "random");
 
-		generateDummyCounts(multiModeCounts);
+		generateDummyCounts(counts);
 
-		CountsWriterHandlerImplV2 writer = new CountsWriterHandlerImplV2(multiModeCounts);
+		CountsWriterV2 writer = new CountsWriterV2(new IdentityTransformation(), counts);
 		String filename = utils.getOutputDirectory() + "test_counts.xml";
 
 		writer.write(filename);
@@ -52,13 +53,13 @@ public class CountsV2Test {
 
 		String filename = utils.getOutputDirectory() + "test_counts.xml";
 
-		MultiModeCounts<Link> dummyCounts = new MultiModeCounts<>();
+		Counts<Link> dummyCounts = new Counts<>();
 		generateDummyCounts(dummyCounts);
 
-		CountsWriterHandlerImplV2 writer = new CountsWriterHandlerImplV2(dummyCounts);
+		CountsWriterV2 writer = new CountsWriterV2(new IdentityTransformation(), dummyCounts);
 		writer.write(filename);
 
-		MultiModeCounts<Link> counts = new MultiModeCounts<>();
+		Counts<Link> counts = new Counts<>();
 		CountsReaderMatsimV2 reader = new CountsReaderMatsimV2(counts, Link.class);
 
 		Assertions.assertThatNoException().isThrownBy(() -> reader.readFile(filename));
@@ -90,7 +91,7 @@ public class CountsV2Test {
 	@Test(expected = IllegalArgumentException.class)
 	public void test_illegal() {
 
-		MultiModeCounts<Link> dummyCounts = new MultiModeCounts<>();
+		Counts<Link> dummyCounts = new Counts<>();
 
 		MeasurementLocation<Link> station = dummyCounts.createAndAddMeasureLocation(Id.create("12", Link.class), "12_test");
 		Measurable volume = station.createVolume(TransportMode.car, Measurable.HOURLY);
@@ -99,7 +100,7 @@ public class CountsV2Test {
 
 	}
 
-	public void generateDummyCounts(MultiModeCounts<Link> multiModeCounts) {
+	public void generateDummyCounts(Counts<Link> counts) {
 		Set<String> modes = Set.of(TransportMode.car, TransportMode.bike, TransportMode.drt);
 
 		URL berlin = ExamplesUtils.getTestScenarioURL("berlin");
@@ -113,7 +114,7 @@ public class CountsV2Test {
 				break;
 
 			if (id.toString().equals("12")) {
-				MeasurementLocation<Link> count = multiModeCounts.createAndAddMeasureLocation(id, id + "_test");
+				MeasurementLocation<Link> count = counts.createAndAddMeasureLocation(id, id + "_test");
 				Measurable volume = count.createVolume(TransportMode.car, Measurable.HOURLY);
 
 				for (int i = 1; i <= 24; i++) {
@@ -122,7 +123,7 @@ public class CountsV2Test {
 				continue;
 			}
 
-			MeasurementLocation<Link> count = multiModeCounts.createAndAddMeasureLocation(id, id + "_test");
+			MeasurementLocation<Link> count = counts.createAndAddMeasureLocation(id, id + "_test");
 
 			if (random.nextBoolean())
 				count.getAttributes().putAttribute("testAttribute", "test");
