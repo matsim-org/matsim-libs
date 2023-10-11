@@ -4,6 +4,8 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +31,8 @@ public class RaptorStaticConfig {
          */
         OneToAllRouting }
 
-    /**
+
+	/**
      * The distance in meters that agents can walk to get from one stop to
      * another stop of a nearby transit line.
      */
@@ -46,6 +49,8 @@ public class RaptorStaticConfig {
     private boolean useCapacityConstraints = false;
 
     private RaptorOptimization optimization = RaptorOptimization.OneToOneRouting;
+
+	private SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling intermodalLegOnlyHandling = SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.forbid;
 
     public double getBeelineWalkConnectionDistance() {
         return this.beelineWalkConnectionDistance;
@@ -118,4 +123,12 @@ public class RaptorStaticConfig {
     public void setOptimization(RaptorOptimization optimization) {
         this.optimization = optimization;
     }
+
+	public SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling getIntermodalLegOnlyHandling() {
+		return intermodalLegOnlyHandling;
+	}
+
+	public void setIntermodalLegOnlyHandling(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling intermodalLegOnlyHandling) {
+		this.intermodalLegOnlyHandling = intermodalLegOnlyHandling;
+	}
 }

@@ -202,7 +202,10 @@ public class SwissRailRaptorTest {
     public void testDirectWalkCheaper() {
         Fixture f = new Fixture();
         f.init();
+		SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(f.config,SwissRailRaptorConfigGroup.class);
+		srrConfig.setIntermodalLegOnlyHandling(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.avoid);
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(4000, 3000);
         Coord toCoord = new Coord(8000, 3000);
@@ -595,15 +598,13 @@ public class SwissRailRaptorTest {
     private static double calcTripDuration(List<PlanElement> planElements) {
         double duration = 0.0;
         for (PlanElement pe : planElements) {
-            if (pe instanceof Activity) {
-                Activity act = (Activity)pe;
+            if (pe instanceof Activity act) {
 				if (act.getStartTime().isDefined() && act.getEndTime().isDefined()) {
                     double startTime = act.getStartTime().seconds();
 					double endTime = act.getEndTime().seconds();
                     duration += (endTime - startTime);
                 }
-            } else if (pe instanceof Leg) {
-                Leg leg = (Leg) pe;
+            } else if (pe instanceof Leg leg) {
 				duration += leg.getTravelTime().seconds();
             }
         }
