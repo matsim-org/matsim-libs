@@ -41,13 +41,13 @@ public final class RaptorUtils {
 
         RaptorStaticConfig staticConfig = new RaptorStaticConfig();
 
-        staticConfig.setBeelineWalkConnectionDistance(config.transitRouter().getMaxBeelineWalkConnectionDistance());
-
-        PlansCalcRouteConfigGroup.TeleportedModeParams walk = pcrConfig.getModeRoutingParams().get(TransportMode.walk );
-        staticConfig.setBeelineWalkSpeed(walk.getTeleportedModeSpeed() / walk.getBeelineDistanceFactor());
-        staticConfig.setBeelineWalkDistanceFactor(walk.getBeelineDistanceFactor());
-        staticConfig.setTransferWalkMargin(srrConfig.getTransferWalkMargin());
-        staticConfig.setMinimalTransferTime(config.transitRouter().getAdditionalTransferTime());
+		staticConfig.setBeelineWalkConnectionDistance(config.transitRouter().getMaxBeelineWalkConnectionDistance());
+		PlansCalcRouteConfigGroup.TeleportedModeParams walk = pcrConfig.getModeRoutingParams().get(TransportMode.walk );
+		staticConfig.setBeelineWalkSpeed(walk.getTeleportedModeSpeed() / walk.getBeelineDistanceFactor());
+		staticConfig.setBeelineWalkDistanceFactor(walk.getBeelineDistanceFactor());
+		staticConfig.setTransferWalkMargin(srrConfig.getTransferWalkMargin());
+		staticConfig.setIntermodalLegOnlyHandling(srrConfig.getIntermodalLegOnlyHandling());
+		staticConfig.setMinimalTransferTime(config.transitRouter().getAdditionalTransferTime());
 
         staticConfig.setUseModeMappingForPassengers(srrConfig.isUseModeMappingForPassengers());
         if (srrConfig.isUseModeMappingForPassengers()) {
@@ -81,7 +81,7 @@ public final class RaptorUtils {
             double marginalUtility_utl_s = modeParams.getMarginalUtilityOfTraveling()/3600.0 - marginalUtilityPerforming;
             raptorParams.setMarginalUtilityOfTravelTime_utl_s(mode, marginalUtility_utl_s);
         }
-        
+
         double costPerHour = advancedConfig.getTransferPenaltyCostPerTravelTimeHour();
         if (costPerHour == 0.0) {
             // for backwards compatibility, use the default utility of line switch.
@@ -104,9 +104,8 @@ public final class RaptorUtils {
         for (RaptorRoute.RoutePart part : route.parts) {
             if (part.planElements != null) {
                 for (PlanElement pe : part.planElements) {
-                    if (pe instanceof Leg) {
-                        Leg leg = (Leg) pe;
-                        legs.add(leg);
+                    if (pe instanceof Leg leg) {
+						legs.add(leg);
                         if (leg.getDepartureTime().isUndefined()) {
                             leg.setDepartureTime(lastArrivalTime);
                         }
