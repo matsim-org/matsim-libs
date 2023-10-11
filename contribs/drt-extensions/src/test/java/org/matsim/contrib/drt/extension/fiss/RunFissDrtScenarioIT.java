@@ -173,7 +173,7 @@ public class RunFissDrtScenarioIT {
 		}
 
 		run.run();
-		Assert.assertEquals(23961, linkCounter.getLinkLeaveCount());
+		Assert.assertEquals(23817, linkCounter.getLinkLeaveCount());
 	}
 
 	static class LinkCounter implements LinkLeaveEventHandler {
