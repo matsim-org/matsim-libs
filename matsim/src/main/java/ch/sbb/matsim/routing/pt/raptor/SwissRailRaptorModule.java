@@ -1,6 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2017.
- */
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package ch.sbb.matsim.routing.pt.raptor;
 
@@ -29,7 +45,7 @@ public class SwissRailRaptorModule extends AbstractModule {
             for (String mode : getConfig().transit().getTransitModes()) {
                 addRoutingModuleBinding(mode).toProvider(SwissRailRaptorRoutingModuleProvider.class);
             }
-            
+
             SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(getConfig(), SwissRailRaptorConfigGroup.class);
 
             if (srrConfig.isUseRangeQuery()) {
@@ -37,7 +53,7 @@ public class SwissRailRaptorModule extends AbstractModule {
             } else {
                 bind(RaptorRouteSelector.class).to(LeastCostRaptorRouteSelector.class); // just a simple default in case it ever gets used.
             }
-            
+
             switch (srrConfig.getScoringParameters()) {
             case Default:
                 bind(RaptorParametersForPerson.class).to(DefaultRaptorParametersForPerson.class);
@@ -54,7 +70,7 @@ public class SwissRailRaptorModule extends AbstractModule {
             if (useCapacityConstraints) {
                 addEventHandlerBinding().to(OccupancyTracker.class);
             }
-            
+
             bind(RaptorIntermodalAccessEgress.class).to(DefaultRaptorIntermodalAccessEgress.class);
             bind(RaptorInVehicleCostCalculator.class).to(DefaultRaptorInVehicleCostCalculator.class);
             bind(RaptorTransferCostCalculator.class).to(DefaultRaptorTransferCostCalculator.class);

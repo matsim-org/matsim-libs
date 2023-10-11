@@ -1,7 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.* 												   *
- *
- *                                                                         *
+ * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2023 by the members listed in the COPYING,        *
@@ -17,15 +15,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package ch.sbb.matsim.routing.pt.raptor;
 
-import java.util.function.Supplier;
+package org.matsim.contrib.drt.optimizer.rebalancing;
+
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * @author mrieser / Simunto
+ * Custom rebalancing strategy parameters. User is responsible for installing rebalancing module and parameters.
  */
-public interface RaptorTransferCostCalculator {
+public final class CustomRebalancingStrategyParams extends ReflectiveConfigGroup
+		implements RebalancingParams.RebalancingStrategyParams {
+	public static final String SET_NAME = "CustomRebalancingStrategy";
 
-	double calcTransferCost(Supplier<Transfer> transfer, RaptorParameters raptorParams, int totalTravelTime, int totalTransferCount, double existingTransferCosts, double currentTime);
-
+	public CustomRebalancingStrategyParams() {
+		super(SET_NAME);
+	}
 }
