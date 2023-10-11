@@ -45,9 +45,21 @@ public final class TransitScheduleUtils {
 		return accessTime!=null?(double) accessTime:0.0;
 	}
 
+	public static void setStopAccessTime(TransitStopFacility stopFacility, double stopAccessTime){
+		stopFacility.getAttributes().putAttribute(ACCESSTIME_ATTRIBUTE,stopAccessTime);
+	}
+
 	public static double getStopEgressTime(TransitStopFacility stopFacility){
 		Object egressTime = stopFacility.getAttributes().getAttribute(EGRESSTIME_ATTRIBUTE);
 		return egressTime!=null?(double) egressTime:0.0;
+	}
+	public static void setStopEgressTime(TransitStopFacility stopFacility, double stopEgressTime){
+		stopFacility.getAttributes().putAttribute(EGRESSTIME_ATTRIBUTE,stopEgressTime);
+	}
+
+	public static void setSymmetricStopAccessEgressTime(TransitStopFacility stopFacility, double stopAccessEgressTime){
+		setStopAccessTime(stopFacility,stopAccessEgressTime);
+		setStopEgressTime(stopFacility,stopAccessEgressTime);
 	}
 
 	public static QuadTree<TransitStopFacility> createQuadTreeOfTransitStopFacilities(TransitSchedule transitSchedule) {
