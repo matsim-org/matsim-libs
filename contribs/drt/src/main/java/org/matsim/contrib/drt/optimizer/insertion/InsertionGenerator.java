@@ -20,6 +20,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -152,6 +153,12 @@ public class InsertionGenerator {
 	public List<InsertionWithDetourData> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
 		int stopCount = vEntry.stops.size();
 		List<InsertionWithDetourData> insertions = new ArrayList<>();
+
+		if (drtRequest.getPassengerIds().size() > vEntry.vehicle.getCapacity()) {
+			//exit early
+			return Collections.EMPTY_LIST;
+		}
+
 		int occupancy = vEntry.start.occupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			Waypoint.Stop nextStop = nextStop(vEntry, i);

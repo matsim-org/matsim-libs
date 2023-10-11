@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -66,6 +67,21 @@ public class InsertionGeneratorTest {
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
 	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(Collections.singleton(Id.createPersonId("person"))).build();
+
+	private final DrtRequest drtRequest2Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
+			Sets.newHashSet(
+					Id.createPersonId("person1"),
+					Id.createPersonId("person2")
+			)).build();
+
+	private final DrtRequest drtRequest5Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
+			Sets.newHashSet(
+					Id.createPersonId("person1"),
+					Id.createPersonId("person2"),
+					Id.createPersonId("person3"),
+					Id.createPersonId("person4"),
+					Id.createPersonId("person5")
+			)).build();
 
 	private final Link depotLink = link("depot");
 	private final DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder()
@@ -344,6 +360,39 @@ public class InsertionGeneratorTest {
 				new Insertion(drtRequest, entry, 0, 1),
 				//pickup after stop 0
 				new Insertion(drtRequest, entry, 2, 2));
+	}
+
+
+	@Test
+	public void startEmpty_smallGroup() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
+		VehicleEntry entry = entry(start);
+		assertInsertionsOnly(drtRequest2Pax, entry,
+				//pickup after start
+				new Insertion(drtRequest2Pax, entry, 0, 0));
+	}
+
+	@Test
+	public void startEmpty_groupExceedsCapacity() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
+		VehicleEntry entry = entry(start);
+		assertInsertionsOnly(drtRequest5Pax, entry
+				//no insertion possible
+		);
+	}
+
+	@Test
+	public void startEmpty_twoStops_groupExceedsCapacityAtFirstStop() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
+		Waypoint.Stop stop0 = stop(0, toLink, 3);//dropoff 1 pax
+		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//dropoff 1 pax
+		VehicleEntry entry = entry(start, stop0, stop1);
+		assertInsertionsOnly(drtRequest2Pax, entry,
+				//pickup after start:
+				new Insertion(drtRequest2Pax, entry, 0, 1),
+				//pickup after stop 1
+				new Insertion(drtRequest2Pax, entry, 2, 2)
+				);
 	}
 
 	private Link link(String id) {
