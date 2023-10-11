@@ -383,12 +383,12 @@ public final class PopulationUtils {
 		}
 		
 		@Override
-		public String getPlanId() {
+		public Id<String> getPlanId() {
 			return this.delegate.getPlanId();
 		}
 
 		@Override
-		public void setPlanId(String planId) {
+		public void setPlanId(Id<String> planId) {
 			throw new UnsupportedOperationException();
 		}
 		

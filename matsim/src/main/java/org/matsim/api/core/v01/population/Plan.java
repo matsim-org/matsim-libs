@@ -23,6 +23,7 @@ package org.matsim.api.core.v01.population;
 import java.util.List;
 
 import org.matsim.api.core.v01.Customizable;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimPopulationObject;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
@@ -50,9 +51,9 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, A
 
 	public abstract void setType(final String type);
 	
-	public abstract void setPlanId(final String planId);
+	public abstract void setPlanId(final Id<String> planId);
 	
-	public abstract String getPlanId();
+	public abstract Id<String> getPlanId();
 	
 	public abstract int getIterationCreated();
 	

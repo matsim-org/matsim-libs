@@ -23,47 +23,106 @@ package org.matsim.core.replanning.inheritance;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+
 /**
  * Data container storing the data of a single plan.
  * 
- * @author neuma
+ * @author neuma, alex94263
  */
 public class PlanInheritanceRecord {
 	
 	/**
 	 * Id of the person that plan record belongs to.
 	 */
-	String agentId;
+	private Id<Person> agentId;
 	
 	/**
 	 * The globally unique plan id.
 	 */
-	String planId;
+	private Id<String> planId;
 	
 	/**
 	 * Id of the plan that this plan had been copied from before mutating. 
 	 */
-	String ancestorId;
+	private Id<String> ancestorId;
 	
 	/**
 	 * The name of the strategy that altered this plan.
 	 */
-	String mutatedBy;
+	private String mutatedBy;
 	
 	/**
 	 * Iteration in which this plan had been created. May be {@linkplain PlanInheritanceModule#INITIAL_PLAN} if the plan had been in the choice-set from the very beginning.
 	 */
-	int iterationCreated;
+	private int iterationCreated;
 	
 	/**
 	 * Iteration in which the plan had been removed from the choice-set.
 	 */
-	int iterationRemoved;
+	private int iterationRemoved;
 	
 	/**
 	 * Collection of iterations this plan had been the selected plan.
 	 * Initialize this with one since each plan is selected at least once. 
 	 */
-	List<Integer> iterationsSelected = new ArrayList<>(1);
+	private List<Integer> iterationsSelected = new ArrayList<>(1);
+
+	public Id<String> getPlanId() {
+		return planId;
+	}
+
+	public void setPlanId(Id<String> planId) {
+		this.planId = planId;
+	}
+
+	public Id<String> getAncestorId() {
+		return ancestorId;
+	}
+
+	public void setAncestorId(Id<String> ancestorId) {
+		this.ancestorId = ancestorId;
+	}
+
+	public String getMutatedBy() {
+		return mutatedBy;
+	}
+
+	public void setMutatedBy(String mutatedBy) {
+		this.mutatedBy = mutatedBy;
+	}
+
+	public int getIterationCreated() {
+		return iterationCreated;
+	}
+
+	public void setIterationCreated(int iterationCreated) {
+		this.iterationCreated = iterationCreated;
+	}
+
+	public int getIterationRemoved() {
+		return iterationRemoved;
+	}
+
+	public void setIterationRemoved(int iterationRemoved) {
+		this.iterationRemoved = iterationRemoved;
+	}
+
+	public List<Integer> getIterationsSelected() {
+		return iterationsSelected;
+	}
+
+	public void setIterationsSelected(List<Integer> iterationsSelected) {
+		this.iterationsSelected = iterationsSelected;
+	}
+
+	public Id<Person> getAgentId() {
+		return agentId;
+	}
+
+	public void setAgentId(Id<Person> agentId) {
+		this.agentId = agentId;
+	}
 
 }

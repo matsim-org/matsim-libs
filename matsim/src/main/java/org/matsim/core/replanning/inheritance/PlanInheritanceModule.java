@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
@@ -59,7 +60,7 @@ import com.google.inject.Singleton;
  *  <li> Book-keeping, i.e. setting additional plan attributes not stored in the plan itself
  *  <li> Calculation default stats like the distribution of mutators among (selected) plans
  * 
- * @author neuma
+ * @author neuma, alex94263
  */
 @Singleton
 public class PlanInheritanceModule extends AbstractModule implements StartupListener, BeforeMobsimListener, ShutdownListener  {
@@ -74,7 +75,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	public static final String FILENAME_PLAN_INHERITANCE_RECORDS = "planInheritanceRecords";
 	
 	long numberOfPlanInheritanceRecordsCreated = 0;
-	Map<String, PlanInheritanceRecord> planId2planInheritanceRecords = new ConcurrentHashMap<>();
+	Map<Id<String>, PlanInheritanceRecord> planId2planInheritanceRecords = new ConcurrentHashMap<>();
 	
 	PlanInheritanceRecordWriter planInheritanceRecordWriter;
 	private ArrayList<String> strategies;
@@ -95,7 +96,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		// reset all plan attributes that might be present from a previously performed matsim run
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				plan.setPlanId(NONE);
+				plan.setPlanId(Id.create(NONE, String.class));
 				plan.setPlanMutator(INITIAL_PLAN);
 				plan.setIterationCreated(0);
 			}
@@ -156,8 +157,8 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		// check the plans of the population and all currently stored plan records - do the actual book-keeping
 		
-		Set<String> activePlanIds = new HashSet<>();
-		Set<String> selectedPlanIds = new HashSet<>();
+		Set<Id<String>> activePlanIds = new HashSet<>();
+		Set<Id<String>> selectedPlanIds = new HashSet<>();
 		
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -172,18 +173,18 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 					// it's a new plan created in this iteration - create a new record
 					
 					PlanInheritanceRecord planInheritanceRecord = new PlanInheritanceRecord();
-					planInheritanceRecord.agentId = person.getId().toString();
-					planInheritanceRecord.planId = Long.toString(++this.numberOfPlanInheritanceRecordsCreated, 36);
-					planInheritanceRecord.ancestorId = plan.getPlanId();
-					plan.setPlanId(planInheritanceRecord.planId);
-					planInheritanceRecord.iterationCreated = plan.getIterationCreated();
-					planInheritanceRecord.mutatedBy = plan.getPlanMutator();
+					planInheritanceRecord.setAgentId(person.getId());
+					planInheritanceRecord.setPlanId( Id.create(Long.toString(++this.numberOfPlanInheritanceRecordsCreated, 36), String.class) );
+					planInheritanceRecord.setAncestorId(plan.getPlanId());
+					plan.setPlanId(planInheritanceRecord.getPlanId());
+					planInheritanceRecord.setIterationCreated(plan.getIterationCreated());
+					planInheritanceRecord.setMutatedBy(plan.getPlanMutator());
 					
-					this.planId2planInheritanceRecords.put(planInheritanceRecord.planId, planInheritanceRecord);
+					this.planId2planInheritanceRecords.put(planInheritanceRecord.getPlanId(), planInheritanceRecord);
 				}
 				
 				if (PersonUtils.isSelected(plan)) {
-					this.planId2planInheritanceRecords.get(plan.getPlanId()).iterationsSelected.add(event.getIteration());
+					this.planId2planInheritanceRecords.get(plan.getPlanId()).getIterationsSelected().add(event.getIteration());
 					selectedPlanIds.add(plan.getPlanId());
 				}
 				
@@ -191,16 +192,16 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 			}
 		}
 		
-		List<String> deletedPlans = new ArrayList<>();
-		for (String planId : this.planId2planInheritanceRecords.keySet()) {
+		List<Id<String>> deletedPlans = new ArrayList<>();
+		for (Id<String> planId : this.planId2planInheritanceRecords.keySet()) {
 			if (!activePlanIds.contains(planId)) {
 				deletedPlans.add(planId);
 			}
 		}
 		
-		for (String deletedPlanId : deletedPlans) {
+		for (Id<String> deletedPlanId : deletedPlans) {
 			PlanInheritanceRecord deletedPlanInheritanceRecord = this.planId2planInheritanceRecords.remove(deletedPlanId);
-			deletedPlanInheritanceRecord.iterationRemoved = event.getIteration();
+			deletedPlanInheritanceRecord.setIterationRemoved(event.getIteration());
 			this.planInheritanceRecordWriter.write(deletedPlanInheritanceRecord);
 		}
 		
@@ -213,13 +214,13 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	/**
 	 * Updates the default plan stats - namely the distribution of plan mutators based on the given plan ids.
 	 */
-	private void calculateAndWriteDistribution(int currentIteration, ArrayList<String> strategies, Map<String, PlanInheritanceRecord> planId2planInheritanceRecords, Set<String> planIds, BufferedWriter writer) {
+	private void calculateAndWriteDistribution(int currentIteration, ArrayList<String> strategies, Map<Id<String>, PlanInheritanceRecord> planId2planInheritanceRecords, Set<Id<String>> planIds, BufferedWriter writer) {
 		Map<String, AtomicLong> strategy2count = new HashMap<>();
 		for (String strategyName : strategies) {
 			strategy2count.put(strategyName, new AtomicLong(0));
 		}
-		for (String planId : planIds) {
-			String mutatedBy = planId2planInheritanceRecords.get(planId).mutatedBy;
+		for (Id<String> planId : planIds) {
+			String mutatedBy = planId2planInheritanceRecords.get(planId).getMutatedBy();
 			strategy2count.get(mutatedBy).incrementAndGet();
 		}
 		long sum = strategy2count.values().stream().mapToLong(count -> count.get()).sum();

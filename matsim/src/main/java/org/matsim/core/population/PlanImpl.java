@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -124,12 +125,12 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	}
     
 	@Override
-	public String getPlanId() {
-		return (String) this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID);
+	public Id<String> getPlanId() {
+		return (Id<String>) this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID);
 	}
 
 	@Override
-	public void setPlanId(String planId) {
+	public void setPlanId(Id<String> planId) {
 		this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_ID, planId);
 	}
 	

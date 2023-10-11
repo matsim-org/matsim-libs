@@ -28,17 +28,17 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * Writes {@linkplain PlanInheritanceRecord} to file in a fixed column sequence.
  * 
- * @author neuma
+ * @author neuma, alex94263
  */
 public class PlanInheritanceRecordWriter {
 	
-	public final String AGENT_ID = "agentId";
-	public final String PLAN_ID = "planId";
-	public final String ANCESTOR_ID = "ancestorId";
-	public final String MUTATED_BY = "mutatedBy";
-	public final String ITERATION_CREATED = "iterationCreated";
-	public final String ITERATION_REMOVED = "iterationRemoved";
-	public final String ITERATIONS_SELECTED = "iterationsSelected";
+	public static final String AGENT_ID = "agentId";
+	public static final String PLAN_ID = "planId";
+	public static final String ANCESTOR_ID = "ancestorId";
+	public static final String MUTATED_BY = "mutatedBy";
+	public static final String ITERATION_CREATED = "iterationCreated";
+	public static final String ITERATION_REMOVED = "iterationRemoved";
+	public static final String ITERATIONS_SELECTED = "iterationsSelected";
 	
 	private final Character DELIMITER = '\t';
 	private final BufferedWriter writer;
@@ -65,13 +65,13 @@ public class PlanInheritanceRecordWriter {
 
 	public void write(PlanInheritanceRecord planInheritanceRecord) {
 		StringBuffer line = new StringBuffer();
-		line.append(planInheritanceRecord.agentId); line.append(DELIMITER);
-		line.append(planInheritanceRecord.planId); line.append(DELIMITER);
-		line.append(planInheritanceRecord.ancestorId); line.append(DELIMITER);
-		line.append(planInheritanceRecord.mutatedBy); line.append(DELIMITER);
-		line.append(planInheritanceRecord.iterationCreated); line.append(DELIMITER);
-		line.append(planInheritanceRecord.iterationRemoved); line.append(DELIMITER);
-		line.append(planInheritanceRecord.iterationsSelected);
+		line.append(planInheritanceRecord.getAgentId()); line.append(DELIMITER);
+		line.append(planInheritanceRecord.getPlanId()); line.append(DELIMITER);
+		line.append(planInheritanceRecord.getAncestorId()); line.append(DELIMITER);
+		line.append(planInheritanceRecord.getMutatedBy()); line.append(DELIMITER);
+		line.append(planInheritanceRecord.getIterationCreated()); line.append(DELIMITER);
+		line.append(planInheritanceRecord.getIterationRemoved()); line.append(DELIMITER);
+		line.append(planInheritanceRecord.getIterationsSelected());
 		
 		try {
 			this.writer.write(line.toString());

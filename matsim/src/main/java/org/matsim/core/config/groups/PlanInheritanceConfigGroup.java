@@ -47,7 +47,7 @@ public final class PlanInheritanceConfigGroup extends ReflectiveConfigGroup {
 
 	
 	@StringSetter( ENABLED )
-	public void setWriteLinkStatsInterval(boolean enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 	
