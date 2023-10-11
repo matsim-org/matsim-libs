@@ -79,8 +79,15 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 	 * @param baseLinkId linkId of the origin destination where the parkingSearch starts
 	 */
 	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Link> baseLinkId, Id<Vehicle> vehicleId, String mode, double now,
-								double maxParkingDuration, double nextPickupTime, boolean passangerInteractionAtEndOfLeg) {
-
+								double maxParkingDuration, double nextPickupTime, boolean passangerInteractionAtParkingFacilityAtEndOfLeg,
+								Coord coordOfAttraction) {
+		double maxAdditionalDistanceToAttraction = Double.MAX_VALUE;
+		// if a passenger interaction take place at a facility the walking distance to the attraction should be not extended by the value of maxAdditionalDistanceToAttraction
+		if (passangerInteractionAtParkingFacilityAtEndOfLeg) {
+			if (Double.isNaN(distanceFromBaseToAttraction))
+				findDistanceBetweenBaseLinkAndAttraction(baseLinkId, coordOfAttraction);
+			maxAdditionalDistanceToAttraction = 200.;
+		}
 		if (actualRoute == null) {
 			actualRoute = findRouteToNearestParkingFacility(baseLinkId, currentLinkId, canCheckParkingCapacitiesInAdvanced, now, maxParkingDuration, passangerInteractionAtEndOfLeg);
 			if (!passangerInteractionAtEndOfLeg)
@@ -177,7 +184,9 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 	}
 
 	private NetworkRoute findRouteToNearestParkingFacility(Id<Link> baseLinkId, Id<Link> currentLinkId, boolean canCheckParkingCapacitiesInAdvanced,
-														   double now, double maxParkingDuration, boolean passangerInteractionAtEndOfLeg) {
+														   double now, double maxParkingDuration,
+														   boolean passangerInteractionAtParkingFacilityAtEndOfLeg, double maxDistanceFromBase,
+														   Coord coordOfAttraction) {
 		TreeMap<Double, ActivityFacility> euclideanDistanceToParkingFacilities = new TreeMap<>();
 		ActivityFacility nearstActivityFacility = null;
 		NetworkRoute selectedRoute = null;
@@ -210,7 +219,7 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 
 			double distanceBaseAndFacility = NetworkUtils.getEuclideanDistance(activityFacility.getCoord(), coordBaseLink);
 			double distanceCurrentAndFacility;
-			if (passangerInteractionAtEndOfLeg)
+			if (passangerInteractionAtParkingFacilityAtEndOfLeg)
 				distanceCurrentAndFacility = 0.;
 			else
 				distanceCurrentAndFacility = NetworkUtils.getEuclideanDistance(activityFacility.getCoord(), coordCurrentLink);
@@ -235,7 +244,7 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 			NetworkRoute possibleRoute = this.parkingRouter.getRouteFromParkingToDestination(activityFacility.getLinkId(), now,
 				currentLinkId);
 			// reason is that we expect that the driver will always take the nearest possible getOff point to reduce the walk distance for the guests
-			if (passangerInteractionAtEndOfLeg){
+			if (passangerInteractionAtParkingFacilityAtEndOfLeg){
 				selectedRoute = possibleRoute;
 				nearstActivityFacility = activityFacility;
 				break;

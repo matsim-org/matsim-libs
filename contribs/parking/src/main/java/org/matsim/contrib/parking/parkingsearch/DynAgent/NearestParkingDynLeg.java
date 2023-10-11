@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class NearestParkingDynLeg extends ParkingDynLeg {
 	private boolean parkingAtEndOfLeg = true;
-	private boolean passangerInteractionAtEndOfLeg = false;
+	private boolean passangerInteractionAtParkingFacilityAtEndOfLeg = false;
 	private boolean reachedDestinationWithoutParking = false;
 	private boolean alreadyReservedParking = false;
 	private boolean driveToBaseWithoutParking = false;
@@ -51,7 +51,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		if (ParkingUtils.checkIfActivityHasNoParking(followingActivity))
 			parkingAtEndOfLeg = false;
 		if (ParkingUtils.checkIfActivityHasPassengerInteraction(followingActivity))
-			passangerInteractionAtEndOfLeg = true;
+			passangerInteractionAtParkingFacilityAtEndOfLeg = true;
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 	@Override
 	public Id<Link> getNextLinkId() {
 
-		if (!passangerInteractionAtEndOfLeg && (!parkingMode && parkingAtEndOfLeg)) {
+		if (!passangerInteractionAtParkingFacilityAtEndOfLeg && (!parkingMode && parkingAtEndOfLeg)) {
 			parkingMode = true;
 			this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
 		}
@@ -106,7 +106,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		} else {
 			if (hasFoundParking || reachedDestinationWithoutParking) {
 				// easy, we can just park where at our destination link
-				if (hasFoundParking && !passangerInteractionAtEndOfLeg) {
+				if (hasFoundParking && !passangerInteractionAtParkingFacilityAtEndOfLeg) {
 					double parkingDuration;
 					double expectedDrivingDurationToPickup;
 					double drivingDurationFromGetOff = timer.getTimeOfDay() - currentPlannedLeg.getDepartureTime().seconds();
@@ -166,6 +166,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 				double maxParkingDuration = nextPickupTime - timer.getTimeOfDay();
 				Id<Link> nextLinkId = ((NearestParkingSpotSearchLogic) this.logic).getNextLink(currentLinkId, route.getEndLinkId(), vehicleId, mode,
 					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime, passangerInteractionAtEndOfLeg);
+					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime, passangerInteractionAtParkingFacilityAtEndOfLeg,
 				if (((NearestParkingSpotSearchLogic) this.logic).isNextParkingActivitySkipped() && parkingAtEndOfLeg) {
 					removeNextActivityAndFollowingLeg();
 					parkingAtEndOfLeg = false;
