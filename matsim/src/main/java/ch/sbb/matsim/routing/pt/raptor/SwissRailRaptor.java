@@ -79,31 +79,6 @@ public class SwissRailRaptor implements TransitRouter {
         RaptorRoute directWalk = createDirectWalk(fromFacility, toFacility, departureTime, person, parameters);
 
         /*
-		 * The pt trip is compared with a direct walk from trip origin to trip destination. This is useful for backwards
-		 * compatibility, but leads to many trips with only a single "transit_walk" leg which are then considered pt
-		 * trips by the main mode identifier even though they do not contain any pt leg and should rather be considered
-		 * "walk" trips.
-		 *
-		 * That problem can be avoided by setting a very high direct walk factor in TransitRouterConfigGroup. However
-		 * this should be combined with enabling mode choice for pt and walk trips such that slow pt trips can be
-		 * replaced by (faster) walk trips by mode choice. Otherwise agents can be stuck with very slow pt trips.
-		 *
-		 * Comparison is only made between a pt trip and a direct walk trip, other modes (e.g. intermodal access/egress
-		 * modes) are not considered. If they had been considered here, the router would effectively be a mode choice
-		 * module although it is supposed not to change mode choice but rather to simply return a route for a given
-		 * mode. Furthermore there is the problem that the generalized cost calculated by the router can be different
-		 * from the cost the agent will be exposed to in scoring, because the mode performed differently in mobsim than
-		 * anticipated by the router (e.g. the drt travel time turns out to be higher than expected, but the router will
-		 * always chose a direct drt trip over the pt trip, because the router might consistently underestimate drt
-		 * travel time). So it seems a bad idea to compare other modes than walk here. Walk is usually teleported at a
-		 * fixed speed, so it is usually completely deterministic whereas other modes are not.
-		 *
-		 * Overall enabling mode choice and setting a very high direct walk factor (e.g. Double.POSITIVE_INFINITY which
-		 * effectively excludes all direct walks) seems cleaner and better.
-		 *
-		 * vsp-gleich sep'19 (after talking with KN)
-		 *
-		 *
 		 * foundRoute.parts.size() == 0 can happen if SwissRasilRaptorCore.createRaptorRoute() finds a trip made up of,
 		 * only 2 parts which consists only of an access and an egress leg without any pt leg inbetween.
 		 */
