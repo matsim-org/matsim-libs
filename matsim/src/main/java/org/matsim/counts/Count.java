@@ -107,7 +107,7 @@ public class Count<T> implements Identifiable<T> {
 		for (Int2DoubleMap.Entry e : this.volume) {
 			if (e.getDoubleValue() > max) {
 				max = e.getDoubleValue();
-				hour = e.getIntKey() / 60;
+				hour = e.getIntKey() / Measurable.HOURLY;
 			}
 		}
 		return hour >= 0 ? new Volume(hour, max) : null;
@@ -125,7 +125,7 @@ public class Count<T> implements Identifiable<T> {
 	public final HashMap<Integer, Volume> getVolumes() {
 		HashMap<Integer, Volume> res = new HashMap<>();
 		for (Int2DoubleMap.Entry e : volume) {
-			int h = e.getIntKey() / 60;
+			int h = e.getIntKey() / Measurable.HOURLY;
 			res.put(h, new Volume(h, e.getDoubleValue()));
 		}
 

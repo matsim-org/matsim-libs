@@ -58,7 +58,7 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 	private void addValuesToMeasurable(Attributes atts) {
 		int t = Integer.parseInt(atts.getValue("t"));
 		double val = Double.parseDouble(atts.getValue("val"));
-		this.currMeasurable.setAtMinute(t, val);
+		this.currMeasurable.setAtSecond(t, val);
 	}
 
 	private void startMeasurable(String tag, Attributes atts) {

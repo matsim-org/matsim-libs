@@ -141,16 +141,16 @@ final class CountsWriterV2 extends MatsimXmlWriter {
 			);
 
 			//write values
-			Int2DoubleMap hourlyValues = m.getValues();
+			Int2DoubleMap values = m.getValues();
 			try {
-				for (Integer hour : hourlyValues.keySet()) {
-					double v = hourlyValues.get(hour.intValue());
+				for (int second : values.keySet()) {
+					double v = values.get(second);
 					writeEmptyLine();
 
 					//start tag
 					super.writer.write("\t\t\t\t<value ");
 
-					super.writer.write("t=\"" + hour + "\" ");
+					super.writer.write("t=\"" + second + "\" ");
 
 					super.writer.write("val=\"" + v + "\" ");
 

@@ -176,7 +176,7 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 	}
 
 	/**
-	 * Iterate over all values as minute-value pairs.
+	 * Iterate over all values as seconds-value pairs.
 	 */
 	@Override
 	public Iterator<Int2DoubleMap.Entry> iterator() {
