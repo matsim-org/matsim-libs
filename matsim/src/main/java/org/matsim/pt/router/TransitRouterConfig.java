@@ -27,7 +27,7 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.config.TransitRouterConfigGroup;
@@ -119,7 +119,7 @@ public class TransitRouterConfig implements MatsimParameters {
 		
 		// walk:
 		{
-			ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.walk );
+			TeleportedModeParams params = pcrConfig.getModeRoutingParams().get( TransportMode.walk );
 			Gbl.assertNotNull( params );
 			this.beelineDistanceFactor = params.getBeelineDistanceFactor();
 			this.beelineWalkSpeed = params.getTeleportedModeSpeed() / beelineDistanceFactor;

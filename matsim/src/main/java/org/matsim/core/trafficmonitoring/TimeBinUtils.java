@@ -20,11 +20,11 @@
 package org.matsim.core.trafficmonitoring;
 
 public class TimeBinUtils {
-	public static int getTimeBinIndex(double time, int travelTimeBinSize, int travelTimeBinCount) {
-		return Math.min((int)time / travelTimeBinSize, travelTimeBinCount - 1);
+	public static int getTimeBinIndex(double time, double travelTimeBinSize, int travelTimeBinCount) {
+		return Math.max(0, Math.min((int)Math.floor(time / travelTimeBinSize), travelTimeBinCount - 1));
 	}
 
-	public static int getTimeBinCount(int maxTime, int travelTimeBinSize) {
-		return maxTime / travelTimeBinSize + 1;
+	public static int getTimeBinCount(int maxTime, double travelTimeBinSize) {
+		return (int) Math.ceil(maxTime / travelTimeBinSize) + 1;
 	}
 }

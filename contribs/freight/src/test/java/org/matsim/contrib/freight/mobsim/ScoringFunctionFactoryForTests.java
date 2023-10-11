@@ -3,8 +3,6 @@ package org.matsim.contrib.freight.mobsim;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -15,7 +13,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.CarrierConstants;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -37,7 +35,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			private final Set<CarrierVehicle> employedVehicles;
 			private Leg currentLeg = null;
 			private double currentLegStartTime;
-			
+
 			public DriverLegScoring(Carrier carrier, Network network) {
 				super();
 				this.network = network;
@@ -45,10 +43,10 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 				employedVehicles = new HashSet<CarrierVehicle>();
 			}
 
-			
+
 			@Override
 			public void finish() {
-				
+
 			}
 
 
@@ -68,7 +66,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			@Override
 			public void startLeg(double time, Leg leg) {
 				currentLeg = leg;
-				currentLegStartTime = time; 
+				currentLegStartTime = time;
 			}
 
 
@@ -92,9 +90,9 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 					}
 					score += (-1)*distance*getDistanceParameter(vehicle,null);
 				}
-				
+
 			}
-			
+
 			private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
 				return vehicle.getType().getCostInformation().getCostsPerMeter();
 			}
@@ -108,20 +106,20 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 //			}
 //
 		}
-	
+
 	 static class DriverActScoring implements BasicScoring, ActivityScoring{
 
 		 boolean firstEnd = true;
-		 
+
 		 double startTime;
-		 
-		 double startTimeOfEnd; 
-		 
+
+		 double startTimeOfEnd;
+
 		 double amountPerHour = 20.0;
-		 
+
 		@Override
 		public void startActivity(double time, Activity act) {
-			if(act.getType().equals(FreightConstants.END)){
+			if(act.getType().equals(CarrierConstants.END)){
 				startTimeOfEnd = time;
 			}
 		}
@@ -132,7 +130,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 				startTime = time;
 				firstEnd = false;
 			}
-			
+
 		}
 
 		@Override
@@ -150,13 +148,13 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			startTimeOfEnd = 0.0;
 			firstEnd = true;
 		}
-		 
+
 	 }
-	 
+
 	static class NumberOfToursAward implements BasicScoring{
 
 		private Carrier carrier;
-		
+
 		public NumberOfToursAward(Carrier carrier) {
 			super();
 			this.carrier = carrier;
@@ -177,11 +175,11 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 		@Override
 		public void reset() {
 		}
-		
+
 	}
-	 
+
 	 private Network network;
-	
+
 	public ScoringFunctionFactoryForTests(Network network) {
 		super();
 		this.network = network;

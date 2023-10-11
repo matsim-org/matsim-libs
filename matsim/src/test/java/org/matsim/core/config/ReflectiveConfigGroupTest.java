@@ -22,6 +22,9 @@ package org.matsim.core.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +64,9 @@ public class ReflectiveConfigGroupTest {
 		dumpedModule.charField = 'z';
 		dumpedModule.byteField = 78;
 		dumpedModule.booleanField = true;
+		dumpedModule.localTimeField = LocalTime.of(23, 59, 59);
+		dumpedModule.localDateField = LocalDate.of(2022, 12, 31);
+		dumpedModule.localDateTimeField = LocalDateTime.of(2022, 12, 31, 23, 59, 59);
 		dumpedModule.enumListField = List.of(MyEnum.VALUE1, MyEnum.VALUE2);
 		dumpedModule.enumSetField = Set.of(MyEnum.VALUE2);
 		dumpedModule.setField = ImmutableSet.of("a", "b", "c");
@@ -154,6 +160,9 @@ public class ReflectiveConfigGroupTest {
 		expectedComments.put("charField", "char");
 		expectedComments.put("byteField", "byte");
 		expectedComments.put("booleanField", "boolean");
+		expectedComments.put("localTimeField", "local time");
+		expectedComments.put("localDateField", "local date");
+		expectedComments.put("localDateTimeField", "local datetime");
 		expectedComments.put("enumField", "Possible values: VALUE1,VALUE2");
 		expectedComments.put("enumListField", "list of enum");
 		expectedComments.put("enumSetField", "set of enum");
@@ -438,6 +447,18 @@ public class ReflectiveConfigGroupTest {
 		@Comment("boolean")
 		@Parameter
 		private boolean booleanField;
+
+		@Comment("local time")
+		@Parameter
+		private LocalTime localTimeField;
+
+		@Comment("local date")
+		@Parameter
+		private LocalDate localDateField;
+
+		@Comment("local datetime")
+		@Parameter
+		private LocalDateTime localDateTimeField;
 
 		@Comment("set")
 		@Parameter

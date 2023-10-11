@@ -47,7 +47,7 @@
         <param name="outputDirectory" value="output/commercialtraffictestrun"/>
         <!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
         <param name="overwriteFiles" value="deleteDirectoryIfExists"/>
-        <!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
+        <!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, SpeedyALT -->
         <param name="routingAlgorithmType" value="AStarLandmarks"/>
         <!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
         <param name="runId" value="jointDemandUsingDRTExample"/>

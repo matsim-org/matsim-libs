@@ -35,10 +35,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -47,8 +49,10 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * @author thibautd
@@ -207,7 +211,7 @@ public class PopulationV6IOTest {
 
 		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
 	}
-	
+
 	@Test
 	public void testLegAttributesLegacyIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
@@ -241,7 +245,7 @@ public class PopulationV6IOTest {
 
 		Assert.assertEquals("RoutingMode not set in Leg.", TransportMode.car, readLeg.getRoutingMode());
 	}
-	
+
 	@Test
 	public void testPlanAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
@@ -426,6 +430,36 @@ public class PopulationV6IOTest {
 		Assert.assertNull(((Activity) pp1.getPlanElements().get(4)).getFacilityId());
 		Assert.assertNull(((Activity) pp1.getPlanElements().get(4)).getCoord());
 		Assert.assertEquals(((Activity) pp1.getPlanElements().get(4)).getLinkId(), linkId);
+	}
+
+	@Test
+	public void testPopulationCoordinateTransformationIO() {
+		String outputDirectory = utils.getOutputDirectory();
+
+		// Create a population with CRS EPSG:25832
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		ProjectionUtils.putCRS(population, "EPSG:25832");
+		final Person person = population.getFactory().createPerson(Id.createPersonId("Donald Trump"));
+		population.addPerson(person);
+		Plan plan = population.getFactory().createPlan();
+		plan.addActivity(population.getFactory().createInteractionActivityFromCoord("home", new Coord(712568.0, 256600.0)));
+		person.addPlan(plan);
+		new PopulationWriter(population).write(outputDirectory + "output.xml");
+
+		// Read in again, but with CRS EPSG:4326
+		Config config = ConfigUtils.createConfig();
+		config.global().setCoordinateSystem("EPSG:4326");
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		final String targetCRS = config.global().getCoordinateSystem();
+		final String internalCRS = config.global().getCoordinateSystem();
+		final PopulationReader reader = new PopulationReader(targetCRS, internalCRS, scenario);
+		reader.putAttributeConverters(Collections.emptyMap());
+		reader.readFile(outputDirectory + "output.xml");
+		Person inputPerson = scenario.getPopulation().getPersons().values().iterator().next();
+		Activity act = (Activity) inputPerson.getPlans().get(0).getPlanElements().get(0);
+		Assert.assertEquals(10.911495969392414, act.getCoord().getX(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(2.3202288392002424, act.getCoord().getY(), MatsimTestUtils.EPSILON);
+
 	}
 
 }

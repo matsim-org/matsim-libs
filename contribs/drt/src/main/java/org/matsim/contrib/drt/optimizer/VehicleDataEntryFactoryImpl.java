@@ -24,6 +24,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseT
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -100,31 +101,40 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			Waypoint.Stop s = stops[i] = new Waypoint.Stop(stopTasks.get(i), outgoingOccupancy);
 			outgoingOccupancy -= s.getOccupancyChange();
 		}
+		
+		Waypoint.Stop startStop = startTask != null && STOP.isBaseTypeOf(startTask)
+				? new Waypoint.Stop((DrtStopTask) startTask, 0)
+				: null;
 
-		var slackTimes = computeSlackTimes(vehicle, currentTime, stops);
+		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop);
 
 		return new VehicleEntry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
-				ImmutableList.copyOf(stops), slackTimes);
+				ImmutableList.copyOf(stops), slackTimes, currentTime);
 	}
 
 	public boolean isNotEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
 		return currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime();
 	}
 
-	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops) {
-		double[] slackTimes = new double[stops.length + 1];
+	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops, Waypoint.Stop start) {
+		double[] slackTimes = new double[stops.length + 2];
 
 		//vehicle
 		double slackTime = calcVehicleSlackTime(vehicle, now);
-		slackTimes[stops.length] = slackTime;
+		slackTimes[stops.length + 1] = slackTime;
 
 		//stops
 		for (int i = stops.length - 1; i >= 0; i--) {
 			var stop = stops[i];
 			slackTime = Math.min(stop.latestArrivalTime - stop.task.getBeginTime(), slackTime);
 			slackTime = Math.min(stop.latestDepartureTime - stop.task.getEndTime(), slackTime);
-			slackTimes[i] = slackTime;
+			slackTimes[i + 1] = slackTime;
 		}
+		
+		// start
+		slackTimes[0] = start == null ? slackTime : 
+			Math.min(start.latestDepartureTime - start.task.getEndTime(), slackTime);
+		
 		return slackTimes;
 	}
 

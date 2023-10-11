@@ -90,7 +90,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	 * @param carrierVehicleTypes
 	 */
 	public CarrierPlanReaderV1( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
-		super();
+		super(ValidationType.DTD_OR_XSD);
 		this.carriers = carriers;
 		this.carrierVehicleTypes = carrierVehicleTypes;
 		this.setValidating(false);

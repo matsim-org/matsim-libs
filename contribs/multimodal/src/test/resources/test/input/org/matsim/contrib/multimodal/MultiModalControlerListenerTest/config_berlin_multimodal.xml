@@ -25,18 +25,18 @@
 	</module>
 
 	<module name="controler">
-		<param name="routingAlgorithmType" value="FastAStarLandmarks" />
+		<param name="routingAlgorithmType" value="SpeedyALT" />
 	</module>
 
 	<module name="qsim">
-		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ 
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/
 			run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 
 		<param name="snapshotperiod" value="00:00:00" /> <!-- 00:00:00 means NO snapshot writing -->
 
-		<param name="flowCapacityFactor" value="0.02" /> <!-- we simulate only 1% of the population, and reduce the network capacity 
+		<param name="flowCapacityFactor" value="0.02" /> <!-- we simulate only 1% of the population, and reduce the network capacity
 			to 2% -->
 		<param name="storageCapacityFactor" value="0.05" />
 	</module>

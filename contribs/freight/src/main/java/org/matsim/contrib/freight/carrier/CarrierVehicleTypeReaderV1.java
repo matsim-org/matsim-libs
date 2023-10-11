@@ -43,7 +43,7 @@ class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
 	private VehicleType currentType;
 
 	CarrierVehicleTypeReaderV1( CarrierVehicleTypes carrierVehicleTypes ) {
-		super();
+		super(ValidationType.XSD_ONLY);
 		this.carrierVehicleTypes = carrierVehicleTypes;
 		this.setValidating(false);
 	}

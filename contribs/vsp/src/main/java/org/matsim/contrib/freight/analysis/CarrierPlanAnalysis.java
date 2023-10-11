@@ -40,7 +40,7 @@ public class CarrierPlanAnalysis  {
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
 		//Write headline:
-		bw1.write("carrierId \t scoreOfSelectedPlan \t nuOfTours \t nuOfShipments(input) \t nuOfServices(input) ");
+		bw1.write("carrierId \t MATSimScoreSelectedPlan \t jSpritScoreSelectedPlan \t nuOfTours \t nuOfShipments(input) \t nuOfServices(input) ");
 		bw1.newLine();
 
 		final TreeMap<Id<Carrier>, Carrier> sortedCarrierMap = new TreeMap<>(carriers.getCarriers());
@@ -48,6 +48,7 @@ public class CarrierPlanAnalysis  {
 		for (Carrier carrier : sortedCarrierMap.values()) {
 			bw1.write(carrier.getId().toString());
 			bw1.write("\t" + carrier.getSelectedPlan().getScore());
+			bw1.write("\t" + carrier.getSelectedPlan().getJspritScore());
 			bw1.write("\t" + carrier.getSelectedPlan().getScheduledTours().size());
 			bw1.write("\t" + carrier.getShipments().size());
 			bw1.write("\t" + carrier.getServices().size());

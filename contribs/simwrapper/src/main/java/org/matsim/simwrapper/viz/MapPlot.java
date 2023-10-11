@@ -25,7 +25,7 @@ public final class MapPlot extends Viz {
 	/**
 	 * Set the shape url, providing the path.
 	 */
-	public MapPlot setShapes(String file) {
+	public MapPlot setShape(String file) {
 		shapes = file;
 		return this;
 	}
@@ -59,6 +59,8 @@ public final class MapPlot extends Viz {
 
 		public DisplaySettings fillHeight = new DisplaySettings();
 
+		public DisplaySettings radius = new DisplaySettings();
+
 	}
 
 
@@ -91,8 +93,8 @@ public final class MapPlot extends Viz {
 		/**
 		 * Sets the full color ramps settings.
 		 */
-		public DisplaySettings setColorRamp(String ramp, int steps, boolean reversed) {
-			colorRamp = Map.of("ramp", ramp, "reversed", reversed, "steps", steps);
+		public DisplaySettings setColorRamp(String ramp, int steps, boolean reverse) {
+			colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
 			return this;
 		}
 	}

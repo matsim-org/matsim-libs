@@ -40,7 +40,7 @@ import java.util.Stack;
 
 /**
  * Reader reading carrierVehicleTypes from a xml-file.
- * 
+ *
  * @author sschroeder
  *
  */
@@ -50,7 +50,6 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 	private final CarrierVehicleTypeParser reader;
 
 	public CarrierVehicleTypeReader( final CarrierVehicleTypes types ) {
-		System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefinition_v2.0.xsd is online
 		this.reader = new CarrierVehicleTypeParser( types ) ;
 	}
 
@@ -116,7 +115,8 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 		private MatsimXmlParser delegate = null;
 
 		CarrierVehicleTypeParser(CarrierVehicleTypes vehicleTypes) {
-			this.vehicleTypes = vehicleTypes ;
+			super(ValidationType.XSD_ONLY);
+			this.vehicleTypes = vehicleTypes;
 		}
 
 		@Override

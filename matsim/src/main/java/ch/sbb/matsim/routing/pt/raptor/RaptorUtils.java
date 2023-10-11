@@ -43,7 +43,7 @@ public final class RaptorUtils {
 
         staticConfig.setBeelineWalkConnectionDistance(config.transitRouter().getMaxBeelineWalkConnectionDistance());
 
-        PlansCalcRouteConfigGroup.ModeRoutingParams walk = pcrConfig.getModeRoutingParams().get(TransportMode.walk);
+        PlansCalcRouteConfigGroup.TeleportedModeParams walk = pcrConfig.getModeRoutingParams().get(TransportMode.walk );
         staticConfig.setBeelineWalkSpeed(walk.getTeleportedModeSpeed() / walk.getBeelineDistanceFactor());
         staticConfig.setBeelineWalkDistanceFactor(walk.getBeelineDistanceFactor());
         staticConfig.setTransferWalkMargin(srrConfig.getTransferWalkMargin());

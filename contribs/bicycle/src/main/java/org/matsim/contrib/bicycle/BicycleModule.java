@@ -48,32 +48,16 @@ public final class BicycleModule extends AbstractModule {
 		// * link speeds are computed via a plugin handler to the DefaultLinkSpeedCalculator.  If the plugin handler returns a speed, it is
 		// used, otherwise the default speed is used. This has the advantage that multiple plugins can register such special link speed calculators.
 
-
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
 
-		switch ( bicycleConfigGroup.getBicycleScoringType() ) {
-			case legBased -> {
-				this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
-			}
-			case linkBased -> {
-				// yyyy the leg based scoring was moved to score events, so that it does not change the scoring function.  For the
-				// link based scoring, this has not yet been done.  It seems to me that the link based scoring is needed for the
-				// motorized interaction.  However, from a technical point of vew it should be possible to use the score events as
-				// well, since they are computed link-by-link.  That is, optimally the link based scoring would go away completely,
-				// and only motorized interaction would be switched on or off.  kai, jun'23
+		this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
+		// (the motorized interaction is in the BicycleScoreEventsCreator)
 
-				bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
-			}
-			default -> throw new IllegalStateException( "Unexpected value: " + bicycleConfigGroup.getBicycleScoringType() );
-		}
+		this.bind( AdditionalBicycleLinkScore.class ).to( AdditionalBicycleLinkScoreDefaultImpl.class );
 
 		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
-		// this is still needed because the bicycle travel time calculator needs to use the same bicycle speed as the mobsim.  kai, jun'23
-
-		if (bicycleConfigGroup.isMotorizedInteraction()) {
-			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
-		}
+		// this is still needed because the bicycle travel time calculator for routing needs to use the same bicycle speed as the mobsim.  kai, jun'23
 
 		this.installOverridingQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
