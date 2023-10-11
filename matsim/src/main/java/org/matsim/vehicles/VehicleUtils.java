@@ -117,11 +117,11 @@ public final class VehicleUtils {
 	/**
 	 * Checks whether a person has a vehicle id for mode - without throwing an
 	 * exception if not.
-	 * 
+	 *
 	 * @param person the person one wants to check for a vehicle id
 	 * @param mode   the mode for the vehicle id to check
 	 * @return whether person has a vehicle id for that mode
-	 * 
+	 *
 	 * @see {@link VehicleUtils#getVehicleId(Person, String)}
 	 */
 	public static boolean hasVehicleId(Person person, String mode) {
@@ -179,13 +179,32 @@ public final class VehicleUtils {
 		Map<String, Id<Vehicle>> modeToVehicleCopy = new HashMap<>(modeToVehicle);
 		PersonVehicles personVehicles;
 		if (attr == null) {
-			personVehicles = new PersonVehicles(modeToVehicleCopy);
+			personVehicles = new PersonVehicles();
 		} else {
 			personVehicles = (PersonVehicles) attr;
 		}
 		personVehicles.addModeVehicleList(modeToVehicleCopy);
 		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, personVehicles);
 	}
+
+	/**
+	 * Attaches vehicle types to a person, so that the router knows which vehicle to use for which mode and person.
+	 * @param modeToVehicleType mode string mapped to vehicle type ids. The provided map is copied and stored as unmodifiable map.
+	 */
+	public static void insertVehicleTypesIntoAttributes(Person person, Map<String, Id<VehicleType>> modeToVehicleType) {
+		Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
+
+		Map<String, Id<VehicleType>> modeToTypesCopy = new HashMap<>(modeToVehicleType);
+		PersonVehicles personVehicles;
+		if (attr == null) {
+			personVehicles = new PersonVehicles();
+		} else {
+			personVehicles = (PersonVehicles) attr;
+		}
+		personVehicles.addModeVehicleTypes(modeToTypesCopy);
+		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, personVehicles);
+	}
+
 	//******** general VehicleType attributes ************
 
 	public static VehicleType.DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){

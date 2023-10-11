@@ -14,6 +14,8 @@ public class PersonVehiclesAttributeConverter implements AttributeConverter<Pers
 
     private final Logger logger = LogManager.getLogger(PersonVehiclesAttributeConverter.class);
 
+	// TODO: handle person vehicles types (special separator)
+
     @Override
     public PersonVehicles convert(String value) {
         PersonVehicles vehicles = new PersonVehicles();
@@ -26,12 +28,11 @@ public class PersonVehiclesAttributeConverter implements AttributeConverter<Pers
 
     @Override
     public String convertToString(Object o) {
-        if(!(o instanceof PersonVehicles)){
-            logger.error("Object is not of type PersonVehicles: " + o.getClass().toString());
+        if(!(o instanceof PersonVehicles vehicles)){
+            logger.error("Object is not of type PersonVehicles: " + o.getClass());
             return null;
         }
-        PersonVehicles vehicles = (PersonVehicles)o;
-        Map<String, String> stringMap = new HashMap<>();
+		Map<String, String> stringMap = new HashMap<>();
         for (Map.Entry<String, Id<Vehicle>> entry: vehicles.getModeVehicles().entrySet()) {
             stringMap.put(entry.getKey(), entry.getValue().toString());
         }
