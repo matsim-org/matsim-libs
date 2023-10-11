@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.config;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
@@ -69,7 +84,7 @@ public class SwissRailRaptorConfigGroupTest {
 
             RangeQuerySettingsParameterSet range2 = new RangeQuerySettingsParameterSet();
             range2.setSubpopulations("inflexible");
-            range2.setMaxEarlierDeparture(1*60);
+            range2.setMaxEarlierDeparture(60);
             range2.setMaxLaterDeparture(15*60);
             config1.addRangeQuerySettings(range2);
         }
@@ -89,7 +104,7 @@ public class SwissRailRaptorConfigGroupTest {
         Assert.assertNotNull(range2);
         Assert.assertEquals(1, range2.getSubpopulations().size());
         Assert.assertEquals("inflexible", range2.getSubpopulations().iterator().next());
-        Assert.assertEquals(1*60, range2.getMaxEarlierDeparture());
+        Assert.assertEquals(60, range2.getMaxEarlierDeparture());
         Assert.assertEquals(15*60, range2.getMaxLaterDeparture());
     }
 

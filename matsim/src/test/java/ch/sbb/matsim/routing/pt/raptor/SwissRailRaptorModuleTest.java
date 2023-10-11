@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
 import java.util.ArrayList;
@@ -231,7 +246,7 @@ public class SwissRailRaptorModuleTest {
         // :-( :-(  kai, mar'20)
 
     }
-    
+
     /**
      * Test update of SwissRailRaptorData after TransitScheduleChangedEvent
      */
@@ -252,7 +267,7 @@ public class SwissRailRaptorModuleTest {
         plan.addActivity(homeAct);
         plan.addLeg(pf.createLeg(TransportMode.pt));
         plan.addActivity(pf.createActivityFromCoord("work", new Coord(24010, 10000)));
-        
+
         // prepare scoring
         Config config = f.config;
         PlanCalcScoreConfigGroup.ActivityParams homeScoring = new PlanCalcScoreConfigGroup.ActivityParams("home");
@@ -288,12 +303,12 @@ public class SwissRailRaptorModuleTest {
         });
 
         controler.run();
-        
+
         // test that swiss rail raptor was used
         TripRouter tripRouter = controler.getInjector().getInstance(TripRouter.class);
         RoutingModule module = tripRouter.getRoutingModule(TransportMode.pt);
         Assert.assertTrue(module instanceof SwissRailRaptorRoutingModule);
-        
+
         // Check routed plan
         List<PlanElement> planElements = p1.getSelectedPlan().getPlanElements();
         for (PlanElement pe : planElements) {
@@ -317,13 +332,13 @@ public class SwissRailRaptorModuleTest {
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(1)).getMode());
         Assert.assertEquals(TransportMode.pt, ((Leg) planElements.get(3)).getMode());
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(5)).getMode());
-        
+
         // Check route: should return one of the added lines although the removed green line would be faster
         Leg ptLeg = (Leg) planElements.get(3);
         TransitPassengerRoute ptRoute = (TransitPassengerRoute) ptLeg.getRoute();
-        Assert.assertEquals(Id.create("AddedLine" + 1, TransitLine.class), ptRoute.getLineId());        
+        Assert.assertEquals(Id.create("AddedLine" + 1, TransitLine.class), ptRoute.getLineId());
     }
-    
+
     /**
      * Test individual scoring parameters for agents
      */
@@ -431,5 +446,5 @@ public class SwissRailRaptorModuleTest {
         }
 
     }
-    
+
 }
