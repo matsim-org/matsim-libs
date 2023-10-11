@@ -82,6 +82,39 @@ public class ConfigReaderMatsimV2Test {
 	}
 
 	/**
+	 * Test that a parameter can be renamed inside a renamed module.
+	 */
+	@Test
+	public void testConditionalParamNameAliasWithModuleRenaming() {
+		Config config = ConfigUtils.createConfig();
+		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
+
+		String xml = """
+				<?xml version="1.0" ?>
+				<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+				<config>
+					<module name="the_network">
+						<param name="input" value="my_network.xml.gz" />
+					</module>
+					<module name="the_plans">
+						<param name="input" value="my_plans.xml.gz" />
+					</module>
+				</config>
+				""";
+		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+
+		r2.addAlias("the_network", "network");
+		r2.addAlias("the_plans", "plans");
+		// for the path, the new name needs to be used:
+		r2.addAlias("input", "inputNetworkFile", "network");
+		r2.addAlias("input", "inputPlansFile", "plans");
+		r2.readStream(bais);
+
+		Assert.assertEquals("my_network.xml.gz", config.network().getInputFile());
+		Assert.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
+	}
+
+	/**
 	 * Test that 2 aliases for the same parameter name resolve to
 	 * different parameter names depending on in which module they are in.
 	 */
