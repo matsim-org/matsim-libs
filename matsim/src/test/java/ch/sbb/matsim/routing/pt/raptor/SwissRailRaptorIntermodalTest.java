@@ -32,6 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -39,6 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.util.ArrayList;
@@ -1219,6 +1221,69 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
         Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
     }
+
+	@Test
+	public void testIntermodalTripWithAccessAndEgressTimesAtStops() {
+		IntermodalFixture f = new IntermodalFixture();
+		f.scenario.getTransitSchedule().getFacilities().values()
+				.forEach(stopFacility -> TransitScheduleUtils.setSymmetricStopAccessEgressTime(stopFacility,120.0));
+		PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+		walk.setMarginalUtilityOfTraveling(0.0);
+		f.config.planCalcScore().addModeParams(walk);
+
+		Map<String, RoutingModule> routingModules = new HashMap<>();
+		routingModules.put(TransportMode.walk,
+				new TeleportationRoutingModule(TransportMode.walk, f.scenario, 1.1, 1.3));
+		routingModules.put(TransportMode.bike,
+				new TeleportationRoutingModule(TransportMode.bike, f.scenario, 3, 1.4));
+
+		f.srrConfig.setUseIntermodalAccessEgress(true);
+		IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();
+		walkAccess.setMode(TransportMode.walk);
+		walkAccess.setMaxRadius(1000);
+		walkAccess.setInitialSearchRadius(1000);
+		f.srrConfig.addIntermodalAccessEgress(walkAccess);
+		IntermodalAccessEgressParameterSet bikeAccess = new IntermodalAccessEgressParameterSet();
+		bikeAccess.setMode(TransportMode.bike);
+		bikeAccess.setMaxRadius(1500);
+		bikeAccess.setInitialSearchRadius(1500);
+		bikeAccess.setStopFilterAttribute("bikeAccessible");
+		bikeAccess.setLinkIdAttribute("accessLinkId_bike");
+		bikeAccess.setStopFilterValue("true");
+		f.srrConfig.addIntermodalAccessEgress(bikeAccess);
+
+		SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
+		DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
+		SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
+
+		Facility fromFac = new FakeFacility(new Coord(10000, 10500), Id.create("from", Link.class));
+		Facility toFac = new FakeFacility(new Coord(50000, 10500), Id.create("to", Link.class));
+
+		List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFac, toFac, 7*3600, f.dummyPerson));
+		for (PlanElement leg : legs) {
+			System.out.println(leg);
+		}
+
+		Assert.assertEquals("wrong number of legs.", 5, legs.size());
+		Leg	leg = (Leg) legs.get(1);
+		Assert.assertEquals(TransportMode.walk, leg.getMode());
+		Assert.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getEndLinkId());
+		Assert.assertEquals(120.0,leg.getTravelTime().seconds(), MatsimTestUtils.EPSILON);
+		leg = (Leg) legs.get(2);
+		Assert.assertEquals(TransportMode.pt, leg.getMode());
+		Assert.assertEquals(Id.create("pt_2", Link.class), leg.getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+		leg = (Leg) legs.get(3);
+		Assert.assertEquals(TransportMode.walk, leg.getMode());
+		Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getEndLinkId());
+		Assert.assertEquals(120.0,leg.getTravelTime().seconds(), MatsimTestUtils.EPSILON);
+		leg = (Leg) legs.get(4);
+		Assert.assertEquals(TransportMode.bike, leg.getMode());
+		Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+	}
 
 
 

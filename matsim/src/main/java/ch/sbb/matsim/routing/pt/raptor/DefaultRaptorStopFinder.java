@@ -207,24 +207,24 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
                     // the router for the access/egress mode could not find a route, skip that access/egress mode
                     continue;
                 }
-                if (stopFacility != stop) {
-                    if (direction == Direction.ACCESS) {
-                        Leg transferLeg = PopulationUtils.createLeg(TransportMode.walk);
-                        Route transferRoute = RouteUtils.createGenericRouteImpl(stopFacility.getLinkId(), stop.getLinkId());
-						double accessTime = TransitScheduleUtils.getStopAccessTime(stop);
-                        transferRoute.setTravelTime(accessTime);
-                        transferRoute.setDistance(0);
-                        transferLeg.setRoute(transferRoute);
-                        transferLeg.setTravelTime(accessTime);
+				double accessTime = TransitScheduleUtils.getStopAccessTime(stop);
+				double egressTime = TransitScheduleUtils.getStopEgressTime(stop);
+				if ((stopFacility != stop) || accessTime>0.0 || egressTime>0.0) {
+					if (direction == Direction.ACCESS) {
+						Leg transferLeg = PopulationUtils.createLeg(TransportMode.walk);
+						Route transferRoute = RouteUtils.createGenericRouteImpl(stopFacility.getLinkId(), stop.getLinkId());
+						transferRoute.setTravelTime(accessTime);
+						transferRoute.setDistance(0);
+						transferLeg.setRoute(transferRoute);
+						transferLeg.setTravelTime(accessTime);
 
-                        List<PlanElement> tmp = new ArrayList<>(routeParts.size() + 1);
-                        tmp.addAll(routeParts);
-                        tmp.add(transferLeg);
-                        routeParts = tmp;
-                    } else {
-                        Leg transferLeg = PopulationUtils.createLeg(TransportMode.walk);
-                        Route transferRoute = RouteUtils.createGenericRouteImpl(stop.getLinkId(), stopFacility.getLinkId());
-						double egressTime = TransitScheduleUtils.getStopEgressTime(stop);
+						List<PlanElement> tmp = new ArrayList<>(routeParts.size() + 1);
+						tmp.addAll(routeParts);
+						tmp.add(transferLeg);
+						routeParts = tmp;
+					} else {
+						Leg transferLeg = PopulationUtils.createLeg(TransportMode.walk);
+						Route transferRoute = RouteUtils.createGenericRouteImpl(stop.getLinkId(), stopFacility.getLinkId());
                         transferRoute.setTravelTime(egressTime);
                         transferRoute.setDistance(0);
                         transferLeg.setRoute(transferRoute);
