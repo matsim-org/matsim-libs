@@ -29,12 +29,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkFactory;
 
 public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
-	
+
 	private final static Logger log = LogManager.getLogger(ArrayRoutingNetworkFactory.class);
-	
+
 	private int nodeArrayIndexCounter;
 	private int linkArrayIndexCounter;
 
@@ -42,9 +41,9 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 	public synchronized ArrayRoutingNetwork createRoutingNetwork(final Network network) {
 		this.nodeArrayIndexCounter = 0;
 		this.linkArrayIndexCounter = 0;
-		
+
 		ArrayRoutingNetwork routingNetwork = new ArrayRoutingNetwork(network);
-		
+
 		for (Node node : network.getNodes().values()) {
 			RoutingNetworkNode routingNode = createRoutingNetworkNode(node, node.getOutLinks().size());
 			routingNetwork.addNode(routingNode);
@@ -56,22 +55,22 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 			RoutingNetworkLink dijkstraLink = createRoutingNetworkLink(link, fromNode, toNode);
 			routingLinks.put(dijkstraLink.getId(), dijkstraLink);
 		}
-		
+
 		for (Node node : network.getNodes().values()) {
 			RoutingNetworkLink[] outLinks = new RoutingNetworkLink[node.getOutLinks().size()];
-			
+
 			int i = 0;
 			for (Link outLink : node.getOutLinks().values()) {
 				outLinks[i] = routingLinks.remove(outLink.getId());
 				i++;
 			}
-			
+
 			RoutingNetworkNode dijkstraNode = routingNetwork.getNodes().get(node.getId());
 			dijkstraNode.setOutLinksArray(outLinks);
 		}
-		
+
 		if (routingLinks.size() > 0) log.warn("Not all links have been use in the ArrayRoutingNetwork - check connectivity of input network!");
-		
+
 		return routingNetwork;
 	}
 

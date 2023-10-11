@@ -55,7 +55,7 @@
 		<!-- Default=1000;  -->
 		<param name="lastIteration" value="1000" />
 
-		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim 
+		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim
 		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
 		For 'qsim', add a module 'qsim' to the config. -->
 		<param name="mobsim" value="qsim" />
@@ -65,7 +65,7 @@
 		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
 		<param name="overwriteFiles" value="failIfDirectoryExists" />
 
-		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
+		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, AStarLandmarks or SpeedyALT -->
 		<param name="routingAlgorithmType" value="Dijkstra" />
 
 		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
@@ -234,7 +234,7 @@
 				<!-- method to compute score at typical duration.  Options: | uniform | relative | Use uniform for backwards compatibility (all activities same score; higher proba to drop long acts). -->
 				<param name="typicalDurationScoreComputation" value="uniform" />
 			</parameterset>
-			
+
 			<parameterset type="activityParams" >
 				<param name="activityType" value="w" />
 				<param name="closingTime" value="undefined" />
@@ -249,7 +249,7 @@
 				<!-- method to compute score at typical duration.  Options: | uniform | relative | Use uniform for backwards compatibility (all activities same score; higher proba to drop long acts). -->
 				<param name="typicalDurationScoreComputation" value="uniform" />
 			</parameterset>
-			
+
 			<parameterset type="activityParams" >
 				<param name="activityType" value="car interaction" />
 				<param name="closingTime" value="undefined" />

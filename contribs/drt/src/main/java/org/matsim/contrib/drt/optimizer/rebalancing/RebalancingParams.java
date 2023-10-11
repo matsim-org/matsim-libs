@@ -79,6 +79,9 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 		addDefinition(PlusOneRebalancingStrategyParams.SET_NAME, PlusOneRebalancingStrategyParams::new,
 				() -> (ConfigGroup)rebalancingStrategyParams,
 				params -> rebalancingStrategyParams = (RebalancingStrategyParams)params);
+		addDefinition(CustomRebalancingStrategyParams.SET_NAME, CustomRebalancingStrategyParams::new,
+			() -> (ConfigGroup)rebalancingStrategyParams,
+			params -> rebalancingStrategyParams = (RebalancingStrategyParams)params);
 	}
 
 	@Override

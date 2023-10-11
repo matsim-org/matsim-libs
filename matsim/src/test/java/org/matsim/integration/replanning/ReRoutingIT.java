@@ -56,19 +56,19 @@ public class ReRoutingIT {
 		config.qsim().setRemoveStuckVehicles(true);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controler().setLastIteration(1);
-		/* linear interpolate the into time bins aggregated travel time data to avoid artifacts at the boundaries of time bins: 
+		/* linear interpolate the into time bins aggregated travel time data to avoid artifacts at the boundaries of time bins:
 		 * e.g. a first time bin with aggregated travel time of 90 seconds and a second time bin with 45 seconds; time bin size 60;
-		 * i.e. consolidateData-method in TravelTimeCalculator will accept this difference; imagine an requested route starting 2 
+		 * i.e. consolidateData-method in TravelTimeCalculator will accept this difference; imagine an requested route starting 2
 		 * seconds before the end of the first time bin, another route starts 2 seconds after the start of the second time bin; then
-		 * the second one will arrive 41 seconds earlier than the first. Depending on the algorithm, some routers will detect this, 
-		 * some not (see MATSim-730), which is why we decided to test the linear interpolated travel time data here (which does not 
+		 * the second one will arrive 41 seconds earlier than the first. Depending on the algorithm, some routers will detect this,
+		 * some not (see MATSim-730), which is why we decided to test the linear interpolated travel time data here (which does not
 		 * contain this artifacts). theresa, sep'17
 		 * */
 		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
-		 * to store the persons in the population, we have to sort the population manually.  
+		 * to store the persons in the population, we have to sort the population manually.
 		 * cdobler, oct'11
 		 */
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -88,31 +88,9 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingFastDijkstra() throws MalformedURLException {
-		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
-		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.run();
-		this.evaluate();
-	}
-
-	@Test
 	public void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
-		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.run();
-		this.evaluate();
-	}
-
-	@Test
-	public void testReRoutingFastAStarLandmarks() throws MalformedURLException {
-		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
@@ -154,5 +132,5 @@ public class ReRoutingIT {
 		}
 		Assert.assertTrue("different plans files.", isEqual);
 	}
-	
+
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FastRouterDelegateFactory.java
+ * AbstractRoutingNetworkFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,13 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router;
+package org.matsim.core.router.util;
 
-import org.matsim.core.router.util.NodeDataFactory;
-import org.matsim.core.router.util.RoutingNetwork;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
-public interface FastRouterDelegateFactory {
+public abstract class AbstractRoutingNetworkFactory implements RoutingNetworkFactory {
 
-	public FastRouterDelegate createFastRouterDelegate(Dijkstra dijkstra,
-			NodeDataFactory nodeDataFactory, RoutingNetwork routingNetwork);
+	@Override
+	public Link createLink(final Id<Link> id, final Node fromNode, final Node toNode) {
+		throw new RuntimeException("Not supported operation!");
+	}
+
+	@Override
+	public RoutingNetworkNode createNode(final Id<Node> id, final Coord coord) {
+		throw new RuntimeException("Not supported operation!");
+	}
 }

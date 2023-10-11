@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.router;
+package org.matsim.contrib.eventsBasedPTRouter;
 
 import static org.junit.Assert.*;
 
@@ -36,6 +36,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.pt.router.CustomDataManager;
+import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
 /**

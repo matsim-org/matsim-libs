@@ -30,39 +30,39 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
- * Used by the MultiNodeDijkstra for backwards compatibility with default Dijkstra. 
- * 
+ * Used by the MultiNodeDijkstra for backwards compatibility with default Dijkstra.
+ *
  * @see org.matsim.core.router.Dijkstra
- * @see org.matsim.core.router.MultiNodeDijkstra
+ * @see MultiNodeDijkstra
  * @author cdobler
  */
 public class ImaginaryNode implements Node {
 
 	/*package*/ final Collection<? extends InitialNode> initialNodes;
 	/*package*/ final Coord coord;
-	
+
 	 ImaginaryNode(Collection<? extends InitialNode> initialNodes, Coord coord) {
 		this.initialNodes = initialNodes;
 		this.coord = coord;
 	}
-	
+
 	 ImaginaryNode(Collection<? extends InitialNode> initialNodes) {
 		this.initialNodes = initialNodes;
-		
+
 		double sumX = 0.0;
 		double sumY = 0.0;
-		
+
 		for (InitialNode initialNode : initialNodes) {
 			sumX += initialNode.node.getCoord().getX();
 			sumY += initialNode.node.getCoord().getY();
 		}
-		
+
 		sumX /= initialNodes.size();
 		sumY /= initialNodes.size();
 
 		this.coord = new Coord(sumX, sumY);
 	}
-	
+
 	@Override
 	public Coord getCoord() {
 		return this.coord;

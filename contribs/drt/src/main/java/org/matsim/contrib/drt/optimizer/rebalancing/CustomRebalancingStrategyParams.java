@@ -1,10 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RoutingNetworkNode.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,20 +16,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.contrib.drt.optimizer.rebalancing;
 
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.PreProcessDijkstra.DeadEndData;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
-public interface RoutingNetworkNode extends Node {
-	
-	public Node getNode();
+/**
+ * Custom rebalancing strategy parameters. User is responsible for installing rebalancing module and parameters.
+ */
+public final class CustomRebalancingStrategyParams extends ReflectiveConfigGroup
+		implements RebalancingParams.RebalancingStrategyParams {
+	public static final String SET_NAME = "CustomRebalancingStrategy";
 
-	public void setOutLinksArray(RoutingNetworkLink[] outLinks);
-	
-	public RoutingNetworkLink[] getOutLinksArray();
-
-	public void setDeadEndData(DeadEndData deadEndData);
-	
-	public DeadEndData getDeadEndData();
+	public CustomRebalancingStrategyParams() {
+		super(SET_NAME);
+	}
 }
