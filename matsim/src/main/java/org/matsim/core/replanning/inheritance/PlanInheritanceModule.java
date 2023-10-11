@@ -69,6 +69,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	public static final String PLAN_MUTATOR = "planMutator";
 	
 	public static final String INITIAL_PLAN = "initialPlan";
+	public static final String NONE = "NONE";
 	
 	public static final String FILENAME_PLAN_INHERITANCE_RECORDS = "planInheritanceRecords";
 	
@@ -94,7 +95,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		// reset all plan attributes that might be present from a previously performed matsim run
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				plan.setPlanId(Long.toString(0, 36));
+				plan.setPlanId(NONE);
 				plan.setPlanMutator(INITIAL_PLAN);
 				plan.setIterationCreated(0);
 			}
