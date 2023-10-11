@@ -2,6 +2,7 @@ package org.matsim.counts;
 
 import it.unimi.dsi.fastutil.ints.Int2DoubleAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleSortedMap;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -16,27 +17,32 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 
 	static final String ELEMENT_NAME = "measurements";
 
+	/**
+	 * String to denote that the mode includes all vehicles.
+	 */
+	public static final String ANY_MODE = "any_vehicle";
+
 	public static String VOLUMES = "volumes";
 	public static String VELOCITIES = "velocities";
 	public static String PASSENGERS = "passengers";
 
 	/**
-	 * Daily interval in minutes.
+	 * Daily interval in seconds.
 	 */
-	public static int DAILY = 1440;
+	public static int DAILY = 24 * 60 * 60;
 	/**
-	 * Hourly interval in minutes.
+	 * Hourly interval in seconds.
 	 */
-	public static int HOURLY = 60;
+	public static int HOURLY = 60 * 60;
 	/**
-	 * Quarter hourly interval in minutes.
+	 * Quarter hourly interval in seconds.
 	 */
-	public static int QUARTER_HOURLY = 15;
+	public static int QUARTER_HOURLY = 15 * 60;
 
 	private final String type;
 	private final String mode;
 
-	private final Int2DoubleMap values;
+	private final Int2DoubleSortedMap values;
 
 	/**
 	 * Measurement interval in minutes.
@@ -58,7 +64,7 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 	 * Adds a value observed at a certain hour.
 	 */
 	public void setAtHour(int hour, double value) {
-		setAtMinute(hour * 60, value);
+		setAtSecond(hour * HOURLY, value);
 	}
 
 	/**
@@ -66,24 +72,27 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 	 * the minute must be something like 15, 30, 45, 300 etc.
 	 */
 	public void setAtMinute(int minute, double value) {
-		if (minute <= 0)
+		setAtSecond(minute * 60, value);
+	}
+
+	public void setAtSecond(int seconds, double value) {
+		if (seconds <= 0)
 			throw new IllegalArgumentException("Time value starts at 1 and *not* zero.");
 
-		if (minute % this.interval != 0)
+		if (seconds % this.interval != 0)
 			throw new IllegalArgumentException("Time value doesn't match the interval!");
 
-
-		this.values.put(minute, value);
+		this.values.put(seconds, value);
 	}
 
 	/**
 	 * Returns the observed daily value.
 	 */
 	public OptionalDouble getDailyValue() {
-		if (interval == DAILY)
-			return getAtHour(24);
+		if (interval != DAILY)
+			throw new IllegalArgumentException("Does not contain daily values!");
 
-		throw new IllegalArgumentException("Does not contain daily values!");
+		return getAtHour(24);
 	}
 
 	public void setDailyValue(double value) {
@@ -96,9 +105,9 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 	/**
 	 * Return sum of values or daily value.
 	 */
-	public double getDailySum() {
+	public double aggregateDaily() {
 		if (interval != DAILY)
-			return getAtHour(24).orElse(0);
+			return values.get(24 * HOURLY);
 
 		return values.values().doubleStream().sum();
 	}
@@ -107,17 +116,45 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 	 * Returns the observed value at a certain hour.
 	 */
 	public OptionalDouble getAtHour(int hour) {
-		return getAtMinute(hour * 60);
+		return getAtSecond(hour * HOURLY);
+	}
+
+	/**
+	 * Whether the interval allows for an hourly aggregation.
+	 */
+	public boolean supportsHourlyAggregate() {
+		return interval > HOURLY || interval % HOURLY != 0;
+	}
+
+	/**
+	 * Returns the aggregate for an specific hour. If the resolution does not allow this aggregation an error is thrpwn.
+	 */
+	public OptionalDouble aggregateAtHour(int hour) {
+		if (!supportsHourlyAggregate())
+			throw new IllegalArgumentException("Can not aggregate hourly values.");
+
+		if (interval == HOURLY)
+			return getAtHour(hour);
+
+		Int2DoubleSortedMap values = this.values.subMap((hour - 1) * HOURLY + 1, hour * HOURLY + 1);
+		if (values.isEmpty())
+			return OptionalDouble.empty();
+
+		return OptionalDouble.of(values.values().doubleStream().sum());
+	}
+
+	public OptionalDouble getAtSecond(int second) {
+		if (values.containsKey(second))
+			return OptionalDouble.of(values.get(second));
+
+		return OptionalDouble.empty();
 	}
 
 	/**
 	 * Returns the observed value at a certain minute.
 	 */
 	public OptionalDouble getAtMinute(int minutes) {
-		if (values.containsKey(minutes))
-			return OptionalDouble.of(values.get(minutes));
-
-		return OptionalDouble.empty();
+		return getAtSecond(minutes * 60);
 	}
 
 	/**

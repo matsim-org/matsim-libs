@@ -100,6 +100,32 @@ public class CountsV2Test {
 
 	}
 
+
+	@Test
+	public void aggregate() {
+
+		Counts<Link> counts = new Counts<>();
+
+		MeasurementLocation<Link> station = counts.createAndAddMeasureLocation(Id.createLinkId(1), "test");
+		Measurable volumes = station.createVolume(TransportMode.car, Measurable.QUARTER_HOURLY);
+
+		volumes.setAtMinute(15, 100);
+		volumes.setAtMinute(30, 100);
+		volumes.setAtMinute(45, 100);
+		volumes.setAtMinute(60, 100);
+		volumes.setAtMinute(75, 100);
+
+		assertThat(volumes.aggregateAtHour(1).orElse(-1))
+			.isEqualTo(400);
+
+
+		assertThat(volumes.aggregateAtHour(2).orElse(-1))
+			.isEqualTo(100);
+
+		assertThat(volumes.aggregateAtHour(3).isEmpty())
+			.isTrue();
+	}
+
 	public void generateDummyCounts(Counts<Link> counts) {
 		Set<String> modes = Set.of(TransportMode.car, TransportMode.bike, TransportMode.drt);
 
