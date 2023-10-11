@@ -165,8 +165,8 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 				double nextPickupTime = followingActivity.getStartTime().seconds() + followingActivity.getMaximumDuration().seconds();
 				double maxParkingDuration = nextPickupTime - timer.getTimeOfDay();
 				Id<Link> nextLinkId = ((NearestParkingSpotSearchLogic) this.logic).getNextLink(currentLinkId, route.getEndLinkId(), vehicleId, mode,
-					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime, passangerInteractionAtEndOfLeg);
 					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime, passangerInteractionAtParkingFacilityAtEndOfLeg,
+					followingActivity.getCoord());
 				if (((NearestParkingSpotSearchLogic) this.logic).isNextParkingActivitySkipped() && parkingAtEndOfLeg) {
 					removeNextActivityAndFollowingLeg();
 					parkingAtEndOfLeg = false;
