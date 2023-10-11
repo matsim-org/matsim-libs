@@ -37,6 +37,7 @@ public class DrtRequest implements PassengerRequest {
 	private final double earliestStartTime;
 	private final double latestStartTime;
 	private final double latestArrivalTime;
+	private final double maxRideDuration;
 
 	private final Id<Person> passengerId;
 	private final String mode;
@@ -50,6 +51,7 @@ public class DrtRequest implements PassengerRequest {
 		earliestStartTime = builder.earliestStartTime;
 		latestStartTime = builder.latestStartTime;
 		latestArrivalTime = builder.latestArrivalTime;
+		maxRideDuration = builder.maxRideDuration;
 		passengerId = builder.passengerId;
 		mode = builder.mode;
 		fromLink = builder.fromLink;
@@ -67,6 +69,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.earliestStartTime = copy.getEarliestStartTime();
 		builder.latestStartTime = copy.getLatestStartTime();
 		builder.latestArrivalTime = copy.getLatestArrivalTime();
+		builder.maxRideDuration = copy.getMaxRideDuration();
 		builder.passengerId = copy.getPassengerId();
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
@@ -96,6 +99,10 @@ public class DrtRequest implements PassengerRequest {
 
 	public double getLatestArrivalTime() {
 		return latestArrivalTime;
+	}
+
+	public double getMaxRideDuration() {
+		return maxRideDuration;
 	}
 
 	@Override
@@ -139,6 +146,7 @@ public class DrtRequest implements PassengerRequest {
 		private double earliestStartTime;
 		private double latestStartTime;
 		private double latestArrivalTime;
+		private double maxRideDuration;
 		private Id<Person> passengerId;
 		private String mode;
 		private Link fromLink;
@@ -169,6 +177,11 @@ public class DrtRequest implements PassengerRequest {
 
 		public Builder latestArrivalTime(double val) {
 			latestArrivalTime = val;
+			return this;
+		}
+
+		public Builder maxRideDuration(double maxRideDuration) {
+			this.maxRideDuration = maxRideDuration;
 			return this;
 		}
 

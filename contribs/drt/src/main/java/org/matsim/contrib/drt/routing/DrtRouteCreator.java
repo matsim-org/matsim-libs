@@ -65,17 +65,24 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 				drtCfg.maxTravelTimeAlpha * unsharedRideTime + drtCfg.maxTravelTimeBeta);
 	}
 
+	static double getMaxRideDuration(DrtConfigGroup drtCfg, double unsharedRideTime) {
+		return Math.min(drtCfg.maxAbsoluteDetour,
+			drtCfg.maxDetourAlpha * unsharedRideTime + drtCfg.maxDetourBeta);
+	}
+
 	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
 			Attributes tripAttributes, RouteFactories routeFactories) {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
 				router, travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
 		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
+		double maxRideDuration = getMaxRideDuration(drtCfg, unsharedRideTime);
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
 		DrtRoute route = routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
 		route.setDistance(unsharedDistance);
 		route.setTravelTime(maxTravelTime);
+		route.setRideDuration(maxRideDuration);
 		route.setDirectRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.maxWaitTime);
 

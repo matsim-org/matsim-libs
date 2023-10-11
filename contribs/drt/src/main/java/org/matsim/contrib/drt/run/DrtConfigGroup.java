@@ -113,6 +113,20 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public double maxAbsoluteDetour = Double.POSITIVE_INFINITY;// [s]
 
 	@Parameter
+	@Comment(
+		"Defines the maximum allowed absolute detour based on the unsharedRideTime. A linear combination similar to travel time constrain is used"
+					+ "This is the ratio part")
+	@DecimalMin("1.0")
+	public double maxDetourAlpha = Double.POSITIVE_INFINITY;// [s]
+
+	@Parameter
+	@Comment(
+		"Defines the maximum allowed absolute detour based on the unsharedRideTime. A linear combination similar to travel time constrain is used"
+					+ "This is the constant part")
+	@PositiveOrZero
+	public double maxDetourBeta = Double.POSITIVE_INFINITY;// [s]
+
+	@Parameter
 	@Comment("If true, the max travel and wait times of a submitted request"
 			+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
 			+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"

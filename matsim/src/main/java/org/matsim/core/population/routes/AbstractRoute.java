@@ -43,6 +43,8 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	protected double travTime = UNDEFINED_TIME;
 
+	private double rideDuration = UNDEFINED_TIME;
+
 	private Id<Link> startLinkId = null;
 	private Id<Link> endLinkId = null;
 
@@ -70,10 +72,19 @@ public abstract class AbstractRoute implements Route, Cloneable {
 		return asOptionalTime(this.travTime);
 	}
 
+	public final OptionalTime getRideDuration() {
+		return asOptionalTime(this.rideDuration);
+	}
+
 	@Override
 	public final void setTravelTime(final double travTime) {
 		OptionalTime.assertDefined(travTime);
 		this.travTime = travTime;
+	}
+
+	public final void setRideDuration(final double rideDuration) {
+		OptionalTime.assertDefined(rideDuration);
+		this.rideDuration = rideDuration;
 	}
 
 	@Override
@@ -102,7 +113,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	public final Id<Link> getEndLinkId() {
 		return this.endLinkId;
 	}
-	
+
 	public final void setLocked() {
 		locked = true ;
 	}
@@ -116,9 +127,9 @@ public abstract class AbstractRoute implements Route, Cloneable {
 		// * primitive types can be changed on the copy without affecting the original
 		// * the references to objects can be changed on the copy without affecting the original.  For example, a copy can
 		//    point to other links or nodes or persons or IDs.
-		// * One has to be careful with objects where the contents can be changed AND they are not shared between the 
+		// * One has to be careful with objects where the contents can be changed AND they are not shared between the
 		//    original and the copy.  For example, changing the income of the person is not a problem since it is the same
-		//    for two plans pointing to the same person.  In contrast (and potentially quite dangerous): the contents of 
+		//    for two plans pointing to the same person.  In contrast (and potentially quite dangerous): the contents of
 		//    Customizable (currently not applicable for Route) would have to be explicitly deepcopied.
 		// The method can only be called if a class implements "Cloneable"; otherwise, it leads to a runtime exception (!).
 		// It is, however, sufficient to have clone available as protected.
@@ -130,7 +141,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 			throw new AssertionError(e);
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		String str = "";
@@ -140,7 +151,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 		str += " dist=" + dist ;
 		return str ;
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void testForLocked() {
 		if ( locked ) {

@@ -40,21 +40,24 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 
 	public static final String ATTRIBUTE_LATEST_PICKUP_TIME = "latestPickupTime";
 	public static final String ATTRIBUTE_LATEST_DROPOFF_TIME = "latestDropoffTime";
+	public static final String ATTRIBUTE_MAX_RIDE_DURATION = "maxRideDuration";
 
 	private final double unsharedRideTime;
 	private final double unsharedRideDistance;
 
 	private final double latestPickupTime;
 	private final double latestDropoffTime;
+	private final double maxRideDuration;
 
 	public DrtRequestSubmittedEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
-			Id<Link> fromLinkId, Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance,
-			double latestPickupTime, double latestDropoffTime) {
+									Id<Link> fromLinkId, Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance,
+									double latestPickupTime, double latestDropoffTime, double maxRideDuration) {
 		super(time, mode, requestId, personId, fromLinkId, toLinkId);
 		this.unsharedRideTime = unsharedRideTime;
 		this.unsharedRideDistance = unsharedRideDistance;
 		this.latestPickupTime = latestPickupTime;
 		this.latestDropoffTime = latestDropoffTime;
+		this.maxRideDuration = maxRideDuration;
 	}
 
 	@Override
@@ -84,6 +87,10 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		return latestDropoffTime;
 	}
 
+	public double getMaxRideDuration() {
+		return maxRideDuration;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
@@ -91,6 +98,7 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		attr.put(ATTRIBUTE_UNSHARED_RIDE_DISTANCE, unsharedRideDistance + "");
 		attr.put(ATTRIBUTE_LATEST_PICKUP_TIME, latestPickupTime + "");
 		attr.put(ATTRIBUTE_LATEST_DROPOFF_TIME, latestDropoffTime + "");
+		attr.put(ATTRIBUTE_MAX_RIDE_DURATION, maxRideDuration + "");
 		return attr;
 	}
 
@@ -106,7 +114,8 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		double unsharedRideDistance = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_DISTANCE));
 		double latestPickupTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_PICKUP_TIME, "NaN"));
 		double latestDropoffTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_DROPOFF_TIME, "NaN"));
+		double maxRideDuration = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_MAX_RIDE_DURATION, "NaN"));
 		return new DrtRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId, unsharedRideTime,
-				unsharedRideDistance, latestPickupTime, latestDropoffTime);
+				unsharedRideDistance, latestPickupTime, latestDropoffTime, maxRideDuration);
 	}
 }
