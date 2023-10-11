@@ -27,9 +27,9 @@
 	<module name="qsim">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
-	
+
 		<param name = "snapshotperiod"	value = "00:00:00"/>
-		
+
 		<param name = "flowCapacityFactor" value="0.02" /> <!-- we simulate only 1% of the population, and reduce the network capacity to 2% -->
 		<param name = "storageCapacityFactor" value="0.05" />
 	</module>
@@ -50,6 +50,15 @@
 			</parameterset>
 			<parameterset type="modeParams">
 				<param name="mode" value="pt"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-3.0" />
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="walk"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-1.0" />
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="ride"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-5.0" />
 			</parameterset>
 
 			<parameterset type="activityParams">
@@ -75,7 +84,7 @@
 			</parameterset>
 		</parameterset>
 	</module>
-	
+
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
