@@ -70,6 +70,9 @@ class ConfigReaderMatsimV2 extends MatsimXmlParser {
 		this.addAlias("planscalcroute", "routing");
 		this.addAlias("strategy", "replanning");
 		this.addAlias("parallelEventHandling", "eventsManager");
+
+		this.addAlias("BrainExpBeta", "brainExpBeta", "scoring");
+		this.addAlias("PathSizeLogitBeta", "pathSizeLogitBeta", "scoring");
 	}
 
 	public void addAlias(String oldName, String newName, String... path) {

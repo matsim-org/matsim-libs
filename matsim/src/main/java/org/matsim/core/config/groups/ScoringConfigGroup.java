@@ -63,8 +63,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	public static final String GROUP_NAME = "scoring";
 
 	private static final String LEARNING_RATE = "learningRate";
-	private static final String BRAIN_EXP_BETA = "BrainExpBeta";
-	private static final String PATH_SIZE_LOGIT_BETA = "PathSizeLogitBeta";
+	private static final String BRAIN_EXP_BETA = "brainExpBeta";
+	private static final String PATH_SIZE_LOGIT_BETA = "pathSizeLogitBeta";
 	private static final String LATE_ARRIVAL = "lateArrival";
 	private static final String EARLY_DEPARTURE = "earlyDeparture";
 	private static final String PERFORMING = "performing";
