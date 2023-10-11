@@ -35,7 +35,19 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public final class TransitScheduleUtils {
 
+	public final static String ACCESSTIME_ATTRIBUTE = "accessTime";
+	public final static String EGRESSTIME_ATTRIBUTE = "egressTime";
 	private TransitScheduleUtils() {
+	}
+
+	public static double getStopAccessTime(TransitStopFacility stopFacility){
+		Object accessTime = stopFacility.getAttributes().getAttribute(ACCESSTIME_ATTRIBUTE);
+		return accessTime!=null?(double) accessTime:0.0;
+	}
+
+	public static double getStopEgressTime(TransitStopFacility stopFacility){
+		Object egressTime = stopFacility.getAttributes().getAttribute(EGRESSTIME_ATTRIBUTE);
+		return egressTime!=null?(double) egressTime:0.0;
 	}
 
 	public static QuadTree<TransitStopFacility> createQuadTreeOfTransitStopFacilities(TransitSchedule transitSchedule) {
