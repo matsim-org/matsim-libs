@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RoutingNetworkLink.java
+ * RoutingNetwork.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,25 +20,24 @@
 
 package org.matsim.core.router.util;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.RoutingNetworkNode;
 
-public interface RoutingNetworkLink extends Link {
-	// yy In most of matsim we have the convention that the wrapped object is provided, but the methods are not delegated.  I.e.
-	//    routingNetworkLink.getLink().getFreeSpeed() ;
-	// but NOT
-	//    routingNetworkLink.getFreeSpeed() ;
-	// The current approach seems to be doing both.  Why did it add the second way of doing things?  
-	// (I can imagine that this came from retrofitting, but a design choice explanation would still be helpful.)  kai, may'17
+/**
+ * A network that is used by FastDijkstra, FastAStarEuclidean and FastAStarLandmarks.
+ * Instead of storing the node data in a map, the data is attached directly to the nodes
+ * which is faster but also consumes more memory.
+ *
+ * @author cdobler
+ */
+public interface RoutingNetwork extends Network {
 
-	public Link getLink();
-	
+	public void initialize();
+
 	@Override
-	public Id<Link> getId();
-	
-	@Override
-	public RoutingNetworkNode getFromNode();
-	
-	@Override
-	public RoutingNetworkNode getToNode();
+	public Map<Id<Node>, RoutingNetworkNode> getNodes();
 }

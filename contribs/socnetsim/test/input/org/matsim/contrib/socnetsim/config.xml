@@ -36,7 +36,7 @@
 		<param name="mobsim" value="qsim" />
 		<param name="outputDirectory" value="./output/&outputName;" />
 
-		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
+		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, AStarLandmarks or SpeedyALT -->
 		<param name="routingAlgorithmType" value="Dijkstra" />
 
 		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
