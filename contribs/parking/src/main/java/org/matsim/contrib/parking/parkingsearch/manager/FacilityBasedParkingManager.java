@@ -37,7 +37,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * @author jbischoff, schlenther
+ * @author jbischoff, schlenther, Ricardo Ewert
  */
 public class FacilityBasedParkingManager implements ParkingSearchManager {
 
