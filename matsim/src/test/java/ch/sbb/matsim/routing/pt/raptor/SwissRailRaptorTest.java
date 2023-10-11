@@ -52,6 +52,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.TransitPassengerRoute;
+import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -167,6 +168,28 @@ public class SwissRailRaptorTest {
         double expectedEgressWalkTime = CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
 		assertEquals(Math.ceil(expectedEgressWalkTime), ((Leg)legs.get(2)).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
     }
+
+
+	@Test
+	public void testStationAccessEgressTimes() {
+		Fixture f = new Fixture();
+		f.init();
+		RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+		f.schedule.getFacilities().values().forEach(facility-> TransitScheduleUtils.setSymmetricStopAccessEgressTime(facility,120.0));
+		TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
+		Coord fromCoord = new Coord(3800, 5100);
+		Coord toCoord = new Coord(16100, 5050);
+		List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null));
+		assertEquals(3, legs.size());
+		assertEquals(TransportMode.walk, ((Leg)legs.get(0)).getMode());
+		assertEquals(TransportMode.pt, ((Leg)legs.get(1)).getMode());
+		assertEquals(TransportMode.walk, ((Leg)legs.get(2)).getMode());
+
+		double expectedAccessWalkTime = 120.0 + CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("0", TransitStopFacility.class)).getCoord(), fromCoord) / raptorParams.getBeelineWalkSpeed();
+		assertEquals(Math.ceil(expectedAccessWalkTime), ((Leg)legs.get(0)).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
+		double expectedEgressWalkTime = 120.0 + CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
+		assertEquals(Math.ceil(expectedEgressWalkTime), ((Leg)legs.get(2)).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
+	}
 
     @Test
     public void testWalkDurations_range() {
