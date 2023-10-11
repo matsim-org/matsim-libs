@@ -36,9 +36,9 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -119,16 +119,16 @@ public class PtAlongALine2Test {
 		if (drtMode == DrtMode.teleportBeeline) {// (configure teleportation router)
 			config.plansCalcRoute()
 					.addModeRoutingParams(
-							new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode(TransportMode.drt ).setTeleportedModeSpeed(100. / 3.6 ) );
+							new RoutingConfigGroup.TeleportedModeParams().setMode(TransportMode.drt ).setTeleportedModeSpeed(100. / 3.6 ) );
 			if (drt2) {
 				config.plansCalcRoute()
 						.addModeRoutingParams(
-								new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode("drt2" ).setTeleportedModeSpeed(100. / 3.6 ) );
+								new RoutingConfigGroup.TeleportedModeParams().setMode("drt2" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
 			if (drt3) {
 				config.plansCalcRoute()
 						.addModeRoutingParams(
-								new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode("drt3" ).setTeleportedModeSpeed(100. / 3.6 ) );
+								new RoutingConfigGroup.TeleportedModeParams().setMode("drt3" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if (drtMode == DrtMode.teleportBasedOnNetworkRoute) {// (route as network route)
@@ -144,11 +144,11 @@ public class PtAlongALine2Test {
 		}
 
 		config.plansCalcRoute()
-				.addModeRoutingParams(new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode("walk" ).setTeleportedModeSpeed(5. / 3.6 ) );
+				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// set up walk2 so we don't need walk in raptor:
 		config.plansCalcRoute()
-				.addModeRoutingParams(new PlansCalcRouteConfigGroup.TeleportedModeParams().setMode("walk2" ).setTeleportedModeSpeed(5. / 3.6 ) );
+				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk2" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// === RAPTOR: ===
 		{
@@ -597,7 +597,7 @@ public class PtAlongALine2Test {
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
@@ -605,10 +605,10 @@ public class PtAlongALine2Test {
 		config.plansCalcRoute().setNetworkModes(new HashSet<>(Arrays.asList(TransportMode.drt, "drt2")));
 
 		// set up walk2 so we don't use faulty walk in raptor:
-		config.plansCalcRoute().addModeRoutingParams(new PlansCalcRouteConfigGroup.TeleportedModeParams("walk2").setTeleportedModeSpeed(5. / 3.6 ) );
+		config.plansCalcRoute().addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams("walk2").setTeleportedModeSpeed(5. / 3.6 ) );
 
 		config.plansCalcRoute()
-				.addModeRoutingParams(new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(0. ) );
+				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(0. ) );
 		// (when specifying "walk2", all default routing params are cleared.  However, swiss rail raptor needs "walk" to function. kai, feb'20)
 
 		// === RAPTOR: ===

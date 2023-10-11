@@ -36,7 +36,7 @@ import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -235,7 +235,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		config.controler().setOutputDirectory(outputLocation.toString());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
-				config.controler().getOverwriteFileSetting(), ControlerConfigGroup.CompressionType.gzip);
+				config.controler().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setLastIteration(lastMATSimIteration);
 		config.global().setRandomSeed(4177);

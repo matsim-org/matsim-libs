@@ -21,7 +21,7 @@
 
  package org.matsim.core.config.groups;
 
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
+import static org.matsim.core.config.groups.ScoringConfigGroup.createStageActivityType;
 
 import java.util.Map;
 import java.util.Random;
@@ -37,19 +37,19 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class PlanCalcScoreConfigGroupTest {
+public class ScoringConfigGroupTest {
 	private static final Logger log =
-		LogManager.getLogger(PlanCalcScoreConfigGroupTest.class);
+		LogManager.getLogger(ScoringConfigGroupTest.class);
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private void testResultsBeforeCheckConsistency( Config config, boolean fullyHierarchical ) {
-		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		ScoringConfigGroup scoringConfig = config.planCalcScore() ;
 
 		if ( ! fullyHierarchical ){
 			// mode params are there for default modes:
@@ -70,7 +70,7 @@ public class PlanCalcScoreConfigGroupTest {
 //		}
 	}
 	private void testResultsAfterCheckConsistency( Config config ) {
-		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		ScoringConfigGroup scoringConfig = config.planCalcScore() ;
 
 		// default stage/interaction params for modes routed on the network are now there:
 		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
@@ -81,7 +81,7 @@ public class PlanCalcScoreConfigGroupTest {
 	@Test
 	public void testFullyHierarchicalVersion() {
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_w_scoringparams.xml" ) ;
-		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		ScoringConfigGroup scoringConfig = config.planCalcScore() ;
 		testResultsBeforeCheckConsistency( config, true ) ;
 		log.warn( "" );
 		for( ModeParams modeParams : scoringConfig.getModes().values() ){
@@ -93,7 +93,7 @@ public class PlanCalcScoreConfigGroupTest {
 		}
 		log.warn( "" );
 		log.warn( "checking consistency ..." );
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );
@@ -109,7 +109,7 @@ public class PlanCalcScoreConfigGroupTest {
 	@Test
 	public void testVersionWoScoringparams() {
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_wo_scoringparams.xml" ) ;
-		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		ScoringConfigGroup scoringConfig = config.planCalcScore() ;
 		testResultsBeforeCheckConsistency( config, false ) ;
 		log.warn( "" );
 		for( ModeParams modeParams : scoringConfig.getModes().values() ){
@@ -121,7 +121,7 @@ public class PlanCalcScoreConfigGroupTest {
 		}
 		log.warn( "" );
 		log.warn( "checking consistency ..." );
-		config.plansCalcRoute().setAccessEgressType( PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType( RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );
@@ -137,7 +137,7 @@ public class PlanCalcScoreConfigGroupTest {
 
 	@Test
 	public void testAddActivityParams() {
-		PlanCalcScoreConfigGroup c = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup c = new ScoringConfigGroup();
         int originalSize = c.getActivityParams().size();
 		Assert.assertNull(c.getActivityParams("type1"));
         Assert.assertEquals(originalSize, c.getActivityParams().size());
@@ -150,7 +150,7 @@ public class PlanCalcScoreConfigGroupTest {
 
 	@Test
 	public void testIODifferentVersions() {
-		final PlanCalcScoreConfigGroup initialGroup = createTestConfigGroup();
+		final ScoringConfigGroup initialGroup = createTestConfigGroup();
 
 		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
 		final Config configV1 = new Config();
@@ -175,8 +175,8 @@ public class PlanCalcScoreConfigGroupTest {
 
 	private void assertIdentical(
 			final String msg,
-			final PlanCalcScoreConfigGroup initialGroup,
-			final PlanCalcScoreConfigGroup inputConfigGroup) {
+			final ScoringConfigGroup initialGroup,
+			final ScoringConfigGroup inputConfigGroup) {
 		Assert.assertEquals(
 				"wrong brainExpBeta "+msg,
 				initialGroup.getBrainExpBeta(),
@@ -359,7 +359,7 @@ public class PlanCalcScoreConfigGroupTest {
 
 	}
 
-	private static ConfigGroup toUnderscoredModule(final PlanCalcScoreConfigGroup initialGroup) {
+	private static ConfigGroup toUnderscoredModule(final ScoringConfigGroup initialGroup) {
 		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
 		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
@@ -401,8 +401,8 @@ public class PlanCalcScoreConfigGroupTest {
 		return module;
 	}
 
-	private PlanCalcScoreConfigGroup createTestConfigGroup() {
-		final PlanCalcScoreConfigGroup group = new PlanCalcScoreConfigGroup();
+	private ScoringConfigGroup createTestConfigGroup() {
+		final ScoringConfigGroup group = new ScoringConfigGroup();
 
 		group.setBrainExpBeta( 124);
 		group.getModes().get(TransportMode.bike).setConstant((double) 98);

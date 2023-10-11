@@ -26,13 +26,12 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.*;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.CheckingOfMarginalUtilityOfTravellng;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -402,7 +401,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added feb'16
-		if ( config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none ) ) {
+		if ( config.plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none ) ) {
 			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or " +
 						      "some other value or talk to Kai." ) ;
 		}
@@ -418,7 +417,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added apr'21:
-		for( Map.Entry<String, PlanCalcScoreConfigGroup.ScoringParameterSet> entry : config.planCalcScore().getScoringParametersPerSubpopulation().entrySet() ){
+		for( Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : config.planCalcScore().getScoringParametersPerSubpopulation().entrySet() ){
 			for( ActivityParams activityParam : entry.getValue().getActivityParams() ){
 				if( activityParam.getMinimalDuration().isDefined() ){
 					log.log( lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey() );

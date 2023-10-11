@@ -2,7 +2,7 @@ package org.matsim.core.config;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +30,7 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("theController", ControlerConfigGroup.GROUP_NAME);
+		r2.addAlias("theController", ControllerConfigGroup.GROUP_NAME);
 		r2.readStream(bais);
 
 		Assert.assertEquals(27, config.controler().getLastIteration());
@@ -74,7 +74,7 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("theController", ControlerConfigGroup.GROUP_NAME);
+		r2.addAlias("theController", ControllerConfigGroup.GROUP_NAME);
 		r2.addAlias("theLastIteration", "lastIteration");
 		r2.readStream(bais);
 

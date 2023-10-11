@@ -31,7 +31,7 @@ import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -50,10 +50,10 @@ public class CarrierModuleTest {
     @Before
     public void setUp(){
         Config config = ConfigUtils.createConfig() ;
-        PlanCalcScoreConfigGroup.ActivityParams workParams = new PlanCalcScoreConfigGroup.ActivityParams("w");
+        ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("w");
         workParams.setTypicalDuration(60 * 60 * 8);
         config.planCalcScore().addActivityParams(workParams);
-        PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams("h");
+        ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("h");
         homeParams.setTypicalDuration(16 * 60 * 60);
         config.planCalcScore().addActivityParams(homeParams);
         config.global().setCoordinateSystem("EPSG:32632");

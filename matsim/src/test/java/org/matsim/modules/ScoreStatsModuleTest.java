@@ -37,7 +37,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;

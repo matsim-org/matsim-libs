@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -93,7 +93,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 				if (av.getAnnealParameter().equals(AnnealParameterOption.globalInnovationRate)) {
 					header.addAll(this.config.strategy().getStrategySettings().stream()
 							.filter(s -> Objects.equals(av.getDefaultSubpopulation(), s.getSubpopulation()))
-							.map(StrategyConfigGroup.StrategySettings::getStrategyName)
+							.map(ReplanningConfigGroup.StrategySettings::getStrategyName)
 							.collect(Collectors.toList()));
 				}
 			} else { // if disabled, better remove it
@@ -195,7 +195,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 				List<Double> annealValues = annealReplanning(annealValue,
 						event.getServices().getStrategyManager(), av.getDefaultSubpopulation());
 				int i = 0;
-				for (StrategyConfigGroup.StrategySettings ss : this.config.strategy().getStrategySettings()) {
+				for (ReplanningConfigGroup.StrategySettings ss : this.config.strategy().getStrategySettings()) {
 					if (Objects.equals(ss.getSubpopulation(), av.getDefaultSubpopulation())) {
 						annealStats.put(ss.getStrategyName(), String.format(Locale.US, "%.4f", annealValues.get(i)));
 						i++;
@@ -262,9 +262,9 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 		if (this.currentIter == this.innovationStop + 1 && stratType.equals(StratType.allInnovation)) {
 			return 0.0;
 		}
-		Collection<StrategyConfigGroup.StrategySettings> strategies = config.strategy().getStrategySettings();
+		Collection<ReplanningConfigGroup.StrategySettings> strategies = config.strategy().getStrategySettings();
 		double totalWeights = 0.0;
-		for (StrategyConfigGroup.StrategySettings strategy : strategies) {
+		for (ReplanningConfigGroup.StrategySettings strategy : strategies) {
 			if (Objects.equals(strategy.getSubpopulation(), subpopulation)) {
 				switch (stratType) {
 					case allSelectors:
@@ -294,7 +294,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 
 		int innoStop = -1;
 
-		for (StrategyConfigGroup.StrategySettings strategy : config.strategy().getStrategySettings()) {
+		for (ReplanningConfigGroup.StrategySettings strategy : config.strategy().getStrategySettings()) {
 			// check if this modules should be disabled after some iterations
 			int maxIter = strategy.getDisableAfter();
 			if ((maxIter > globalInnovationDisableAfter || maxIter == -1) && isInnovationStrategy(strategy.getStrategyName())) {
@@ -362,8 +362,8 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 			stratMan.changeWeightOfStrategy(strategy, subpopulation, weight);
 		}
 		// adapt also in config for the record
-		Collection<StrategyConfigGroup.StrategySettings> strategiesConfig = config.strategy().getStrategySettings();
-		for (StrategyConfigGroup.StrategySettings strategy : strategiesConfig) {
+		Collection<ReplanningConfigGroup.StrategySettings> strategiesConfig = config.strategy().getStrategySettings();
+		for (ReplanningConfigGroup.StrategySettings strategy : strategiesConfig) {
 			if (Objects.equals(strategy.getSubpopulation(), subpopulation)) {
 				double weight = strategy.getWeight();
 				if (isInnovationStrategy(strategy.toString())) {

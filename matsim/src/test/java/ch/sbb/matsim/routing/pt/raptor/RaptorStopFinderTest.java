@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingRequest;
@@ -56,10 +56,10 @@ public class RaptorStopFinderTest {
      *
      * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
      * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
-     * where StopFilterAttributes are used. 
+     * where StopFilterAttributes are used.
      */
-    
-    
+
+
     @Test
     public void testDefaultStopFinder_EmptyInitialSearchRadius() {
         /* General Radius includes no stops. Search_Extension_Radius is 0
@@ -88,9 +88,9 @@ public class RaptorStopFinderTest {
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
 
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+
         }
-        
+
         /* General Radius includes stop B. Search_Extension_Radius is 0.
         Expected: Stop Finder will only find stop B. Lines C, D, and E are set to very fast, so as to check that only
         stop B is included.
@@ -215,9 +215,9 @@ public class RaptorStopFinderTest {
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
-            
+
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+
         }
 
         /* General Radius includes stop B. Search_Extension_Radius is 0.
@@ -405,9 +405,9 @@ public class RaptorStopFinderTest {
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
 
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+
         }
-        
+
         /* General Radius includes stop B. Search_Extension_Radius is 0.
         Expected: Stop Finder will only find stop B. Lines C, D, and E are set to very fast, so as to check that only
         stop B is included.
@@ -535,7 +535,7 @@ public class RaptorStopFinderTest {
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
 
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+
         }
 
         /* General Radius includes stop B. Search_Extension_Radius is 0.
@@ -709,7 +709,7 @@ public class RaptorStopFinderTest {
      *
      * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
      * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
-     * where StopFilterAttributes are used. 
+     * where StopFilterAttributes are used.
      */
     @Test
     public void testDefaultStopFinder_HalfFullInitialSearchRadius() {
@@ -1213,7 +1213,7 @@ public class RaptorStopFinderTest {
      *
      * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
      * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
-     * where StopFilterAttributes are used. 
+     * where StopFilterAttributes are used.
      */
     @Test
     public void testDefaultStopFinder_FullInitialSearchRadius() {
@@ -1666,7 +1666,7 @@ public class RaptorStopFinderTest {
             routingModules.put("zoomer",
                     new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
 
-            PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("zoomer");
+            ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
             f0.scenario.getConfig().planCalcScore().addModeParams(modeParams);
 
@@ -1732,7 +1732,7 @@ public class RaptorStopFinderTest {
             routingModules.put("zoomer",
                     new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
 
-            PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("zoomer");
+            ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
             f0.scenario.getConfig().planCalcScore().addModeParams(modeParams);
 

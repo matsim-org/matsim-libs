@@ -35,7 +35,7 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -130,7 +130,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_SmallV1,
 				MatsimTestUtils.EPSILON);
-		
+
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV1.getSelectedPlan().getScheduledTours().iterator().next().getTour()
 				.getTourElements();
@@ -185,8 +185,8 @@ public class DistanceConstraintFromVehiclesFileTest {
 		CarrierUtils.setJspritIterations(carrierV2, 10);
 
 		FreightUtils.runJsprit(scenario);
-		
-		
+
+
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
 
@@ -359,7 +359,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_SmallV4,
 				MatsimTestUtils.EPSILON);
-		
+
 		for (ScheduledTour scheduledTour : carrierV4.getSelectedPlan().getScheduledTours()) {
 
 			String thisTypeId = scheduledTour.getVehicle().getType().getId().toString();

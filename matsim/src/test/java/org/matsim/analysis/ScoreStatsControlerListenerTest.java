@@ -20,8 +20,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -474,13 +474,13 @@ public class ScoreStatsControlerListenerTest {
 
 
 	private void performTest(String outputDirectory, Population population) throws IOException {
-		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
-		controlerConfigGroup.setCreateGraphs(true);
-		controlerConfigGroup.setFirstIteration(0);
-		controlerConfigGroup.setLastIteration(10);
-		ScoreStatsControlerListener scoreStatsControlerListener = new ScoreStatsControlerListener(controlerConfigGroup, population, controlerIO, null, null);
+		controllerConfigGroup.setCreateGraphs(true);
+		controllerConfigGroup.setFirstIteration(0);
+		controllerConfigGroup.setLastIteration(10);
+		ScoreStatsControlerListener scoreStatsControlerListener = new ScoreStatsControlerListener(controllerConfigGroup, population, controlerIO, null, null);
 
 		String outDir = utils.getOutputDirectory() + "/ScoreStatsControlerListener";
 

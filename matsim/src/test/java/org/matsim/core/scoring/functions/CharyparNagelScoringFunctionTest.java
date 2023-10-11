@@ -46,9 +46,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -77,16 +77,16 @@ import org.matsim.vehicles.Vehicle;
 public class CharyparNagelScoringFunctionTest {
 
 	private static final double EPSILON =1e-9;
-	
+
 	@Parameter
 	public TypicalDurationScoreComputation typicalDurationComputation;
-	
+
 	 @Parameterized.Parameters
 	 public static Object[] testParameters() {
 	      return new Object[] {TypicalDurationScoreComputation.relative,TypicalDurationScoreComputation.uniform};
 	  }
-	 
-	 
+
+
 	private ScoringFunction getScoringFunctionInstance(final Fixture f, final Person person) {
 		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory =
 				new CharyparNagelScoringFunctionFactory( f.scenario );
@@ -102,9 +102,9 @@ public class CharyparNagelScoringFunctionTest {
 			if (planElement instanceof Activity) {
 				testee.handleActivity((Activity) planElement);
 			} else if (planElement instanceof Leg) {
-				testee.handleLeg((Leg) planElement);	
+				testee.handleLeg((Leg) planElement);
 			}
-		}		
+		}
 		testee.finish();
 		return testee.getScore();
 	}
@@ -119,7 +119,7 @@ public class CharyparNagelScoringFunctionTest {
 	 */
 	private double getZeroUtilDuration_hrs(final double typicalDuration_hrs, final double priority) {
 		// yy could/should use static function from CharyparNagelScoringUtils. kai, nov'13
-		
+
 		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
 			return typicalDuration_hrs * Math.exp(-10.0 / typicalDuration_hrs / priority);
 		} else {
@@ -138,18 +138,18 @@ public class CharyparNagelScoringFunctionTest {
 
 		ZeroUtilityComputation computation;
 		if(this.typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
-			computation = new ActivityUtilityParameters.SameAbsoluteScore();	
+			computation = new ActivityUtilityParameters.SameAbsoluteScore();
 		} else {
 			computation = new ActivityUtilityParameters.SameRelativeScore();
 		}
-		
-		
+
+
 		{
 			ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder();
 			factory.setType("w");
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(8.0 * 3600);
-			factory.setZeroUtilityComputation(computation);	
+			factory.setZeroUtilityComputation(computation);
 			ActivityUtilityParameters params = factory.build();
 			assertEquals(zeroUtilDurW, params.getZeroUtilityDuration_h(), EPSILON);
 
@@ -242,13 +242,13 @@ public class CharyparNagelScoringFunctionTest {
 		double zeroUtilDurH = getZeroUtilDuration_hrs(15.0, 1.0);
 
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
-		
+
 		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
 			for(ActivityParams p : f.config.planCalcScore().getActivityParams()){
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
-		}	
-		
+		}
+
 		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
 				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
 				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
@@ -306,13 +306,13 @@ public class CharyparNagelScoringFunctionTest {
 		Fixture f = new Fixture();
 		double perf_hrs = +6.0;
 		f.config.planCalcScore().setPerforming_utils_hr(perf_hrs);
-		
+
 		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
 			for(ActivityParams p : f.config.planCalcScore().getActivityParams()){
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
-		}	
-		
+		}
+
 		double initialScore = calcScore(f);
 
 		// test1: agents has to wait before and after
@@ -515,18 +515,18 @@ public class CharyparNagelScoringFunctionTest {
 		// change the last act to something different than the first act
 		((Activity) f.plan.getPlanElements().get(8)).setType("h2");
 
-		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h2");
+		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8*3600);
-		
+
 		f.config.planCalcScore().addActivityParams(params);
 		f.config.planCalcScore().getActivityParams("h").setTypicalDuration(6.0 * 3600);
-		
+
 		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
 			for(ActivityParams p : f.config.planCalcScore().getActivityParams()){
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
-		}	
-		
+		}
+
 		double perf = +6.0;
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
 		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
@@ -565,8 +565,8 @@ public class CharyparNagelScoringFunctionTest {
 			for(ActivityParams p : f.config.planCalcScore().getActivityParams()){
 				p.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
 			}
-		}	
-		
+		}
+
 		ScoringFunction testee = getScoringFunctionInstance(f, f.person);
 		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
 		testee.handleLeg((Leg) f.plan.getPlanElements().get(1));
@@ -575,7 +575,7 @@ public class CharyparNagelScoringFunctionTest {
 
 		assertEquals(
 				perf * 3.0 * Math.log(2.5 / zeroUtilDurW) +
-				perf * 7.0 * Math.log(7.0 / zeroUtilDurH), 
+				perf * 7.0 * Math.log(7.0 / zeroUtilDurH),
 				testee.getScore(), EPSILON);
 	}
 
@@ -717,7 +717,7 @@ public class CharyparNagelScoringFunctionTest {
 			// home 15:15 to ...
 
 			this.config = ConfigUtils.createConfig();
-			PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
+			ScoringConfigGroup scoring = this.config.planCalcScore();
 			scoring.setBrainExpBeta(2.0);
 
 			scoring.getModes().get(TransportMode.car).setConstant(0.0);
@@ -740,12 +740,12 @@ public class CharyparNagelScoringFunctionTest {
 
 
 			// setup activity types h and w for scoring
-			PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h");
+			ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("h");
 			params.setTypicalDuration(15*3600);
 			scoring.addActivityParams(params);
 
 
-			params = new PlanCalcScoreConfigGroup.ActivityParams("w");
+			params = new ScoringConfigGroup.ActivityParams("w");
 			params.setTypicalDuration(3*3600);
 			scoring.addActivityParams(params);
 
@@ -842,6 +842,6 @@ public class CharyparNagelScoringFunctionTest {
 			Activity fifthActivity = PopulationUtils.createAndAddActivityFromLinkId(this.plan, "h", link9.getId());
 			fifthActivity.setStartTime(fourthLegStartTime + fourthLegTravelTime);
 			this.scenario.getPopulation().addPerson(this.person);
-		}      
+		}
 	}
 }

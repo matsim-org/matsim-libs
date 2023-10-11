@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -68,7 +68,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	/**
-	 * Tests a few cases where the router can decide if it is better to pay the 
+	 * Tests a few cases where the router can decide if it is better to pay the
 	 * toll or not.
 	 */
 	@Test
@@ -163,11 +163,11 @@ public class PlansCalcRouteWithTollOrNotTest {
 //				new ControlerDefaultCoreListenersModule(),
 //				new NewControlerModule())
 //				.getInstance(PlansCalcRouteWithTollOrNot.class);
-		
+
 		Provider<TripRouter> tripRouterProvider = Injector.createInjector(scenario.getConfig(),
-				new RoadPricingModuleDefaults(toll), 
+				new RoadPricingModuleDefaults(toll),
 				new ScenarioByInstanceModule(scenario),
-				new ControlerDefaultCoreListenersModule(), 
+				new ControlerDefaultCoreListenersModule(),
 				new NewControlerModule()).getProvider(TripRouter.class);
 
 			return new PlansCalcRouteWithTollOrNot( toll, tripRouterProvider, TimeInterpretation.create(scenario.getConfig()) ) ;

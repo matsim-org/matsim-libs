@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
@@ -32,7 +32,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Iterator;
 
 /**
  * @author mrieser

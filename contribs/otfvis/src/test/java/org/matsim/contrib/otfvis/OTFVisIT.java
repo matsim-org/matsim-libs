@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.otfvis;
 
@@ -28,7 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
@@ -36,17 +35,16 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
 
-import static org.matsim.core.config.groups.ControlerConfigGroup.*;
+import static org.matsim.core.config.groups.ControllerConfigGroup.*;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
  * Needs somehow a bunch of memory - please use "-Xmx630m"!
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class OTFVisIT {
 

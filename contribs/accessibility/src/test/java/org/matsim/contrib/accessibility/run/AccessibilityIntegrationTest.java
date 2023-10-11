@@ -49,7 +49,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -171,7 +171,7 @@ public class AccessibilityIntegrationTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
-		
+
 		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		final Scenario sc = createTestScenario(config);
@@ -331,7 +331,7 @@ public class AccessibilityIntegrationTest {
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
-		
+
 		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		Controler controler = new Controler(sc);

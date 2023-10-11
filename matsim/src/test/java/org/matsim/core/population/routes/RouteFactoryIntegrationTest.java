@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.heavycompressed.HeavyCompressedNetworkRoute;
 import org.matsim.core.population.routes.heavycompressed.HeavyCompressedNetworkRouteFactory;
@@ -78,7 +78,7 @@ public class RouteFactoryIntegrationTest {
 						Leg leg = (Leg) pe;
 						Route route = leg.getRoute();
 						Assert.assertTrue(route instanceof NetworkRoute  || route instanceof GenericRouteImpl ); // that must be different from the class used below
-						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise 
+						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise
 						// test would be better. kai, feb'16
 					}
 				}
@@ -107,7 +107,7 @@ public class RouteFactoryIntegrationTest {
 						Route route = leg.getRoute();
 						Assert.assertTrue("person: " + person.getId() + "; plan: " + planCounter,
 								route instanceof HeavyCompressedNetworkRoute || route instanceof GenericRouteImpl );
-						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise 
+						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise
 						// test would be better. kai, feb'16
 					}
 				}

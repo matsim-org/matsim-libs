@@ -13,11 +13,11 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.CommandLine.ConfigurationException;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 /**
- * 
+ *
  * This is an example of a station-based oneway car-sharing service
  * siouxfalls-2014 can be used to run the simulation with the provided example
  * input file in the resources/example *
@@ -66,7 +66,7 @@ public class RunCarsharing {
 		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
 		dropoffParams.setScoringThisActivityAtAll(false);
 		config.planCalcScore().addActivityParams(dropoffParams);
-		
+
 		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
 		bookingParams.setScoringThisActivityAtAll(false);
 		config.planCalcScore().addActivityParams(bookingParams);

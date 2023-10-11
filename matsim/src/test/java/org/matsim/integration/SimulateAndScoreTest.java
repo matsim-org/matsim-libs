@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.PrepareForSimUtils;
@@ -90,11 +90,11 @@ public class SimulateAndScoreTest {
 		final Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 
-		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
+		ScoringConfigGroup.ActivityParams h = new ScoringConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
+		ScoringConfigGroup.ActivityParams w = new ScoringConfigGroup.ActivityParams("w");
 		w.setTypicalDuration(8 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		ScoringConfigGroup.ActivityParams transitActivityParams = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 
 		config.planCalcScore().setPerforming_utils_hr(0);
@@ -278,9 +278,9 @@ public class SimulateAndScoreTest {
 		Netsim sim = new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.build(scenario, events);
-		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
+		ScoringConfigGroup.ActivityParams h = new ScoringConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
+		ScoringConfigGroup.ActivityParams w = new ScoringConfigGroup.ActivityParams("w");
 		w.setTypicalDuration(8 * 3600);
 		scenario.getConfig().planCalcScore().setPerforming_utils_hr(0);
 		final double travelingPt = -1.00;

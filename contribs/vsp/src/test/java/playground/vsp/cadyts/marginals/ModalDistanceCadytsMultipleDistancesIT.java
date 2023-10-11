@@ -16,10 +16,10 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -144,13 +144,13 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 		config.counts().setWriteCountsInterval(1);
 		config.counts().setAverageCountsOverIterations(1);
 
-		PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
 		home.setMinimalDuration(6 * 3600);
 		home.setTypicalDuration(6 * 3600);
 		home.setEarliestEndTime(6 * 3600);
 		config.planCalcScore().addActivityParams(home);
 
-		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setMinimalDuration(8 * 3600);
 		work.setTypicalDuration(8 * 3600);
 		work.setEarliestEndTime(14 * 3600);
@@ -159,14 +159,14 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 		config.planCalcScore().addActivityParams(work);
 
 		// have random selection of plans to generate heterogenity in the beginning, so that cadyts can calibrate its correction
-		StrategyConfigGroup.StrategySettings selectRandom = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings selectRandom = new ReplanningConfigGroup.StrategySettings();
 		selectRandom.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.SelectRandom);
 		selectRandom.setDisableAfter(17);
 		selectRandom.setWeight(0.5);
 		config.strategy().addStrategySettings(selectRandom);
 
 		// have change exp beta, so that mode distribution converges at the end of the simulation
-		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
 		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		changeExpBeta.setWeight(0.5);
 		config.strategy().addStrategySettings(changeExpBeta);

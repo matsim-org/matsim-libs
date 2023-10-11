@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +43,7 @@ import org.matsim.contrib.hybridsim.utils.IdIntMapper;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -328,7 +327,7 @@ public class RunExample {
 	}
 
 	private static void enrichConfig(Config c) {
-		PlanCalcScoreConfigGroup.ActivityParams pre = new PlanCalcScoreConfigGroup.ActivityParams("origin");
+		ScoringConfigGroup.ActivityParams pre = new ScoringConfigGroup.ActivityParams("origin");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when
 		// running a simulation one gets
 		// "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
@@ -340,7 +339,7 @@ public class RunExample {
 		pre.setLatestStartTime(49);
 		pre.setOpeningTime(49);
 
-		PlanCalcScoreConfigGroup.ActivityParams post = new PlanCalcScoreConfigGroup.ActivityParams("destination");
+		ScoringConfigGroup.ActivityParams post = new ScoringConfigGroup.ActivityParams("destination");
 		post.setTypicalDuration(49); // dito
 		post.setMinimalDuration(49);
 		post.setClosingTime(49);

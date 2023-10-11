@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
+import org.matsim.core.config.groups.ScoringConfigGroup.ScoringParameterSet;
 
 /**
  * <p>
@@ -44,63 +44,63 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSe
  * application in itself, it provides advanced functionality to directly modify
  * the MATSim {@link Config} object.
  * </p>
- * 
+ *
  * <h1>General usage</h1>
- * 
+ *
  * <p>
  * The command line interpreter is set up using the {@link CommandLine.Builder}:
  * </p>
- * 
+ *
  * <pre>
  * CommandLine cmd = new CommandLine.Builder(args) //
  * 		.allowOptions("optionA", "optionB") //
  * 		.requireOptions("outputPath") //
  * 		.allowPositionalArguments(false).build();
  * </pre>
- * 
+ *
  * <p>
  * The command line option can be accessed via safe getters, which return
  * {@link Optional}s, or strict getters, which raise exceptions:
  * </p>
- * 
+ *
  * <pre>
  * int numberOfThreads = cmd.getOption("threads").map(Integer::parseInt).orElse(4);
  * int numberOfThreads = Integer.parseInt(cmd.getOptionStrict("threads"));
  * </pre>
- * 
+ *
  * <p>
  * As can be seen, options are always returned as strings. It is the task of the
  * user to convert the arguments to the expected data types. They are given in
  * one of the following ways:
  * </p>
- * 
+ *
  * <ul>
  * <li>Value following the option name: <code>--threads 20</code></li>
  * <li>With equals sign between: <code>--threads=20</code></li>
  * </ul>
- * 
+ *
  * <h2>MATSim usage</h2>
- * 
+ *
  * <p>
  * In order to configure MATSim with the command line, one needs to tell the
  * interpreter to apply the command line options to the MATSim {@link Config}:
  * </p>
- * 
+ *
  * <pre>
  * CommandLine cmd = new CommandLine.Builder(args) //
  * 		.allowPositionalArguments(false)//
  * 		.build();
- * 
+ *
  * Config config = ConfigUtils.createConfig();
  * cmd.applyConfiguration(config);
  * </pre>
- * 
+ *
  * <p>
  * This will interpret all command line options of the form
  * <code>config:*</code> as options that are supposed to be inserted into the
  * MATSim config. The rules are as follows:
  * </p>
- * 
+ *
  * <ul>
  * <li><code>--config:MODULE.PARAM VALUE</code> sets a certain parameter with
  * name <code>PARAM</code> in the module <code>MODULE</code> to the value
@@ -113,15 +113,15 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSe
  * <li><code>--config:MODULE.SET_TYPE[*=*].PARAM VALUE</code> sets a value in
  * <i>all</i> parameter sets of SET_TYPE</li>
  * </ul>
- * 
+ *
  * Some examples:
- * 
+ *
  * <ul>
  * <li><code>--config:global.numberOfThreads 48</code></li>
  * <li><code>--config:strategy.strategysettings[strategyName=ReRoute].weight 0.0</code></li>
  * <li><code>--config:planCalcScore.scoringParameters[subpopulation=null].modeParams[mode=car].constant -3.5</code></li>
  * </ul>
- * 
+ *
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
 public class CommandLine {
@@ -157,7 +157,7 @@ public class CommandLine {
 
 		/**
 		 * Creates a builder instance.
-		 * 
+		 *
 		 * @param args The command line arguments passed to the Java application.
 		 */
 		public Builder(String[] args) {
@@ -247,7 +247,7 @@ public class CommandLine {
 		 * Builds the command line interpreter with the given configuration. An
 		 * {@link ConfigurationException} may be thrown directly in one of the following
 		 * cases:
-		 * 
+		 *
 		 * <ul>
 		 * <li>An unnamed (positional) command line argument is passed, although it is
 		 * forbidden (see {{@link #allowPositionalArguments(boolean)})</li>
@@ -260,7 +260,7 @@ public class CommandLine {
 		 * <li>Some command line options have been defined as required (see
 		 * {@link #requireOptions(Collection)}), but are not present.</li>
 		 * </ul>
-		 * 
+		 *
 		 * @throws ConfigurationException
 		 */
 		public CommandLine build() throws ConfigurationException {
@@ -348,7 +348,7 @@ public class CommandLine {
 	/**
 	 * Returns a named command line option if it is present, raises a
 	 * {@link ConfigurationException} otherwise.
-	 * 
+	 *
 	 * @throws ConfigurationException
 	 */
 	public String getOptionStrict(String option) throws ConfigurationException {
@@ -364,7 +364,7 @@ public class CommandLine {
 
 	/**
 	 * Processes a list of raw command line arguments.
-	 * 
+	 *
 	 * @throws ConfigurationException
 	 */
 	private void process(List<String> args) throws ConfigurationException {
@@ -401,13 +401,13 @@ public class CommandLine {
 
 	/**
 	 * Flattens a list of raw command line arguments:
-	 * 
+	 *
 	 * <ul>
 	 * <li>Splits <code>["param=value"]</code> into <code>["param", "value"]</code>,
 	 * </li>
 	 * <li>but makes sure that <code>["param[key=value]"]</code> is preserved</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param args
 	 * @return
 	 */
@@ -435,7 +435,7 @@ public class CommandLine {
 
 	/**
 	 * Adds a positional argument and checks if this is allowed by configuration.
-	 * 
+	 *
 	 * @throws ConfigurationException
 	 */
 	private void addPositionalArgument(String value) throws ConfigurationException {
@@ -448,7 +448,7 @@ public class CommandLine {
 
 	/**
 	 * Adds a named option and checks whether it is allowed by configuration.
-	 * 
+	 *
 	 * @throws ConfigurationException
 	 */
 	private void addOption(String option, String value) throws ConfigurationException {
@@ -465,7 +465,7 @@ public class CommandLine {
 
 	/**
 	 * Checks that are required options are present.
-	 * 
+	 *
 	 * @throws ConfigurationException
 	 */
 	private void checkRequiredOptions() throws ConfigurationException {
@@ -488,7 +488,7 @@ public class CommandLine {
 	/**
 	 * Applies the command line configuration to a MATSim {@link Config} instance.
 	 * See {@link CommandLine} for more information on the syntax.
-	 * 
+	 *
 	 * @throws ConfigurationException
 	 */
 	public void applyConfiguration(Config config) throws ConfigurationException {
@@ -606,13 +606,13 @@ public class CommandLine {
 											return;
 										}
 									}
-									
+
 									// allow for the case subpopulation = 'null' in the scoring parameters
 									if (parameterSetType.equals(ScoringParameterSet.SET_TYPE) && selectionParameter.equals("subpopulation") && selectionValue.equals("null")) {
 										processParameter(option, newPath, parameterSet, newRemainder);
 										return;
 									}
-									
+
 								}
 							}
 

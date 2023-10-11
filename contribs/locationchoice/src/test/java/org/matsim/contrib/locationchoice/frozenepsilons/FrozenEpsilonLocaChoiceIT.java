@@ -5,7 +5,7 @@ import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopW
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype;
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.ApproximationLevel;
-import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import static org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -157,7 +157,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2 );
-		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			newWork = (Activity) newPlan.getPlanElements().get(6);
 		}
 		System.err.println( " newWork: " + newWork ) ;

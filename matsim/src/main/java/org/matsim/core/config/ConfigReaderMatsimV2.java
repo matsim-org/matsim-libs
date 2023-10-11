@@ -61,9 +61,15 @@ class ConfigReaderMatsimV2 extends MatsimXmlParser {
 
 	public void addDefaultAliases() {
 		// when renaming config modules and parameter names, add them here as aliases:
-//		this.addAlias("controler", "controller");
-//		this.addAlias("planCalcScore", "scoring");
-//		this.addAlias("planscalcroute", "routing");
+
+		this.addAlias("ReplanningAnnealer", "replanningAnnealer");
+		this.addAlias("TimeAllocationMutator", "timeAllocationMutator");
+		this.addAlias("JDEQSim", "jdeqsim");
+		this.addAlias("controler", "controller");
+		this.addAlias("planCalcScore", "scoring");
+		this.addAlias("planscalcroute", "routing");
+		this.addAlias("strategy", "replanning");
+		this.addAlias("parallelEventHandling", "eventsManager");
 	}
 
 	public void addAlias(String oldName, String newName, String... path) {

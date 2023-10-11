@@ -17,8 +17,8 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeLimitedMaxSpeedTravelTi
 import org.matsim.contrib.vsp.scenario.SnzActivities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
@@ -76,11 +76,11 @@ public class DrtTestScenario extends MATSimApplication {
 
 		SnzActivities.addScoringParams(config);
 
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("car interaction").setTypicalDuration(60));
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("car interaction").setTypicalDuration(60));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
 
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
 
 
 		MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
@@ -88,7 +88,7 @@ public class DrtTestScenario extends MATSimApplication {
 
 		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.planCalcScore(), config.plansCalcRoute());
 
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		prepareConfig.accept(config);
 

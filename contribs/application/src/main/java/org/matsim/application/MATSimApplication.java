@@ -13,7 +13,7 @@ import org.matsim.application.commands.ShowGUI;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -313,7 +313,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	protected List<ConfigGroup> getConfigurableModules() {
 		return Lists.newArrayList(
-				new ControlerConfigGroup(),
+				new ControllerConfigGroup(),
 				new GlobalConfigGroup(),
 				new QSimConfigGroup()
 		);

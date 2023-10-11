@@ -27,10 +27,10 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -128,7 +128,7 @@ public class PtAlongALineTest {
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice);
 			stratSets.setWeight(0.1);
 			config.strategy().addStrategySettings(stratSets);
@@ -136,7 +136,7 @@ public class PtAlongALineTest {
 			config.subtourModeChoice().setModes(new String[] { TransportMode.car, "drt_A" });
 		}
 		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 			stratSets.setWeight(1.);
 			config.strategy().addStrategySettings(stratSets);
@@ -210,7 +210,7 @@ public class PtAlongALineTest {
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		// yy why?  kai, jun'19
 
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		ModeParams accessWalk = new ModeParams(TransportMode.non_network_walk);
 		accessWalk.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(accessWalk);

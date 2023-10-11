@@ -61,7 +61,7 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -451,7 +451,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 
 		{    //some consistency checks.. //TODO consider to put in a JUnit test..
-			int offset = config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ? 1 : 3;
+			int offset = config.plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ? 1 : 3;
 
 			Preconditions.checkNotNull(pluginTripOrigin, "pluginTripOrigin is null. should never happen..");
 			Preconditions.checkState(!pluginTripOrigin.equals(actWhileCharging),

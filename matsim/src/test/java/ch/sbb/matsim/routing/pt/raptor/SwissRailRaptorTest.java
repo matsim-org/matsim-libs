@@ -21,8 +21,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -863,7 +863,7 @@ public class SwissRailRaptorTest {
         config.transitRouter().setDirectWalkFactor(1.0);
 
         double beelineDistanceFactor = config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-        PlansCalcRouteConfigGroup.TeleportedModeParams walkParameters = new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk);
+        RoutingConfigGroup.TeleportedModeParams walkParameters = new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk);
         walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
         config.plansCalcRoute().addParameterSet(walkParameters);
 
@@ -1226,7 +1226,7 @@ public class SwissRailRaptorTest {
             this.config.transitRouter().setMaxBeelineWalkConnectionDistance(100.0);
 
             double beelineDistanceFactor = this.config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-            PlansCalcRouteConfigGroup.TeleportedModeParams walkParameters = new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk);
+            RoutingConfigGroup.TeleportedModeParams walkParameters = new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk);
             walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
             this.config.plansCalcRoute().addParameterSet(walkParameters);
 

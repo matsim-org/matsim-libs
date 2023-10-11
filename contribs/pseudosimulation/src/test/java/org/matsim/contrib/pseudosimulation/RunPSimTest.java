@@ -18,8 +18,7 @@ import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEm
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -72,7 +71,7 @@ public class RunPSimTest {
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.SelectExpBeta );
 
 		//lower the weight of non-selector strategies, as we will run many iters
-		for( StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings() ){
+		for( ReplanningConfigGroup.StrategySettings settings : config.strategy().getStrategySettings() ){
 			if( !selectorNames.contains( settings.getStrategyName() ) ){
 				logger.warn( settings.getStrategyName() );
 				settings.setWeight( settings.getWeight() * 20 );

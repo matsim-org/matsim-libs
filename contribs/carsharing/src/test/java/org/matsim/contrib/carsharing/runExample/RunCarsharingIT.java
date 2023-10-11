@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.carsharing.runExample;
 
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
+import static org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
+import static org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;

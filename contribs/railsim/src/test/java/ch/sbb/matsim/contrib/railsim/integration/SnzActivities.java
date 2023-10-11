@@ -5,7 +5,7 @@
 package ch.sbb.matsim.contrib.railsim.integration;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 
 /**
  * Defines available activities and open- and closing times in Snz scenarios at vsp.
@@ -58,7 +58,7 @@ public enum SnzActivities {
 	/**
 	 * Apply start and end time to params.
 	 */
-	public PlanCalcScoreConfigGroup.ActivityParams apply(PlanCalcScoreConfigGroup.ActivityParams params) {
+	public ScoringConfigGroup.ActivityParams apply(ScoringConfigGroup.ActivityParams params) {
 		if (start >= 0)
 			params = params.setOpeningTime(start * 3600.);
 		if (end >= 0)
@@ -74,18 +74,18 @@ public enum SnzActivities {
 
 		for (SnzActivities value : SnzActivities.values()) {
 			for (long ii = 600; ii <= 97200; ii += 600) {
-				config.planCalcScore().addActivityParams(value.apply(new PlanCalcScoreConfigGroup.ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii)));
+				config.planCalcScore().addActivityParams(value.apply(new ScoringConfigGroup.ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii)));
 			}
 		}
 
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("car interaction").setTypicalDuration(60));
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("ride interaction").setTypicalDuration(60));
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("bike interaction").setTypicalDuration(60));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("car interaction").setTypicalDuration(60));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("ride interaction").setTypicalDuration(60));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("bike interaction").setTypicalDuration(60));
 
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
 
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
-		config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
+		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
 
 	}
 }

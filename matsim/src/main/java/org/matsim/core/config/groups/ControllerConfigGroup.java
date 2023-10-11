@@ -31,8 +31,8 @@ import org.matsim.core.utils.misc.StringUtils;
 import java.util.*;
 
 
-public final class ControlerConfigGroup extends ReflectiveConfigGroup {
-	private static final Logger log = LogManager.getLogger( ControlerConfigGroup.class );
+public final class ControllerConfigGroup extends ReflectiveConfigGroup {
+	private static final Logger log = LogManager.getLogger( ControllerConfigGroup.class );
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, SpeedyALT}
 
@@ -58,7 +58,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		delete,
 	}
 
-	public static final String GROUP_NAME = "controler";
+	public static final String GROUP_NAME = "controller";
 
 	private static final String OUTPUT_DIRECTORY = "outputDirectory";
 	private static final String FIRST_ITERATION = "firstIteration";
@@ -109,7 +109,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	private CleanIterations cleanItersAtEnd = CleanIterations.keep;
 
-	public ControlerConfigGroup() {
+	public ControllerConfigGroup() {
 		super(GROUP_NAME);
 	}
 

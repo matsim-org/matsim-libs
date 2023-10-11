@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.analysis;
 
@@ -23,14 +23,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -60,7 +59,7 @@ public class ModeStatsControlerListenerTest {
 
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		final List<PlanElement> planElem = new ArrayList<PlanElement>();
-		PlanCalcScoreConfigGroup scoreConfig = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup scoreConfig = new ScoringConfigGroup();
 		TransportPlanningMainModeIdentifier transportId = new TransportPlanningMainModeIdentifier();
 		ModeParams modeParam1 = new ModeParams(TransportMode.walk);
 		ModeParams modeParam2 = new ModeParams(TransportMode.car);
@@ -349,14 +348,14 @@ public class ModeStatsControlerListenerTest {
 	}
 
 	private void performTest(Population population, TransportPlanningMainModeIdentifier transportId,
-			PlanCalcScoreConfigGroup scoreConfig, String outputDirectory, List<PlanElement> planElem) {
+													 ScoringConfigGroup scoreConfig, String outputDirectory, List<PlanElement> planElem) {
 
-		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
-		controlerConfigGroup.setCreateGraphs(true);
-		controlerConfigGroup.setFirstIteration(0);
-		ModeStatsControlerListener modStatListner = new ModeStatsControlerListener(controlerConfigGroup, population,
+		controllerConfigGroup.setCreateGraphs(true);
+		controllerConfigGroup.setFirstIteration(0);
+		ModeStatsControlerListener modStatListner = new ModeStatsControlerListener(controllerConfigGroup, population,
 				controlerIO, scoreConfig, transportId);
 
 		StartupEvent eventStart = new StartupEvent(null);
@@ -373,7 +372,7 @@ public class ModeStatsControlerListenerTest {
 		person3modes.forEach((k, v) -> modesIter0.merge(k, v, Integer::sum));
 
 		readAndcompareValues(modesIter0, 0);
-		
+
 		//Remove one person
 		population.getPersons().remove(Id.create("2", Person.class));
 

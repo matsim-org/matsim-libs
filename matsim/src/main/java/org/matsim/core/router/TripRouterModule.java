@@ -22,7 +22,7 @@
 
 package org.matsim.core.router;
 
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
@@ -47,7 +47,7 @@ public class TripRouterModule extends AbstractModule {
         install(new LeastCostPathCalculatorModule());
         install(new TransitRouterModule());
         bind(SingleModeNetworksCache.class).asEagerSingleton();
-        PlansCalcRouteConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
+        RoutingConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
         for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
             if (getConfig().transit().isUseTransit() && getConfig().transit().getTransitModes().contains(mode)) {
                 // default config contains "pt" as teleported mode, but if we have simulated transit, this is supposed to override it

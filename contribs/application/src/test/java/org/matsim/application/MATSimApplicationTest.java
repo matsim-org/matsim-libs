@@ -11,7 +11,7 @@ import org.matsim.application.prepare.population.MergePopulations;
 import org.matsim.application.prepare.population.TrajectoryToPlans;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
@@ -63,9 +63,9 @@ public class MATSimApplicationTest {
 		assertThat(controler.getConfig().controler().getRunId())
 				.isEqualTo("567");
 
-		PlanCalcScoreConfigGroup score = controler.getConfig().planCalcScore();
+		ScoringConfigGroup score = controler.getConfig().planCalcScore();
 
-		PlanCalcScoreConfigGroup.ScoringParameterSet params = score.getScoringParameters(null);
+		ScoringConfigGroup.ScoringParameterSet params = score.getScoringParameters(null);
 
 		assertThat(params.getOrCreateModeParams("car").getConstant())
 				.isEqualTo(-1);

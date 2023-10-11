@@ -42,9 +42,9 @@ import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -78,7 +78,7 @@ public class AdvancedMarginalCongestionPricingIT {
 	@Test
 	public final void test0a(){
 
-		PlanCalcScoreConfigGroup plansCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 		ActivityParams activityParams = new ActivityParams("work");
 		activityParams.setTypicalDuration(6 * 3600.);
 		activityParams.setOpeningTime(7 * 3600.);
@@ -143,7 +143,7 @@ public class AdvancedMarginalCongestionPricingIT {
 	@Test
 	public final void test0b(){
 
-		PlanCalcScoreConfigGroup plansCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 		ActivityParams activityParams = new ActivityParams("overnightActivity");
 		activityParams.setTypicalDuration(12 * 3600.);
 
@@ -191,7 +191,7 @@ public class AdvancedMarginalCongestionPricingIT {
 	@Test
 	public final void test0c(){
 
-		PlanCalcScoreConfigGroup plansCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 
 		ActivityParams activityParams1 = new ActivityParams("firstActivityType");
 		activityParams1.setTypicalDuration(12 * 3600.);

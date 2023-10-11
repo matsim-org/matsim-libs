@@ -40,7 +40,7 @@ import org.matsim.contrib.decongestion.data.LinkInfo;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.contrib.decongestion.handler.IntervalBasedTolling;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollSetting;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;

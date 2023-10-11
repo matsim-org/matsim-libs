@@ -40,9 +40,9 @@ import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -102,20 +102,20 @@ class RunJointDemandDRTExample {
 
 
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
-        StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+        ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
         config.strategy().addStrategySettings(changeExpBeta);
-        StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
+        ReplanningConfigGroup.StrategySettings changeServiceOperator = new ReplanningConfigGroup.StrategySettings();
         changeServiceOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
         changeServiceOperator.setWeight(0.5);
         config.strategy().addStrategySettings(changeServiceOperator);
 
         config.strategy().setFractionOfIterationsToDisableInnovation(.8);
-        PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
         home.setTypicalDuration(14 * 3600);
         config.planCalcScore().addActivityParams(home);
-        PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
         work.setTypicalDuration(14 * 3600);
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);

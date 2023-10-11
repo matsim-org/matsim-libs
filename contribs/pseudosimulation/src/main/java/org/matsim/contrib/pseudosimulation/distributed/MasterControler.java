@@ -33,7 +33,7 @@ import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTra
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -229,12 +229,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             borrowingRate = 0.9999 * borrowingRate / (masterMutationRate + borrowingRate);
             masterMutationRate = 0.9999 * masterMutationRate / (masterMutationRate + borrowingRate);
         }
-        List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+        List<ReplanningConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
         strategySettings.addAll(config.strategy().getStrategySettings());
         Map<Integer, Double> selectors = new HashMap<>();
         Map<Integer, Double> mutators = new HashMap<>();
         for (int i = 0; i < strategySettings.size(); i++) {
-            StrategyConfigGroup.StrategySettings setting = strategySettings.get(i);
+            ReplanningConfigGroup.StrategySettings setting = strategySettings.get(i);
             if (DistributedPlanStrategyTranslationAndRegistration.SupportedSelectors.keySet().contains(setting.getStrategyName()))
                 selectors.put(i, setting.getWeight());
             else {
@@ -254,11 +254,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
         //put it back in the config
         config.strategy().clearStrategySettings();
-        for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
+        for (ReplanningConfigGroup.StrategySettings strategySetting : strategySettings) {
             config.strategy().addStrategySettings(strategySetting);
         }
         // add the borrowing rate entry
-        StrategyConfigGroup.StrategySettings borrowingSetting = new StrategyConfigGroup.StrategySettings();
+        ReplanningConfigGroup.StrategySettings borrowingSetting = new ReplanningConfigGroup.StrategySettings();
         borrowingSetting.setWeight(borrowingRate);
         borrowingSetting.setStrategyName("ReplacePlanFromSlave");
         borrowingSetting.setDisableAfter(maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling : disableAfterIteration);

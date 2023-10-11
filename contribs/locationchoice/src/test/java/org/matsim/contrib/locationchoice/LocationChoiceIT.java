@@ -44,10 +44,10 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -137,7 +137,7 @@ public class LocationChoiceIT {
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
-		if (!config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+		if (!config.plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			newWork = (Activity) newPlan.getPlanElements().get(6);
 		}
 		assertNotNull( newWork ) ;

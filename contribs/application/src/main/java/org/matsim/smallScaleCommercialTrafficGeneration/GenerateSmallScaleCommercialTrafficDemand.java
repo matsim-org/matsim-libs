@@ -45,7 +45,7 @@ import org.matsim.contrib.freight.controler.*;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -440,7 +440,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		else
 			config.controler().setOutputDirectory(output.toString());
 		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
-			config.controler().getOverwriteFileSetting(), ControlerConfigGroup.CompressionType.gzip);
+			config.controler().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		new File(Path.of(config.controler().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
 		rnd = new Random(config.global().getRandomSeed());
 		if (config.network().getInputFile() == null)

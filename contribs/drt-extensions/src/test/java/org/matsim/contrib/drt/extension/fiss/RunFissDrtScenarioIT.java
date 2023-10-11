@@ -20,9 +20,9 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -91,9 +91,9 @@ public class RunFissDrtScenarioIT {
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
-		PlanCalcScoreConfigGroup.ModeParams scoreParams = new PlanCalcScoreConfigGroup.ModeParams("drt");
+		ScoringConfigGroup.ModeParams scoreParams = new ScoringConfigGroup.ModeParams("drt");
 		config.planCalcScore().addModeParams(scoreParams);
-		PlanCalcScoreConfigGroup.ModeParams scoreParams2 = new PlanCalcScoreConfigGroup.ModeParams("walk");
+		ScoringConfigGroup.ModeParams scoreParams2 = new ScoringConfigGroup.ModeParams("walk");
 		config.planCalcScore().addModeParams(scoreParams2);
 
 		config.plans().setInputFile(plansFile);
@@ -102,15 +102,15 @@ public class RunFissDrtScenarioIT {
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
 
-		final PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		final ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
 		home.setTypicalDuration(8 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams other = new PlanCalcScoreConfigGroup.ActivityParams("other");
+		final ScoringConfigGroup.ActivityParams other = new ScoringConfigGroup.ActivityParams("other");
 		other.setTypicalDuration(4 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams education = new PlanCalcScoreConfigGroup.ActivityParams("education");
+		final ScoringConfigGroup.ActivityParams education = new ScoringConfigGroup.ActivityParams("education");
 		education.setTypicalDuration(6 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams shopping = new PlanCalcScoreConfigGroup.ActivityParams("shopping");
+		final ScoringConfigGroup.ActivityParams shopping = new ScoringConfigGroup.ActivityParams("shopping");
 		shopping.setTypicalDuration(2 * 3600);
-		final PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		final ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(2 * 3600);
 
 		config.planCalcScore().addActivityParams(home);
@@ -119,7 +119,7 @@ public class RunFissDrtScenarioIT {
 		config.planCalcScore().addActivityParams(shopping);
 		config.planCalcScore().addActivityParams(work);
 
-		final StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+		final ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 		stratSets.setWeight(1);
 		stratSets.setStrategyName("ChangeExpBeta");
 		config.strategy().addStrategySettings(stratSets);

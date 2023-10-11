@@ -26,8 +26,8 @@ import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -88,21 +88,21 @@ class RunJointDemandCarToggleJspritExample {
     }
 
     private static void prepareConfig(Config config) {
-        StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+        ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
         config.strategy().addStrategySettings(changeExpBeta);
 
-        StrategyConfigGroup.StrategySettings changeJobOperator = new StrategyConfigGroup.StrategySettings();
+        ReplanningConfigGroup.StrategySettings changeJobOperator = new ReplanningConfigGroup.StrategySettings();
         changeJobOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
         changeJobOperator.setWeight(0.5);
         config.strategy().addStrategySettings(changeJobOperator);
 
         config.strategy().setFractionOfIterationsToDisableInnovation(.8);
-        PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
         home.setTypicalDuration(14 * 3600);
         config.planCalcScore().addActivityParams(home);
-        PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
         work.setTypicalDuration(14 * 3600);
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);

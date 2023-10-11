@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -141,14 +141,14 @@ public class SwissRailRaptorModuleTest {
 
         // prepare scoring
         Config config = f.config;
-        PlanCalcScoreConfigGroup.ActivityParams homeScoring = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        ScoringConfigGroup.ActivityParams homeScoring = new ScoringConfigGroup.ActivityParams("home");
         homeScoring.setTypicalDuration(16*3600);
         f.config.planCalcScore().addActivityParams(homeScoring);
-        PlanCalcScoreConfigGroup.ActivityParams workScoring = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        ScoringConfigGroup.ActivityParams workScoring = new ScoringConfigGroup.ActivityParams("work");
         workScoring.setTypicalDuration(8*3600);
         f.config.planCalcScore().addActivityParams(workScoring);
 
-        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
         f.config.planCalcScore().addModeParams(walk);
 
@@ -231,7 +231,7 @@ public class SwissRailRaptorModuleTest {
         // :-( :-(  kai, mar'20)
 
     }
-    
+
     /**
      * Test update of SwissRailRaptorData after TransitScheduleChangedEvent
      */
@@ -252,13 +252,13 @@ public class SwissRailRaptorModuleTest {
         plan.addActivity(homeAct);
         plan.addLeg(pf.createLeg(TransportMode.pt));
         plan.addActivity(pf.createActivityFromCoord("work", new Coord(24010, 10000)));
-        
+
         // prepare scoring
         Config config = f.config;
-        PlanCalcScoreConfigGroup.ActivityParams homeScoring = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        ScoringConfigGroup.ActivityParams homeScoring = new ScoringConfigGroup.ActivityParams("home");
         homeScoring.setTypicalDuration(16*3600);
         f.config.planCalcScore().addActivityParams(homeScoring);
-        PlanCalcScoreConfigGroup.ActivityParams workScoring = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        ScoringConfigGroup.ActivityParams workScoring = new ScoringConfigGroup.ActivityParams("work");
         workScoring.setTypicalDuration(8*3600);
         f.config.planCalcScore().addActivityParams(workScoring);
 
@@ -288,12 +288,12 @@ public class SwissRailRaptorModuleTest {
         });
 
         controler.run();
-        
+
         // test that swiss rail raptor was used
         TripRouter tripRouter = controler.getInjector().getInstance(TripRouter.class);
         RoutingModule module = tripRouter.getRoutingModule(TransportMode.pt);
         Assert.assertTrue(module instanceof SwissRailRaptorRoutingModule);
-        
+
         // Check routed plan
         List<PlanElement> planElements = p1.getSelectedPlan().getPlanElements();
         for (PlanElement pe : planElements) {
@@ -317,13 +317,13 @@ public class SwissRailRaptorModuleTest {
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(1)).getMode());
         Assert.assertEquals(TransportMode.pt, ((Leg) planElements.get(3)).getMode());
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(5)).getMode());
-        
+
         // Check route: should return one of the added lines although the removed green line would be faster
         Leg ptLeg = (Leg) planElements.get(3);
         TransitPassengerRoute ptRoute = (TransitPassengerRoute) ptLeg.getRoute();
-        Assert.assertEquals(Id.create("AddedLine" + 1, TransitLine.class), ptRoute.getLineId());        
+        Assert.assertEquals(Id.create("AddedLine" + 1, TransitLine.class), ptRoute.getLineId());
     }
-    
+
     /**
      * Test individual scoring parameters for agents
      */
@@ -431,5 +431,5 @@ public class SwissRailRaptorModuleTest {
         }
 
     }
-    
+
 }

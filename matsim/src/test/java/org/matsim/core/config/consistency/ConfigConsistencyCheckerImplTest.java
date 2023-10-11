@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.utils.LogCounter;
 
@@ -124,7 +124,7 @@ public class ConfigConsistencyCheckerImplTest {
 			logger.deactivate();
 		}
 	}
-	
+
 	@Test
 	public void testCheckPlanCalcScore_PtInteractionActivity() {
 		Config config = new Config();
@@ -138,18 +138,18 @@ public class ConfigConsistencyCheckerImplTest {
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
 			Assert.assertEquals(0,1) ; // should never get here
 		} catch ( Exception ee ){
-			
+
 			System.out.println("expected exception") ;
 		}
-		
+
 		config.vspExperimental().setAbleToOverwritePtInteractionParams(true) ;
-		
+
 		try {
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config );
 		} catch ( Exception ee ){
 			Assert.assertEquals(0,1) ; // should never get here
 		}
-		
+
 	}
 
 

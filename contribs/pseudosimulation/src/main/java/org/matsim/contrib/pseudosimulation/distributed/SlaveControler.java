@@ -41,7 +41,7 @@ import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -630,12 +630,12 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private void setReplanningWeights(Config config, double mutationRate) {
         if (mutationRate > 1)
             mutationRate = 0.9999;
-        List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+        List<ReplanningConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
         strategySettings.addAll(config.strategy().getStrategySettings());
         Map<Integer, Double> selectors = new HashMap<>();
         Map<Integer, Double> mutators = new HashMap<>();
         for (int i = 0; i < strategySettings.size(); i++) {
-            StrategyConfigGroup.StrategySettings setting = strategySettings.get(i);
+            ReplanningConfigGroup.StrategySettings setting = strategySettings.get(i);
             if (DistributedPlanStrategyTranslationAndRegistration.SupportedSelectors.keySet().contains(setting.getStrategyName()))
                 selectors.put(i, setting.getWeight());
             else {
@@ -654,7 +654,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
         //put it back in the config
         config.strategy().clearStrategySettings();
-        for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
+        for (ReplanningConfigGroup.StrategySettings strategySetting : strategySettings) {
             config.strategy().addStrategySettings(strategySetting);
         }
     }

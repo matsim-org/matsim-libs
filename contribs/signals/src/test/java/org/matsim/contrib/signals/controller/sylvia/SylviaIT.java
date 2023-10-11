@@ -60,8 +60,8 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -74,10 +74,10 @@ import java.util.Map;
 /**
  * Test sylvia logic at an intersection with four incoming links and one signal each.
  * No lanes are used.
- * 
+ *
  * It is tested whether sylvia expands signal phases correctly when more vehicles want to pass
  * and whether cycle times are kept.
- * 
+ *
  * @author tthunig
  *
  */
@@ -94,7 +94,7 @@ public class SylviaIT {
 	 * used. The two approaches have equal demand but different priority in the
 	 * Sylvia signal algorithm. The priority is given by the order in the signal
 	 * plan. In this test, signal group 1 has priority over 2.
-	 * 
+	 *
 	 * note: signal settings of the fixed time plan are unbalanced with 5 seconds
 	 * for signal group 1 vs. 45 seconds for signal group 2. but signal settings of
 	 * the sylvia plan are balanced, because each setting is shortend to 5 seconds
@@ -123,16 +123,16 @@ public class SylviaIT {
 		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 30, avgSignalGreenTimePerCycle.get(signalGroupId1), 1);
 		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 20, avgSignalGreenTimePerCycle.get(signalGroupId2), 1);
 		// can differ from the fixed cycle length because the analysis is quit after the last activity start event
-		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1); 
+		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1);
 	}
-	
+
 	/**
 	 * Test sylvia with two conflicting streams at a single intersection. A fixed
 	 * cycle time (of 60 seconds) and no maximal extension time per setting are
 	 * used. The two approaches have equal demand but different priority in the
 	 * Sylvia signal algorithm. The priority is given by the order in the signal
 	 * plan. In this test, signal group 2 has priority over 1.
-	 * 
+	 *
 	 * note: signal settings of the fixed time plan are unbalanced with 5 seconds
 	 * for signal group 1 vs. 45 seconds for signal group 2. but signal settings of
 	 * the sylvia plan are balanced, because each setting is shortend to 5 seconds
@@ -162,7 +162,7 @@ public class SylviaIT {
 		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 30, avgSignalGreenTimePerCycle.get(signalGroupId2), 1);
 		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 20, avgSignalGreenTimePerCycle.get(signalGroupId1), 1);
 		// can differ from the fixed cycle length because the analysis is quit after the last activity start event
-		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1); 
+		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1);
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class SylviaIT {
 
 	/**
 	 * creates a network like this:
-	 * 
+	 *
 	 * 					 6
 	 * 					 ^
 	 * 					 |
@@ -245,8 +245,8 @@ public class SylviaIT {
 	 * 					 ^
 	 * 					 |
 	 * 					 v
-	 * 					 9 
-	 * 
+	 * 					 9
+	 *
 	 * @param net
 	 *            the object where the network should be stored
 	 */
@@ -403,7 +403,7 @@ public class SylviaIT {
 		config.qsim().setEndTime(3 * 3600);
 
 		config.qsim().setUsingFastCapacityUpdate(false);
-	
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		config.vspExperimental().setWritingOutputEvents(false);

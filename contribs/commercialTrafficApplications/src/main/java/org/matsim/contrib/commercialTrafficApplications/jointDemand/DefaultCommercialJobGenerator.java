@@ -49,7 +49,7 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.jsprit.VRPTransportCostsFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.population.PopulationUtils;

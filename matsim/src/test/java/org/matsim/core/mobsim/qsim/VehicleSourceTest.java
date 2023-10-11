@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
@@ -57,7 +57,7 @@ import java.util.*;
 
 /**
  * A test to check the functionality of the VehicleSource.
- * 
+ *
  * @author amit
  */
 
@@ -184,7 +184,7 @@ public class VehicleSourceTest {
 		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.create("0_bike", Vehicle.class));
 		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(carId);
 
-		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
+		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue();
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
 		switch (this.vehiclesSource ) {
