@@ -57,7 +57,8 @@ public class Count<T> implements Identifiable<T> {
 		this.volume = location.createVolume(mode, Measurable.HOURLY);
 
 		if (!this.volume.supportsHourlyAggregate()) {
-			log.warn("Unsupported counts '" + this.volume.getInterval() + "' for analyses.");
+			log.warn("Unsupported counts interval '" + this.volume.getInterval() + "' for analysis functionality. " +
+				"Interval should be able to aggregate hourly, otherwise counts will be empty");
 		}
 	}
 

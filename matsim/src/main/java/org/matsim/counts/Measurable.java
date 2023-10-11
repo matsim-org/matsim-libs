@@ -123,7 +123,7 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 	 * Whether the interval allows for an hourly aggregation.
 	 */
 	public boolean supportsHourlyAggregate() {
-		return interval > HOURLY || interval % HOURLY != 0;
+		return (interval <= HOURLY) && (HOURLY % interval) == 0;
 	}
 
 	/**
