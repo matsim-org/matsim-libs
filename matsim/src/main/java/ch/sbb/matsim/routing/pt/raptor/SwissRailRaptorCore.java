@@ -772,9 +772,9 @@ public class SwissRailRaptorCore {
 
     private PathElement findLeastCostArrival(Map<TransitStopFacility, InitialStop> destinationStops) {
         double leastCost = Double.POSITIVE_INFINITY;
-        double leastCostFeederFeederOnly = Double.POSITIVE_INFINITY;
+        double leastCostFeederOnly = Double.POSITIVE_INFINITY;
         PathElement leastCostPath = null;
-        PathElement leastCostPathFeederFeederOnly = null;
+        PathElement leastCostPathFeederOnly = null;
 
 		SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling intermodalLegOnlyHandling = data.config.getIntermodalLegOnlyHandling();
 		boolean checkBothPtAndPurelyIntermodalRoutes = intermodalLegOnlyHandling.equals(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.avoid) || intermodalLegOnlyHandling.equals(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.forbid);
@@ -791,9 +791,9 @@ public class SwissRailRaptorCore {
 						PathElement egressLegCandidate = new PathElement(pe, null, pe.firstDepartureTime, TIME_UNDEFINED, arrivalTime, arrivalTravelCost, pe.arrivalTransferCost, egressStop.distance, pe.transferCount, true, null, egressStop);
 
 						if (pe.comingFrom == null && checkBothPtAndPurelyIntermodalRoutes) {
-							if (totalCost < leastCostFeederFeederOnly) {
-								leastCostFeederFeederOnly = totalCost;
-								leastCostPathFeederFeederOnly = egressLegCandidate;
+							if (totalCost < leastCostFeederOnly) {
+								leastCostFeederOnly = totalCost;
+								leastCostPathFeederOnly = egressLegCandidate;
 							}
 						} else {
 							// this is the egress leg
@@ -808,7 +808,7 @@ public class SwissRailRaptorCore {
 
 		if (checkBothPtAndPurelyIntermodalRoutes){
 			if (Double.isInfinite(leastCost)){
-				return leastCostPathFeederFeederOnly;
+				return leastCostPathFeederOnly;
 			}
 		}
         return leastCostPath;
