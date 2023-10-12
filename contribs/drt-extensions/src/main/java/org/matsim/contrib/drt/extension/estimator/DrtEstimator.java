@@ -26,8 +26,9 @@ public interface DrtEstimator extends ControlerListener {
 	 * @param travelTime  travel time in seconds
 	 * @param waitingTime waiting time in seconds
 	 * @param fare        money, which is negative if the customer needs to pay it
+	 * @param rejectionRate probability of a trip being rejected
 	 */
-	record Estimate(double distance, double travelTime, double waitingTime, double fare) {
+	record Estimate(double distance, double travelTime, double waitingTime, double fare, double rejectionRate) {
 
 	}
 

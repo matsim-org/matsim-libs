@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
+import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
@@ -33,15 +34,12 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	private final DrtConfigGroup drtConfig;
 
 	private final DrtSpeedUpParams speedUpParams;
-
+	private final SplittableRandom rnd = new SplittableRandom();
 	/**
 	 * Currently valid estimates.
 	 */
 	private GlobalEstimate currentEst;
-
 	private RegressionResults fare;
-
-	private final SplittableRandom rnd = new SplittableRandom();
 
 	@Inject
 	public BasicDrtEstimator(ModalInjector injector) {
@@ -67,13 +65,16 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 
 		// Speed-up iteration need to be ignored for the estimates
 		if (speedUpParams != null &&
-				DrtSpeedUp.isTeleportDrtUsers(speedUpParams, event.getServices().getConfig().controler(), event.getIteration())) {
+			DrtSpeedUp.isTeleportDrtUsers(speedUpParams, event.getServices().getConfig().controler(), event.getIteration())) {
 			return;
 		}
 
 		GlobalEstimate est = new GlobalEstimate();
 
 		int n = 0;
+
+		int nRejections = collector.getRejectedRequestSequences().size();
+		int nSubmitted = collector.getRequestSubmissions().size();
 
 		for (DrtEventSequenceCollector.EventSequence seq : collector.getPerformedRequestSequences().values()) {
 
@@ -99,16 +100,20 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 
 		fare = est.fare.regress();
 
+		double rejectionRate = (double) nRejections / nSubmitted;
+
 		if (currentEst == null) {
 			est.meanWait = est.waitTime.getMean();
 			est.stdWait = est.waitTime.getStandardDeviation();
 			est.meanDetour = est.detour.getMean();
 			est.stdDetour = est.detour.getStandardDeviation();
+			est.rejectionRate = rejectionRate;
 		} else {
 			est.meanWait = config.decayFactor * est.waitTime.getMean() + (1 - config.decayFactor) * currentEst.waitTime.getMean();
 			est.stdWait = config.decayFactor * est.waitTime.getStandardDeviation() + (1 - config.decayFactor) * currentEst.waitTime.getStandardDeviation();
 			est.meanDetour = config.decayFactor * est.detour.getMean() + (1 - config.decayFactor) * currentEst.detour.getMean();
 			est.stdDetour = config.decayFactor * est.detour.getStandardDeviation() + (1 - config.decayFactor) * currentEst.detour.getStandardDeviation();
+			est.rejectionRate = config.decayFactor * rejectionRate + (1 - config.decayFactor) * currentEst.rejectionRate;
 		}
 
 		log.info("Calculated {}", est);
@@ -120,22 +125,35 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 
 		if (currentEst == null) {
 			// If not estimates are present, use the drt default worse case parameters
-			double travelTime =  Math.min(route.getDirectRideTime() + drtConfig.maxAbsoluteDetour,
+			double travelTime = Math.min(route.getDirectRideTime() + drtConfig.maxAbsoluteDetour,
 				route.getDirectRideTime() * drtConfig.maxTravelTimeAlpha + drtConfig.maxTravelTimeBeta);
 
+			double fare = 0;
+			if (drtConfig.getDrtFareParams().isPresent()) {
+				DrtFareParams fareParams = drtConfig.getDrtFareParams().get();
+				fare = fareParams.distanceFare_m * route.getDistance()
+					+ fareParams.timeFare_h * route.getDirectRideTime() / 3600.0
+					+ fareParams.baseFare;
+
+				fare = Math.max(fare, fareParams.minFarePerTrip);
+			}
+
 			// for distance, also use the max travel time alpha
-			return new Estimate(route.getDistance() * drtConfig.maxTravelTimeAlpha, travelTime, drtConfig.maxWaitTime, 0);
+			return new Estimate(route.getDistance() * drtConfig.maxTravelTimeAlpha, travelTime, drtConfig.maxWaitTime, fare, 0);
 		}
 
 		double fare = 0;
 		if (this.fare != null)
 			fare = this.fare.getParameterEstimate(0) + this.fare.getParameterEstimate(1) * route.getDistance();
 
+		if (drtConfig.getDrtFareParams().isPresent()) {
+			fare = Math.max(fare, drtConfig.getDrtFareParams().get().minFarePerTrip);
+		}
 
 		double detour = Math.max(1, rnd.nextGaussian(currentEst.meanDetour, config.randomization * currentEst.stdDetour));
 		double waitTime = Math.max(0, rnd.nextGaussian(currentEst.meanWait, config.randomization * currentEst.stdWait));
 
-		return new Estimate(route.getDistance() * detour, route.getDirectRideTime() * detour, waitTime, fare);
+		return new Estimate(route.getDistance() * detour, route.getDirectRideTime() * detour, waitTime, fare, currentEst.rejectionRate);
 	}
 
 	/**
@@ -151,15 +169,17 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 		private double stdWait;
 		private double meanDetour;
 		private double stdDetour;
+		private double rejectionRate;
 
 		@Override
 		public String toString() {
 			return "GlobalEstimate{" +
-					"meanWait=" + meanWait +
-					", stdWait=" + stdWait +
-					", meanDetour=" + meanDetour +
-					", stdDetour=" + stdDetour +
-					'}';
+				"meanWait=" + meanWait +
+				", stdWait=" + stdWait +
+				", meanDetour=" + meanDetour +
+				", stdDetour=" + stdDetour +
+				", rejectionRate=" + rejectionRate +
+				'}';
 		}
 	}
 }
