@@ -63,7 +63,7 @@ public class ParkingListener implements IterationEndsListener, MobsimBeforeSimSt
 		BufferedWriter bw = IOUtils.getBufferedWriter(output.getIterationFilename(iteration, "parkingStatsPerTimeSteps.csv"));
 		try {
 
-			String header = "time;rejectedReservations;foundParking;unpark";
+			String header = "time;rejectedParkingRequest;foundParking;unpark";
 			bw.write(header);
 			bw.newLine();
 			for (String s : produceBeneStatistics){
