@@ -87,7 +87,7 @@ public class TravelTimeCalculatorTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		TimeSlotComputation travelTimeAggregator = new TimeSlotComputation( numSlots, binSize );
 		TravelTimeGetter travelTimeGetter = new AveragingTravelTimeGetter( travelTimeAggregator ) ;
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
+		doTravelTimeCalculatorTest(scenario,
 				travelTimeAggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
@@ -102,80 +102,11 @@ public class TravelTimeCalculatorTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		TimeSlotComputation aggregator = new TimeSlotComputation( numSlots, binSize );
 		TravelTimeGetter travelTimeGetter = new LinearInterpolatingTravelTimeGetter( numSlots, binSize, aggregator );
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
+		doTravelTimeCalculatorTest(scenario,
 				aggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
-	@Test public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
-
-		int endTime = 30*3600;
-		int binSize = 15*60;
-		int numSlots = (endTime / binSize) + 1;
-
-		// by default: averaging travel times
-		String compareFile = utils.getClassInputDirectory() + "link10_ttimes.txt";
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		TimeSlotComputation travelTimeAggregator = new TimeSlotComputation( numSlots, binSize );
-		TravelTimeGetter travelTimeGetter = new AveragingTravelTimeGetter( travelTimeAggregator ) ;
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-				travelTimeAggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
-	}
-
-	@Test public final void testTravelTimeCalculator_HashMap_Optimistic_LinearInterpolation() throws IOException {
-		String compareFile;
-		MutableScenario scenario;
-		TimeSlotComputation aggregator;
-
-		int endTime = 30*3600;
-		int binSize = 15*60;
-		int numSlots = (endTime / binSize) + 1;
-
-		// use linear interpolation
-		compareFile = utils.getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
-		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		aggregator = new TimeSlotComputation(numSlots, binSize);
-		TravelTimeGetter travelTimeGetter = new LinearInterpolatingTravelTimeGetter( numSlots, binSize, aggregator );
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-				aggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
-	}
-
-//	@Test public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
-//		String compareFile;
-//		MutableScenario scenario;
-//		TravelTimeAggregator aggregator;
-//
-//		int endTime = 12*3600;
-//		int binSize = 1*60;
-//		int numSlots = (endTime / binSize) + 1;
-//
-//		// by default: averaging travel times
-//		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
-//		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
-//		assertEquals(AveragingTravelTimeGetter.class, aggregator.getTravelTimeGetter().getClass());
-//		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-//				aggregator, binSize, endTime, compareFile, false);
-//	}
-//
-//	@Test public final void testTravelTimeCalculator_HashMap_Pessimistic_LinearInterpolation() throws IOException {
-//		String compareFile;
-//		MutableScenario scenario;
-//		TravelTimeAggregator aggregator;
-//
-//		int endTime = 12*3600;
-//		int binSize = 1*60;
-//		int numSlots = (endTime / binSize) + 1;
-//
-//		// use linear interpolation
-//		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic_linearinterpolation.txt";
-//		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
-//		aggregator.connectTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
-//		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-//				aggregator, binSize, endTime, compareFile, false);
-//	}
-
-	private static void doTravelTimeCalculatorTest( final MutableScenario scenario, final TravelTimeDataFactory ttDataFactory,
+	private static void doTravelTimeCalculatorTest( final MutableScenario scenario,
 									final TimeSlotComputation aggregator, final int timeBinSize, final int endTime,
 									final String compareFile, final boolean generateNewData, String inputDirectory,
 									TravelTimeGetter travelTimeGetter ) throws IOException {
@@ -195,9 +126,8 @@ public class TravelTimeCalculatorTest {
 		EventsManager events2 = EventsUtils.createEventsManager();
 
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, endTime, scenario.getConfig().travelTimeCalculator());
-		ttcalc.travelTimeGetter = travelTimeGetter ;
-		ttcalc.aggregator = aggregator ;
-		ttcalc.setTtDataFactory( ttDataFactory );
+		ttcalc.travelTimeGetter = travelTimeGetter;
+		ttcalc.aggregator = aggregator;
 		events2.addHandler(ttcalc);
 		events2.initProcessing();
 		for (Event e : collector.getEvents()) {
